@@ -696,6 +696,26 @@ class Command implements SignalableCommandInterface
         if (!$attribute && '__invoke' === $reflection->getName()) {
             /** @var AsCommand|null $attribute */
             $attribute = ($class->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+        } elseif ($attribute && '__invoke' !== $reflection->getName() && $prefix = ($class->getAttributes(AsCommand::class)[0] ?? null)?->newInstance()->name) {
+            // the class-level name prefixes the names declared on methods
+            $hidden = str_starts_with($prefix, '|');
+            if ($prefix = explode('|', ltrim($prefix, '|'))[0]) {
+                $names = explode('|', $attribute->name);
+                if ($hidden && '' !== $names[0]) {
+                    // the method commands of a hidden class-level command are hidden too
+                    array_unshift($names, '');
+                }
+                $attribute->name = implode('|', array_map(static function (string $name) use ($prefix, $class, $reflection) {
+                    if ('' === $name) {
+                        return $name;
+                    }
+                    if (str_starts_with($name, $prefix.':')) {
+                        throw new LogicException(\sprintf('The name "%s" of the command "%s::%s()" repeats the class-level name "%s": method-level names are relative to it, use "%s" instead.', $name, $class->getName(), $reflection->getName(), $prefix, substr($name, \strlen($prefix) + 1)));
+                    }
+
+                    return $prefix.':'.$name;
+                }, $names));
+            }
         }
 
         if (!$attribute) {

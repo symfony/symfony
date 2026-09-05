@@ -209,7 +209,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->setDefinition('my-command', $definition);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must either be a subclass of "Symfony\Component\Console\Command\Command" or have an "__invoke()" method');
+        $this->expectExceptionMessage('The service "my-command" tagged "console.command" must either be a subclass of "Symfony\Component\Console\Command\Command", have an "__invoke()" method, or declare method-level commands.');
 
         $container->compile();
     }
@@ -252,19 +252,79 @@ class AddConsoleCommandPassTest extends TestCase
         /** @var ContainerCommandLoader $loader */
         $loader = $container->get('console.command_loader');
 
-        $this->assertSame(['app:cmd0', 'app:cmd1', 'app:cmd2'], $loader->getNames());
+        $this->assertSame(['app:cmd0', 'app:cmd0:cmd1', 'app:cmd0:cmd2'], $loader->getNames());
 
         $commandTester = new CommandTester($loader->get('app:cmd0'));
         $this->assertSame(Command::SUCCESS, $commandTester->execute([]));
         $this->assertSame('cmd0', $commandTester->getDisplay());
 
-        $commandTester = new CommandTester($loader->get('app:cmd1'));
+        $commandTester = new CommandTester($loader->get('app:cmd0:cmd1'));
         $this->assertSame(Command::SUCCESS, $commandTester->execute([]));
         $this->assertSame('cmd1', $commandTester->getDisplay());
 
-        $commandTester = new CommandTester($loader->get('app:cmd2'));
+        $commandTester = new CommandTester($loader->get('app:cmd0:cmd2'));
         $this->assertSame(Command::SUCCESS, $commandTester->execute([]));
         $this->assertSame('cmd2', $commandTester->getDisplay());
+    }
+
+    public function testProcessPrefixesMethodCommandsWithTheClassLevelName()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = new Definition(GroupedCommands::class);
+        $definition->addTag('console.command');
+        $definition->addTag('console.command', ['method' => 'one']);
+        $definition->addTag('console.command', ['method' => 'two']);
+        $definition->addTag('console.command', ['method' => 'three', 'command' => 'tagged|t']);
+        $container->setDefinition(GroupedCommands::class, $definition);
+
+        new AddConsoleCommandPass()->process($container);
+        $container->compile();
+
+        /** @var ContainerCommandLoader $loader */
+        $loader = $container->get('console.command_loader');
+
+        $this->assertSame(['group:one', 'group:1', 'group:sub:two', 'group:tagged', 'group:t'], $loader->getNames());
+        $this->assertFalse($container->has(GroupedCommands::class.'.command'), 'A class-level attribute without __invoke() only names the prefix.');
+        $this->assertTrue($loader->get('group:one')->isHidden());
+        $this->assertSame(['group:1'], $loader->get('group:one')->getAliases());
+        $this->assertSame('Sub two', $loader->get('group:sub:two')->getDescription());
+    }
+
+    public function testProcessHidesTheMethodCommandsOfAHiddenClassLevelName()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = new Definition(HiddenGroupCommands::class);
+        $definition->addTag('console.command');
+        $definition->addTag('console.command', ['method' => 'one']);
+        $definition->addTag('console.command', ['method' => 'two']);
+        $container->setDefinition(HiddenGroupCommands::class, $definition);
+
+        new AddConsoleCommandPass()->process($container);
+        $container->compile();
+
+        /** @var ContainerCommandLoader $loader */
+        $loader = $container->get('console.command_loader');
+
+        $this->assertSame(['hidden-group:one', 'hidden-group:two'], $loader->getNames());
+        $this->assertTrue($loader->get('hidden-group:one')->isHidden());
+        $this->assertTrue($loader->get('hidden-group:two')->isHidden());
+    }
+
+    public function testProcessRejectsAMethodCommandRepeatingTheClassLevelName()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = new Definition(RepeatedPrefixCommands::class);
+        $definition->addTag('console.command');
+        $definition->addTag('console.command', ['method' => 'one']);
+        $container->setDefinition(RepeatedPrefixCommands::class, $definition);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The name "group:one" of the command "Symfony\Component\Console\Tests\DependencyInjection\RepeatedPrefixCommands::one()" repeats the class-level name "group": method-level names are relative to it, use "one" instead.');
+
+        new AddConsoleCommandPass()->process($container);
     }
 
     public function testProcessOnChildDefinitionWithClass()
@@ -444,6 +504,53 @@ class DescriptionWithPercentageSignsCommand
 {
     public function __invoke(): void
     {
+    }
+}
+
+#[AsCommand(name: 'group', description: 'A group without code of its own')]
+class GroupedCommands
+{
+    #[AsCommand(name: 'one', aliases: ['1'], hidden: true)]
+    public function one(): int
+    {
+        return Command::SUCCESS;
+    }
+
+    #[AsCommand(name: 'sub:two', description: 'Sub two')]
+    public function two(): int
+    {
+        return Command::SUCCESS;
+    }
+
+    public function three(): int
+    {
+        return Command::SUCCESS;
+    }
+}
+
+#[AsCommand(name: 'hidden-group', hidden: true)]
+class HiddenGroupCommands
+{
+    #[AsCommand(name: 'one')]
+    public function one(): int
+    {
+        return Command::SUCCESS;
+    }
+
+    #[AsCommand(name: 'two', hidden: true)]
+    public function two(): int
+    {
+        return Command::SUCCESS;
+    }
+}
+
+#[AsCommand(name: 'group')]
+class RepeatedPrefixCommands
+{
+    #[AsCommand(name: 'group:one')]
+    public function one(): int
+    {
+        return Command::SUCCESS;
     }
 }
 

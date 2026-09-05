@@ -24,6 +24,7 @@ use Symfony\Component\Console\Attribute\MapDateTime;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
@@ -804,6 +805,59 @@ class InvokableCommandTest extends TestCase
         self::assertStringContainsString('Enter a value:', $tester->getDisplay());
         self::assertStringContainsString('Value must be "valid"', $tester->getDisplay());
         self::assertStringContainsString('Value: valid', $tester->getDisplay());
+    }
+
+    public function testSignalsOfAnInvokableWrappedInAClosure()
+    {
+        $invokable = new class implements SignalableCommandInterface {
+            public array $handled = [];
+
+            public function __invoke(): int
+            {
+                return 0;
+            }
+
+            public function run(): int
+            {
+                return 0;
+            }
+
+            public function getSubscribedSignals(): array
+            {
+                return [1, 2];
+            }
+
+            public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+            {
+                $this->handled[] = $signal;
+
+                return 3;
+            }
+        };
+
+        foreach ([\Closure::fromCallable($invokable), \Closure::fromCallable([$invokable, 'run']), $invokable->run(...)] as $code) {
+            $command = new Command('signal');
+            $command->setCode($code);
+
+            $this->assertSame([1, 2], $command->getSubscribedSignals());
+            $this->assertSame(3, $command->handleSignal(1));
+        }
+
+        $this->assertSame([1, 1, 1], $invokable->handled);
+    }
+
+    public function testAClosureBoundToTheCommandDoesNotHandleItsSignals()
+    {
+        $command = new class('signal') extends Command {
+            public function __construct(string $name)
+            {
+                parent::__construct($name);
+                $this->setCode(static fn () => 0);
+            }
+        };
+
+        $this->assertSame([], $command->getSubscribedSignals());
+        $this->assertFalse($command->handleSignal(1));
     }
 }
 

@@ -21,7 +21,7 @@ final class AsCommand
     public ?string $help;
 
     /**
-     * @param string                          $name        The name of the command, used when calling it (i.e. "cache:clear")
+     * @param string                          $name        The name of the command, used when calling it (i.e. "cache:clear"); on a method, it is relative to the name of the class-level attribute, if any
      * @param string|(callable():string)|null $description The description of the command, displayed with the help page
      * @param string[]                        $aliases     The list of aliases of the command. The command will be executed when using one of them (i.e. "cache:clean")
      * @param bool                            $hidden      If true, the command won't be shown when listing all the available commands, but it can still be run as any other command

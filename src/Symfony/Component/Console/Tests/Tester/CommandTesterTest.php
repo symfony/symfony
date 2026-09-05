@@ -391,11 +391,11 @@ class CommandTesterTest extends TestCase
         $application->setAutoExit(false);
 
         $bufferedOutput = new BufferedOutput();
-        $statusCode = $application->run(new ArrayInput(['command' => 'help', 'command_name' => 'app:cmd1']), $bufferedOutput);
+        $statusCode = $application->run(new ArrayInput(['command' => 'help', 'command_name' => 'app:cmd0:cmd1']), $bufferedOutput);
 
         $expectedOutput = <<<TXT
             Usage:
-              app:cmd1 [<name>]
+              app:cmd0:cmd1 [<name>]
 
             Arguments:
               name %S

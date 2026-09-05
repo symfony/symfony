@@ -15,9 +15,11 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
 use Symfony\Component\Console\ArgumentResolver\ArgumentResolverInterface;
 use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Interact;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
+use Symfony\Component\Console\CommandChain;
 use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -105,6 +107,16 @@ class InvokableCommand implements SignalableCommandInterface
                 }
             }
         }
+
+        // the options listed in the attribute come after the ones the parameters declare
+        $attribute = ($this->invokable->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+        if (!$attribute && '__invoke' === $this->invokable->getName()) {
+            $attribute = ($this->invokable->getClosureScopeClass()?->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+        }
+
+        foreach ($attribute?->options ?? [] as $option) {
+            $definition->addOption($option);
+        }
     }
 
     public function getCode(): callable
@@ -150,6 +162,7 @@ class InvokableCommand implements SignalableCommandInterface
                     SymfonyStyle::class => new SymfonyStyle($input, $output, $this->command->getApplication()?->getDispatcher()),
                     Cursor::class => new Cursor($output),
                     Application::class => $this->command->getApplication(),
+                    CommandChain::class => $this->getCommandChain($input),
                     Command::class, self::class => $this->command,
                     default => false,
                 };
@@ -252,5 +265,16 @@ class InvokableCommand implements SignalableCommandInterface
                 $this->interactions[] = new Interaction($invokableThis, $attribute);
             }
         }
+    }
+
+    /**
+     * The application's chain is stale when the command runs from another one.
+     */
+    private function getCommandChain(InputInterface $input): CommandChain
+    {
+        $chain = $this->command->getApplication()?->getCommandChain();
+        $commands = $chain?->getCommands();
+
+        return $commands && $this->command === end($commands) ? $chain : new CommandChain([[$this->command, $input]]);
     }
 }

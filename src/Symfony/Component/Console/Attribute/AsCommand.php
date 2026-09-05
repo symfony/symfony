@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Attribute;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Input\InputOption;
+
 /**
  * Service tag to autoconfigure commands.
  */
@@ -27,6 +30,7 @@ final class AsCommand
      * @param bool                            $hidden      If true, the command won't be shown when listing all the available commands, but it can still be run as any other command
      * @param string|(callable():string)|null $help        The help content of the command, displayed with the help page
      * @param string[]                        $usages      The list of usage examples, displayed with the help page
+     * @param InputOption[]                   $options     Options to add after the ones the parameters of the command declare
      */
     public function __construct(
         public string $name,
@@ -35,7 +39,14 @@ final class AsCommand
         bool $hidden = false,
         string|callable|null $help = null,
         public array $usages = [],
+        public array $options = [],
     ) {
+        foreach ($options as $option) {
+            if (!$option instanceof InputOption) {
+                throw new InvalidArgumentException(\sprintf('The "options" of the "%s" command must be "%s" instances, "%s" given.', $name, InputOption::class, get_debug_type($option)));
+            }
+        }
+
         $this->description = null === $description || \is_string($description) ? $description : $description();
         $this->help = null === $help || \is_string($help) ? $help : $help();
 

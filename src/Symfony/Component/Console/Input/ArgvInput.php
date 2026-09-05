@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Input;
 
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Exception\UnexpectedArgumentException;
 
 /**
  * ArgvInput represents an input coming from the CLI arguments.
@@ -42,7 +43,7 @@ class ArgvInput extends Input
 {
     /** @var list<string> */
     private array $tokens;
-    private array $parsed;
+    private array $parsed = [];
 
     /** @param list<string>|null $argv */
     public function __construct(?array $argv = null, ?InputDefinition $definition = null)
@@ -74,7 +75,16 @@ class ArgvInput extends Input
         $parseOptions = true;
         $this->parsed = $this->tokens;
         while (null !== $token = array_shift($this->parsed)) {
-            $parseOptions = $this->parseToken($token, $parseOptions);
+            try {
+                $parseOptions = $this->parseToken($token, $parseOptions);
+            } catch (UnexpectedArgumentException $e) {
+                if (!$this->definition->ignoresExtraArguments()) {
+                    throw $e;
+                }
+
+                array_unshift($this->parsed, $token);
+                break;
+            }
         }
     }
 
@@ -159,7 +169,7 @@ class ArgvInput extends Input
     /**
      * Parses an argument.
      *
-     * @throws RuntimeException When too many arguments are given
+     * @throws UnexpectedArgumentException When too many arguments are given
      */
     private function parseArgument(string $token): void
     {
@@ -196,7 +206,7 @@ class ArgvInput extends Input
                 $message = \sprintf('No arguments expected, got "%s".', $token);
             }
 
-            throw new RuntimeException($message);
+            throw new UnexpectedArgumentException($message);
         }
     }
 
@@ -378,6 +388,18 @@ class ArgvInput extends Input
         }
 
         return $parameters;
+    }
+
+    /**
+     * Returns the tokens left unparsed when the definition ignores extra arguments.
+     *
+     * @see InputDefinition::setIgnoreExtraArguments()
+     *
+     * @return list<string>
+     */
+    public function getUnparsedTokens(): array
+    {
+        return $this->parsed;
     }
 
     /**

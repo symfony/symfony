@@ -26,7 +26,7 @@ class MethodBasedTestCommand
         return Command::SUCCESS;
     }
 
-    #[AsCommand('app:cmd1')]
+    #[AsCommand('cmd1')]
     public function cmd1(OutputInterface $o, #[Argument] ?string $name = null): int
     {
         $o->write('cmd1');
@@ -34,7 +34,7 @@ class MethodBasedTestCommand
         return Command::SUCCESS;
     }
 
-    #[AsCommand('app:cmd2')]
+    #[AsCommand('cmd2')]
     public function cmd2(OutputInterface $o): int
     {
         $o->write('cmd2');

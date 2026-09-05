@@ -52,8 +52,21 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
             }
 
-            foreach ($commands as $tags) {
-                $this->registerCommand($container, $r, $id, $class, $tags, $definition, $serviceIds, $lazyCommandMap, $lazyCommandRefs);
+            // the class-level name prefixes the names declared on methods
+            $prefix = $commands['__invoke'][0]['command'] ?? $this->getCommandAttribute($r)?->name;
+            if (null !== $prefix) {
+                $hidden = str_starts_with($prefix, '|') ? '|' : '';
+                $prefix = explode('|', ltrim($prefix, '|'))[0];
+                $prefix = '' === $prefix ? null : $hidden.$prefix;
+            }
+
+            foreach ($commands as $method => $tags) {
+                if ('__invoke' === $method && 1 < \count($commands) && !$r->hasMethod('__invoke') && !$r->isSubclassOf(Command::class)) {
+                    // the class-level attribute only names the prefix of the method-level commands
+                    continue;
+                }
+
+                $this->registerCommand($container, $r, $id, $class, $tags, $definition, $serviceIds, $lazyCommandMap, $lazyCommandRefs, '__invoke' === $method ? null : $prefix);
             }
         }
 
@@ -66,13 +79,13 @@ class AddConsoleCommandPass implements CompilerPassInterface
         $container->setParameter('console.command.ids', $serviceIds);
     }
 
-    private function registerCommand(ContainerBuilder $container, \ReflectionClass $reflection, string $id, string $class, array $tags, Definition $definition, array &$serviceIds, array &$lazyCommandMap, array &$lazyCommandRefs): void
+    private function registerCommand(ContainerBuilder $container, \ReflectionClass $reflection, string $id, string $class, array $tags, Definition $definition, array &$serviceIds, array &$lazyCommandMap, array &$lazyCommandRefs, ?string $prefix = null): void
     {
         if (!$reflection->isSubclassOf(Command::class)) {
             $method = $tags[0]['method'] ?? '__invoke';
 
             if (!$reflection->hasMethod($method)) {
-                throw new InvalidArgumentException(\sprintf('The service "%s" tagged "%s" must either be a subclass of "%s" or have an "%s()" method.', $id, 'console.command', Command::class, $method));
+                throw new InvalidArgumentException(\sprintf('The service "%s" tagged "%s" must either be a subclass of "%s", have an "%s()" method%s.', $id, 'console.command', Command::class, $method, '__invoke' === $method ? ', or declare method-level commands' : ''));
             }
 
             $reflection = $reflection->getMethod($method);
@@ -103,9 +116,30 @@ class AddConsoleCommandPass implements CompilerPassInterface
         $definition->addTag('container.no_preload');
 
         $attribute = $this->getCommandAttribute($reflection);
-        $defaultName = $attribute?->name;
-        $aliases = str_replace('%', '%%', $tags[0]['command'] ?? $defaultName ?? '');
-        $aliases = explode('|', $aliases);
+        $aliases = $tags[0]['command'] ?? $attribute?->name ?? '';
+
+        if (null !== $prefix && '' !== $aliases) {
+            $names = explode('|', $aliases);
+            if (str_starts_with($prefix, '|')) {
+                // the method commands of a hidden class-level command are hidden too
+                $prefix = substr($prefix, 1);
+                if ('' !== $names[0]) {
+                    array_unshift($names, '');
+                }
+            }
+            $aliases = implode('|', array_map(static function (string $name) use ($prefix, $reflection) {
+                if ('' === $name) {
+                    return $name;
+                }
+                if (str_starts_with($name, $prefix.':')) {
+                    throw new InvalidArgumentException(\sprintf('The name "%s" of the command "%s::%s()" repeats the class-level name "%s": method-level names are relative to it, use "%s" instead.', $name, $reflection->class, $reflection->name, $prefix, substr($name, \strlen($prefix) + 1)));
+                }
+
+                return $prefix.':'.$name;
+            }, $names));
+        }
+
+        $aliases = explode('|', str_replace('%', '%%', $aliases));
         $commandName = array_shift($aliases);
 
         if ($isHidden = '' === $commandName) {

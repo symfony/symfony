@@ -13,6 +13,20 @@ AssetMapper
 
  * Add argument `$useEsm` to `ImportMapConfigReader::createRemoteEntry()`
 
+Console
+-------
+
+ * [BC BREAK] A token that names a registered sub-command runs it instead of binding to an argument of its
+   parent: with both `app:import` and `app:import:users` registered, `app:import users` and `app import users`
+   now run `app:import:users`, where `users` was bound to the `file` argument of `app:import`. Write
+   `app:import -- users` to bind it as an argument
+ * [BC BREAK] Positional `ArrayInput` parameters bind to the argument slots in order, where they were validated
+   by index and never read: `new ArrayInput(['foo'])` binds `foo` to the first argument of the definition
+ * A bare namespace does not dispatch `ConsoleEvents::ERROR` anymore when it lists its commands: nothing fails,
+   the listing is still written on the error output and the exit code is still `1`
+ * The application listing collapses the commands below a registered command to that command's own line;
+   `list <namespace>`, the `--raw` option and the `json` and `md` formats keep listing every command
+
 Crowdin Translation Provider
 ----------------------------
 

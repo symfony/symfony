@@ -22,6 +22,7 @@ use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Attribute\ValueResolver;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\CommandChain;
 use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\RawInputInterface;
@@ -43,6 +44,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
         SymfonyStyle::class,
         Cursor::class,
         Application::class,
+        CommandChain::class,
         Command::class,
     ];
 

@@ -360,6 +360,18 @@ class InputDefinitionTest extends TestCase
         $this->assertSame($defaults, $definition->getOptionDefaults(), '->getOptionDefaults() returns the default values for all options');
     }
 
+    public function testSetIgnoreExtraArguments()
+    {
+        $definition = new InputDefinition();
+        $this->assertFalse($definition->ignoresExtraArguments());
+
+        $definition->setIgnoreExtraArguments();
+        $this->assertTrue($definition->ignoresExtraArguments());
+
+        $definition->setIgnoreExtraArguments(false);
+        $this->assertFalse($definition->ignoresExtraArguments());
+    }
+
     #[DataProvider('getGetSynopsisData')]
     public function testGetSynopsis(InputDefinition $definition, $expectedSynopsis, $message = null)
     {

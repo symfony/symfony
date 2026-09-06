@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-09-05T21:42:47Z
+
+These failures are not caused by this change. `RedisProxiesTest::testRelayProxy` compares the committed `RelayProxy` with the installed extension, and the runners now install relay 0.50.0, which added `himport` and made `lmovem`/`blmovem` nullable. The same base commit passed on 6.4 before that release. The Windows job fails on a flaky Redis integration test in Messenger.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T07:41:25Z
+
+Thank you for the patience, and for tracking the reset down to the peek path.
+
+I pushed one change on top of your commit. The reset had to be scoped.
+
+`RequestRateLimiterInterface::reset()` is all-or-nothing, and `AbstractRequestRateLimiter::reset()` loops over everything `getLimiters()` returns, so it also cleared the global per-IP limiter. Your `UNTOUCHED_LIMITER_ATTRIBUTE` guard cannot hold that back, because `getMinimalRateLimit()` returns whichever limiter has the fewest remaining tokens, which is usually the IP one once anything has touched it.
+
+Reproduced with the config from #65858 (`ip_login` 50, `username_ip_login` 5). The client fails on 49 usernames, leaving one token so its own login still passes, logs in to an account it controls, then repeats:
+
+```
+=== with the first version of this PR ===    === 6.4 ===
+round 1:  49 guesses, own login: ok          round 1: 49 guesses, own login: ok
+round 2:  98 guesses, own login: ok          round 2: 50 guesses, own login: BLOCKED
+round 3: 147 guesses, own login: ok          round 3: 50 guesses, own login: BLOCKED
+round 4: 196 guesses, own login: ok          round 4: 50 guesses, own login: BLOCKED
+```
+
+The IP limit is what bounds how many usernames one client may try, so it has to survive the successful login of any one of them. `DefaultLoginRateLimiter::reset()` now clears the username+IP limit only, which needs no new API and fits 6.4. Limiters that are not peekable already reached `reset()` on every successful login, so they had the same hole and get it closed too.
+
+`testSuccessfulLoginKeepsTheGlobalLimit` covers it. Your two tests are unchanged, and the reported case still gives a fresh five attempts after a successful login.

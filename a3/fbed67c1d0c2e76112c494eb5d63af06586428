@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T12:56:18Z
+
+I hit this independently while triaging the red `high-deps` job and opened #65872 before seeing yours; I closed it in favour of this one, which is the same fix plus the deprecation mine lacked.
+
+Reproduced and verified on my side. The bisect: `bad5327fcee` green, `c0ae13940d5` red, and the green run before and the red runs after all installed the same `web-token/jwt-library 4.3.x-dev 285bb17`, so the library is not the variable. `symfony/security-http` is, moving from `b6d6a09` to `e8456cd`.
+
+Worth adding to the description, because it is wider than the CI job: `symfony/security-bundle` 8.1 requires `symfony/security-http: ^8.1`, which resolves to `8.2.x-dev`. Anyone pinning the bundle without pinning the component gets 401s on every OIDC access token, not just the cross-version leg. That is also why the 7.4 PRs are red: their `^7.4|^8.0` resolves to 8.2 too.
+
+With your handler dropped into an 8.1 tree, `AccessTokenTest::testOidcSuccess` goes from `Failures: 2` to `OK (2 tests, 6 assertions, 1 deprecation)`. The deprecation is correct there: the 8.1 definition of `security.access_token_handler.oidc` stops at the seventh argument. On 8.2 the definition passes `false` at index 8, so no bundle user will see it.

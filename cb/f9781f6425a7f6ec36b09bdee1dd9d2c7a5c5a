@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T07:45:47Z
+
+Thank you for the patience, and for the analysis, which made the review short.
+
+I confirmed your precedence claim with the parser PHPStan uses: `callable(string):string[]` and `callable(string):(string[])` produce an identical AST, a `CallableTypeNode` whose return type is `ArrayTypeNode<string>`.
+
+I changed the form on top of your commit. Writing the return type as `array<string>` removes the trailing `[]` entirely, so nothing is left for a parser to bind either way. It says the same thing to PHPStan, it needs no nested parentheses, and it cannot regress: someone tidying `(string[])` back to `string[]` would reintroduce the Mago error, while `array<string>` has no such shape to tidy. `array<...>` is also the more common form in Console already.
+
+Retitled to match, since the diff no longer adds parentheses.

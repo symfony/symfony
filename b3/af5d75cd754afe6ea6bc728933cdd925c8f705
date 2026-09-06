@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T07:57:03Z
+
+Retargeted to 8.1 and rewritten in that branch's shape.
+
+The defect is in released code: 8.1's `ScreenWriter` has the same `maxLinesRendered` viewport logic, on plain arrays instead of `LineBufferInterface`. Reproduced there directly, 5-row terminal, 107 lines of content:
+
+```
+                             expected                      8.1
+one trailing line removed    B C D E F                     C D E F (blank)
+three trailing lines removed transcript 99 A B C D         C D (blank) (blank) (blank)
+```
+
+The test also changed. The case it covered, removing two leading lines, is the one where `writeInternal()` already fell through to `fullRender()`, so the screen came out right on base and only the scrollback wipe and the full-buffer read failed. It is now a data provider over four shrink shapes, two of which fail on base on the screen content itself, which is the reported symptom. The read count is a separate test, since it is a different property.
+
+Dropped the CHANGELOG entry: this is a bugfix, and the Tui CHANGELOG carries no `Fix` lines.
+
+The 8.2 resolution is in the description, and I ran it there: `OK (1981 tests, 5792 assertions)`.

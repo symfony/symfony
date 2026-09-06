@@ -210,6 +210,7 @@ class OidcTokenHandlerTest extends TestCase
             ['https://www.example.com'],
             'sub',
             $loggerMock,
+            enforceAtJwtType: true,
         ))->getUserBadgeFrom($token);
 
         $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
@@ -245,6 +246,7 @@ class OidcTokenHandlerTest extends TestCase
             ['https://www.example.com'],
             'sub',
             $loggerMock,
+            enforceAtJwtType: true,
         ))->getUserBadgeFrom($token);
     }
 

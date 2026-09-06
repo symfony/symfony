@@ -73,8 +73,9 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
      * @param bool $enforceAtJwtType Whether the "typ" header of the token must be "at+jwt" or "application/at+jwt",
      *                               which RFC 9068 §4 requires from a JWT access token. This is what tells an access
      *                               token apart from the ID token the provider issues for the same audience, which
-     *                               would otherwise pass every other check. Turn it off only for providers that do
+     *                               would otherwise pass every other check. Keep it off only for providers that do
      *                               not follow the profile and keep emitting a plain "JWT" type.
+     *                               Defaults to false in 8.2 and will default to true in 9.0.
      */
     public function __construct(
         private AlgorithmManager $signatureAlgorithm,
@@ -85,7 +86,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         private ?LoggerInterface $logger = null,
         private ClockInterface $clock = new Clock(),
         private int $allowedTimeDrift = 0,
-        private bool $enforceAtJwtType = true,
+        private bool $enforceAtJwtType = false,
     ) {
     }
 

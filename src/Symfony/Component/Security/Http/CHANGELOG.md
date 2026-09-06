@@ -25,7 +25,7 @@ CHANGELOG
  * Add the `user_data_source` and `user_identifier_claim` options to `OidcLoginAuthenticator` to pick where the user claims are read from and the claim the user identifier is read from
  * Add `OidcEndSessionListener` for RP-Initiated Logout via the OIDC `end_session_endpoint`
  * Add `UnsupportedReasons`, held by the `SecurityRequestAttributes::UNSUPPORTED_REASONS` request attribute while the profiler is enabled, so that `supports()` can tell why an authenticator did not support a request
- * Make `OidcTokenHandler` reject the tokens whose `typ` header is not the `at+jwt` RFC 9068 requires from an access token, and add the `$enforceAtJwtType` argument to turn the check off
+ * Add the `$enforceAtJwtType` argument to `OidcTokenHandler` to reject the tokens whose `typ` header is not the `at+jwt` RFC 9068 requires from an access token; it defaults to `false` in 8.2 and will default to `true` in 9.0
  * Make `OidcTokenGenerator` emit the `at+jwt` type header RFC 9068 requires from an access token
 
 8.1

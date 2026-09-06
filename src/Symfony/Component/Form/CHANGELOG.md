@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `BoundsType` to render a lower and an upper bound of the same inner type
  * Add `#[AsFormType]` and `#[FormField]` attributes to derive a form type from the properties of a data class
  * Add the `allow_array_submission` option to let `PRE_SUBMIT` listeners turn a submitted array into data the form accepts
  * Add support for grouping and nested steps in `FormFlowType`

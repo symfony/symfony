@@ -69,6 +69,7 @@ class ValidatorExtension extends AbstractExtension
     {
         return [
             new Type\FormTypeValidatorExtension($this->validator, $this->violationMapper, $this->formRenderer, $this->translator),
+            new Type\BoundsTypeValidatorExtension(),
             new Type\RepeatedTypeValidatorExtension(),
             new Type\SubmitTypeValidatorExtension(),
         ];

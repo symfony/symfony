@@ -46,6 +46,7 @@ class CoreExtension extends AbstractExtension
         return [
             new Type\FormType($this->propertyAccessor),
             new Type\BirthdayType(),
+            new Type\BoundsType($this->translator),
             new Type\CheckboxType(),
             new Type\ChoiceType($this->choiceListFactory, $this->translator),
             new Type\CollectionType(),

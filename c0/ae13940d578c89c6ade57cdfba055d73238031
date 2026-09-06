@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T09:46:09Z
+
+I pushed one test and a changelog split on top of your commit.
+
+`enableJweSupport()` has no test coverage in the component, and the encrypted path is where the placement of this check matters. `testEnforcesTheAccessTokenTypeInsideAnEncryptedToken` covers it: the type sits in the signed token, so the check only works once the JWE is decrypted, which is where you put it. I checked what happens otherwise by moving the check onto the outer token before decryption, and every encrypted token is then rejected, valid ones included. Only the new test catches that.
+
+It is also what answers the "why not do this in userland" question. A decorator around the handler can read the header of a plain JWS and reject an ID token, but it sees the JWE header on an encrypted token, so it cannot do this at all. `decryptIfNeeded()` is private, so there is no way in from outside.
+
+I confirmed the rest against the constraint: `CallableChecker` and the third argument of `HeaderCheckerManager::check()` both exist in `web-token/jwt-library` 3.3.2, with the same signatures. Worth stating because the low-deps job resolves this component to 4.0.7, so the `^3.3.2` leg of the constraint is never exercised by CI.
+
+Split the `Security/Http` changelog entry in two, since the generator emitting the header is a separate change from the handler argument.
+
+Suites: `Security/Http` OK (944 tests, 2234 assertions), `SecurityBundle` OK (546 tests, 1581 assertions). The red jobs are unrelated, they all stop on `RedisProxiesTest::testRelayProxy` in Cache.
+
+Left the two questions on the default open in the inline threads.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-06T10:09:04Z
+
+Thanks for the JWE test, it is the right one: it pins the placement of the check, and it is also the answer to "why not a decorator", since a decorator only ever sees the JWE header. Kept as is, along with the changelog split.
+
+Both your questions are applied, and the two inline threads carry the details. In short:
+
+- `$enforceAtJwtType` defaults to `true`. No FC layer in the component, and `UPGRADE-8.2.md` carries it as a BC BREAK under Security for direct instantiations.
+- The `enforce_at_jwt_type` node is `defaultNull()`, and not setting it is deprecated, resolving to `false`. An application coming from 8.1 through SecurityBundle sees no behaviour change until 9.0.
+
+One thing worth recording, since 8.2 is unreleased and that sometimes lets us skip a deprecation: it does not apply here. `OidcTokenHandler` shipped in 6.3 and has never read `typ` on any released version, 6.3 through 8.1. Only the option and the constructor argument are new, so their shape is free, but the enforcement cannot be turned on silently.
+
+Test side, `buildJWS()` and `buildJWSWithKey()` now emit `at+jwt` by default and keep a header override for the rejection cases. `invalidAccessTokens` in the functional suite gained an ID token and a token with no type, both 401 end to end, and the `access_token_oidc` fixtures set the option so the deprecation is not tripped anywhere else.
+
+Suites: `Security/Http` 944 tests, 2234 assertions, `SecurityBundle` 549 tests, 1591 assertions, both green with no unexpected deprecation. The red jobs are the `RedisProxiesTest::testRelayProxy` drift in Cache, which the 8.2 branch itself shows at the commit this is rebased on.

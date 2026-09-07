@@ -132,6 +132,8 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             ]);
         });
 
+        $this->assertFalse($container->hasAlias('lock.factory'));
+
         $this->expectException(OutOfBoundsException::class);
         $this->expectExceptionMessageMatches('/^The argument "2" doesn\'t exist.*\.$/');
 

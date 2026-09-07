@@ -31,8 +31,6 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
-use Symfony\Component\Lock\Lock;
-use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
@@ -173,7 +171,7 @@ class Configuration implements ConfigurationInterface
         $this->addPhpErrorsSection($rootNode);
         $this->addExceptionsSection($rootNode);
         $this->addWebLinkSection($rootNode);
-        $this->addLockSection($rootNode, $enableIfStandalone);
+        $this->addLockSection($rootNode);
         $this->addSemaphoreSection($rootNode);
         $this->addMessengerSection($rootNode, $enableIfStandalone);
         $this->addSchedulerSection($rootNode, $enableIfStandalone);
@@ -1311,85 +1309,15 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addLockSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addLockSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('lock')
-                    ->info('Lock configuration')
-                    ->acceptAndWrap(['string'], 'resources')
-                    ->{$enableIfStandalone('symfony/lock', Lock::class)}()
-                    ->beforeNormalization()
-                        ->ifArray()
-                        ->then(static function ($v) {
-                            if (!isset($v['resources']) && !isset($v['resource'])) {
-                                $v = ['resources' => $v];
-                                if (\array_key_exists('enabled', $v['resources'])) {
-                                    $v['enabled'] = $v['resources']['enabled'];
-                                    unset($v['resources']['enabled']);
-                                }
-                            }
-
-                            return $v;
-                        })
-                    ->end()
-                    ->addDefaultsIfNotSet()
-                    ->validate()
-                        ->ifTrue(static fn ($v) => $v['enabled'] && !$v['resources'])
-                        ->thenInvalid('At least one resource must be defined.')
-                    ->end()
-                    ->children()
-                        ->arrayNode('resources', 'resource')
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('name')
-                            ->defaultValue(['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']])
-                            ->acceptAndWrap(['string'], 'default')
-                            ->beforeNormalization()
-                                ->ifArray()
-                                ->then(static function ($v) {
-                                    if (!array_is_list($v)) {
-                                        return isset($v['service_id']) ? ['default' => $v] : $v;
-                                    }
-
-                                    $resources = [];
-                                    foreach ($v as $resource) {
-                                        [$name, $store] = \is_array($resource) && isset($resource['name'])
-                                            ? [$resource['name'], $resource['value']]
-                                            : ['default', $resource]
-                                        ;
-                                        $resources[] = [$name => \is_array($store) && !array_is_list($store) ? [$store] : $store];
-                                    }
-
-                                    return array_merge_recursive([], ...$resources);
-                                })
-                            ->end()
-                            ->prototype('array')
-                                ->info('Each store is a DSN, a store keyword, the id of a service holding a connection, or an array with a "service_id" key and an "advisory" key.')
-                                ->performNoDeepMerging()
-                                ->acceptAndWrap(['string'])
-                                // acceptAndWrap() doesn't list null as an accepted value on purpose,
-                                // yet the XML loader can yield some and we should convert them to 'null'
-                                ->beforeNormalization()->ifNull()->then(static fn () => ['null'])->end()
-                                ->beforeNormalization()
-                                    ->ifTrue(static fn ($v) => \is_array($v) && (isset($v['service_id']) || isset($v['advisory'])))
-                                    ->then(static fn ($v) => [$v])
-                                ->end()
-                                ->variablePrototype()
-                                    ->beforeNormalization()
-                                        ->ifArray()
-                                        ->then(static fn ($v) => ['service_id' => $v['service_id'] ?? null, 'advisory' => $v['advisory'] ?? false] + $v)
-                                    ->end()
-                                    ->validate()
-                                        ->ifTrue(static fn ($v) => \is_array($v) && (2 !== \count($v) || !\is_string($v['service_id']) || !\is_bool($v['advisory'])))
-                                        ->thenInvalid('A lock store must be a string or an array with a "service_id" string and an optional "advisory" boolean, got %s.')
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('lock')
+                    ->aliasOf('lock')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike([])
+                    ->beforeNormalization()->ifString()->then(static fn ($v) => ['resources' => $v])->end()
                 ->end()
             ->end()
         ;

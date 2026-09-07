@@ -27,7 +27,6 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
-use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
@@ -482,137 +481,6 @@ class ConfigurationTest extends TestCase
         yield [$createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.'];
     }
 
-    #[DataProvider('provideValidLockConfigurationTests')]
-    public function testValidLockConfiguration($lockConfig, $processedConfig)
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [[
-            'lock' => $lockConfig,
-        ]]);
-
-        $this->assertArrayHasKey('lock', $config);
-
-        $this->assertEquals($processedConfig, $config['lock']);
-    }
-
-    public static function provideValidLockConfigurationTests(): iterable
-    {
-        yield [null, ['enabled' => true, 'resources' => ['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']]]];
-
-        yield ['flock', ['enabled' => true, 'resources' => ['default' => ['flock']]]];
-        yield [['flock', 'semaphore'], ['enabled' => true, 'resources' => ['default' => ['flock', 'semaphore']]]];
-        yield [['foo' => 'flock', 'bar' => 'semaphore'], ['enabled' => true, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
-        yield [['foo' => ['flock', 'semaphore'], 'bar' => 'semaphore'], ['enabled' => true, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
-        yield [['default' => 'flock'], ['enabled' => true, 'resources' => ['default' => ['flock']]]];
-
-        yield [['enabled' => false, 'flock'], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
-        yield [['enabled' => false, ['flock', 'semaphore']], ['enabled' => false, 'resources' => ['default' => ['flock', 'semaphore']]]];
-        yield [['enabled' => false, 'foo' => 'flock', 'bar' => 'semaphore'], ['enabled' => false, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
-        yield [['enabled' => false, 'foo' => ['flock', 'semaphore']], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore']]]];
-        yield [['enabled' => false, 'default' => 'flock'], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
-
-        yield [['resources' => 'flock'], ['enabled' => true, 'resources' => ['default' => ['flock']]]];
-        yield [['resources' => ['flock', 'semaphore']], ['enabled' => true, 'resources' => ['default' => ['flock', 'semaphore']]]];
-        yield [['resources' => ['foo' => 'flock', 'bar' => 'semaphore']], ['enabled' => true, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
-        yield [['resources' => ['foo' => ['flock', 'semaphore'], 'bar' => 'semaphore']], ['enabled' => true, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
-        yield [['resources' => ['default' => 'flock']], ['enabled' => true, 'resources' => ['default' => ['flock']]]];
-
-        yield [['enabled' => false, 'resources' => 'flock'], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
-        yield [['enabled' => false, 'resources' => ['flock', 'semaphore']], ['enabled' => false, 'resources' => ['default' => ['flock', 'semaphore']]]];
-        yield [['enabled' => false, 'resources' => ['foo' => 'flock', 'bar' => 'semaphore']], ['enabled' => false, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
-        yield [['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => 'semaphore']], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
-        yield [['enabled' => false, 'resources' => ['default' => 'flock']], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
-
-        // xml
-
-        yield [['resource' => ['flock']], ['enabled' => true, 'resources' => ['default' => ['flock']]]];
-        yield [['resource' => ['flock', ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => true, 'resources' => ['default' => ['flock'], 'foo' => ['semaphore']]]];
-        yield [['resource' => [['name' => 'foo', 'value' => 'flock']]], ['enabled' => true, 'resources' => ['foo' => ['flock']]]];
-        yield [['resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => true, 'resources' => ['foo' => ['flock', 'semaphore']]]];
-        yield [['resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => true, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
-        yield [['resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => true, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
-
-        yield [['enabled' => false, 'resource' => ['flock']], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
-        yield [['enabled' => false, 'resource' => ['flock', ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['default' => ['flock'], 'foo' => ['semaphore']]]];
-        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock']]], ['enabled' => false, 'resources' => ['foo' => ['flock']]]];
-        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore']]]];
-        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
-        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
-
-        // service id and advisory locks
-
-        $advisory = ['service_id' => 'my_connection', 'advisory' => true];
-        $tableBased = ['service_id' => 'my_connection', 'advisory' => false];
-
-        yield [['service_id' => 'my_connection'], ['enabled' => true, 'resources' => ['default' => [$tableBased]]]];
-        yield [$advisory, ['enabled' => true, 'resources' => ['default' => [$advisory]]]];
-        yield [['advisory' => true, 'service_id' => 'my_connection'], ['enabled' => true, 'resources' => ['default' => [$advisory]]]];
-        yield [[$advisory], ['enabled' => true, 'resources' => ['default' => [$advisory]]]];
-        yield [['flock', $advisory], ['enabled' => true, 'resources' => ['default' => ['flock', $advisory]]]];
-        yield [['foo' => $advisory], ['enabled' => true, 'resources' => ['foo' => [$advisory]]]];
-        yield [['foo' => [$advisory]], ['enabled' => true, 'resources' => ['foo' => [$advisory]]]];
-        yield [['foo' => ['flock', $advisory], 'bar' => 'semaphore'], ['enabled' => true, 'resources' => ['foo' => ['flock', $advisory], 'bar' => ['semaphore']]]];
-        yield [['resources' => $advisory], ['enabled' => true, 'resources' => ['default' => [$advisory]]]];
-        yield [['resources' => ['foo' => $advisory]], ['enabled' => true, 'resources' => ['foo' => [$advisory]]]];
-        yield [['resources' => ['foo' => ['flock', $advisory]]], ['enabled' => true, 'resources' => ['foo' => ['flock', $advisory]]]];
-        yield [['enabled' => false, 'foo' => $advisory], ['enabled' => false, 'resources' => ['foo' => [$advisory]]]];
-    }
-
-    #[DataProvider('provideInvalidLockConfigurationTests')]
-    public function testInvalidLockConfiguration(array $lockConfig, string $expectedMessage)
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($expectedMessage);
-
-        $processor->processConfiguration($configuration, [['lock' => $lockConfig]]);
-    }
-
-    public static function provideInvalidLockConfigurationTests(): iterable
-    {
-        yield [
-            ['foo' => ['advisory' => true]],
-            'Invalid configuration for path "framework.lock.resources.foo.0": A lock store must be a string or an array with a "service_id" string and an optional "advisory" boolean, got {"service_id":null,"advisory":true}.',
-        ];
-
-        yield [
-            ['foo' => ['service_id' => 'my_connection', 'advisory' => 'yes']],
-            'Invalid configuration for path "framework.lock.resources.foo.0": A lock store must be a string or an array with a "service_id" string and an optional "advisory" boolean, got {"service_id":"my_connection","advisory":"yes"}.',
-        ];
-
-        yield [
-            ['foo' => ['service_id' => 'my_connection', 'store' => 'postgresql_advisory']],
-            'Invalid configuration for path "framework.lock.resources.foo.0": A lock store must be a string or an array with a "service_id" string and an optional "advisory" boolean, got {"service_id":"my_connection","advisory":false,"store":"postgresql_advisory"}.',
-        ];
-    }
-
-    public function testLockMergeConfigs()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [
-            [
-                'lock' => ['payload' => 'flock'],
-            ],
-            [
-                'lock' => ['payload' => 'semaphore'],
-            ],
-        ]);
-
-        $this->assertEquals(
-            [
-                'enabled' => true,
-                'resources' => [
-                    'payload' => ['semaphore'],
-                ],
-            ],
-            $config['lock']
-        );
-    }
-
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
@@ -758,31 +626,6 @@ class ConfigurationTest extends TestCase
                     'baz' => null,
                 ],
             ],
-        ]]);
-    }
-
-    public function testLockCanBeDisabled()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $config = $processor->processConfiguration($configuration, [[
-            'lock' => ['enabled' => false],
-        ]]);
-
-        $this->assertFalse($config['lock']['enabled']);
-    }
-
-    public function testEnabledLockNeedsResources()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
-
-        $processor->processConfiguration($configuration, [[
-            'lock' => ['enabled' => true],
         ]]);
     }
 
@@ -1198,14 +1041,6 @@ class ConfigurationTest extends TestCase
             'php_errors' => [
                 'log' => true,
                 'throw' => true,
-            ],
-            'lock' => [
-                'enabled' => !class_exists(FullStack::class),
-                'resources' => [
-                    'default' => [
-                        class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock',
-                    ],
-                ],
             ],
             'messenger' => [
                 'enabled' => !class_exists(FullStack::class),

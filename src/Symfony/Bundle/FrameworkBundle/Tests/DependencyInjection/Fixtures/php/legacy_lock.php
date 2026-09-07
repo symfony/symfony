@@ -1,5 +1,5 @@
 <?php
 
 $container->loadFromExtension('framework', [
-    'lock' => null,
+    'lock' => 'flock',
 ]);

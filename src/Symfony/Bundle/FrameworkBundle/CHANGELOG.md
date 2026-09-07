@@ -6,6 +6,8 @@ CHANGELOG
 
  * Make `framework.web_link` an alias of the `web_link` configuration provided by `WebLinkBundle`
  * Register `WebLinkBundle` automatically when the WebLink component is installed
+ * Make `framework.lock` an alias of the `lock` configuration provided by `LockBundle`
+ * Register `LockBundle` automatically when the Lock component is installed
  * Make `framework.semaphore` an alias of the `semaphore` configuration provided by `SemaphoreBundle`
  * Register `SemaphoreBundle` automatically when the Semaphore component is installed
  * Make `framework.html_sanitizer` an alias of the `html_sanitizer` configuration provided by `HtmlSanitizerBundle`

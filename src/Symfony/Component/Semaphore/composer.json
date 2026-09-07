@@ -25,8 +25,13 @@
     },
     "require-dev": {
         "predis/predis": "^1.1|^2.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
         "symfony/lock": "^7.4|^8.0",
         "symfony/serializer": "^6.4|^7.0"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<8.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Semaphore\\": "" },

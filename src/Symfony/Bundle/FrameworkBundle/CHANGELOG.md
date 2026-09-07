@@ -6,6 +6,8 @@ CHANGELOG
 
  * Make `framework.web_link` an alias of the `web_link` configuration provided by `WebLinkBundle`
  * Register `WebLinkBundle` automatically when the WebLink component is installed
+ * Make `framework.semaphore` an alias of the `semaphore` configuration provided by `SemaphoreBundle`
+ * Register `SemaphoreBundle` automatically when the Semaphore component is installed
  * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
  * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Make `framework.remote_event` an alias of the `remote_event` configuration provided by `RemoteEventBundle`

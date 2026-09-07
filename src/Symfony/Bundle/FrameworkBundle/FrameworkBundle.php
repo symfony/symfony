@@ -78,6 +78,7 @@ use Symfony\Component\Routing\DependencyInjection\RoutingControllerPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
+use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass as SerializerAttributeMetadataPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass;
@@ -114,6 +115,7 @@ class_exists(Registry::class);
 #[RequiredBundle(ServicesBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(SemaphoreBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(RemoteEventBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]

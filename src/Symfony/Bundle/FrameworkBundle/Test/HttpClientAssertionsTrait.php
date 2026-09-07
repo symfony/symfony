@@ -31,6 +31,7 @@ trait HttpClientAssertionsTrait
         /** @var HttpClientDataCollector $httpClientDataCollector */
         $httpClientDataCollector = $profile->getCollector('http_client');
         $expectedRequestHasBeenFound = false;
+        $urlAndMethodHaveBeenFound = false;
 
         if (!\array_key_exists($httpClientId, $httpClientDataCollector->getClients())) {
             static::fail(\sprintf('HttpClient "%s" is not registered.', $httpClientId));
@@ -43,6 +44,8 @@ trait HttpClientAssertionsTrait
                 continue;
             }
 
+            $urlAndMethodHaveBeenFound = true;
+
             if (null !== $expectedBody) {
                 $actualBody = null;
 
@@ -54,28 +57,17 @@ trait HttpClientAssertionsTrait
                     $actualBody = $trace['options']['json']->getValue(true);
                 }
 
-                if (!$actualBody) {
+                if ($expectedBody !== $actualBody) {
                     continue;
-                }
-
-                if ($expectedBody === $actualBody) {
-                    $expectedRequestHasBeenFound = true;
-
-                    if (!$expectedHeaders) {
-                        break;
-                    }
                 }
             }
 
             if ($expectedHeaders) {
-                $actualHeaders = $trace['options']['headers'] ?? [];
+                $actualHeaders = ($trace['options']['headers'] ?? null)?->getValue(true) ?? [];
 
-                foreach ($actualHeaders as $headerKey => $actualHeader) {
-                    if (\array_key_exists($headerKey, $expectedHeaders)
-                        && $expectedHeaders[$headerKey] === $actualHeader->getValue(true)
-                    ) {
-                        $expectedRequestHasBeenFound = true;
-                        break 2;
+                foreach ($expectedHeaders as $headerKey => $expectedHeader) {
+                    if (!\array_key_exists($headerKey, $actualHeaders) || $expectedHeader !== $actualHeaders[$headerKey]) {
+                        continue 2;
                     }
                 }
             }
@@ -84,7 +76,9 @@ trait HttpClientAssertionsTrait
             break;
         }
 
-        self::assertTrue($expectedRequestHasBeenFound, 'The expected request has not been called: "'.$expectedMethod.'" - "'.$expectedUrl.'"');
+        self::assertTrue($expectedRequestHasBeenFound, $urlAndMethodHaveBeenFound
+            ? \sprintf('The request "%s" - "%s" has been called, but with a different body or different headers.', $expectedMethod, $expectedUrl)
+            : \sprintf('The expected request has not been called: "%s" - "%s"', $expectedMethod, $expectedUrl));
     }
 
     public function assertNotHttpClientRequest(string $unexpectedUrl, string $expectedMethod = 'GET', string $httpClientId = 'http_client'): void

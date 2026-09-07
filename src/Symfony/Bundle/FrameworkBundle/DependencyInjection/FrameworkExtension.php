@@ -156,7 +156,6 @@ use Symfony\Component\ObjectMapper\Metadata\EnumMappingMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\TransformCallableInterface;
-use Symfony\Component\Process\Messenger\RunProcessMessageHandler;
 use Symfony\Component\Process\Process;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
@@ -283,12 +282,6 @@ class FrameworkExtension extends Extension
 
         if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/framework-bundle'])) {
             $container->removeDefinition('controller.expression_language');
-        }
-
-        $loader->load('process.php');
-
-        if (!class_exists(RunProcessMessageHandler::class)) {
-            $container->removeDefinition('process.messenger.process_message_handler');
         }
 
         if ($this->hasConsole()) {

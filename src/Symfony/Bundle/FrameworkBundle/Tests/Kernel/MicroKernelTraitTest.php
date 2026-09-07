@@ -280,6 +280,7 @@ class MicroKernelTraitTest extends TestCase
             'Symfony\Component\DependencyInjection\Kernel\ServicesBundle' => ['all' => true],
             'Symfony\Component\Console\ConsoleBundle' => ['all' => true],
             'Symfony\Component\Workflow\WorkflowBundle' => ['all' => true],
+            'Symfony\Component\Process\ProcessBundle' => ['all' => true],
             'Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true],
             'TestBundle' => ['test' => true, 'dev' => true],
         ], $parameters['.kernel.bundles_definition']);

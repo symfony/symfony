@@ -69,6 +69,7 @@ use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
 use Symfony\Component\ObjectMapper\DependencyInjection\ReverseMappingPass;
+use Symfony\Component\Process\ProcessBundle;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass;
@@ -111,6 +112,7 @@ class_exists(Registry::class);
 #[RequiredBundle(ServicesBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 class FrameworkBundle extends Bundle
 {
     public function boot(): void

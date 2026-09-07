@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `ProcessBundle`
 
 7.3
 ---

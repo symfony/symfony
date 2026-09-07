@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-09-07T09:31:28Z
+
+The four red jobs fail in Messenger and HttpClient on tests that are timing-dependent. This change only touches the Sweego mailer bridge, so the failures do not come from it.

@@ -19,7 +19,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilder
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FindCommandBundlesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonPathPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
@@ -64,6 +63,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentL
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterLocaleAwareServicesPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
 use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
@@ -113,6 +113,7 @@ class_exists(Registry::class);
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 class FrameworkBundle extends Bundle
 {
     public function boot(): void
@@ -219,7 +220,6 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, StreamablePass::class);
         $this->addCompilerPassIfExists($container, TransformerPass::class);
         $this->addCompilerPassIfExists($container, ReverseMappingPass::class);
-        $this->addCompilerPassIfExists($container, JsonPathPass::class);
 
         if ($container->getParameter('kernel.debug')) {
             if ($container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {

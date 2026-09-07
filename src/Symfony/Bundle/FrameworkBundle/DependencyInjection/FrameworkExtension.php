@@ -101,8 +101,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
-use Symfony\Component\JsonPath\Attribute\AsJsonPathFunction;
-use Symfony\Component\JsonPath\JsonPathCrawler;
 use Symfony\Component\JsonStreamer\Attribute\JsonStreamable;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
@@ -682,21 +680,6 @@ class FrameworkExtension extends Extension
             if (!class_exists(EnumMappingMetadataFactory::class)) {
                 $container->removeDefinition('object_mapper.metadata_factory.enum');
             }
-        }
-
-        if (ContainerBuilder::willBeAvailable('symfony/json-path', JsonPathCrawler::class, ['symfony/framework-bundle'])) {
-            $loader->load('json_path.php');
-            $container->registerAttributeForAutoconfiguration(AsJsonPathFunction::class, static function (ChildDefinition $definition, AsJsonPathFunction $attribute, \ReflectionClass $reflector): void {
-                if (!$reflector->hasMethod('__invoke')) {
-                    throw new LogicException(\sprintf('The "%s" attribute can only be applied to invokable classes, "%s" is not invokable.', AsJsonPathFunction::class, $reflector->name));
-                }
-
-                $definition->addTag('json_path.function', [
-                    'name' => $attribute->name,
-                    'return_type' => $attribute->returnType->value,
-                    'arity' => $reflector->getMethod('__invoke')->getNumberOfRequiredParameters(),
-                ]);
-            });
         }
 
         $container->registerForAutoconfiguration(PackageInterface::class)

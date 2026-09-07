@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\JsonPath\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonPathPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\JsonPath\DependencyInjection\JsonPathPass;
 use Symfony\Component\JsonPath\FunctionReturnType;
 use Symfony\Component\JsonPath\JsonPathCrawler;
 use Symfony\Component\JsonPath\JsonPathCrawlerInterface;

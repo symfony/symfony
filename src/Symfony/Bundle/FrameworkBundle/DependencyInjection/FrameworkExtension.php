@@ -146,12 +146,6 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
-use Symfony\Component\ObjectMapper\Attribute\Map;
-use Symfony\Component\ObjectMapper\ConditionCallableInterface;
-use Symfony\Component\ObjectMapper\Metadata\EnumMappingMetadataFactory;
-use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
-use Symfony\Component\ObjectMapper\TransformCallableInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
@@ -652,28 +646,6 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
-        }
-
-        if (ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
-            $loader->load('object_mapper.php');
-            $container->registerForAutoconfiguration(TransformCallableInterface::class)
-                ->addTag('object_mapper.transform_callable');
-            $container->registerForAutoconfiguration(ConditionCallableInterface::class)
-                ->addTag('object_mapper.condition_callable');
-            $container->registerAttributeForAutoconfiguration(Map::class, static function (ChildDefinition $definition, Map $attribute, \ReflectionClass $reflector): void {
-                $definition->addResourceTag('object_mapper.map', [
-                    'source' => $attribute->source ?? $reflector->name,
-                    'target' => $attribute->target ?? $reflector->name,
-                ]);
-            });
-
-            if (!class_exists(ReverseClassObjectMapperMetadataFactory::class)) {
-                $container->removeDefinition('object_mapper.metadata_factory.reverse_class');
-            }
-
-            if (!class_exists(EnumMappingMetadataFactory::class)) {
-                $container->removeDefinition('object_mapper.metadata_factory.enum');
-            }
         }
 
         $container->registerForAutoconfiguration(PackageInterface::class)

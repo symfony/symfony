@@ -20,7 +20,8 @@
         "psr/container": "^2.0"
     },
     "require-dev": {
-        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
         "symfony/property-access": "^7.4|^8.0",
         "symfony/var-exporter": "^7.4|^8.0"
     },
@@ -33,6 +34,7 @@
         ]
     },
     "conflict": {
+      "symfony/dependency-injection": "<8.1",
       "symfony/property-access": "<7.2"
     },
     "minimum-stability": "dev"

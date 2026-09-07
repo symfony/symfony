@@ -68,7 +68,7 @@ use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
 use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Mime\MimeBundle;
-use Symfony\Component\ObjectMapper\DependencyInjection\ReverseMappingPass;
+use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
@@ -115,6 +115,7 @@ class_exists(Registry::class);
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(ObjectMapperBundle::class, ignoreOnInvalid: true)]
 class FrameworkBundle extends Bundle
 {
     public function boot(): void
@@ -213,7 +214,6 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, DeprecateJsonStreamerValueTransformerTagPass::class);
         $this->addCompilerPassIfExists($container, StreamablePass::class);
         $this->addCompilerPassIfExists($container, TransformerPass::class);
-        $this->addCompilerPassIfExists($container, ReverseMappingPass::class);
 
         if ($container->getParameter('kernel.debug')) {
             if ($container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {

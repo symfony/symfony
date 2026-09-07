@@ -20,6 +20,11 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\JsonPath\JsonPathBundle;
+use Symfony\Component\Mime\MimeBundle;
+use Symfony\Component\ObjectMapper\ObjectMapperBundle;
+use Symfony\Component\Process\ProcessBundle;
+use Symfony\Component\Workflow\WorkflowBundle;
 
 #[Group('functional')]
 class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
@@ -139,7 +144,18 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     public static function provideCompletionSuggestions(): iterable
     {
-        $name = ['foo', 'default_config_test', 'extension_without_config_test', 'services', 'console', 'workflow', 'mime', 'json_path', 'process', 'framework', 'test', 'test_dump', 'DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'MimeBundle', 'ServicesBundle', 'JsonPathBundle', 'ConsoleBundle', 'WorkflowBundle', 'ProcessBundle', 'FrameworkBundle', 'ServicesInBuildTestBundle', 'TestBundle'];
+        $aliases = ['foo', 'default_config_test', 'extension_without_config_test', 'services', 'console'];
+        $bundles = ['DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'ServicesBundle', 'ConsoleBundle'];
+
+        // registered through #[RequiredBundle(..., ignoreOnInvalid: true)], so absent when the component is not installed
+        foreach (['workflow' => WorkflowBundle::class, 'process' => ProcessBundle::class, 'json_path' => JsonPathBundle::class, 'mime' => MimeBundle::class, 'object_mapper' => ObjectMapperBundle::class] as $alias => $class) {
+            if (class_exists($class)) {
+                $aliases[] = $alias;
+                $bundles[] = substr($class, 1 + strrpos($class, '\\'));
+            }
+        }
+
+        $name = [...$aliases, 'framework', 'test', 'test_dump', ...$bundles, 'FrameworkBundle', 'ServicesInBuildTestBundle', 'TestBundle'];
         yield 'name, no debug' => [false, [''], $name];
         yield 'name, debug' => [true, [''], $name];
 

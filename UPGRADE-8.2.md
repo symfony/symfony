@@ -109,6 +109,9 @@ FrameworkBundle
  * `HtmlSanitizerBundle` is registered automatically when the HtmlSanitizer component is installed, and its services are
    then registered without any configuration; set `html_sanitizer.enabled` to `false` to disable them. The
    `framework.html_sanitizer` configuration is an alias of the `html_sanitizer` configuration provided by the bundle
+ * `TypeInfoBundle` is registered automatically when the TypeInfo component is installed, and its services are
+   then registered without any configuration; set `type_info.enabled` to `false` to disable them. The
+   `framework.type_info` configuration is an alias of the `type_info` configuration provided by the bundle
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

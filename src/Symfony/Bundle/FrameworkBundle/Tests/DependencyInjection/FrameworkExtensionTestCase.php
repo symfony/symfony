@@ -123,6 +123,7 @@ use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Component\TypeInfo\TypeInfoBundle;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
@@ -483,6 +484,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame(HtmlSanitizer::class, $container->getDefinition('test_html_sanitizer')->getClass());
         $this->assertSame('custom', $container->getDefinition('test_html_sanitizer')->getTag('html_sanitizer')[0]['sanitizer']);
+    }
+
+    public function testTypeInfoConfigurationIsForwardedToTypeInfoBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new TypeInfoBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_type_info');
+        $container->compile();
+
+        $this->assertSame(['CustomAlias' => 'int'], $container->getDefinition('test_type_info_context_factory')->getArgument(1));
     }
 
     public function testEnabledPhpErrorsConfig()
@@ -1991,12 +2003,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('serializer_disabled');
 
         $this->assertFalse($container->hasDefinition('serializer'));
-    }
-
-    public function testTypeInfoEnabled()
-    {
-        $container = $this->createContainerFromFile('type_info');
-        $this->assertTrue($container->has('type_info.resolver'));
     }
 
     public function testPropertyInfoEnabled()

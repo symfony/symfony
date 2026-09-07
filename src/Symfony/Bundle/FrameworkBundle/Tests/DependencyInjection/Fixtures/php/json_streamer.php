@@ -1,9 +1,6 @@
 <?php
 
 $container->loadFromExtension('framework', [
-    'type_info' => [
-        'enabled' => true,
-    ],
     'json_streamer' => [
         'enabled' => true,
     ],

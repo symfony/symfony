@@ -1,0 +1,8 @@
+services:
+    test_type_info_context_factory:
+        alias: type_info.type_context_factory
+        public: true
+framework:
+    type_info:
+        aliases:
+            CustomAlias: int

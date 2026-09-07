@@ -43,7 +43,6 @@ use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
@@ -170,7 +169,7 @@ class Configuration implements ConfigurationInterface
         $this->addValidationSection($rootNode, $enableIfStandalone);
         $this->addSerializerSection($rootNode, $enableIfStandalone);
         $this->addPropertyAccessSection($rootNode, $willBeAvailable);
-        $this->addTypeInfoSection($rootNode, $enableIfStandalone);
+        $this->addTypeInfoSection($rootNode);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
@@ -1109,26 +1108,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addTypeInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addTypeInfoSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('type_info')
-                    ->info('Type info configuration')
-                    ->{$enableIfStandalone('symfony/type-info', Type::class)}()
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->arrayNode('aliases', 'alias')
-                            ->info('Additional type aliases to be used during type context creation.')
-                            ->defaultValue([])
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('name')
-                            ->scalarPrototype()->end()
-                        ->end()
-                    ->end()
+                ->variableNode('type_info')
+                    ->aliasOf('type_info')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

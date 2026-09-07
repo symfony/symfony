@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CheckJsonStreamerTypeInfoPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
@@ -89,6 +90,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
+use Symfony\Component\TypeInfo\TypeInfoBundle;
 use Symfony\Component\Validator\DependencyInjection\AddAutoMappingConfigurationPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
@@ -121,6 +123,7 @@ class_exists(Registry::class);
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(RemoteEventBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(HtmlSanitizerBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(TypeInfoBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
@@ -221,6 +224,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ErrorLoggerCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new VirtualRequestStackPass());
         $container->addCompilerPass(new TranslationUpdateCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new CheckJsonStreamerTypeInfoPass());
         $this->addCompilerPassIfExists($container, DeprecateJsonStreamerValueTransformerTagPass::class);
         $this->addCompilerPassIfExists($container, StreamablePass::class);
         $this->addCompilerPassIfExists($container, TransformerPass::class);

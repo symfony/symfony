@@ -33,7 +33,6 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Webhook\Controller\WebhookController;
 
@@ -1135,10 +1134,6 @@ class ConfigurationTest extends TestCase
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
                 'wildcard_reads' => false,
-            ],
-            'type_info' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(Type::class),
-                'aliases' => [],
             ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),

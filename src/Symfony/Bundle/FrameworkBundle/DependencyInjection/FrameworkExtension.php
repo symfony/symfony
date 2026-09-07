@@ -186,10 +186,6 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\TypeResolver\PhpDocAwareReflectionTypeResolver;
-use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
-use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\Uuid47Transformer;
 use Symfony\Component\Uid\UuidV4;
@@ -450,19 +446,11 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.serializer_debug');
         }
 
-        if ($typeInfoEnabled = $this->readConfigEnabled('type_info', $container, $config['type_info'])) {
-            $this->registerTypeInfoConfiguration($config['type_info'], $container, $loader);
-        }
-
         if ($propertyInfoEnabled) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('json_streamer', $container, $config['json_streamer'])) {
-            if (!$typeInfoEnabled) {
-                throw new LogicException('JsonStreamer support cannot be enabled as the TypeInfo component is not '.(interface_exists(TypeResolverInterface::class) ? 'enabled.' : 'installed. Try running "composer require symfony/type-info".'));
-            }
-
             $this->registerJsonStreamerConfiguration($config['json_streamer'], $container, $loader);
         }
 
@@ -1995,38 +1983,6 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('property_info.cache');
-        }
-    }
-
-    private function registerTypeInfoConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!class_exists(Type::class)) {
-            throw new LogicException('TypeInfo support cannot be enabled as the TypeInfo component is not installed. Try running "composer require symfony/type-info".');
-        }
-
-        $loader->load('type_info.php');
-
-        if (ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
-            $container->register('type_info.resolver.string', StringTypeResolver::class)
-                ->setArguments([null, null, $config['aliases']]);
-
-            $container->register('type_info.resolver.reflection_parameter.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
-                ->setArguments([new Reference('type_info.resolver.reflection_parameter'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);
-            $container->register('type_info.resolver.reflection_property.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
-                ->setArguments([new Reference('type_info.resolver.reflection_property'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);
-            $container->register('type_info.resolver.reflection_return.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
-                ->setArguments([new Reference('type_info.resolver.reflection_return'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);
-
-            /** @var ServiceLocatorArgument $resolversLocator */
-            $resolversLocator = $container->getDefinition('type_info.resolver')->getArgument(0);
-            $resolversLocator->setValues([
-                'string' => new Reference('type_info.resolver.string'),
-                \ReflectionParameter::class => new Reference('type_info.resolver.reflection_parameter.phpdoc_aware'),
-                \ReflectionProperty::class => new Reference('type_info.resolver.reflection_property.phpdoc_aware'),
-                \ReflectionFunctionAbstract::class => new Reference('type_info.resolver.reflection_return.phpdoc_aware'),
-            ] + $resolversLocator->getValues());
-
-            $container->getDefinition('type_info.type_context_factory')->replaceArgument(1, $config['aliases']);
         }
     }
 

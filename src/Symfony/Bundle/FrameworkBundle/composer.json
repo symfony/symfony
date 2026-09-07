@@ -75,7 +75,7 @@
         "symfony/string": "^7.4|^8.0",
         "symfony/translation": "^7.4|^8.0",
         "symfony/twig-bundle": "^7.4|^8.0",
-        "symfony/type-info": "^7.4.1|^8.0.1",
+        "symfony/type-info": "^8.2",
         "symfony/uid": "^7.4|^8.0",
         "symfony/validator": "^7.4|^8.0",
         "symfony/workflow": "^8.2",
@@ -104,6 +104,7 @@
         "symfony/rate-limiter": "<8.2",
         "symfony/remote-event": "<8.2",
         "symfony/translation": "<7.4",
+        "symfony/type-info": "<8.2",
         "symfony/web-link": "<8.2",
         "symfony/webhook": "<7.4",
         "symfony/workflow": "<8.2"

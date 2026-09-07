@@ -103,6 +103,8 @@ use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventHandler;
+use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Semaphore\Store\LockStore;
 use Symfony\Component\Semaphore\Store\StoreFactory as SemaphoreStoreFactory;
@@ -434,6 +436,24 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->compile();
 
         $this->assertSame(AddLinkHeaderListener::class, $container->getDefinition('test_add_link_header_listener')->getClass());
+    }
+
+    #[DataProvider('provideRemoteEventConfigurationFixtures')]
+    public function testRemoteEventConfigurationIsForwardedToRemoteEventBundle(string $file)
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new RemoteEventBundle()->getContainerExtension());
+        $this->loadFromFile($container, $file);
+        $container->compile();
+
+        $this->assertSame(ConsumeRemoteEventHandler::class, $container->getDefinition('test_remote_event_handler')->getClass());
+    }
+
+    public static function provideRemoteEventConfigurationFixtures(): iterable
+    {
+        yield 'underscored' => ['legacy_remote_event'];
+        yield 'hyphenated' => ['legacy_hyphenated_remote_event'];
     }
 
     public function testEnabledPhpErrorsConfig()

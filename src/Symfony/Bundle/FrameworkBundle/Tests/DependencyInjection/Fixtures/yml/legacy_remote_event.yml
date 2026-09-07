@@ -1,0 +1,6 @@
+services:
+    test_remote_event_handler:
+        alias: remote_event.messenger.handler
+        public: true
+framework:
+    remote_event: ~

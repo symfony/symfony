@@ -162,8 +162,6 @@ use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
-use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
-use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
@@ -627,10 +625,6 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if ($this->readConfigEnabled('remote_event', $container, $config['remote_event'])) {
-            $this->registerRemoteEventConfiguration($loader);
-        }
-
         if ($this->readConfigEnabled('html_sanitizer', $container, $config['html_sanitizer'])) {
             if (!class_exists(HtmlSanitizerConfig::class)) {
                 throw new LogicException('HtmlSanitizer support cannot be enabled as the HtmlSanitizer component is not installed. Try running "composer require symfony/html-sanitizer".');
@@ -699,9 +693,6 @@ class FrameworkExtension extends Extension
         });
         $container->registerAttributeForAutoconfiguration(Route::class, static function (ChildDefinition $definition, Route $attribute, \ReflectionClass|\ReflectionMethod $reflection): void {
             $definition->addTag('controller.service_arguments')->addTag('routing.controller');
-        });
-        $container->registerAttributeForAutoconfiguration(AsRemoteEventConsumer::class, static function (ChildDefinition $definition, AsRemoteEventConsumer $attribute): void {
-            $definition->addTag('remote_event.consumer', ['consumer' => $attribute->name]);
         });
         $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
             $tagAttributes = get_object_vars($attribute);
@@ -3439,15 +3430,6 @@ class FrameworkExtension extends Extension
         }
 
         $container->getDefinition('webhook.transport')->replaceArgument(0, new Reference($clientId));
-    }
-
-    private function registerRemoteEventConfiguration(PhpFileLoader $loader): void
-    {
-        if (!class_exists(RemoteEvent::class)) {
-            throw new LogicException('RemoteEvent support cannot be enabled as the component is not installed. Try running "composer require symfony/remote-event".');
-        }
-
-        $loader->load('remote_event.php');
     }
 
     private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

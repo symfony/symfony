@@ -32,7 +32,6 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
-use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\TypeInfo\Type;
@@ -1415,9 +1414,6 @@ class ConfigurationTest extends TestCase
                 'signing_algorithm' => 'sha256',
                 'signature_format' => 'legacy',
                 'timestamp_tolerance' => 300,
-            ],
-            'remote_event' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
             ],
             'json_streamer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(JsonStreamWriter::class),

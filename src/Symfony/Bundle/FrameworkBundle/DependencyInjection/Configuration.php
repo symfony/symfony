@@ -40,7 +40,6 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
-use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Semaphore\Semaphore;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
@@ -192,7 +191,7 @@ class Configuration implements ConfigurationInterface
         $this->addUidSection($rootNode, $enableIfStandalone);
         $this->addHtmlSanitizerSection($rootNode, $enableIfStandalone);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
-        $this->addRemoteEventSection($rootNode, $enableIfStandalone);
+        $this->addRemoteEventSection($rootNode);
         $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
 
         $rootNode
@@ -2456,16 +2455,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addRemoteEventSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('remote_event')
-                    ->info('RemoteEvent configuration')
-                    ->{$enableIfStandalone('symfony/remote-event', RemoteEvent::class)}()
+                ->variableNode('remote_event')
+                    ->aliasOf('remote_event')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

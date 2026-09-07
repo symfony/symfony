@@ -766,6 +766,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Replaces the configuration arrays of the given extension.
+     *
+     * @param array<array<string, mixed>> $configs
+     */
+    public function setExtensionConfig(string $name, array $configs): void
+    {
+        $this->extensionConfigs[$name] = array_values($configs);
+    }
+
+    /**
      * Deprecates a service container parameter.
      *
      * @throws ParameterNotFoundException if the parameter is not defined

@@ -11,7 +11,12 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
  * This is the entry class for building a config tree.
@@ -57,7 +62,13 @@ class TreeBuilder implements NodeParentInterface
 
     public function buildTree(): NodeInterface
     {
-        return $this->tree ??= $this->root->getNode(true);
+        if (null !== $this->tree) {
+            return $this->tree;
+        }
+
+        self::checkAliases($tree = $this->root->getNode(true), 0, $tree->getPath());
+
+        return $this->tree = $tree;
     }
 
     public function setPathSeparator(string $separator): void
@@ -66,5 +77,26 @@ class TreeBuilder implements NodeParentInterface
         $this->tree = null;
 
         $this->root->setPathSeparator($separator);
+    }
+
+    private static function checkAliases(NodeInterface $node, int $depth, string $path): void
+    {
+        if ($node instanceof BaseNode && null !== $node->getAttribute('alias_of')) {
+            if (1 !== $depth) {
+                throw new InvalidDefinitionException(\sprintf('Only the direct children of a root node can declare an "alias_of" attribute, but "%s" does.', $path));
+            }
+
+            if ($node instanceof ScalarNode) {
+                throw new InvalidDefinitionException(\sprintf('The value of a node declaring an "alias_of" attribute is forwarded as the configuration of the aliased extension, so the node must accept arrays, but "%s" does not.', $path));
+            }
+        }
+
+        if ($node instanceof PrototypedArrayNode) {
+            self::checkAliases($node->getPrototype(), 1 + $depth, $path.'[]');
+        } elseif ($node instanceof ArrayNode) {
+            foreach ($node->getChildren() as $child) {
+                self::checkAliases($child, 1 + $depth, $child->getPath());
+            }
+        }
     }
 }

@@ -102,6 +102,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         sort($knownEnvs);
         $extensionsPerEnv = [];
         $appTypes = '';
+        $trees = [];
 
         $anyEnvExtensions = [];
         $registeredExtensions = $container->getExtensions();
@@ -127,8 +128,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
                 continue;
             }
             $anyEnvExtensions[$extensionAlias] = $extension;
-            $type = $this->camelCase($extensionAlias).'Config';
-            $appTypes .= \sprintf("\n * @psalm-type %s = %s", $type, ArrayShapeGenerator::generate($tree));
+            $trees[$extensionAlias] = $tree;
 
             foreach ($knownEnvs as $env) {
                 if ($envs[$env] ?? $envs['all'] ?? false) {
@@ -147,10 +147,14 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
                 continue;
             }
             $anyEnvExtensions[$alias] = $extension;
-            $type = $this->camelCase($alias).'Config';
-            $appTypes .= \sprintf("\n * @psalm-type %s = %s", $type, ArrayShapeGenerator::generate($tree));
+            $trees[$alias] = $tree;
         }
         krsort($extensionsPerEnv);
+
+        $resolveAlias = fn (string $alias): ?string => isset($trees[$alias]) ? $this->camelCase($alias).'Config' : null;
+        foreach ($trees as $alias => $tree) {
+            $appTypes .= \sprintf("\n * @psalm-type %s = %s", $this->camelCase($alias).'Config', ArrayShapeGenerator::generate($tree, $resolveAlias));
+        }
 
         $r = new \ReflectionClass(AppReference::class);
 

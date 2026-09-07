@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T12:59:02Z
+
+Pushed two fixes and corrected the description.
+
+**The `base_uri` sentence was my mistake, not yours.** I wrote it in my #65865 comment and you took it from there. There is no `base_uri` under `framework.http_client.default_options`: the node runs from `Configuration.php:1973` to `:2076` and every `base_uri` occurrence is at `:2081` or later, inside `scoped_clients`. Booting a kernel with it gives `Unrecognized option "base_uri" under "framework.http_client.default_options"`. On 7.4 the factory ignores its configuration and always injects the `http_client` service, so the only shape that reaches an endpoint is replacing that service, for instance with `ScopingHttpClient::forBaseUri()`. The description now says that.
+
+**The transport row was claimed but not covered.** The table lists "is unreachable, `TransportException`" and the provider had no such case; the three body rows are all `HttpClient\Exception\JsonException` from three different `toArray()` branches. `MockResponse` simulates it with the `error` info key, so I added `'the server is unreachable'`. It fails on the current handler with `TransportException: Could not resolve host: authorization-server.example.com`, which is the only row proving `TransportExceptionInterface`. All six now fail on base and pass with the fix.
+
+**`'exception' => $e::class` should pass the exception.** Every other `'exception' =>` log context in Symfony passes the Throwable, PSR-3 §1.3 reserves the key for one, and Monolog's normalizer special-cases it, so a bare class-name string arrives where a formatter expects an exception. Changed to `$e`. This matters more than it looks here: the widened catch is defensible partly because the real cause still reaches the log, and the class-name string was degrading exactly that. #65866 carried the identical line and I fixed it there too.
+
+I also dropped the historical docblock from the test method. It is the only test-method docblock in the component, and the test name plus your class docblock already carry the reason.
+
+I added a `Merge-up to 8.2:` paragraph. The resolution is not obvious in one direction: if #65865 lands before this merges up, the `'exception' =>` line auto-merges from this side while the catch line conflicts, so a merger resolving only the visible markers ends up with `catch (AuthenticationException)` plus the new log key, which is the wrong half of both. That combination was verified red on every row.
+
+One thing I did not touch: the branch is still based on `74334425cde` and 7.4 has moved to `1cc6d9f764d`. No conflict, so it is only worth a rebase if CI needs a fresh run.

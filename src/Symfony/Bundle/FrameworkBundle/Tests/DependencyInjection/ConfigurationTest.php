@@ -33,7 +33,6 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Webhook\Controller\WebhookController;
 
 class ConfigurationTest extends TestCase
@@ -1314,13 +1313,6 @@ class ConfigurationTest extends TestCase
                     'cache_pool' => 'cache.rate_limiter',
                     'storage_service' => null,
                 ],
-            ],
-            'uid' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
-                'default_uuid_version' => 7,
-                'name_based_uuid_version' => 5,
-                'time_based_uuid_version' => 7,
-                'uuid47_secret' => null,
             ],
             'scheduler' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(SchedulerTransportFactory::class),

@@ -93,6 +93,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
 use Symfony\Component\TypeInfo\TypeInfoBundle;
+use Symfony\Component\Uid\UidBundle;
 use Symfony\Component\Validator\DependencyInjection\AddAutoMappingConfigurationPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
@@ -127,6 +128,7 @@ class_exists(Registry::class);
 #[RequiredBundle(HtmlSanitizerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(TypeInfoBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(PropertyAccessBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(UidBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]

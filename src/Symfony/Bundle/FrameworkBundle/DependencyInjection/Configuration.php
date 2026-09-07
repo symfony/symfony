@@ -42,7 +42,6 @@ use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
 
@@ -184,7 +183,7 @@ class Configuration implements ConfigurationInterface
         $this->addSecretsSection($rootNode);
         $this->addNotifierSection($rootNode, $enableIfStandalone);
         $this->addRateLimiterSection($rootNode, $enableIfStandalone);
-        $this->addUidSection($rootNode, $enableIfStandalone);
+        $this->addUidSection($rootNode);
         $this->addHtmlSanitizerSection($rootNode);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode);
@@ -2530,41 +2529,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addUidSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('uid')
-                    ->info('Uid configuration')
-                    ->{$enableIfStandalone('symfony/uid', UuidFactory::class)}()
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->enumNode('default_uuid_version')
-                            ->values([7, 6, 4, 1])
-                            ->defaultValue(7)
-                        ->end()
-                        ->enumNode('name_based_uuid_version')
-                            ->defaultValue(5)
-                            ->values([5, 3])
-                        ->end()
-                        ->scalarNode('name_based_uuid_namespace')
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->enumNode('time_based_uuid_version')
-                            ->values([7, 6, 1])
-                            ->defaultValue(7)
-                        ->end()
-                        ->scalarNode('time_based_uuid_node')
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->scalarNode('uuid47_secret')
-                            ->info('A high-entropy secret used by the "uuid47_transformer" service. Defaults to "kernel.secret".')
-                            ->defaultNull()
-                        ->end()
-                    ->end()
+                ->variableNode('uid')
+                    ->aliasOf('uid')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

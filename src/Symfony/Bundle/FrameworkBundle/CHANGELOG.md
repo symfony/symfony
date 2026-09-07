@@ -14,6 +14,8 @@ CHANGELOG
  * Register `TypeInfoBundle` automatically when the TypeInfo component is installed
  * Make `framework.property_access` an alias of the `property_access` configuration provided by `PropertyAccessBundle`
  * Register `PropertyAccessBundle` automatically when the PropertyAccess component is installed
+ * Make `framework.uid` an alias of the `uid` configuration provided by `UidBundle`
+ * Register `UidBundle` automatically when the Uid component is installed
  * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
  * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Make `framework.remote_event` an alias of the `remote_event` configuration provided by `RemoteEventBundle`

@@ -1,0 +1,11 @@
+services:
+    test_uuid_factory:
+        alias: uuid.factory
+        public: true
+    test_uuid47_transformer:
+        alias: uuid47_transformer
+        public: true
+framework:
+    uid:
+        default_uuid_version: 6
+        name_based_uuid_namespace: '73902feb-9b95-4fe5-9c6f-b3e6d29e77b5'

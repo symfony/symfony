@@ -186,9 +186,6 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Uid\Factory\UuidFactory;
-use Symfony\Component\Uid\Uuid47Transformer;
-use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\Attribute\ExtendsValidationFor;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
@@ -462,16 +459,6 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
-        }
-
-        if ($this->readConfigEnabled('uid', $container, $config['uid'])) {
-            if (!class_exists(UuidFactory::class)) {
-                throw new LogicException('Uid support cannot be enabled as the Uid component is not installed. Try running "composer require symfony/uid".');
-            }
-
-            $this->registerUidConfiguration($config['uid'], $container, $loader);
-        } else {
-            $container->removeDefinition('argument_resolver.uid');
         }
 
         // register cache before session so both can share the connection services
@@ -3386,35 +3373,6 @@ class FrameworkExtension extends Extension
             $container->setAlias(RateLimiterBuilder::class, 'limiter_builder');
         } else {
             $container->removeDefinition('limiter_builder');
-        }
-    }
-
-    private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        $loader->load('uid.php');
-
-        $container->getDefinition('uuid.factory')
-            ->setArguments([
-                $config['default_uuid_version'],
-                $config['time_based_uuid_version'],
-                $config['name_based_uuid_version'],
-                UuidV4::class,
-                $config['time_based_uuid_node'] ?? null,
-                $config['name_based_uuid_namespace'] ?? null,
-            ])
-        ;
-
-        if (isset($config['name_based_uuid_namespace'])) {
-            $container->getDefinition('name_based_uuid.factory')
-                ->setArguments([$config['name_based_uuid_namespace']]);
-        }
-
-        if (!class_exists(Uuid47Transformer::class)) {
-            $container->removeDefinition('uuid47_transformer');
-            $container->removeAlias(Uuid47Transformer::class);
-        } elseif (null !== ($config['uuid47_secret'] ?? null)) {
-            $container->getDefinition('uuid47_transformer')
-                ->setArguments([$config['uuid47_secret']]);
         }
     }
 

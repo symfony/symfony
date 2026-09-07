@@ -125,6 +125,9 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\TypeInfo\TypeInfoBundle;
+use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Uid\UidBundle;
+use Symfony\Component\Uid\Uuid47Transformer;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
@@ -491,6 +494,24 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->compile();
 
         $this->assertSame(['CustomAlias' => 'int'], $container->getDefinition('test_type_info_context_factory')->getArgument(1));
+    }
+
+    public function testUidConfigurationIsForwardedToUidBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $bundle = new UidBundle();
+        $bundle->build($container);
+        $container->registerExtension($bundle->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_uid');
+        $container->compile();
+
+        $definition = $container->getDefinition('test_uuid_factory');
+        $this->assertSame(UuidFactory::class, $definition->getClass());
+        $this->assertSame(6, $definition->getArgument(0));
+        $this->assertSame('73902feb-9b95-4fe5-9c6f-b3e6d29e77b5', $definition->getArgument(5));
+
+        $this->assertSame(Uuid47Transformer::class, $container->getDefinition('test_uuid47_transformer')->getClass());
     }
 
     public function testEnabledPhpErrorsConfig()

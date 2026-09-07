@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T14:53:50Z
+
+I ran the branch against these cases, and I confirm both of @HypeMC's findings. There are two more of the same kind.
+
+The escape syntax is a second BC break. On 8.2, `[\*]` round-trips: `setValue($d, '[\*]', 'v')` writes the key `\*` and `getValue($d, '[\*]')` returns `'v'`. On this branch the setter still writes `\*` but the getter now unescapes and reads the key `*`, so the same round trip returns `null`. Code that already uses `[\*]` paths silently loses its values, so the syntax added to preserve BC breaks the people who already had that literal.
+
+The result shape depends on the data, not on the path. `readWildcard()` merges the collected values only when every one of them is a list:
+
+```php
+$pa->getValue([['tags' => ['a', 'b']], ['tags' => ['c']]], '[*][tags]');        // ['a', 'b', 'c']
+$pa->getValue([['tags' => ['a', 'b']], ['tags' => ['k' => 'c']]], '[*][tags]'); // [['a', 'b'], ['k' => 'c']]
+```
+
+One non-list value anywhere switches the whole result from flat to nested, so a consumer cannot type the return of a fixed path.
+
+All four issues have the same root: `[*]` changes meaning implicitly, and only on the read side. I would rather see wildcard reads opt-in on `PropertyAccessorBuilder`, for example `enableWildcardReads()`. That removes both BC breaks, since the default accessor stays byte-identical, and it gives the setter question a coherent answer: with wildcards enabled, a write through a `[*]` path should throw as unsupported instead of writing a literal key. Independently of that, the result shape needs one rule: one entry per matched element, never data-dependent merging, with chained wildcards nesting.
+
+Would you rework it in that direction?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T07:49:14Z
+
+I reworked the branch along the lines I described above, and rebased it on 8.2. Thanks @Boulea7 for the proposal and @HypeMC for the review, which found most of this.
+
+What changed:
+
+* Wildcards are now opt-in, through `PropertyAccessorBuilder::enableWildcardReads()` or `framework.property_access.wildcard_reads`. With the option off the accessor behaves exactly as before, so both BC breaks are gone: `[*]` still reads the index named `*`, `[\*]` still reads the index named `\*`, and both can still be written to.
+* The result shape follows the path instead of the data. One entry per matched element, one nesting level per wildcard, keys dropped. The `array_merge()` flattening is gone, so a fixed path always returns the same shape. It also fixes a case that was not raised yet: a trailing `[*]` used to drop a level, `getValue(['tags' => [['a'], ['b']]], '[tags][*]')` returning `['a', 'b']` instead of `[['a'], ['b']]`.
+* `[\*]` now unescapes on the write side too, so it round-trips. The cost, which the description records, is that with the option on an index literally named `\*` can no longer be addressed.
+* Writing through a wildcard path throws `InvalidArgumentException`, and `isWritable()` returns `false`. That removes the asymmetry where the setter created a phantom `*` entry that the getter then folded into the result.
+* The traversability check is `is_iterable()` instead of `ArrayAccess` and `Traversable` together. The expansion only iterates, and the rest of the path is read from each element, so a plain `Iterator`, an `IteratorAggregate` or a generator works now.
+
+The tests were rewritten around those rules, and two of them pin the behavior with the option off. `PropertyAccess` and `FrameworkBundle` pass, as do `Form`, `Validator` and `Serializer` as consumers.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-09-03T07:56:31Z
+
+> * `[\*]` now unescapes on the write side too, so it round-trips. The cost, which the description records, is that with the option on an index literally named `\*` can no longer be addressed.
+
+this could be solved by also allowing to escape the `\` to represent a `\` that is not an escape char (or to change the escaping strategy by doubling the `*`)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T11:25:43Z
+
+Addressed in 4a28f9cfb1a. With wildcard reads enabled, `[\\*]` now addresses an index named `\*`. The regression covers `setValue()`, `getValue()`, and `isWritable()`.

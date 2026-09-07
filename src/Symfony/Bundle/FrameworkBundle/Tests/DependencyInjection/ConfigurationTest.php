@@ -1263,9 +1263,6 @@ class ConfigurationTest extends TestCase
                 'log' => true,
                 'throw' => true,
             ],
-            'web_link' => [
-                'enabled' => !class_exists(FullStack::class),
-            ],
             'lock' => [
                 'enabled' => !class_exists(FullStack::class),
                 'resources' => [

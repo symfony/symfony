@@ -1,0 +1,6 @@
+services:
+    test_add_link_header_listener:
+        alias: web_link.add_link_header_listener
+        public: true
+framework:
+    web_link: true

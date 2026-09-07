@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.web_link` an alias of the `web_link` configuration provided by `WebLinkBundle`
+ * Register `WebLinkBundle` automatically when the WebLink component is installed
  * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
  * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Deprecate `JsonPathPass`, use the one from the JsonPath component instead

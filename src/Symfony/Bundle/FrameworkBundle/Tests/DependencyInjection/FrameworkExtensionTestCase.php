@@ -130,6 +130,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\Webhook\Server\SignatureFormat;
+use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
+use Symfony\Component\WebLink\WebLinkBundle;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\WorkflowBundle;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
@@ -423,6 +425,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('article', $container->getDefinition('test_workflow')->getTag('workflow')[0]['name']);
     }
 
+    public function testWebLinkConfigurationIsForwardedToWebLinkBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new WebLinkBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_web_link');
+        $container->compile();
+
+        $this->assertSame(AddLinkHeaderListener::class, $container->getDefinition('test_add_link_header_listener')->getClass());
+    }
+
     public function testEnabledPhpErrorsConfig()
     {
         $container = $this->createContainerFromFile('php_errors_enabled');
@@ -697,22 +710,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         // default package
         $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
         $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
-    }
-
-    public function testWebLink()
-    {
-        $container = $this->createContainerFromFile('web_link');
-        $this->assertTrue($container->hasDefinition('web_link.add_link_header_listener'));
-        $this->assertTrue($container->hasDefinition('web_link.http_header_serializer'));
-        $this->assertTrue($container->hasDefinition('web_link.http_header_parser'));
-        $this->assertTrue($container->hasDefinition('web_link.link_template_header_serializer'));
-        $this->assertTrue($container->hasDefinition('web_link.link_template_header_parser'));
-        $this->assertTrue($container->hasDefinition('web_link.json_linkset_serializer'));
-        $this->assertTrue($container->hasDefinition('web_link.json_linkset_parser'));
-
-        $listener = $container->getDefinition('web_link.add_link_header_listener');
-        $this->assertSame('web_link.http_header_serializer', (string) $listener->getArgument(0));
-        $this->assertSame('web_link.link_template_header_serializer', (string) $listener->getArgument(1));
     }
 
     public function testMessengerServicesRemovedWhenDisabled()

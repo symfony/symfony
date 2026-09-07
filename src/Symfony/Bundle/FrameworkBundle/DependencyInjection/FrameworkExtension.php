@@ -215,7 +215,6 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\Webhook\Server\SignatureFormat;
-use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -493,14 +492,6 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
-        }
-
-        if ($this->readConfigEnabled('web_link', $container, $config['web_link'])) {
-            if (!class_exists(HttpHeaderSerializer::class)) {
-                throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed. Try running "composer require symfony/weblink".');
-            }
-
-            $loader->load('web_link.php');
         }
 
         if ($this->readConfigEnabled('uid', $container, $config['uid'])) {

@@ -91,6 +91,7 @@ use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\WebLink\WebLinkBundle;
 use Symfony\Component\Workflow\WorkflowBundle;
 
 // Help opcache.preload discover always-needed symbols
@@ -111,6 +112,7 @@ class_exists(Registry::class);
  */
 #[RequiredBundle(ServicesBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]

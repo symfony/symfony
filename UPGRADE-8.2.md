@@ -97,6 +97,9 @@ FrameworkBundle
  * `WorkflowBundle` is registered automatically when the Workflow component is installed, and its services are then
    registered without any configuration; set `workflow.enabled` to `false` to disable them. The `framework.workflows`
    configuration is an alias of the `workflow` configuration provided by the bundle
+ * `WebLinkBundle` is registered automatically when the WebLink component is installed, and its services are then
+   registered without any configuration; set `web_link.enabled` to `false` to disable them. The `framework.web_link`
+   configuration is an alias of the `web_link` configuration provided by the bundle
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

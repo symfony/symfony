@@ -50,7 +50,6 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
-use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * FrameworkExtension configuration structure.
@@ -179,7 +178,7 @@ class Configuration implements ConfigurationInterface
         $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
         $this->addExceptionsSection($rootNode);
-        $this->addWebLinkSection($rootNode, $enableIfStandalone);
+        $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode, $enableIfStandalone);
         $this->addSemaphoreSection($rootNode, $enableIfStandalone);
         $this->addMessengerSection($rootNode, $enableIfStandalone);
@@ -1486,16 +1485,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addWebLinkSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addWebLinkSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('web_link')
-                    ->info('Web links configuration')
-                    ->{$enableIfStandalone('symfony/weblink', HttpHeaderSerializer::class)}()
+                ->variableNode('web_link')
+                    ->aliasOf('web_link')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

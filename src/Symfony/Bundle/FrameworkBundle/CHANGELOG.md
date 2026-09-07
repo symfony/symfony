@@ -8,6 +8,8 @@ CHANGELOG
  * Register `WebLinkBundle` automatically when the WebLink component is installed
  * Make `framework.semaphore` an alias of the `semaphore` configuration provided by `SemaphoreBundle`
  * Register `SemaphoreBundle` automatically when the Semaphore component is installed
+ * Make `framework.html_sanitizer` an alias of the `html_sanitizer` configuration provided by `HtmlSanitizerBundle`
+ * Register `HtmlSanitizerBundle` automatically when the HtmlSanitizer component is installed
  * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
  * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Make `framework.remote_event` an alias of the `remote_event` configuration provided by `RemoteEventBundle`

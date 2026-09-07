@@ -77,10 +77,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerAction;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -530,9 +526,6 @@ class FrameworkExtension extends Extension
                 $container->removeDefinition('form.type_extension.form.validator');
                 $container->removeDefinition('form.type_guesser.validator');
             }
-            if (!$this->readConfigEnabled('html_sanitizer', $container, $config['html_sanitizer'])) {
-                $container->removeDefinition('form.type_extension.form.html_sanitizer');
-            }
         } else {
             $container->removeDefinition('console.command.form_debug');
         }
@@ -613,14 +606,6 @@ class FrameworkExtension extends Extension
                     )
                     ->addTag('container.error');
             }
-        }
-
-        if ($this->readConfigEnabled('html_sanitizer', $container, $config['html_sanitizer'])) {
-            if (!class_exists(HtmlSanitizerConfig::class)) {
-                throw new LogicException('HtmlSanitizer support cannot be enabled as the HtmlSanitizer component is not installed. Try running "composer require symfony/html-sanitizer".');
-            }
-
-            $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
         }
 
         $container->registerForAutoconfiguration(PackageInterface::class)
@@ -3510,94 +3495,6 @@ class FrameworkExtension extends Extension
         } elseif (null !== ($config['uuid47_secret'] ?? null)) {
             $container->getDefinition('uuid47_transformer')
                 ->setArguments([$config['uuid47_secret']]);
-        }
-    }
-
-    private function registerHtmlSanitizerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        $loader->load('html_sanitizer.php');
-
-        foreach ($config['sanitizers'] as $sanitizerName => $sanitizerConfig) {
-            $configId = 'html_sanitizer.config.'.$sanitizerName;
-            $def = $container->register($configId, HtmlSanitizerConfig::class);
-
-            // Base
-            if ($sanitizerConfig['default_action'] ?? false) {
-                $def->addMethodCall('defaultAction', [HtmlSanitizerAction::from($sanitizerConfig['default_action'])], true);
-            }
-
-            if ($sanitizerConfig['allow_safe_elements']) {
-                $def->addMethodCall('allowSafeElements', [], true);
-            }
-
-            if ($sanitizerConfig['allow_static_elements']) {
-                $def->addMethodCall('allowStaticElements', [], true);
-            }
-
-            // Configures elements
-            foreach ($sanitizerConfig['allow_elements'] as $element => $attributes) {
-                $def->addMethodCall('allowElement', [$element, $attributes], true);
-            }
-
-            foreach ($sanitizerConfig['block_elements'] as $element) {
-                $def->addMethodCall('blockElement', [$element], true);
-            }
-
-            foreach ($sanitizerConfig['drop_elements'] as $element) {
-                $def->addMethodCall('dropElement', [$element], true);
-            }
-
-            // Configures attributes
-            foreach ($sanitizerConfig['allow_attributes'] as $attribute => $elements) {
-                $def->addMethodCall('allowAttribute', [$attribute, $elements], true);
-            }
-
-            foreach ($sanitizerConfig['drop_attributes'] as $attribute => $elements) {
-                $def->addMethodCall('dropAttribute', [$attribute, $elements], true);
-            }
-
-            // Force attributes
-            foreach ($sanitizerConfig['force_attributes'] as $element => $attributes) {
-                foreach ($attributes as $attrName => $attrValue) {
-                    $def->addMethodCall('forceAttribute', [$element, $attrName, $attrValue], true);
-                }
-            }
-
-            // Settings
-            $def->addMethodCall('forceHttpsUrls', [$sanitizerConfig['force_https_urls']], true);
-            if ($sanitizerConfig['allowed_link_schemes']) {
-                $def->addMethodCall('allowLinkSchemes', [$sanitizerConfig['allowed_link_schemes']], true);
-            }
-            $def->addMethodCall('allowLinkHosts', [$sanitizerConfig['allowed_link_hosts']], true);
-            $def->addMethodCall('allowRelativeLinks', [$sanitizerConfig['allow_relative_links']], true);
-            if ($sanitizerConfig['allowed_media_schemes']) {
-                $def->addMethodCall('allowMediaSchemes', [$sanitizerConfig['allowed_media_schemes']], true);
-            }
-            $def->addMethodCall('allowMediaHosts', [$sanitizerConfig['allowed_media_hosts']], true);
-            $def->addMethodCall('allowRelativeMedias', [$sanitizerConfig['allow_relative_medias']], true);
-
-            // Custom attribute sanitizers
-            foreach ($sanitizerConfig['with_attribute_sanitizers'] as $serviceName) {
-                $def->addMethodCall('withAttributeSanitizer', [new Reference($serviceName)], true);
-            }
-
-            foreach ($sanitizerConfig['without_attribute_sanitizers'] as $serviceName) {
-                $def->addMethodCall('withoutAttributeSanitizer', [new Reference($serviceName)], true);
-            }
-
-            if ($sanitizerConfig['max_input_length']) {
-                $def->addMethodCall('withMaxInputLength', [$sanitizerConfig['max_input_length']], true);
-            }
-
-            // Create the sanitizer and link its config
-            $sanitizerId = 'html_sanitizer.sanitizer.'.$sanitizerName;
-            $container->register($sanitizerId, HtmlSanitizer::class)
-                ->addTag('html_sanitizer', ['sanitizer' => $sanitizerName])
-                ->addArgument(new Reference($configId));
-
-            if ('default' !== $sanitizerName) {
-                $container->registerAliasForArgument($sanitizerId, HtmlSanitizerInterface::class, $sanitizerName);
-            }
         }
     }
 

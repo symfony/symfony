@@ -84,7 +84,7 @@ class UndefinedCallableHandler
     ];
 
     private const FULL_STACK_ENABLE = [
-        'html-sanitizer' => 'enable "framework.html_sanitizer"',
+        'html-sanitizer' => 'enable "html_sanitizer"',
         'form' => 'enable "framework.form"',
         'security-core' => 'add the "SecurityBundle"',
         'security-http' => 'add the "SecurityBundle"',

@@ -1,4 +1,0 @@
-framework:
-    html_sanitizer:
-        sanitizers:
-            custom_default: ~

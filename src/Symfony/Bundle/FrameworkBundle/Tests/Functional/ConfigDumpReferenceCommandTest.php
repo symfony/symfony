@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
 use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\Mime\MimeBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
@@ -151,7 +152,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $bundles = ['DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'ServicesBundle', 'ConsoleBundle'];
 
         // registered through #[RequiredBundle(..., ignoreOnInvalid: true)], so absent when the component is not installed
-        foreach (['web_link' => WebLinkBundle::class, 'semaphore' => SemaphoreBundle::class, 'workflow' => WorkflowBundle::class, 'remote_event' => RemoteEventBundle::class, 'process' => ProcessBundle::class, 'json_path' => JsonPathBundle::class, 'mime' => MimeBundle::class, 'object_mapper' => ObjectMapperBundle::class] as $alias => $class) {
+        foreach (['web_link' => WebLinkBundle::class, 'semaphore' => SemaphoreBundle::class, 'workflow' => WorkflowBundle::class, 'remote_event' => RemoteEventBundle::class, 'html_sanitizer' => HtmlSanitizerBundle::class, 'process' => ProcessBundle::class, 'json_path' => JsonPathBundle::class, 'mime' => MimeBundle::class, 'object_mapper' => ObjectMapperBundle::class] as $alias => $class) {
             if (class_exists($class)) {
                 $aliases[] = $alias;
                 $bundles[] = substr($class, 1 + strrpos($class, '\\'));

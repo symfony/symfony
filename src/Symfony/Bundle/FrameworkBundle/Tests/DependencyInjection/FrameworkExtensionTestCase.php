@@ -59,9 +59,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Attribute\AsFormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerAction;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -473,6 +471,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
         $this->assertSame([SemaphoreStoreFactory::class, 'createStore'], $storeDef->getFactory());
         $this->assertSame('redis://localhost', $storeDef->getArgument(0));
+    }
+
+    public function testHtmlSanitizerConfigurationIsForwardedToHtmlSanitizerBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new HtmlSanitizerBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_html_sanitizer');
+        $container->compile();
+
+        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('test_html_sanitizer')->getClass());
+        $this->assertSame('custom', $container->getDefinition('test_html_sanitizer')->getTag('html_sanitizer')[0]['sanitizer']);
     }
 
     public function testEnabledPhpErrorsConfig()
@@ -3031,103 +3041,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $localeAwareServices = array_map(static fn (Reference $r) => (string) $r, $switcherDef->getArgument(1)->getValues());
 
         $this->assertNotContains('translation.locale_switcher', $localeAwareServices);
-    }
-
-    public function testHtmlSanitizer()
-    {
-        $container = $this->createContainerFromFile('html_sanitizer');
-
-        // html_sanitizer service
-        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.custom')->getClass());
-        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.custom')->getArguments());
-        $this->assertSame('html_sanitizer.config.custom', (string) $args[0]);
-
-        // config
-        $this->assertTrue($container->hasDefinition('html_sanitizer.config.custom'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
-        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.custom')->getClass());
-        $this->assertCount(24, $calls = $container->getDefinition('html_sanitizer.config.custom')->getMethodCalls());
-        $this->assertSame(
-            [
-                ['defaultAction', [HtmlSanitizerAction::Allow], true],
-                ['allowSafeElements', [], true],
-                ['allowStaticElements', [], true],
-                ['allowElement', ['iframe', 'src'], true],
-                ['allowElement', ['custom-tag', ['data-attr', 'data-attr-1']], true],
-                ['allowElement', ['custom-tag-2', '*'], true],
-                ['blockElement', ['section'], true],
-                ['dropElement', ['video'], true],
-                ['allowAttribute', ['src', ['iframe']], true],
-                ['allowAttribute', ['data-attr', '*'], true],
-                ['dropAttribute', ['data-attr', ['custom-tag']], true],
-                ['dropAttribute', ['data-attr-1', []], true],
-                ['dropAttribute', ['data-attr-2', '*'], true],
-                ['forceAttribute', ['a', 'rel', 'noopener noreferrer'], true],
-                ['forceAttribute', ['h1', 'class', 'bp4-heading'], true],
-                ['forceHttpsUrls', [true], true],
-                ['allowLinkSchemes', [['http', 'https', 'mailto']], true],
-                ['allowLinkHosts', [['symfony.com']], true],
-                ['allowRelativeLinks', [true], true],
-                ['allowMediaSchemes', [['http', 'https', 'data']], true],
-                ['allowMediaHosts', [['symfony.com']], true],
-                ['allowRelativeMedias', [true], true],
-                ['withAttributeSanitizer', ['@App\\Sanitizer\\CustomAttributeSanitizer'], true],
-                ['withoutAttributeSanitizer', ['@App\\Sanitizer\\OtherCustomAttributeSanitizer'], true],
-            ],
-
-            // Convert references to their names for easier assertion
-            array_map(
-                static function ($call) {
-                    foreach ($call[1] as $k => $arg) {
-                        $call[1][$k] = $arg instanceof Reference ? '@'.$arg : $arg;
-                    }
-
-                    return $call;
-                },
-                $calls
-            )
-        );
-
-        // Named alias
-        $this->assertSame('html_sanitizer.sanitizer.all.sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class.' $allSanitizer'));
-        $this->assertFalse($container->hasAlias(HtmlSanitizerInterface::class.' $default'));
-    }
-
-    public function testHtmlSanitizerDefaultNullAllowedLinkMediaHost()
-    {
-        $container = $this->createContainerFromFile('html_sanitizer_default_allowed_link_and_media_hosts');
-
-        $calls = $container->getDefinition('html_sanitizer.config.custom_default')->getMethodCalls();
-        $this->assertContains(['allowLinkHosts', [null], true], $calls);
-        $this->assertContains(['allowRelativeLinks', [false], true], $calls);
-        $this->assertContains(['allowMediaHosts', [null], true], $calls);
-        $this->assertContains(['allowRelativeMedias', [false], true], $calls);
-    }
-
-    public function testHtmlSanitizerDefaultConfig()
-    {
-        $container = $this->createContainerFromFile('html_sanitizer_default_config');
-
-        // html_sanitizer service
-        $this->assertTrue($container->hasAlias('html_sanitizer'), '->registerHtmlSanitizerConfiguration() loads default_config');
-        $this->assertSame('html_sanitizer.sanitizer.default', (string) $container->getAlias('html_sanitizer'));
-        $this->assertSame(HtmlSanitizer::class, $container->getDefinition('html_sanitizer.sanitizer.default')->getClass());
-        $this->assertCount(1, $args = $container->getDefinition('html_sanitizer.sanitizer.default')->getArguments());
-        $this->assertSame('html_sanitizer.config.default', (string) $args[0]);
-
-        // config
-        $this->assertTrue($container->hasDefinition('html_sanitizer.config.default'), '->registerHtmlSanitizerConfiguration() loads custom sanitizer');
-        $this->assertSame(HtmlSanitizerConfig::class, $container->getDefinition('html_sanitizer.config.default')->getClass());
-        $this->assertCount(1, $calls = $container->getDefinition('html_sanitizer.config.default')->getMethodCalls());
-        $this->assertSame(
-            ['allowSafeElements', [], true],
-            $calls[0]
-        );
-
-        // Named alias
-        $this->assertFalse($container->hasAlias(HtmlSanitizerInterface::class.' $default'));
-
-        // Default alias
-        $this->assertSame('html_sanitizer', (string) $container->getAlias(HtmlSanitizerInterface::class));
     }
 
     public function testNotifierWithDisabledMessageBus()

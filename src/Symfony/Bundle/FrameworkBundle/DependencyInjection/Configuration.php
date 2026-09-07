@@ -36,7 +36,6 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Scheduler\Schedule;
@@ -168,7 +167,7 @@ class Configuration implements ConfigurationInterface
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone);
         $this->addSerializerSection($rootNode, $enableIfStandalone);
-        $this->addPropertyAccessSection($rootNode, $willBeAvailable);
+        $this->addPropertyAccessSection($rootNode);
         $this->addTypeInfoSection($rootNode);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
@@ -1060,28 +1059,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $willBeAvailable
-     */
-    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
+    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('property_access')
-                    ->addDefaultsIfNotSet()
-                    ->info('Property access configuration')
-                    ->{$willBeAvailable('symfony/property-access', PropertyAccessor::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-                    ->children()
-                        ->booleanNode('magic_call')->defaultFalse()->end()
-                        ->booleanNode('magic_get')->defaultTrue()->end()
-                        ->booleanNode('magic_set')->defaultTrue()->end()
-                        ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
-                        ->booleanNode('throw_exception_on_invalid_property_path')->defaultTrue()->end()
-                        ->booleanNode('wildcard_reads')
-                            ->info('Enables reading every element of a collection through a "[*]" wildcard.')
-                            ->defaultFalse()
-                        ->end()
-                    ->end()
+                ->variableNode('property_access')
+                    ->aliasOf('property_access')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

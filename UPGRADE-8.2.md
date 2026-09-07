@@ -112,6 +112,9 @@ FrameworkBundle
  * `TypeInfoBundle` is registered automatically when the TypeInfo component is installed, and its services are
    then registered without any configuration; set `type_info.enabled` to `false` to disable them. The
    `framework.type_info` configuration is an alias of the `type_info` configuration provided by the bundle
+ * `PropertyAccessBundle` is registered automatically when the PropertyAccess component is installed, and its services
+   are then registered as before; set `property_access.enabled` to `false` to disable them. The
+   `framework.property_access` configuration is an alias of the `property_access` configuration provided by the bundle
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

@@ -293,7 +293,6 @@ class FrameworkExtension extends Extension
 
         // warmup config enabled
         $this->readConfigEnabled('translator', $container, $config['translator']);
-        $this->readConfigEnabled('property_access', $container, $config['property_access']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
 
         // A translator must always be registered (as support is included by
@@ -410,7 +409,6 @@ class FrameworkExtension extends Extension
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale'], $config['enabled_locales']);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
-        $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
 
         $exceptionListener = $container->getDefinition('exception_listener');
@@ -1664,31 +1662,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!$this->readConfigEnabled('property_access', $container, $config)) {
-            return;
-        }
-
-        $loader->load('property_access.php');
-
-        $magicMethods = PropertyAccessor::DISALLOW_MAGIC_METHODS;
-        $magicMethods |= $config['magic_call'] ? PropertyAccessor::MAGIC_CALL : 0;
-        $magicMethods |= $config['magic_get'] ? PropertyAccessor::MAGIC_GET : 0;
-        $magicMethods |= $config['magic_set'] ? PropertyAccessor::MAGIC_SET : 0;
-
-        $throw = PropertyAccessor::DO_NOT_THROW;
-        $throw |= $config['throw_exception_on_invalid_index'] ? PropertyAccessor::THROW_ON_INVALID_INDEX : 0;
-        $throw |= $config['throw_exception_on_invalid_property_path'] ? PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH : 0;
-
-        $container
-            ->getDefinition('property_accessor')
-            ->replaceArgument(0, $magicMethods)
-            ->replaceArgument(1, $throw)
-            ->replaceArgument(5, $config['wildcard_reads'])
-        ;
-    }
-
     private function registerSecretsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, ?string $secret): void
     {
         if (!$this->readConfigEnabled('secrets', $container, $config)) {
@@ -1782,17 +1755,8 @@ class FrameworkExtension extends Extension
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
-        if (!$this->isInitializedConfigEnabled('property_access')) {
-            $container->removeAlias('serializer.property_accessor');
-            $container->removeDefinition('serializer.normalizer.object');
-        }
-
         if (!class_exists(Yaml::class)) {
             $container->removeDefinition('serializer.encoder.yaml');
-        }
-
-        if (!$this->isInitializedConfigEnabled('property_access')) {
-            $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 
         if (!class_exists(Headers::class)) {

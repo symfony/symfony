@@ -12,6 +12,8 @@ CHANGELOG
  * Register `HtmlSanitizerBundle` automatically when the HtmlSanitizer component is installed
  * Make `framework.type_info` an alias of the `type_info` configuration provided by `TypeInfoBundle`
  * Register `TypeInfoBundle` automatically when the TypeInfo component is installed
+ * Make `framework.property_access` an alias of the `property_access` configuration provided by `PropertyAccessBundle`
+ * Register `PropertyAccessBundle` automatically when the PropertyAccess component is installed
  * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
  * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Make `framework.remote_event` an alias of the `remote_event` configuration provided by `RemoteEventBundle`

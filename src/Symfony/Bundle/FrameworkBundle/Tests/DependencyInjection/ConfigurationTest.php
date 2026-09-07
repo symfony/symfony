@@ -1126,15 +1126,6 @@ class ConfigurationTest extends TestCase
                 'mapping' => ['paths' => []],
                 'named_serializers' => [],
             ],
-            'property_access' => [
-                'enabled' => true,
-                'magic_call' => false,
-                'magic_get' => true,
-                'magic_set' => true,
-                'throw_exception_on_invalid_index' => false,
-                'throw_exception_on_invalid_property_path' => true,
-                'wildcard_reads' => false,
-            ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),
                 'with_constructor_extractor' => true,

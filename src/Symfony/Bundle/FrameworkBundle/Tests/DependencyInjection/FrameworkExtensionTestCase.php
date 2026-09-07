@@ -100,6 +100,7 @@ use Symfony\Component\Mime\Crypto\PgpEncrypter;
 use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventHandler;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
@@ -166,20 +167,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->createContainerFromFile('form_csrf_disabled');
     }
 
-    public function testPropertyAccessWithDefaultValue()
+    public function testPropertyAccessConfigurationIsForwardedToPropertyAccessBundle()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new PropertyAccessBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_property_access');
+        $container->compile();
 
-        $def = $container->getDefinition('property_accessor');
-        $this->assertSame(PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_GET, $def->getArgument(0));
-        $this->assertSame(PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, $def->getArgument(1));
-        $this->assertFalse($def->getArgument(5));
-    }
-
-    public function testPropertyAccessWithOverriddenValues()
-    {
-        $container = $this->createContainerFromFile('property_accessor');
-        $def = $container->getDefinition('property_accessor');
+        $def = $container->getDefinition('test_property_accessor');
         $this->assertSame(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_CALL, $def->getArgument(0));
         $this->assertSame(PropertyAccessor::THROW_ON_INVALID_INDEX, $def->getArgument(1));
         $this->assertTrue($def->getArgument(5));
@@ -187,7 +183,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testPropertyAccessCache()
     {
-        $container = $this->createContainerFromFile('property_accessor');
+        $container = $this->createContainerFromFile('full');
 
         $cache = $container->getDefinition('cache.property_access');
         $this->assertSame([PropertyAccessor::class, 'createCache'], $cache->getFactory(), 'PropertyAccessor::createCache() should be used in non-debug mode');
@@ -196,7 +192,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testPropertyAccessCacheWithDebug()
     {
-        $container = $this->createContainerFromFile('property_accessor', ['kernel.debug' => true]);
+        $container = $this->createContainerFromFile('full', ['kernel.debug' => true]);
 
         $cache = $container->getDefinition('cache.property_access');
         $this->assertNull($cache->getFactory());

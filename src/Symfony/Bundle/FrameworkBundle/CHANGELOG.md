@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
+ * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Auto-configure the `form.data_class` resource tag for classes with the `#[AsFormType]` attribute
  * Add the `cache.adapter.mongodb` and `cache.adapter.mongodb_tag_aware` cache adapters, and the `framework.cache.default_mongodb_provider` option
  * Add Messenger routing and failure transport information to the `debug:messenger` command

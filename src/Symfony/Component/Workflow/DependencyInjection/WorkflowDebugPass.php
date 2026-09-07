@@ -25,6 +25,10 @@ class WorkflowDebugPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
+        if (!$container->has('debug.stopwatch')) {
+            return;
+        }
+
         foreach ($container->findTaggedServiceIds('workflow') as $id => $attributes) {
             $container->register("debug.{$id}", TraceableWorkflow::class)
                 ->setDecoratedService($id)

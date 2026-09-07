@@ -89,7 +89,7 @@ class UndefinedCallableHandler
         'security-core' => 'add the "SecurityBundle"',
         'security-http' => 'add the "SecurityBundle"',
         'web-link' => 'enable "framework.web_link"',
-        'workflow' => 'enable "framework.workflows"',
+        'workflow' => 'enable "workflow"',
     ];
 
     public static function onUndefinedFilter(string $name): TwigFilter|false

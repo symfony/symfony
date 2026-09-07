@@ -19,7 +19,6 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
-use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Places;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
@@ -955,134 +954,6 @@ class ConfigurationTest extends TestCase
         $this->assertSame([], $config['serializer']['default_context'] ?? []);
     }
 
-    public function testWorkflowEnumArcsNormalization()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $config = $processor->processConfiguration($configuration, [[
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
-            'workflows' => [
-                'workflows' => [
-                    'enum' => [
-                        'supports' => [self::class],
-                        'places' => Places::cases(),
-                        'initial_marking' => Places::A,
-                        'transitions' => [
-                            [
-                                'name' => 'one',
-                                'from' => [Places::A],
-                                'to' => [['place' => Places::B, 'weight' => 2]],
-                            ],
-                            [
-                                'name' => 'two',
-                                'from' => ['place' => Places::B, 'weight' => 3],
-                                'to' => ['place' => Places::C],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]]);
-
-        $this->assertSame(['a'], $config['workflows']['workflows']['enum']['initial_marking']);
-
-        $transitions = $config['workflows']['workflows']['enum']['transitions'];
-
-        $this->assertSame('one', $transitions[0]['name']);
-        $this->assertSame([['place' => 'a', 'weight' => 1]], $transitions[0]['from']);
-        $this->assertSame([['place' => 'b', 'weight' => 2]], $transitions[0]['to']);
-
-        $this->assertSame('two', $transitions[1]['name']);
-        $this->assertSame([['place' => 'b', 'weight' => 3]], $transitions[1]['from']);
-        $this->assertSame([['place' => 'c', 'weight' => 1]], $transitions[1]['to']);
-    }
-
-    public function testWorkflowEventsToDispatchRejectsMixedAllowListAndBlockList()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Cannot mix allow-list and block-list entries in "events_to_dispatch": every entry must start with "!" (block-list mode) or none of them must (allow-list mode).');
-
-        $processor->processConfiguration($configuration, [[
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
-            'workflows' => [
-                'workflows' => [
-                    'mixed' => [
-                        'supports' => [self::class],
-                        'places' => ['a', 'b'],
-                        'initial_marking' => 'a',
-                        'events_to_dispatch' => ['workflow.enter', '!workflow.announce'],
-                        'transitions' => [
-                            ['name' => 'go', 'from' => ['a'], 'to' => ['b']],
-                        ],
-                    ],
-                ],
-            ],
-        ]]);
-    }
-
-    public function testWorkflowEventsToDispatchAcceptsBlockListOnlyList()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $config = $processor->processConfiguration($configuration, [[
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
-            'workflows' => [
-                'workflows' => [
-                    'block_list' => [
-                        'supports' => [self::class],
-                        'places' => ['a', 'b'],
-                        'initial_marking' => 'a',
-                        'events_to_dispatch' => ['!workflow.announce'],
-                        'transitions' => [
-                            ['name' => 'go', 'from' => ['a'], 'to' => ['b']],
-                        ],
-                    ],
-                ],
-            ],
-        ]]);
-
-        $this->assertSame(['!workflow.announce'], $config['workflows']['workflows']['block_list']['events_to_dispatch']);
-    }
-
-    public function testWorkflowEventsToDispatchRejectsBlockListedGuardEvent()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The "workflow.guard" event cannot be disabled in "events_to_dispatch": it is always dispatched.');
-
-        $processor->processConfiguration($configuration, [[
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
-            'workflows' => [
-                'workflows' => [
-                    'guard_block' => [
-                        'supports' => [self::class],
-                        'places' => ['a', 'b'],
-                        'initial_marking' => 'a',
-                        'events_to_dispatch' => ['!workflow.guard'],
-                        'transitions' => [
-                            ['name' => 'go', 'from' => ['a'], 'to' => ['b']],
-                        ],
-                    ],
-                ],
-            ],
-        ]]);
-    }
-
     public function testFormCsrfProtectionFieldAttrDoNotNormalizeKeys()
     {
         $processor = new Processor();
@@ -1387,10 +1258,6 @@ class ConfigurationTest extends TestCase
                 'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null,
                 'default_mongodb_provider' => 'mongodb://localhost/app',
                 'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
-            ],
-            'workflows' => [
-                'enabled' => false,
-                'workflows' => [],
             ],
             'php_errors' => [
                 'log' => true,

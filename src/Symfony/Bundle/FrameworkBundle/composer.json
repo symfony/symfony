@@ -77,7 +77,7 @@
         "symfony/type-info": "^7.4.1|^8.0.1",
         "symfony/uid": "^7.4|^8.0",
         "symfony/validator": "^7.4|^8.0",
-        "symfony/workflow": "^7.4|^8.0",
+        "symfony/workflow": "^8.2",
         "symfony/web-link": "^8.2",
         "symfony/webhook": "^7.4|^8.0",
         "symfony/yaml": "^7.4|^8.0"

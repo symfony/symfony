@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `WorkflowBundle`, which provides the `workflow` configuration and the services previously provided by `FrameworkBundle` under `framework.workflows`
  * Allow prefixing entries with `!` in the `$eventsToDispatch` constructor argument of `Workflow` and `StateMachine` to permanently disable an event; e.g. `new Workflow(..., eventsToDispatch: ['!workflow.announce'])` fires every event except `workflow.announce`. The GuardEvent can never be suppressed; `!workflow.guard` throws an `InvalidArgumentException`. Mixing allow-list and block-list entries also throws an `InvalidArgumentException`.
 
 8.1

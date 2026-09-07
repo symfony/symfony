@@ -29,10 +29,6 @@ use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
-use Symfony\Component\Workflow\Definition;
-use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
-use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
-use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 {
@@ -70,133 +66,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                 ],
             ]);
         });
-    }
-
-    public function testWorkflowValidationStateMachine()
-    {
-        $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
-        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'workflows' => [
-                    'article' => [
-                        'type' => 'state_machine',
-                        'supports' => [
-                            __CLASS__,
-                        ],
-                        'places' => [
-                            'a',
-                            'b',
-                            'c',
-                        ],
-                        'transitions' => [
-                            'a_to_b' => [
-                                'from' => ['a'],
-                                'to' => ['b', 'c'],
-                            ],
-                        ],
-                    ],
-                ],
-            ]);
-            $container->addCompilerPass(new WorkflowValidatorPass());
-        });
-    }
-
-    #[DataProvider('provideWorkflowValidationCustomTests')]
-    public function testWorkflowValidationCustomBroken(string $class, string $message)
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($message);
-        $this->createContainerFromClosure(static function ($container) use ($class) {
-            $container->loadFromExtension('framework', [
-                'workflows' => [
-                    'article' => [
-                        'type' => 'state_machine',
-                        'supports' => [
-                            __CLASS__,
-                        ],
-                        'places' => [
-                            'a',
-                            'b',
-                        ],
-                        'transitions' => [
-                            'a_to_b' => [
-                                'from' => ['a'],
-                                'to' => ['b'],
-                            ],
-                        ],
-                        'definition_validators' => [
-                            $class,
-                        ],
-                    ],
-                ],
-            ]);
-        });
-    }
-
-    public static function provideWorkflowValidationCustomTests()
-    {
-        yield ['classDoesNotExist', 'Invalid configuration for path "framework.workflows.workflows.article.definition_validators.0": The validation class "classDoesNotExist" does not exist.'];
-
-        yield [\DateTime::class, 'Invalid configuration for path "framework.workflows.workflows.article.definition_validators.0": The validation class "DateTime" is not an instance of "Symfony\Component\Workflow\Validator\DefinitionValidatorInterface".'];
-
-        yield [WorkflowValidatorWithConstructor::class, 'Invalid configuration for path "framework.workflows.workflows.article.definition_validators.0": The "Symfony\\\\Bundle\\\\FrameworkBundle\\\\Tests\\\\DependencyInjection\\\\WorkflowValidatorWithConstructor" validation class constructor must not have any arguments.'];
-    }
-
-    public function testWorkflowDefaultMarkingStoreDefinition()
-    {
-        $container = $this->createContainerFromClosure(static function ($container) {
-            $container->loadFromExtension('framework', [
-                'workflows' => [
-                    'workflow_a' => [
-                        'type' => 'state_machine',
-                        'marking_store' => [
-                            'type' => 'method',
-                            'property' => 'status',
-                        ],
-                        'supports' => [
-                            __CLASS__,
-                        ],
-                        'places' => [
-                            'a',
-                            'b',
-                        ],
-                        'transitions' => [
-                            'a_to_b' => [
-                                'from' => ['a'],
-                                'to' => ['b'],
-                            ],
-                        ],
-                    ],
-                    'workflow_b' => [
-                        'type' => 'state_machine',
-                        'supports' => [
-                            __CLASS__,
-                        ],
-                        'places' => [
-                            'a',
-                            'b',
-                        ],
-                        'transitions' => [
-                            'a_to_b' => [
-                                'from' => ['a'],
-                                'to' => ['b'],
-                            ],
-                        ],
-                    ],
-                ],
-            ]);
-        });
-
-        $workflowA = $container->getDefinition('state_machine.workflow_a');
-        $argumentsA = $workflowA->getArguments();
-        $this->assertArrayHasKey('index_1', $argumentsA, 'workflow_a has a marking_store argument');
-        $this->assertNotNull($argumentsA['index_1'], 'workflow_a marking_store argument is not null');
-
-        $workflowB = $container->getDefinition('state_machine.workflow_b');
-        $argumentsB = $workflowB->getArguments();
-        $this->assertArrayHasKey('index_1', $argumentsB, 'workflow_b has a marking_store argument');
-        $this->assertNull($argumentsB['index_1'], 'workflow_b marking_store argument is null');
     }
 
     public function testRateLimiterLockFactoryWithLockDisabled()
@@ -765,16 +634,5 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                 ],
             ]);
         });
-    }
-}
-
-class WorkflowValidatorWithConstructor implements DefinitionValidatorInterface
-{
-    public function __construct(bool $enabled)
-    {
-    }
-
-    public function validate(Definition $definition, string $name): void
-    {
     }
 }

@@ -289,4 +289,16 @@ class TextWrapperTest extends TestCase
         $this->assertSame('Hello', $lines[0]);
         $this->assertSame('World', $lines[1]);
     }
+
+    public function testBreakingALongWordThatCarriesMalformedUtf8()
+    {
+        $word = "aaaaa\xC3\u{0301}aaaaaaaaaa";
+        $lines = TextWrapper::wrapTextWithAnsi($word, 5);
+
+        $this->assertSame($word, implode('', $lines));
+
+        foreach ($lines as $line) {
+            $this->assertLessThanOrEqual(5, AnsiUtils::visibleWidth($line));
+        }
+    }
 }

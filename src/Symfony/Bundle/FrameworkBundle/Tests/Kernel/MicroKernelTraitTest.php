@@ -282,6 +282,7 @@ class MicroKernelTraitTest extends TestCase
             'Symfony\Component\Workflow\WorkflowBundle' => ['all' => true],
             'Symfony\Component\Process\ProcessBundle' => ['all' => true],
             'Symfony\Component\JsonPath\JsonPathBundle' => ['all' => true],
+            'Symfony\Component\Mime\MimeBundle' => ['all' => true],
             'Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true],
             'TestBundle' => ['test' => true, 'dev' => true],
         ], $parameters['.kernel.bundles_definition']);

@@ -67,7 +67,7 @@ use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
 use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
-use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
+use Symfony\Component\Mime\MimeBundle;
 use Symfony\Component\ObjectMapper\DependencyInjection\ReverseMappingPass;
 use Symfony\Component\Process\ProcessBundle;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
@@ -114,6 +114,7 @@ class_exists(Registry::class);
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
 class FrameworkBundle extends Bundle
 {
     public function boot(): void
@@ -140,12 +141,6 @@ class FrameworkBundle extends Bundle
 
         if ($this->container->hasParameter('kernel.trust_x_sendfile_type_header') && $this->container->getParameter('kernel.trust_x_sendfile_type_header')) {
             BinaryFileResponse::trustXSendfileTypeHeader();
-        }
-
-        // Instantiate the mime_types service so its setDefault() call fires.
-        // The service is made public by AddMimeTypeGuesserPass only when custom guessers are tagged.
-        if ($this->container->has('mime_types')) {
-            $this->container->get('mime_types');
         }
     }
 
@@ -204,7 +199,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $this->addCompilerPassIfExists($container, AddMimeTypeGuesserPass::class);
         $this->addCompilerPassIfExists($container, AddScheduleMessengerPass::class);
         $this->addCompilerPassIfExists($container, MessengerPass::class);
         $this->addCompilerPassIfExists($container, HttpClientPass::class);

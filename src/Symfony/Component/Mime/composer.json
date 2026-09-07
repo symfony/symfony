@@ -24,7 +24,9 @@
         "egulias/email-validator": "^2.1.10|^3.1|^4",
         "league/html-to-markdown": "^5.0",
         "phpdocumentor/reflection-docblock": "^5.2|^6.0",
-        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
+        "symfony/filesystem": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
         "symfony/property-info": "^7.4|^8.0",
@@ -33,7 +35,8 @@
     "conflict": {
         "egulias/email-validator": "~3.0.0",
         "phpdocumentor/reflection-docblock": "<5.2|>=7",
-        "phpdocumentor/type-resolver": "<1.5.1"
+        "phpdocumentor/type-resolver": "<1.5.1",
+        "symfony/dependency-injection": "<8.1"
     },
     "suggest": {
         "symfony/process": "For PGP/MIME signing and encryption support"

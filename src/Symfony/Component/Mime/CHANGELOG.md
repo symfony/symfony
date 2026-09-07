@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `MimeBundle`, which provides the MIME type guessing services previously provided by `FrameworkBundle`
  * Support `binary` as a `Content-Transfer-Encoding`
  * Add PGP/MIME signing and encryption support with the `PgpSigner` and `PgpEncrypter` classes
  * Add `AbstractPart::setContentTypeParameter()`

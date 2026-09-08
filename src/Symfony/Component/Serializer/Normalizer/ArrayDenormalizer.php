@@ -73,6 +73,11 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
 
         if (\is_array($objectsToPopulate = $context[AbstractNormalizer::OBJECT_TO_POPULATE] ?? null)) {
             unset($context[AbstractNormalizer::OBJECT_TO_POPULATE]);
+
+            if (array_is_list($objectsToPopulate)) {
+                // positions are not identities, the payload can list different items
+                $objectsToPopulate = [];
+            }
         } else {
             $objectsToPopulate = [];
         }

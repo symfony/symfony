@@ -21,6 +21,8 @@ CHANGELOG
  * Add a `transport` option to `#[AsMessageHandler]` and to the `messenger.message_handler` tag to route the handled messages to that transport and bind the handler to it
  * Add `OutboxStamp` and `OutboxSender` to store messages in an outbox transport and forward them to their target transport when the outbox is consumed
  * Add the `outbox` option to transports
+ * Add `ChainStamp` and `ChainMiddleware` to dispatch a sequence of messages one after another, each one once the previous one is handled
+ * Add `chain` to the default bus middleware, between `send_message` and `handle_message`
 
 8.1
 ---

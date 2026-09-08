@@ -148,6 +148,16 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertSame([['bus' => null, 'handles' => null, 'method' => null, 'priority' => 0, 'sign' => false, 'transport' => 'async', 'from_transport' => null]], $definition->getTag('messenger.message_handler'));
     }
 
+    public function testMessengerChainMiddleware()
+    {
+        $container = $this->createContainerFromFile('messenger', false);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
+
+        $this->assertSame('messenger.routable_message_bus', (string) $container->getDefinition('messenger.middleware.chain')->getArgument(0));
+        $this->assertContains('messenger.middleware.chain', $this->getBusMiddlewareIds($container, 'messenger.bus.default'));
+    }
+
     public function testMessengerRejectRedeliveredMessagesEnabledByDefault()
     {
         $container = $this->createContainerFromFile('messenger', false);
@@ -531,6 +541,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
             ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'chain'],
             ['id' => 'handle_message', 'arguments' => ['index_1' => false]],
         ], $container->getParameter('messenger.bus.events.middleware'));
     }
@@ -550,6 +561,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
             ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'chain'],
             ['id' => 'handle_message', 'arguments' => ['index_1' => false]],
         ], $container->getParameter('messenger.bus.commands.middleware'));
         $this->assertTrue($container->has('messenger.bus.events'));
@@ -564,6 +576,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'deduplicate_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
             ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'chain'],
             ['id' => 'handle_message', 'arguments' => ['index_1' => false]],
         ], $container->getParameter('messenger.bus.events.middleware'));
         $this->assertTrue($container->has('messenger.bus.queries'));

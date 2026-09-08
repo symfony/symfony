@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T09:22:55Z
+
+Rebased on 8.2 now that #65896 has merged, which resolves the overlap the two had.
+
+The only conflict was the `response_signature` validator, and it collapsed rather than needing a merge: this branch still carried a check that `algorithms` is set, written before #65896 gave it a default. Since it can no longer be missing, that check is gone and only the two this PR adds remain, one requiring either `keyset` or `discovery` and one making them exclusive.
+
+Security/Http 1121, SecurityBundle 615, both green on the rebased head.

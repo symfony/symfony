@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\JsonStreamer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\JsonStreamer\DependencyInjection\DeprecateValueTransformerTagPass;
 
-class DeprecateJsonStreamerValueTransformerTagPassTest extends TestCase
+class DeprecateValueTransformerTagPassTest extends TestCase
 {
     #[Group('legacy')]
     #[IgnoreDeprecations]
@@ -38,7 +38,7 @@ class DeprecateJsonStreamerValueTransformerTagPassTest extends TestCase
 
         $this->expectUserDeprecationMessage('Since symfony/json-streamer 8.1: The "json_streamer.value_transformer" tag is deprecated, use "json_streamer.property_value_transformer" instead on service "deprecated_tag_service".');
 
-        (new DeprecateJsonStreamerValueTransformerTagPass())->process($container);
+        new DeprecateValueTransformerTagPass()->process($container);
 
         $tags = $container->getDefinition('deprecated_tag_service')->getTags();
         $this->assertArrayHasKey('json_streamer.property_value_transformer', $tags);

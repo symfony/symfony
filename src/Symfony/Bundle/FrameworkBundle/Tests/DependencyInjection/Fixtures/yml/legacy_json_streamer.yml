@@ -1,0 +1,8 @@
+services:
+    test_json_streamer_stream_writer:
+        alias: json_streamer.stream_writer
+        public: true
+framework:
+    json_streamer:
+        default_options:
+            include_null_properties: true

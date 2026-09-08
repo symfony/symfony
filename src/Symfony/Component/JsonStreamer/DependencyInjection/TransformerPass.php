@@ -62,7 +62,9 @@ class TransformerPass implements CompilerPassInterface
         $container->getDefinition('json_streamer.stream_writer')
             ->replaceArgument(0, $transformersArgument);
 
-        $container->getDefinition('.json_streamer.cache_warmer.streamer')
-            ->setArgument(7, $transformersArgument);
+        if ($container->hasDefinition('.json_streamer.cache_warmer.streamer')) {
+            $container->getDefinition('.json_streamer.cache_warmer.streamer')
+                ->setArgument(7, $transformersArgument);
+        }
     }
 }

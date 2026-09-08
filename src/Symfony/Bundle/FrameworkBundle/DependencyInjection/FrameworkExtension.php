@@ -44,8 +44,6 @@ use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -88,12 +86,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
-use Symfony\Component\JsonStreamer\Attribute\JsonStreamable;
-use Symfony\Component\JsonStreamer\JsonStreamWriter;
-use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
-use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
-use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
-use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Mailer\Bridge as MailerBridge;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
@@ -405,10 +397,6 @@ class FrameworkExtension extends Extension
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
-        if ($this->readConfigEnabled('json_streamer', $container, $config['json_streamer'])) {
-            $this->registerJsonStreamerConfiguration($config['json_streamer'], $container, $loader);
-        }
-
         if ($this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter'])) {
             if (!interface_exists(LimiterInterface::class)) {
                 throw new LogicException('Rate limiter support cannot be enabled as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
@@ -580,13 +568,6 @@ class FrameworkExtension extends Extension
         });
         $container->registerAttributeForAutoconfiguration(MappedSuperclass::class, static function (ChildDefinition $definition) {
             $definition->addTag('container.excluded', ['source' => 'because it\'s a Doctrine mapped superclass'])->addTag('doctrine.orm.entity');
-        });
-
-        $container->registerAttributeForAutoconfiguration(JsonStreamable::class, static function (ChildDefinition $definition, JsonStreamable $attribute) {
-            $definition->addTag('json_streamer.streamable', [
-                'object' => $attribute->asObject,
-                'list' => $attribute->asList,
-            ])->addTag('container.excluded', ['source' => 'because it\'s a streamable JSON']);
         });
 
         if (!$config['disallow_search_engine_index']) {
@@ -1722,55 +1703,6 @@ class FrameworkExtension extends Extension
             $definition->addTag('serializer.attribute_metadata', ['for' => $attribute->class])
                 ->addTag('container.excluded', ['source' => 'because it\'s a serializer metadata extension']);
         });
-    }
-
-    private function registerJsonStreamerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!class_exists(JsonStreamWriter::class)) {
-            throw new LogicException('JsonStreamer support cannot be enabled as the JsonStreamer component is not installed. Try running "composer require symfony/json-streamer".');
-        }
-
-        $container->registerForAutoconfiguration(PropertyValueTransformerInterface::class)
-            ->addTag('json_streamer.property_value_transformer');
-
-        $container->registerForAutoconfiguration(ValueObjectTransformerInterface::class)
-            ->addTag('json_streamer.value_object_transformer');
-
-        $loader->load('json_streamer.php');
-
-        $container->setParameter('.json_streamer.default_options', $config['default_options']);
-        $container->setParameter('.json_streamer.stream_writers_dir', '%kernel.cache_dir%/json_streamer/stream_writer');
-        $container->setParameter('.json_streamer.stream_readers_dir', '%kernel.cache_dir%/json_streamer/stream_reader');
-
-        // BC layer for "symfony/json-streamer" < 8.0
-        if (method_exists(PropertyMetadata::class, 'getNativeToStreamValueTransformer')) {
-            $container->getDefinition('json_streamer.stream_writer')->replaceArgument(4, null);
-            $container->getDefinition('json_streamer.stream_reader')->replaceArgument(4, null);
-        }
-
-        // BC layer for "symfony/json-streamer" < 8.1
-        if (!interface_exists(PropertyValueTransformerInterface::class)) {
-            $container->registerForAutoconfiguration(ValueTransformerInterface::class)
-                ->addTag('json_streamer.value_transformer');
-
-            $valueTransformers = new ServiceLocatorArgument(new TaggedIteratorArgument('json_streamer.value_transformer', null, true));
-
-            $container->getDefinition('json_streamer.stream_writer')->replaceArgument(0, $valueTransformers);
-            $container->getDefinition('json_streamer.stream_reader')->replaceArgument(0, $valueTransformers);
-            $container->getDefinition('.json_streamer.write.property_metadata_loader.attribute')->replaceArgument(1, $valueTransformers);
-            $container->getDefinition('.json_streamer.read.property_metadata_loader.attribute')->replaceArgument(1, $valueTransformers);
-            $container->getDefinition('.json_streamer.cache_warmer.streamer')->replaceArgument(7, $valueTransformers);
-
-            $container->removeDefinition('.json_streamer.value_object_transformer.date_time');
-        }
-
-        // FC layer for "symfony/json-streamer" >= 8.1
-        if (interface_exists(PropertyValueTransformerInterface::class)) {
-            $container->removeDefinition('.json_streamer.read.property_metadata_loader.date_time');
-            $container->removeDefinition('.json_streamer.write.property_metadata_loader.date_time');
-            $container->getDefinition('json_streamer.value_transformer.date_time_to_string')->clearTag('json_streamer.value_transformer');
-            $container->getDefinition('json_streamer.value_transformer.string_to_date_time')->clearTag('json_streamer.value_transformer');
-        }
     }
 
     private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

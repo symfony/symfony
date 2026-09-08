@@ -33,6 +33,7 @@ final class StreamerCacheWarmer implements CacheWarmerInterface
 {
     private StreamWriterGenerator $streamWriterGenerator;
     private StreamReaderGenerator $streamReaderGenerator;
+    private LoggerInterface $logger;
 
     /**
      * @param iterable<class-string, array{object: bool, list: bool}> $streamable
@@ -43,10 +44,12 @@ final class StreamerCacheWarmer implements CacheWarmerInterface
         PropertyMetadataLoaderInterface $streamReaderPropertyMetadataLoader,
         string $streamWritersDir,
         string $streamReadersDir,
-        private LoggerInterface $logger = new NullLogger(),
+        ?LoggerInterface $logger = null,
         ?ConfigCacheFactoryInterface $configCacheFactory = null,
         ?ContainerInterface $transformers = null,
     ) {
+        $this->logger = $logger ?? new NullLogger();
+
         $transformers ??= new class implements ContainerInterface {
             public function has(string $id): bool
             {

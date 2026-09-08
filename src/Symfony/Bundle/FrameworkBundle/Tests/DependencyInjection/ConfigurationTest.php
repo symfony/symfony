@@ -23,7 +23,6 @@ use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
@@ -938,12 +937,6 @@ class ConfigurationTest extends TestCase
                 'signing_algorithm' => 'sha256',
                 'signature_format' => 'legacy',
                 'timestamp_tolerance' => 300,
-            ],
-            'json_streamer' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(JsonStreamWriter::class),
-                'default_options' => [
-                    'include_null_properties' => false,
-                ],
             ],
         ];
     }

@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Sets the streamable metadata to the services that need them.
  *
+ * The cache warmer is dropped when nothing is streamable.
+ *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
 class StreamablePass implements CompilerPassInterface
@@ -37,6 +39,16 @@ class StreamablePass implements CompilerPassInterface
             ];
 
             $container->removeDefinition($id);
+        }
+
+        if (!$container->hasDefinition('.json_streamer.cache_warmer.streamer')) {
+            return;
+        }
+
+        if (!$streamable) {
+            $container->removeDefinition('.json_streamer.cache_warmer.streamer');
+
+            return;
         }
 
         $container->getDefinition('.json_streamer.cache_warmer.streamer')

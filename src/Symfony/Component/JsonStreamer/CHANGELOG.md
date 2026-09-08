@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add `JsonStreamerBundle`, which provides the `json_streamer` configuration and the services previously provided by `FrameworkBundle` under `framework.json_streamer`
+ * Drop the streamer cache warmer when no class is streamable
  * Add `BcMath\Number` value object support with `BcMathNumberValueObjectTransformer`
  * Add `GMP` value object support with `GmpNumberValueObjectTransformer`
  * Add a `cache_variant` option that partitions the generated code cache, so a custom property metadata loader can produce several payload shapes for the same PHP type

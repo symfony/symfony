@@ -42,9 +42,12 @@
         "nst/json-test-suite": "*",
         "phpstan/phpdoc-parser": "^1.0",
         "symfony/config": "^7.4|^8.0",
-        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/uid": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<8.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\JsonStreamer\\": "" },

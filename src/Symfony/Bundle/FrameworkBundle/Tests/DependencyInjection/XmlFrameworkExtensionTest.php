@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -62,6 +63,14 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $definition = $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler');
         $this->assertSame('strict', $definition->getArgument(0));
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testMailerSmimeEncrypterCipherAsConstantName()
+    {
+        $container = $this->createContainerFromFile('mailer_with_smime_encrypter');
+
+        $this->assertSame(\OPENSSL_CIPHER_AES_256_CBC, $container->getParameter('mailer.smime_encrypter.cipher'));
     }
 
     public function testWorkflowEnumPlaces()

@@ -898,7 +898,7 @@
 
     <xsd:complexType name="mailer_smime_encrypter">
         <xsd:attribute name="repository" type="xsd:string" />
-        <xsd:attribute name="cipher" type="xsd:integer" />
+        <xsd:attribute name="cipher" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="http_cache">

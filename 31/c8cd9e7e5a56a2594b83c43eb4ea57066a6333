@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T14:31:07Z
+
+Thank you @Spomky. I rebased this on 8.2 and pushed two changes.
+
+**`OidcTokenGenerator` validated far less than the handler.** It only refused the empty list, so it accepted what the handler refuses and minted tokens the handler then rejects:
+
+```
+an empty string             generator => ACCEPTED   handler => InvalidArgumentException
+an empty string in a list   generator => ACCEPTED   handler => InvalidArgumentException
+a non-string in a list      generator => ACCEPTED   handler => InvalidArgumentException
+generator with ''   mints  aud=""
+generator with [42] mints  aud="42"
+```
+
+`[42]` also went against the generator's own `@param string|list<string>`, silently turned into `"42"` by `json_encode()`. It now runs the same check as the handler, and `testRejectsAnAudienceNamingNothing` became a data provider with the same four rows the handler test has. Three of them fail on the previous state of this branch.
+
+**Naming.** The property holding the list is now `$audiences`, as in `Oauth2TokenHandler`, since the method and its docblock speak of audiences throughout. The constructor argument keeps its name.
+
+What I checked beyond that:
+
+- Every config shape, against 8.2 and against this branch. Nothing that worked before stops working, and `audience: '%env(AUD)%'` still resolves, wrapped into a one-element list. An empty string used to be accepted and built a handler that rejected every token, which is what this now refuses at build time, as the description says.
+- The new tests: 16 of the 18 fail with the sources put back to their 8.2 state. The two that pass are a pre-existing one and the single-string row, which is the shape 8.2 already supports.
+- `CallableChecker` is already used in four places on 8.2, so the lowest-deps leg keeps working with `web-token/jwt-library` 3.3.2.
+- Security/Http `OK (1184 tests, 2672 assertions)` and SecurityBundle `OK (631, 1759)` on the rebased result.
+
+One thing worth knowing rather than fixing: a whole list still cannot come from a single environment variable. `audience: '%env(json:AUDS)%'` is wrapped as one identifier and resolves to a nested array, which the constructor now reports with a clear message instead of the `TypeError` it raised before. The `oauth2` option has the same limitation.
+
+I added the documentation points to the description so the symfony-docs pull request does not have to be reconstructed from the diff.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T14:47:02Z
+
+Follow-up push: the option now reads an environment variable holding the whole list.
+
+A prototyped list refuses a whole `%env()%` value, whatever type the processor declares for it, because `ArrayNode::allowPlaceholders()` is false and the type map is never consulted:
+
+```
+plain prototyped list + %env(X)%       => A dynamic value is not compatible with a "PrototypedArrayNode" node type
+plain prototyped list + %env(json:X)%  => A dynamic value is not compatible with a "PrototypedArrayNode" node type
+```
+
+`acceptAndWrap()` gets around that by wrapping the placeholder into a one-element list before the type check, which is what made `%env(AUD)%` work here. It is also what silently nested `%env(json:AUDS)%` into `[["a","b"]]`.
+
+So the bundle unwraps it again on the way out, which is what `FrameworkExtension` already does for `trusted_hosts` and `trusted_proxies`:
+
+```php
+$audience = [0] === array_keys($config['audience']) ? $config['audience'][0] : $config['audience'];
+```
+
+Together with the `string|list<string>` argument this PR adds, the environment variable decides the shape. Measured through the real factories, from the config node to the resolved container argument:
+
+```
+oidc,   a string             => "https://api.example.com"
+oidc,   a list               => ["https://api.example.com","https://admin.example.com"]
+oidc,   %env(AUD)%           => "https://api.example.com"
+oidc,   %env(json:AUDS)%     => ["https://api.example.com","https://admin.example.com"]
+oauth2, %env(json:AUDS)%     => ["https://api.example.com","https://admin.example.com"]
+oauth2, no audience          => []
+```
+
+`Oauth2TokenHandler` takes the same `string|list<string>` argument for its half, and validates its entries the way the oidc handler does, so an empty string no longer builds a handler that refuses every token.
+
+A side effect worth naming: the container argument keeps the plain string it had when a single identifier is configured, so the six expectations this PR was changing from `'audience'` to `['audience']` are back to what they were. The only fixture that moves is the one oauth2 test where a lone audience is now passed as a string.
+
+Security/Http `OK (1188 tests, 2681 assertions)`, SecurityBundle `OK (631, 1759)`.

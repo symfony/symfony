@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `MessengerBundle`, which provides the `messenger` configuration and the services previously provided by `FrameworkBundle` under `framework.messenger`
  * Add claim check support with `ClaimCheckSerializer` and PSR-6 cache pools
  * Add routing and failure transport information and a `--message` option to the `debug:messenger` command
  * Add `HandlerStartingEvent`, `HandlerSuccessEvent` and `HandlerFailureEvent`, dispatched around each handler call

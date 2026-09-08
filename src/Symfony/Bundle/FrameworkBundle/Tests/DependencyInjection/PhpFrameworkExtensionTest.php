@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,7 +21,6 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
-use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -356,97 +353,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         foreach (Email::VALIDATION_MODES as $mode) {
             yield [$mode];
         }
-    }
-
-    #[Group('legacy')]
-    #[IgnoreDeprecations]
-    public function testLegacyMessengerSigningSerializerWiring()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.1: Using the "senders" nesting level for messenger routing configuration is deprecated and will be removed in version 9.0. Use a flat list of senders instead.');
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->register('signed_handler', 'stdClass')
-                ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
-
-            $container->loadFromExtension('framework', [
-                'messenger' => [
-                    'transports' => [
-                        'async' => ['dsn' => 'in-memory://'],
-                    ],
-                    'routing' => [
-                        DummyMessage::class => ['senders' => ['async']],
-                    ],
-                    'buses' => [
-                        'message_bus' => ['default_middleware' => ['enabled' => true]],
-                    ],
-                ],
-            ]);
-        });
-
-        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
-        $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
-        $this->assertArrayHasKey(DummyMessage::class, $mapping);
-        $this->assertNotEmpty($mapping[DummyMessage::class]);
-
-        $this->assertTrue($container->hasDefinition('message_bus'));
-        $this->assertSame('message_bus', (string) $container->getAlias('messenger.default_bus'));
-    }
-
-    public function testMessengerSigningSerializerWiring()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->register('signed_handler', 'stdClass')
-                ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
-
-            $container->loadFromExtension('framework', [
-                'messenger' => [
-                    'transports' => [
-                        'async' => ['dsn' => 'in-memory://'],
-                    ],
-                    'routing' => [
-                        DummyMessage::class => ['async'],
-                    ],
-                    'buses' => [
-                        'message_bus' => ['default_middleware' => ['enabled' => true]],
-                    ],
-                ],
-            ]);
-        });
-
-        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
-        $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
-        $this->assertArrayHasKey(DummyMessage::class, $mapping);
-        $this->assertNotEmpty($mapping[DummyMessage::class]);
-
-        $this->assertTrue($container->hasDefinition('message_bus'));
-        $this->assertSame('message_bus', (string) $container->getAlias('messenger.default_bus'));
-    }
-
-    public function testMessengerSigningSerializerWiringForUnroutedMessages()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->register('signed_handler', 'stdClass')
-                ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
-
-            $container->loadFromExtension('framework', [
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'messenger' => [
-                    'transports' => [
-                        'async' => ['dsn' => 'in-memory://'],
-                    ],
-                    'routing' => [],
-                    'buses' => [
-                        'message_bus' => ['default_middleware' => ['enabled' => true]],
-                    ],
-                ],
-            ]);
-        });
-
-        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
-        $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
-        $this->assertArrayHasKey('*', $mapping);
-        $this->assertContains('messenger.default_serializer', $mapping['*']);
     }
 
     public function testMailerWebhookProdExcludesLocalhost()

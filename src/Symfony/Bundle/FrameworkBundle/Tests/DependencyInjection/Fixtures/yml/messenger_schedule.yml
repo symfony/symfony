@@ -1,4 +1,0 @@
-framework:
-    messenger:
-        transports:
-            schedule: 'schedule://default'

@@ -1,0 +1,5 @@
+framework:
+    scheduler: true
+    messenger:
+        transports:
+            sender.foo: 'null://'

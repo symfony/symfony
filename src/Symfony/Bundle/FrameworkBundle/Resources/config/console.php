@@ -45,15 +45,6 @@ use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\Form\Command\DebugCommand;
-use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
-use Symfony\Component\Messenger\Command\DebugCommand as MessengerDebugCommand;
-use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
-use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
-use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
-use Symfony\Component\Messenger\Command\SetupTransportsCommand;
-use Symfony\Component\Messenger\Command\ShowMessagesCommand;
-use Symfony\Component\Messenger\Command\StatsCommand;
-use Symfony\Component\Messenger\Command\StopWorkersCommand;
 use Symfony\Component\Scheduler\Command\DebugCommand as SchedulerDebugCommand;
 use Symfony\Component\Serializer\Command\DebugCommand as SerializerDebugCommand;
 use Symfony\Component\Translation\Command\TranslationLintCommand;
@@ -155,85 +146,6 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.event_dispatcher_debug', EventDispatcherDebugCommand::class)
             ->args([
                 tagged_locator('event_dispatcher.dispatcher', 'name'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)
-            ->args([
-                abstract_arg('Routable message bus'),
-                service('messenger.receiver_locator'),
-                service('event_dispatcher'),
-                service('logger')->nullOnInvalid(),
-                [], // Receiver names
-                service('messenger.listener.reset_services')->nullOnInvalid(),
-                [], // Bus names
-                service('messenger.rate_limiter_locator')->nullOnInvalid(),
-                null,
-                param('kernel.project_dir').'/bin/console',
-            ])
-            ->tag('console.command')
-            ->tag('monolog.logger', ['channel' => 'messenger'])
-
-        ->set('console.command.messenger_setup_transports', SetupTransportsCommand::class)
-            ->args([
-                service('messenger.receiver_locator'),
-                [], // Receiver names
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.messenger_debug', MessengerDebugCommand::class)
-            ->args([
-                [], // Message to handlers mapping
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.messenger_stop_workers', StopWorkersCommand::class)
-            ->args([
-                service('cache.messenger.restart_workers_signal'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.messenger_failed_messages_retry', FailedMessagesRetryCommand::class)
-            ->args([
-                abstract_arg('Default failure receiver name'),
-                abstract_arg('Receivers'),
-                service('messenger.routable_message_bus'),
-                service('event_dispatcher'),
-                service('logger')->nullOnInvalid(),
-                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
-                null,
-            ])
-            ->tag('console.command')
-            ->tag('monolog.logger', ['channel' => 'messenger'])
-
-        ->set('console.command.messenger_failed_messages_show', FailedMessagesShowCommand::class)
-            ->args([
-                abstract_arg('Default failure receiver name'),
-                abstract_arg('Receivers'),
-                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.messenger_failed_messages_remove', FailedMessagesRemoveCommand::class)
-            ->args([
-                abstract_arg('Default failure receiver name'),
-                abstract_arg('Receivers'),
-                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.messenger_stats', StatsCommand::class)
-            ->args([
-                service('messenger.receiver_locator'),
-                abstract_arg('Receivers names'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.messenger_show', ShowMessagesCommand::class)
-            ->args([
-                service('messenger.receiver_locator'),
-                abstract_arg('Receivers names'),
-                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
 

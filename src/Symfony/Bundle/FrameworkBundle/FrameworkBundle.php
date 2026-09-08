@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CheckJsonStreame
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultCachePoolsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultLockFactoryPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FindCommandBundlesPass;
@@ -70,7 +71,7 @@ use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
 use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
 use Symfony\Component\Lock\LockBundle;
-use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
+use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Mime\MimeBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
@@ -124,6 +125,7 @@ class_exists(Registry::class);
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(LockBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(MessengerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(SemaphoreBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(RemoteEventBundle::class, ignoreOnInvalid: true)]
@@ -221,7 +223,8 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, AddScheduleMessengerPass::class);
-        $this->addCompilerPassIfExists($container, MessengerPass::class);
+        // must run before CachePoolPass, which wires the pools this pass can still remove
+        $container->addCompilerPass(new DefaultMessageBusPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 33);
         $this->addCompilerPassIfExists($container, HttpClientPass::class);
         $this->addCompilerPassIfExists($container, AddAutoMappingConfigurationPass::class);
         $container->addCompilerPass(new RegisterReverseContainerPass(true));

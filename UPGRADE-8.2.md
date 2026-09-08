@@ -99,6 +99,9 @@ FrameworkBundle
  * `LockBundle` is registered automatically when the Lock component is installed, and its services are then
    registered without any configuration; set `lock.enabled` to `false` to disable them. The `framework.lock`
    configuration is an alias of the `lock` configuration provided by the bundle
+ * `MessengerBundle` is registered automatically when the Messenger component is installed, and its services are then
+   registered without any configuration; set `messenger.enabled` to `false` to disable them. The `framework.messenger`
+   configuration is an alias of the `messenger` configuration provided by the bundle
  * `SemaphoreBundle` is registered automatically when the Semaphore component is installed, and its services are then
    registered without any configuration; set `semaphore.enabled` to `false` to disable them. The `framework.semaphore`
    configuration is an alias of the `semaphore` configuration provided by the bundle

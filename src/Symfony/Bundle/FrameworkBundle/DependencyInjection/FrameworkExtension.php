@@ -15,10 +15,7 @@ use Composer\InstalledVersions;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
-use Http\Client\HttpAsyncClient;
-use Http\Client\HttpClient;
 use PhpParser\Parser;
-use Psr\Http\Client\ClientInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -57,14 +54,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
-use Symfony\Component\HttpClient\CachingHttpClient;
-use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
-use Symfony\Component\HttpClient\RetryableHttpClient;
-use Symfony\Component\HttpClient\ScopingHttpClient;
-use Symfony\Component\HttpClient\ThrottlingHttpClient;
-use Symfony\Component\HttpClient\UriTemplateHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
@@ -135,7 +124,6 @@ use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CallbackInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
@@ -300,10 +288,6 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
-        }
-
-        if ($this->readConfigEnabled('http_client', $container, $config['http_client'])) {
-            $this->registerHttpClientConfiguration($config['http_client'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
@@ -651,10 +635,6 @@ class FrameworkExtension extends Extension
 
         if ($this->isInitializedConfigEnabled('mailer')) {
             $loader->load('mailer_debug.php');
-        }
-
-        if ($this->isInitializedConfigEnabled('http_client')) {
-            $loader->load('http_client_debug.php');
         }
 
         if ($this->isInitializedConfigEnabled('notifier')) {
@@ -1119,7 +1099,7 @@ class FrameworkExtension extends Extension
         $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
 
         foreach ($classToServices as $class => [$package, $services]) {
-            if ($container->hasDefinition('http_client') && ContainerBuilder::willBeAvailable($package, $class, $parentPackages)) {
+            if (ContainerBuilder::willBeAvailable($package, $class, $parentPackages)) {
                 continue;
             }
 
@@ -1523,270 +1503,6 @@ class FrameworkExtension extends Extension
             $definition->addTag('serializer.attribute_metadata', ['for' => $attribute->class])
                 ->addTag('container.excluded', ['source' => 'because it\'s a serializer metadata extension']);
         });
-    }
-
-    private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        $loader->load('http_client.php');
-
-        $options = $config['default_options'] ?? [];
-        $cachingOptions = $options['caching'] ?? ['enabled' => false];
-        unset($options['caching']);
-        $rateLimiter = $options['rate_limiter'] ?? null;
-        unset($options['rate_limiter']);
-        $retryOptions = $options['retry_failed'] ?? ['enabled' => false];
-        unset($options['retry_failed']);
-        $defaultUriTemplateVars = $options['vars'] ?? [];
-        unset($options['vars']);
-        $container->getDefinition('http_client.transport')->setArguments([$options, $config['max_host_connections'] ?? 6]);
-
-        if (!$hasPsr18 = ContainerBuilder::willBeAvailable('psr/http-client', ClientInterface::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
-            $container->removeDefinition('psr18.http_client');
-            $container->removeAlias(ClientInterface::class);
-        }
-
-        if (!$hasHttplug = ContainerBuilder::willBeAvailable('php-http/httplug', HttpAsyncClient::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
-            $container->removeDefinition('httplug.http_client');
-            $container->removeAlias(HttpAsyncClient::class);
-            $container->removeAlias(HttpClient::class);
-        }
-
-        if ($this->readConfigEnabled('http_client.caching', $container, $cachingOptions)) {
-            $this->registerCachingHttpClient($cachingOptions, $options, 'http_client', $container);
-        }
-
-        if (null !== $rateLimiter) {
-            $this->registerThrottlingHttpClient($rateLimiter, 'http_client', $container);
-        }
-
-        if ($this->readConfigEnabled('http_client.retry_failed', $container, $retryOptions)) {
-            $this->registerRetryableHttpClient($retryOptions, 'http_client', $container);
-        }
-
-        if (ContainerBuilder::willBeAvailable('guzzlehttp/uri-template', \GuzzleHttp\UriTemplate\UriTemplate::class, [])) {
-            $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.guzzle');
-        } elseif (ContainerBuilder::willBeAvailable('rize/uri-template', \Rize\UriTemplate::class, [])) {
-            $container->setAlias('http_client.uri_template_expander', 'http_client.uri_template_expander.rize');
-        }
-
-        $container
-            ->getDefinition('http_client.uri_template')
-            ->setArgument(2, $defaultUriTemplateVars);
-
-        if (!$defaultMockResponseFactory = $config['mock_response_factory'] ?? null) {
-            $defaultTransportId = 'http_client.transport';
-        } elseif (\is_string($defaultMockResponseFactory)) {
-            $defaultTransportId = '.http_client.mock_transport.'.$defaultMockResponseFactory;
-            $container->register($defaultTransportId, MockHttpClient::class)
-                ->setArguments([new Reference($defaultMockResponseFactory)])
-                ->addTag('kernel.reset', ['method' => 'reset']);
-        } else {
-            $defaultTransportId = 'http_client.mock_transport';
-        }
-
-        $realTransportId = 'http_client.transport';
-
-        if ('http_client.transport' !== $defaultTransportId) {
-            // Decorate "http_client.transport" instead of replacing it as the transport of "http_client", so that
-            // decorators registered on "http_client.transport" remain in the chain when a mock factory is configured.
-            // The highest priority makes the mock the innermost decorator: decorators keep running around it whatever
-            // their own priority. The undecorated transport stays available under "http_client.transport.real" for
-            // scoped clients that opt out with "mock_response_factory: false".
-            $container->getDefinition($defaultTransportId)
-                ->setDecoratedService('http_client.transport', $realTransportId = 'http_client.transport.real', \PHP_INT_MAX);
-            $defaultTransportId = 'http_client.transport';
-        }
-
-        foreach ($config['scoped_clients'] as $name => $scopeConfig) {
-            if ($container->has($name)) {
-                throw new InvalidArgumentException(\sprintf('Invalid scope name: "%s" is reserved.', $name));
-            }
-
-            $scope = $scopeConfig['scope'] ?? null;
-            unset($scopeConfig['scope']);
-            $cachingOptions = $scopeConfig['caching'] ?? ['enabled' => false];
-            unset($scopeConfig['caching']);
-            $rateLimiter = $scopeConfig['rate_limiter'] ?? null;
-            unset($scopeConfig['rate_limiter']);
-            $retryOptions = $scopeConfig['retry_failed'] ?? ['enabled' => false];
-            unset($scopeConfig['retry_failed']);
-
-            // the base URI is the first one tried and the configured list holds the fallbacks; the
-            // scoping and the retryable clients must agree on the whole set
-            if ($retryOptions['base_uris'] ?? []) {
-                $retryOptions['base_uris'] = array_merge([$scopeConfig['base_uri']], $retryOptions['base_uris']);
-            }
-
-            if (false === $mockResponseFactory = $scopeConfig['mock_response_factory'] ?? $defaultMockResponseFactory) {
-                $transportId = $realTransportId;
-            } elseif ($mockResponseFactory === $defaultMockResponseFactory) {
-                $transportId = $defaultTransportId;
-            } elseif (\is_string($mockResponseFactory)) {
-                $transportId = '.http_client.mock_transport.'.$mockResponseFactory;
-                $container->register($transportId, MockHttpClient::class)
-                    ->setArguments([new Reference($mockResponseFactory)])
-                    ->addTag('kernel.reset', ['method' => 'reset']);
-            } else {
-                $transportId = 'http_client.mock_transport';
-            }
-            unset($scopeConfig['mock_response_factory']);
-
-            // This "transport" service is decorated in the following order:
-            // 1. ThrottlingHttpClient (5) -> throttles requests
-            // 2. UriTemplateHttpClient (10) -> expands URI templates
-            // 3. ScopingHttpClient (15) -> resolves relative URLs and applies scope configuration
-            // 4. CachingHttpClient (20) -> caches responses
-            // 5. RetryableHttpClient (25) -> retries requests
-            // 6. TraceableHttpClient (100) -> traces requests
-            //
-            // when "retry_failed.base_uris" is set, RetryableHttpClient moves to 12 so that it
-            // wraps ScopingHttpClient instead of being wrapped by it, see below
-            $container->register($name, HttpClientInterface::class)
-                ->setFactory('current')
-                ->setArguments([[new Reference($transportId)]])
-                ->addTag('http_client.client')
-            ;
-
-            $scopingDefinition = $container->register($name.'.scoping', ScopingHttpClient::class)
-                ->setDecoratedService($name, null, 15)
-                ->addTag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore']);
-
-            if (null === $scope) {
-                $baseUri = $scopeConfig['base_uri'];
-                unset($scopeConfig['base_uri']);
-
-                if ($retryOptions['base_uris'] ?? []) {
-                    // the scope must match every URI the retryable client may rotate to, otherwise
-                    // the scoped options stop applying as soon as it leaves the first one
-                    $scopingDefinition
-                        ->setFactory([ScopingHttpClient::class, 'forBaseUris'])
-                        ->setArguments([new Reference('.inner'), $retryOptions['base_uris'], $scopeConfig]);
-                } else {
-                    $scopingDefinition
-                        ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                        ->setArguments([new Reference('.inner'), $baseUri, $scopeConfig]);
-                }
-            } else {
-                $scopingDefinition
-                    ->setArguments([new Reference('.inner'), [$scope => $scopeConfig], $scope]);
-            }
-
-            if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.caching', $container, $cachingOptions)) {
-                $this->registerCachingHttpClient($cachingOptions, $scopeConfig, $name, $container);
-            }
-
-            if (null !== $rateLimiter) {
-                $this->registerThrottlingHttpClient($rateLimiter, $name, $container);
-            }
-
-            if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.retry_failed', $container, $retryOptions)) {
-                $this->registerRetryableHttpClient($retryOptions, $name, $container);
-            }
-
-            $container
-                ->register($name.'.uri_template', UriTemplateHttpClient::class)
-                ->setDecoratedService($name, null, 10)
-                ->setArguments([
-                    new Reference('.inner'),
-                    new Reference('http_client.uri_template_expander', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                    $defaultUriTemplateVars,
-                ]);
-
-            $container->registerAliasForArgument($name, HttpClientInterface::class);
-
-            if ($hasPsr18) {
-                $container->setDefinition('psr18.'.$name, new ChildDefinition('psr18.http_client'))
-                    ->replaceArgument(0, new Reference($name));
-
-                $container->registerAliasForArgument('psr18.'.$name, ClientInterface::class, $name);
-            }
-
-            if ($hasHttplug) {
-                $container->setDefinition('httplug.'.$name, new ChildDefinition('httplug.http_client'))
-                    ->replaceArgument(0, new Reference($name));
-
-                $container->registerAliasForArgument('httplug.'.$name, HttpAsyncClient::class, $name);
-            }
-        }
-    }
-
-    private function registerCachingHttpClient(array $options, array $defaultOptions, string $name, ContainerBuilder $container): void
-    {
-        if (!class_exists(ChunkCacheItemNotFoundException::class)) {
-            throw new LogicException('Caching cannot be enabled as version 7.4+ of the HttpClient component is required.');
-        }
-
-        $definition = $container
-            ->register($name.'.caching', CachingHttpClient::class)
-            ->setDecoratedService($name, null, 20)
-            ->setArguments([
-                new Reference('.inner'),
-                new Reference($options['cache_pool']),
-                $defaultOptions,
-                $options['shared'],
-                $options['max_ttl'],
-            ]);
-
-        if (method_exists(CachingHttpClient::class, 'setLogger')) {
-            $definition
-                ->addMethodCall('setLogger', [new Reference('logger')])
-                ->addTag('monolog.logger', ['channel' => 'http_client']);
-        }
-    }
-
-    private function registerThrottlingHttpClient(string $rateLimiter, string $name, ContainerBuilder $container): void
-    {
-        if (!interface_exists(LimiterInterface::class)) {
-            throw new LogicException('Rate limiter cannot be used within HttpClient as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
-        }
-
-        $container->register($name.'.throttling.limiter', LimiterInterface::class)
-            ->setFactory([new Reference('limiter.'.$rateLimiter), 'create']);
-
-        $container
-            ->register($name.'.throttling', ThrottlingHttpClient::class)
-            ->setDecoratedService($name, null, 5)
-            ->setArguments([new Reference('.inner'), new Reference($name.'.throttling.limiter')]);
-    }
-
-    private function registerRetryableHttpClient(array $options, string $name, ContainerBuilder $container): void
-    {
-        if (null !== $options['retry_strategy']) {
-            $retryStrategy = new Reference($options['retry_strategy']);
-        } else {
-            $retryStrategy = new ChildDefinition('http_client.abstract_retry_strategy');
-            $codes = [];
-            foreach ($options['http_codes'] as $code => $codeOptions) {
-                if ($codeOptions['methods']) {
-                    $codes[$code] = $codeOptions['methods'];
-                } else {
-                    $codes[] = $code;
-                }
-            }
-
-            $retryStrategy
-                ->replaceArgument(0, $codes ?: GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES)
-                ->replaceArgument(1, $options['delay'])
-                ->replaceArgument(2, $options['multiplier'])
-                ->replaceArgument(3, $options['max_delay'])
-                ->replaceArgument(4, $options['jitter']);
-            $container->setDefinition($name.'.retry_strategy', $retryStrategy);
-
-            $retryStrategy = new Reference($name.'.retry_strategy');
-        }
-
-        // when retrying against several URIs, the retryable client must sit outside the scoping one:
-        // scoping resolves the URL and consumes the "base_uri" option, so a base URI injected below
-        // it would never be applied
-        $definition = $container
-            ->register($name.'.retryable', RetryableHttpClient::class)
-            ->setDecoratedService($name, null, $options['base_uris'] ? 12 : 25)
-            ->setArguments([new Reference('.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
-            ->addTag('monolog.logger', ['channel' => 'http_client']);
-
-        if ($options['base_uris']) {
-            $definition->addMethodCall('withOptions', [['base_uri' => $options['base_uris']]], true);
-        }
     }
 
     private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

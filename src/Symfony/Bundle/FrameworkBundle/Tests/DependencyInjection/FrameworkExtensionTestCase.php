@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -62,7 +63,9 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
 use Symfony\Component\HttpClient\CachingHttpClient;
+use Symfony\Component\HttpClient\DependencyInjection\RemoveMissingDependenciesPass as HttpClientRemoveMissingDependenciesPass;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
+use Symfony\Component\HttpClient\HttpClientBundle;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -2701,6 +2704,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->registerExtension(new AssetMapperBundle()->getContainerExtension());
         $container->registerExtension(new RateLimiterBundle()->getContainerExtension());
         $container->registerExtension(new WebhookBundle()->getContainerExtension());
+        $container->registerExtension(new HttpClientBundle()->getContainerExtension());
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;
@@ -2721,7 +2725,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2744,6 +2748,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->addCompilerPass(new RemoveMissingDependenciesPass());
         $container->addCompilerPass(new AssetMapperRemoveMissingDependenciesPass());
         $container->addCompilerPass(new WebhookRemoveMissingDependenciesPass());
+        $container->addCompilerPass(new HttpClientRemoveMissingDependenciesPass());
+        $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

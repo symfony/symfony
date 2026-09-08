@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
+use Symfony\Component\HttpClient\HttpClientBundle;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -306,7 +307,7 @@ class MicroKernelTraitTest extends TestCase
         ];
 
         // registered with ignoreOnInvalid, so absent when the component is not installed
-        foreach ([WebLinkBundle::class, LockBundle::class, MessengerBundle::class, SemaphoreBundle::class, WorkflowBundle::class, RemoteEventBundle::class, HtmlSanitizerBundle::class, TypeInfoBundle::class, PropertyAccessBundle::class, PropertyInfoBundle::class, UidBundle::class, SchedulerBundle::class, JsonStreamerBundle::class, AssetMapperBundle::class, RateLimiterBundle::class, WebhookBundle::class, ProcessBundle::class, JsonPathBundle::class, MimeBundle::class, ObjectMapperBundle::class] as $class) {
+        foreach ([WebLinkBundle::class, LockBundle::class, MessengerBundle::class, SemaphoreBundle::class, WorkflowBundle::class, RemoteEventBundle::class, HtmlSanitizerBundle::class, TypeInfoBundle::class, PropertyAccessBundle::class, PropertyInfoBundle::class, UidBundle::class, SchedulerBundle::class, JsonStreamerBundle::class, AssetMapperBundle::class, RateLimiterBundle::class, WebhookBundle::class, HttpClientBundle::class, ProcessBundle::class, JsonPathBundle::class, MimeBundle::class, ObjectMapperBundle::class] as $class) {
             if (class_exists($class)) {
                 $expected[$class] = ['all' => true];
             }

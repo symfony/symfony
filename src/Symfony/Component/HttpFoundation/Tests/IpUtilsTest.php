@@ -84,6 +84,7 @@ class IpUtilsTest extends TestCase
             [false, '}__test|O:21:&quot;JDatabaseDriverMysqli&quot;:3:{s:2', '::1'],
             [false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'],
             [false, '', '::1'],
+            [false, "::1\0", '::1/128'],
             [false, '127.0.0.1', '::1'],
             [false, '0.0.0.0/8', '::1'],
             [false,  '::1', '127.0.0.1'],
@@ -307,5 +308,49 @@ class IpUtilsTest extends TestCase
         }
 
         $this->assertLessThan($maxCheckedIps, \count($checkedIps));
+    }
+
+    #[DataProvider('getIpv4MappedData')]
+    public function testIpv4MappedAddressesAreCheckedAsTheIpv4HostTheyEmbed(bool $matches, string $remoteAddr, string $cidr)
+    {
+        $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
+    }
+
+    public static function getIpv4MappedData(): array
+    {
+        return [
+            [true, '::ffff:10.0.0.5', '10.0.0.0/8'],
+            [true, '::ffff:a00:5', '10.0.0.0/8'],
+            [true, '::ffff:127.0.0.1', '127.0.0.1'],
+            [true, '::ffff:10.0.0.5', '::ffff:10.0.0.0/104'],
+            [false, '::ffff:8.8.8.8', '10.0.0.0/8'],
+            [false, '::10.0.0.5', '10.0.0.0/8'],
+            [false, '2002:a00:5::', '10.0.0.0/8'],
+            [false, '10.0.0.5', '::ffff:10.0.0.0/104'],
+            [false, "::ffff:10.0.0.5\0", '10.0.0.0/8'],
+        ];
+    }
+
+    #[DataProvider('getAddressesARemoteClientCanPresent')]
+    public function testPrivateRangesDoNotCoverAddressesARemoteClientCanPresent(string $ip)
+    {
+        $this->assertFalse(IpUtils::checkIp($ip, IpUtils::PRIVATE_RANGES));
+        $this->assertTrue(IpUtils::isPrivateIp($ip));
+    }
+
+    public static function getAddressesARemoteClientCanPresent(): array
+    {
+        return [
+            'IPv4-mapped' => ['::ffff:8.8.8.8'],
+            'IPv4-compatible' => ['::8.8.8.8'],
+            '6to4' => ['2002:808:808::1'],
+            'Teredo' => ['2001:0:4136:e378:8000:63bf:3fff:fdd2'],
+            'NAT64' => ['64:ff9b::8.8.8.8'],
+        ];
+    }
+
+    public function testPrivateRangesAreASubsetOfPrivateSubnets()
+    {
+        $this->assertSame([], array_diff(IpUtils::PRIVATE_RANGES, IpUtils::PRIVATE_SUBNETS));
     }
 }

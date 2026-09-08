@@ -2816,7 +2816,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('trusted_proxies_private_ranges');
 
-        $this->assertSame(IpUtils::PRIVATE_SUBNETS, $container->getParameter('kernel.trusted_proxies'));
+        $this->assertSame(IpUtils::PRIVATE_RANGES, $container->getParameter('kernel.trusted_proxies'));
     }
 
     public function testWebhook()

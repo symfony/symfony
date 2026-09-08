@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Attribute\AsMessage;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
@@ -130,6 +131,20 @@ class MessengerBundleExtensionTest extends TestCase
             [['transport' => null, 'serializedTypeName' => 'my.type', 'serializedTypeNameAliases' => ['my.legacy.type']]],
             $definition->getTag('messenger.message')
         );
+    }
+
+    public function testMessengerAsMessageHandlerTransportIsForwardedToTheTag()
+    {
+        $container = $this->createContainerFromFile('messenger', false);
+        $container->compile();
+
+        $configurators = $container->getAttributeAutoconfigurators()[AsMessageHandler::class] ?? [];
+        $this->assertCount(1, $configurators);
+
+        $definition = new ChildDefinition('');
+        $configurators[0]($definition, new AsMessageHandler(transport: 'async'), new \ReflectionClass(DummyMessage::class));
+
+        $this->assertSame([['bus' => null, 'handles' => null, 'method' => null, 'priority' => 0, 'sign' => false, 'transport' => 'async', 'from_transport' => null]], $definition->getTag('messenger.message_handler'));
     }
 
     public function testMessengerRejectRedeliveredMessagesEnabledByDefault()

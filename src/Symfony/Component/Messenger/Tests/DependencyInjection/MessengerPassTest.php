@@ -47,6 +47,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyHandlerWithCustomMethods;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithAttribute;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQuery;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage;
@@ -116,6 +118,210 @@ class MessengerPassTest extends TestCase
         $this->assertCount(1, $handlerDescriptionMapping);
 
         $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [[DummyHandler::class, '__invoke']], [['from_transport' => 'async']]);
+    }
+
+    public function testTransportViaTagAttributeRoutesTheMessageAndBindsTheHandler()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container
+            ->register(DummyHandler::class, DummyHandler::class)
+            ->addTag('messenger.message_handler', ['transport' => 'async', 'method' => '__invoke'])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $handlerDescriptionMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+        $this->assertCount(1, $handlerDescriptionMapping);
+
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [[DummyHandler::class, '__invoke']], [['from_transport' => 'async']]);
+        $this->assertSame([DummyMessage::class => ['async']], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsMergedWithTheConfiguredRouting()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([
+            DummyMessage::class => ['sync'],
+            SecondMessage::class => ['audit'],
+        ]);
+        $container->register('messenger.transport.sync', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'sync']);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register('app.first_handler', DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async']);
+        $container->register('app.second_handler', DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'sync', 'from_transport' => 'sync']);
+        $container->register('app.third_handler', DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([
+            DummyMessage::class => ['sync', 'async'],
+            SecondMessage::class => ['audit'],
+        ], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsNotAddedWhenTheTransportIsRoutedByServiceId()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->register('messenger.senders_locator')->addArgument([DummyMessage::class => ['messenger.transport.async']]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async', 'method' => '__invoke']);
+
+        (new MessengerPass())->process($container);
+
+        $handlerDescriptionMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [[DummyHandler::class, '__invoke']], [['from_transport' => 'async']]);
+        $this->assertSame([DummyMessage::class => ['messenger.transport.async']], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsAddedToTheAttributeRouting()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register('messenger.transport.audit', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'audit']);
+        $container->register(MissingArgumentTypeHandler::class, MissingArgumentTypeHandler::class)->addTag('messenger.message_handler', ['handles' => DummyMessageWithAttribute::class, 'transport' => 'audit']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([DummyMessageWithAttribute::class => ['first_sender', 'second_sender', 'audit']], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsAddedToTheNamespaceRouting()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument(['Symfony\Component\Messenger\Tests\Fixtures\*' => ['wild']]);
+        $container->register('messenger.transport.audit', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'audit']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'audit']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([
+            'Symfony\Component\Messenger\Tests\Fixtures\*' => ['wild'],
+            DummyMessage::class => ['wild', 'audit'],
+        ], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsAddedToTheInterfaceRouting()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([DummyMessageInterface::class => ['async']]);
+        $container->register('messenger.transport.audit', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'audit']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'audit']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([
+            DummyMessageInterface::class => ['async'],
+            DummyMessage::class => ['async', 'audit'],
+        ], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsAddedToTheFallbackRouting()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument(['*' => ['fallback']]);
+        $container->register('messenger.transport.audit', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'audit']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'audit']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([
+            '*' => ['fallback'],
+            DummyMessage::class => ['fallback', 'audit'],
+        ], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsNotAddedWhenAWildcardRoutesToTheTransportServiceId()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument(['Symfony\Component\Messenger\Tests\Fixtures\*' => ['messenger.transport.audit']]);
+        $container->register('messenger.transport.audit', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'audit']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'audit']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([
+            'Symfony\Component\Messenger\Tests\Fixtures\*' => ['messenger.transport.audit'],
+            DummyMessage::class => ['messenger.transport.audit'],
+        ], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsNotCheckedWithoutReceiverLocator()
+    {
+        $container = $this->getContainerBuilder();
+        $container->removeDefinition('messenger.receiver_locator');
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([DummyMessage::class => ['async']], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    public function testTransportViaTagAttributeIsAddedToTheDebugCommandRouting()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([DummyMessage::class => ['sync']]);
+        $container->register('messenger.transport.sync', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'sync']);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async']);
+        $container->register('console.command.messenger_debug', DebugCommand::class)->addArgument([]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([DummyMessage::class => ['sync']], $container->getDefinition('console.command.messenger_debug')->getArgument(1));
+        $this->assertSame([DummyMessage::class => ['async']], $container->getDefinition('console.command.messenger_debug')->getArgument(5));
+    }
+
+    public function testTransportViaTagAttributeConflictingWithFromTransport()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async', 'from_transport' => 'sync']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\DummyHandler": the "transport" and "from_transport" options of the "messenger.message_handler" tag must have the same value, "async" and "sync" given.');
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testTransportViaTagAttributeMustBeAConfiguredTransport()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register('messenger.transport.audit', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'audit']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'unknown']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\DummyHandler": the "transport" option refers to "unknown", which is not a configured transport (known ones are: "async", "audit").');
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testTransportViaTagAttributeCannotRouteEveryMessage()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register(MissingArgumentTypeHandler::class, MissingArgumentTypeHandler::class)->addTag('messenger.message_handler', ['handles' => '*', 'transport' => 'async']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentTypeHandler": the "transport" option cannot be used with "*" as message type.');
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testTransportViaTagAttributeNeedsTheSendersLocator()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\DummyHandler": the "transport" option needs the "messenger.senders_locator" service, which is not defined.');
+
+        (new MessengerPass())->process($container);
     }
 
     public function testHandledMessageTypeResolvedWithMethodAndNoHandlesViaTagAttributes()

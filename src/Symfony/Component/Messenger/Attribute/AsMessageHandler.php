@@ -49,6 +49,12 @@ class AsMessageHandler
          * Whether messages should be signed when sent on a transport.
          */
         public bool $sign = false,
+
+        /**
+         * Name of the transport to route the handled messages to.
+         * The handler then only receives messages from that transport, as with $fromTransport.
+         */
+        public ?string $transport = null,
     ) {
     }
 }

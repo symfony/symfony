@@ -63,7 +63,17 @@ trait HttpClientAssertionsTrait
             }
 
             if ($expectedHeaders) {
-                $actualHeaders = ($trace['options']['headers'] ?? null)?->getValue(true) ?? [];
+                $actualHeaders = [];
+
+                foreach (($trace['options']['headers'] ?? null)?->getValue(true) ?? [] as $name => $value) {
+                    if (\is_int($name)) {
+                        // a scoped client records its headers as raw "Name: value" lines
+                        [$name, $value] = explode(':', $value, 2) + [1 => ''];
+                        $value = ltrim($value, ' ');
+                    }
+
+                    $actualHeaders[$name] = $value;
+                }
 
                 foreach ($expectedHeaders as $headerKey => $expectedHeader) {
                     if (!\array_key_exists($headerKey, $actualHeaders) || $expectedHeader !== $actualHeaders[$headerKey]) {

@@ -20,6 +20,8 @@ CHANGELOG
  * Make the `messenger:consume` and `messenger:failed:retry` commands exit immediately when a second `SIGINT` is received
  * Add `ChainStamp` and `ChainMiddleware` to dispatch a sequence of messages one after another, each one once the previous one is handled
  * Add `chain` to the default bus middleware, between `send_message` and `handle_message`
+ * Add `DispatchOnFailureStamp`, `FailedMessageStamp`, `DispatchOnFailureMiddleware` and `DispatchOnFailureListener` to dispatch a message when another one fails for good
+ * Add `dispatch_on_failure` to the default bus middleware, after `failed_message_processing_middleware`
 
 8.1
 ---

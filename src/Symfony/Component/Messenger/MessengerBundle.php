@@ -362,6 +362,7 @@ class MessengerBundle extends AbstractBundle
                 ['id' => 'dispatch_after_current_bus'],
                 ['id' => 'decode_failed_message_middleware'],
                 ['id' => 'failed_message_processing_middleware'],
+                ['id' => 'dispatch_on_failure'],
             ],
             'after' => [
                 ['id' => 'send_message'],

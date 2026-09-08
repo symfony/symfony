@@ -32,6 +32,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
+use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -143,6 +144,10 @@ class MessengerBundle extends AbstractBundle
                             ->scalarNode('failure_transport')
                                 ->defaultNull()
                                 ->info('Transport name to send failed messages to (after all retries have failed).')
+                            ->end()
+                            ->scalarNode('outbox')
+                                ->defaultNull()
+                                ->info('Name of the transport that stores the messages inside the current database transaction; consume that transport to forward them to this one.')
                             ->end()
                             ->arrayNode('retry_strategy')
                                 ->addDefaultsIfNotSet()
@@ -525,6 +530,19 @@ class MessengerBundle extends AbstractBundle
                 if (!isset($senderReferences[$transport['failure_transport']])) {
                     throw new LogicException(\sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $transport['failure_transport']));
                 }
+            }
+
+            if ($transport['outbox']) {
+                if (!isset($config['transports'][$transport['outbox']])) {
+                    throw new LogicException(\sprintf('Invalid Messenger configuration: the outbox "%s" of the "%s" transport is not a configured transport.', $transport['outbox'], $name));
+                }
+                if ($transport['outbox'] === $name) {
+                    throw new LogicException(\sprintf('Invalid Messenger configuration: the "%s" transport cannot be its own outbox.', $name));
+                }
+
+                $container->setDefinition($outboxSenderId = '.messenger.transport.'.$name.'.outbox_sender', (new Definition(OutboxSender::class))
+                    ->setArguments([new Reference($senderAliases[$name]), new Reference($senderAliases[$transport['outbox']]), $name]));
+                $senderReferences[$name] = $senderReferences[$senderAliases[$name]] = new Reference($outboxSenderId);
             }
         }
 

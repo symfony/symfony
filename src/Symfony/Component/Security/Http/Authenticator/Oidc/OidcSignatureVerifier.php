@@ -129,7 +129,12 @@ final class OidcSignatureVerifier
             throw new AuthenticationException(\sprintf('The ID token is not signed with any of the expected algorithms ("%s").', implode('", "', $algorithms->list())), previous: $e);
         }
 
-        $keys = $this->getKeys($jws->getSignature(0)->hasProtectedHeaderParameter('kid') ? $jws->getSignature(0)->getProtectedHeaderParameter('kid') : null);
+        $kid = $jws->getSignature(0)->hasProtectedHeaderParameter('kid') ? $jws->getSignature(0)->getProtectedHeaderParameter('kid') : null;
+        if (null !== $kid && !\is_string($kid)) {
+            throw new AuthenticationException('The ID token "kid" header must be a string.');
+        }
+
+        $keys = $this->getKeys($kid);
         if (!$keys) {
             throw new AuthenticationException('The OIDC provider published no signing key usable to verify the ID token signature.');
         }
@@ -199,7 +204,10 @@ final class OidcSignatureVerifier
         // document downgrading its transport to plain HTTP must not be honored
         $jwksUri = $this->discovery->getSecureEndpoint('jwks_uri');
 
-        $cacheKey = 'oidc_jwks.'.hash('xxh128', $jwksUri);
+        // strict and lax filters yield different key sets, so each gets its own entry;
+        // the strictness is kept out of the hash, where a "jwks_uri" ending with the
+        // marker would collide with the other strictness of the same endpoint
+        $cacheKey = 'oidc_jwks.'.($this->enforceKeyUsageVerification ? '' : 'lax.').hash('xxh128', $jwksUri);
         $compute = fn (ItemInterface $item): array => [
             'keys' => OidcJwks::fetchKeys($this->httpClient, $jwksUri, $item, $this->jwksCacheTtl, $this->enforceKeyUsageVerification),
             // the JWKS is stored with the time it was fetched, so that the rotation

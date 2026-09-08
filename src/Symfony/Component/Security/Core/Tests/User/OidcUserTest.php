@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\User;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\OidcUser;
 
@@ -44,6 +45,27 @@ class OidcUserTest extends TestCase
         $this->assertNull($user->getNickname());
         $this->assertSame(['customId' => 12345], $user->getAdditionalClaims());
         $this->assertSame(['ROLE_USER'], $user->getRoles());
+    }
+
+    #[DataProvider('getVerifiedFlags')]
+    public function testFromClaimsOnlyKeepsARecognizableVerifiedFlag(mixed $value, ?bool $expected)
+    {
+        $user = OidcUser::fromClaims(['sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f', 'email_verified' => $value, 'phone_number_verified' => $value]);
+
+        $this->assertSame($expected, $user->getEmailVerified());
+        $this->assertSame($expected, $user->getPhoneNumberVerified());
+    }
+
+    public static function getVerifiedFlags(): iterable
+    {
+        yield 'true' => [true, true];
+        yield 'false' => [false, false];
+        yield '"true"' => ['true', true];
+        // a plain (bool) cast would turn this one into true
+        yield '"false"' => ['false', false];
+        yield '"0"' => ['0', false];
+        yield '1' => [1, true];
+        yield '"maybe"' => ['maybe', null];
     }
 
     public function testFromClaimsGrantsTheRolesItIsGiven()

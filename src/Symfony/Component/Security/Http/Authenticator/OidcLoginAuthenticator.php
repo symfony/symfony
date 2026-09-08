@@ -233,6 +233,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         $codeVerifier = \is_array($attempt) ? $attempt['code_verifier'] ?? null : null;
         $redirectUri = \is_array($attempt) ? $attempt['redirect_uri'] ?? null : null;
 
+        $this->checkIssuerParameter($request);
         $this->checkForProviderError($request);
 
         $code = $request->query->get('code');
@@ -343,6 +344,35 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             // only the matched attempt was consumed: a provider error for one tab
             // must not cancel the logins pending in the others
             throw new AuthenticationException(\sprintf('OIDC provider returned an error: "%s"', $description));
+        }
+    }
+
+    /**
+     * Checks the "iss" authorization response parameter of RFC 9207, which ties the
+     * callback to the provider that issued it: without it, a client registered with
+     * several providers can be led to send the code of an honest one to the token
+     * endpoint of a malicious one (the mix-up attack of the OAuth 2.0 Security BCP).
+     * It is checked before the "error" parameter, which RFC 9207, Section 2 requires
+     * it to accompany too.
+     */
+    private function checkIssuerParameter(Request $request): void
+    {
+        $configuration = $this->discovery->getConfiguration();
+        $iss = $request->query->get('iss');
+
+        if (null === $iss) {
+            // a provider announcing support for the parameter sends it on every
+            // authorization response, so a callback without it did not come from it
+            if (true === ($configuration['authorization_response_iss_parameter_supported'] ?? null)) {
+                throw new AuthenticationException('The OIDC provider announces support for the "iss" authorization response parameter, but the callback does not carry it.');
+            }
+
+            return;
+        }
+
+        $expectedIssuer = $configuration['issuer'] ?? null;
+        if (!\is_string($iss) || '' === $iss || !\is_string($expectedIssuer) || !hash_equals($expectedIssuer, $iss)) {
+            throw new AuthenticationException('The OIDC callback "iss" parameter does not match the expected issuer.');
         }
     }
 

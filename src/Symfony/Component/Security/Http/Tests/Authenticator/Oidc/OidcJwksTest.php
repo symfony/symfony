@@ -45,13 +45,42 @@ class OidcJwksTest extends TestCase
      */
     public static function getKeyUsages(): iterable
     {
-        yield 'use=sig' => [['kid' => 'k', 'use' => 'sig'], true, true];
-        yield 'use=enc' => [['kid' => 'k', 'use' => 'enc'], false, false];
-        yield 'no usage at all' => [['kid' => 'k'], false, true];
-        yield 'key_ops=verify' => [['kid' => 'k', 'key_ops' => ['verify']], true, true];
-        yield 'key_ops=sign' => [['kid' => 'k', 'key_ops' => ['sign']], true, true];
-        yield 'key_ops=encrypt' => [['kid' => 'k', 'key_ops' => ['encrypt']], false, false];
-        yield 'key_ops=encrypt+verify' => [['kid' => 'k', 'key_ops' => ['encrypt', 'verify']], true, true];
+        yield 'use=sig' => [['kid' => 'k', 'kty' => 'EC', 'use' => 'sig'], true, true];
+        yield 'use=enc' => [['kid' => 'k', 'kty' => 'EC', 'use' => 'enc'], false, false];
+        yield 'no usage at all' => [['kid' => 'k', 'kty' => 'EC'], false, true];
+        yield 'key_ops=verify' => [['kid' => 'k', 'kty' => 'EC', 'key_ops' => ['verify']], true, true];
+        yield 'key_ops=sign' => [['kid' => 'k', 'kty' => 'EC', 'key_ops' => ['sign']], true, true];
+        yield 'key_ops=encrypt' => [['kid' => 'k', 'kty' => 'EC', 'key_ops' => ['encrypt']], false, false];
+        yield 'key_ops=encrypt+verify' => [['kid' => 'k', 'kty' => 'EC', 'key_ops' => ['encrypt', 'verify']], true, true];
+    }
+
+    #[DataProvider('getMalformedKeys')]
+    public function testFromResponseDropsTheKeysJwkSetCannotLoad(array $malformedKey, bool $strict)
+    {
+        // a valid key sits next to the malformed one, and is the only one kept
+        $validKey = ['kid' => 'k', 'kty' => 'EC', 'use' => 'sig'];
+        $response = (new MockHttpClient(new JsonMockResponse(['keys' => [$malformedKey, $validKey]])))
+            ->request('GET', 'https://provider.example.com/jwks');
+
+        [$keys] = OidcJwks::fromResponse($response, $strict);
+
+        $this->assertSame([$validKey], $keys);
+    }
+
+    /**
+     * Entries that make JWKSet::createFromKeyData() throw: no "kty", a "kty" that is
+     * not a non-empty string, or a "kid" that is not a string.
+     */
+    public static function getMalformedKeys(): iterable
+    {
+        foreach ([true, false] as $strict) {
+            $mode = $strict ? 'strict' : 'lax';
+
+            yield "no kty ($mode)" => [['kid' => 'k', 'use' => 'sig'], $strict];
+            yield "non-string kty ($mode)" => [['kid' => 'k', 'kty' => 123, 'use' => 'sig'], $strict];
+            yield "empty kty ($mode)" => [['kid' => 'k', 'kty' => '', 'use' => 'sig'], $strict];
+            yield "array kid ($mode)" => [['kid' => ['not', 'a', 'string'], 'kty' => 'EC', 'use' => 'sig'], $strict];
+        }
     }
 
     public function testFromResponseRejectsAnOversizedJwks()
@@ -67,24 +96,24 @@ class OidcJwksTest extends TestCase
 
     public function testFromResponseIgnoresKeysThatAreNotObjects()
     {
-        $response = (new MockHttpClient(new JsonMockResponse(['keys' => ['garbage', ['kid' => 'k', 'use' => 'sig']]])))
+        $response = (new MockHttpClient(new JsonMockResponse(['keys' => ['garbage', ['kid' => 'k', 'kty' => 'EC', 'use' => 'sig']]])))
             ->request('GET', 'https://provider.example.com/jwks');
 
         [$keys] = OidcJwks::fromResponse($response);
 
-        $this->assertSame([['kid' => 'k', 'use' => 'sig']], $keys);
+        $this->assertSame([['kid' => 'k', 'kty' => 'EC', 'use' => 'sig']], $keys);
     }
 
     public function testFromResponseReadsTheProviderMaxAge()
     {
         $response = (new MockHttpClient(new JsonMockResponse(
-            ['keys' => [['kid' => 'sig-key', 'use' => 'sig']]],
+            ['keys' => [['kid' => 'sig-key', 'kty' => 'EC', 'use' => 'sig']]],
             ['response_headers' => ['cache-control' => 'public, max-age=600']],
         )))->request('GET', 'https://provider.example.com/jwks');
 
         [$keys, $ttl] = OidcJwks::fromResponse($response);
 
-        $this->assertSame([['kid' => 'sig-key', 'use' => 'sig']], $keys);
+        $this->assertSame([['kid' => 'sig-key', 'kty' => 'EC', 'use' => 'sig']], $keys);
         $this->assertSame(600, $ttl);
     }
 
@@ -102,7 +131,7 @@ class OidcJwksTest extends TestCase
     public function testFetchKeysAppliesProviderTtlToCacheItem()
     {
         $httpClient = new MockHttpClient(new JsonMockResponse(
-            ['keys' => [['kid' => 'sig-key', 'use' => 'sig']]],
+            ['keys' => [['kid' => 'sig-key', 'kty' => 'EC', 'use' => 'sig']]],
             ['response_headers' => ['cache-control' => 'max-age=120']],
         ));
 
@@ -111,7 +140,7 @@ class OidcJwksTest extends TestCase
 
         $keys = OidcJwks::fetchKeys($httpClient, 'https://provider.example.com/jwks', $item);
 
-        $this->assertSame([['kid' => 'sig-key', 'use' => 'sig']], $keys);
+        $this->assertSame([['kid' => 'sig-key', 'kty' => 'EC', 'use' => 'sig']], $keys);
     }
 
     public function testFetchKeysCapsTheProviderTtl()
@@ -140,11 +169,11 @@ class OidcJwksTest extends TestCase
 
     public function testFetchKeysIsUsableAsACacheCallback()
     {
-        $httpClient = new MockHttpClient(new JsonMockResponse(['keys' => [['kid' => 'sig-key', 'use' => 'sig']]]));
+        $httpClient = new MockHttpClient(new JsonMockResponse(['keys' => [['kid' => 'sig-key', 'kty' => 'EC', 'use' => 'sig']]]));
         $cache = new ArrayAdapter();
 
         $keys = $cache->get('jwks', static fn (ItemInterface $item) => OidcJwks::fetchKeys($httpClient, 'https://provider.example.com/jwks', $item));
 
-        $this->assertSame([['kid' => 'sig-key', 'use' => 'sig']], $keys);
+        $this->assertSame([['kid' => 'sig-key', 'kty' => 'EC', 'use' => 'sig']], $keys);
     }
 }

@@ -96,12 +96,12 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
             $claims['updatedAt'] = (new \DateTimeImmutable())->setTimestamp($claims['updatedAt']);
         }
 
-        if ('' !== ($claims['emailVerified'] ?? '')) {
-            $claims['emailVerified'] = (bool) $claims['emailVerified'];
-        }
-
-        if ('' !== ($claims['phoneNumberVerified'] ?? '')) {
-            $claims['phoneNumberVerified'] = (bool) $claims['phoneNumberVerified'];
+        // a string "false" would cast to true, so only a recognizable boolean is kept,
+        // and any other value is dropped rather than turned into a verified flag
+        foreach (['emailVerified', 'phoneNumberVerified'] as $flag) {
+            if (isset($claims[$flag]) && '' !== $claims[$flag] && null === $claims[$flag] = filter_var($claims[$flag], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE)) {
+                unset($claims[$flag]);
+            }
         }
 
         return new OAuth2User(...$claims);

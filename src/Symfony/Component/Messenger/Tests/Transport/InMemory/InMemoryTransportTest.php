@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Transport\InMemory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -83,6 +84,19 @@ class InMemoryTransportTest extends TestCase
         $envelope2 = (new Envelope(new \stdClass()))->with(new DelayStamp(10_000));
         $envelope2 = $this->transport->send($envelope2);
         $this->assertSame([$envelope1], $this->transport->get());
+    }
+
+    public function testQueueWithSubSecondDelay()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00');
+        $transport = new InMemoryTransport(clock: $clock);
+        $envelope = $transport->send((new Envelope(new \stdClass()))->with(new DelayStamp(500)));
+
+        $clock->sleep(0.1);
+        $this->assertSame([], $transport->get());
+
+        $clock->sleep(0.5);
+        $this->assertSame([$envelope], $transport->get());
     }
 
     public function testQueueWithSerialization()

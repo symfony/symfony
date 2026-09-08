@@ -53,7 +53,7 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
         self::assertInstanceOf(Animal::class, $zoo->getAnimals()[0]);
     }
 
-    public function testPropertyPhpDocWithDeepObjectToPopulate()
+    public function testDeepObjectToPopulateRebuildsTheItemsOfAList()
     {
         $json = <<<EOF
             {
@@ -68,7 +68,9 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
         ], ['json' => new JsonEncoder()]);
 
         $zoo = new Zoo();
-        $zoo->setAnimals([$animal = new Animal()]);
+        $zoo->setAnimals([$cat = new Animal(), $dog = new Animal()]);
+        $cat->setName('Cat');
+        $dog->setName('Dog');
 
         $serializer->deserialize($json, Zoo::class, 'json', [
             'object_to_populate' => $zoo,
@@ -76,7 +78,36 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
         ]);
 
         self::assertCount(1, $zoo->getAnimals());
-        self::assertSame($animal, $zoo->getAnimals()[0]);
+        self::assertNotSame($cat, $zoo->getAnimals()[0]);
+        self::assertSame('Bug', $zoo->getAnimals()[0]->getName());
+        self::assertSame('Cat', $cat->getName());
+        self::assertSame('Dog', $dog->getName());
+    }
+
+    public function testDeepObjectToPopulateReusesTheItemsOfAKeyedCollection()
+    {
+        $json = <<<EOF
+            {
+                "animalsString": {
+                    "animal1": {"name": "Bug"}
+                }
+            }
+            EOF;
+        $serializer = new Serializer([
+            new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+            new ArrayDenormalizer(),
+        ], ['json' => new JsonEncoder()]);
+
+        $zoo = new ZooWithKeyTypes();
+        $zoo->animalsString = ['animal1' => $animal = new Animal()];
+
+        $serializer->deserialize($json, ZooWithKeyTypes::class, 'json', [
+            'object_to_populate' => $zoo,
+            'deep_object_to_populate' => true,
+        ]);
+
+        self::assertCount(1, $zoo->animalsString);
+        self::assertSame($animal, $zoo->animalsString['animal1']);
         self::assertSame('Bug', $animal->getName());
     }
 

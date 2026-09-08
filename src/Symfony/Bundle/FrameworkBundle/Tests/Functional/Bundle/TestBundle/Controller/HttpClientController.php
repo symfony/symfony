@@ -28,6 +28,7 @@ class HttpClientController
             'headers' => ['X-Test-Header' => 'foo'],
             'json' => ['foo' => 'bar'],
         ]);
+        $symfonyHttpClient->request('POST', '/empty-body', ['body' => '']);
         $symfonyHttpClient->request('GET', '/doc/current/index.html');
 
         return new Response();

@@ -33,7 +33,6 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
-use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -171,7 +170,7 @@ class Configuration implements ConfigurationInterface
         $this->addLockSection($rootNode);
         $this->addSemaphoreSection($rootNode);
         $this->addMessengerSection($rootNode);
-        $this->addSchedulerSection($rootNode, $enableIfStandalone);
+        $this->addSchedulerSection($rootNode);
         $this->addRobotsIndexSection($rootNode);
         $this->addHttpClientSection($rootNode, $enableIfStandalone);
         $this->addMailerSection($rootNode, $enableIfStandalone);
@@ -1239,16 +1238,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addSchedulerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addSchedulerSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('scheduler')
-                    ->info('Scheduler configuration')
-                    ->{$enableIfStandalone('symfony/scheduler', Schedule::class)}()
+                ->variableNode('scheduler')
+                    ->aliasOf('scheduler')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

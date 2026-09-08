@@ -45,7 +45,6 @@ use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\Form\Command\DebugCommand;
-use Symfony\Component\Scheduler\Command\DebugCommand as SchedulerDebugCommand;
 use Symfony\Component\Serializer\Command\DebugCommand as SerializerDebugCommand;
 use Symfony\Component\Translation\Command\TranslationLintCommand;
 use Symfony\Component\Translation\Command\TranslationPullCommand;
@@ -146,12 +145,6 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.event_dispatcher_debug', EventDispatcherDebugCommand::class)
             ->args([
                 tagged_locator('event_dispatcher.dispatcher', 'name'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.scheduler_debug', SchedulerDebugCommand::class)
-            ->args([
-                tagged_locator('scheduler.schedule_provider', 'name'),
             ])
             ->tag('console.command')
 

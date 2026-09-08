@@ -36,6 +36,7 @@ CHANGELOG
  * Deprecate not setting the `enforce_at_jwt_type` option of the OIDC token handler, which defaults to `false` in 8.2 and will default to `true` in 9.0
  * Add the `resource_metadata` option to the `access_token` authenticator to serve the RFC 9728 protected resource metadata document of the firewall and advertise its URL in the `WWW-Authenticate` header
  * Pick an authenticator implementing `FallbackAuthenticationEntryPointInterface` as the firewall entry point only when no other authenticator provides one
+ * Add the `http_client` option to the `oidc_login` authenticator, naming the HTTP client its calls to the provider are made with
 
 8.1
 ---

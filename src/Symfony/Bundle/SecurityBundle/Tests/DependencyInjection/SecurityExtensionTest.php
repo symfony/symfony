@@ -31,6 +31,7 @@ use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
@@ -1704,6 +1705,54 @@ class SecurityExtensionTest extends TestCase
         $this->assertArrayHasKey('routing.route_loader', $loader->getTags());
         // it declares no route as long as no firewall configures the OIDC authenticator
         $this->assertCount(0, (new OidcLoginRouteLoader($container->getParameter('security.oidc_login.callback_uris'), 'security.oidc_login.callback_uris', $container->getParameter('security.oidc_login.start_paths'), 'security.oidc_login.start_paths'))());
+    }
+
+    public function testOidcLoginCallsTheProviderWithTheDefaultHttpClient()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['client_secret_post' => 'my-client-secret'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
+        $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
+        $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
+    }
+
+    public function testOidcLoginCallsTheProviderWithTheConfiguredHttpClient()
+    {
+        $container = $this->getRawContainer();
+        $container->register('oidc.http_client', MockHttpClient::class);
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['client_secret_post' => 'my-client-secret'],
+                        'http_client' => 'oidc.http_client',
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
+        $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
+        $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
     }
 
     protected function getRawContainer()

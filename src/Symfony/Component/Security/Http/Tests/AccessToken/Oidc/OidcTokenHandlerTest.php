@@ -1194,4 +1194,100 @@ class OidcTokenHandlerTest extends TestCase
             true,
         ))->getUserBadgeFrom($token);
     }
+
+    /**
+     * A resource server answering for several identifiers, as one deployed behind more than one
+     * API base URL is, declares them all, and RFC 7519 §4.1.3 lets the provider name the ones a
+     * token is minted for as a string or as a list.
+     */
+    #[DataProvider('getAudiencesNamingADeclaredOne')]
+    public function testAcceptsATokenIssuedForAnyOfTheDeclaredAudiences(string|array $tokenAudience)
+    {
+        $token = self::buildJWS(json_encode(['aud' => $tokenAudience] + self::getValidClaims()));
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->never())->method('error');
+
+        $userBadge = (new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            self::getJWKSet(),
+            ['https://api.example.com', self::AUDIENCE],
+            ['https://www.example.com'],
+            'sub',
+            $loggerMock,
+            new Clock(),
+            0,
+            true,
+        ))->getUserBadgeFrom($token);
+
+        $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
+    }
+
+    public static function getAudiencesNamingADeclaredOne(): iterable
+    {
+        yield 'a string naming the first one' => ['https://api.example.com'];
+        yield 'a string naming the last one' => [self::AUDIENCE];
+        yield 'a list naming one of them' => [['https://elsewhere.example.com', self::AUDIENCE]];
+        yield 'a list naming them all' => [['https://api.example.com', self::AUDIENCE]];
+    }
+
+    #[DataProvider('getAudiencesNamingNoDeclaredOne')]
+    public function testRejectsATokenIssuedForNoneOfTheDeclaredAudiences(mixed $tokenAudience)
+    {
+        $token = self::buildJWS(json_encode(['aud' => $tokenAudience] + self::getValidClaims()));
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())->method('error');
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+
+        (new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            self::getJWKSet(),
+            ['https://api.example.com', self::AUDIENCE],
+            ['https://www.example.com'],
+            'sub',
+            $loggerMock,
+            new Clock(),
+            0,
+            true,
+        ))->getUserBadgeFrom($token);
+    }
+
+    public static function getAudiencesNamingNoDeclaredOne(): iterable
+    {
+        yield 'a string naming another audience' => ['https://elsewhere.example.com'];
+        yield 'a list naming another audience' => [['https://elsewhere.example.com']];
+        yield 'an empty list' => [[]];
+        yield 'a non-string' => [42];
+        yield 'a list of non-strings' => [[42]];
+    }
+
+    #[DataProvider('getAudiencesNamingNothing')]
+    public function testRejectsAnAudienceNamingNothing(string|array $audience, string $expectedMessage)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            self::getJWKSet(),
+            $audience,
+            ['https://www.example.com'],
+            'sub',
+            null,
+            new Clock(),
+            0,
+            true,
+        );
+    }
+
+    public static function getAudiencesNamingNothing(): iterable
+    {
+        yield 'an empty list' => [[], 'cannot be an empty list'];
+        yield 'an empty string' => ['', 'must be a non-empty string or a list of non-empty strings'];
+        yield 'an empty string among others' => [['https://api.example.com', ''], 'must be a non-empty string or a list of non-empty strings'];
+        yield 'a non-string' => [[42], 'must be a non-empty string or a list of non-empty strings'];
+    }
 }

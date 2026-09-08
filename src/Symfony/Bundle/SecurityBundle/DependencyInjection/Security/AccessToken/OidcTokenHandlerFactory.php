@@ -33,8 +33,12 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
             $config['enforce_at_jwt_type'] = false;
         }
 
+        // a lone identifier is passed as it was given, so that an environment variable holding the
+        // whole list, as "%env(json:AUDIENCES)%" does, reaches the handler as the list it resolves to
+        $audience = [0] === array_keys($config['audience']) ? $config['audience'][0] : $config['audience'];
+
         $tokenHandlerDefinition = $container->setDefinition($id, (new ChildDefinition('security.access_token_handler.oidc'))
-            ->replaceArgument(2, $config['audience'])
+            ->replaceArgument(2, $audience)
             ->replaceArgument(3, $config['issuers'])
             ->replaceArgument(4, $config['claim'])
             ->replaceArgument(7, $config['allowed_time_drift'])
@@ -113,7 +117,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                 (new ChildDefinition('security.access_token_handler.oidc.generator'))
                     ->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))->replaceArgument(0, $config['algorithms']))
                     ->replaceArgument(1, (new ChildDefinition('security.access_token_handler.oidc.jwkset'))->replaceArgument(0, $config['keyset']))
-                    ->replaceArgument(2, $config['audience'])
+                    ->replaceArgument(2, $audience)
                     ->replaceArgument(3, $config['issuers'])
                     ->replaceArgument(4, $config['claim']),
                 $config['algorithms'],
@@ -164,9 +168,12 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                         ->info('Claim which contains the user identifier (e.g.: sub, email..).')
                         ->defaultValue('sub')
                     ->end()
-                    ->scalarNode('audience')
-                        ->info('Audience set in the token, for validation purpose.')
+                    ->arrayNode('audience')
+                        ->info('Identifiers of this resource server, one of which the "aud" of the token must name. A single identifier may be given as a string.')
                         ->isRequired()
+                        ->requiresAtLeastOneElement()
+                        ->acceptAndWrap(['string'])
+                        ->scalarPrototype()->cannotBeEmpty()->end()
                     ->end()
                     ->arrayNode('issuers', 'issuer')
                         ->info('Issuers allowed to generate the token, for validation purpose.')

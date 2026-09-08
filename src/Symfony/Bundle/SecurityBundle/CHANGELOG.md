@@ -37,6 +37,7 @@ CHANGELOG
  * Add the `resource_metadata` option to the `access_token` authenticator to serve the RFC 9728 protected resource metadata document of the firewall and advertise its URL in the `WWW-Authenticate` header
  * Pick an authenticator implementing `FallbackAuthenticationEntryPointInterface` as the firewall entry point only when no other authenticator provides one
  * Add the `http_client` option to the `oidc_login` authenticator, naming the HTTP client its calls to the provider are made with
+ * Allow the `audience` option of the `oidc` token handler to name several identifiers as a list, as the `oauth2` one does
 
 8.1
 ---

@@ -188,6 +188,28 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertArrayNotHasKey('kernel.reset', $tags);
     }
 
+    public function testOidcTokenHandlerConfigurationWithSeveralAudiences()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'enforce_at_jwt_type' => true,
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => ['https://api.example.com', 'https://admin.example.com'],
+                    'keyset' => '{"keys":[]}',
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        $this->assertSame(['https://api.example.com', 'https://admin.example.com'], $container->getDefinition('security.access_token_handler.firewall1')->getArgument(2));
+    }
+
     public function testOidcTokenHandlerConfigurationWithEncryption()
     {
         $container = new ContainerBuilder();
@@ -634,7 +656,7 @@ class AccessTokenFactoryTest extends TestCase
         $definition = $container->getDefinition('security.access_token_handler.firewall1');
         $this->assertEquals([
             'index_0' => new Reference('oauth2.introspection'),
-            'index_2' => ['https://api.example.com'],
+            'index_2' => 'https://api.example.com',
             'index_3' => 'https://www.example.com',
             'index_4' => 'username',
             'index_6' => 5,

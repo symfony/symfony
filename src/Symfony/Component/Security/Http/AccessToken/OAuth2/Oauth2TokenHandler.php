@@ -90,10 +90,15 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
     private ?HttpClientInterface $metadataClient = null;
 
     /**
+     * @var list<string>
+     */
+    private readonly array $audiences;
+
+    /**
      * @param HttpClientInterface $client           The client the introspection endpoint is reached with, whose
      *                                              base URI is that endpoint and whose options carry the
      *                                              credentials of this resource server
-     * @param list<string>        $audiences        The identifiers of this resource server, one of which the "aud"
+     * @param string|list<string> $audiences        The identifiers of this resource server, one of which the "aud"
      *                                              of the introspection response must name, or an empty list to
      *                                              skip that check
      * @param string|null         $issuer           The identifier of the authorization server, checked against the
@@ -106,12 +111,19 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
     public function __construct(
         private readonly HttpClientInterface $client,
         private readonly ?LoggerInterface $logger = null,
-        private readonly array $audiences = [],
+        string|array $audiences = [],
         private readonly ?string $issuer = null,
         private readonly ?string $claim = null,
         private readonly ClockInterface $clock = new Clock(),
         private readonly int $allowedTimeDrift = 0,
     ) {
+        $this->audiences = \is_array($audiences) ? array_values($audiences) : [$audiences];
+
+        foreach ($this->audiences as $value) {
+            if (!\is_string($value) || '' === $value) {
+                throw new \InvalidArgumentException(\sprintf('The "$audiences" argument of "%s()" must be a non-empty string or a list of non-empty strings.', __METHOD__));
+            }
+        }
     }
 
     /**

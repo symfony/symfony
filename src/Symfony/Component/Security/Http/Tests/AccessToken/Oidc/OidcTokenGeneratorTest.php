@@ -66,6 +66,48 @@ class OidcTokenGeneratorTest extends TestCase
         $this->assertSame('john_doe', $handler->getUserBadgeFrom($token)->getUserIdentifier());
     }
 
+    /**
+     * The "aud" claim keeps the single-string form of RFC 7519 §4.1.3 when the resource server
+     * answers for one identifier, and names them all when it answers for several.
+     */
+    #[DataProvider('getAudiences')]
+    public function testGeneratesTokensNamingEveryDeclaredAudience(string|array $audience, string|array $expected)
+    {
+        $algorithmManager = new AlgorithmManager([new ES256()]);
+        $issuers = ['https://www.example.com'];
+
+        $generator = new OidcTokenGenerator($algorithmManager, $this->getJWKSet(), $audience, $issuers);
+        $handler = new OidcTokenHandler($algorithmManager, $this->getJWKSet(), $audience, $issuers, 'sub', null, new Clock(), 0, true);
+
+        $token = $generator->generate('john_doe', null, null, 3600);
+
+        $this->assertSame($expected, $handler->getUserBadgeFrom($token)->getAttributes()['aud']);
+    }
+
+    public static function getAudiences(): iterable
+    {
+        yield 'a string' => ['Symfony OIDC', 'Symfony OIDC'];
+        yield 'a list of one' => [['Symfony OIDC'], 'Symfony OIDC'];
+        yield 'a list of several' => [['Symfony OIDC', 'https://api.example.com'], ['Symfony OIDC', 'https://api.example.com']];
+    }
+
+    #[DataProvider('getAudiencesNamingNothing')]
+    public function testRejectsAnAudienceNamingNothing(string|array $audience, string $expectedMessage)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        new OidcTokenGenerator(new AlgorithmManager([new ES256()]), $this->getJWKSet(), $audience, ['https://www.example.com']);
+    }
+
+    public static function getAudiencesNamingNothing(): iterable
+    {
+        yield 'an empty list' => [[], 'cannot be an empty list'];
+        yield 'an empty string' => ['', 'must be a non-empty string or a list of non-empty strings'];
+        yield 'an empty string among others' => [['https://api.example.com', ''], 'must be a non-empty string or a list of non-empty strings'];
+        yield 'a non-string' => [[42], 'must be a non-empty string or a list of non-empty strings'];
+    }
+
     #[DataProvider('provideGenerateWithInvalid')]
     public function testGenerateWithInvalid(?string $algorithm, ?string $issuer, ?int $ttl, ?int $notBefore, string $expectedMessage)
     {

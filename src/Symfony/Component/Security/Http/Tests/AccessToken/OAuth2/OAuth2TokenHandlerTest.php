@@ -163,6 +163,32 @@ class OAuth2TokenHandlerTest extends TestCase
         yield 'not a boolean at all' => [['active' => 'bogus', 'sub' => 'jdoe']];
     }
 
+    /**
+     * A provider that does not serialize the verified claims as JSON booleans must not make
+     * the user report the opposite of what the claim says: (bool) "false" is true.
+     */
+    #[DataProvider('verifiedClaims')]
+    public function testOnlyKeepsARecognizableBooleanForTheVerifiedClaims(mixed $value, ?bool $expected)
+    {
+        $claims = ['active' => true, 'sub' => 'jdoe', 'email_verified' => $value];
+        $client = new MockHttpClient([new MockResponse(json_encode($claims, \JSON_THROW_ON_ERROR))]);
+
+        $user = (new Oauth2TokenHandler($client))->getUserBadgeFrom('a-secret-token')->getUserLoader()();
+
+        $this->assertSame($expected, $user->additionalClaims['emailVerified'] ?? null);
+    }
+
+    public static function verifiedClaims(): iterable
+    {
+        yield 'a boolean true' => [true, true];
+        yield 'a boolean false' => [false, false];
+        yield 'a stringly typed true' => ['true', true];
+        yield 'a stringly typed false' => ['false', false];
+        yield 'no' => ['no', false];
+        yield 'off' => ['off', false];
+        yield 'anything else' => ['maybe', null];
+    }
+
     #[DataProvider('unusableTokens')]
     public function testRejectsATokenTheServerReportsAsUnusable(array $claims, string $message)
     {

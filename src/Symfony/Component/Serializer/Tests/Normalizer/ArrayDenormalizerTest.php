@@ -85,6 +85,33 @@ class ArrayDenormalizerTest extends TestCase
         $this->assertArrayNotHasKey('object_to_populate', $contexts[3]);
     }
 
+    public function testDenormalizeKeepsObjectToPopulateOutOfListItems()
+    {
+        $contexts = [];
+
+        $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);
+        $nestedDenormalizer->expects($this->exactly(2))
+            ->method('denormalize')
+            ->willReturnCallback(static function ($data, $type, $format, $context) use (&$contexts) {
+                $contexts[] = $context;
+
+                return $data;
+            })
+        ;
+
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+        $denormalizer->denormalize(
+            [[], []],
+            __NAMESPACE__.'\ArrayDummy[]',
+            null,
+            ['object_to_populate' => [new ArrayDummy('one', 'two'), new ArrayDummy('three', 'four')]]
+        );
+
+        $this->assertArrayNotHasKey('object_to_populate', $contexts[0]);
+        $this->assertArrayNotHasKey('object_to_populate', $contexts[1]);
+    }
+
     public function testSupportsValidArray()
     {
         $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);

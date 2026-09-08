@@ -101,12 +101,12 @@ class OidcUser implements UserInterface
             $claims['updatedAt'] = (new \DateTimeImmutable())->setTimestamp((int) $claims['updatedAt']);
         }
 
-        if (isset($claims['emailVerified'])) {
-            $claims['emailVerified'] = (bool) $claims['emailVerified'];
-        }
-
-        if (isset($claims['phoneNumberVerified'])) {
-            $claims['phoneNumberVerified'] = (bool) $claims['phoneNumberVerified'];
+        // a string "false" would cast to true, so only a recognizable boolean is kept,
+        // and any other value is dropped rather than turned into a verified flag
+        foreach (['emailVerified', 'phoneNumberVerified'] as $flag) {
+            if (isset($claims[$flag]) && null === $claims[$flag] = filter_var($claims[$flag], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE)) {
+                unset($claims[$flag]);
+            }
         }
 
         // a subclass that changes the constructor signature breaks this factory anyway,

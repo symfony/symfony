@@ -249,6 +249,43 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $container->getDefinition('limiter.without_lock')->getArgument(2);
     }
 
+    public function testRateLimiterAutoLockFactoryWithoutDefaultLockResource()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'lock' => ['foo' => 'flock'],
+                'rate_limiter' => [
+                    'without_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
+                ],
+            ]);
+        });
+
+        $this->expectException(OutOfBoundsException::class);
+        $this->expectExceptionMessageMatches('/^The argument "2" doesn\'t exist.*\.$/');
+
+        $container->getDefinition('limiter.without_lock')->getArgument(2);
+    }
+
+    public function testRateLimiterCustomLockFactoryWithoutDefaultLockResource()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'lock' => ['foo' => 'flock'],
+                'rate_limiter' => [
+                    'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour', 'lock_factory' => 'app.lock_factory'],
+                ],
+            ]);
+        });
+
+        $this->assertSame('app.lock_factory', (string) $container->getDefinition('limiter.with_lock')->getArgument(2));
+    }
+
     public function testRateLimiterDisableLockFactory()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {

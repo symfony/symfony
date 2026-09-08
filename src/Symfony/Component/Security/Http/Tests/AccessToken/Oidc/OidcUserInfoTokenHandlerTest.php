@@ -29,6 +29,40 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class OidcUserInfoTokenHandlerTest extends TestCase
 {
+    #[DataProvider('getVerifiedClaims')]
+    public function testOnlyKeepsARecognizableBooleanForTheVerifiedClaims(mixed $value, ?bool $expected)
+    {
+        $claims = ['sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f', 'email_verified' => $value];
+
+        $responseMock = $this->createMock(ResponseInterface::class);
+        $responseMock->expects($this->once())->method('toArray')->willReturn($claims);
+
+        $clientMock = $this->createMock(HttpClientInterface::class);
+        $clientMock->expects($this->once())->method('request')->willReturn($responseMock);
+
+        $user = (new OidcUserInfoTokenHandler($clientMock))->getUserBadgeFrom('a-secret-token')->getUserLoader()();
+
+        $this->assertSame($expected, $user->getEmailVerified());
+    }
+
+    /**
+     * A provider that does not serialize the claim as a JSON boolean must not end up
+     * reporting a verified email: "false" cast to true, which is the reverse of what
+     * the claim says, and anything unrecognizable leaves the flag unknown.
+     */
+    public static function getVerifiedClaims(): iterable
+    {
+        yield 'a boolean true' => [true, true];
+        yield 'a boolean false' => [false, false];
+        yield 'a stringly typed true' => ['true', true];
+        yield 'a stringly typed false' => ['false', false];
+        yield 'no' => ['no', false];
+        yield 'off' => ['off', false];
+        yield 'the number one' => [1, true];
+        yield 'the number zero' => [0, false];
+        yield 'anything else' => ['maybe', null];
+    }
+
     #[DataProvider('getClaims')]
     public function testGetsUserIdentifierFromOidcServerResponse(string $claim, string $expected)
     {

@@ -3754,7 +3754,7 @@ class FrameworkExtension extends Extension
                 ->addTag('rate_limiter', ['name' => $name]);
 
             if ('auto' === $limiterConfig['lock_factory']) {
-                $limiterConfig['lock_factory'] = $this->isInitializedConfigEnabled('lock') ? 'lock.factory' : null;
+                $limiterConfig['lock_factory'] = $container->hasAlias('lock.factory') ? 'lock.factory' : null;
             }
 
             if (null !== $limiterConfig['lock_factory']) {
@@ -3813,7 +3813,7 @@ class FrameworkExtension extends Extension
             $builderConfig = $config['builder'];
 
             if ('auto' === $builderConfig['lock_factory']) {
-                $builderConfig['lock_factory'] = interface_exists(LockInterface::class) && $this->isInitializedConfigEnabled('lock') ? 'lock.factory' : null;
+                $builderConfig['lock_factory'] = interface_exists(LockInterface::class) && $container->hasAlias('lock.factory') ? 'lock.factory' : null;
             }
 
             $builder = $container->getDefinition('limiter_builder');

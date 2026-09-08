@@ -18,6 +18,8 @@ CHANGELOG
  * Add an optional `LoggingMiddleware` logging the processing time and memory usage of each message
  * Add the `messenger:show` command to list and inspect pending messages of a transport
  * Make the `messenger:consume` and `messenger:failed:retry` commands exit immediately when a second `SIGINT` is received
+ * Add `ChainStamp` and `ChainMiddleware` to dispatch a sequence of messages one after another, each one once the previous one is handled
+ * Add `chain` to the default bus middleware, between `send_message` and `handle_message`
 
 8.1
 ---

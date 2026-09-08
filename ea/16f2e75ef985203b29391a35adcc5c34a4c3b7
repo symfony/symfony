@@ -1,0 +1,184 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T16:27:31Z
+
+This PR grew from the parser primitives into the full sub-command feature; the description is rewritten accordingly. The design was refined round by round before implementation: no parent declarations and no registration API remain, the tree derives entirely from registered colon names. One commit per step, each with its tests; the first commit keeps @dantleech's authorship.
+
+---------------------------------------------------------------------------
+
+by dantleech at 2026-09-03T17:39:40Z
+
+This looks good!
+
+One of the reasons I avoided the `one:two:three` approach was because renaming an intermediate node is annoying, but so be it. (perhaps it could be done via. `#[AsCommand(parent: MyOtherCommand::class)]` future if that was deemed valuable).
+
+A feature of the original approach was being able to pass "attributes" around. So the `compose` sub-command could, for example, instantiate an object that should be shared to all sub-commands (imagine a `DockerClient` sourced using options from the sub-command or something). So that was the reasoning behind adding `->setAttribute('foo', $service)` to the `Input` (similar to the HTTP `Request`). It's not important but worth mentioning and could be achieved in other ways I guess.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T18:14:42Z
+
+Or as a service now that it's easy to use DI + Console standalone ;)
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-03T19:14:04Z
+
+Hi. I find the use of `:` smart DX-wise but I fear it may become increasingly difficult to know if there will be a BC whenever we add an argument to an existing command or if it will match an alias or another command... I wonder if it should be more opt-in instead of applying to all existing commands.
+
+Also with the examples in the description how would it go if `DockerCommand` also declares an invoke ? would it be possible to just call `bin/console docker` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T19:35:18Z
+
+There's a compiler log to at least spot these cases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T19:51:51Z
+
+Yes: a command that defines its own code (an `__invoke` or `execute()`) runs it when invoked bare, exactly as today; the sub-command listing is only the default behavior for commands without code. Its help still lists the sub-commands either way. So `bin/console docker` runs `DockerCommand::__invoke()`, and `bin/console docker compose up` never executes it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-04T08:35:31Z
+
+Review round applied on top of the previous head (b5fc88debb0), rebased on 8.2:
+
+- `Command::ignoreExtraArguments()` is removed: the resolver builds its own definitions and never called it. The parser layer is `InputDefinition::setIgnoreExtraArguments()` plus `getUnparsedTokens()` on `ArgvInput` and `ArrayInput`; a flag set on a command's own definition still survives `mergeApplicationDefinition()`.
+- `help docker compose` resolves the spaced path, aliases and implicit nodes included. Tokens that name no sub-command are ignored as before, so `help messenger:consume async` keeps showing the help of `messenger:consume`.
+- `CommandChain::getCommand()` and `getInput()` also match the class of an invokable command; the level holds the `Command` wrapper, so the class lookup returned null for the promoted style.
+- An alias at an intermediate level (`docker c up` with alias `docker:c`) was treated as a leaf; the walk and the completion now continue from the canonical name.
+- The implicit root no longer appears in the chain, matching the intermediate levels and the class docblock; the running command is always the last level.
+- A nested `Application::doRun()` (the bare-group listing uses one) reset the chain for the rest of the outer run; the chain is now saved and restored around each run.
+
+Each change sits in the step commit it belongs to, with its test. Checks: the Console suite passes locally (the two QuestionHelper timeout tests fail in my environment on every branch), php-cs-fixer is clean, and every commit of the series passes the tests of the files it touches.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-04T14:27:24Z
+
+Review round applied on top of the previous head (61370d0d9ad), rebased on 8.2. Every finding was reproduced with a probe on the base branch and on the PR head before anything changed.
+
+Findings applied:
+
+- `ArrayInput` on a command with descendants: `['command' => 'deploy', 'target' => 'prod']` threw. Covered by the resolution rule below, for named and positional values alike.
+- An alias under the command's own name (`deploy` aliased `deploy:prod`) made `deploy:prod staging` fail. Such an alias is not a descendant anymore.
+- A walk failure (`docker compos`) skipped `ConsoleEvents::ERROR`. The event is dispatched like for the other resolution failures.
+- A lazily registered `help` never received the command to describe. It is unwrapped before the wrap.
+- A bare namespace holding only hidden commands printed the `execute()` `LogicException`. It reports the namespace like `list` does.
+- `deploy -- <TAB>` suggested sub-commands. It completes the node's own arguments.
+- The lenient `ArrayInput` mode filled slots by `count($this->arguments)` and wrote `IS_ARRAY` slots as scalars. It fills the first free slot and appends to array arguments.
+- A command run from inside another one received the caller's chain. It gets its own single-level chain.
+- Completion and help resolved every lazy command through `all()`. They resolve the sub-tree only, so `app:one --help` instantiates one command, as before.
+- `CommandChain` class lookups return the deepest matching level.
+
+Design changes decided during the round:
+
+- Sub-command first, argument otherwise. At a node with descendants, a token that names no sub-command starts the node's own arguments, so `deploy prod` and `app:import file.csv` behave exactly as today, and `--` is only needed when a value collides with a sub-command name. The strict rule broke the colon form of every prefix pair with arguments (`app:import file.csv` failed as soon as `app:import:users` existed), against the "byte-identical" promise. The `--` hint and the compiler-log commit are gone with it, and completion offers a node's argument values next to its sub-commands.
+- A bare group keeps today's behavior of a bare namespace: listing on the error output, exit code 1. Only the `ConsoleEvents::ERROR` event is not dispatched for it anymore.
+- Application options bound at an ancestor level are re-emitted on the leaf input, so `docker --profile compose up` profiles like `docker compose up --profile`, and `(string) $input` carries them.
+- `ArrayInput` binds positional values in strict mode too, in a commit of its own: `CommandTester::execute(['foo'])` binds `foo`, and `ApplicationTester::run(['command' => 'deploy', '--', 'rollback'])` works. A positional value that finds no free slot stays ignored as before; three tests in Symfony itself pass such values.
+- `setIgnoreExtraArguments()` documents that it is set in `configure()`, like any change made through `getDefinition()` before the application definition is merged.
+
+Checks: the Console suite passes locally except the two QuestionHelper stdin failures that fail on every branch in my environment, the FrameworkBundle Console and Command tests pass, php-cs-fixer is clean, and each commit passes the tests of the files it touches.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-04T14:32:16Z
+
+Follow-up noted during the review, out of scope for this PR: reclaiming application option names for commands.
+
+Today a command cannot declare an option named `verbose`, `quiet`, `ansi`, `no-interaction`, `help` or `version` (nor `env`, `no-debug` or `profile` in a Symfony application), and none of their shortcuts, because the application definition is merged into every command definition and a clash throws. Per-level parsing opens an additive route: a command, or a tree level, may declare a shadowing option; at that level the command's definition wins, and the application option stays reachable before the command name or at an ancestor level, so `docker compose down -v` can mean "remove volumes" while `docker -v compose down` keeps the global verbosity. It needs the merge and the level definitions to skip shadowed application options, `configureIO()` to re-derive verbosity, ansi and interactivity from the bound inputs once the command is known, and the option replay of this PR to skip shadowed names. Nobody has such a command today since the clash throws, so it can come as its own PR on top of this one.
+
+A rule "application options only before the command name" for 9.0 was considered for the same goal and dropped: trailing `-vvv`, `-n` and `-e prod` sit in every script and CI job.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-05T06:00:44Z
+
+`CommandChain` class lookups now also match container-registered commands. The compiler pass wraps the service in a `Closure`, so `getCode() instanceof SomeInvokable` was false in every Symfony application and only a hand-built `setCode(new SomeInvokable())` matched. The lookup reads the object behind the closure, with a test for the `__invoke` and the method shapes. Squashed into the `CommandChain` commit.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-09-07T13:49:02Z
+
+@nicolas-grekas what happens if your intermediate command is defining an `execute` method ?
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-07T13:50:56Z
+
+would it work if both `docker` & `up` exposes `--context` option ? would it make it impossible ? override ? accept ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:46:39Z
+
+@stof it runs, and only when it is the command being invoked. Nothing changes for a node that defines `execute()` (or `__invoke()`, or `setCode()`): the tree only decides which command the input resolves to, and that command runs alone.
+
+With `docker`, `docker:compose` and `docker:compose:up` all defining `execute()`:
+
+```
+docker compose up   ->  docker:compose:up::execute
+docker compose      ->  docker:compose::execute
+docker              ->  docker::execute
+docker:compose      ->  docker:compose::execute   (unchanged colon form)
+```
+
+So an intermediate `execute()` is what a node runs when the invocation stops there, exactly like today when that command is called by its colon name. Ancestor levels are parsed, never executed, and their bound input stays readable from the leaf through `CommandChain`.
+
+The listing behavior only fills the gap: a node **without** code of its own would have thrown "You must override the execute() method"; it now lists its sub-commands on the error output with exit code 1, like a bare namespace. Defining `execute()` opts out of that listing, since the command has something to do.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:46:43Z
+
+@Neirda24 it works, and the two are independent, because each level parses against its own definition:
+
+```
+docker --context=a compose up --context=b   ->  up sees "b",             docker level holds "a"
+docker --context=a compose up               ->  up sees its own default, docker level holds "a"
+docker compose up --context=b               ->  up sees "b",             docker level holds its default
+docker -c a compose up -c b                 ->  same, shortcuts included
+```
+
+No override and no clash: `--context` before `compose` belongs to `docker`, `--context` after `up` belongs to `up`. The leaf reads its own value from `$input` as usual, and the ancestor value through the chain:
+
+```php
+$chain->getInput('docker')->getOption('context');
+```
+
+If only `docker` declares the option, then `docker --context=a compose up` binds it at the `docker` level, while `docker compose up --context=a` fails with `The "--context" option does not exist.`, since `up` does not declare it: options are per level, and a child does not inherit its parent's ones. The exception is the application's own options (`-v`, `-n`, `--env`, …), which every level accepts and which are carried over to the leaf input wherever they appear.
+
+What is not possible today is a command declaring an option that collides with an **application** option, `--verbose` or `-v` for instance, because the application definition is merged into every command. Making a level shadow those is the follow-up I described [above](https://github.com/symfony/symfony/pull/65825#issuecomment-5541950457).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:46:46Z
+
+Psalm was right about one thing on the previous head: `InvokableCommand::getCommandChain()` returned `$chain` from a branch where Psalm could not see it was non-null (the null check went through the sibling variable). Rewritten so the narrowing is explicit, no behavior change. Pushed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T10:27:29Z
+
+Thanks @chalasr, this round found real defects. Every one was reproduced on 8.2 and on the PR head before anything changed; head is now 099fa37194b.
+
+Fixed, each with its test:
+
+- `ArrayInput` named keys became segments: `['command' => 'deploy', 'target' => 'rollback']` ran `deploy:rollback` with `target` unset. `getUnparsedTokens()` now puts a `--` in front of the first string-keyed parameter, so a named argument can never name a sub-command, and option parameters keep their place before it.
+- `false` option values: re-emitting now follows the convention of `Input::unparse()`, so `--ansi => false` becomes `--no-ansi`, a value-less option set to false is not re-emitted at all, and a value option keeps its `=value` form.
+- `help` resolved every lazy command: both `getNamespaces()` calls are gone, replaced by `all($path)` which resolves the sub-tree only. In my probe with six lazy commands, `help app:one nope` went from 6 to 1 and `help other` from 6 to 1.
+- A command re-running itself received the outer chain: the chain is reused only when its last level holds the very input being run.
+- The chain survived a throwing command: `try`/`finally` now. `$runningCommand` stays out of it on purpose, since `renderThrowable()` prints the synopsis of the command that failed.
+- The bare namespace holding only hidden commands rendered the application header before throwing: the listing is built in a buffer and written only once it succeeded.
+- An alias resolving outside its own namespace orphaned the sub-commands registered under it: the alias is canonicalized unless that would orphan them, so `docker compose up` reaches `docker:compose:up` while `docker compose` still runs the aliased command.
+- The application options replayed on the leaf keep the token as it was given, so `docker -vv compose up` reaches the leaf as `-vv`, `hasParameterOption('-vv')` included.
+
+Documentation: `UPGRADE-8.2.md` gained the Console section it was missing, covering the sub-command-first rule in both forms, the positional `ArrayInput` binding, the bare-namespace `ConsoleEvents::ERROR` removal and the collapsed listing. The description now names the colon form in the behavior-change list, says that `--format=json` and `--format=md` keep listing every command, and states what the option replay really promises.
+
+The level-arguments point is the one I did not apply; the reasoning is in that thread, and I am happy to go the other way if you prefer the narrower chain API.
+
+Checks: the Console suite passes locally except the two `QuestionHelper` stdin tests that fail on every branch in my environment, the FrameworkBundle Console and Command tests pass, php-cs-fixer is clean.

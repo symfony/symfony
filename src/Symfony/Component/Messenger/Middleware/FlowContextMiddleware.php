@@ -77,11 +77,7 @@ final class FlowContextMiddleware implements MiddlewareInterface
         }
 
         if (null !== $handled && null === $envelope->last(ReceivedStamp::class)) {
-            foreach ($handled->all() as $class => $stamps) {
-                if (is_subclass_of($class, PropagatedStampInterface::class) && null === $envelope->last($class)) {
-                    $envelope = $envelope->with(...$stamps);
-                }
-            }
+            $envelope = self::propagate($envelope, $handled);
         }
 
         if (null !== $envelope->last(DispatchAfterCurrentBusStamp::class)) {
@@ -91,6 +87,22 @@ final class FlowContextMiddleware implements MiddlewareInterface
         }
 
         return $this->track($envelope, $stack, $stack->next());
+    }
+
+    /**
+     * Gives an envelope the PropagatedStampInterface stamps of another one, except for the stamp classes it already carries.
+     *
+     * @internal
+     */
+    public static function propagate(Envelope $envelope, Envelope $from): Envelope
+    {
+        foreach ($from->all() as $class => $stamps) {
+            if (is_subclass_of($class, PropagatedStampInterface::class) && null === $envelope->last($class)) {
+                $envelope = $envelope->with(...$stamps);
+            }
+        }
+
+        return $envelope;
     }
 
     private function track(Envelope $envelope, StackInterface $stack, MiddlewareInterface $next): Envelope

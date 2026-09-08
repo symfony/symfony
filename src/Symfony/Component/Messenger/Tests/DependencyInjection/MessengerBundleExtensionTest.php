@@ -76,7 +76,7 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_show'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_remove'));
         $this->assertFalse($container->hasDefinition('serializer.normalizer.flatten_exception'));
-        $this->assertFalse($container->hasDefinition('serializer.normalizer.chain_stamp'));
+        $this->assertFalse($container->hasDefinition('serializer.normalizer.message_stamp'));
     }
 
     public function testMessenger()
@@ -173,7 +173,24 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertSame('messenger.routable_message_bus', (string) $container->getDefinition('messenger.middleware.chain')->getArgument(0));
         $this->assertSame('messenger.senders_locator', (string) $container->getDefinition('messenger.middleware.chain')->getArgument(1));
         $this->assertContains('messenger.middleware.chain', $this->getBusMiddlewareIds($container, 'messenger.bus.default'));
-        $this->assertTrue($container->getDefinition('serializer.normalizer.chain_stamp')->hasTag('serializer.normalizer'));
+        $this->assertTrue($container->getDefinition('serializer.normalizer.message_stamp')->hasTag('serializer.normalizer'));
+    }
+
+    public function testMessengerDispatchOnFailure()
+    {
+        $container = $this->createContainerFromFile('messenger', false);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
+
+        $middleware = $container->getDefinition('messenger.middleware.dispatch_on_failure');
+        $this->assertSame('messenger.routable_message_bus', (string) $middleware->getArgument(0));
+        $this->assertEquals(new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE), $middleware->getArgument(1));
+        $this->assertContains('messenger.middleware.dispatch_on_failure', $this->getBusMiddlewareIds($container, 'messenger.bus.default'));
+
+        $listener = $container->getDefinition('messenger.failure.dispatch_on_failure_listener');
+        $this->assertEquals(new Reference('messenger.routable_message_bus'), $listener->getArgument(0));
+        $this->assertEquals(new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE), $listener->getArgument(1));
+        $this->assertTrue($listener->hasTag('kernel.event_subscriber'));
     }
 
     public function testMessengerRejectRedeliveredMessagesEnabledByDefault()
@@ -236,8 +253,21 @@ class MessengerBundleExtensionTest extends TestCase
 
         $this->assertNotFalse($position, 'The flow_context middleware is listed.');
         $this->assertSame(['id' => 'decode_failed_message_middleware'], $middleware[$position - 1]);
-        $this->assertSame(['id' => 'dispatch_after_current_bus'], $middleware[$position + 1]);
+        $this->assertGreaterThan($position, array_search(['id' => 'dispatch_after_current_bus'], $middleware, true));
         $this->assertSame(FlowContextMiddleware::class, $container->getDefinition('messenger.middleware.flow_context')->getClass());
+    }
+
+    public function testMessengerDispatchOnFailureMiddlewareRunsBetweenFlowContextAndDispatchAfterCurrentBus()
+    {
+        $container = $this->createContainerFromFile('messenger', false);
+        $container->compile();
+
+        $middleware = array_values($container->getParameter('messenger.bus.default.middleware'));
+        $position = array_search(['id' => 'dispatch_on_failure'], $middleware, true);
+
+        $this->assertNotFalse($position, 'The dispatch_on_failure middleware is listed.');
+        $this->assertSame(['id' => 'flow_context'], $middleware[$position - 1]);
+        $this->assertSame(['id' => 'dispatch_after_current_bus'], $middleware[$position + 1]);
     }
 
     public function testMessengerIdentityStampsUseUuidV7WhenTheUidComponentIsInstalled()
@@ -813,6 +843,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'decode_failed_message_middleware'],
             ['id' => 'flow_context'],
+            ['id' => 'dispatch_on_failure'],
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
@@ -834,6 +865,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'decode_failed_message_middleware'],
             ['id' => 'flow_context'],
+            ['id' => 'dispatch_on_failure'],
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
@@ -849,6 +881,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'decode_failed_message_middleware'],
             ['id' => 'flow_context'],
+            ['id' => 'dispatch_on_failure'],
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],

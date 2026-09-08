@@ -21,7 +21,9 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ChainStamp;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\DispatchOnFailureStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\FailedMessageStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -146,18 +148,18 @@ class SerializerTest extends TestCase
         $this->assertEquals($stamps, $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'), $stamps)))->all(ValidationStamp::class));
     }
 
-    #[DataProvider('provideChainStamps')]
-    public function testEncodedWithChainStampIsDecodable(string $format, ChainStamp $stamp)
+    #[DataProvider('provideMessageStamps')]
+    public function testEncodedWithMessageStampIsDecodable(string $format, StampInterface $stamp)
     {
         $serializer = new Serializer(null, $format);
 
         $decoded = $serializer->decode($serializer->encode(new Envelope(new DummyMessage('first'), [$stamp])));
 
         $this->assertEquals(new DummyMessage('first'), $decoded->getMessage());
-        $this->assertEquals([$stamp], $decoded->all(ChainStamp::class));
+        $this->assertEquals([$stamp], $decoded->all($stamp::class));
     }
 
-    public static function provideChainStamps(): iterable
+    public static function provideMessageStamps(): iterable
     {
         foreach (['json', 'xml'] as $format) {
             yield $format.' one message' => [$format, new ChainStamp(new DummyMessage('second'))];
@@ -167,7 +169,29 @@ class SerializerTest extends TestCase
                 new Envelope(new SecondMessage(), [new BusNameStamp('other_bus'), new ValidationStamp(['foo']), new ValidationStamp([]), new ValidationStamp(['foo', 'bar'])]),
                 new Envelope(new DummyMessage('fourth'), [new ChainStamp(new DummyMessage('fifth'))]),
             )];
+            yield $format.' chain with a failure message' => [$format, new ChainStamp(new Envelope(new DummyMessage('second'), [new DispatchOnFailureStamp(new SecondMessage())]))];
+            yield $format.' failure message' => [$format, new DispatchOnFailureStamp(new DummyMessage('failure'))];
+            yield $format.' failure envelope with one stamp' => [$format, new DispatchOnFailureStamp(new Envelope(new SecondMessage(), [new DelayStamp(1000)]))];
+            yield $format.' failure envelope' => [$format, new DispatchOnFailureStamp(new Envelope(new DummyMessage('failure'), [new BusNameStamp('other_bus'), new ValidationStamp(['foo']), new ChainStamp(new SecondMessage())]))];
+            yield $format.' failed message' => [$format, new FailedMessageStamp(new DummyMessage('failed'))];
+            yield $format.' failed message without properties' => [$format, new FailedMessageStamp(new SecondMessage())];
         }
+    }
+
+    public function testDecodingFailsWithAFailureMessageThatIsNotAStamp()
+    {
+        $serializer = new Serializer();
+
+        $envelope = $serializer->decode([
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.DispatchOnFailureStamp::class => json_encode([['type' => SecondMessage::class, 'message' => [], 'stamps' => [['type' => DummyMessage::class, 'stamp' => ['message' => 'injected']]]]]),
+            ],
+        ]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertSame(\sprintf('Could not decode stamp: "%s" is not a "%s".', DummyMessage::class, StampInterface::class), $envelope->getMessage()->getMessage());
     }
 
     public function testDecodingFailsWithAChainedMessageThatIsNotAStamp()

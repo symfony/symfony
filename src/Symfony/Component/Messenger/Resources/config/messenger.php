@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
+use Symfony\Component\Messenger\EventListener\DispatchOnFailureListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
 use Symfony\Component\Messenger\EventListener\ReleaseDeduplicationLockOnFailureListener;
 use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
@@ -36,6 +37,7 @@ use Symfony\Component\Messenger\Middleware\ChainMiddleware;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
+use Symfony\Component\Messenger\Middleware\DispatchOnFailureMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\FlowContextMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -49,8 +51,8 @@ use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
-use Symfony\Component\Messenger\Transport\Serialization\Normalizer\ChainStampNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
+use Symfony\Component\Messenger\Transport\Serialization\Normalizer\MessageStampNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -89,7 +91,7 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.normalizer.flatten_exception', FlattenExceptionNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
 
-        ->set('serializer.normalizer.chain_stamp', ChainStampNormalizer::class)
+        ->set('serializer.normalizer.message_stamp', MessageStampNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
 
         ->set('.messenger.transport.native_php_serializer', PhpSerializer::class)
@@ -156,6 +158,13 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.routable_message_bus'),
                 service('messenger.senders_locator'),
             ])
+
+        ->set('messenger.middleware.dispatch_on_failure', DispatchOnFailureMiddleware::class)
+            ->args([
+                service('messenger.routable_message_bus'),
+                service('logger')->ignoreOnInvalid(),
+            ])
+            ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.middleware.validation', ValidationMiddleware::class)
             ->args([
@@ -289,6 +298,14 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('failure transports'),
                 service('logger')->ignoreOnInvalid(),
                 abstract_arg('failure transports by name'),
+            ])
+            ->tag('kernel.event_subscriber')
+            ->tag('monolog.logger', ['channel' => 'messenger'])
+
+        ->set('messenger.failure.dispatch_on_failure_listener', DispatchOnFailureListener::class)
+            ->args([
+                service('messenger.routable_message_bus'),
+                service('logger')->ignoreOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])

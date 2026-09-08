@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ChainStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
+use Symfony\Component\Messenger\Stamp\DispatchOnFailureStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -37,9 +38,10 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
  * It is handled in this process when that transport is not a sender, as the transport of a schedule.
  *
  * The next message is dispatched without non-sendable stamps, which a chain read from a transport could carry, and as untrusted when the current message is not trusted.
+ * It gets the DispatchOnFailureStamp of the current message unless it carries its own, so that a chain dispatches its failure message once, whichever step fails.
  *
  * A message sent to a transport starts its next step where it is handled, whatever the position of this middleware in the stack.
- * The returned envelope keeps the chain stamps, so that a message retried because its next step could not be dispatched dispatches that step again.
+ * The returned envelope keeps the chain stamps and the DispatchOnFailureStamp, so that a message retried because its next step could not be dispatched dispatches that step again, with the same failure message.
  *
  * A message handled by a batch handler cannot open a chain: the batch decides when it processes the message, which is after the handler returned.
  */
@@ -84,6 +86,10 @@ final class ChainMiddleware implements MiddlewareInterface
 
         if (null === $next->last(BusNameStamp::class) && null !== $busNameStamp = $envelope->last(BusNameStamp::class)) {
             $next = $next->with($busNameStamp);
+        }
+
+        if (null === $next->last(DispatchOnFailureStamp::class) && null !== $failureStamp = $envelope->last(DispatchOnFailureStamp::class)) {
+            $next = $next->with($failureStamp);
         }
 
         if (!TrustStamp::isEnvelopeTrusted($envelope)) {

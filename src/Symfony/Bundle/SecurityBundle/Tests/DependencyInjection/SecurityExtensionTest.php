@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -305,6 +306,43 @@ class SecurityExtensionTest extends TestCase
             new IteratorArgument([new Reference($expressionId)]),
             $container->getDefinition('security.cache_warmer.expression')->getArgument(0)
         );
+    }
+
+    public function testAccessControlRuleRestrictedToGetAppliesToHeadRequests()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'main' => ['pattern' => '^/', 'http_basic' => []],
+            ],
+            'access_control' => [
+                ['path' => '^/admin', 'roles' => 'ROLE_ADMIN', 'methods' => ['GET']],
+                ['path' => '^/upload', 'roles' => 'ROLE_USER', 'methods' => ['POST']],
+            ],
+        ]);
+        $container->compile();
+
+        [$adminRule, $uploadRule] = $container->getDefinition('security.access_map')->getMethodCalls();
+
+        $matcher = $this->createRequestMatcher($container, $adminRule[1][0]);
+        $this->assertTrue($matcher->matches(Request::create('/admin', 'GET')));
+        $this->assertTrue($matcher->matches(Request::create('/admin', 'HEAD')));
+
+        $matcher = $this->createRequestMatcher($container, $uploadRule[1][0]);
+        $this->assertFalse($matcher->matches(Request::create('/upload', 'HEAD')));
+        $this->assertTrue($matcher->matches(Request::create('/upload', 'POST')));
+    }
+
+    private function createRequestMatcher(ContainerBuilder $container, $reference): RequestMatcherInterface
+    {
+        $definition = $container->getDefinition((string) $reference);
+        $class = $definition->getClass();
+
+        return new $class(...$definition->getArguments());
     }
 
     public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()

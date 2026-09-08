@@ -41,6 +41,15 @@ class RequestMatcherTest extends TestCase
             ['get', 'GET', true],
             ['get', ['GET', 'POST'], true],
             ['get', 'POST', false],
+            // HEAD requests are served by the GET handler
+            ['head', 'get', true],
+            ['head', ['get', 'post'], true],
+            ['head', 'GET', true],
+            ['head', 'head', true],
+            ['head', ['post', 'head'], true],
+            ['head', 'post', false],
+            ['get', 'head', false],
+            ['post', 'get', false],
         ];
     }
 

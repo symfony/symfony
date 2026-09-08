@@ -67,9 +67,44 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->cannotBeEmpty()
                 ->info('The OIDC client identifier.')
             ->end()
-            ->scalarNode('client_secret')
-                ->defaultNull()
-                ->info('The OIDC client secret. Required by every "token_endpoint_auth_method" but "none", which declares a public client.')
+            ->arrayNode('client_authentication')
+                ->isRequired()
+                ->info('How the client authenticates at the token endpoint, which RFC 7591, Section 2 names in its "token_endpoint_auth_method" metadata. Set the method Symfony ships with its parameters, or the id of a service implementing "Symfony\\Component\\Security\\Http\\OAuth2\\ClientAuthentication\\ClientAuthenticationInterface" for a scheme it does not. Exactly one of them.')
+                ->example(['client_secret_basic' => '%env(OIDC_CLIENT_SECRET)%'])
+                // a bare string is the id of a service, except "none", which is the one
+                // method taking no parameter and would otherwise have to be written as a
+                // service id or as a single-key mapping to declare a public client
+                ->beforeNormalization()
+                    ->ifString()
+                    ->then(static fn (string $v): array => 'none' === $v ? ['none' => true] : ['id' => $v])
+                ->end()
+                // "isRequired" must be set otherwise the following custom validation is not called
+                ->validate()
+                    ->ifTrue(static fn (array $v): bool => 1 !== \count($v))
+                    ->thenInvalid('Exactly one OIDC "client_authentication" method must be configured, got %s. Set "client_secret_basic", "client_secret_post" or "none", or the "id" of your own implementation.')
+                ->end()
+                ->validate()
+                    ->ifTrue(static fn (array $v): bool => false === ($v['none'] ?? null))
+                    ->thenInvalid('The OIDC "client_authentication.none" option only takes true, which declares a public client. Set "client_secret_basic" or "client_secret_post" with your client secret to authenticate the client instead.')
+                ->end()
+                ->children()
+                    ->scalarNode('client_secret_basic')
+                        ->cannotBeEmpty()
+                        ->info('Send the client secret as HTTP Basic credentials, the "client_secret_basic" method of RFC 6749, Section 2.3.1, which the RFC recommends. Takes the client secret.')
+                    ->end()
+                    ->scalarNode('client_secret_post')
+                        ->cannotBeEmpty()
+                        ->info('Send the client secret in the body of the token request, the "client_secret_post" method of RFC 6749, Section 2.3.1. Takes the client secret. Use it for the providers that support nothing else.')
+                    ->end()
+                    ->booleanNode('none')
+                        ->treatNullLike(true)
+                        ->info('Declare a public client (a SPA, a mobile or a native application), which holds no secret and relies on PKCE to protect the code exchange. It can disable neither PKCE nor the ID token signature check.')
+                    ->end()
+                    ->scalarNode('id')
+                        ->cannotBeEmpty()
+                        ->info('The id of a service implementing "ClientAuthenticationInterface", for a scheme Symfony does not ship, such as the "private_key_jwt" of OIDC Core 1.0, Section 9. The method it reports is only known once it is built, so the rules a public client cannot bend are then checked on the first request to this firewall instead of while the container compiles.')
+                    ->end()
+                ->end()
             ->end()
             ->arrayNode('scope')
                 ->beforeNormalization()->castToArray()->end()
@@ -111,7 +146,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->children()
                     ->booleanNode('required')
                         ->defaultTrue()
-                        ->info('When true (default), the ID token signature is verified against the provider JWKS. Setting it to false decodes the ID token without verifying it, which OIDC Core 1.0, Section 3.1.3.7, item 6 only allows because the token comes from the token endpoint over TLS: it is then only as safe as the TLS verification of the HTTP client used for that request, so never turn it off with a client configured with "verify_peer: false" or "verify_host: false", nor behind a TLS-terminating proxy. A public client ("token_endpoint_auth_method: none") cannot turn it off at all.')
+                        ->info('When true (default), the ID token signature is verified against the provider JWKS. Setting it to false decodes the ID token without verifying it, which OIDC Core 1.0, Section 3.1.3.7, item 6 only allows because the token comes from the token endpoint over TLS: it is then only as safe as the TLS verification of the HTTP client used for that request, so never turn it off with a client configured with "verify_peer: false" or "verify_host: false", nor behind a TLS-terminating proxy. A public client, whose "client_authentication" reports the "none" method, cannot turn it off at all.')
                     ->end()
                     ->arrayNode('algorithms', 'algorithm')
                         ->beforeNormalization()->castToArray()->end()
@@ -126,17 +161,12 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                     ->end()
                 ->end()
             ->end()
-            ->enumNode('token_endpoint_auth_method')
-                ->values(['client_secret_post', 'client_secret_basic', 'none'])
-                ->defaultValue('client_secret_post')
-                ->info('Authentication method for the token endpoint. "none" declares a public client (a SPA, a mobile or a native application), which holds no secret and relies on PKCE to protect the code exchange.')
-            ->end()
             ->arrayNode('pkce')
                 ->addDefaultsIfNotSet()
                 ->children()
                     ->booleanNode('enabled')
                         ->defaultTrue()
-                        ->info('Whether to use PKCE (Proof Key for Code Exchange, RFC 7636), which any current provider should support; only disable it for one that rejects the "code_challenge" parameter.')
+                        ->info('Whether to use PKCE (Proof Key for Code Exchange, RFC 7636), which any current provider should support; only disable it for one that rejects the "code_challenge" parameter. A public client, whose "client_authentication" reports the "none" method, cannot disable it at all.')
                     ->end()
                     ->enumNode('method')
                         ->values(['S256', 'plain'])
@@ -180,29 +210,49 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->end()
         ;
 
-        // the client type is what "token_endpoint_auth_method" really selects, so the
-        // options it makes mandatory or meaningless can only be checked here, once the
-        // whole authenticator configuration is known; an empty "client_secret" is also
-        // caught here and not on the scalar node, whose validators would reject the empty
-        // string an environment variable resolves to while the container compiles
+        // the two rules a public client cannot bend, checked here for the methods this
+        // bundle builds itself, so that a faulty configuration names the firewall it is
+        // in and a key that can be grepped for; a "client_authentication.id" only reports
+        // its method once built, so the same two rules are checked again by the
+        // constructor of OidcLoginAuthenticator, which is what catches that case
         $node
             ->validate()
-                ->ifTrue(static fn ($v): bool => 'none' !== $v['token_endpoint_auth_method'] && (null === $v['client_secret'] || '' === $v['client_secret']))
-                ->thenInvalid('The OIDC "client_secret" is required by the "token_endpoint_auth_method" in use, which defaults to "client_secret_post". Set a secret, or set "token_endpoint_auth_method" to "none" to declare a public client, which authenticates with its "client_id" and PKCE only.')
+                ->ifTrue(static fn ($v): bool => isset($v['client_authentication']['none']) && !$v['pkce']['enabled'])
+                ->thenInvalid('The OIDC "pkce.enabled" option cannot be false for a public client, declared by "client_authentication.none": a public client sends no secret, so PKCE is the only thing binding the authorization code to it.')
             ->end()
             ->validate()
-                ->ifTrue(static fn ($v): bool => 'none' === $v['token_endpoint_auth_method'] && null !== $v['client_secret'])
-                ->thenInvalid('The OIDC "client_secret" must not be set when "token_endpoint_auth_method" is "none", as a public client never sends it. Remove the secret, or authenticate with it by using "client_secret_post" or "client_secret_basic".')
-            ->end()
-            ->validate()
-                ->ifTrue(static fn ($v): bool => 'none' === $v['token_endpoint_auth_method'] && !$v['pkce']['enabled'])
-                ->thenInvalid('The OIDC "pkce.enabled" option cannot be false when "token_endpoint_auth_method" is "none": a public client sends no secret, so PKCE is the only thing binding the authorization code to it.')
-            ->end()
-            ->validate()
-                ->ifTrue(static fn ($v): bool => 'none' === $v['token_endpoint_auth_method'] && !$v['id_token_signature']['required'])
-                ->thenInvalid('The OIDC "id_token_signature.required" option cannot be false when "token_endpoint_auth_method" is "none": without the signature check, only the TLS verification of the token request ties the ID token to the provider, which is too little for a public client that has nothing but PKCE protecting its code exchange. Keep the check enabled, or authenticate with "client_secret_post" or "client_secret_basic".')
+                ->ifTrue(static fn ($v): bool => isset($v['client_authentication']['none']) && !$v['id_token_signature']['required'])
+                ->thenInvalid('The OIDC "id_token_signature.required" option cannot be false for a public client, declared by "client_authentication.none": without the signature check, only the TLS verification of the token request ties the ID token to the provider, which is too little for a public client that has nothing but PKCE protecting its code exchange. Keep the check enabled, or authenticate the client with "client_authentication.client_secret_basic" or "client_authentication.client_secret_post".')
             ->end()
         ;
+    }
+
+    /**
+     * Registers the client authentication of the firewall and returns its service id.
+     *
+     * A method this bundle knows is built here, which is what lets the configuration check the
+     * rules a public client cannot bend; anything else is the service the "id" option names,
+     * whose method is only known once it is built.
+     */
+    private function createClientAuthentication(ContainerBuilder $container, string $firewallName, array $config): string
+    {
+        if (isset($config['id'])) {
+            return $config['id'];
+        }
+
+        // the only method with nothing to configure, so every public client shares the one service
+        if (isset($config['none'])) {
+            return 'security.oauth2.client_authentication.none';
+        }
+
+        $method = array_key_first($config);
+        $clientAuthenticationId = 'security.authenticator.oidc_login.client_authentication.'.$firewallName;
+        $container
+            ->setDefinition($clientAuthenticationId, new ChildDefinition('security.oauth2.client_authentication.'.$method))
+            ->replaceArgument(0, $config[$method])
+        ;
+
+        return $clientAuthenticationId;
     }
 
     public function getKey(): string
@@ -258,23 +308,12 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
         ;
 
         $oidcClientId = 'security.authenticator.oidc_login.client.'.$firewallName;
-        if ('none' === $config['token_endpoint_auth_method']) {
-            // a public client holds no secret, so it only tells the token endpoint which
-            // client_id the authorization code was issued to, and proves it with PKCE
-            $container
-                ->setDefinition($oidcClientId, new ChildDefinition('security.authenticator.oidc_login.public_client'))
-                ->replaceArgument(1, new Reference($discoveryId))
-                ->replaceArgument(2, $config['client_id'])
-            ;
-        } else {
-            $container
-                ->setDefinition($oidcClientId, new ChildDefinition('security.authenticator.oidc_login.client'))
-                ->replaceArgument(1, new Reference($discoveryId))
-                ->replaceArgument(2, $config['client_id'])
-                ->replaceArgument(3, $config['client_secret'])
-                ->replaceArgument(4, $config['token_endpoint_auth_method'])
-            ;
-        }
+        $container
+            ->setDefinition($oidcClientId, new ChildDefinition('security.authenticator.oidc_login.client'))
+            ->replaceArgument(1, new Reference($discoveryId))
+            ->replaceArgument(2, $config['client_id'])
+            ->replaceArgument(3, new Reference($this->createClientAuthentication($container, $firewallName, $config['client_authentication'])))
+        ;
 
         $signatureVerifier = null;
         if ($config['id_token_signature']['required']) {

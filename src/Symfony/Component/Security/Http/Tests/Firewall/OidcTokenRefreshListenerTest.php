@@ -23,11 +23,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Http\Authenticator\Oidc\OidcConfidentialClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcTokenRefresher;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 use Symfony\Component\Security\Http\Firewall\OidcTokenRefreshListener;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 class OidcTokenRefreshListenerTest extends TestCase
@@ -129,7 +130,7 @@ class OidcTokenRefreshListenerTest extends TestCase
         return new OidcTokenRefreshListener(
             $this->tokenStorage,
             new OidcTokenRefresher(
-                new OidcConfidentialClient(new MockHttpClient($tokenEndpointResponse), $discovery, 'test-client-id', 'test-client-secret'),
+                new OidcClient(new MockHttpClient($tokenEndpointResponse), $discovery, 'test-client-id', new ClientSecretPost('test-client-secret')),
                 $discovery,
                 new OidcIdToken($this->clock),
                 'test-client-id',

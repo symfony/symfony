@@ -45,7 +45,7 @@ final class OidcTokenRefresher
      *                                                      the clock of the "symfony/clock" component
      */
     public function __construct(
-        private readonly OidcClient $client,
+        private readonly OidcClientInterface $client,
         private readonly OidcDiscovery $discovery,
         private readonly OidcIdToken $idToken,
         private readonly string $clientId,

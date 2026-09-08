@@ -13,38 +13,39 @@ namespace Symfony\Component\Security\Http\Authenticator\Oidc;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * Base HTTP client for OpenID Connect protocol operations.
+ * HTTP client for OpenID Connect protocol operations.
  *
- * Concrete subclasses decide how the client authenticates at the token endpoint
- * (RFC 6749 §2.3): confidential clients send a secret, public clients rely on PKCE,
- * other profiles use signed JWTs (OIDC Core §9).
+ * How the client authenticates at the token endpoint (RFC 6749 §2.3) is a property of
+ * its registration at the provider, not of this class: it is injected, so that sending
+ * a secret, sending nothing at all, or signing an assertion (OIDC Core §9) are the same
+ * client with a different dependency.
  *
  * @see https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth OIDC Core 1.0 §3.1
  * @see https://datatracker.ietf.org/doc/html/rfc6749                      OAuth 2.0 (RFC 6749)
  *
  * @author Mathieu Santostefano <msantostefano@proton.me>
  */
-abstract class OidcClient
+final class OidcClient implements OidcClientInterface
 {
     public function __construct(
-        protected readonly HttpClientInterface $httpClient,
-        protected readonly OidcDiscovery $discovery,
-        protected readonly string $clientId,
+        private readonly HttpClientInterface $httpClient,
+        private readonly OidcDiscovery $discovery,
+        private readonly string $clientId,
+        private readonly ClientAuthenticationInterface $clientAuthentication,
     ) {
     }
 
-    /**
-     * Exchanges an authorization code for tokens at the token endpoint.
-     *
-     * @return array<string, mixed>
-     *
-     * @throws AuthenticationException If the token endpoint is missing, cannot be reached or returns an invalid response
-     */
+    public function getClientAuthenticationMethod(): string
+    {
+        return $this->clientAuthentication->getMethod();
+    }
+
     public function exchangeCode(string $code, string $redirectUri, ?string $codeVerifier = null): array
     {
         $tokenEndpoint = $this->discovery->getSecureEndpoint('token_endpoint');
@@ -60,7 +61,7 @@ abstract class OidcClient
             $body['code_verifier'] = $codeVerifier;
         }
 
-        $options = $this->applyClientAuthentication($body, []);
+        $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
 
         try {
             return $this->httpClient->request('POST', $tokenEndpoint, $options)->toArray();
@@ -69,22 +70,6 @@ abstract class OidcClient
         }
     }
 
-    /**
-     * Renews an access token with the refresh token grant of RFC 6749, Section 6.
-     *
-     * The provider may answer with a new refresh token, which then replaces the one
-     * given here, and with a new ID token, which OIDC Core 1.0, Section 12.2 constrains.
-     *
-     * @param list<string> $scopes The scopes of the new access token, which RFC 6749,
-     *                             Section 6 only allows to narrow the ones the refresh
-     *                             token was issued with; the original scopes are asked
-     *                             for when the list is empty
-     *
-     * @return array<string, mixed>
-     *
-     * @throws OidcInvalidGrantException If the provider no longer honors the refresh token
-     * @throws AuthenticationException   If the token endpoint is missing, cannot be reached or returns an invalid response
-     */
     public function refreshToken(#[\SensitiveParameter] string $refreshToken, array $scopes = []): array
     {
         $tokenEndpoint = $this->discovery->getSecureEndpoint('token_endpoint');
@@ -99,7 +84,7 @@ abstract class OidcClient
             $body['scope'] = implode(' ', $scopes);
         }
 
-        $options = $this->applyClientAuthentication($body, []);
+        $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
 
         try {
             $response = $this->httpClient->request('POST', $tokenEndpoint, $options);
@@ -119,13 +104,6 @@ abstract class OidcClient
         }
     }
 
-    /**
-     * Fetches the user's claims from the OIDC provider's UserInfo endpoint.
-     *
-     * @return array<string, mixed>
-     *
-     * @throws AuthenticationException If the userinfo endpoint is missing, cannot be reached or returns an invalid response
-     */
     public function fetchUserInfo(string $accessToken): array
     {
         $userInfoEndpoint = $this->discovery->getSecureEndpoint('userinfo_endpoint');
@@ -138,17 +116,4 @@ abstract class OidcClient
             throw new AuthenticationException(\sprintf('The OIDC userinfo endpoint request failed: "%s"', $e->getMessage()), previous: $e);
         }
     }
-
-    /**
-     * Applies the client authentication scheme to the token endpoint request.
-     *
-     * Subclasses return the final HttpClient options array (typically shaped as
-     * `['body' => ..., 'auth_basic' => ...]`), starting from the given request body.
-     *
-     * @param array<string, mixed> $body    The token request body being built
-     * @param array<string, mixed> $options The HttpClient options being built
-     *
-     * @return array<string, mixed> The final HttpClient options
-     */
-    abstract protected function applyClientAuthentication(array $body, array $options): array;
 }

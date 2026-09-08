@@ -12,14 +12,16 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\Controller\OidcLoginStartController;
-use Symfony\Component\Security\Http\Authenticator\Oidc\OidcConfidentialClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
-use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcTokenRefresher;
 use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
 use Symfony\Component\Security\Http\EventListener\OidcEndSessionListener;
 use Symfony\Component\Security\Http\Firewall\OidcTokenRefreshListener;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretBasic;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 return static function (ContainerConfigurator $container) {
@@ -75,22 +77,29 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('endpoints that must be announced and must not downgrade to plain HTTP the transport of the discovery document'),
             ])
 
-        ->set('security.authenticator.oidc_login.client', OidcConfidentialClient::class)
+        ->set('security.authenticator.oidc_login.client', OidcClient::class)
             ->abstract()
             ->args([
                 service('http_client'),
                 abstract_arg('OIDC discovery'),
                 abstract_arg('client ID'),
-                abstract_arg('client secret'),
-                abstract_arg('token endpoint auth method'),
+                abstract_arg('client authentication'),
             ])
 
-        ->set('security.authenticator.oidc_login.public_client', OidcPublicClient::class)
+        // the only client authentication method that has nothing to configure, so that
+        // declaring a public client takes no service of its own
+        ->set('security.oauth2.client_authentication.none', NoClientAuthentication::class)
+
+        ->set('security.oauth2.client_authentication.client_secret_basic', ClientSecretBasic::class)
             ->abstract()
             ->args([
-                service('http_client'),
-                abstract_arg('OIDC discovery'),
-                abstract_arg('client ID'),
+                abstract_arg('client secret'),
+            ])
+
+        ->set('security.oauth2.client_authentication.client_secret_post', ClientSecretPost::class)
+            ->abstract()
+            ->args([
+                abstract_arg('client secret'),
             ])
 
         // the target of the routes declared for the "start_path" of each oidc_login

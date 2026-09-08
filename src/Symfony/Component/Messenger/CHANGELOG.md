@@ -21,6 +21,8 @@ CHANGELOG
  * Add a `transport` option to `#[AsMessageHandler]` and to the `messenger.message_handler` tag to route the handled messages to that transport and bind the handler to it
  * Add `OutboxStamp` and `OutboxSender` to store messages in an outbox transport and forward them to their target transport when the outbox is consumed
  * Add the `outbox` option to transports
+ * Add `StopWorkerOnIdleListener` to stop the worker as soon as no message is available
+ * Make `InMemoryTransport` implement `ListableReceiverInterface` and `MessageCountAwareInterface`
 
 8.1
 ---

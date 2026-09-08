@@ -223,4 +223,78 @@ class InMemoryTransportTest extends TestCase
         $this->assertSame([], $this->transport->getRejected(), 'Should be empty after reset');
         $this->assertSame([], $this->transport->getSent(), 'Should be empty after reset');
     }
+
+    public function testGetMessageCount()
+    {
+        $this->assertSame(0, $this->transport->getMessageCount());
+
+        $envelope1 = $this->transport->send(new Envelope(new \stdClass()));
+        $envelope2 = $this->transport->send((new Envelope(new \stdClass()))->with(new DelayStamp(10_000)));
+        $this->assertSame(2, $this->transport->getMessageCount());
+
+        $this->transport->ack($envelope1);
+        $this->assertSame(1, $this->transport->getMessageCount());
+
+        $this->transport->reject($envelope2);
+        $this->assertSame(0, $this->transport->getMessageCount());
+    }
+
+    public function testAll()
+    {
+        $this->assertSame([], $this->transport->all());
+
+        $envelope1 = $this->transport->send(new Envelope(new \stdClass()));
+        $envelope2 = $this->transport->send((new Envelope(new \stdClass()))->with(new DelayStamp(10_000)));
+        $envelope3 = $this->transport->send(new Envelope(new \stdClass()));
+        $this->assertSame([$envelope1, $envelope2, $envelope3], $this->transport->all());
+        $this->assertSame([$envelope1, $envelope2], $this->transport->all(2));
+
+        $this->transport->ack($envelope1);
+        $this->transport->reject($envelope3);
+        $this->assertSame([$envelope2], $this->transport->all());
+        $this->assertSame([], $this->transport->get(), 'Delayed messages are listed but not received');
+    }
+
+    public function testAllWithSerialization()
+    {
+        $envelope = new Envelope(new \stdClass());
+        $envelopeDecoded = Envelope::wrap(new DummyMessage('Hello.'));
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer
+            ->method('encode')
+            ->willReturnCallback(function (Envelope $encodedEnvelope) use ($envelope) {
+                $this->assertEquals($envelope->with(new TransportMessageIdStamp(1)), $encodedEnvelope);
+
+                return ['foo' => 'ba'];
+            })
+        ;
+        $serializer
+            ->method('decode')
+            ->willReturnMap([
+                [['foo' => 'ba'], $envelopeDecoded],
+            ])
+        ;
+        $serializeTransport = new InMemoryTransport($serializer);
+        $serializeTransport->send($envelope);
+        $this->assertSame([$envelopeDecoded], $serializeTransport->all());
+        $this->assertSame($envelopeDecoded, $serializeTransport->find(1));
+    }
+
+    public function testFind()
+    {
+        $this->assertNull($this->transport->find(1));
+
+        $envelope1 = $this->transport->send(new Envelope(new \stdClass()));
+        $envelope2 = $this->transport->send(new Envelope(new \stdClass()));
+        $this->assertSame($envelope1, $this->transport->find(1));
+        $this->assertSame($envelope2, $this->transport->find('2'));
+        $this->assertNull($this->transport->find(3));
+        $this->assertNull($this->transport->find('foo'));
+        $this->assertNull($this->transport->find([]));
+
+        $this->transport->ack($envelope1);
+        $this->assertNull($this->transport->find(1));
+        $this->transport->reject($envelope2);
+        $this->assertNull($this->transport->find(2));
+    }
 }

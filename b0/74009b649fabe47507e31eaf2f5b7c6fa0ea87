@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:47:28Z
+
+Rebased on 8.2 and pushed four changes. The feature is right; what needed work was the firewall hook.
+
+**Blocker: the fallback handler was disabling denial handling the application had already configured.** `ExceptionListener::handleAccessDeniedException()` is `if (accessDeniedHandler) elseif (errorPage)`, strictly exclusive, and `createExceptionListener()` was setting argument 6 whenever the *firewall* configured neither, without looking at what the *application* configured. Argument 5 still held `%security.access.denied_url%`, unreachable. Since the handler returned `null` for a role denial, nothing rendered:
+
+```
+before this PR:  403  body='CUSTOM 403 PAGE'
+with this PR:    403  body='Symfony\...\AccessDeniedHttpException {...}'
+```
+
+Fixed in two places, because there are two ways an application configures this. The extension now falls back only when `security.access.denied_url` is empty, and `InsufficientScopeAccessDeniedHandler` takes the application's `security.access.denied_handler` and hands back to it every denial no scope took part in, instead of returning `null`. Both directions have a functional test and both revert-verify.
+
+Worth knowing for anyone touching this again: inside `SecurityExtension::load()` the container is a `MergeExtensionConfigurationContainerBuilder` holding parameters only, so `$container->has('security.access.denied_handler')` is always false. The parameter is the only thing visible there, which is why the two halves are fixed differently.
+
+**@welcoMattic, yes.** `ATTRIBUTE_PREFIX` is private now. `getRequiredScopes()` is already the public seam and the only thing outside the class that needed it, so nothing else moved.
+
+**A malformed attribute no longer silently works.** `OAUTH2_SCOPE(profile:read`, with the closing parenthesis missing, behaved exactly like the correct form, while `OAUTH2_SCOPE(profile:read))` could never be granted. For an authorization primitive a typo that silently grants is worse than one that denies, so the closing parenthesis is required and anything malformed abstains. Your test row that asserted the lenient reading is updated, with two rows added around it.
+
+**The token attribute is `oauth2_scope` now, not `scope`.** The voter is registered in every application, since `security_authenticator_access_token.php` loads unconditionally, so an application already storing a `scope` attribute on its token would have satisfied `OAUTH2_SCOPE(...)` on a firewall having nothing to do with access tokens. Every other attribute in the component is namespaced the same way (`oidc_id_token`, `oidc_access_token`). It is a public constant carried for all of 8.x, so it is now or never. The PR description mentions the old name in the "Reading the scopes" section.
+
+**The 403 now advertises `resource_metadata` too.** #65864 taught `AccessTokenAuthenticator::getAuthenticateHeader()` to advertise it and this handler carried a second copy of that builder, so the `insufficient_scope` 403 would have been the only response without the pointer, which is the response a client holding a token most needs it on. RFC 9728 §5.1 does not restrict the parameter to 401s. Now that #65864 has landed the fix belongs here, so the rebase carries it: `InsufficientScopeAccessDeniedHandler` takes the resource metadata URI as a third argument, `AccessTokenFactory` passes the one it already computed, and a functional test asserts the full challenge and fails when the entry is removed.
+
+```
+Bearer realm="My API",error="insufficient_scope",error_description="...",scope="openid profile:read",resource_metadata="http://localhost/.well-known/oauth-protected-resource"
+```
+
+Rebased on 8.2 after #65864 merged. Security/Http 1055, SecurityBundle 603, both green.

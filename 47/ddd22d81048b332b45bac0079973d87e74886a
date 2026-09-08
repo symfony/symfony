@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T09:21:32Z
+
+The reshape is right and I agree with the argument for it: turning the scheme into a dependency is what lets `private_key_jwt` arrive as one class instead of a config branch. I checked the claim it rests on rather than taking it, and it holds. `4b3a225b334`, which added `OidcClient`, is an ancestor of none of 8.1, 8.0 or 7.4, `Authenticator/Oidc/` does not exist on 8.1, and the latest release is v8.1.6. So this really is pre-release reshaping and no BC layer is owed.
+
+I rebased on 8.2 and pushed two fixes.
+
+**The rename dropped the assertions guarding the client secret on the refresh path.** `OidcConfidentialClientTest::testRefreshToken` asserted `$body['client_secret']` and `testRefreshTokenWithClientSecretBasic` asserted the `Authorization` header plus the absence of the secret from the body. The new `testRefreshToken` keeps `grant_type`, `refresh_token` and `client_id` but not the secret, and the Basic test has no successor; `testTheTokenRequestIsMadeWithTheOptionsTheClientAuthenticationReturns` covers `exchangeCode()` only. So the refresh path had no coverage of the client authentication at all. Measured, on the submitted head, with `refreshToken()` made to skip it:
+
+```
+$options = ['body' => $body];   // instead of ->authenticate(...)
+OK (1105 tests, 2512 assertions)
+```
+
+A refactoring that silently stops sending the client secret on every token refresh would have shipped green. The same mutation fails twice on the base. I restored the assertion and added `testTheRefreshRequestIsMadeWithTheOptionsTheClientAuthenticationReturns`; the mutation now fails both.
+
+**`authenticate()` lost its fourth parameter.** `$options` was dead at both call sites, `OidcClient` passing `[]` each time, so an implementation could only ever receive an empty array while the docblock described "the HttpClient options being built". Worse, the body only reached the request through the returned `$options['body']`, so an implementation that forgot the copy sent a POST with no body, no `Content-Type` and no `Content-Length`, and the author saw `HTTP 400 returned for "https://provider.example.com/token"`, a diagnostic pointing at the provider. That is exactly the mistake the `PrivateKeyJwtAuthentication` example in the description invites.
+
+The signature is now `authenticate(string $clientId, string $tokenEndpoint, array $options): array`, with `OidcClient` passing `['body' => $body]`. The body is then already in the array the implementation receives, so a forgetful implementation returning `$options` untouched still sends it. Nothing outside the three shipped classes implements or calls the interface, and both suites are green. I updated the example in the description to match.
+
+## On the point you flagged for review
+
+The runtime check is fail-closed, which is the part that matters, and I verified it specifically: with a public client and `id_token_signature.required: false`, the request throws before any HTTP call and the security token is untouched, on the eager and the lazy firewall alike, and through a decorated client-authentication service.
+
+But the reason given for not doing better does not survive testing. Of the three cases named, only the decorator genuinely hides the class. `findDefinition()` resolves alias chains at every compiler stage, and a factory cannot defeat it because a factory-built definition without a class does not compile at all: `Please add the class to service "..." even if it is constructed by a factory since we might need to add method calls based on compile-time checks.` A pass at `TYPE_BEFORE_REMOVING` firing only on an exact `NoClientAuthentication` match, falling through to the constructor otherwise, catches every case except the decorator and can only add errors. `SortFirewallListenersPass` sits at that same stage for the same reason. I did not push it, since fail-closed is preserved either way, but it is 53 lines if you want it.
+
+What I would fix regardless is the message. Before, a faulty configuration failed at boot with `Invalid configuration for path "security.firewalls.oidc.oidc_login": The OIDC "pkce.enabled" option cannot be false ...`. Now it fails on the first request with `PKCE cannot be disabled for a public OIDC client`, which names neither the firewall nor a key anyone can grep for in `security.yaml`.
+
+Worth knowing which of the two rules carries the weight: the PKCE one has a backstop, since `NoClientAuthentication` throws anyway when no verifier reaches it. The signature rule has none, so a `none` client with the check off would complete a login on an unverified ID token. That is the one whose coverage matters.
+
+## On the configuration cost
+
+The description presents the choice as service id versus a node growing a branch per profile with keys, algorithms and rotation options frozen at the release. There is a middle ground it does not consider: keep `client_secret` and `token_endpoint_auth_method` as sugar that registers a `ClientSecretBasic` or `ClientSecretPost` service per firewall, with `client_authentication` as the escape hatch, the two mutually exclusive and one required. That is two scalar keys for the two schemes you already ship, not a branch per profile, and it restores compile-time knowledge of the method on the common path for free.
+
+I built it and ran it through the functional app: both sugar shapes boot and reach `/oidc/start`, the conflict and the missing-both cases fail at boot with clear messages, and the public-client shape is untouched. The only thing it breaks is this PR's own `testRejectsAMissingClientAuthentication`. Your call, but it is worth answering rather than leaving, because "the shortest OIDC configuration now declares one service" is what every application will feel.
+
+## The rest
+
+`ClientSecretBasic` is the first conforming `client_secret_basic` in Symfony, and that is worth saying out loud. `auth_basic` base64-encodes its argument verbatim, so a scoped client carrying it misauthenticates any client id containing a colon; I documented that on #65865 and concluded the right home was an OAuth2-aware layer. This is that layer. Verified on the wire: `cli:ent`/`secret` becomes `cli%3Aent:secret`, `clïent`/`sécrét` becomes `cl%C3%AFent:s%C3%A9cr%C3%A9t`. `ClientSecretPost` correctly does not double-encode, since the form encoder encodes once; all seven secret shapes round-trip.
+
+Continuity with #65875 holds in both directions under mutation: the refresh grant still skips the verifier requirement and an authorization-code exchange without one is still refused. The OIDC Core §12.2 `sub` check is intact and still protected. `OidcClient` becoming `final` is safe, nothing extends it anywhere. Both CHANGELOG entries were amended in place rather than appended, which is right for unreleased API, and no UPGRADE entry is owed. `security.oauth2.client_authentication.none` works end to end: a firewall declaring nothing but `provider_uri`, `client_id` and that service id refreshes a token with no `client_secret` in the body and no `Authorization` header.
+
+Two smaller things. `getMethod()` is compared exactly, so `'None'`, `' none'` or any typo silently opts a custom implementation out of both security rules; worth a sentence in the interface docblock saying a security decision reads that value. And the description says the new namespace sits next to `AccessToken\OAuth2\`, where it is actually a new top-level `Security\Http\OAuth2\`, which is arguably the better split but not what the text says.
+
+Documentation the merge owes: the `client_authentication` option and the ready-made service id, the three implementations and when to pick each, and the two rules a public client cannot bend.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-08T10:10:53Z
+
+Thanks, both fixes are right and I took them as they are.
+
+The refresh one is the important half. The coverage was gone and the mutation you ran proves it: a refactoring that stopped sending the client secret on every token refresh shipped green. `testTheRefreshRequestIsMadeWithTheOptionsTheClientAuthenticationReturns` is the test that had no successor after the rename, and it belongs there.
+
+The signature recut is a strict improvement. Passing `['body' => $body]` rather than the body as its own argument means an implementation that returns `$options` untouched still sends it, which removes exactly the trap the example in the description was inviting.
+
+**On the configuration cost.** You are right that leaving it was not an option, and I have taken the middle ground, though not the one you built. `client_authentication` is now one node with a key per method:
+
+```yaml
+client_authentication: { client_secret_basic: '%env(OIDC_CLIENT_SECRET)%' }
+client_authentication: { client_secret_post: '%env(OIDC_CLIENT_SECRET)%' }
+client_authentication: { none: true }               # or "{ none: ~ }"
+client_authentication: none                         # the same, as a string
+client_authentication: { id: app.private_key_jwt }
+client_authentication: app.private_key_jwt          # the same, as a string
+```
+
+It answers the same thing yours does: the secret is back next to the client id, the shortest configuration declares no service, and the method is known while the container compiles. Where the two differ is what happens next. A key per method leaves room for a scheme that takes more than a secret to carry its own parameters under its own key, without the root of the firewall growing an option per profile, whereas flat scalars have nowhere to put them. The RFC 7591 vocabulary is not lost either, the method name is simply a key instead of a value. And it is one option with several shapes rather than two options saying the same thing with a validator keeping them apart, which is what `token_handler` already does in this bundle.
+
+**On the compiler pass.** Your testing corrects the description, and I have rewritten that paragraph: only the decorator genuinely hides the class. The node makes the pass close to moot in practice, since the one case left is an `id` pointing at the shipped `none` service, which the `none` shorthand makes pointless to write. If you still want that residual case covered, send the 53 lines and I will take them.
+
+Both rules are back at compile time for every method the bundle builds, so the message names the firewall and a greppable key again, and the constructor keeps them for the `id` branch, which is the only thing that can catch a custom implementation reporting `none`. Your point that the signature rule is the one without a backstop is now in the description, and the interface says that `getMethod()` is compared exactly and carries a security decision. The `AccessToken\OAuth2\` claim is gone rather than corrected.
+
+Documentation is owed and I will write it: the `client_authentication` shapes, the three implementations, and the two rules a public client cannot bend.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T11:49:53Z
+
+Your node is better than the sugar I proposed, and the reason is the one you give plus one you do not: `createClientAuthentication()` builds a `ChildDefinition` of `security.oauth2.client_authentication.<method>`, so shipping `private_key_jwt` later is one service definition and no factory change at all. Flat scalars would have needed a branch in the factory for every method. I withdraw mine.
+
+I exercised the node rather than reading it. Every shape normalizes as advertised:
+
+```
+{client_secret_basic: s3cret}   OK  {"client_secret_basic":"s3cret"}
+{client_secret_post: s3cret}    OK  {"client_secret_post":"s3cret"}
+{none: true} / {none: ~} / none OK  {"none":true}
+{id: app.pkjwt} / app.pkjwt     OK  {"id":"app.pkjwt"}
+{client_secret_basic: %env()%}  OK  (placeholder preserved, resolved at runtime)
+```
+
+and every rejection names its path: two methods and the empty mapping hit "Exactly one ... method must be configured", `none: false` hits its own message, an empty secret and an empty `id` hit `cannotBeEmpty`, an absent node hits `isRequired`, and an unknown key is rejected with the four available options listed. `client_authentication: ''` lands on the `id` branch and is refused there, which is the right place for it.
+
+The rules are genuinely back at compile time, and only where they can be:
+
+```
+public + pkce off         REFUSED: ... The OIDC "pkce.enabled" option cannot be false for a public client, declared by "client_authentication.none" ...
+public + signature off    REFUSED: ... The OIDC "id_token_signature.required" option cannot be false for a public client ...
+public, both on           ACCEPTED
+confidential + either off ACCEPTED
+id branch + either off    ACCEPTED  (falls through to the constructor)
+```
+
+The message names the firewall path, the option key and the declaring key, so all three are greppable again. That was the regression, and it is closed.
+
+**On the compiler pass: do not take it.** With the node in place the residual case is an `id` pointing at something that reports `none`. If that is the shipped service, the `none` shorthand makes it pointless to write; if it is a custom implementation, its method is not knowable while the container compiles, which is exactly what the constructor check exists for. So the pass would cover almost nothing that the two mechanisms you already have do not, and it would add a compiler pass to carry. The 53 lines are better left unwritten.
+
+Both of my fixes survived your push, and I re-ran the mutation that motivated the first one: making `refreshToken()` skip the client authentication now fails `testRefreshToken` and `testTheRefreshRequestIsMadeWithTheOptionsTheClientAuthenticationReturns`. Security/Http 1131, SecurityBundle 623, both green, and CI is clean.
+
+The `getMethod()` docblock addition says the right thing. One last small note for the documentation rather than the code: `client_authentication: none` as a bare string is the one value that is not read as a service id, so an application whose service is literally named `none` writes `{ id: none }`. The code comment explains it; the docs should too.
+
+Nothing else from me. Good change.

@@ -11,14 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
-use Doctrine\DBAL\Connection;
 use Psr\Log\LogLevel;
 use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -167,7 +165,7 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyAccessSection($rootNode);
         $this->addTypeInfoSection($rootNode);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
-        $this->addCacheSection($rootNode, $willBeAvailable);
+        $this->addCacheSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
         $this->addExceptionsSection($rootNode);
         $this->addWebLinkSection($rootNode);
@@ -186,23 +184,6 @@ class Configuration implements ConfigurationInterface
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode);
         $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
-
-        $rootNode
-            ->validate()
-                ->always(static function (array $config): array {
-                    foreach ($config['messenger']['transports'] ?? [] as $name => $transport) {
-                        if (null === $pool = $transport['claim_check']['cache_pool'] ?? null) {
-                            continue;
-                        }
-                        if (isset($config['cache']['pools'][$pool]) && !isset($config['cache']['pools'][$pool]['default_lifetime'])) {
-                            throw new InvalidConfigurationException(\sprintf('The cache pool "%s" used by Messenger transport "%s" for claim checks must define a "default_lifetime".', $pool, $name));
-                        }
-                    }
-
-                    return $config;
-                })
-            ->end()
-        ;
 
         return $treeBuilder;
     }
@@ -1103,119 +1084,12 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $willBeAvailable
-     */
-    private function addCacheSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
+    private function addCacheSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('cache')
-                    ->info('Cache configuration')
-                    ->addDefaultsIfNotSet()
-                    // "app" is checked before normalization so that setting it explicitly is told apart from
-                    // its default value, and after merging so that the two options cannot come from two files
-                    ->beforeNormalization()
-                        ->ifArray()
-                        ->then(static function ($v) {
-                            if (isset($v['app'], $v['default_provider'])) {
-                                throw new InvalidConfigurationException('The "framework.cache.app" and "framework.cache.default_provider" options cannot be used together, the adapter is deduced from the DSN.');
-                            }
-
-                            return $v;
-                        })
-                    ->end()
-                    ->validate()
-                        ->ifTrue(static fn ($v) => isset($v['default_provider']) && 'cache.adapter.filesystem' !== $v['app'])
-                        ->thenInvalid('The "framework.cache.app" and "framework.cache.default_provider" options cannot be used together, the adapter is deduced from the DSN.')
-                    ->end()
-                    ->children()
-                        ->scalarNode('prefix_seed')
-                            ->info('Used to namespace cache keys when using several apps with the same shared backend.')
-                            ->defaultValue('_%kernel.project_dir%.%kernel.container_class%')
-                            ->example('my-application-name/%kernel.environment%')
-                        ->end()
-                        ->scalarNode('app')
-                            ->info('App related cache pools configuration. Cannot be combined with "default_provider".')
-                            ->defaultValue('cache.adapter.filesystem')
-                        ->end()
-                        ->scalarNode('system')
-                            ->info('System related cache pools configuration.')
-                            ->defaultValue('cache.adapter.system')
-                        ->end()
-                        ->scalarNode('directory')->defaultValue('%kernel.share_dir%/pools/app')->end()
-                        ->scalarNode('default_provider')
-                            ->info('DSN of the backend to use for "cache.app"; the adapter is deduced from it. Replaces "app", which cannot be set alongside it.')
-                            ->example('%env(APP_CACHE_DSN)%')
-                        ->end()
-                        ->scalarNode('default_psr6_provider')->end()
-                        ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
-                        ->scalarNode('default_valkey_provider')->defaultValue('valkey://localhost')->end()
-                        ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
-                        ->scalarNode('default_doctrine_dbal_provider')->defaultValue('database_connection')->end()
-                        ->scalarNode('default_pdo_provider')->defaultValue($willBeAvailable('doctrine/dbal', Connection::class) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null)->end()
-                        ->scalarNode('default_mongodb_provider')->defaultValue('mongodb://localhost/app')->end()
-                        ->arrayNode('pools', 'pool')
-                            ->useAttributeAsKey('name')
-                            ->prototype('array')
-                                ->validate()
-                                    ->ifTrue(static fn ($v) => isset($v['provider']) && 1 < \count($v['adapters']))
-                                    ->thenInvalid('Pool cannot have a "provider" while more than one adapter is defined')
-                                ->end()
-                                ->children()
-                                    ->arrayNode('adapters', 'adapter')
-                                        ->performNoDeepMerging()
-                                        ->info('One or more adapters to chain for creating the pool, defaults to "cache.app".')
-                                        ->acceptAndWrap(['string'])
-                                        ->beforeNormalization()
-                                            ->ifArray()
-                                            ->then(static function ($values) {
-                                                if ([0] === array_keys($values) && \is_array($values[0])) {
-                                                    return $values[0];
-                                                }
-                                                $adapters = [];
-
-                                                foreach ($values as $k => $v) {
-                                                    if (\is_int($k) && \is_string($v)) {
-                                                        $adapters[] = $v;
-                                                    } elseif (!\is_array($v)) {
-                                                        $adapters[$k] = $v;
-                                                    } elseif (isset($v['provider'])) {
-                                                        $adapters[$v['provider']] = $v['name'] ?? $v;
-                                                    } else {
-                                                        $adapters[] = $v['name'] ?? $v;
-                                                    }
-                                                }
-
-                                                return $adapters;
-                                            })
-                                        ->end()
-                                        ->prototype('scalar')->end()
-                                    ->end()
-                                    ->scalarNode('tags')->defaultNull()->end()
-                                    ->booleanNode('public')->defaultFalse()->end()
-                                    ->scalarNode('default_lifetime')
-                                        ->info('Default lifetime of the pool.')
-                                        ->example('"300" for 5 minutes expressed in seconds, "PT5M" for five minutes expressed as ISO 8601 time interval, or "5 minutes" as a date expression')
-                                    ->end()
-                                    ->scalarNode('provider')
-                                        ->info('Overwrite the setting from the default provider for this adapter.')
-                                    ->end()
-                                    ->scalarNode('early_expiration_message_bus')
-                                        ->example('"messenger.default_bus" to send early expiration events to the default Messenger bus.')
-                                    ->end()
-                                    ->scalarNode('clearer')->end()
-                                    ->scalarNode('marshaller')
-                                        ->info('The marshaller service to use for this pool.')
-                                    ->end()
-                                ->end()
-                            ->end()
-                            ->validate()
-                                ->ifTrue(static fn ($v) => isset($v['cache.app']) || isset($v['cache.system']))
-                                ->thenInvalid('"cache.app" and "cache.system" are reserved names')
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('cache')
+                    ->aliasOf('cache')
                 ->end()
             ->end()
         ;

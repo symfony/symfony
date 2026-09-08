@@ -262,6 +262,11 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.listener.dispatch_pcntl_signal_listener', DispatchPcntlSignalListener::class)
             ->tag('kernel.event_subscriber')
 
+        ->set('cache.messenger.restart_workers_signal')
+            ->parent('cache.app')
+            ->private()
+            ->tag('cache.pool')
+
         ->set('messenger.listener.stop_worker_on_restart_signal_listener', StopWorkerOnRestartSignalListener::class)
             ->args([
                 service('cache.messenger.restart_workers_signal'),

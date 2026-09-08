@@ -38,6 +38,11 @@ return static function (ContainerConfigurator $container) {
         ->alias(PropertyInitializableExtractorInterface::class, 'property_info')
         ->alias(PropertyNameExtractorInterface::class, 'property_info')
 
+        ->set('cache.property_info')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+
         ->set('property_info.cache', PropertyInfoCacheExtractor::class)
             ->decorate('property_info')
             ->args([service('property_info.cache.inner'), service('cache.property_info')])

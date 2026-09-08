@@ -18,6 +18,11 @@ use Symfony\Component\Scheduler\Messenger\ServiceCallMessageHandler;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('cache.scheduler')
+            ->parent('cache.app')
+            ->private()
+            ->tag('cache.pool')
+
         ->set('scheduler.messenger.service_call_message_handler', ServiceCallMessageHandler::class)
             ->args([
                 tagged_locator('scheduler.task'),

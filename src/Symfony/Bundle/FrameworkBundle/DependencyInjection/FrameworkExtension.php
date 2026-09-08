@@ -21,7 +21,6 @@ use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use PhpParser\Parser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Client\ClientInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
@@ -34,12 +33,6 @@ use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Adapter\ChainAdapter;
-use Symfony\Component\Cache\Adapter\TagAwareAdapter;
-use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -64,7 +57,6 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Filesystem\Filesystem;
@@ -140,7 +132,6 @@ use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
 use Symfony\Component\Process\Process;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
@@ -196,10 +187,7 @@ use Symfony\Component\Webhook\Server\SignatureFormat;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
-use Symfony\Contracts\Cache\NamespacedPoolInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
@@ -278,9 +266,6 @@ class FrameworkExtension extends Extension
                 $container->removeDefinition('console.messenger.execute_command_handler');
             }
         }
-
-        // Load Cache configuration first as it is used by other components
-        $loader->load('cache.php');
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -376,8 +361,6 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerAssetMapperConfiguration($config['asset_mapper'], $container, $loader, $this->readConfigEnabled('assets', $container, $config['assets']), $this->readConfigEnabled('http_client', $container, $config['http_client']));
-        } else {
-            $container->removeDefinition('cache.asset_mapper');
         }
 
         if ($this->readConfigEnabled('http_client', $container, $config['http_client'])) {
@@ -454,9 +437,6 @@ class FrameworkExtension extends Extension
             $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
         }
 
-        // register cache before session so both can share the connection services
-        $this->registerCacheConfiguration($config['cache'], $container);
-
         if ($this->readConfigEnabled('session', $container, $config['session'])) {
             if (!\extension_loaded('session')) {
                 throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
@@ -507,7 +487,6 @@ class FrameworkExtension extends Extension
             }
             $this->registerSchedulerConfiguration($container, $loader);
         } else {
-            $container->removeDefinition('cache.scheduler');
             $container->removeDefinition('console.command.scheduler_debug');
         }
 
@@ -524,7 +503,6 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');
             $container->removeDefinition('console.command.messenger_failed_messages_remove');
-            $container->removeDefinition('cache.messenger.restart_workers_signal');
         }
 
         // notifier depends on messenger, mailer being registered
@@ -1070,10 +1048,8 @@ class FrameworkExtension extends Extension
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 
             if ($usedEnvs || str_contains($config['handler_id'], '://')) {
-                $id = '.cache_connection.'.ContainerBuilder::hash($config['handler_id']);
-
                 $container->getDefinition('session.abstract_handler')
-                    ->replaceArgument(0, $container->hasDefinition($id) ? new Reference($id) : $config['handler_id']);
+                    ->replaceArgument(0, $config['handler_id']);
 
                 $container->setAlias('session.handler', 'session.abstract_handler');
             } else {
@@ -2104,6 +2080,7 @@ class FrameworkExtension extends Extension
         $transportRateLimiterReferences = [];
         $serializerReferencesByTransport = [];
         $serializerIds = [];
+        $claimCheckPools = [];
         foreach ($config['transports'] as $name => $transport) {
             $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
             $transportSerializerId = $serializerId;
@@ -2123,6 +2100,7 @@ class FrameworkExtension extends Extension
                         new Reference($transport['claim_check']['cache_pool']),
                         $transport['claim_check']['max_size'],
                     ]));
+                $claimCheckPools[$transport['claim_check']['cache_pool']] = $name;
             }
 
             $serializerReferencesByTransport[$name] = new Reference($transportSerializerId);
@@ -2161,6 +2139,10 @@ class FrameworkExtension extends Extension
 
                 $transportRateLimiterReferences[$name] = new Reference('limiter.'.$transport['rate_limiter']);
             }
+        }
+
+        if ($claimCheckPools) {
+            $container->setParameter('.messenger.claim_check_pools', $claimCheckPools);
         }
 
         if (class_exists(DecodeFailedMessageMiddleware::class)) {
@@ -2267,130 +2249,6 @@ class FrameworkExtension extends Extension
 
         if (!$container->hasDefinition('console.command.messenger_consume_messages')) {
             $container->removeDefinition('messenger.listener.reset_services');
-        }
-    }
-
-    private function registerCacheConfiguration(array $config, ContainerBuilder $container): void
-    {
-        $version = new Parameter('container.build_id');
-        $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
-        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
-        $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
-
-        if (isset($config['prefix_seed'])) {
-            $container->setParameter('cache.prefix.seed', $config['prefix_seed']);
-        }
-        if ($container->hasParameter('cache.prefix.seed')) {
-            // Inline any env vars referenced in the parameter
-            $container->setParameter('cache.prefix.seed', $container->resolveEnvPlaceholders($container->getParameter('cache.prefix.seed'), true));
-        }
-        foreach (['psr6', 'redis', 'valkey', 'memcached', 'doctrine_dbal', 'pdo', 'mongodb'] as $name) {
-            if (isset($config[$name = 'default_'.$name.'_provider'])) {
-                $container->setAlias('cache.'.$name, new Alias(CachePoolPass::getServiceProvider($container, $config[$name]), false));
-            }
-        }
-        foreach (['app', 'system'] as $name) {
-            $config['pools']['cache.'.$name] = [
-                // an explicit DSN decides which adapter "cache.app" uses, so none is named here
-                'adapters' => 'app' === $name && isset($config['default_provider']) ? [] : [$config[$name]],
-                'provider' => 'app' === $name ? $config['default_provider'] ?? null : null,
-                'public' => true,
-                'tags' => false,
-            ];
-        }
-        $nativeTagAwareAdapters = [['cache.adapter.redis_tag_aware'], ['cache.adapter.valkey_tag_aware'], ['cache.adapter.pdo_tag_aware'], ['cache.adapter.mongodb_tag_aware']];
-        foreach ($config['pools'] as $name => $pool) {
-            if (null === ($pool['provider'] ??= null)) {
-                unset($pool['provider']);
-            }
-            // no adapter named and a provider given: the DSN decides which adapter to build
-            $isDsnPool = !$pool['adapters'] && isset($pool['provider']);
-            $pool['adapters'] = $pool['adapters'] ?: ['cache.app'];
-
-            $isNativeTagAware = \in_array($pool['adapters'], $nativeTagAwareAdapters, true);
-            foreach ($pool['adapters'] as $provider => $adapter) {
-                if (\in_array($config['pools'][$adapter]['adapters'] ?? null, $nativeTagAwareAdapters, true)) {
-                    $isNativeTagAware = true;
-                } elseif ($config['pools'][$adapter]['tags'] ?? false) {
-                    $pool['adapters'][$provider] = $adapter = '.'.$adapter.'.inner';
-                }
-            }
-
-            if ($isDsnPool) {
-                $definition = (new Definition(AdapterInterface::class))
-                    ->setFactory([AbstractAdapter::class, 'createAdapter'])
-                    ->setArguments([
-                        new Reference(CachePoolPass::getServiceProvider($container, $pool['provider'])),
-                        '',
-                        0,
-                        new Reference('cache.default_marshaller'),
-                    ]);
-            } elseif (1 === \count($pool['adapters'])) {
-                if (!isset($pool['provider']) && !\is_int($provider)) {
-                    $pool['provider'] = $provider;
-                }
-                $definition = new ChildDefinition($adapter);
-            } else {
-                $definition = new Definition(ChainAdapter::class, [$pool['adapters'], 0]);
-                $pool['reset'] = 'reset';
-            }
-
-            if ($isNativeTagAware && 'cache.app' === $name) {
-                $container->setAlias('cache.app.taggable', $name);
-                $definition->addTag('cache.taggable', ['pool' => $name]);
-            } elseif ($isNativeTagAware) {
-                $tagAwareId = $name;
-                $container->setAlias('.'.$name.'.inner', $name);
-                $definition->addTag('cache.taggable', ['pool' => $name]);
-            } elseif ($pool['tags']) {
-                if (true !== $pool['tags'] && ($config['pools'][$pool['tags']]['tags'] ?? false)) {
-                    $pool['tags'] = '.'.$pool['tags'].'.inner';
-                }
-                $container->register($name, TagAwareAdapter::class)
-                    ->addArgument(new Reference('.'.$name.'.inner'))
-                    ->addArgument(true !== $pool['tags'] ? new Reference($pool['tags']) : null)
-                    ->addMethodCall('setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)])
-                    ->setPublic($pool['public'])
-                    ->addTag('cache.taggable', ['pool' => $name])
-                    ->addTag('monolog.logger', ['channel' => 'cache']);
-
-                $pool['name'] = $tagAwareId = $name;
-                $pool['public'] = false;
-                $name = '.'.$name.'.inner';
-            } elseif (!\in_array($name, ['cache.app', 'cache.system'], true)) {
-                $tagAwareId = '.'.$name.'.taggable';
-                $container->register($tagAwareId, TagAwareAdapter::class)
-                    ->addArgument(new Reference($name))
-                    ->addTag('cache.taggable', ['pool' => $name])
-                ;
-            }
-
-            if (!\in_array($name, ['cache.app', 'cache.system'], true)) {
-                $container->registerAliasForArgument($tagAwareId, TagAwareCacheInterface::class, $pool['name'] ?? $name);
-                $container->registerAliasForArgument($name, CacheInterface::class, $pool['name'] ?? $name);
-                $container->registerAliasForArgument($name, CacheItemPoolInterface::class, $pool['name'] ?? $name);
-                $container->registerAliasForArgument($name, NamespacedPoolInterface::class, $pool['name'] ?? $name);
-            }
-
-            $definition->setPublic($pool['public']);
-            unset($pool['adapters'], $pool['public'], $pool['tags']);
-
-            $definition->addTag('cache.pool', $pool);
-            $container->setDefinition($name, $definition);
-        }
-
-        if (class_exists(PropertyAccessor::class)) {
-            $propertyAccessDefinition = $container->register('cache.property_access', AdapterInterface::class);
-
-            if (!$container->getParameter('kernel.debug')) {
-                $propertyAccessDefinition->setFactory([PropertyAccessor::class, 'createCache']);
-                $propertyAccessDefinition->setArguments(['', 0, $version, new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]);
-                $propertyAccessDefinition->addTag('cache.pool', ['clearer' => 'cache.system_clearer']);
-                $propertyAccessDefinition->addTag('monolog.logger', ['channel' => 'cache']);
-            } else {
-                $propertyAccessDefinition->setClass(ArrayAdapter::class);
-                $propertyAccessDefinition->setArguments([0, false]);
-            }
         }
     }
 

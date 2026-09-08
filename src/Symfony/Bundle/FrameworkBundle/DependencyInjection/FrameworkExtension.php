@@ -3491,7 +3491,7 @@ class FrameworkExtension extends Extension
                 ->addTag('rate_limiter', ['name' => $name]);
 
             if ('auto' === $limiterConfig['lock_factory']) {
-                $limiterConfig['lock_factory'] = $this->isInitializedConfigEnabled('lock') ? 'lock.factory' : null;
+                $limiterConfig['lock_factory'] = $container->hasAlias('lock.factory') ? 'lock.factory' : null;
             }
 
             if (null !== $limiterConfig['lock_factory']) {

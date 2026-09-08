@@ -1,0 +1,345 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Messenger\Tests\Middleware;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\ChainMiddleware;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackInterface;
+use Symfony\Component\Messenger\Middleware\StackMiddleware;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\ChainStamp;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
+use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\SentStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+
+class ChainMiddlewareTest extends MiddlewareTestCase
+{
+    public function testNextMessageIsDispatchedOnceTheCurrentOneIsHandled()
+    {
+        $second = new SecondMessage();
+        $third = new ThirdMessage();
+        $envelope = new Envelope(new DummyMessage('first'), [new BusNameStamp('the_bus'), new ChainStamp($second, $third)]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(function (Envelope $next) use ($second, $third) {
+                $this->assertSame($second, $next->getMessage());
+                $this->assertCount(1, $next->all(DispatchAfterCurrentBusStamp::class));
+                $this->assertSame([$third], $next->last(ChainStamp::class)->getMessages());
+                $this->assertSame('the_bus', $next->last(BusNameStamp::class)->getBusName());
+
+                return true;
+            }))
+            ->willReturnArgument(0);
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+
+        $handled = $middleware->handle($envelope, $this->getStackMock());
+
+        $this->assertSame($envelope->getMessage(), $handled->getMessage());
+        $this->assertSame($envelope->all(ChainStamp::class), $handled->all(ChainStamp::class));
+    }
+
+    public function testLastMessageIsDispatchedWithoutChain()
+    {
+        $second = new SecondMessage();
+        $envelope = new Envelope(new DummyMessage('first'), [new ChainStamp($second)]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(function (Envelope $next) use ($second) {
+                $this->assertSame($second, $next->getMessage());
+                $this->assertCount(1, $next->all(DispatchAfterCurrentBusStamp::class));
+                $this->assertSame([], $next->all(ChainStamp::class));
+                $this->assertNull($next->last(BusNameStamp::class));
+
+                return true;
+            }))
+            ->willReturnArgument(0);
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testEnvelopeWithoutChainIsPassedThrough()
+    {
+        $envelope = new Envelope(new DummyMessage('first'));
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+
+        $this->assertSame($envelope, $middleware->handle($envelope, $this->getStackMock()));
+    }
+
+    public function testEnvelopeInChainKeepsItsStamps()
+    {
+        $second = new SecondMessage();
+        $third = new ThirdMessage();
+        $delayStamp = new DelayStamp(1000);
+        $envelope = new Envelope(new DummyMessage('first'), [new BusNameStamp('the_bus'), new ChainStamp(new Envelope($second, [$delayStamp, new BusNameStamp('other_bus')]), $third)]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(function (Envelope $next) use ($second, $third, $delayStamp) {
+                $this->assertSame($second, $next->getMessage());
+                $this->assertSame([$delayStamp], $next->all(DelayStamp::class));
+                $this->assertSame('other_bus', $next->last(BusNameStamp::class)->getBusName());
+                $this->assertCount(1, $next->all(BusNameStamp::class));
+                $this->assertCount(1, $next->all(DispatchAfterCurrentBusStamp::class));
+                $this->assertSame([$third], $next->last(ChainStamp::class)->getMessages());
+
+                return true;
+            }))
+            ->willReturnArgument(0);
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testChainStampsOfAnEnvelopeFormOneSequence()
+    {
+        $second = new SecondMessage();
+        $third = new ThirdMessage();
+        $fourth = new DummyMessage('fourth');
+        $envelope = new Envelope(new DummyMessage('first'), [new ChainStamp(new Envelope($second, [new ChainStamp($third)])), new ChainStamp($fourth)]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(function (Envelope $next) use ($second, $third, $fourth) {
+                $this->assertSame($second, $next->getMessage());
+                $this->assertSame([[$third], [$fourth]], array_map(static fn (ChainStamp $stamp) => $stamp->getMessages(), $next->all(ChainStamp::class)));
+
+                return true;
+            }))
+            ->willReturnArgument(0);
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testNothingIsDispatchedWhenTheMessageWasSentToATransport()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ChainStamp(new SecondMessage())]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+        $middleware->handle($envelope, $this->getStackAdding(new SentStamp('Some\\Sender', 'async')));
+    }
+
+    public function testTheChainContinuesWhenTheMessageWasSentToASynchronousTransport()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new SentStamp('Some\\Sender', 'sync'), new ReceivedStamp('sync'), new ChainStamp(new SecondMessage())]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->willReturnArgument(0);
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+        $middleware->handle($envelope, $this->getStackAdding(new HandledStamp(null, 'handler')));
+    }
+
+    public function testNothingIsDispatchedWhenAReceivedMessageIsSentAgain()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ReceivedStamp('outbox'), new ChainStamp(new SecondMessage())]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+        $handled = $middleware->handle($envelope, $this->getStackAdding(new SentStamp('Some\\Sender', 'async')));
+
+        $this->assertCount(1, $handled->all(ChainStamp::class));
+    }
+
+    public function testANextStepWithoutRouteIsSentToTheTransportThePreviousStepCameFrom()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ReceivedStamp('async'), new ChainStamp(new SecondMessage())]);
+
+        $next = $this->dispatchNextStep($envelope, ['async', 'other']);
+
+        $this->assertSame(['async'], $next->last(TransportNamesStamp::class)->getTransportNames());
+    }
+
+    public function testANextStepOfARetriedFailedMessageIsSentToItsOriginalTransport()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ReceivedStamp('failed'), new ReceivedStamp('async'), new ChainStamp(new SecondMessage())]);
+
+        $next = $this->dispatchNextStep($envelope, ['async', 'failed']);
+
+        $this->assertSame(['async'], $next->last(TransportNamesStamp::class)->getTransportNames());
+    }
+
+    public function testANextStepWithARouteOfItsOwnKeepsIt()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ReceivedStamp('async'), new ChainStamp(new SecondMessage())]);
+
+        $next = $this->dispatchNextStep($envelope, ['async', 'other'], [SecondMessage::class => ['other']]);
+
+        $this->assertSame([], $next->all(TransportNamesStamp::class));
+    }
+
+    public function testANextStepWithTransportNamesKeepsThem()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ReceivedStamp('async'), new ChainStamp(new Envelope(new SecondMessage(), [new TransportNamesStamp([])]))]);
+
+        $next = $this->dispatchNextStep($envelope, ['async']);
+
+        $this->assertCount(1, $next->all(TransportNamesStamp::class));
+        $this->assertSame([], $next->last(TransportNamesStamp::class)->getTransportNames());
+    }
+
+    public function testANextStepAfterAStepDispatchedInThisProcessKeepsItsRouting()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ChainStamp(new SecondMessage())]);
+
+        $next = $this->dispatchNextStep($envelope, ['async']);
+
+        $this->assertSame([], $next->all(TransportNamesStamp::class));
+    }
+
+    public function testANextStepIsHandledInThisProcessWhenThePreviousTransportCannotSend()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ReceivedStamp('scheduler_default'), new ChainStamp(new SecondMessage())]);
+
+        $next = $this->dispatchNextStep($envelope, ['async']);
+
+        $this->assertSame([], $next->all(TransportNamesStamp::class));
+    }
+
+    /**
+     * @param list<StampInterface> $stamps
+     */
+    #[DataProvider('provideTrust')]
+    public function testANextStepIsUntrustedWhenThePreviousStepIs(array $stamps, bool $trusted)
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [...$stamps, new ChainStamp(new SecondMessage())]);
+
+        $next = $this->dispatchNextStep($envelope);
+
+        if ($trusted) {
+            $this->assertSame([], $next->all(TrustStamp::class));
+        } else {
+            $this->assertCount(1, $next->all(TrustStamp::class));
+            $this->assertFalse($next->last(TrustStamp::class)->isTrusted());
+        }
+    }
+
+    public static function provideTrust(): iterable
+    {
+        yield 'dispatched in this process' => [[], true];
+        yield 'received' => [[new ReceivedStamp('async')], false];
+        yield 'received and trusted' => [[new ReceivedStamp('async'), TrustStamp::trusted()], true];
+        yield 'received and untrusted' => [[new ReceivedStamp('async'), TrustStamp::untrusted()], false];
+        yield 'untrusted' => [[TrustStamp::untrusted()], false];
+    }
+
+    public function testTheNonSendableStampsOfANextStepAreDropped()
+    {
+        $chain = (new \ReflectionClass(ChainStamp::class))->newInstanceWithoutConstructor();
+        (new \ReflectionProperty(ChainStamp::class, 'messages'))->setValue($chain, [new Envelope(new SecondMessage(), [new HandlerArgumentsStamp(['forged']), new ReceivedStamp('forged'), $delay = new DelayStamp(1000)])]);
+
+        $next = $this->dispatchNextStep(new Envelope(new DummyMessage('first'), [$chain]));
+
+        $this->assertSame([], $next->all(HandlerArgumentsStamp::class));
+        $this->assertSame([], $next->all(ReceivedStamp::class));
+        $this->assertSame([$delay], $next->all(DelayStamp::class));
+    }
+
+    public function testAMessageHandledByABatchHandlerCannotOpenAChain()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ChainStamp(new SecondMessage())]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('A message handled by the batch handler "Closure" cannot carry a "Symfony\\Component\\Messenger\\Stamp\\ChainStamp".');
+
+        $middleware->handle($envelope, $this->getStackAdding(new NoAutoAckStamp(new HandlerDescriptor(static function () {}))));
+    }
+
+    public function testNothingIsDispatchedWhenHandlingFails()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [new ChainStamp(new SecondMessage())]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Thrown from next middleware.');
+
+        $middleware->handle($envelope, $this->getThrowingStackMock());
+    }
+
+    /**
+     * @param list<string>                      $senders
+     * @param array<class-string, list<string>> $routing
+     */
+    private function dispatchNextStep(Envelope $envelope, array $senders = [], array $routing = []): Envelope
+    {
+        $next = null;
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(static function (Envelope $envelope) use (&$next): Envelope {
+                return $next = $envelope;
+            });
+
+        $sendersLocator = new Container();
+        foreach ($senders as $name) {
+            $sendersLocator->set($name, new InMemoryTransport());
+        }
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator($routing, $sendersLocator));
+        $middleware->handle($envelope, $this->getStackMock());
+
+        return $next;
+    }
+
+    private function getStackAdding(StampInterface ...$stamps): StackInterface
+    {
+        $next = $this->createMock(MiddlewareInterface::class);
+        $next->expects($this->once())->method('handle')->willReturnCallback(static fn (Envelope $envelope): Envelope => $envelope->with(...$stamps));
+
+        return new StackMiddleware($next);
+    }
+}

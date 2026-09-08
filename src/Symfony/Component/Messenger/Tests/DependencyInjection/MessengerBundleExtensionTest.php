@@ -76,6 +76,7 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_show'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_remove'));
         $this->assertFalse($container->hasDefinition('serializer.normalizer.flatten_exception'));
+        $this->assertFalse($container->hasDefinition('serializer.normalizer.chain_stamp'));
     }
 
     public function testMessenger()
@@ -161,6 +162,18 @@ class MessengerBundleExtensionTest extends TestCase
         $configurators[0]($definition, new AsMessageHandler(transport: 'async'), new \ReflectionClass(DummyMessage::class));
 
         $this->assertSame([['bus' => null, 'handles' => null, 'method' => null, 'priority' => 0, 'sign' => false, 'transport' => 'async', 'from_transport' => null]], $definition->getTag('messenger.message_handler'));
+    }
+
+    public function testMessengerChainMiddleware()
+    {
+        $container = $this->createContainerFromFile('messenger', false);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
+
+        $this->assertSame('messenger.routable_message_bus', (string) $container->getDefinition('messenger.middleware.chain')->getArgument(0));
+        $this->assertSame('messenger.senders_locator', (string) $container->getDefinition('messenger.middleware.chain')->getArgument(1));
+        $this->assertContains('messenger.middleware.chain', $this->getBusMiddlewareIds($container, 'messenger.bus.default'));
+        $this->assertTrue($container->getDefinition('serializer.normalizer.chain_stamp')->hasTag('serializer.normalizer'));
     }
 
     public function testMessengerRejectRedeliveredMessagesEnabledByDefault()
@@ -804,6 +817,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
             ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'chain'],
             ['id' => 'handle_message', 'arguments' => ['index_1' => false]],
         ], $container->getParameter('messenger.bus.events.middleware'));
     }
@@ -824,6 +838,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
             ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'chain'],
             ['id' => 'handle_message', 'arguments' => ['index_1' => false]],
         ], $container->getParameter('messenger.bus.commands.middleware'));
         $this->assertTrue($container->has('messenger.bus.events'));
@@ -839,6 +854,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'deduplicate_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
             ['id' => 'send_message', 'arguments' => [true]],
+            ['id' => 'chain'],
             ['id' => 'handle_message', 'arguments' => ['index_1' => false]],
         ], $container->getParameter('messenger.bus.events.middleware'));
         $this->assertTrue($container->has('messenger.bus.queries'));

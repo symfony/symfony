@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
-use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Stamp\UnverifiedDecodingFailureStamp;
 
@@ -58,8 +57,7 @@ final class SigningSerializer implements SerializerInterface
             return $encoded;
         }
 
-        // a TrustStamp decides; without one, an envelope that no transport delivered was dispatched in this process
-        $trusted = ($trust = $envelope->last(TrustStamp::class)) ? $trust->isTrusted() : null === $envelope->last(ReceivedStamp::class);
+        $trusted = TrustStamp::isEnvelopeTrusted($envelope);
 
         if (($message = $envelope->getMessage()) instanceof MessageDecodingFailedException) {
             // the inner serializer can send the failed envelope again as it is: it must have been signed with this key, and not as unverified

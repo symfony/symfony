@@ -32,6 +32,7 @@ use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
+use Symfony\Component\Messenger\Middleware\ChainMiddleware;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
@@ -48,6 +49,7 @@ use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\Normalizer\ChainStampNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
@@ -85,6 +87,9 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('serializer.normalizer.flatten_exception', FlattenExceptionNormalizer::class)
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
+
+        ->set('serializer.normalizer.chain_stamp', ChainStampNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
 
         ->set('.messenger.transport.native_php_serializer', PhpSerializer::class)
@@ -145,6 +150,12 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('messenger.middleware.dispatch_after_current_bus', DispatchAfterCurrentBusMiddleware::class)
+
+        ->set('messenger.middleware.chain', ChainMiddleware::class)
+            ->args([
+                service('messenger.routable_message_bus'),
+                service('messenger.senders_locator'),
+            ])
 
         ->set('messenger.middleware.validation', ValidationMiddleware::class)
             ->args([

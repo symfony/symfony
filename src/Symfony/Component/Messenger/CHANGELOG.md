@@ -40,6 +40,8 @@ CHANGELOG
  * Add `TrustStamp`, for transports that yield messages created in the same process to have `SigningSerializer` sign them as verified and `SendMessageMiddleware` honor their `RedispatchStamp`
  * Make `HandleMessageMiddleware` refuse to call the handlers that require a signature for an envelope marked untrusted
  * Sign messages with a serializer created for each transport instead of decorating the serializer services: encoding with `messenger.default_serializer` or another serializer service does not sign anymore
+ * Add `ChainStamp` and `ChainMiddleware` to dispatch messages one after another, with `ChainStampNormalizer` to carry a chain with the Symfony serializer
+ * Add `chain` to the default bus middleware, between `send_message` and `handle_message`
 
 8.1
 ---

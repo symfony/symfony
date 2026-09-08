@@ -18,7 +18,9 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\ChainStamp;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
@@ -31,6 +33,7 @@ use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithInterfaceWithSerializedTypeName;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithSerializedTypeName;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
@@ -141,6 +144,80 @@ class SerializerTest extends TestCase
 
         $serializer = new Serializer(null, 'xml');
         $this->assertEquals($stamps, $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'), $stamps)))->all(ValidationStamp::class));
+    }
+
+    #[DataProvider('provideChainStamps')]
+    public function testEncodedWithChainStampIsDecodable(string $format, ChainStamp $stamp)
+    {
+        $serializer = new Serializer(null, $format);
+
+        $decoded = $serializer->decode($serializer->encode(new Envelope(new DummyMessage('first'), [$stamp])));
+
+        $this->assertEquals(new DummyMessage('first'), $decoded->getMessage());
+        $this->assertEquals([$stamp], $decoded->all(ChainStamp::class));
+    }
+
+    public static function provideChainStamps(): iterable
+    {
+        foreach (['json', 'xml'] as $format) {
+            yield $format.' one message' => [$format, new ChainStamp(new DummyMessage('second'))];
+            yield $format.' messages' => [$format, new ChainStamp(new SecondMessage(), new DummyMessage('third'))];
+            yield $format.' envelopes' => [$format, new ChainStamp(
+                new Envelope(new DummyMessage('second'), [new DelayStamp(1000)]),
+                new Envelope(new SecondMessage(), [new BusNameStamp('other_bus'), new ValidationStamp(['foo']), new ValidationStamp([]), new ValidationStamp(['foo', 'bar'])]),
+                new Envelope(new DummyMessage('fourth'), [new ChainStamp(new DummyMessage('fifth'))]),
+            )];
+        }
+    }
+
+    public function testDecodingFailsWithAChainedMessageThatIsNotAStamp()
+    {
+        $serializer = new Serializer();
+
+        $envelope = $serializer->decode([
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.ChainStamp::class => json_encode([['messages' => [['type' => SecondMessage::class, 'message' => [], 'stamps' => [['type' => DummyMessage::class, 'stamp' => ['message' => 'injected']]]]]]]),
+            ],
+        ]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertSame(\sprintf('Could not decode stamp: "%s" is not a "%s".', DummyMessage::class, StampInterface::class), $envelope->getMessage()->getMessage());
+    }
+
+    public function testDecodingDropsTheNonSendableStampsOfAChainedMessage()
+    {
+        $serializer = new Serializer();
+
+        $envelope = $serializer->decode([
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.ChainStamp::class => json_encode([['messages' => [['type' => SecondMessage::class, 'message' => [], 'stamps' => [['type' => ReceivedStamp::class, 'stamp' => ['transportName' => 'injected']]]]]]]),
+            ],
+        ]);
+
+        $this->assertInstanceOf(DummyMessage::class, $envelope->getMessage());
+        $this->assertEquals([new SecondMessage()], $envelope->last(ChainStamp::class)->getMessages());
+    }
+
+    public function testDecodedChainedSerializerStampSkipsCodeAffectingContextOptions()
+    {
+        $serializer = new Serializer();
+
+        $envelope = $serializer->decode([
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.ChainStamp::class => json_encode([['messages' => [['type' => SecondMessage::class, 'message' => [], 'stamps' => [['type' => SerializerStamp::class, 'stamp' => ['context' => [
+                    AbstractNormalizer::CALLBACKS => ['message' => [DummySymfonySerializerCallback::class, 'shout']],
+                    DateTimeNormalizer::FORMAT_KEY => 'Y-m-d',
+                ]]]]]]]]),
+            ],
+        ]);
+
+        $this->assertSame([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'], $envelope->last(ChainStamp::class)->getMessages()[0]->last(SerializerStamp::class)->getContext());
     }
 
     public function testSerializedMessageStampIsUsedForEncoding()

@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
+use Symfony\Component\Messenger\Transport\Serialization\Normalizer\ChainStampNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -91,6 +92,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         $encoders = [new XmlEncoder(), new JsonEncoder()];
         $normalizers = [
             new FlattenExceptionNormalizer(),
+            new ChainStampNormalizer(),
             new DateTimeNormalizer(),
             new ArrayDenormalizer(),
             new ObjectNormalizer(propertyTypeExtractor: new ReflectionExtractor()),
@@ -205,16 +207,20 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         ];
     }
 
-    private function decodeStamps(array $encodedEnvelope, ?\Throwable &$failure = null): array
+    /**
+     * Decodes the stamps of an envelope read from a transport, from their encoded values keyed by stamp class.
+     *
+     * @param array<string, mixed>                      $values
+     * @param \Closure(string, mixed): StampInterface[] $decode Decodes the list of stamps of a class
+     *
+     * @return StampInterface[]
+     *
+     * @internal
+     */
+    public static function decodeStampValues(array $values, \Closure $decode, ?\Throwable &$failure = null): array
     {
         $stamps = [];
-        foreach (\is_array($encodedEnvelope['headers'] ?? null) ? $encodedEnvelope['headers'] : [] as $name => $value) {
-            if (!str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
-                continue;
-            }
-
-            $class = substr($name, \strlen(self::STAMP_HEADER_PREFIX));
-
+        foreach ($values as $class => $value) {
             try {
                 if (!is_subclass_of($class, StampInterface::class)) {
                     $failure ??= new MessageDecodingFailedException(\sprintf('Could not decode stamp: "%s" is not a "%s".', $class, StampInterface::class));
@@ -226,11 +232,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
                     continue;
                 }
 
-                if (ValidationStamp::class === $class && XmlEncoder::FORMAT === $this->format && $this->serializer instanceof DecoderInterface && $this->serializer instanceof DenormalizerInterface) {
-                    $stamps[] = $this->decodeXmlValidationStamps($value);
-                } else {
-                    $stamps[] = $this->serializer->deserialize($value, $class.'[]', $this->format, $this->stampContext);
-                }
+                $stamps[] = $decode($class, $value);
             } catch (ExceptionInterface $e) {
                 $failure ??= new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
             } catch (\Throwable $e) {
@@ -257,17 +259,37 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
      * The XML encoder decodes a list of one group as the group itself, and an empty list as an empty string.
      *
      * @return ValidationStamp[]
+     *
+     * @internal
      */
-    private function decodeXmlValidationStamps(string $value): array
+    public static function denormalizeXmlValidationStamps(array $data, DenormalizerInterface $denormalizer, array $context): array
     {
         $stamps = [];
-        foreach ((array) $this->serializer->decode($value, $this->format, $this->stampContext) as $data) {
-            $stamps[] = \is_string($groups = $data['groups'] ?? null)
+        foreach ($data as $stampData) {
+            $stamps[] = \is_string($groups = $stampData['groups'] ?? null)
                 ? new ValidationStamp('' === $groups ? [] : [$groups])
-                : $this->serializer->denormalize($data, ValidationStamp::class, $this->format, $this->stampContext);
+                : $denormalizer->denormalize($stampData, ValidationStamp::class, XmlEncoder::FORMAT, $context);
         }
 
         return $stamps;
+    }
+
+    private function decodeStamps(array $encodedEnvelope, ?\Throwable &$failure = null): array
+    {
+        $values = [];
+        foreach (\is_array($encodedEnvelope['headers'] ?? null) ? $encodedEnvelope['headers'] : [] as $name => $value) {
+            if (str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
+                $values[substr($name, \strlen(self::STAMP_HEADER_PREFIX))] = $value;
+            }
+        }
+
+        return self::decodeStampValues($values, function (string $class, mixed $value): array {
+            if (ValidationStamp::class === $class && XmlEncoder::FORMAT === $this->format && $this->serializer instanceof DecoderInterface && $this->serializer instanceof DenormalizerInterface) {
+                return self::denormalizeXmlValidationStamps((array) $this->serializer->decode($value, $this->format, $this->stampContext), $this->serializer, $this->stampContext);
+            }
+
+            return $this->serializer->deserialize($value, $class.'[]', $this->format, $this->stampContext);
+        }, $failure);
     }
 
     private function encodeStamps(Envelope $envelope): array

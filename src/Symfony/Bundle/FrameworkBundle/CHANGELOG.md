@@ -36,6 +36,8 @@ CHANGELOG
  * Register `WebhookBundle` automatically when the Webhook component is installed
  * Make `framework.http_client` an alias of the `http_client` configuration provided by `HttpClientBundle`
  * Register `HttpClientBundle` automatically when the HttpClient component is installed
+ * Make `framework.mailer` an alias of the `mailer` configuration provided by `MailerBundle`
+ * Register `MailerBundle` automatically when the Mailer component is installed
  * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
  * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Make `framework.remote_event` an alias of the `remote_event` configuration provided by `RemoteEventBundle`

@@ -21,6 +21,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingMailerDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -79,15 +80,10 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\JsonStreamer\JsonStreamerBundle;
 use Symfony\Component\Lock\LockBundle;
-use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
-use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
-use Symfony\Component\Mailer\EventListener\PgpMimeEncryptedMessageListener;
-use Symfony\Component\Mailer\EventListener\PgpMimeSignedMessageListener;
-use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\DependencyInjection\RemoveMissingDependenciesPass as MailerRemoveMissingDependenciesPass;
+use Symfony\Component\Mailer\MailerBundle;
 use Symfony\Component\Messenger\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Messenger\MessengerBundle;
-use Symfony\Component\Mime\Crypto\PgpEncrypter;
-use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
@@ -427,6 +423,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         yield 'underscored' => ['legacy_remote_event'];
         yield 'hyphenated' => ['legacy_hyphenated_remote_event'];
+    }
+
+    public function testMailerConfigurationIsForwardedToMailerBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $this->loadFromFile($container, 'legacy_mailer');
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+
+        $this->assertSame(['main' => 'smtp://example.com'], $container->getDefinition('mailer.transports')->getArgument(0));
     }
 
     public function testWebhookConfigurationIsForwardedToWebhookBundle()
@@ -2006,196 +2017,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
     }
 
-    public static function provideMailer(): iterable
-    {
-        yield [
-            'mailer_with_dsn',
-            ['main' => 'smtp://example.com'],
-            ['redirected@example.org'],
-            ['foobar@example\.org'],
-        ];
-        yield [
-            'mailer_with_transports',
-            [
-                'transport1' => 'smtp://example1.com',
-                'transport2' => 'smtp://example2.com',
-            ],
-            ['redirected@example.org', 'redirected1@example.org'],
-            ['foobar@example\.org', '.*@example\.com'],
-        ];
-    }
-
-    #[DataProvider('provideMailer')]
-    public function testMailer(string $configFile, array $expectedTransports, array $expectedRecipients, array $expectedAllowedRecipients)
-    {
-        $container = $this->createContainerFromFile($configFile);
-
-        $this->assertTrue($container->hasAlias('mailer'));
-        $this->assertTrue($container->hasDefinition('mailer.transports'));
-        $this->assertSame($expectedTransports, $container->getDefinition('mailer.transports')->getArgument(0));
-        $this->assertTrue($container->hasAlias('mailer.default_transport'));
-        $this->assertTrue($container->hasDefinition('mailer.envelope_listener'));
-        $l = $container->getDefinition('mailer.envelope_listener');
-        $this->assertSame('sender@example.org', $l->getArgument(0));
-        $this->assertSame($expectedRecipients, $l->getArgument(1));
-        $this->assertSame($expectedAllowedRecipients, $l->getArgument(2));
-        $this->assertEquals(new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.mailer')->getArgument(1));
-
-        $this->assertTrue($container->hasDefinition('mailer.message_listener'));
-        $l = $container->getDefinition('mailer.message_listener');
-        $h = $l->getArgument(0);
-        $this->assertCount(3, $h->getMethodCalls());
-    }
-
-    public function testMailerWithTracking()
-    {
-        if (!class_exists(TrackingHeader::class)) {
-            $this->markTestSkipped('This test requires symfony/mailer 8.2 or superior.');
-        }
-
-        $container = $this->createContainerFromFile('mailer_with_tracking');
-
-        $l = $container->getDefinition('mailer.message_listener');
-        $calls = $l->getArgument(0)->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertSame('add', $calls[0][0]);
-        $header = $calls[0][1][0];
-        $this->assertSame(TrackingHeader::class, $header->getClass());
-        $this->assertSame([false, false], $header->getArguments());
-    }
-
-    public function testMailerTrackingYieldsToAnExplicitTrackingHeader()
-    {
-        if (!class_exists(TrackingHeader::class)) {
-            $this->markTestSkipped('This test requires symfony/mailer 8.2 or superior.');
-        }
-
-        $container = $this->createContainerFromFile('mailer_with_tracking_and_header');
-
-        $l = $container->getDefinition('mailer.message_listener');
-        $calls = $l->getArgument(0)->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertSame('addHeader', $calls[0][0]);
-        $this->assertSame(['X-Track', 'opens=true; clicks=default'], $calls[0][1]);
-    }
-
-    public function testMailerSmimeEncrypterWithCertificates()
-    {
-        $container = $this->createContainerFromFile('mailer_with_smime_certificates');
-
-        $this->assertTrue($container->hasDefinition('mailer.smime_encrypter.repository'));
-        $definition = $container->getDefinition('mailer.smime_encrypter.repository');
-        $this->assertSame(InMemorySmimeCertificateRepository::class, $definition->getClass());
-        $this->assertSame([
-            'r1@example.com' => '/path/to/r1.crt',
-            'r2@example.com' => '/path/to/r2.crt',
-        ], $definition->getArgument(0));
-
-        $listener = $container->getDefinition('mailer.smime_encrypter.listener');
-        $this->assertSame('fail', $listener->getArgument(2));
-        $this->assertTrue($listener->getArgument(3));
-    }
-
-    public function testMailerSmimeEncrypterDefaultsToTheDeprecatedBehaviorAndNoSenderEncryption()
-    {
-        $container = $this->createContainerFromFile('mailer_with_smime_repository');
-
-        $this->assertTrue($container->hasAlias('mailer.smime_encrypter.repository'));
-        $this->assertSame('my_repository', (string) $container->getAlias('mailer.smime_encrypter.repository'));
-
-        $listener = $container->getDefinition('mailer.smime_encrypter.listener');
-        $this->assertSame('send_unencrypted', $listener->getArgument(2));
-        $this->assertFalse($listener->getArgument(3));
-    }
-
-    public function testMailerSmimeEncrypterRejectsBothRepositoryAndCertificates()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('You cannot use both "smime_encrypter.repository" and "smime_encrypter.certificates" at the same time.');
-
-        $this->createContainerFromFile('mailer_with_smime_repository_and_certificates');
-    }
-
-    public function testMailerSmimeEncrypterRequiresARepositoryOrCertificates()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('You must configure either "smime_encrypter.repository" or "smime_encrypter.certificates".');
-
-        $this->createContainerFromFile('mailer_with_smime_without_source');
-    }
-
-    public function testMailerPgp()
-    {
-        if (!class_exists(PgpSigner::class) || !class_exists(PgpMimeSignedMessageListener::class)) {
-            $this->markTestSkipped('This test requires symfony/mime 8.2 and symfony/mailer 8.2 or higher.');
-        }
-
-        $container = $this->createContainerFromFile('mailer_with_pgp');
-
-        $signer = $container->getDefinition('mailer.pgp_signer');
-        $this->assertSame('/path/to/secret.asc', $signer->getArgument(0));
-        $this->assertSame('/path/to/public.asc', $signer->getArgument(1));
-        $this->assertSame('passphrase', $signer->getArgument(2));
-        $this->assertSame(['binary' => 'gpg', 'digest_algorithm' => 'SHA256'], $signer->getArgument(3));
-
-        $repository = $container->getDefinition('mailer.pgp_encrypter.repository');
-        $this->assertSame(InMemoryPgpPublicKeyRepository::class, $repository->getClass());
-        $this->assertSame([
-            'r1@example.com' => '/path/to/r1.asc',
-            'r2@example.com' => '/path/to/r2.asc',
-        ], $repository->getArgument(0));
-
-        $this->assertSame([
-            'binary' => 'gpg',
-            'cipher_algorithm' => 'AES192',
-            'timeout' => 60.0,
-            'hide_recipients' => true,
-        ], $container->getDefinition('mailer.pgp_encrypter')->getArgument(0));
-
-        $listener = $container->getDefinition('mailer.pgp_encrypter.listener');
-        $this->assertSame('skip', $listener->getArgument(2));
-        $this->assertTrue($listener->getArgument(3));
-    }
-
-    public function testMailerPgpEncrypterFailsAndDoesNotEncryptForTheSenderByDefault()
-    {
-        if (!class_exists(PgpEncrypter::class) || !class_exists(PgpMimeEncryptedMessageListener::class)) {
-            $this->markTestSkipped('This test requires symfony/mime 8.2 and symfony/mailer 8.2 or higher.');
-        }
-
-        $container = $this->createContainerFromFile('mailer_with_pgp_repository');
-
-        $this->assertSame('my_pgp_repository', (string) $container->getAlias('mailer.pgp_encrypter.repository'));
-        $this->assertFalse($container->hasDefinition('mailer.pgp_signer'));
-
-        $listener = $container->getDefinition('mailer.pgp_encrypter.listener');
-        $this->assertSame('fail', $listener->getArgument(2));
-        $this->assertFalse($listener->getArgument(3));
-    }
-
-    public function testMailerPgpSignerRequiresASecretKey()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('You must configure "pgp_signer.secret_key".');
-
-        $this->createContainerFromFile('mailer_with_pgp_signer_without_secret_key');
-    }
-
-    public function testMailerPgpEncrypterRequiresARepositoryOrKeys()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('You must configure either "pgp_encrypter.repository" or "pgp_encrypter.keys".');
-
-        $this->createContainerFromFile('mailer_with_pgp_without_source');
-    }
-
-    public function testMailerWithDisabledMessageBus()
-    {
-        $container = $this->createContainerFromFile('mailer_with_disabled_message_bus');
-
-        $this->assertNull($container->getDefinition('mailer.mailer')->getArgument(1));
-    }
-
     /**
      * @param array{profiler?: bool|array<string, mixed>, test?: bool} $extraConfig
      */
@@ -2247,13 +2068,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
     }
 
-    public function testMailerWithSpecificMessageBus()
-    {
-        $container = $this->createContainerFromFile('mailer_with_specific_message_bus');
-
-        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('mailer.mailer')->getArgument(1));
-    }
-
     public function testHttpClientNoMock()
     {
         $container = $this->createContainerFromFile('http_client_scoped_without_query_option');
@@ -2264,16 +2078,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertCount(1, $arguments);
         $this->assertInstanceOf(Reference::class, $arguments[0]);
         $this->assertSame('http_client.transport', (string) $arguments[0]);
-    }
-
-    public function testMailerRateLimiter()
-    {
-        $container = $this->createContainerFromFile('mailer_with_rate_limiter');
-
-        $this->assertTrue($container->hasDefinition('mailer.rate_limiter_locator'));
-        $l = $container->getDefinition('mailer.rate_limiter_locator');
-        $this->assertCount(1, $l->getArguments());
-        $this->assertEquals(new Reference('limiter.foo_limiter', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE), $l->getArgument(0)['main']);
     }
 
     public function testHttpClientMockResponseFactory()
@@ -2422,6 +2226,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'kernel.reset',
             'kernel.locale_aware',
         ], $container->getParameter('container.behavior_describing_tags'));
+    }
+
+    public function testNotifierEmailChannelIsWiredWithTheMailerEnvelopeSender()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'mailer' => ['dsn' => 'smtp://example.com', 'envelope' => ['sender' => 'sender@example.org']],
+                'notifier' => ['texter_transports' => ['twilio' => 'twilio://ACCOUNT:TOKEN@default?from=FROM']],
+            ]);
+        });
+
+        $this->assertSame('sender@example.org', $container->getDefinition('notifier.channel.email')->getArgument(2));
     }
 
     public function testNotifierWithoutMailer()
@@ -2705,6 +2521,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->registerExtension(new RateLimiterBundle()->getContainerExtension());
         $container->registerExtension(new WebhookBundle()->getContainerExtension());
         $container->registerExtension(new HttpClientBundle()->getContainerExtension());
+        $container->registerExtension(new MailerBundle()->getContainerExtension());
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;
@@ -2725,7 +2542,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new RemoveMissingMailerDependenciesPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2749,7 +2566,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->addCompilerPass(new AssetMapperRemoveMissingDependenciesPass());
         $container->addCompilerPass(new WebhookRemoveMissingDependenciesPass());
         $container->addCompilerPass(new HttpClientRemoveMissingDependenciesPass());
+        $container->addCompilerPass(new MailerRemoveMissingDependenciesPass());
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
+        $container->addCompilerPass(new RemoveMissingMailerDependenciesPass());
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

@@ -24,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfig
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingMailerDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSerializerPropertyAccessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
@@ -70,6 +71,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\JsonStreamer\JsonStreamerBundle;
 use Symfony\Component\Lock\LockBundle;
+use Symfony\Component\Mailer\MailerBundle;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Mime\MimeBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
@@ -140,6 +142,7 @@ class_exists(Registry::class);
 #[RequiredBundle(RateLimiterBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebhookBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(HttpClientBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(MailerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
@@ -225,6 +228,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
         $container->addCompilerPass(new RemoveUnusedValidatorPropertyInfoLoaderPass());
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
+        $container->addCompilerPass(new RemoveMissingMailerDependenciesPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);

@@ -38,6 +38,7 @@ CHANGELOG
  * Pick an authenticator implementing `FallbackAuthenticationEntryPointInterface` as the firewall entry point only when no other authenticator provides one
  * Add the `http_client` option to the `oidc_login` authenticator, naming the HTTP client its calls to the provider are made with
  * Allow the `audience` option of the `oidc` token handler to name several identifiers as a list, as the `oauth2` one does
+ * Add the `client_secret_jwt` and `private_key_jwt` client authentication methods to the `oidc_login` authenticator, which authenticate the client at the token endpoint with a JWT assertion it signs itself (RFC 7523, OIDC Core 1.0 §9)
 
 8.1
 ---

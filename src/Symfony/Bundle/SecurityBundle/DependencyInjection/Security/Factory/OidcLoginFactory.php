@@ -86,7 +86,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 // "isRequired" must be set otherwise the following custom validation is not called
                 ->validate()
                     ->ifTrue(static fn (array $v): bool => 1 !== \count($v))
-                    ->thenInvalid('Exactly one OIDC "client_authentication" method must be configured, got %s. Set "client_secret_basic", "client_secret_post" or "none", or the "id" of your own implementation.')
+                    ->thenInvalid('Exactly one OIDC "client_authentication" method must be configured, got %s. Set "client_secret_basic", "client_secret_post", "client_secret_jwt", "private_key_jwt" or "none", or the "id" of your own implementation.')
                 ->end()
                 ->validate()
                     ->ifTrue(static fn (array $v): bool => false === ($v['none'] ?? null))
@@ -105,9 +105,59 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                         ->treatNullLike(true)
                         ->info('Declare a public client (a SPA, a mobile or a native application), which holds no secret and relies on PKCE to protect the code exchange. It can disable neither PKCE nor the ID token signature check.')
                     ->end()
+                    ->arrayNode('client_secret_jwt')
+                        ->info('Authenticate with a JWT assertion keyed with the client secret, the "client_secret_jwt" method of OIDC Core 1.0, Section 9. The secret keys an HMAC and is never sent, but the provider holds it too and could sign an assertion in the name of the client: prefer "private_key_jwt", which nobody but the client can sign. Takes the client secret, or a mapping to also set "algorithm" and "lifetime".')
+                        ->example(['secret' => '%env(OIDC_CLIENT_SECRET)%', 'algorithm' => 'HS256'])
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(static fn (string $v): array => ['secret' => $v])
+                        ->end()
+                        ->children()
+                            ->scalarNode('secret')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                                ->info('The client secret, whose octets key the HMAC. It must be at least as long as the digest the algorithm produces, which RFC 7518, Section 3.2 requires and the algorithm itself checks: 32 bytes for "HS256", 48 for "HS384", 64 for "HS512".')
+                            ->end()
+                            ->enumNode('algorithm')
+                                ->values(['HS256', 'HS384', 'HS512'])
+                                ->defaultValue('HS256')
+                                ->info('The MAC algorithm the assertion is signed with, which must be one your provider announces in "token_endpoint_auth_signing_alg_values_supported".')
+                            ->end()
+                            ->integerNode('lifetime')
+                                ->min(1)
+                                ->defaultValue(60)
+                                ->info('How long an assertion is valid, in seconds. It is built for one request and sent right away, so keep it short: it is the window a provider that does not track the "jti" would accept a captured assertion in.')
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->arrayNode('private_key_jwt')
+                        ->info('Authenticate with a JWT assertion signed with the private key of the client, the "private_key_jwt" method of OIDC Core 1.0, Section 9, and the one FAPI 2.0 asks for. The provider only holds the public half, registered as the client "jwks" or fetched from its "jwks_uri", so it learns nothing it could authenticate as the client with.')
+                        ->example(['key' => '%env(OIDC_CLIENT_SIGNING_KEY)%', 'algorithm' => 'ES256'])
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(static fn (string $v): array => ['key' => $v])
+                        ->end()
+                        ->children()
+                            ->scalarNode('key')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                                ->info('JSON-encoded JWK of the private key the assertion is signed with. Give it a "kid" when the client publishes several keys, so that the provider knows which one verifies the signature without trying them all.')
+                            ->end()
+                            ->enumNode('algorithm')
+                                ->values(['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'PS256', 'PS384', 'PS512'])
+                                ->defaultValue('RS256')
+                                ->info('The signature algorithm the assertion is signed with, which must be one your provider announces in "token_endpoint_auth_signing_alg_values_supported". FAPI 2.0 asks for "PS256" or "ES256".')
+                            ->end()
+                            ->integerNode('lifetime')
+                                ->min(1)
+                                ->defaultValue(60)
+                                ->info('How long an assertion is valid, in seconds. It is built for one request and sent right away, so keep it short: it is the window a provider that does not track the "jti" would accept a captured assertion in.')
+                            ->end()
+                        ->end()
+                    ->end()
                     ->scalarNode('id')
                         ->cannotBeEmpty()
-                        ->info('The id of a service implementing "ClientAuthenticationInterface", for a scheme Symfony does not ship, such as the "private_key_jwt" of OIDC Core 1.0, Section 9. The method it reports is only known once it is built, so the rules a public client cannot bend are then checked on the first request to this firewall instead of while the container compiles.')
+                        ->info('The id of a service implementing "ClientAuthenticationInterface", for a scheme Symfony does not ship, such as the "tls_client_auth" of RFC 8705, Section 2. The method it reports is only known once it is built, so the rules a public client cannot bend are then checked on the first request to this firewall instead of while the container compiles.')
                     ->end()
                 ->end()
             ->end()
@@ -251,11 +301,21 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
         }
 
         $method = array_key_first($config);
+        $arguments = match ($method) {
+            'client_secret_jwt' => [$config[$method]['secret'], $config[$method]['algorithm'], $config[$method]['lifetime']],
+            'private_key_jwt' => [
+                (new ChildDefinition('security.oauth2.client_authentication.private_key_jwt.signing_key'))->replaceArgument(0, $config[$method]['key']),
+                $config[$method]['algorithm'],
+                $config[$method]['lifetime'],
+            ],
+            default => [$config[$method]],
+        };
+
         $clientAuthenticationId = 'security.authenticator.oidc_login.client_authentication.'.$firewallName;
-        $container
-            ->setDefinition($clientAuthenticationId, new ChildDefinition('security.oauth2.client_authentication.'.$method))
-            ->replaceArgument(0, $config[$method])
-        ;
+        $definition = $container->setDefinition($clientAuthenticationId, new ChildDefinition('security.oauth2.client_authentication.'.$method));
+        foreach ($arguments as $index => $argument) {
+            $definition->replaceArgument($index, $argument);
+        }
 
         return $clientAuthenticationId;
     }

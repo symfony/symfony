@@ -23,6 +23,11 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthenti
 
 class OidcLoginFactoryTest extends TestCase
 {
+    /**
+     * A JSON-encoded private JWK, the shape the "private_key_jwt" method takes its key in.
+     */
+    private const SIGNING_KEY = '{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}';
+
     public function testBasicServiceConfiguration()
     {
         $container = new ContainerBuilder();
@@ -706,6 +711,138 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame('my-client-secret', $clientAuthentication->getArgument(0));
     }
 
+    public function testTheClientSecretJwtMethodIsBuiltFromTheConfiguration()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_jwt' => ['secret' => 'my-client-secret', 'algorithm' => 'HS512', 'lifetime' => 30]],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame('security.oauth2.client_authentication.client_secret_jwt', $clientAuthentication->getParent());
+        $this->assertSame('my-client-secret', $clientAuthentication->getArgument(0));
+        $this->assertSame('HS512', $clientAuthentication->getArgument(1));
+        $this->assertSame(30, $clientAuthentication->getArgument(2));
+    }
+
+    public function testTheClientSecretJwtMethodTakesTheSecretAlone()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_jwt' => 'my-client-secret'],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame('my-client-secret', $clientAuthentication->getArgument(0));
+        $this->assertSame('HS256', $clientAuthentication->getArgument(1));
+        $this->assertSame(60, $clientAuthentication->getArgument(2));
+    }
+
+    /**
+     * The key is configured as a JSON-encoded JWK, which an environment variable can carry,
+     * and parsed by a definition of its own so that it stays a string until runtime.
+     */
+    public function testThePrivateKeyJwtMethodIsBuiltFromTheConfiguration()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['private_key_jwt' => ['key' => self::SIGNING_KEY, 'algorithm' => 'ES256', 'lifetime' => 30]],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame('security.oauth2.client_authentication.private_key_jwt', $clientAuthentication->getParent());
+        $this->assertSame('ES256', $clientAuthentication->getArgument(1));
+        $this->assertSame(30, $clientAuthentication->getArgument(2));
+
+        $signingKey = $clientAuthentication->getArgument(0);
+        $this->assertInstanceOf(ChildDefinition::class, $signingKey);
+        $this->assertSame('security.oauth2.client_authentication.private_key_jwt.signing_key', $signingKey->getParent());
+        $this->assertSame(self::SIGNING_KEY, $signingKey->getArgument(0));
+    }
+
+    public function testThePrivateKeyJwtMethodTakesTheKeyAlone()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['private_key_jwt' => self::SIGNING_KEY],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame(self::SIGNING_KEY, $clientAuthentication->getArgument(0)->getArgument(0));
+        $this->assertSame('RS256', $clientAuthentication->getArgument(1));
+        $this->assertSame(60, $clientAuthentication->getArgument(2));
+    }
+
+    /**
+     * Each assertion method takes the algorithms it can be signed with and no other, so that
+     * a shared secret never keys an asymmetric signature nor a private key a MAC.
+     */
+    #[DataProvider('provideAlgorithmsTheMethodDoesNotAllow')]
+    public function testRejectsAnAlgorithmTheAssertionMethodDoesNotAllow(array $clientAuthentication, string $message)
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => $clientAuthentication,
+        ], $factory);
+    }
+
+    public static function provideAlgorithmsTheMethodDoesNotAllow(): iterable
+    {
+        yield 'an asymmetric algorithm for client_secret_jwt' => [['client_secret_jwt' => ['secret' => 'my-client-secret', 'algorithm' => 'RS256']], 'The value "RS256" is not allowed for path "oidc-login.client_authentication.client_secret_jwt.algorithm". Permissible values: "HS256", "HS384", "HS512".'];
+        yield 'a MAC algorithm for private_key_jwt' => [['private_key_jwt' => ['key' => self::SIGNING_KEY, 'algorithm' => 'HS256']], 'The value "HS256" is not allowed for path "oidc-login.client_authentication.private_key_jwt.algorithm". Permissible values: "RS256", "RS384", "RS512", "ES256", "ES384", "ES512", "PS256", "PS384", "PS512".'];
+    }
+
+    #[DataProvider('provideAssertionMethodsWithoutALifetime')]
+    public function testRejectsAnAssertionLifetimeThatIsNotPositive(array $clientAuthentication, string $message)
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => $clientAuthentication,
+        ], $factory);
+    }
+
+    public static function provideAssertionMethodsWithoutALifetime(): iterable
+    {
+        yield 'client_secret_jwt' => [['client_secret_jwt' => ['secret' => 'my-client-secret', 'lifetime' => 0]], 'The value 0 is too small for path "oidc-login.client_authentication.client_secret_jwt.lifetime". Should be greater than or equal to 1'];
+        yield 'private_key_jwt' => [['private_key_jwt' => ['key' => self::SIGNING_KEY, 'lifetime' => 0]], 'The value 0 is too small for path "oidc-login.client_authentication.private_key_jwt.lifetime". Should be greater than or equal to 1'];
+    }
+
     /**
      * Each firewall gets its own client authentication, as two of them authenticate at two
      * providers with two secrets.
@@ -803,6 +940,10 @@ class OidcLoginFactoryTest extends TestCase
 
         yield 'client_secret_basic' => [['client_secret_basic' => 'my-client-secret'], $perFirewall];
         yield 'client_secret_post' => [['client_secret_post' => 'my-client-secret'], $perFirewall];
+        yield 'client_secret_jwt' => [['client_secret_jwt' => 'my-client-secret'], $perFirewall];
+        yield 'client_secret_jwt as a mapping' => [['client_secret_jwt' => ['secret' => 'my-client-secret', 'algorithm' => 'HS384']], $perFirewall];
+        yield 'private_key_jwt' => [['private_key_jwt' => self::SIGNING_KEY], $perFirewall];
+        yield 'private_key_jwt as a mapping' => [['private_key_jwt' => ['key' => self::SIGNING_KEY, 'algorithm' => 'ES256']], $perFirewall];
         yield 'none as a mapping' => [['none' => true], 'security.oauth2.client_authentication.none'];
         yield 'none as a null mapping' => [['none' => null], 'security.oauth2.client_authentication.none'];
         yield 'none as a string' => ['none', 'security.oauth2.client_authentication.none'];

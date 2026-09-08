@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
+use Jose\Component\Core\JWK;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
@@ -50,11 +51,19 @@ use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
 
 class SecurityExtensionTest extends TestCase
 {
+    /**
+     * A JSON-encoded private JWK, the shape the "private_key_jwt" client authentication takes
+     * its key in.
+     */
+    private const OIDC_SIGNING_KEY = '{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}';
+
     public function testLdapAndNonLdapVariantsOfTheSameAuthenticatorCanShareAFirewall()
     {
         $container = $this->getRawContainer();
@@ -1682,6 +1691,64 @@ class SecurityExtensionTest extends TestCase
         $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
         $this->assertSame(OidcClient::class, $client->getClass());
         $this->assertSame(NoClientAuthentication::class, $container->getDefinition('security.oauth2.client_authentication.none')->getClass());
+    }
+
+    /**
+     * The assertion methods are wired end to end: the JSON-encoded key becomes a JWK built by
+     * a definition of its own, which the client authentication takes as its first argument.
+     */
+    public function testOidcLoginBuildsThePrivateKeyJwtClientAuthentication()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['private_key_jwt' => ['key' => self::OIDC_SIGNING_KEY, 'algorithm' => 'ES256']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame(PrivateKeyJwt::class, $clientAuthentication->getClass());
+        $this->assertSame('ES256', $clientAuthentication->getArgument(1));
+        $this->assertSame(60, $clientAuthentication->getArgument(2));
+        $this->assertEquals(new Reference('clock'), $clientAuthentication->getArgument(3));
+
+        $signingKey = $clientAuthentication->getArgument(0);
+        $this->assertSame([JWK::class, 'createFromJson'], $signingKey->getFactory());
+        $this->assertSame(self::OIDC_SIGNING_KEY, $signingKey->getArgument(0));
+    }
+
+    public function testOidcLoginBuildsTheClientSecretJwtClientAuthentication()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['client_secret_jwt' => 'a-client-secret-of-thirty-two-by'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame(ClientSecretJwt::class, $clientAuthentication->getClass());
+        $this->assertSame('a-client-secret-of-thirty-two-by', $clientAuthentication->getArgument(0));
+        $this->assertSame('HS256', $clientAuthentication->getArgument(1));
+        $this->assertSame(60, $clientAuthentication->getArgument(2));
     }
 
     public function testOidcLoginCallbackRouteLoaderIsAlwaysRegistered()

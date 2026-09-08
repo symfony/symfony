@@ -142,6 +142,9 @@ FrameworkBundle
    `framework.asset_mapper` configuration is an alias of the `asset_mapper` configuration provided by the bundle. The
    asset package is dropped when the Asset component is not enabled, and the cache pool when no `cache.system` pool
    is registered
+ * `RateLimiterBundle` is registered automatically when the RateLimiter component is installed, and its services are
+   then registered without any configuration; set `rate_limiter.enabled` to `false` to disable them. The
+   `framework.rate_limiter` configuration is an alias of the `rate_limiter` configuration provided by the bundle
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

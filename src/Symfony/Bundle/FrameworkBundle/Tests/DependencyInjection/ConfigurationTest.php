@@ -24,7 +24,6 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
-use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Webhook\Controller\WebhookController;
 
@@ -39,34 +38,6 @@ class ConfigurationTest extends TestCase
         ]]);
 
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
-    }
-
-    public function testRateLimiterBuilderIsNotReadAsALimiterName()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [[
-            // no "limiters" key: the shorthand below would otherwise read "builder" as a limiter name
-            'rate_limiter' => [
-                'builder' => ['cache_pool' => 'my.pool'],
-            ],
-        ]]);
-
-        $this->assertSame([], $config['rate_limiter']['limiters']);
-        $this->assertSame('my.pool', $config['rate_limiter']['builder']['cache_pool']);
-    }
-
-    public function testRateLimiterBuilderCanBeConfiguredAlongsideLimiters()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [[
-            'rate_limiter' => [
-                'limiters' => ['foo' => ['policy' => 'fixed_window', 'limit' => 5, 'interval' => '1 minute']],
-                'builder' => ['cache_pool' => 'my.pool'],
-            ],
-        ]]);
-
-        $this->assertSame(['foo'], array_keys($config['rate_limiter']['limiters']));
-        $this->assertSame('my.pool', $config['rate_limiter']['builder']['cache_pool']);
     }
 
     public function testTranslatorProviderDomainsCanBeKeyed()
@@ -803,15 +774,6 @@ class ConfigurationTest extends TestCase
                 'debug' => '%kernel.debug%',
                 'private_headers' => [],
                 'skip_response_headers' => [],
-            ],
-            'rate_limiter' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class),
-                'limiters' => [],
-                'builder' => [
-                    'lock_factory' => 'auto',
-                    'cache_pool' => 'cache.rate_limiter',
-                    'storage_service' => null,
-                ],
             ],
             'exceptions' => [],
             'webhook' => [

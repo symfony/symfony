@@ -21,7 +21,13 @@
     },
     "require-dev": {
         "psr/cache": "^1.0|^2.0|^3.0",
+        "symfony/cache": "^7.4.8|^8.0.8",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
         "symfony/lock": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<8.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\RateLimiter\\": "" },

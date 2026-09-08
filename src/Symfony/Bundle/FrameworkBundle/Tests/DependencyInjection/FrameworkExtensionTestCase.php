@@ -19,7 +19,6 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultLockFactoryPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -93,6 +92,8 @@ use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoBundle;
+use Symfony\Component\RateLimiter\DependencyInjection\DefaultLockFactoryPass;
+use Symfony\Component\RateLimiter\RateLimiterBundle;
 use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventHandler;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Scheduler\SchedulerBundle;
@@ -2915,6 +2916,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->registerExtension(new JsonStreamerBundle()->getContainerExtension());
         $container->registerExtension(new PropertyInfoBundle()->getContainerExtension());
         $container->registerExtension(new AssetMapperBundle()->getContainerExtension());
+        $container->registerExtension(new RateLimiterBundle()->getContainerExtension());
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;

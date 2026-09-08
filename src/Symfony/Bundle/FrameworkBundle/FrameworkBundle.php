@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorSecu
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultCachePoolsPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultLockFactoryPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FindCommandBundlesPass;
@@ -76,6 +75,7 @@ use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\PropertyInfo\PropertyInfoBundle;
+use Symfony\Component\RateLimiter\RateLimiterBundle;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingControllerPass;
@@ -135,6 +135,7 @@ class_exists(Registry::class);
 #[RequiredBundle(SchedulerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonStreamerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(AssetMapperBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(RateLimiterBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
@@ -219,7 +220,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
         $container->addCompilerPass(new RemoveUnusedValidatorPropertyInfoLoaderPass());
-        $container->addCompilerPass(new DefaultLockFactoryPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);

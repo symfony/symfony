@@ -37,7 +37,6 @@ use Symfony\Component\Console\Attribute\AsTargetedValueResolver as AsTargetedCon
 use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -78,7 +77,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
-use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Mailer\Bridge as MailerBridge;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
 use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
@@ -100,11 +98,7 @@ use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
 use Symfony\Component\Process\Process;
-use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\LimiterInterface;
-use Symfony\Component\RateLimiter\RateLimiterBuilder;
-use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
-use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -311,12 +305,10 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->readConfigEnabled('http_client', $container, $config['http_client'])) {
-            $this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter']); // makes sure that isInitializedConfigEnabled() will work
             $this->registerHttpClientConfiguration($config['http_client'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
-            $this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter']);
             $this->registerMailerConfiguration($config['mailer'], $container, $loader, $this->readConfigEnabled('webhook', $container, $config['webhook']));
 
             if (!$this->hasConsole() || !class_exists(MailerTestCommand::class)) {
@@ -365,14 +357,6 @@ class FrameworkExtension extends Extension
                 ->clearTag('kernel.event_subscriber');
 
             $container->removeDefinition('console.command.serializer_debug');
-        }
-
-        if ($this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter'])) {
-            if (!interface_exists(LimiterInterface::class)) {
-                throw new LogicException('Rate limiter support cannot be enabled as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
-            }
-
-            $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('session', $container, $config['session'])) {
@@ -1768,8 +1752,8 @@ class FrameworkExtension extends Extension
 
     private function registerThrottlingHttpClient(string $rateLimiter, string $name, ContainerBuilder $container): void
     {
-        if (!$this->isInitializedConfigEnabled('rate_limiter')) {
-            throw new LogicException('Rate limiter cannot be used within HttpClient as the RateLimiter component is not enabled.');
+        if (!interface_exists(LimiterInterface::class)) {
+            throw new LogicException('Rate limiter cannot be used within HttpClient as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
         }
 
         $container->register($name.'.throttling.limiter', LimiterInterface::class)
@@ -1847,18 +1831,18 @@ class FrameworkExtension extends Extension
 
         foreach ($transports as $name => $transport) {
             if ($transport['rate_limiter'] ?? null) {
+                if (!interface_exists(LimiterInterface::class)) {
+                    throw new LogicException('Rate limiter cannot be used within Mailer as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
+                }
+
                 $transportRateLimiterReferences[$name] = new Reference('limiter.'.$transport['rate_limiter']);
             }
         }
 
-        if ($transportRateLimiterReferences && $this->isInitializedConfigEnabled('rate_limiter')) {
-            if (!interface_exists(LimiterInterface::class)) {
-                throw new LogicException('Rate limiter cannot be used within Mailer as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
-            }
-
-            $container->getDefinition('mailer.rate_limiter_locator')->replaceArgument(0, $transportRateLimiterReferences);
-        } else {
+        if (!$transportRateLimiterReferences) {
             $container->removeDefinition('mailer.rate_limiter_locator');
+        } else {
+            $container->getDefinition('mailer.rate_limiter_locator')->replaceArgument(0, $transportRateLimiterReferences);
         }
 
         $mailer = $container->getDefinition('mailer.mailer');
@@ -2341,122 +2325,6 @@ class FrameworkExtension extends Extension
         }
 
         $container->getDefinition('webhook.transport')->replaceArgument(0, new Reference($clientId));
-    }
-
-    private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        $loader->load('rate_limiter.php');
-
-        $limiters = [];
-        $compoundLimiters = [];
-        $lockFactories = [];
-
-        foreach ($config['limiters'] as $name => $limiterConfig) {
-            if ('compound' === $limiterConfig['policy']) {
-                $compoundLimiters[$name] = $limiterConfig;
-
-                continue;
-            }
-
-            unset($limiterConfig['limiters']);
-
-            $limiters[] = $name;
-
-            // default configuration (when used by other DI extensions)
-            $limiterConfig += ['lock_factory' => 'lock.factory', 'cache_pool' => 'cache.rate_limiter'];
-
-            $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'))
-                ->addTag('rate_limiter', ['name' => $name]);
-
-            if ('auto' === $limiterConfig['lock_factory']) {
-                $lockFactories[$limiterId] = [2, null];
-            } elseif (null !== $limiterConfig['lock_factory']) {
-                if (!interface_exists(LockInterface::class)) {
-                    throw new LogicException(\sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
-                }
-
-                if ('lock.factory' === $limiterConfig['lock_factory']) {
-                    $lockFactories[$limiterId] = [2, \sprintf('Rate limiter "%s"', $name)];
-                } else {
-                    $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
-                }
-            }
-            unset($limiterConfig['lock_factory']);
-
-            if (null === $storageId = $limiterConfig['storage_service'] ?? null) {
-                $container->register($storageId = 'limiter.storage.'.$name, CacheStorage::class)->addArgument(new Reference($limiterConfig['cache_pool']));
-            }
-
-            $limiter->replaceArgument(1, new Reference($storageId));
-            unset($limiterConfig['storage_service'], $limiterConfig['cache_pool']);
-
-            $limiterConfig['id'] = $name;
-            $limiter->replaceArgument(0, $limiterConfig);
-
-            $container->registerAliasForArgument($limiterId, RateLimiterFactoryInterface::class, $name.'.limiter', $name);
-        }
-
-        foreach ($compoundLimiters as $name => $limiterConfig) {
-            if (!$limiterConfig['limiters']) {
-                throw new LogicException(\sprintf('Compound rate limiter "%s" requires at least one sub-limiter.', $name));
-            }
-
-            if ($unknownLimiters = array_diff(array_keys($limiterConfig['limiters']), $limiters)) {
-                throw new LogicException(\sprintf('Compound rate limiter "%s" references unknown limiter(s) "%s".', $name, implode('", "', $unknownLimiters)));
-            }
-
-            $factories = $keys = [];
-            foreach ($limiterConfig['limiters'] as $subName => $subConfig) {
-                $factories[$subName] = new Reference('limiter.'.$subName);
-
-                if (null !== $subConfig['key']) {
-                    $keys[$subName] = $subConfig['key'];
-                }
-            }
-
-            $container->register($limiterId = 'limiter.'.$name, CompoundRateLimiterFactory::class)
-                ->addTag('rate_limiter', ['name' => $name])
-                ->setArguments([new IteratorArgument($factories), $keys])
-            ;
-
-            $container->registerAliasForArgument($limiterId, RateLimiterFactoryInterface::class, $name.'.limiter', $name);
-        }
-
-        if (class_exists(RateLimiterBuilder::class)) {
-            $builderConfig = $config['builder'];
-
-            $builder = $container->getDefinition('limiter_builder');
-
-            if (null === $storageId = $builderConfig['storage_service']) {
-                $container->register($storageId = 'limiter_builder.storage', CacheStorage::class)->addArgument(new Reference($builderConfig['cache_pool']));
-            }
-
-            $builder->replaceArgument(0, new Reference($storageId));
-
-            if ('auto' === $builderConfig['lock_factory']) {
-                if (interface_exists(LockInterface::class)) {
-                    $lockFactories['limiter_builder'] = [1, null];
-                }
-            } elseif ($builderConfig['lock_factory']) {
-                if (!interface_exists(LockInterface::class)) {
-                    throw new LogicException('Rate Limiter Builder requires the Lock component to be installed. Try running "composer require symfony/lock".');
-                }
-
-                if ('lock.factory' === $builderConfig['lock_factory']) {
-                    $lockFactories['limiter_builder'] = [1, 'Rate Limiter Builder'];
-                } else {
-                    $builder->replaceArgument(1, new Reference($builderConfig['lock_factory']));
-                }
-            }
-
-            $container->setAlias(RateLimiterBuilder::class, 'limiter_builder');
-        } else {
-            $container->removeDefinition('limiter_builder');
-        }
-
-        if ($lockFactories) {
-            $container->setParameter('.rate_limiter.lock_factories', $lockFactories);
-        }
     }
 
     protected function isConfigEnabled(ContainerBuilder $container, array $config): bool

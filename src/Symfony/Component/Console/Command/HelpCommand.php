@@ -13,6 +13,8 @@ namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -53,6 +55,8 @@ class HelpCommand extends Command
                 EOF
             )
         ;
+
+        $this->getDefinition()->setIgnoreExtraArguments();
     }
 
     public function setCommand(Command $command): void
@@ -62,7 +66,30 @@ class HelpCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->command ??= $this->getApplication()->find($input->getArgument('command_name'));
+        if (!isset($this->command)) {
+            $application = $this->getApplication();
+            $name = $input->getArgument('command_name');
+            // only the commands below the path are resolved, unlike getNamespaces() which resolves them all
+            $isNamespace = static fn (string $path) => (bool) array_filter($application->all($path), static fn (Command $command) => !$command->isHidden());
+
+            if ($input instanceof ArgvInput || $input instanceof ArrayInput) {
+                // a spaced path names a command in a tree: "help docker compose"
+                foreach ($input->getUnparsedTokens() as $token) {
+                    $childPath = ($application->has($name) ? $application->get($name)->getName() : $name).':'.$token;
+                    if (!$application->has($childPath) && !$isNamespace($childPath)) {
+                        break;
+                    }
+                    $name = $childPath;
+                }
+            }
+
+            if (!$application->has($name) && $isNamespace($name)) {
+                $this->command = new Command($name);
+                $this->command->setApplication($application);
+            } else {
+                $this->command = $application->find($name);
+            }
+        }
 
         $helper = new DescriptorHelper();
         $helper->describe($output, $this->command, [

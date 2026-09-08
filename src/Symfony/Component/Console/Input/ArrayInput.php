@@ -21,10 +21,16 @@ use Symfony\Component\Console\Exception\InvalidOptionException;
  *
  *     $input = new ArrayInput(['command' => 'foo:bar', 'foo' => 'bar', '--bar' => 'foobar']);
  *
+ * Values without a key fill the argument slots in order:
+ *
+ *     $input = new ArrayInput(['foo:bar', 'bar', '--bar' => 'foobar']);
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ArrayInput extends Input
 {
+    private array $unparsedParameters = [];
+
     public function __construct(
         private array $parameters,
         ?InputDefinition $definition = null,
@@ -113,18 +119,73 @@ class ArrayInput extends Input
 
     protected function parse(): void
     {
+        $this->unparsedParameters = [];
+        $ignoresExtraArguments = $this->definition->ignoresExtraArguments();
+        $remaining = $this->parameters;
+
         foreach ($this->parameters as $key => $value) {
             if ('--' === $key) {
                 return;
             }
-            if (str_starts_with($key, '--')) {
+            if (\is_string($key) && str_starts_with($key, '--')) {
                 $this->addLongOption(substr($key, 2), $value);
-            } elseif (str_starts_with($key, '-')) {
+            } elseif (\is_string($key) && str_starts_with($key, '-')) {
                 $this->addShortOption(substr($key, 1), $value);
-            } else {
+            } elseif ($ignoresExtraArguments && ((\is_int($key) && '--' === $value) || !$this->findArgument($key))) {
+                // the remaining parameters are for something else: a sub-command, or the arguments after a "--"
+                $this->unparsedParameters = $remaining;
+
+                return;
+            } elseif (!\is_int($key) || '--' !== $value) {
+                // a positional "--" is the argv separator, it binds to nothing
                 $this->addArgument($key, $value);
             }
+            unset($remaining[$key]);
         }
+    }
+
+    /**
+     * Returns the parameters left unparsed when the definition ignores extra
+     * arguments, converted to argv-shaped tokens.
+     *
+     * @see InputDefinition::setIgnoreExtraArguments()
+     *
+     * @return list<string>
+     */
+    public function getUnparsedTokens(): array
+    {
+        $tokens = [];
+        $arguments = [];
+        $escaped = false;
+
+        foreach ($this->unparsedParameters as $key => $value) {
+            if (\is_string($key) && str_starts_with($key, '-')) {
+                foreach ($this->unparseOption($key, $value) as $token) {
+                    $tokens[] = $token;
+                }
+
+                continue;
+            }
+
+            if ('--' === $key || '--' === $value) {
+                $escaped = true;
+
+                continue;
+            }
+
+            // a named parameter targets an argument of the command itself, it can never name a sub-command
+            $escaped = $escaped || \is_string($key);
+
+            foreach (\is_array($value) ? $value : [$value] as $v) {
+                if ($escaped) {
+                    $arguments[] = $v;
+                } else {
+                    $tokens[] = $v;
+                }
+            }
+        }
+
+        return $escaped ? [...$tokens, '--', ...$arguments] : $tokens;
     }
 
     /**
@@ -182,10 +243,74 @@ class ArrayInput extends Input
      */
     private function addArgument(string|int $name, mixed $value): void
     {
-        if (!$this->definition->hasArgument($name)) {
-            throw new InvalidArgumentException(\sprintf('The "%s" argument does not exist.', $name));
+        if (!$argument = $this->findArgument($name)) {
+            if (\is_string($name) || !$this->definition->hasArgument($name)) {
+                throw new InvalidArgumentException(\sprintf('The "%s" argument does not exist.', $name));
+            }
+
+            // no free slot left: the value is ignored, as it was when positional values did not bind
+            return;
         }
 
-        $this->arguments[$name] = $value;
+        if (\is_int($name) && $argument->isArray()) {
+            $this->arguments[$argument->getName()][] = $value;
+        } else {
+            $this->arguments[$argument->getName()] = $value;
+        }
+    }
+
+    /**
+     * Turns an option parameter back into tokens, the way unparse() does.
+     *
+     * @return list<string>
+     */
+    private function unparseOption(string $key, mixed $value): array
+    {
+        $short = !str_starts_with($key, '--');
+        $name = ltrim($key, '-');
+        $option = match (true) {
+            !$short && $this->definition->hasOption($name) => $this->definition->getOption($name),
+            $short && $this->definition->hasShortcut($name) => $this->definition->getOptionForShortcut($name),
+            default => null,
+        };
+
+        $tokens = [];
+        foreach (\is_array($value) ? $value : [$value] as $v) {
+            if ($option?->isNegatable()) {
+                $tokens[] = \sprintf('--%s%s', $v ? '' : 'no-', $option->getName());
+            } elseif ($option && !$option->acceptValue()) {
+                // a value-less option set to false was not passed
+                if ($v) {
+                    $tokens[] = $key;
+                }
+            } elseif (\in_array($v, [true, null, ''], true)) {
+                $tokens[] = $key;
+            } elseif ($short) {
+                $tokens[] = $key;
+                $tokens[] = $v;
+            } else {
+                $tokens[] = $key.'='.$v;
+            }
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * Returns the argument a parameter binds to: by name, or the first free slot for a positional one.
+     */
+    private function findArgument(string|int $name): ?InputArgument
+    {
+        if (\is_string($name)) {
+            return $this->definition->hasArgument($name) ? $this->definition->getArgument($name) : null;
+        }
+
+        foreach ($this->definition->getArguments() as $argument) {
+            if ($argument->isArray() || !\array_key_exists($argument->getName(), $this->arguments)) {
+                return $argument;
+            }
+        }
+
+        return null;
     }
 }

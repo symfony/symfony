@@ -69,7 +69,7 @@ final class CompletionInput extends ArgvInput
         parent::bind($definition);
 
         $relevantToken = $this->getRelevantToken();
-        if ('-' === $relevantToken[0]) {
+        if (str_starts_with($relevantToken, '-')) {
             // the current token is an input option: complete either option name or option value
             [$optionToken, $optionValue] = explode('=', $relevantToken, 2) + ['', ''];
 

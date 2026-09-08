@@ -18,6 +18,7 @@ use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Interact;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
+use Symfony\Component\Console\CommandChain;
 use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -150,6 +151,7 @@ class InvokableCommand implements SignalableCommandInterface
                     SymfonyStyle::class => new SymfonyStyle($input, $output, $this->command->getApplication()?->getDispatcher()),
                     Cursor::class => new Cursor($output),
                     Application::class => $this->command->getApplication(),
+                    CommandChain::class => $this->getCommandChain($input),
                     Command::class, self::class => $this->command,
                     default => false,
                 };
@@ -252,5 +254,22 @@ class InvokableCommand implements SignalableCommandInterface
                 $this->interactions[] = new Interaction($invokableThis, $attribute);
             }
         }
+    }
+
+    /**
+     * The application's chain is stale when the command runs from another one, itself included.
+     */
+    private function getCommandChain(InputInterface $input): CommandChain
+    {
+        if ($chain = $this->command->getApplication()?->getCommandChain()) {
+            $commands = $chain->getCommands();
+            $inputs = $chain->getInputs();
+
+            if ($this->command === end($commands) && $input === end($inputs)) {
+                return $chain;
+            }
+        }
+
+        return new CommandChain([[$this->command, $input]]);
     }
 }

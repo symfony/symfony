@@ -4,6 +4,16 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve spaced sub-command invocations through the tree derived from registered command names, with per-level options and `--` binding the remaining tokens to the current command
+ * List the sub-commands of a command invoked bare when it has no code of its own, on the error output and with exit code 1 like a bare namespace
+ * Walk namespaces without a registered root command the same way: `cache clear` runs `cache:clear`
+ * Show the help of the deepest resolved command when `--help` is used on a spaced sub-command invocation
+ * Add `CommandChain` to read the resolved commands and each level's bound input, injectable into invokable commands and exposed by `Application::getCommandChain()`
+ * Complete sub-command segments, per-level options and the node's own argument values when the completion cursor sits inside a command tree
+ * Collapse the commands below a registered command to that command's line in the application listing, and list a command's sub-commands in its help
+ * Add `InputDefinition::setIgnoreExtraArguments()`, `ArgvInput::getUnparsedTokens()` and `ArrayInput::getUnparsedTokens()` to stop parsing on the first extra argument and retrieve the remaining tokens
+ * Add `UnexpectedArgumentException`, thrown when an input has more arguments than its definition expects
+ * Bind positional `ArrayInput` parameters to the argument slots in order
  * Allow reading several files at once through a variadic `InputFile` or `InputFile[]`-typed `#[Argument]`/`#[Option]`, the `FileQuestion` `multiple` option, and `SymfonyStyle::askFiles()`
  * Add `InputOption::HIDDEN` and `InputOption::DEPRECATED` modes
  * Allow a callable for the `description` and `help` options of `#[AsCommand]`, and for the `description` option of `#[Argument]` and `#[Option]`

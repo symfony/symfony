@@ -185,6 +185,39 @@ class TextDescriptor extends Descriptor
             $this->writeText('  '.$this->wrapText($help, $terminalWidth - 2, 2), $options);
             $this->writeText("\n");
         }
+
+        if (($application = $command->getApplication()) && ($path = $command->getName()) && $children = $this->getSubCommands($application, $path)) {
+            $width = max(array_map(Helper::width(...), array_keys($children)));
+
+            $this->writeText("\n<comment>Available sub-commands:</comment>", $options);
+            foreach ($children as $segment => $childDescription) {
+                $this->writeText("\n");
+                $this->writeText(\sprintf('  <info>%s</info>%s%s', $segment, str_repeat(' ', $width - Helper::width($segment) + 2), $childDescription), $options);
+            }
+            $this->writeText("\n");
+        }
+    }
+
+    /**
+     * @return array<string, string> the sub-command segments below the given path, with their description
+     */
+    private function getSubCommands(Application $application, string $path): array
+    {
+        $prefix = $path.':';
+        $children = [];
+        foreach ($application->all($path) as $name => $child) {
+            if ($name !== $child->getName() || $child->isHidden()) {
+                continue;
+            }
+            $segment = explode(':', substr($name, \strlen($prefix)))[0];
+            if ($prefix.$segment === $name) {
+                $children[$segment] = $child->getDescription();
+            } else {
+                $children[$segment] ??= '';
+            }
+        }
+
+        return $children;
     }
 
     protected function describeApplication(Application $application, array $options = []): void
@@ -216,6 +249,21 @@ class TextDescriptor extends Descriptor
 
             $commands = $description->getCommands();
             $namespaces = $description->getNamespaces();
+
+            if (!$describedNamespace) {
+                // a registered command collapses the tree below its name
+                foreach (array_keys($commands) as $name) {
+                    $prefix = '';
+                    foreach (explode(':', $name) as $segment) {
+                        if ('' !== $prefix && isset($commands[$prefix])) {
+                            unset($commands[$name]);
+                            break;
+                        }
+                        $prefix = '' === $prefix ? $segment : $prefix.':'.$segment;
+                    }
+                }
+            }
+
             if ($describedNamespace && $namespaces) {
                 // make sure all alias commands are included when describing a specific namespace
                 $describedNamespaceInfo = reset($namespaces);

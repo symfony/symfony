@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\UnexpectedArgumentException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -588,6 +589,62 @@ class ArgvInputTest extends TestCase
         yield [['app/console', '--no-ansi', 'foo:bar', 'argument'], ['argument']];
         yield [['app/console', '--no-ansi', 'foo:bar', 'foo:bar'], ['foo:bar']];
         yield [['app/console', '--no-ansi', 'foo:bar', '--', 'argument'], ['--', 'argument']];
+    }
+
+    public function testGetUnparsedTokens()
+    {
+        $definition = new InputDefinition([new InputOption('verbose', 'v', InputOption::VALUE_NONE)]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArgvInput(['cli.php', '--verbose', 'compose', 'up', '--detach']);
+        $input->bind($definition);
+
+        $this->assertTrue($input->getOption('verbose'));
+        $this->assertSame([], $input->getArguments());
+        $this->assertSame(['compose', 'up', '--detach'], $input->getUnparsedTokens());
+    }
+
+    public function testGetUnparsedTokensAfterParsedArguments()
+    {
+        $definition = new InputDefinition([new InputArgument('name', InputArgument::REQUIRED)]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArgvInput(['cli.php', 'foo', 'sub', '--opt=1']);
+        $input->bind($definition);
+
+        $this->assertSame(['name' => 'foo'], $input->getArguments());
+        $this->assertSame(['sub', '--opt=1'], $input->getUnparsedTokens());
+    }
+
+    public function testGetUnparsedTokensWithFullyParsedInput()
+    {
+        $definition = new InputDefinition([new InputArgument('names', InputArgument::IS_ARRAY)]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArgvInput(['cli.php', 'foo', 'bar']);
+        $input->bind($definition);
+
+        $this->assertSame(['names' => ['foo', 'bar']], $input->getArguments());
+        $this->assertSame([], $input->getUnparsedTokens());
+    }
+
+    public function testIgnoreExtraArgumentsDoesNotIgnoreUnknownOptions()
+    {
+        $definition = new InputDefinition();
+        $definition->setIgnoreExtraArguments(true);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The "--unknown" option does not exist.');
+
+        (new ArgvInput(['cli.php', '--unknown', 'sub']))->bind($definition);
+    }
+
+    public function testExtraArgumentsThrowUnexpectedArgumentException()
+    {
+        $this->expectException(UnexpectedArgumentException::class);
+        $this->expectExceptionMessage('No arguments expected, got "sub".');
+
+        (new ArgvInput(['cli.php', 'sub']))->bind(new InputDefinition());
     }
 
     #[DataProvider('unparseProvider')]

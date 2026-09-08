@@ -18,8 +18,12 @@ use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
 use Symfony\Component\Console\Completion\Output\CompletionOutputInterface;
 use Symfony\Component\Console\Completion\Output\FishCompletionOutput;
 use Symfony\Component\Console\Completion\Output\ZshCompletionOutput;
+use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -104,11 +108,31 @@ final class CompleteCommand extends Command
                 '<info>Messages:</>',
             ]);
 
-            if ($command = $this->findCommand($completionInput)) {
+            $treeSuggested = false;
+            $command = $this->findCommand($completionInput);
+            $node = $command;
+            if (null === $node && $first = $completionInput->getFirstArgument()) {
+                try {
+                    $node = new Command($first);
+                    $node->setApplication($this->getApplication());
+                } catch (InvalidArgumentException) {
+                    // the first argument is not a valid command name, nothing to walk
+                }
+            }
+            if ($node && $tree = $this->completeCommandTree($node, $input, $suggestions)) {
+                if (\is_array($tree)) {
+                    [$command, $completionInput] = $tree;
+                } else {
+                    $treeSuggested = true;
+                }
+            }
+            if ($command && !$treeSuggested) {
                 $command->mergeApplicationDefinition();
                 $completionInput->bind($command->getDefinition());
             }
-            if (null === $command) {
+            if ($treeSuggested) {
+                $this->log('  Suggesting the sub-commands and options of a command tree level.');
+            } elseif (null === $command) {
                 $this->log('  No command found, completing using the Application class.');
 
                 $this->getApplication()->complete($completionInput, $suggestions);
@@ -188,6 +212,131 @@ final class CompleteCommand extends Command
         }
 
         return $completionInput;
+    }
+
+    /**
+     * Completes an input that walks into the tree below the found command.
+     *
+     * Returns true when suggestions for a branch level were added, a rebased
+     * command and input when the cursor sits at leaf level, or null when the
+     * regular completion flow applies.
+     *
+     * @return array{Command, CompletionInput}|true|null
+     */
+    private function completeCommandTree(Command $command, InputInterface $input, CompletionSuggestions $suggestions): array|bool|null
+    {
+        $application = $this->getApplication();
+        $path = $command->getName();
+        $getDescendants = static fn (string $p) => array_keys($application->all($p));
+
+        if (!$path || !$getDescendants($path)) {
+            return null;
+        }
+
+        $words = $input->getOption('input') ?? [];
+        $current = (int) $input->getOption('current');
+        $tokens = \array_slice($words, 1, max(0, $current - 1));
+        $cursorWord = $words[$current] ?? '';
+
+        if (!$tokens) {
+            return null;
+        }
+
+        $node = $command;
+        $isRoot = true;
+
+        while (true) {
+            $definition = new InputDefinition();
+            if ($node) {
+                $definition->setOptions($node->getNativeDefinition()->getOptions());
+                $definition->addOptions($application->getDefinition()->getOptions());
+            } else {
+                $definition->setOptions($application->getDefinition()->getOptions());
+            }
+            if ($isRoot) {
+                $definition->setArguments($application->getDefinition()->getArguments());
+            }
+            $definition->setIgnoreExtraArguments(true);
+
+            $levelInput = new ArgvInput(['', ...$tokens]);
+            try {
+                $levelInput->bind($definition);
+            } catch (ExceptionInterface) {
+                return null;
+            }
+            $unparsed = $levelInput->getUnparsedTokens();
+            $consumed = \array_slice($tokens, 0, \count($tokens) - \count($unparsed));
+
+            if ('--' === end($consumed)) {
+                // the remaining tokens are the current node's own arguments
+                if ($isRoot) {
+                    return null;
+                }
+
+                return $node ? $this->rebaseCompletion($node, $path, $tokens, $words, $current) : true;
+            }
+
+            if (!$unparsed) {
+                if (str_starts_with($cursorWord, '-')) {
+                    $suggestions->suggestOptions($definition->getOptions());
+
+                    return true;
+                }
+
+                $prefixLength = \strlen($path) + 1;
+                $segments = [];
+                foreach ($getDescendants($path) as $name) {
+                    $segments[explode(':', substr($name, $prefixLength))[0]] = true;
+                }
+                foreach (array_keys($segments) as $segment) {
+                    $childPath = $path.':'.$segment;
+                    $suggestions->suggestValue(new Suggestion($segment, $application->has($childPath) ? $application->get($childPath)->getDescription() : ''));
+                }
+
+                if (!$node?->getNativeDefinition()->getArguments()) {
+                    return true;
+                }
+
+                // the node's own argument values complete next to its sub-commands
+                return $isRoot ? null : $this->rebaseCompletion($node, $path, $tokens, $words, $current);
+            }
+
+            $segment = array_shift($unparsed);
+            $childPath = $path.':'.$segment;
+            // an alias of the current node is not a sub-command
+            if ($registered = $application->has($childPath) && $application->get($childPath)->getName() !== $path) {
+                $childPath = $application->get($childPath)->getName();
+            }
+            $childDescendants = $getDescendants($childPath);
+
+            if (!$registered && !$childDescendants) {
+                // the segment names no sub-command: it starts the node's own arguments, if it has any
+                if (!$node?->getNativeDefinition()->getArguments()) {
+                    return true;
+                }
+
+                return $isRoot ? null : $this->rebaseCompletion($node, $path, $tokens, $words, $current);
+            }
+
+            if ($registered && !$childDescendants) {
+                return $this->rebaseCompletion($application->get($childPath), $childPath, $unparsed, $words, $current);
+            }
+
+            $node = $registered ? $application->get($childPath) : null;
+            $path = $childPath;
+            $tokens = $unparsed;
+            $isRoot = false;
+        }
+    }
+
+    /**
+     * Rebases the completion input on a tree node, so that its own definition completes the remaining words.
+     *
+     * @return array{Command, CompletionInput}
+     */
+    private function rebaseCompletion(Command $node, string $path, array $tokens, array $words, int $current): array
+    {
+        return [$node instanceof LazyCommand ? $node->getCommand() : $node, CompletionInput::fromTokens([$words[0], $path, ...$tokens, ...\array_slice($words, $current)], 2 + \count($tokens))];
     }
 
     private function findCommand(CompletionInput $completionInput): ?Command

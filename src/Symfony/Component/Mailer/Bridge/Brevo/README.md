@@ -45,8 +45,8 @@ $email
 
 This example allow you to set:
 
- * templateId
- * params
+ * templateId (deprecated, use RemoteTemplateEmail instead)
+ * params (deprecated, use RemoteTemplateEmail instead)
  * tags
  * headers
      * sender.ip

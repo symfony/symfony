@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T11:20:09Z
+
+Pushed fixes on top of your branch, and rebased the stack onto the #65865 head as it stands now, so the `active` fix from there is in.
+
+The verification core held against everything I threw at it. Minted with the installed library and fed through the real handler, all rejected: an ID token and an access token carrying the same key, issuer and audience (the RFC 9701 §8.1 attack, caught on `typ`), a missing `typ`, the RFC 7662 members flat instead of nested, `alg: none` with `web-token/jwt-unsecured` actually installed, HMAC keyed with both the public JWK JSON and the raw EC point, an algorithm outside the configured list, another EC key, each missing mandatory top-level claim, a wrong `iss`, a wrong `aud`, a future `iat`, a string `iat`, an unknown `crit`, and a bad-signature JWT under `enforce: false`. Worth recording that `none` and HMAC cannot even be configured, since `AlgorithmManagerFactory` only knows the tagged ES/RS/PS services.
+
+**Tests for five checks that had none.** Deleting the top-level `aud` checker, the `iat` checker, the mandatory-claim list, or the `token_introspection`-is-an-object check each left the suite green at 36 tests. Added cases for all of them, plus one for an algorithm the resource server did not declare; the four mutations now fail. Four existing tests asserted only the outer `'Invalid credentials.'` wrapper, which every rejection produces, so they moved to the `assertBadCredentials()` helper already in the file and now pin the real message.
+
+**`response_signature: false` was rejected.** `canBeEnabled()` with `isRequired()` on the children means omitting the node works but disabling it explicitly throws `The child config "algorithms" ... must be configured`. Moved the requirement into a `validate()` on the node, with a test. The same trap ships in `OidcTokenHandlerFactory`'s `encryption` node, if you want to fix it there too.
+
+**Media type matched by prefix.** `str_starts_with($contentType, self::JWT_RESPONSE_MEDIA_TYPE)` sent `application/token-introspection+jwtfoo` down the JWT branch. Not exploitable, since the JWT still has to verify, but it now compares the media type after stripping parameters, so `charset` and case variation keep working.
+
+**The verification keyset held the private key.** `createSignedResponseHandler()` passed a JWKSet built from a JWK still carrying `d`, where the option's own `info()` asks for public keys. Added `publicJwk()`.
+
+Two things left for you:
+
+RFC 9701 §8.1 is only closed in one direction here. Its normative sentence is about the other one, that a resource server must check the `typ` of the JWT access tokens it receives, and that is what #65862 adds. I fed a valid signed introspection response to `OidcTokenHandler` and it accepted it as an access token (`id=jdoe`); it takes a non-conforming server, since an RFC-conforming payload fails on the missing `exp`. Now that #65862 is merged the countermeasure is in, so it is worth a sentence in the description saying the two halves belong together.
+
+There is no functional test. The bundle-side coverage asserts `getMethodCalls()` equals two unresolved `ChildDefinition` objects, which cannot catch a wrong parent id, a missing abstract parent, or a `JWKSet::createFromJson()` failure. I proved the wiring compiles by hand, including with no `oidc` handler configured, but the fixture you added in #65865 makes a `config_oauth2_signed.yml` cheap.
+
+One note on the library floor: the named-argument call to `IssuedAtChecker` is what keeps `web-token/jwt-library` 3.x working, since the argument order changed in 4.0. It should not be turned into positional arguments. The low-deps job will not catch a regression there, because `jwt-unsecured` and `jwt-rsa15` in the dev tree require `^4.3`, so low-deps resolves 4.0.7 and the `^3.3.2` half of the declared constraint is never exercised.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T13:00:02Z
+
+Pushed fixes and rebased the stack onto the new #65865 head.
+
+**Your justification for the wider catch holds, and I verified it per case.** Narrowing it back and re-running the battery, these all escape as non-`AuthenticationException` and would reach the user as a 500: `InvalidHeaderException` (both §8.1 substitutions and a missing `typ`), `MissingMandatoryHeaderParameterException`, `MissingMandatoryClaimException`, `InvalidClaimException` (wrong `iss`, wrong `aud`, future `iat`), `UnsupportedAlgorithmException`, `InvalidKeySetException`. Nine tests fail when it is narrowed, so it is pinned. You were precise in what you claimed: the signature, the payload and the nesting are converted locally and you did not claim them.
+
+I built the narrow alternative anyway and it loses, mainly on one point worth recording: the library's exception classes are not stable across the declared `^3.3.2|^4.0`. The `Jose\Component\Core\Exception\` namespace does not exist in 3.x, where `AlgorithmManager` throws a plain `\InvalidArgumentException`. Only the four `Checker\*` classes are stable, so a narrow catch on the verifier has to widen to `\InvalidArgumentException` regardless.
+
+**The `typ` check rejected a compliant spelling.** RFC 7515 §4.1.9 says a recipient must treat an omitted `application/` prefix as if present, so an authorization server sending `application/token-introspection+jwt` was getting a 401:
+
+```
+typ='application/token-introspection+jwt'  => REJECTED (The "typ" header is invalid.)
+typ='TOKEN-INTROSPECTION+JWT'              => REJECTED
+```
+
+Your own #65862, merged into 8.2 four commits earlier, does the opposite for the same problem: `OidcTokenHandler::AT_JWT_TYPES = ['at+jwt', 'application/at+jwt']`, matched with `strtolower()`. Two handlers in one directory reading `typ` two ways. This one now reads both spellings case-insensitively, with a data provider over the three forms.
+
+**The media-type boundary fix had no test.** Reverting `strtok` plus exact compare back to `str_starts_with` passed the whole suite, because `jwtResponse()` always emits the exact lowercase type. Added a provider covering the bare type, `; charset=utf-8`, a different case, `application/token-introspection+jwtfoo` and `application/json`.
+
+**The CHANGELOG oversold one line.** The widening is not conditional on `enableSignedResponse()`: on an unsigned handler all five HTTP error shapes were 500s before and are 401s now. Tying that to the RFC 9701 method leaves a reader on the plain JSON path uninformed, and once #65870 ships the same behaviour in a 7.4 patch release the 8.2 entry would be claiming it as new. Split into two lines.
+
+I also changed `'exception' => $e::class` to `'exception' => $e`, for the reason in #65870: PSR-3 reserves that key for a Throwable and Monolog's normalizer special-cases it.
+
+**On merge order with #65870:** no constraint, and the hint belongs in that PR rather than here, so I put it there. If this lands first, the catch line and the log line merge cleanly, because both sides make the identical change. What a merger will get wrong either way is the test file, since #65870 adds a test this PR deleted from 8.2; the resolution is keep-both, and that test passes unmodified on this head. One sentence in the description saying the two overlap and either can land first would help.
+
+**Still open, both worth a follow-up rather than blocking:** there is no functional test for the signed path, and the fixture #65865 added makes a `config_oauth2_signed.yml` cheap. And `iat` has no upper bound, so a captured introspection JWT stays acceptable indefinitely unless the nested `exp` bounds it, which RFC 7662 §2.2 makes optional. A `max_age` option would close it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:47:09Z
+
+Rebased on the new #65865 head. Your alignment of `active` and the catch block came through as is; the three conflicts were the RFC 9701 docblocks and the `$save` line, all resolved to your side.
+
+**A correction I owe you.** My round-2 comment said I had changed `'exception' => $e::class` to `'exception' => $e` here. I had not: the patch I pushed contained no such hunk, and the line only ever changed on #65870. It is right in your current code, so nothing to do, but the claim was wrong and I would rather say so than leave it standing.
+
+**Two checks had no test, both load-bearing.** Dropping `typ` from the mandatory header list left the suite green at 78 tests, and a JWT carrying no `typ` at all was then accepted, which is the RFC 9701 §8.1 defence itself; the existing test only covers a *wrong* `typ`. Dropping the payload-is-an-object check also left it green, and a scalar payload then raised a `TypeError`, which is an `\Error` and escapes `catch (\Exception)` as a 500. Both are covered now and both mutations fail.
+
+The helper needed widening for that: `jwtResponse()` takes a nullable `$type` and a string-or-array payload, so a JWT with no `typ` and one with a scalar body can be minted.
+
+Still open and worth a follow-up rather than a blocker: no functional test for the signed path, though the fixture #65865 added makes a `config_oauth2_signed.yml` cheap; and `iat` has no upper bound, so a captured introspection JWT stays acceptable indefinitely unless the nested `exp` bounds it, which RFC 7662 §2.2 makes optional.
+
+One thing to defend against #65880's reasoning: the `IssuedAtChecker` call here must stay named. web-token reversed that constructor between 3.x and 4.x, both are inside the declared `^3.3.2|^4.0`, and low-deps resolves 4.0.7 so the older leg is never exercised. Positional would be a `TypeError` under 3.3.2.
+
+Security/Http 1028, SecurityBundle 558, both green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T08:13:32Z
+
+Added the functional test for the signed path, which was the last open item on this PR.
+
+`IntrospectionResponseFactory`, the fixture #65865 brought in, now answers a `SIGNED_ACCESS_TOKEN` with a real RFC 9701 response: an ES256 JWS typed `token-introspection+jwt`, carrying `iss`, `aud` and `iat` at the top level and the RFC 7662 members inside `token_introspection`. `config_oauth2_signed.yml` enables `response_signature` with `algorithms: ['ES256']` and the public half of the fixture key, so the whole path runs through a booted kernel rather than a hand-built `ChildDefinition`: the bundle wiring, the scoped client, the `Accept` negotiation, the signature verification against the configured JWKSet, and the unwrapping of the claim.
+
+Two tests. The first authenticates on the signed response and asserts the request carried `Accept: application/token-introspection+jwt`, which is what §4 requires and what the fixture keys its answer on. The second sends a token the fixture answers with plain JSON and asserts the 401, since `enforce` defaults to true and a server answering unsigned to a request that asked for a JWT has given up the guarantee.
+
+They bite, checked by mutation rather than by the green run:
+
+```
+ignore "enforce"                    -> testOAuth2IntrospectionFailureOnAnUnsignedResponse: 200 is not 401
+return $payload, not the nesting    -> testOAuth2IntrospectionSuccessWithASignedResponse:  401 is not 200
+```
+
+The fixture only touches the JOSE classes inside that branch, so nothing changes for the unsigned tests, and both new tests carry `#[RequiresPhpExtension('openssl')]` like the OIDC ones.
+
+Rebased on 8.2 after #65865 merged, so this is a single commit now. SecurityBundle 614, Security/Http 1119, both green.
+
+Two items stay open as follow-ups rather than blockers: `iat` has no upper bound, so a captured introspection JWT remains acceptable indefinitely unless the nested `exp` bounds it, which RFC 7662 §2.2 makes optional; and the top level has no `exp` or `nbf` checker, which is defensible for `exp` since RFC 9701 §5 says the JWT SHOULD NOT carry one, less so for `nbf`.

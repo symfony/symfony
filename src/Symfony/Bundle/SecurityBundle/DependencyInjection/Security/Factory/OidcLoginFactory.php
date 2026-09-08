@@ -62,6 +62,11 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->end()
                 ->info('The OIDC Issuer URL (e.g. "https://accounts.example.com"). Used for .well-known/openid-configuration discovery.')
             ->end()
+            ->scalarNode('http_client')
+                ->defaultNull()
+                ->cannotBeEmpty()
+                ->info('The id of the HttpClient service every call to the provider is made with: discovery, JWKS, token and UserInfo endpoints. Defaults to "http_client". A scoped client must scope every host the provider announces, not only the issuer.')
+            ->end()
             ->scalarNode('client_id')
                 ->isRequired()
                 ->cannotBeEmpty()
@@ -289,9 +294,12 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             $checkedEndpoints[] = 'userinfo_endpoint';
         }
 
+        $httpClient = new Reference($config['http_client'] ?? 'http_client');
+
         $discoveryId = 'security.authenticator.oidc_login.discovery.'.$firewallName;
         $container
             ->setDefinition($discoveryId, new ChildDefinition('security.authenticator.oidc_login.discovery'))
+            ->replaceArgument(0, $httpClient)
             // the discovery URL is built from the issuer by OidcDiscovery, which is the only
             // place a "provider_uri" coming from an environment variable can be normalized
             ->replaceArgument(3, $config['provider_uri'])
@@ -310,6 +318,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
         $oidcClientId = 'security.authenticator.oidc_login.client.'.$firewallName;
         $container
             ->setDefinition($oidcClientId, new ChildDefinition('security.authenticator.oidc_login.client'))
+            ->replaceArgument(0, $httpClient)
             ->replaceArgument(1, new Reference($discoveryId))
             ->replaceArgument(2, $config['client_id'])
             ->replaceArgument(3, new Reference($this->createClientAuthentication($container, $firewallName, $config['client_authentication'])))
@@ -321,6 +330,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             $container
                 ->setDefinition($signatureVerifierId, new ChildDefinition('security.authenticator.oidc_login.signature_verifier'))
                 ->replaceArgument(0, new Reference($discoveryId))
+                ->replaceArgument(2, $httpClient)
                 ->replaceArgument(3, $config['id_token_signature']['algorithms'])
                 ->replaceArgument(4, $config['discovery_cache_ttl'])
                 ->replaceArgument(5, $config['id_token_signature']['enforce_key_usage_verification'])

@@ -1101,6 +1101,70 @@ class OidcLoginFactoryTest extends TestCase
         ], $factory);
     }
 
+    public function testTheConfiguredHttpClientIsUsedForEveryCallToTheProvider()
+    {
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+            'http_client' => 'oidc.client',
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
+        $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
+        $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
+    }
+
+    public function testTheConfiguredHttpClientIsUsedWhenTheIdTokenSignatureIsNotVerified()
+    {
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+            'id_token_signature' => ['required' => false],
+            'http_client' => 'oidc.client',
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.signature_verifier.main'));
+        $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
+        $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
+    }
+
+    public function testTheHttpClientDefaultsToNull()
+    {
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+        ], $factory);
+
+        $this->assertNull($config['http_client']);
+    }
+
+    public function testRejectsAnEmptyHttpClient()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+            'http_client' => '',
+        ], $factory);
+    }
+
     private function processConfig(array $config, OidcLoginFactory $factory): array
     {
         $nodeDefinition = new ArrayNodeDefinition('oidc-login');

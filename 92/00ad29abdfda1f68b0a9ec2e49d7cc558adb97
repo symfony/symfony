@@ -1,0 +1,124 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T11:06:50Z
+
+Pushed a fix on top of your branch.
+
+`ProtectedResourceMetadataController` built the document with `['resource' => $request->getSchemeAndHttpHost()] + $metadata`. The array union keeps the left operand, so the configured `resource` was always dropped and every firewall published the request origin. With two firewalls pinning `https://api.example.com/api` and `https://api.example.com/admin`, both `/.well-known/oauth-protected-resource/api` and `.../admin` answered `{"resource":"http://localhost"}`. RFC 9728, Section 3.3 makes such a document unusable: the value MUST be identical to the identifier the well-known suffix was inserted into. The existing test passed by coincidence, since its fixture's `resource` equals the request origin and the entry that carries a path is never requested. I added `testServesThePinnedResourceOfAFirewallCoveringAPath`, which fails on the old line.
+
+Two points left for you:
+
+The challenge is only emitted once an extractor found a token. `AccessTokenFactory` does not implement `EntryPointFactoryInterface`, so a request carrying no token gets a bare 401 with no `WWW-Authenticate` at all. That is the primary RFC 9728 discovery flow, and RFC 6750, Section 3 asks for the header there. The gap predates this PR, but the feature is about discovery, so it is worth either making the authenticator the entry point here or stating the limitation in the description.
+
+The route loader only runs when the application imports it. An app that configures `resource_metadata` and forgets the import gets a challenge advertising a URL that 404s, with no diagnostic. `symfony/recipes` already ships `_security_logout` and `_security_oidc_login`; this needs the same block.
+
+Smaller ones: `parse_url()` returning `false` makes the validator accept the value, so a malformed `resource` is published as is; the invalid-identifier message cites Section 2, where the identifier is defined in Section 1.2, which also makes "no query" a SHOULD NOT rather than a MUST; and the document ships escaped slashes, where every other discovery document does not.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-06T11:55:02Z
+
+Thanks for the fix, and for catching the array union: `['resource' => $default] + $metadata` keeps the left operand, so the pinned identifier never reached the document. My own test passed by coincidence exactly as you describe.
+
+**Entry point.** Done, as a fallback one. Implementing `AuthenticationEntryPointInterface` outright is a BC break, which I measured on a firewall combining `access_token` and `http_basic` without an explicit `entry_point`: it compiles today and picks `http_basic`, and with the interface implemented unconditionally it stops compiling with `Because you have multiple authenticators in firewall "main", you need to set the "entry_point" key to one of your authenticators ("access_token", "http_basic")`.
+
+So `AccessTokenAuthenticator` implements a new `FallbackAuthenticationEntryPointInterface`, and `RegisterEntryPointPass` keeps the fallback entry points of a firewall only when it declares no other one. An `access_token` firewall on its own now answers a request carrying no token with the challenge, a firewall that already had `form_login`, `http_basic` or `oidc_login` keeps picking that one, and `entry_point: access_token` still selects it explicitly. All four cases are covered by `testAccessTokenIsAFallbackEntryPoint`.
+
+The challenge `start()` emits carries no error code: RFC 6750, Section 3 reserves those for a token the client actually sent, so a request with no credentials gets `Bearer realm="...",resource_metadata="..."`.
+
+**Recipe.** symfony/recipes#1570.
+
+**Smaller ones.** All three done. `parse_url()` returning `false` is now rejected where it used to be accepted. The message cites Section 1.2, and a query component is accepted, since it is only a SHOULD NOT there, with Section 3.1 keeping it after the path in the advertised URL. And the document is served with `JSON_UNESCAPED_SLASHES`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T13:19:18Z
+
+Pushed three fixes. The entry point is the right answer, and I owe you a correction on how I framed the request.
+
+**My suggestion was half wrong.** I said you could implement `EntryPointFactoryInterface` on the factory. That class does not exist: `cab0672248f` deleted it in 5.2 and replaced it with the `is_a()` detection `RegisterEntryPointPass` still does. So that route was never open to you.
+
+**The interface earns its place, and here is the run that proves it.** The obvious alternative is making `AccessTokenAuthenticator` implement the plain `AuthenticationEntryPointInterface`. I patched it that way and booted a firewall with `access_token` plus `http_basic` and no explicit `entry_point`, which compiles today:
+
+```
+InvalidConfigurationException: Because you have multiple authenticators in firewall "main",
+you need to set the "entry_point" key to one of your authenticators ("access_token", "http_basic")
+```
+
+A hard BC break for every app combining `access_token` with any entry-point authenticator, with no deprecation path. So a second signal is needed, and the precedence rule you built is the right one. A userland `entry_point` service also closes the gap and produces a byte-identical header, but only by restating the realm and the well-known path by hand, with nothing keeping them in sync with the node the bundle already derives them from.
+
+**Blocker fixed: the fallback entry point was starting a session on every anonymous request.** `ExceptionListener::startAuthentication()` saves a target path for any non-stateless firewall once an entry point exists. Before this push that line was unreachable for an `access_token` firewall, because the null entry point threw first. Now it is reachable, and `config_resource_metadata.yml` does not declare `stateless: true`, like most real configs:
+
+```
+before: no token -> 401  WWW-Authenticate=NULL  Set-Cookie=NULL
+after : no token -> 401  WWW-Authenticate='Bearer realm="My API",resource_metadata="..."'  Set-Cookie='MOCKSESSID=...; path=/; httponly; samesite=lax'
+```
+
+A public bearer-protected API that did not set `stateless: true` would allocate a session per unauthenticated GET. And there is nothing to come back to: a bearer challenge starts no authentication, so the target path is dead weight by construction. `ExceptionListener` now skips `setTargetPath()` for a `FallbackAuthenticationEntryPointInterface`, which also gives the interface a second meaningful rule rather than leaving it a pure precedence marker. Covered both ways in `ExceptionListenerTest`.
+
+**Also fixed:** a firewall pinning neither `realm` nor `resource_metadata` emitted `'Bearer '` with a trailing space and no auth-params, since `realm` defaults to null and that is the common case. RFC 7230 §7 says not to generate an empty list, and RFC 6750 §3 makes `realm` optional, so the bare `Bearer` is correct. And I added the `UPGRADE-8.2.md` entries for the new constructor argument and for the behaviour change, since an unauthenticated request now gets a header where it got none. That entry will conflict with #65865 and #65866, which both append to the end of the same Security section; trivial to resolve.
+
+**The `error` handling is right and worth saying so**, since it is easy to get backwards: RFC 6750 §3 says a resource server SHOULD NOT include an error code when the request carried no authentication information, and `start()` omits `error` and `error_description` while `onAuthenticationFailure()` keeps `error="invalid_token"`. That is exactly the split the RFC asks for.
+
+Two things I left alone. `ExceptionListener::handleAccessDeniedException()` also calls `start()`, for a token that authenticated but is not full-fledged, where RFC 6750 §3.1 would want `error="insufficient_scope"` and a 403; ignoring `$authException` there is a defensible simplification, and a follow-up at most. And two fallback entry points in one firewall now throw where nothing threw before, which today needs a hand-written subclass of `AccessTokenAuthenticator`; a data-provider row in `SecurityExtensionTest` would cover it if you want the branch pinned.
+
+Your three RFC 9728 corrections in this push all check out against the text: the identifier is defined in §1.2 not §2, §1.2 only SHOULD NOTs a query, and §3.1 inserts the well-known suffix before "the path and/or query components", so keeping the query after the inserted path is right.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-06T19:12:19Z
+
+Thanks, and the session blocker is a good catch. I had not seen that making the entry point reachable also made `setTargetPath()` reachable. A bearer challenge starts no authentication, so there is indeed nothing to come back to, and the rule belongs on the interface rather than beside it.
+
+**The fallback entry point branch is pinned.** A `TestFallbackEntryPointAuthenticator` stub next to `TestAuthenticator`, two services registered in `testEntryPointRequired`, and the data provider row. Mutation-checked: replacing `$entryPoints = $entryPoints ?: $fallbackEntryPoints` with one that takes the first fallback instead of throwing fails that row alone, the `http_basic` plus `form_login` row staying green.
+
+**`insufficient_scope` I would rather keep out of here.** RFC 6750 §3.1 is about a token that authenticated without being full-fledged, answered with a 403, which is a different path from the RFC 9728 discovery this PR is about. I will open it separately.
+
+Rebased on 8.2 with #65871 in.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:46:40Z
+
+@alexandre-daubois is right, and I pushed the first of the two fixes he names.
+
+The path of the identifier is read when the route is declared, so a value the container cannot parse leaves the route at the bare well-known path while the document publishes an identifier carrying a path. A client then derives `/.well-known/oauth-protected-resource/api`, gets a 404, and even if it found the document RFC 9728 §3.3 would make it refuse the answer, since the `resource` it names is not the identifier the URL was derived from. Resolving in the controller cannot fix it: the route is static, so the mismatch would remain.
+
+So a `resource` that parses as no URL at all is now refused at build time rather than silently mis-served. What still works, and is the answer for anyone driving this from the environment, is interpolating the variable inside the URL:
+
+```yaml
+resource: 'https://%env(API_HOST)%/v1'
+```
+
+There the scheme and the host parse, the path stays readable, and the route and the document agree. The test that asserted the old behaviour moved from the valid provider to the invalid one, and the message points at the working form.
+
+The one thing this gives up is pinning the whole identifier from an env var when it carries no path. That case is still served by leaving `resource` out, which resolves the origin per request. If you would rather keep the placeholder accepted and document the restriction instead, say so and I will put it back.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T07:22:52Z
+
+Correcting myself on one sentence above, because it was misleading about @alexandre-daubois' second option.
+
+I wrote that resolving in the controller "cannot fix it: the route is static". That is true of the controller alone, but it reads as though the whole option were dead, and it is not. Two things I should have said.
+
+The env placeholder already resolves at runtime in the controller's argument, so the **document** is correct today; it is only the route that is frozen. Verified:
+
+```php
+$c->register('svc', ...)->setArguments([['main' => ['resource' => '%env(API_RESOURCE)%', ...]]]);
+// resolved at runtime: 'https://api.example.com/api'
+```
+
+And the option is reachable, just not by touching the controller alone: `ProtectedResourceMetadataRouteLoader` would declare one dynamic route, `/.well-known/oauth-protected-resource/{suffix}` with a `.*` requirement and an empty default, and the controller would derive the expected suffix from the resolved identifier and answer 404 on a mismatch. That supports an identifier whose path is unknown until runtime.
+
+I did not take it, for three reasons rather than the one I gave. The collision check between two firewalls moves from build time to runtime: today a shared path throws naming both firewalls, while env-driven paths cannot be compared while the container is built, so one firewall would silently shadow another. A `.*` route also swallows anything else an application puts under that prefix. And `ContainerParametersResource` stops describing what the routes really depend on.
+
+What decided it is that the realistic case is already served. An environment variable interpolated into the URL keeps the path readable at build time and the host resolved at runtime:
+
+```yaml
+resource: 'https://%env(API_HOST)%/v1'
+```
+
+which routes at `/.well-known/oauth-protected-resource/v1` and advertises the resolved host. The only thing the refusal loses is an identifier whose path itself is unknown until runtime, which is exactly what a static route cannot serve. I have added that to the description.
+
+If you would rather have the dynamic route, it is about thirty lines across the loader and the controller plus moving the collision check, and I am happy to write it.

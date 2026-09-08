@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T13:09:36Z
+
+Thank you Florent. I amended two claims in the option's `info()`, both refuted by a probe.
+
+"Scope it on the issuer" only holds when the provider keeps its endpoints under the issuer host. Google announces `oauth2.googleapis.com`, `www.googleapis.com` and `openidconnect.googleapis.com` from an `accounts.google.com` issuer, so an issuer-scoped client applies its options to the discovery request alone, silently:
+
+```
+0 https://accounts.google.com/.well-known/openid-configuration    ua: AcmeApp/1.0   timeout: 5.0
+1 https://oauth2.googleapis.com/token                             ua: (none)        timeout: 60.0
+2 https://openidconnect.googleapis.com/v1/userinfo                ua: (none)        timeout: 60.0
+```
+
+The text now asks for a `scope` matching every announced host.
+
+"It cannot carry the client authentication" is the opposite of what happens: `$options += $defaultOptions` applies a default the request does not set, so an `auth_basic` on the client with `client_authentication: none` does authenticate at the token endpoint. The reason to forbid it is that the same header reaches the discovery, JWKS and UserInfo requests too, and that `auth_basic` base64s both halves verbatim where `client_secret_basic` form-urlencodes them first.
+
+The description carries the documentation points at the end.

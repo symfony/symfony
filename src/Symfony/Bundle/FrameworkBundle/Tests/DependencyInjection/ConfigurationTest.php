@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
@@ -795,6 +796,78 @@ class ConfigurationTest extends TestCase
                 $this->assertSame(['enabled' => $enabled], $config['remote_event'], $key);
             }
         }
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testMailerSmimeEncrypterCipherAsConstantName()
+    {
+        $config = self::processSmimeEncrypterConfig(['cipher' => 'AES_256_CBC']);
+        $this->assertSame(\OPENSSL_CIPHER_AES_256_CBC, $config['mailer']['smime_encrypter']['cipher']);
+
+        $config = self::processSmimeEncrypterConfig(['cipher' => 'RC2_40']);
+        $this->assertSame(\OPENSSL_CIPHER_RC2_40, $config['mailer']['smime_encrypter']['cipher']);
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testMailerSmimeEncrypterCipherAsConstantValue()
+    {
+        $config = self::processSmimeEncrypterConfig(['cipher' => \OPENSSL_CIPHER_AES_256_CBC]);
+        $this->assertSame(\OPENSSL_CIPHER_AES_256_CBC, $config['mailer']['smime_encrypter']['cipher']);
+
+        $config = self::processSmimeEncrypterConfig(['cipher' => \OPENSSL_CIPHER_RC2_40]);
+        $this->assertSame(\OPENSSL_CIPHER_RC2_40, $config['mailer']['smime_encrypter']['cipher']);
+    }
+
+    public function testMailerSmimeEncrypterCipherDefaultsToNull()
+    {
+        $config = self::processSmimeEncrypterConfig([]);
+
+        $this->assertNull($config['mailer']['smime_encrypter']['cipher']);
+    }
+
+    public function testMailerSmimeEncrypterCipherAsInvalidConstantName()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"NOT_A_CIPHER" is not a valid OPENSSL cipher.');
+
+        self::processSmimeEncrypterConfig(['cipher' => 'NOT_A_CIPHER']);
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testMailerSmimeEncrypterCipherAsInvalidConstantValue()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "framework.mailer.smime_encrypter.cipher": You must provide a valid cipher.');
+
+        self::processSmimeEncrypterConfig(['cipher' => 123456]);
+    }
+
+    public function testMailerSmimeEncrypterCipherIsNotValidatedWithoutOpenssl()
+    {
+        if (\extension_loaded('openssl')) {
+            $this->markTestSkipped('The "openssl" extension is loaded.');
+        }
+
+        $config = self::processSmimeEncrypterConfig(['cipher' => 123456]);
+        $this->assertSame(123456, $config['mailer']['smime_encrypter']['cipher']);
+
+        $config = self::processSmimeEncrypterConfig([]);
+        $this->assertNull($config['mailer']['smime_encrypter']['cipher']);
+    }
+
+    private static function processSmimeEncrypterConfig(array $smimeEncrypter): array
+    {
+        return (new Processor())->processConfiguration(new Configuration(true), [
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'mailer' => [
+                    'dsn' => 'null://null',
+                    'smime_encrypter' => $smimeEncrypter + ['repository' => 'my_certificate_repository'],
+                ],
+            ],
+        ]);
     }
 
     protected static function getBundleDefaultConfig()

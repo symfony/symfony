@@ -2443,16 +2443,18 @@ class Configuration implements ConfigurationInterface
                                     ->defaultNull()
                                     ->beforeNormalization()
                                         ->ifString()
-                                        ->then(static function ($v): ?int {
-                                            if (\defined('OPENSSL_CIPHER_'.$v)) {
-                                                return \constant('OPENSSL_CIPHER_'.$v);
+                                        ->then(static function ($v): int {
+                                            $ciphers = self::getOpensslCiphers();
+
+                                            if (!isset($ciphers[$v])) {
+                                                throw new \InvalidArgumentException(\sprintf('"%s" is not a valid OPENSSL cipher.', $v));
                                             }
 
-                                            throw new \InvalidArgumentException(\sprintf('"%s" is not a valid OPENSSL cipher.', $v));
+                                            return $ciphers[$v];
                                         })
                                     ->end()
                                     ->validate()
-                                        ->ifTrue(static fn ($v) => \extension_loaded('openssl') && null !== $v && !\defined('OPENSSL_CIPHER_'.$v))
+                                        ->ifTrue(static fn ($v) => null !== $v && ($ciphers = self::getOpensslCiphers()) && !\in_array($v, $ciphers, true))
                                         ->thenInvalid('You must provide a valid cipher.')
                                     ->end()
                                 ->end()
@@ -2796,5 +2798,21 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    /**
+     * @return array<string, int> The values of the OPENSSL_CIPHER_* constants, keyed by their unprefixed name
+     */
+    private static function getOpensslCiphers(): array
+    {
+        $ciphers = [];
+
+        foreach (get_defined_constants(true)['openssl'] ?? [] as $name => $value) {
+            if (str_starts_with($name, 'OPENSSL_CIPHER_')) {
+                $ciphers[substr($name, \strlen('OPENSSL_CIPHER_'))] = $value;
+            }
+        }
+
+        return $ciphers;
     }
 }

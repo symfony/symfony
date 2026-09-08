@@ -111,6 +111,13 @@ class Command implements SignalableCommandInterface
         }
 
         $this->configure();
+
+        if (!$this->code) {
+            // the options listed in the attribute come last, after configure(), which a command with code gets from InvokableCommand
+            foreach ($attribute->options ?? [] as $option) {
+                $this->definition->addOption($option);
+            }
+        }
     }
 
     /**

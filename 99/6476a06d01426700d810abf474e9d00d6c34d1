@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:47:56Z
+
+Rebased and renamed one test. Every one of the 31 conversions is right: I paired each call against its base, expanded it into a 9-slot vector and compared slot by slot, then proved each argument still bites by mutation. Forcing `enforceAtJwtType` false fails 5 tests and true fails 8, `enforceKeyUsageVerification` fails 1 each way, the drift fails 1, the claim fails 2, the clock fails 23. The ninth-parameter claim is right too: eight of the nine are promoted, `$enforceAtJwtType` is the only plain one because the constructor body runs the deprecation.
+
+`testTokenWithFutureIatIsRejectedByDefault` now passes an explicit `0` for the drift, so it no longer tests a default: mutating the declared default from `0` to `100` fails on the base and passes here. Renamed to `testTokenWithFutureIatIsRejectedWithoutAllowedTimeDrift`.
+
+Worth stating rather than acting on: the conversion trades one sensitivity for another. Mutating the `$clock` default breaks 23 tests before and 4 after, and the drift default goes 1 to 0. Changing a parameter's default is a BC break under the same promise this PR invokes, so the suite is now blind to that in exchange for catching a reorder. Fair trade to make knowingly, and stof asked for the reorder signal.
+
+Two smaller notes. The five `enableDiscovery(..., enforceKeyUsageVerification: X)` conversions apply verbatim to 8.1, where those exact named calls exist, so doing that half there would let the merge-up carry it instead of diverging five lines. And this file now has essentially no named arguments while its closest neighbours keep 16, 12, 4 and 3, so it is an outlier unless the rule reaches them too.
+
+One boundary to keep: this reasoning is about Symfony's own API, where we promise the order and not the names. It must not be extended to the web-token checkers, which #65866 calls named on purpose: that constructor reversed between 3.x and 4.x, both inside the declared `^3.3.2|^4.0`, so no positional call satisfies both.
+
+Security/Http 964, green.

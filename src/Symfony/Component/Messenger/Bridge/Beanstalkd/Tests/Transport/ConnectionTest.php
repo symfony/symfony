@@ -18,6 +18,7 @@ use Pheanstalk\Exception;
 use Pheanstalk\Exception\ClientException;
 use Pheanstalk\Exception\ConnectionException;
 use Pheanstalk\Exception\DeadlineSoonException;
+use Pheanstalk\Exception\JobNotFoundException;
 use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\Values\Job;
@@ -267,6 +268,47 @@ final class ConnectionTest extends TestCase
         $connection->ack($id);
     }
 
+    public function testAckOnReconnect()
+    {
+        $id = '123456';
+
+        $tube = 'xyz';
+
+        $calls = 0;
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->exactly(2))->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->once())->method('reserveJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturn(new Job(new JobId($id), 'foobar'));
+        $client->expects($this->exactly(2))->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturnCallback(static function () use (&$calls): void {
+            if (1 === ++$calls) {
+                throw new ConnectionException('123', 'foobar');
+            }
+        });
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $connection->ack($id);
+    }
+
+    public function testAckOnReconnectWhenTheJobHasBeenReservedByAnotherConsumer()
+    {
+        $id = '123456';
+
+        $tube = 'xyz';
+
+        $exception = new JobNotFoundException();
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->once())->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException(new ConnectionException('123', 'foobar'));
+        $client->expects($this->once())->method('reserveJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $this->expectExceptionObject(new TransportException(\sprintf('Failed to reacquire the reservation for the Beanstalkd job "%s": the job no longer exists or was reserved by another consumer.', $id), 0, $exception));
+        $connection->ack($id);
+    }
+
     #[TestWith([false, false])]
     #[TestWith([false, true])]
     #[TestWith([true, true])]
@@ -314,6 +356,69 @@ final class ConnectionTest extends TestCase
         $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
 
         $connection->reject($id, $priority);
+    }
+
+    public function testRejectOnReconnect()
+    {
+        $id = '123456';
+
+        $tube = 'baz';
+
+        $calls = 0;
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->exactly(2))->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->once())->method('reserveJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturn(new Job(new JobId($id), 'foobar'));
+        $client->expects($this->exactly(2))->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturnCallback(static function () use (&$calls): void {
+            if (1 === ++$calls) {
+                throw new ConnectionException('123', 'foobar');
+            }
+        });
+
+        $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
+
+        $connection->reject($id, null, true);
+    }
+
+    public function testRejectWithBuryOnReconnect()
+    {
+        $id = '123456';
+
+        $tube = 'baz';
+
+        $calls = 0;
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->exactly(2))->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->once())->method('reserveJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturn(new Job(new JobId($id), 'foobar'));
+        $client->expects($this->exactly(2))->method('bury')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id), 1024)->willReturnCallback(static function () use (&$calls): void {
+            if (1 === ++$calls) {
+                throw new ConnectionException('123', 'foobar');
+            }
+        });
+
+        $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
+
+        $connection->reject($id);
+    }
+
+    public function testRejectWithBuryOnReconnectWhenTheJobHasBeenReservedByAnotherConsumer()
+    {
+        $id = '123456';
+
+        $tube = 'baz';
+
+        $exception = new JobNotFoundException();
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->once())->method('bury')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id), 1024)->willThrowException(new ConnectionException('123', 'foobar'));
+        $client->expects($this->once())->method('reserveJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+
+        $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
+
+        $this->expectExceptionObject(new TransportException(\sprintf('Failed to reacquire the reservation for the Beanstalkd job "%s": the job no longer exists or was reserved by another consumer.', $id), 0, $exception));
+        $connection->reject($id);
     }
 
     public function testRejectWhenABeanstalkdExceptionOccurs()
@@ -578,6 +683,47 @@ final class ConnectionTest extends TestCase
         $connection = new Connection(['tube_name' => $tube], $client);
 
         $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        $connection->keepalive($id);
+    }
+
+    public function testKeepaliveOnReconnect()
+    {
+        $id = '123456';
+
+        $tube = 'baz';
+
+        $calls = 0;
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->exactly(2))->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->once())->method('reserveJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturn(new Job(new JobId($id), 'foobar'));
+        $client->expects($this->exactly(2))->method('touch')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturnCallback(static function () use (&$calls): void {
+            if (1 === ++$calls) {
+                throw new ConnectionException('123', 'foobar');
+            }
+        });
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $connection->keepalive($id);
+    }
+
+    public function testKeepaliveOnReconnectWhenTheJobHasBeenReservedByAnotherConsumer()
+    {
+        $id = '123456';
+
+        $tube = 'baz';
+
+        $exception = new JobNotFoundException();
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->once())->method('touch')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException(new ConnectionException('123', 'foobar'));
+        $client->expects($this->once())->method('reserveJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $this->expectExceptionObject(new TransportException(\sprintf('Failed to reacquire the reservation for the Beanstalkd job "%s": the job no longer exists or was reserved by another consumer.', $id), 0, $exception));
         $connection->keepalive($id);
     }
 

@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-07T07:48:48Z
+
+Second commit, on a point the first one made worse.
+
+`OidcSignatureVerifier` already declared `ClockInterface $clock = new Clock()`, and this pull request added the same default to `OidcLoginAuthenticator` and to the new `OidcTokenRefresher`. `symfony/clock` is a development dependency of `symfony/security-http`, so building one of these classes without the argument, outside of `security-bundle`, died on an unknown class rather than saying what to install.
+
+The argument is nullable now, and the three constructors check the component before falling back to it, the way `DateType` and its siblings do for `DatePoint`:
+
+```
+The "symfony/clock" component is required to build "Symfony\Component\Security\Http\Authenticator\Oidc\OidcTokenRefresher" without a clock. Try running "composer require symfony/clock", or pass any PSR-20 clock to the constructor.
+```
+
+Making `symfony/clock` a hard requirement of `security-http` was the other option. It was dropped: it would install the component for every application, including those whose firewall never touches OIDC.
+
+Nothing changes for `security-bundle`, which requires `symfony/clock` and injects the `clock` service.
+
+There is a neighbouring gap this pull request does not close. `symfony/security-http` does not require `psr/clock` either, while `OidcIdToken`, `OidcSignatureVerifier`, `OidcLoginAuthenticator` and `OidcTokenRefresher` all type-hint `Psr\Clock\ClockInterface`. That one is not the same trade-off, since `psr/clock` holds a single interface and no code, so requiring it costs nothing. Say the word and I add the line here, or send it separately.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:47:54Z
+
+Pushed two fixes. The lazy-firewall problem you fixed yourself before I got there was the important one, and the `supports(): ?bool` returning null is the right shape.
+
+**The PKCE guard was fail-open.** `'authorization_code' === $body['grant_type']` refuses only that one value, so `grant_type` absent, null, empty, `Authorization_Code` or an array all skipped the verifier, and an absent key also raised an undefined-key warning. Not reachable today, since both call sites pass a string literal, but `applyClientAuthentication()` is `abstract protected` and is the documented way to add a client type, so a grant added later would have reached the token endpoint unprotected. Inverted to `'refresh_token' !== ($body['grant_type'] ?? null)`, which refuses every grant but the one that genuinely carries no verifier.
+
+**The `sub` check was skipped when there was no previous ID token.** `verifyRefreshedIdToken()` returned early when the security token carried none, so a refreshed ID token for any subject was stored:
+
+```
+previous id_token = NULL  =>  ACCEPTED, stored sub="attacker-99"
+previous id_token = ''    =>  ACCEPTED, stored sub="attacker-99"
+```
+
+Unreachable through `oidc_login`, since `exchangeAuthorizationCode()` refuses a response without a non-empty `id_token`, but reachable for the on-demand use your description documents, on a token an application assembled itself. It throws now, with a test that revert-verifies.
+
+For the record, everything else the description claims verified. Every §12.2 check exists and rejects: forged signature, a key outside the JWKS, wrong `iss`, wrong `aud`, expired, missing `exp`, future `iat`, missing `iat`, future `nbf`, and a valid ID token for another subject. After each rejection all four token attributes are byte-identical to what they were, so "leaves the security token exactly as it was" holds. Rotation holds both ways, and the error classification never turns a retryable failure into a permanent one.
+
+Two things worth a sentence in the description rather than code: the refresher uses the global `http_client`, so a slow provider blocks the request and there is no per-firewall timeout; and `setToken(null)` on `invalid_grant` is a deauthentication, not a logout, so no `LogoutEvent` fires and a `remember_me` cookie re-logs the user in on the next request with no refresh token.
+
+Security/Http 985, SecurityBundle 561, both green.

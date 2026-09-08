@@ -13,9 +13,11 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Mailer\EventListener\SmimeEncryptedMessageListener;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 #[IgnoreDeprecations]
@@ -66,6 +68,7 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTestCase
     }
 
     #[RequiresPhpExtension('openssl')]
+    #[RequiresMethod(SmimeEncryptedMessageListener::class, 'onMessage')]
     public function testMailerSmimeEncrypterCipherAsConstantName()
     {
         $container = $this->createContainerFromFile('mailer_with_smime_encrypter');

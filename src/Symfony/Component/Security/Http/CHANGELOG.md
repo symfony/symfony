@@ -38,6 +38,7 @@ CHANGELOG
  * Deprecate not passing the `$enforceAtJwtType` argument to `OidcTokenHandler`; it defaults to `false` in 8.2 and will default to `true` in 9.0
  * Make `OidcTokenGenerator` emit the `at+jwt` type header RFC 9068 requires from an access token
  * Add the `$resourceMetadataUri` argument to `AccessTokenAuthenticator`, advertised in the `resource_metadata` parameter of the `WWW-Authenticate` header (RFC 9728)
+ * Widen the `$audience` argument of `OidcTokenHandler` and `OidcTokenGenerator` and the `$audiences` argument of `Oauth2TokenHandler` to take one identifier as a string or several as a list, one of which the `aud` claim must name
  * Add `FallbackAuthenticationEntryPointInterface` for an entry point that only stands in for a firewall declaring no other one, and make `AccessTokenAuthenticator` one, so that a request carrying no access token gets the RFC 6750 challenge instead of a bare 401
 
 8.1

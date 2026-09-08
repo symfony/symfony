@@ -42,8 +42,12 @@ class OAuth2TokenHandlerFactory implements TokenHandlerFactoryInterface
 {
     public function create(ContainerBuilder $container, string $id, array|string $config): void
     {
+        // a lone identifier is passed as it was given, so that an environment variable holding the
+        // whole list, as "%env(json:AUDIENCES)%" does, reaches the handler as the list it resolves to
+        $audience = [0] === array_keys($config['audience']) ? $config['audience'][0] : $config['audience'];
+
         $tokenHandlerDefinition = $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oauth2'))
-            ->replaceArgument(2, $config['audience'])
+            ->replaceArgument(2, $audience)
             ->replaceArgument(3, $config['issuer'])
             ->replaceArgument(4, $config['claim'])
             ->replaceArgument(6, $config['allowed_time_drift'])

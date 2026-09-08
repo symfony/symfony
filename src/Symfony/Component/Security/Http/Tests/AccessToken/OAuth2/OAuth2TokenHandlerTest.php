@@ -299,6 +299,37 @@ class OAuth2TokenHandlerTest extends TestCase
     }
 
     /**
+     * A lone identifier is taken as a string, which is the shape the bundle passes when one is
+     * configured, so that an environment variable can carry the whole list instead.
+     */
+    public function testTakesALoneAudienceAsAString()
+    {
+        $client = new MockHttpClient([
+            new JsonMockResponse(self::activeClaims(['sub' => 'jdoe', 'aud' => self::AUDIENCE])),
+            new JsonMockResponse(self::activeClaims(['sub' => 'jdoe', 'aud' => 'https://other.example.net'])),
+        ]);
+
+        $this->assertSame('jdoe', self::createHandler($client, self::AUDIENCE)->getUserBadgeFrom('a-secret-token')->getUserIdentifier());
+        $this->assertBadCredentials('The token is not intended for any of the audiences "'.self::AUDIENCE.'".', self::createHandler($client, self::AUDIENCE));
+    }
+
+    #[DataProvider('audiencesNamingNothing')]
+    public function testRejectsAnAudienceNamingNothing(string|array $audiences)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be a non-empty string or a list of non-empty strings');
+
+        new Oauth2TokenHandler(new MockHttpClient(), null, $audiences);
+    }
+
+    public static function audiencesNamingNothing(): iterable
+    {
+        yield 'an empty string' => [''];
+        yield 'an empty string among others' => [[self::AUDIENCE, '']];
+        yield 'a non-string' => [[42]];
+    }
+
+    /**
      * RFC 7662 §2.2 types "iss" and "aud" as strings, so a response carrying anything else names
      * neither an issuer nor an audience this resource server can be compared against: an array
      * would be juggled into the string "Array", and a number into a string that the audience of a
@@ -644,7 +675,7 @@ class OAuth2TokenHandlerTest extends TestCase
         $this->fail(\sprintf('The handler did not reject the token with "%s".', $message));
     }
 
-    private static function createHandler(MockHttpClient $client, array $audiences = [], ?string $issuer = null, ?string $claim = null, int $allowedTimeDrift = 0): Oauth2TokenHandler
+    private static function createHandler(MockHttpClient $client, string|array $audiences = [], ?string $issuer = null, ?string $claim = null, int $allowedTimeDrift = 0): Oauth2TokenHandler
     {
         return new Oauth2TokenHandler($client, null, $audiences, $issuer, $claim, new MockClock('@1719000000'), $allowedTimeDrift);
     }

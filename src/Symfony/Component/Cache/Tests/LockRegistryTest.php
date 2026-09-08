@@ -65,6 +65,99 @@ class LockRegistryTest extends TestCase
     }
 
     /**
+     * Calls LockRegistry::compute() for an item whose slot is read-locked by another process, so
+     * that the wait loop succeeds and the pool is asked for the item. Computing that nested item
+     * evicts its own slot, while the outer call still holds the handle of the first one.
+     */
+    public function testEvictingASlotKeepsTheHandlesOfTheOtherSlotsOpen()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('LockRegistry is disabled on Windows');
+        }
+        if (!\function_exists('proc_open')) {
+            $this->markTestSkipped('proc_open() is required');
+        }
+
+        $logger = new class extends AbstractLogger {
+            public array $messages = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->messages[] = $message;
+            }
+        };
+
+        $files = [tempnam(sys_get_temp_dir(), 'sf_lock'), tempnam(sys_get_temp_dir(), 'sf_lock')];
+        $sharedFile = $files[abs(crc32('foo')) % 2];
+        $wedgedFile = $files[abs(crc32('bar')) % 2];
+
+        $script = 'flock($h = fopen($argv[1], "r+"), (int) $argv[2]) || exit(1); echo "locked\n"; fgets(STDIN);';
+        $descriptors = [['pipe', 'r'], ['pipe', 'w'], ['redirect', 1]];
+        $processes = [];
+
+        foreach (['shared' => [$sharedFile, \LOCK_SH], 'wedged' => [$wedgedFile, \LOCK_EX]] as $name => [$file, $operation]) {
+            $process = proc_open([\PHP_BINARY, '-n', '-r', $script, '--', $file, $operation], $descriptors, $pipes);
+            $this->assertSame("locked\n", fgets($pipes[1]));
+            $processes[$name] = [$process, $pipes];
+        }
+
+        $release = static function (string $name) use (&$processes) {
+            if (null === $process = $processes[$name] ?? null) {
+                return;
+            }
+            unset($processes[$name]);
+            fclose($process[1][0]);
+            fclose($process[1][1]);
+            proc_terminate($process[0]);
+            proc_close($process[0]);
+        };
+
+        $pool = new class extends ArrayAdapter {
+            public \Closure $onGet;
+
+            public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
+            {
+                return ($this->onGet)($callback);
+            }
+        };
+        $pool->onGet = static function (callable $callback) use ($pool, $release) {
+            $release('shared');
+            $save = false;
+
+            return LockRegistry::compute($callback, $pool->getItem('bar'), $save, new ArrayAdapter());
+        };
+
+        $item = $pool->getItem('foo');
+        $previousFiles = LockRegistry::setFiles($files);
+        $previousLimit = (int) \ini_get('max_execution_time');
+        $previousRequestTime = $_SERVER['REQUEST_TIME_FLOAT'] ?? null;
+        $save = true;
+
+        try {
+            $_SERVER['REQUEST_TIME_FLOAT'] = microtime(true) - 1.5;
+            set_time_limit(2);
+
+            $this->assertSame('bar', LockRegistry::compute(static fn () => 'bar', $item, $save, $pool, null, $logger));
+            $this->assertSame([
+                'Item "{key}" is locked, waiting for it to be released',
+                'Item "{key}" not found while lock was released, now retrying',
+                'Lock acquired, now computing item "{key}"',
+            ], $logger->messages);
+        } finally {
+            set_time_limit($previousLimit);
+            if (null === $previousRequestTime) {
+                unset($_SERVER['REQUEST_TIME_FLOAT']);
+            } else {
+                $_SERVER['REQUEST_TIME_FLOAT'] = $previousRequestTime;
+            }
+            LockRegistry::setFiles($previousFiles);
+            $release('shared');
+            $release('wedged');
+            array_map('unlink', $files);
+        }
+    }
+
+    /**
      * Calls LockRegistry::compute() while another process holds the lock of the item,
      * with a max_execution_time of 2 seconds of which $requestAge seconds are already spent.
      *

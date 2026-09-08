@@ -16,14 +16,27 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\MessengerBundle;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\CausationStamp;
+use Symfony\Component\Messenger\Stamp\CorrelationStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\MessageIdStamp;
+use Symfony\Component\Messenger\Stamp\PropagatedStampInterface;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\UnverifiedDecodingFailureStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\FailingDummyMessageHandler;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 class MessengerBundleTest extends TestCase
 {
@@ -90,6 +103,79 @@ class MessengerBundleTest extends TestCase
         $this->assertSame('sync_with_retry', $failed->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName());
         $this->assertSame('Handling "Hey" failed 3 time(s).', $failed->last(ErrorDetailsStamp::class)?->getExceptionMessage());
         $this->assertCount(3, $failed->all(RedeliveryStamp::class));
+    }
+
+    public function testAReplayedDecodingFailureKeepsTheIdentityAndThePropagatedStampsOfItsMessage()
+    {
+        $kernel = new TestFlowContextKernel('test', true, $this->varDir);
+        $kernel->boot();
+        FlowContextHandler::$handled = [];
+
+        $encoded = new PhpSerializer()->encode(new Envelope(new DummyMessage('Hey'), [
+            new BusNameStamp('messenger.bus.default'),
+            new FlowTenantStamp('t1'),
+            new MessageIdStamp('original-id'),
+            new CorrelationStamp('original-correlation'),
+        ]));
+        // what PhpSerializer::decode() returns for a body it cannot decode: the bus name only
+        $failure = MessageDecodingFailedException::wrap($encoded, 'Could not decode Envelope.')->with(new BusNameStamp('messenger.bus.default'), new ReceivedStamp('async'));
+
+        $kernel->getContainer()->get('test.messenger.default_bus')->dispatch($failure);
+
+        $this->assertCount(2, FlowContextHandler::$handled);
+        [$decoded, $child] = FlowContextHandler::$handled;
+
+        $this->assertInstanceOf(DummyMessage::class, $decoded->getMessage());
+        $this->assertSame(['original-id'], array_map(static fn (MessageIdStamp $stamp) => $stamp->getId(), $decoded->all(MessageIdStamp::class)));
+        $this->assertSame(['original-correlation'], array_map(static fn (CorrelationStamp $stamp) => $stamp->getId(), $decoded->all(CorrelationStamp::class)));
+
+        $this->assertInstanceOf(SecondMessage::class, $child->getMessage());
+        $this->assertSame(['t1'], array_map(static fn (FlowTenantStamp $stamp) => $stamp->tenant, $child->all(FlowTenantStamp::class)));
+        $this->assertSame('original-correlation', $child->last(CorrelationStamp::class)?->getId());
+        $this->assertSame('original-id', $child->last(CausationStamp::class)?->getId());
+    }
+
+    public function testTheStampsOfAnUnverifiedDecodingFailureDoNotReachWhatItsSignedMessageDispatches()
+    {
+        $kernel = new TestFlowContextKernel('test', true, $this->varDir);
+        $kernel->boot();
+        FlowContextHandler::$handled = [];
+
+        $encoded = new PhpSerializer()->encode(new Envelope(new DummyMessage('Hey'), [new BusNameStamp('messenger.bus.default'), new FlowTenantStamp('good')]));
+        $unverifiedStamps = [new BusNameStamp('messenger.bus.default'), new FlowTenantStamp('evil')];
+        $failure = MessageDecodingFailedException::wrap($encoded, 'Could not retrieve the claim.')
+            ->with(...$unverifiedStamps)
+            ->with(new ReceivedStamp('async'), new UnverifiedDecodingFailureStamp($unverifiedStamps, [DummyMessage::class]));
+
+        $kernel->getContainer()->get('test.messenger.default_bus')->dispatch($failure);
+
+        $this->assertCount(2, FlowContextHandler::$handled);
+        [$decoded, $child] = FlowContextHandler::$handled;
+
+        $this->assertSame(['good'], array_map(static fn (FlowTenantStamp $stamp) => $stamp->tenant, $decoded->all(FlowTenantStamp::class)));
+        $this->assertSame(['good'], array_map(static fn (FlowTenantStamp $stamp) => $stamp->tenant, $child->all(FlowTenantStamp::class)));
+    }
+
+    public function testAMessageHandledThroughTheSyncTransportIsNotItsOwnCause()
+    {
+        $kernel = new TestFlowContextKernel('test', true, $this->varDir);
+        $kernel->boot();
+        FlowContextHandler::$handled = [];
+
+        $kernel->getContainer()->get('test.messenger.default_bus')->dispatch(new ThirdMessage());
+
+        $this->assertCount(2, FlowContextHandler::$handled);
+        [$handled, $child] = FlowContextHandler::$handled;
+
+        $this->assertInstanceOf(ThirdMessage::class, $handled->getMessage());
+        $this->assertNotNull($handled->last(ReceivedStamp::class));
+        $id = $handled->last(MessageIdStamp::class)->getId();
+        $this->assertNull($handled->last(CausationStamp::class));
+        $this->assertSame($id, $handled->last(CorrelationStamp::class)?->getId());
+
+        $this->assertInstanceOf(SecondMessage::class, $child->getMessage());
+        $this->assertSame($id, $child->last(CausationStamp::class)?->getId());
+        $this->assertSame($id, $child->last(CorrelationStamp::class)?->getId());
     }
 }
 
@@ -162,5 +248,80 @@ class TestSyncRetryKernel extends AbstractKernel
             ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
             ->alias('test.messenger.transport.failed', 'messenger.transport.failed')->public()
         ;
+    }
+}
+
+class TestFlowContextKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'identity_stamps' => true,
+            'transports' => [
+                'async' => 'in-memory://',
+                'sync' => 'sync://',
+            ],
+            'routing' => [ThirdMessage::class => 'sync'],
+        ]);
+        $container->services()
+            ->set(FlowContextHandler::class)->autowire()->autoconfigure()
+            ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
+        ;
+    }
+}
+
+class FlowContextHandler
+{
+    /** @var list<Envelope> */
+    public static array $handled = [];
+
+    public function __construct(
+        private MessageBusInterface $bus,
+    ) {
+    }
+
+    #[AsMessageHandler]
+    public function onDummyMessage(DummyMessage $message, Envelope $envelope): void
+    {
+        self::$handled[] = $envelope;
+        $this->bus->dispatch(new SecondMessage());
+    }
+
+    #[AsMessageHandler]
+    public function onThirdMessage(ThirdMessage $message, Envelope $envelope): void
+    {
+        self::$handled[] = $envelope;
+        $this->bus->dispatch(new SecondMessage());
+    }
+
+    #[AsMessageHandler]
+    public function onSecondMessage(SecondMessage $message, Envelope $envelope): void
+    {
+        self::$handled[] = $envelope;
+    }
+}
+
+class FlowTenantStamp implements PropagatedStampInterface
+{
+    public function __construct(
+        public readonly string $tenant,
+    ) {
     }
 }

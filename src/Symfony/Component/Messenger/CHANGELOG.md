@@ -32,6 +32,9 @@ CHANGELOG
  * Add `$retryStrategyLocator`, `$failureSenderLocator`, `$eventDispatcher` and `$logger` arguments to `SyncTransportFactory`
  * Add `SyncMessageFailedEvent` and `SyncMessageRetryingEvent`, dispatched by the sync transport
  * Add the `messenger.serializer.symfony_serializer.service` option
+ * Add `PropagatedStampInterface` and `PropagateStampsMiddleware` to copy stamps onto the messages dispatched while handling the message carrying them
+ * Allow handler methods to declare `Envelope` or stamp-typed arguments after the message
+ * Add `CorrelationStamp`, `MessageIdStamp`, `CausationStamp` and `AddIdentityStampsMiddleware`, enabled on every bus by the `messenger.identity_stamps` option
 
 8.1
 ---

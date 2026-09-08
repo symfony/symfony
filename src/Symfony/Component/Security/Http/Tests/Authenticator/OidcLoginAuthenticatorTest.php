@@ -40,7 +40,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
-use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClientInterface;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
@@ -54,7 +54,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 #[AllowMockObjectsWithoutExpectations]
 class OidcLoginAuthenticatorTest extends TestCase
 {
-    private OidcClient $oidcClient;
+    private OidcClientInterface $oidcClient;
     private OidcDiscovery $discovery;
     private AuthenticationSuccessHandlerInterface $successHandler;
     private AuthenticationFailureHandlerInterface $failureHandler;
@@ -69,7 +69,7 @@ class OidcLoginAuthenticatorTest extends TestCase
             'jwks_uri' => 'https://provider.example.com/jwks',
         ]);
 
-        $this->oidcClient = $this->createMock(OidcClient::class);
+        $this->oidcClient = $this->createMock(OidcClientInterface::class);
 
         $this->successHandler = $this->createStub(AuthenticationSuccessHandlerInterface::class);
         $this->failureHandler = $this->createStub(AuthenticationFailureHandlerInterface::class);
@@ -1438,6 +1438,53 @@ class OidcLoginAuthenticatorTest extends TestCase
             ]]])),
             ['ES256'],
         );
+    }
+
+    /**
+     * A public client sends no secret, so PKCE is the only thing binding the authorization
+     * code to it: the option that turns PKCE off cannot apply to such a client.
+     */
+    public function testRejectsAPublicClientWithoutPkce()
+    {
+        $this->oidcClient->method('getClientAuthenticationMethod')->willReturn('none');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('PKCE cannot be disabled for a public OIDC client');
+
+        $this->createAuthenticator(['pkce_enabled' => false], signatureVerifier: $this->createSignatureVerifier());
+    }
+
+    /**
+     * Without the signature check, only the TLS verification of the token request ties the
+     * ID token to the provider, which is too little for a client that has nothing but PKCE
+     * protecting its code exchange.
+     */
+    public function testRejectsAPublicClientThatDoesNotVerifyTheIdTokenSignature()
+    {
+        $this->oidcClient->method('getClientAuthenticationMethod')->willReturn('none');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The ID token signature must be verified for a public OIDC client');
+
+        $this->createAuthenticator();
+    }
+
+    public function testAPublicClientIsAcceptedWithPkceAndTheSignatureCheck()
+    {
+        $this->oidcClient->method('getClientAuthenticationMethod')->willReturn('none');
+
+        $this->assertInstanceOf(OidcLoginAuthenticator::class, $this->createAuthenticator(signatureVerifier: $this->createSignatureVerifier()));
+    }
+
+    /**
+     * A confidential client authenticates at the token endpoint, so OIDC Core 1.0,
+     * Section 3.1.3.7, item 6 lets it rely on that request alone.
+     */
+    public function testAConfidentialClientMayTurnBothOff()
+    {
+        $this->oidcClient->method('getClientAuthenticationMethod')->willReturn('client_secret_basic');
+
+        $this->assertInstanceOf(OidcLoginAuthenticator::class, $this->createAuthenticator(['pkce_enabled' => false]));
     }
 
     private function createAuthenticator(array $options = [], ?UserProviderInterface $userProvider = null, array $authorizationParams = [], ?OidcSignatureVerifier $signatureVerifier = null, ?ClockInterface $clock = null): OidcLoginAuthenticator

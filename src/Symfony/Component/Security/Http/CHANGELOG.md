@@ -23,10 +23,10 @@ CHANGELOG
  * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()` to add extra query parameters covered by the link signature
  * Expose the verified extra parameters via the `_login_link_parameters` request attribute when consuming a login link
  * Add `OidcLoginAuthenticator` for the OpenID Connect Authorization Code Flow (interactive login via OIDC provider)
- * Add `OidcClient` and `OidcDiscovery` protocol classes
+ * Add `OidcClientInterface`, its `OidcClient` implementation and `OidcDiscovery` protocol classes
  * Cache the discovery document of the `oidc` access token handler for one hour, where it was fetched again on every refresh of the JWKS
  * Add `OidcSignatureVerifier` to verify the ID token signature of the OIDC login authenticator against the provider JWKS, which it now does by default
- * Add `OidcPublicClient` to run the OIDC login flow as a public client, which holds no client secret and relies on PKCE, and support `client_secret_basic` in `OidcConfidentialClient`
+ * Add `ClientAuthenticationInterface` and its `ClientSecretPost`, `ClientSecretBasic` and `NoClientAuthentication` implementations, which say how an OAuth2 client authenticates at the token endpoint; `OidcClient` takes one as a dependency, so that a public client relying on PKCE and a confidential one holding a secret are the same class
  * Add the `pkce_enabled`, `pkce_method` and `max_age` options and the `$authorizationParams` argument to `OidcLoginAuthenticator`, which checks the ID token `auth_time` claim when `max_age` is used
  * Add the `user_data_source` and `user_identifier_claim` options to `OidcLoginAuthenticator` to pick where the user claims are read from and the claim the user identifier is read from
  * Add `OidcEndSessionListener` for RP-Initiated Logout via the OIDC `end_session_endpoint`

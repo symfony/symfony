@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 
 class OidcLoginFactoryTest extends TestCase
 {
@@ -29,7 +30,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'check_path' => '/oidc/callback',
         ];
 
@@ -65,7 +66,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ];
 
         $factory = new OidcLoginFactory();
@@ -82,7 +83,7 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
 
         $this->assertSame(['openid'], $finalizedConfig['scope']);
@@ -95,7 +96,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             // a single string is accepted, so that an environment variable can carry every scope
             'scope' => 'openid profile email',
         ];
@@ -114,7 +115,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'check_path' => '/oidc/callback',
             'enable_end_session' => true,
             'post_logout_redirect_path' => '/logged-out',
@@ -134,7 +135,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'check_path' => '/oidc/callback',
         ];
 
@@ -164,7 +165,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'check_path' => '/oidc/callback',
         ];
 
@@ -189,7 +190,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'check_path' => '/oidc/callback',
             'max_age' => 3600,
             'authorization_params' => ['prompt' => 'consent', 'ui_locales' => 'fr'],
@@ -215,7 +216,7 @@ class OidcLoginFactoryTest extends TestCase
         $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'authorization_params' => ['code_challenge' => ''],
         ], $factory);
     }
@@ -229,7 +230,7 @@ class OidcLoginFactoryTest extends TestCase
         $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'pkce' => ['method' => 'S512'],
         ], $factory);
     }
@@ -242,7 +243,7 @@ class OidcLoginFactoryTest extends TestCase
 
         $this->processConfig([
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
     }
 
@@ -253,7 +254,7 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
 
         $this->assertSame('/oidc/callback', $finalizedConfig['check_path']);
@@ -266,7 +267,7 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
 
         $this->assertSame(3600, $finalizedConfig['discovery_cache_ttl']);
@@ -279,7 +280,7 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
 
         $this->assertSame(0, $finalizedConfig['allowed_time_drift']);
@@ -294,7 +295,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com/',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ];
 
         $factory = new OidcLoginFactory();
@@ -313,7 +314,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'discovery_cache_ttl' => 60,
         ];
 
@@ -330,7 +331,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'allowed_time_drift' => 60,
         ];
 
@@ -354,7 +355,7 @@ class OidcLoginFactoryTest extends TestCase
         $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             $option => -1,
         ], $factory);
     }
@@ -372,7 +373,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'check_path' => '/oidc/callback',
         ];
 
@@ -391,7 +392,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'check_path' => 'oidc_callback_route',
         ];
 
@@ -412,7 +413,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ];
 
         $factory = new OidcLoginFactory();
@@ -432,7 +433,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'start_path' => 'oidc_start_route',
         ];
 
@@ -456,7 +457,7 @@ class OidcLoginFactoryTest extends TestCase
         $this->processConfig([
             'provider_uri' => 'http://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
     }
 
@@ -468,7 +469,7 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig([
             'provider_uri' => 'HTTPS://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
 
         $this->assertSame('HTTPS://provider.example.com', $finalizedConfig['provider_uri']);
@@ -485,7 +486,7 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig([
             'provider_uri' => $providerUri,
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
 
         $this->assertSame($providerUri, $finalizedConfig['provider_uri']);
@@ -509,7 +510,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'pkce' => ['enabled' => false, 'method' => 'plain'],
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
@@ -529,7 +530,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
 
@@ -558,7 +559,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'id_token_signature' => ['required' => false],
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
@@ -577,7 +578,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'discovery_cache_ttl' => 60,
             'id_token_signature' => [
                 'algorithms' => ['ES256', 'PS256'],
@@ -600,21 +601,21 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'id_token_signature' => ['algorithms' => 'ES256'],
         ], $factory);
 
         $this->assertSame(['ES256'], $config['id_token_signature']['algorithms']);
     }
 
-    public function testConfidentialClientIsWiredByDefault()
+    public function testTheClientAuthenticationServiceIsInjectedIntoTheClient()
     {
         $container = new ContainerBuilder();
 
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ];
 
         $factory = new OidcLoginFactory();
@@ -623,86 +624,203 @@ class OidcLoginFactoryTest extends TestCase
         $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
         $this->assertInstanceOf(ChildDefinition::class, $client);
         $this->assertSame('security.authenticator.oidc_login.client', $client->getParent());
-        $this->assertSame('my-client-secret', $client->getArgument(3));
-        $this->assertSame('client_secret_post', $client->getArgument(4));
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $client->getArgument(1));
+        $this->assertSame('my-client-id', $client->getArgument(2));
+        $this->assertEquals(new Reference('app.client_authentication'), $client->getArgument(3));
     }
 
-    public function testPublicClientIsWiredWhenTheTokenEndpointNeedsNoAuthentication()
+    /**
+     * A public client points at the ready-made service rather than declaring one of its
+     * own, as the "none" method has nothing to configure.
+     */
+    public function testAPublicClientCanUseTheReadyMadeNoClientAuthenticationService()
     {
         $container = new ContainerBuilder();
 
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'token_endpoint_auth_method' => 'none',
+            'client_authentication' => 'security.oauth2.client_authentication.none',
         ];
 
         $factory = new OidcLoginFactory();
         $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
 
-        $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
-        $this->assertInstanceOf(ChildDefinition::class, $client);
-        $this->assertSame('security.authenticator.oidc_login.public_client', $client->getParent());
-        $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $client->getArgument(1));
-        $this->assertSame('my-client-id', $client->getArgument(2));
-        // a public client takes neither a secret nor an authentication method
-        $this->assertArrayNotHasKey('index_3', $client->getArguments());
-        $this->assertArrayNotHasKey('index_4', $client->getArguments());
+        $this->assertSame(NoClientAuthentication::class, $container->getDefinition('security.oauth2.client_authentication.none')->getClass());
+        $this->assertEquals(new Reference('security.oauth2.client_authentication.none'), $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(3));
     }
 
-    #[DataProvider('provideSecretBasedAuthMethods')]
-    public function testRejectsAMissingClientSecretForSecretBasedAuthentication(?string $tokenEndpointAuthMethod)
+    public function testTheClientSecretBasicMethodIsBuiltFromTheConfiguration()
     {
-        $factory = new OidcLoginFactory();
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The OIDC "client_secret" is required by the "token_endpoint_auth_method" in use');
+        $container = new ContainerBuilder();
 
         $config = [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'my-client-secret'],
         ];
-        if (null !== $tokenEndpointAuthMethod) {
-            $config['token_endpoint_auth_method'] = $tokenEndpointAuthMethod;
-        }
 
-        $this->processConfig($config, $factory);
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertInstanceOf(ChildDefinition::class, $clientAuthentication);
+        $this->assertSame('security.oauth2.client_authentication.client_secret_basic', $clientAuthentication->getParent());
+        $this->assertSame('my-client-secret', $clientAuthentication->getArgument(0));
+        $this->assertEquals(
+            new Reference('security.authenticator.oidc_login.client_authentication.main'),
+            $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(3),
+        );
     }
 
-    public static function provideSecretBasedAuthMethods(): iterable
+    public function testTheClientSecretPostMethodIsBuiltFromTheConfiguration()
     {
-        yield 'implicit default' => [null];
-        yield 'client_secret_post' => ['client_secret_post'];
-        yield 'client_secret_basic' => ['client_secret_basic'];
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_post' => 'my-client-secret'],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame('security.oauth2.client_authentication.client_secret_post', $clientAuthentication->getParent());
+        $this->assertSame('my-client-secret', $clientAuthentication->getArgument(0));
     }
 
-    public function testRejectsAClientSecretForAPublicClient()
+    /**
+     * Each firewall gets its own client authentication, as two of them authenticate at two
+     * providers with two secrets.
+     */
+    public function testTwoFirewallsGetTwoClientAuthentications()
+    {
+        $container = new ContainerBuilder();
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'main-secret'],
+        ], $factory), 'userprovider');
+        $factory->createAuthenticator($container, 'admin', $this->processConfig([
+            'provider_uri' => 'https://other.example.com',
+            'client_id' => 'my-other-client-id',
+            'client_authentication' => ['client_secret_post' => 'admin-secret'],
+        ], $factory), 'userprovider');
+
+        $this->assertSame('main-secret', $container->getDefinition('security.authenticator.oidc_login.client_authentication.main')->getArgument(0));
+        $this->assertSame('admin-secret', $container->getDefinition('security.authenticator.oidc_login.client_authentication.admin')->getArgument(0));
+    }
+
+    /**
+     * "none" is the one method taking no parameter, so it is the one a bare string may name
+     * without being taken for a service id.
+     */
+    public function testTheNoneShorthandDeclaresAPublicClient()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'none',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.client_authentication.main'));
+        $this->assertEquals(
+            new Reference('security.oauth2.client_authentication.none'),
+            $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(3),
+        );
+    }
+
+    public function testTheNoneMappingDeclaresAPublicClient()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['none' => true],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertEquals(
+            new Reference('security.oauth2.client_authentication.none'),
+            $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(3),
+        );
+    }
+
+    /**
+     * Every shape the "client_authentication" node accepts, and the service each one ends up
+     * injecting into the OIDC client.
+     */
+    #[DataProvider('provideClientAuthenticationShapes')]
+    public function testEveryAcceptedShapeOfTheClientAuthenticationNode(array|string $clientAuthentication, string $expectedServiceId)
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => $clientAuthentication,
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertEquals(
+            new Reference($expectedServiceId),
+            $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(3),
+        );
+    }
+
+    public static function provideClientAuthenticationShapes(): iterable
+    {
+        $perFirewall = 'security.authenticator.oidc_login.client_authentication.main';
+
+        yield 'client_secret_basic' => [['client_secret_basic' => 'my-client-secret'], $perFirewall];
+        yield 'client_secret_post' => [['client_secret_post' => 'my-client-secret'], $perFirewall];
+        yield 'none as a mapping' => [['none' => true], 'security.oauth2.client_authentication.none'];
+        yield 'none as a null mapping' => [['none' => null], 'security.oauth2.client_authentication.none'];
+        yield 'none as a string' => ['none', 'security.oauth2.client_authentication.none'];
+        yield 'a service as a mapping' => [['id' => 'app.client_authentication'], 'app.client_authentication'];
+        yield 'a service as a string' => ['app.client_authentication', 'app.client_authentication'];
+    }
+
+    public function testRejectsSeveralClientAuthenticationMethods()
     {
         $factory = new OidcLoginFactory();
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The OIDC "client_secret" must not be set when "token_endpoint_auth_method" is "none"');
+        $this->expectExceptionMessage('Exactly one OIDC "client_authentication" method must be configured');
 
         $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
-            'token_endpoint_auth_method' => 'none',
+            'client_authentication' => ['client_secret_basic' => 'my-client-secret', 'none' => true],
         ], $factory);
     }
 
-    public function testAllowsAnExplicitNullClientSecretForAPublicClient()
+    public function testRejectsAnEmptyClientAuthenticationMapping()
     {
         $factory = new OidcLoginFactory();
 
-        $finalizedConfig = $this->processConfig([
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Exactly one OIDC "client_authentication" method must be configured');
+
+        $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => null,
-            'token_endpoint_auth_method' => 'none',
+            'client_authentication' => [],
         ], $factory);
-
-        $this->assertNull($finalizedConfig['client_secret']);
     }
 
     public function testRejectsAnEmptyClientSecret()
@@ -710,81 +828,107 @@ class OidcLoginFactoryTest extends TestCase
         $factory = new OidcLoginFactory();
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The OIDC "client_secret" is required by the "token_endpoint_auth_method" in use');
 
         $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => '',
+            'client_authentication' => ['client_secret_basic' => ''],
         ], $factory);
     }
 
-    public function testPublicClientDefaults()
-    {
-        $factory = new OidcLoginFactory();
-
-        $finalizedConfig = $this->processConfig([
-            'provider_uri' => 'https://provider.example.com',
-            'client_id' => 'my-client-id',
-            'token_endpoint_auth_method' => 'none',
-        ], $factory);
-
-        $this->assertNull($finalizedConfig['client_secret']);
-    }
-
-    public function testTokenEndpointAuthMethodDefaultsToClientSecretPost()
-    {
-        $factory = new OidcLoginFactory();
-
-        $finalizedConfig = $this->processConfig([
-            'provider_uri' => 'https://provider.example.com',
-            'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
-        ], $factory);
-
-        $this->assertSame('client_secret_post', $finalizedConfig['token_endpoint_auth_method']);
-    }
-
-    public function testRejectsAPublicClientWithoutPkce()
+    public function testRejectsTheNoneMethodSetToFalse()
     {
         $factory = new OidcLoginFactory();
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The OIDC "pkce.enabled" option cannot be false when "token_endpoint_auth_method" is "none"');
+        $this->expectExceptionMessage('The OIDC "client_authentication.none" option only takes true');
 
         $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'token_endpoint_auth_method' => 'none',
+            'client_authentication' => ['none' => false],
+        ], $factory);
+    }
+
+    /**
+     * The two rules a public client cannot bend are checked while the container compiles for
+     * every method this bundle builds itself, so that the message names the firewall and a key
+     * that can be grepped for in the configuration.
+     */
+    public function testAPublicClientCannotDisablePkceAtCompileTime()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The OIDC "pkce.enabled" option cannot be false for a public client');
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'none',
             'pkce' => ['enabled' => false],
         ], $factory);
     }
 
-    public function testAPublicClientKeepsPkceEnabledByDefault()
+    public function testAPublicClientCannotDisableTheIdTokenSignatureCheckAtCompileTime()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The OIDC "id_token_signature.required" option cannot be false for a public client');
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['none' => true],
+            'id_token_signature' => ['required' => false],
+        ], $factory);
+    }
+
+    /**
+     * A service only reports its method once built, so the same two rules are left to the
+     * constructor of the authenticator, which is what catches a custom implementation
+     * authenticating with "none".
+     */
+    public function testAClientAuthenticationServiceLeavesTheTwoRulesToTheAuthenticator()
     {
         $factory = new OidcLoginFactory();
 
         $finalizedConfig = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'token_endpoint_auth_method' => 'none',
+            'client_authentication' => 'app.client_authentication',
+            'pkce' => ['enabled' => false],
+            'id_token_signature' => ['required' => false],
         ], $factory);
 
-        $this->assertTrue($finalizedConfig['pkce']['enabled']);
+        $this->assertFalse($finalizedConfig['pkce']['enabled']);
+        $this->assertFalse($finalizedConfig['id_token_signature']['required']);
     }
 
-    public function testRejectsTurningTheIdTokenSignatureVerificationOffForAPublicClient()
+    public function testRejectsAMissingClientAuthentication()
     {
         $factory = new OidcLoginFactory();
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The OIDC "id_token_signature.required" option cannot be false when "token_endpoint_auth_method" is "none"');
+        $this->expectExceptionMessage('child config "client_authentication" under "oidc-login" must be configured');
 
         $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'token_endpoint_auth_method' => 'none',
-            'id_token_signature' => ['required' => false],
+        ], $factory);
+    }
+
+    public function testRejectsAnEmptyClientAuthentication()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => '',
         ], $factory);
     }
 
@@ -795,24 +939,11 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'id_token_signature' => ['required' => false],
         ], $factory);
 
         $this->assertFalse($finalizedConfig['id_token_signature']['required']);
-    }
-
-    public function testAPublicClientVerifiesTheIdTokenSignatureByDefault()
-    {
-        $factory = new OidcLoginFactory();
-
-        $finalizedConfig = $this->processConfig([
-            'provider_uri' => 'https://provider.example.com',
-            'client_id' => 'my-client-id',
-            'token_endpoint_auth_method' => 'none',
-        ], $factory);
-
-        $this->assertTrue($finalizedConfig['id_token_signature']['required']);
     }
 
     public function testClaimsSourceAndUserIdentifierDefaults()
@@ -822,7 +953,7 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
 
         $this->assertSame('userinfo', $finalizedConfig['user_data_source']);
@@ -837,7 +968,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'user_data_source' => 'id_token',
             'user_identifier_claim' => 'email',
         ], $factory);
@@ -856,7 +987,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
 
@@ -873,7 +1004,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'user_data_source' => 'id_token',
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
@@ -891,7 +1022,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
 
@@ -912,7 +1043,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'id_token_signature' => ['required' => false],
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
@@ -928,7 +1059,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
 
@@ -944,7 +1075,7 @@ class OidcLoginFactoryTest extends TestCase
         $config = $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'refresh_access_token' => ['enabled' => true, 'leeway' => 60],
         ], $factory);
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
@@ -965,7 +1096,7 @@ class OidcLoginFactoryTest extends TestCase
         $this->processConfig([
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
+            'client_authentication' => 'app.client_authentication',
             'refresh_access_token' => ['enabled' => true, 'leeway' => -1],
         ], $factory);
     }

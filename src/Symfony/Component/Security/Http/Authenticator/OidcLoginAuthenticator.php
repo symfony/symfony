@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
-use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClientInterface;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -54,6 +54,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     private readonly ClockInterface $clock;
 
     /**
+     * A public client, which authenticates with "none", sends no secret: PKCE is then the
+     * only thing binding the authorization code to it, and the ID token signature the only
+     * thing tying the token endpoint response to the provider beyond the TLS verification.
+     * Neither can be turned off for such a client, which is what this constructor refuses.
+     *
      * @param array<string, string>      $authorizationParams Additional parameters of the authorization request, e.g.
      *                                                        "prompt" or "ui_locales"; the protocol parameters the
      *                                                        authenticator manages itself are rejected
@@ -68,7 +73,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     public function __construct(
         private readonly HttpUtils $httpUtils,
         private readonly UserProviderInterface $userProvider,
-        private readonly OidcClient $oidcClient,
+        private readonly OidcClientInterface $oidcClient,
         private readonly OidcDiscovery $discovery,
         private readonly OidcIdToken $idToken,
         private readonly string $clientId,
@@ -97,6 +102,16 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
 
         if (!\in_array($this->options['pkce_method'], ['S256', 'plain'], true)) {
             throw new \InvalidArgumentException(\sprintf('Invalid PKCE method "%s": RFC 7636 defines "S256" and "plain" only.', $this->options['pkce_method']));
+        }
+
+        if ('none' === $oidcClient->getClientAuthenticationMethod()) {
+            if (!$this->options['pkce_enabled']) {
+                throw new \InvalidArgumentException('PKCE cannot be disabled for a public OIDC client, which authenticates with "none": it is the only thing binding the authorization code to this client.');
+            }
+
+            if (null === $signatureVerifier) {
+                throw new \InvalidArgumentException('The ID token signature must be verified for a public OIDC client, which authenticates with "none": without the check, only the TLS verification of the token request ties the ID token to the provider, which is too little for a client that has nothing but PKCE protecting its code exchange.');
+            }
         }
 
         if ($managed = array_intersect_key($authorizationParams, array_flip(self::MANAGED_PARAMS))) {

@@ -45,10 +45,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
-use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -1373,7 +1375,7 @@ class SecurityExtensionTest extends TestCase
                     'oidc_login' => [
                         'provider_uri' => 'https://provider.example.com',
                         'client_id' => 'my-client-id',
-                        'client_secret' => 'my-client-secret',
+                        'client_authentication' => 'app.client_authentication',
                         'refresh_access_token' => true,
                     ],
                 ],
@@ -1403,7 +1405,7 @@ class SecurityExtensionTest extends TestCase
                     'oidc_login' => [
                         'provider_uri' => 'https://provider.example.com',
                         'client_id' => 'my-client-id',
-                        'client_secret' => 'my-client-secret',
+                        'client_authentication' => 'app.client_authentication',
                     ],
                 ],
             ],
@@ -1574,7 +1576,7 @@ class SecurityExtensionTest extends TestCase
                     'oidc_login' => [
                         'provider_uri' => '%env(OIDC_PROVIDER_URI)%',
                         'client_id' => '%env(OIDC_CLIENT_ID)%',
-                        'client_secret' => '%env(OIDC_CLIENT_SECRET)%',
+                        'client_authentication' => 'app.client_authentication',
                     ],
                 ],
             ],
@@ -1599,7 +1601,7 @@ class SecurityExtensionTest extends TestCase
                     'oidc_login' => [
                         'provider_uri' => 'https://provider.example.com',
                         'client_id' => 'my-client-id',
-                        'client_secret' => 'my-client-secret',
+                        'client_authentication' => 'app.client_authentication',
                     ],
                 ],
             ],
@@ -1621,7 +1623,7 @@ class SecurityExtensionTest extends TestCase
                     'oidc_login' => [
                         'provider_uri' => 'https://provider.example.com',
                         'client_id' => 'my-client-id',
-                        'client_secret' => 'my-client-secret',
+                        'client_authentication' => 'app.client_authentication',
                     ],
                 ],
             ],
@@ -1645,7 +1647,7 @@ class SecurityExtensionTest extends TestCase
                     'oidc_login' => [
                         'provider_uri' => 'https://provider.example.com',
                         'client_id' => 'my-client-id',
-                        'client_secret' => 'my-client-secret',
+                        'client_authentication' => 'app.client_authentication',
                         'id_token_signature' => ['required' => false],
                     ],
                 ],
@@ -1668,7 +1670,7 @@ class SecurityExtensionTest extends TestCase
                     'oidc_login' => [
                         'provider_uri' => 'https://provider.example.com',
                         'client_id' => 'my-client-id',
-                        'token_endpoint_auth_method' => 'none',
+                        'client_authentication' => 'security.oauth2.client_authentication.none',
                     ],
                 ],
             ],
@@ -1677,8 +1679,8 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
-        $this->assertSame(OidcPublicClient::class, $client->getClass());
-        $this->assertCount(3, $client->getArguments());
+        $this->assertSame(OidcClient::class, $client->getClass());
+        $this->assertSame(NoClientAuthentication::class, $container->getDefinition('security.oauth2.client_authentication.none')->getClass());
     }
 
     public function testOidcLoginCallbackRouteLoaderIsAlwaysRegistered()
@@ -1718,6 +1720,9 @@ class SecurityExtensionTest extends TestCase
 
         $bundle = new SecurityBundle();
         $bundle->build($container);
+
+        // the service the "client_authentication" option of the oidc_login tests points at
+        $container->register('app.client_authentication', ClientSecretPost::class)->setArguments(['my-client-secret']);
 
         return $container;
     }

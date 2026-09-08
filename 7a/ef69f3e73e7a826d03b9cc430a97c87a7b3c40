@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:11:34Z
+
+I confirmed the root cause from the code: both the body block and the header block only ever set `$expectedRequestHasBeenFound` on success, then fell through to the unconditional assignment at the end of the trace loop, so a matching URL and method alone was enough to pass. Good catch.
+
+I pushed three things on top of your commit:
+
+- The failure message now tells the two cases apart. A body or header mismatch used to report `The expected request has not been called` for a request that is sitting right there in the profiler panel, which is the case your fix makes reachable.
+- The header loop is a direct lookup now. `Data::offsetGet` returns a raw scalar for a leaf, which is why the nested scan was needed, but `getValue(true)` on the whole headers `Data` returns a plain array, and `DataCollector::cloneVar` sets `setMaxItems(-1)` so nothing is truncated.
+- Tests for both messages and for an empty body. Your rewrite of the body check also fixed `assertHttpClientRequest($url, 'POST', '')` against a request that really did send `''`, which the old `if (!$actualBody)` rejected. That was worth locking in.
+
+Header names stay case-sensitive, as in your patch. A trace records the option array passed at the call site, not the headers on the wire, so the case is always the test author's own.
+
+The red Windows job is a runner flake: `Bridge/Twig` died at bootstrap with `Can't initialize heap: [0x000001e7] Attempt to access invalid address`, and FrameworkBundle passed in that same run.

@@ -99,6 +99,7 @@ use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\Webhook\WebhookBundle;
 use Symfony\Component\WebLink\WebLinkBundle;
 use Symfony\Component\Workflow\WorkflowBundle;
 
@@ -136,6 +137,7 @@ class_exists(Registry::class);
 #[RequiredBundle(JsonStreamerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(AssetMapperBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(RateLimiterBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(WebhookBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]

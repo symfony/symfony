@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `WebhookBundle`, which provides the `webhook` configuration and the services previously provided by `FrameworkBundle` under `framework.webhook`
  * Add a `Webhook-Timestamp` header to webhook requests
  * Add support for the [Standard Webhooks](https://www.standardwebhooks.com/) signature scheme with the `SignatureFormat` enum
 

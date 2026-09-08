@@ -145,6 +145,11 @@ FrameworkBundle
  * `RateLimiterBundle` is registered automatically when the RateLimiter component is installed, and its services are
    then registered without any configuration; set `rate_limiter.enabled` to `false` to disable them. The
    `framework.rate_limiter` configuration is an alias of the `rate_limiter` configuration provided by the bundle
+ * `WebhookBundle` is registered automatically when the Webhook component is installed, and its services are then
+   registered without any configuration; set `webhook.enabled` to `false` to disable them. The `framework.webhook`
+   configuration is an alias of the `webhook` configuration provided by the bundle. The transport reports an error
+   when the configured HTTP client is missing, the controller when the configured message bus is, and the payload is
+   serialized with `json_encode()` when the Serializer component is not enabled
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

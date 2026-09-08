@@ -20,6 +20,8 @@ CHANGELOG
  * Register `TypeInfoBundle` automatically when the TypeInfo component is installed
  * Make `framework.property_access` an alias of the `property_access` configuration provided by `PropertyAccessBundle`
  * Register `PropertyAccessBundle` automatically when the PropertyAccess component is installed
+ * Make `framework.property_info` an alias of the `property_info` configuration provided by `PropertyInfoBundle`
+ * Register `PropertyInfoBundle` automatically when the PropertyInfo component is installed
  * Make `framework.uid` an alias of the `uid` configuration provided by `UidBundle`
  * Register `UidBundle` automatically when the Uid component is installed
  * Make `framework.scheduler` an alias of the `scheduler` configuration provided by `SchedulerBundle`

@@ -768,10 +768,6 @@ class ConfigurationTest extends TestCase
                 'mapping' => ['paths' => []],
                 'named_serializers' => [],
             ],
-            'property_info' => [
-                'enabled' => !class_exists(FullStack::class),
-                'with_constructor_extractor' => true,
-            ],
             'router' => [
                 'enabled' => false,
                 'default_uri' => null,

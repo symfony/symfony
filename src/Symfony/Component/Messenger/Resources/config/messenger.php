@@ -190,8 +190,13 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.transport.sync.factory', SyncTransportFactory::class)
             ->args([
                 service('messenger.routable_message_bus'),
+                service('messenger.retry_strategy_locator'),
+                abstract_arg('failure transports by transport name'),
+                service('event_dispatcher'),
+                service('logger')->ignoreOnInvalid(),
             ])
             ->tag('messenger.transport_factory')
+            ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.transport.in_memory.factory', InMemoryTransportFactory::class)
             ->args([

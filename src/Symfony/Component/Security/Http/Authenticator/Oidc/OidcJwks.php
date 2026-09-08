@@ -111,6 +111,19 @@ final class OidcJwks
     private static function filterSignatureKeys(array $keys, bool $enforceKeyUsageVerification): array
     {
         return array_values(array_filter($keys, static function (array $jwk) use ($enforceKeyUsageVerification): bool {
+            // RFC 7517 makes "kty" mandatory and both it and "kid" strings. An entry
+            // breaking that is unusable, and worse than useless: an entry without a
+            // "kty" makes JWKSet::createFromKeyData() throw, and a "kid" that is not
+            // a string makes it throw too on web-token/jwt-library 3.x, which uses it
+            // as an array offset. Either way a single odd entry failed every login
+            // with a 500 instead of an authentication failure.
+            if (!isset($jwk['kty']) || !\is_string($jwk['kty']) || '' === $jwk['kty']) {
+                return false;
+            }
+            if (isset($jwk['kid']) && !\is_string($jwk['kid'])) {
+                return false;
+            }
+
             if ($enforceKeyUsageVerification) {
                 if (isset($jwk['use']) && 'sig' === $jwk['use']) {
                     return true;

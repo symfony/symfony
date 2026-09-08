@@ -501,6 +501,67 @@ class OidcLoginAuthenticatorTest extends TestCase
         $authenticator->authenticate($request);
     }
 
+    public function testAuthenticateAcceptsTheIssParameterOfTheExpectedIssuer()
+    {
+        // RFC 9207: the "iss" authorization response parameter names the provider that
+        // issued the response, and must be the expected one
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->expects($this->once())
+            ->method('exchangeCode')
+            ->willReturn(['access_token' => 'access-123', 'id_token' => $this->buildIdToken(['nonce' => $nonce])]);
+        $this->oidcClient->expects($this->once())
+            ->method('fetchUserInfo')
+            ->willReturn(['sub' => 'user-42']);
+
+        $passport = $this->createAuthenticator()->authenticate($this->createCallbackRequest($state, $nonce, query: ['iss' => 'https://provider.example.com']));
+
+        $this->assertSame('user-42', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+    }
+
+    public function testAuthenticateRejectsTheIssParameterOfAnotherIssuer()
+    {
+        // the response of another provider is rejected before any request is sent
+        // to the token endpoint (mix-up attack), and the attempt is consumed anyway
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->expects($this->never())->method('exchangeCode');
+
+        $request = $this->createCallbackRequest($state, $nonce, query: ['iss' => 'https://evil.example.com']);
+
+        try {
+            $this->createAuthenticator()->authenticate($request);
+            $this->fail('An AuthenticationException should have been thrown.');
+        } catch (AuthenticationException $e) {
+            $this->assertSame('The OIDC callback "iss" parameter does not match the expected issuer.', $e->getMessage());
+        }
+
+        $this->assertFalse($request->getSession()->has('_security.oidc_login.main.attempt.'.$state));
+    }
+
+    public function testAuthenticateRequiresTheIssParameterWhenTheProviderSupportsIt()
+    {
+        // a provider announcing support sends the parameter on every response, so a
+        // callback without it did not come from it
+        $this->discovery = $this->createDiscovery([
+            'issuer' => 'https://provider.example.com',
+            'authorization_endpoint' => 'https://provider.example.com/authorize',
+            'token_endpoint' => 'https://provider.example.com/token',
+            'userinfo_endpoint' => 'https://provider.example.com/userinfo',
+            'jwks_uri' => 'https://provider.example.com/jwks',
+            'authorization_response_iss_parameter_supported' => true,
+        ]);
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The OIDC provider announces support for the "iss" authorization response parameter, but the callback does not carry it.');
+
+        $this->createAuthenticator()->authenticate($this->createCallbackRequest($state, $nonce));
+    }
+
     public function testAuthenticateWithProviderError()
     {
         // the provider echoes the "state" back on an error response too (RFC 6749,
@@ -1346,9 +1407,9 @@ class OidcLoginAuthenticatorTest extends TestCase
         $authenticator->authenticate($request);
     }
 
-    private function createCallbackRequest(string $state, string $nonce, ?string $codeVerifier = null): Request
+    private function createCallbackRequest(string $state, string $nonce, ?string $codeVerifier = null, array $query = []): Request
     {
-        $request = Request::create('/oidc/callback?code=auth-code&state='.$state);
+        $request = Request::create('/oidc/callback?'.http_build_query(['code' => 'auth-code', 'state' => $state] + $query));
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 

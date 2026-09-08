@@ -26,6 +26,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[RequiresPhpExtension('openssl')]
@@ -155,6 +156,58 @@ class OidcSignatureVerifierTest extends TestCase
         $verifier->verify($this->buildJws(json_encode(['sub' => 'user-42'])));
     }
 
+    public function testVerifyIgnoresAMalformedJwksEntryNextToTheSigningKey()
+    {
+        // an entry without "kty" would make JWKSet::createFromKeyData() throw
+        $verifier = $this->createVerifier(jwks: [['keys' => [['kid' => 'malformed', 'use' => 'sig'], self::PUBLIC_JWK]]]);
+
+        $this->assertSame(['sub' => 'user-42'], $verifier->verify($this->buildJws(json_encode(['sub' => 'user-42']))));
+    }
+
+    public function testVerifyDoesNotShareTheKeysCachedByALaxVerifier()
+    {
+        // the provider publishes its key without any usage designation, which only the
+        // lax filter keeps: the strict verifier must not find it in the cache entry the
+        // lax one warmed, or the strictness of one firewall would depend on another
+        $cache = new ArrayAdapter();
+        $jwks = [['keys' => [array_diff_key(self::PUBLIC_JWK, ['use' => true])]]];
+        $token = $this->buildJws(json_encode(['sub' => 'user-42']));
+
+        $this->assertSame(['sub' => 'user-42'], $this->createVerifier(jwks: $jwks, jwksCache: $cache, enforceKeyUsageVerification: false)->verify($token));
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The OIDC provider published no signing key usable to verify the ID token signature.');
+
+        $this->createVerifier(jwks: $jwks, jwksCache: $cache)->verify($token);
+    }
+
+    public function testVerifyKeepsTheStrictnessOutOfTheHashedCacheKey()
+    {
+        // the strictness marker must not be hashed together with the "jwks_uri": a lax
+        // verifier on ".../jwks" would otherwise land on the same entry as a strict one
+        // on ".../jwks#lax", and the strict firewall would read the lax key set
+        $cache = new ArrayAdapter();
+        $jwks = [['keys' => [array_diff_key(self::PUBLIC_JWK, ['use' => true])]]];
+        $token = $this->buildJws(json_encode(['sub' => 'user-42']));
+        $lax = ['issuer' => 'https://provider.example.com', 'jwks_uri' => 'https://provider.example.com/jwks'];
+        $strict = ['issuer' => 'https://provider.example.com', 'jwks_uri' => 'https://provider.example.com/jwks#lax'];
+
+        $this->assertSame(['sub' => 'user-42'], $this->createVerifier(jwks: $jwks, configuration: $lax, jwksCache: $cache, enforceKeyUsageVerification: false)->verify($token));
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The OIDC provider published no signing key usable to verify the ID token signature.');
+
+        $this->createVerifier(jwks: $jwks, configuration: $strict, jwksCache: $cache)->verify($token);
+    }
+
+    public function testVerifyRejectsATokenWhoseKidIsNotAString()
+    {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The ID token "kid" header must be a string.');
+
+        $this->createVerifier()->verify($this->buildJws(json_encode(['sub' => 'user-42']), ['not', 'a', 'string']));
+    }
+
     public function testVerifyRejectsAPlainHttpJwksUri()
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
@@ -278,7 +331,7 @@ class OidcSignatureVerifierTest extends TestCase
      * @param list<array<string, mixed>> $jwks
      * @param list<string>               $algorithms
      */
-    private function createVerifier(?array $jwks = null, array $algorithms = ['ES256'], ?array $configuration = null, ?HttpClientInterface $httpClient = null, ?MockClock $clock = null): OidcSignatureVerifier
+    private function createVerifier(?array $jwks = null, array $algorithms = ['ES256'], ?array $configuration = null, ?HttpClientInterface $httpClient = null, ?MockClock $clock = null, ?CacheInterface $jwksCache = null, bool $enforceKeyUsageVerification = true): OidcSignatureVerifier
     {
         $configuration ??= [
             'issuer' => 'https://provider.example.com',
@@ -294,14 +347,16 @@ class OidcSignatureVerifierTest extends TestCase
 
         return new OidcSignatureVerifier(
             $discovery,
-            new ArrayAdapter(),
+            $jwksCache ?? new ArrayAdapter(),
             $httpClient ?? new MockHttpClient(array_map(static fn (array $jwkSet): JsonMockResponse => new JsonMockResponse($jwkSet), $jwks)),
             $algorithms,
+            3600,
+            $enforceKeyUsageVerification,
             clock: $clock ?? new MockClock(),
         );
     }
 
-    private function buildJws(string $payload, string $kid = 'signing-key'): string
+    private function buildJws(string $payload, string|array $kid = 'signing-key'): string
     {
         // tip: use https://mkjwk.org/ to generate a JWK
         $jwk = new JWK([

@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T11:12:39Z
+
+Pushed fixes on top of your branch.
+
+**The `active` check.** The last push moved `getUserBadgeFrom()` back to a truthy test while `introspect()` kept the strict one, so the two readings disagreed:
+
+```
+active="false" => GRANTED as "jdoe"
+active="no"    => GRANTED as "jdoe"      (any non-empty string granted)
+active=false   => refused
+
+active=1       granted=yes  cached=NO
+active="true"  granted=yes  cached=NO
+active="false" granted=yes  cached=NO
+```
+
+Two problems in one. `"active": "false"` authenticated, and a server answering `1` or `"true"` had its cache silently disabled, so it was re-introspected on every request. Both sites now use `filter_var($claims['active'] ?? false, \FILTER_VALIDATE_BOOL)`, which refuses `"false"`, `"0"`, `"no"`, `""` and `[]` while accepting `true`, `"true"`, `1`, `"1"` and `"yes"`. That keeps the leniency you went back for, without the bypass, so no `[BC BREAK]` line is needed. Three data rows and a cache test cover it, and they fail on the previous handler. This mattered beyond this PR: #65866 reads `token_introspection.active` through the same gate, so a signed response saying `"false"` authenticated too.
+
+**The `auth_basic` claim.** The class docblock said a scoped client's `auth_basic` "covers the `client_secret_basic` of RFC 6749 §2.3.1". It does not. `HttpClientTrait` does `base64_encode($options['auth_basic'])` verbatim, with no encoding:
+
+```
+id=cli:ent  secret=secret     wire=cli:ent:secret     rfc6749=cli%3Aent:secret
+    a server reading it per RFC 7617 sees user='cli' pass='ent:secret'
+id=client   secret=se+cret    wire=client:se+cret     rfc6749=client:se%2Bcret
+id=clïent  secret=sécrét   wire=clïent:sécrét   rfc6749=cl%C3%AFent:s%C3%A9cr%C3%A9t
+```
+
+The colon case is silent misauthentication, and `+` matters because many servers issue base64 secrets. I corrected the docblock and the `http_client` info to say the credentials are sent as given and must be encoded by hand. Worth deciding whether that is enough: `client_secret_post` is not expressible at all either, since the handler's body replaces the scoped client's default rather than merging with it, so `client_id` in a default body does not survive. If you want both schemes back, the previous shape had them.
+
+**Also pushed:** the AS-error functional test the rework dropped, restored on the new fixture (the symptom is a 500 reaching the user, so it belongs at that layer); removal of the dead `$response->getHeaders()` call and the docblock sentence claiming it guarded against 4xx payloads, since `toArray()` already throws on non-2xx and deleting the line left the suite green; `is_string` guards on `iss` and `aud`, which raised `Array to string conversion` on a malformed response; and an `UPGRADE-8.2.md` note, since `oauth2: 'x'` moved from an ignored scalar to an HTTP client service id, so someone who wrote the endpoint there on 7.4 now gets a container that does not compile.
+
+**One split worth making.** `Oauth2TokenHandler` shipped in 7.3, so 7.4 is the oldest maintained branch that has it, and on every released branch a 401, a 503, a non-JSON body or an empty body escapes as a 500 because `AccessTokenAuthenticator` has no `catch`. Narrowing that to `catch (\Exception)` is three lines, has no BC impact, aligns the handler with `OidcTokenHandler`, and is reachable on 7.4 through the `oauth2: true` plus global `default_options.base_uri` configuration that does compile there. The rest belongs here: `oauth2: ~` alone would give 7.4 a container that compiles and then 500s on `POST ''`, which is worse than leaving it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T11:27:53Z
+
+On that last point, would you want to open the 7.4 bugfix yourself, if you agree it belongs there?
+
+It is independent of everything in this PR: narrow `catch (AuthenticationException)` to `catch (\Exception)` in `Oauth2TokenHandler::getUserBadgeFrom()`, with the failing test first. On 7.4 the handler still catches only `AuthenticationException` (line 62), `AccessTokenAuthenticator` has no `catch` of its own, and `OidcTokenHandler` right next to it already catches `\Exception`. So a 401, a 503, a non-JSON body or an empty body from the authorization server reaches the kernel as a 500 on 7.4, 8.0 and 8.1. 6.4 does not have the class, so 7.4 is the oldest branch affected.
+
+It is reachable there through the `oauth2: true` plus global `framework.http_client.default_options.base_uri` configuration, which is the one shape that does compile and run on those branches.
+
+Worth putting `Merge-up to 8.2: keep 8.2's version of Oauth2TokenHandler.php` in the body, so whoever merges it up does not try to reconcile it with the rework here.
+
+If you would rather not, or if you read the branch target differently, say so and I will take care of it.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-06T11:45:34Z
+
+Thanks, all taken.
+
+**The split you asked for is #65870**, on 7.4. It carries the `catch (\Exception)` alone, with a data provider covering the five ways the request fails: the caller refused, the server down, the server unreachable, a non-JSON body, an empty body. All five fail on the current handler.
+
+So this PR no longer widens the catch, and I removed the coverage that went with it, including the functional test you restored and its `BROKEN_ACCESS_TOKEN` fixture branch. Sorry to take that away: it cannot ride to 7.4, where the fixture does not exist, and keeping it here would have made this PR red until #65870 merges up. Say the word and I will put it back once it does, since your point stands that the symptom is only visible at that layer.
+
+#65866 does widen the catch, and states why in its own docblock: verifying an RFC 9701 response goes through the JOSE checkers, and a refused `typ` header or a missing mandatory claim is an exception of theirs, not an `AuthenticationException`. Without the widening those reach the user as a 500, which its tests now assert.
+
+**On `auth_basic`.** You are right, and I checked both halves. `HttpClientTrait` line 163 does `base64_encode($options['auth_basic'])` with nothing in between, so the colon case is silent misauthentication as you show. And `client_secret_post` is not merely awkward, it is unreachable: `mergeDefaultOptions()` ends on `$options += $defaultOptions`, and `+=` keeps the left-hand value, so the handler's `body` discards whatever the scoped client set as a default.
+
+We are keeping the documented caveat rather than bringing the three options back. Moving the credentials into the firewall is the shape this PR was reworked to get away from, and the only place that can form-urlencode both halves while staying out of the firewall is an OAuth2-aware HTTP client. That is the piece we have queued next: it would carry `client_secret_basic` with the right encoding, `client_secret_post` by merging into the body, and later `private_key_jwt`. It would also serve the two `TokenManager` classes the Mailer Google and MicrosoftGraph bridges each reimplement. Until then `http_client` is the seam, and pointing it at that client is a one-line change with nothing to deprecate here.
+
+**The `active` reading.** Agreed on the substance, and thanks for catching that the two sites had drifted apart: the cache being silently disabled for a server answering `1` is worse than it looks, since it turns every request into a round trip to the authorization server.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-06T12:59:41Z
+
+Pushed a few things and corrected the description.
+
+**The description advertised a fix this branch no longer has.** The "One more defect fixed" section still said the 401-instead-of-500 change was in here. It is not, since you moved it to #65870, and carsonbot copies the body into the merge commit. That section now says the opposite and points at #65870.
+
+For the record, and it settles the merge-order question: merging this before #65870 has merged up regresses nothing. This branch restores 8.2's current behaviour exactly. I checked all nine shapes on this head and on plain 8.2, and they produce identical exception classes; the 401 only ever existed on the intermediate head I had pushed, which was never released. So either order works.
+
+**Your reason for removing the functional test was right, though not for the reason given.** "It cannot ride to 7.4" is backwards, since merge-up runs 7.4 to 8.2 and a test added here stays here. But restoring it on this head does fail, `Failed asserting that 500 is identical to 401`, so removing it was correct.
+
+**On `auth_basic`, I now agree with you, and I think the argument is stronger than the one in the thread.** What decides it is that no guard is implementable at this layer. At compile time the scoped client does not exist yet: instrumenting `create()` during the functional test gives `hasDefinition('oauth2.introspection') = false` and a null `framework.http_client` extension config, and the recommended shape passes env placeholders no compile-time guard could resolve, so a guard would be blind exactly where it is needed. At runtime `ScopingHttpClient::$defaultOptionsByRegexp` is private with no getter, so the handler cannot see `auth_basic` at all. And restoring the three options does work mechanically, but a per-request `auth_basic` loses silently to a client-level `Authorization` header, so it adds a second credential path shadowed by the first. One mechanism plus a documented caveat beats two plus a precedence rule.
+
+Two things made me comfortable: the caveat is in the `http_client` node's `info()`, so it shows up in `config:dump-reference security` rather than only in an `@internal` docblock; and a wrongly encoded credential fails loudly, since the authorization server answers 401 and that surfaces naming the endpoint. I did reword the `info()`, because "form-urlencoded as RFC 6749 §2.3.1 prescribes" reads equally as "Symfony encodes them for you". It now says the credentials are sent as given and that a colon, a plus or a space must be encoded by hand. The YAML example in the description passes raw env vars and could say the same.
+
+**Also pushed:** the `[BC BREAK]` bullet now mentions the `active` change, which is the one break a user can actually hit (on 8.2 today, `"active": "false"`, `"no"` and `"bogus"` all authenticate); a data provider on `testDoesNotCacheTheResponseOfAnInactiveToken`, since it only used `['active' => false]`, falsy under both readings, so the cache-side `filter_var` was unpinned and mutating it left the suite green; and a `FOREIGN_ISSUER_ACCESS_TOKEN` branch in the fixture with one functional test, since nothing proved the `issuer` option reached the handler. That last one is mutation-checked: replacing `replaceArgument(3, $config['issuer'])` with `null` makes it fail.
+
+**One judgement call left for you.** The date claims fail open: `exp: "not-a-number"`, `exp: []` and `nbf: "soon"` are all granted, because `is_numeric()` guards the check rather than the value. `OidcTokenHandler` is fail-closed on the same input, since web-token's `ExpirationTimeChecker` throws `"exp" must be an integer.`. Aligning them is six lines and I have it ready, with `exp: null` still granted since JSON null means absent. Deliberate, or worth changing?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-06T19:12:18Z
+
+The date claims are now fail-closed, so that judgement call goes your way.
+
+`is_numeric()` guarded the check rather than the value, so `exp: "not-a-number"`, `exp: []` and `nbf: "soon"` skipped it entirely and the token was granted. RFC 7662 §2.2 types the three members as integer timestamps, so one carrying anything else describes no instant a resource server can confront its clock with. `OidcTokenHandler` being fail-closed on the same input settles it: two handlers in one directory should not read a malformed `exp` two ways.
+
+The three sites go through a `readTimestamp()` that returns null on an absent member and throws on a present one that is not numeric. A JSON null is still read as absent, which §2.2 allows. Four rows in `unusableTokens` cover the malformed shapes and fail on the previous handler, and two tests pin what stays granted, `exp: null` and a stringly typed `exp: "1719000001"`, so nobody tightens `is_numeric` into `is_int` later.
+
+I extended the `[BC BREAK]` bullet rather than adding one, since it already enumerates the date checks. The branch is rebased on 8.2 with #65871 in, so `high-deps` is green again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T06:47:07Z
+
+Rebased on 8.2 now that the merge-up landed, and aligned on the reading that came up with it.
+
+**`active` is now read strictly here too.** #65881 shipped `true !== ($claims['active'] ?? false)` and it merged up, so this PR adopts it at both sites rather than keeping `filter_var()`. Without that, 7.4, 8.0 and 8.1 patch releases would have been stricter on this control than 8.2.0, which is the wrong way round. `testCachesTheResponseOfAStringlyTypedActiveToken` went with it: under the strict reading a stringly typed boolean is not an active token, so there is nothing to cache. The two readings still have to agree, and the provider-driven `testDoesNotCacheTheResponseOfAnInactiveToken` is what pins that now, with the `"true"` and `1` rows the merge-up added.
+
+**The catch came back the other way.** #65870 merged and this branch was rewriting the same lines, so `catch (AuthenticationException $e)` here would have silently undone it. It is now `catch (\Exception $e)` with `'exception' => $e`, and `testTurnsAnErrorOfTheAuthorizationServerIntoBadCredentials` came across so the behaviour is pinned on this branch rather than only below it.
+
+**Two guards I pushed last round had no test.** Deleting the `is_string` guard on `iss`, or the `is_string` filter on `aud`, left the whole suite green. The second one matters: without it `{"aud": 0}` against a configured `audience: ['0']` is granted, because `array_intersect` compares as strings. Both have tests now.
+
+**One gap in the new date validation.** `is_numeric` accepts a float no integer can hold, so `exp: 1e20` and `INF` raised `The float INF is not representable as an int` and produced a garbage timestamp; for `nbf` and `iat` the garbage is `0`, so the token was granted. Guarded with `is_finite` and `PHP_INT_MAX`, with two provider rows.
+
+**The UPGRADE bullet lost its `active` half.** That change now ships in 7.4 and 8.1 patch releases, so by the time anyone upgrades 8.1 to 8.2 it is behind them and it is not an upgrade note. The date half stays, reworded to "not a number it can read as a timestamp", since a numeric string is still accepted and "not a timestamp" read as "not an integer".
+
+Suites on the rebased head: Security/Http 1003, Security/Core 450, SecurityBundle 555, all green.

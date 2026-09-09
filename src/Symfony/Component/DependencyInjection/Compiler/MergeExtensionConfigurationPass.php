@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterf
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader\UndefinedExtensionHandler;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -179,7 +180,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                     $alias = $node->getAttribute('alias_of');
 
                     if (!$container->hasExtension($alias)) {
-                        throw new LogicException(\sprintf('The "%s.%s" configuration is handled by the "%s" extension, which is not registered.', $name, $key, $alias));
+                        throw UndefinedExtensionHandler::createUndefinedAliasException($name, $key, $alias, $container);
                     }
 
                     if ($node->isDeprecated()) {

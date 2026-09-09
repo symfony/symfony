@@ -53,6 +53,7 @@ use Symfony\Component\DependencyInjection\Compiler\RegisterReverseContainerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
+use Symfony\Component\DependencyInjection\Loader\UndefinedExtensionHandler;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
@@ -181,6 +182,35 @@ class FrameworkBundle extends Bundle
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
+
+        // so that a missing extension can be reported with the package that provides it;
+        // "cache" is deliberately absent, it is a hard requirement of this bundle and its
+        // bundle is always registered, so suggesting to require it could never help
+        UndefinedExtensionHandler::addPackages($container, [
+            'asset' => 'symfony/asset',
+            'asset_mapper' => 'symfony/asset-mapper',
+            'html_sanitizer' => 'symfony/html-sanitizer',
+            'http_client' => 'symfony/http-client',
+            'json_streamer' => 'symfony/json-streamer',
+            'lock' => 'symfony/lock',
+            'mailer' => 'symfony/mailer',
+            'messenger' => 'symfony/messenger',
+            'notifier' => 'symfony/notifier',
+            'property_access' => 'symfony/property-access',
+            'property_info' => 'symfony/property-info',
+            'rate_limiter' => 'symfony/rate-limiter',
+            'remote_event' => 'symfony/remote-event',
+            'scheduler' => 'symfony/scheduler',
+            'semaphore' => 'symfony/semaphore',
+            'serializer' => 'symfony/serializer',
+            'translation' => 'symfony/translation',
+            'type_info' => 'symfony/type-info',
+            'uid' => 'symfony/uid',
+            'validation' => 'symfony/validator',
+            'web_link' => 'symfony/web-link',
+            'webhook' => 'symfony/webhook',
+            'workflow' => 'symfony/workflow',
+        ]);
 
         $container->addCompilerPass(new AddEventAliasesPass(
             array_merge(

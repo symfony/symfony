@@ -150,19 +150,22 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $container->setParameter('request_listener.http_port', 80);
         $container->setParameter('request_listener.https_port', 443);
 
-        $config = [
-            'framework' => [
-                'csrf_protection' => false,
-                'router' => ['resource' => 'dummy'],
-            ],
-        ];
-
         if (class_exists(ServicesBundle::class)) {
             new ServicesBundle()->getContainerExtension()->load([], $container);
         }
 
+        $config = ['csrf_protection' => false];
+
+        // the router lives in its own bundle since 8.2, and loading FrameworkExtension by hand does not
+        // forward to it; named as a string so the same file works on the branch before it
+        if (class_exists($routerBundle = 'Symfony\\Component\\Routing\\RouterBundle')) {
+            new $routerBundle()->getContainerExtension()->load([['resource' => 'dummy']], $container);
+        } else {
+            $config['router'] = ['resource' => 'dummy'];
+        }
+
         $ext = new FrameworkExtension();
-        $ext->load($config, $container);
+        $ext->load([$config], $container);
 
         $config = [
             'security' => [

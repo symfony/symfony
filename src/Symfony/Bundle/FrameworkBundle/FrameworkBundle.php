@@ -27,6 +27,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSerializerPropertyAccessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedValidatorPropertyInfoLoaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationLintCommandPass;
@@ -73,8 +74,7 @@ use Symfony\Component\Mime\MimeBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
-use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
-use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
+use Symfony\Component\PropertyInfo\PropertyInfoBundle;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingControllerPass;
@@ -129,6 +129,7 @@ class_exists(Registry::class);
 #[RequiredBundle(HtmlSanitizerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(TypeInfoBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(PropertyAccessBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(PropertyInfoBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(UidBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(SchedulerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonStreamerBundle::class, ignoreOnInvalid: true)]
@@ -210,13 +211,12 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FragmentRendererPass());
         $this->addCompilerPassIfExists($container, SerializerPass::class);
         $this->addCompilerPassIfExists($container, SerializerAttributeMetadataPass::class);
-        $this->addCompilerPassIfExists($container, PropertyInfoPass::class);
-        $this->addCompilerPassIfExists($container, PropertyInfoConstructorPass::class);
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new DefaultCachePoolsPass());
         $this->addCompilerPassIfExists($container, FormPass::class);
         $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
+        $container->addCompilerPass(new RemoveUnusedValidatorPropertyInfoLoaderPass());
         $container->addCompilerPass(new DefaultLockFactoryPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);

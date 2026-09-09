@@ -17,10 +17,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient;
-use phpDocumentor\Reflection\DocBlockFactoryInterface;
-use phpDocumentor\Reflection\Types\ContextFactory;
 use PhpParser\Parser;
-use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Http\Client\ClientInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
@@ -108,15 +105,6 @@ use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
 use Symfony\Component\Process\Process;
-use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
-use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
-use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
-use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
-use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
-use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
@@ -349,7 +337,6 @@ class FrameworkExtension extends Extension
             }
         }
 
-        $propertyInfoEnabled = $this->readConfigEnabled('property_info', $container, $config['property_info']);
         $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override'], $config['allowed_http_method_override']);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
@@ -391,10 +378,6 @@ class FrameworkExtension extends Extension
                 ->clearTag('kernel.event_subscriber');
 
             $container->removeDefinition('console.command.serializer_debug');
-        }
-
-        if ($propertyInfoEnabled) {
-            $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter'])) {
@@ -445,7 +428,7 @@ class FrameworkExtension extends Extension
         }
 
         // validation depends on form, annotations being registered
-        $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
+        $this->registerValidationConfiguration($config['validation'], $container, $loader);
 
         // notifier depends on mailer being registered
         if ($this->readConfigEnabled('notifier', $container, $config['notifier'])) {
@@ -518,18 +501,6 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(LocaleAwareInterface::class)
             ->addTag('kernel.locale_aware');
-        $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
-            ->addTag('property_info.list_extractor');
-        $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)
-            ->addTag('property_info.type_extractor');
-        $container->registerForAutoconfiguration(ConstructorArgumentTypeExtractorInterface::class)
-            ->addTag('property_info.constructor_extractor');
-        $container->registerForAutoconfiguration(PropertyDescriptionExtractorInterface::class)
-            ->addTag('property_info.description_extractor');
-        $container->registerForAutoconfiguration(PropertyAccessExtractorInterface::class)
-            ->addTag('property_info.access_extractor');
-        $container->registerForAutoconfiguration(PropertyInitializableExtractorInterface::class)
-            ->addTag('property_info.initializable_extractor');
         $container->registerForAutoconfiguration(EncoderInterface::class)
             ->addTag('serializer.encoder');
         $container->registerForAutoconfiguration(DecoderInterface::class)
@@ -1340,7 +1311,7 @@ class FrameworkExtension extends Extension
         $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);
     }
 
-    private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled): void
+    private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!$this->readConfigEnabled('validation', $container, $config)) {
             $container->removeDefinition('console.command.validator_debug');
@@ -1414,7 +1385,8 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('validator.auto_mapping', $config['auto_mapping']);
-        if (!$propertyInfoEnabled || !class_exists(PropertyInfoLoader::class)) {
+
+        if (!class_exists(PropertyInfoLoader::class)) {
             $container->removeDefinition('validator.property_info_loader');
         }
 
@@ -1703,39 +1675,6 @@ class FrameworkExtension extends Extension
             $definition->addTag('serializer.attribute_metadata', ['for' => $attribute->class])
                 ->addTag('container.excluded', ['source' => 'because it\'s a serializer metadata extension']);
         });
-    }
-
-    private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!interface_exists(PropertyInfoExtractorInterface::class)) {
-            throw new LogicException('PropertyInfo support cannot be enabled as the PropertyInfo component is not installed. Try running "composer require symfony/property-info".');
-        }
-
-        $loader->load('property_info.php');
-
-        if (!$config['with_constructor_extractor']) {
-            $container->removeDefinition('property_info.constructor_extractor');
-        }
-
-        if (
-            ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'])
-            && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', ContextFactory::class, ['symfony/framework-bundle', 'symfony/property-info'])
-        ) {
-            $definition = $container->register('property_info.phpstan_extractor', PhpStanExtractor::class);
-            $definition->addTag('property_info.type_extractor', ['priority' => -1000]);
-            $definition->addTag('property_info.constructor_extractor', ['priority' => -1000]);
-        }
-
-        if (ContainerBuilder::willBeAvailable('phpdocumentor/reflection-docblock', DocBlockFactoryInterface::class, ['symfony/framework-bundle', 'symfony/property-info'])) {
-            $definition = $container->register('property_info.php_doc_extractor', PhpDocExtractor::class);
-            $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
-            $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
-            $definition->addTag('property_info.constructor_extractor', ['priority' => -1001]);
-        }
-
-        if ($container->getParameter('kernel.debug')) {
-            $container->removeDefinition('property_info.cache');
-        }
     }
 
     private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

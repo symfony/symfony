@@ -123,6 +123,9 @@ FrameworkBundle
  * `PropertyAccessBundle` is registered automatically when the PropertyAccess component is installed, and its services
    are then registered as before; set `property_access.enabled` to `false` to disable them. The
    `framework.property_access` configuration is an alias of the `property_access` configuration provided by the bundle
+ * `PropertyInfoBundle` is registered automatically when the PropertyInfo component is installed, and its services are
+   then registered without any configuration; set `property_info.enabled` to `false` to disable them. The
+   `framework.property_info` configuration is an alias of the `property_info` configuration provided by the bundle
  * `UidBundle` is registered automatically when the Uid component is installed, and its services are then registered
    without any configuration; set `uid.enabled` to `false` to disable them. The `framework.uid` configuration is an
    alias of the `uid` configuration provided by the bundle

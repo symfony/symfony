@@ -30,7 +30,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
@@ -161,7 +160,7 @@ class Configuration implements ConfigurationInterface
         $this->addSerializerSection($rootNode, $enableIfStandalone);
         $this->addPropertyAccessSection($rootNode);
         $this->addTypeInfoSection($rootNode);
-        $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
+        $this->addPropertyInfoSection($rootNode);
         $this->addCacheSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
         $this->addExceptionsSection($rootNode);
@@ -1047,22 +1046,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('property_info')
-                    ->info('Property info configuration')
-                    ->{$enableIfStandalone('symfony/property-info', PropertyInfoExtractorInterface::class)}()
-                    ->children()
-                        ->booleanNode('with_constructor_extractor')
-                            ->info('Registers the constructor extractor.')
-                            ->defaultTrue()
-                        ->end()
-                    ->end()
+                ->variableNode('property_info')
+                    ->aliasOf('property_info')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

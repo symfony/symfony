@@ -90,6 +90,7 @@ use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyInfo\PropertyInfoBundle;
 use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventHandler;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Scheduler\SchedulerBundle;
@@ -1452,34 +1453,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('serializer'));
     }
 
-    public function testPropertyInfoEnabled()
+    public function testPropertyInfoConfigurationIsForwardedToPropertyInfoBundle()
     {
-        $container = $this->createContainerFromFile('property_info');
-        $this->assertTrue($container->has('property_info'));
-        $this->assertTrue($container->has('property_info.constructor_extractor'));
-    }
+        $container = $this->createContainerFromFile('legacy_property_info');
 
-    public function testPropertyInfoWithConstructorExtractorDisabled()
-    {
-        $container = $this->createContainerFromFile('property_info_without_constructor_extractor');
         $this->assertTrue($container->has('property_info'));
         $this->assertFalse($container->has('property_info.constructor_extractor'));
-    }
-
-    public function testPropertyInfoCacheActivated()
-    {
-        $container = $this->createContainerFromFile('property_info');
-
-        $this->assertTrue($container->hasDefinition('property_info.cache'));
-
-        $cache = $container->getDefinition('property_info.cache')->getArgument(1);
-        $this->assertEquals(new Reference('cache.property_info'), $cache);
-    }
-
-    public function testPropertyInfoCacheDisabled()
-    {
-        $container = $this->createContainerFromFile('property_info', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
-        $this->assertFalse($container->hasDefinition('property_info.cache'));
     }
 
     public function testEventDispatcherService()
@@ -2932,6 +2911,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->registerExtension(new MessengerBundle()->getContainerExtension());
         $container->registerExtension(new SchedulerBundle()->getContainerExtension());
         $container->registerExtension(new JsonStreamerBundle()->getContainerExtension());
+        $container->registerExtension(new PropertyInfoBundle()->getContainerExtension());
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;

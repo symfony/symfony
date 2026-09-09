@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `PropertyInfoBundle`, which provides the `property_info` configuration and the services previously provided by `FrameworkBundle` under `framework.property_info`
  * Allow defining accessors and mutators via a `#[WithAccessors]` attribute
  * Gather data from property hooks in ReflectionExtractor
  * Add `PropertyNameExtractorInterface` and `getPropertyName()` to enable property name extraction from an accessor or mutator

@@ -55,6 +55,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
                     'token' => $accessToken,
                     'token_type_hint' => 'access_token',
                 ],
+                'max_redirects' => 0,
             ])->toArray();
 
             $sub = $claims['sub'] ?? null;

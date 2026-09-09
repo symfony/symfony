@@ -46,7 +46,7 @@ final class Cas2Handler implements AccessTokenHandlerInterface
      */
     public function getUserBadgeFrom(string $accessToken): UserBadge
     {
-        $response = $this->client->request('GET', $this->getValidationUrl($accessToken));
+        $response = $this->client->request('GET', $this->getValidationUrl($accessToken), ['max_redirects' => 0]);
 
         $xml = new \SimpleXMLElement($response->getContent(), 0, false, $this->prefix, true);
 

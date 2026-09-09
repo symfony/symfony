@@ -168,7 +168,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
                 $jwksUri = self::checkDiscoveredEndpoint($config['jwks_uri'] ?? null, 'jwks_uri', $response->getInfo('url'));
 
-                $jwkSetResponses[] = $client->request('GET', $jwksUri);
+                $jwkSetResponses[] = $client->request('GET', $jwksUri, ['max_redirects' => 0]);
             }
 
             foreach ($jwkSetResponses as $response) {

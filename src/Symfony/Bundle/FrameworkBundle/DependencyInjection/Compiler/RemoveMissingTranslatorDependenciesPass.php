@@ -33,7 +33,9 @@ class RemoveMissingTranslatorDependenciesPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter(TranslationBundle::TRANS_PATHS_PARAMETER)) {
+        // TranslationBundle::class does not autoload, its constants do, and the Translation component
+        // can be older than this bundle or absent altogether
+        if (!class_exists(TranslationBundle::class) || !$container->hasParameter(TranslationBundle::TRANS_PATHS_PARAMETER)) {
             foreach (self::COMMANDS as $id) {
                 $container->removeDefinition($id);
             }

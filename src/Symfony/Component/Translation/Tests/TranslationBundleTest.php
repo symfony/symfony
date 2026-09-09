@@ -69,7 +69,8 @@ class TranslationBundleTest extends TestCase
     {
         $options = $this->load(['paths' => [__DIR__.'/Fixtures/translations']])->getDefinition('translator.default')->getArgument(4);
 
-        $this->assertContains(__DIR__.'/Fixtures/translations/messages.en.yaml', $options['resource_files']['en']);
+        // the finder reports the paths with the separator of the platform
+        $this->assertContains(strtr(__DIR__.'/Fixtures/translations/messages.en.yaml', '/', \DIRECTORY_SEPARATOR), $options['resource_files']['en']);
         $this->assertContains(__DIR__.'/Fixtures/translations', $options['scanned_directories']);
     }
 

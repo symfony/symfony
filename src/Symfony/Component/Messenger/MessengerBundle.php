@@ -317,27 +317,27 @@ class MessengerBundle extends AbstractBundle
             $container->removeDefinition('serializer.normalizer.flatten_exception');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', Bridge\Amqp\Transport\AmqpTransportFactory::class, ['symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', Bridge\Amqp\Transport\AmqpTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.amqp.factory')->addTag('messenger.transport_factory');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/amp-sql-messenger', Bridge\AmpSql\Transport\AmpSqlTransportFactory::class, ['symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/amp-sql-messenger', Bridge\AmpSql\Transport\AmpSqlTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.amp_sql.factory')->addTag('messenger.transport_factory');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/redis-messenger', Bridge\Redis\Transport\RedisTransportFactory::class, ['symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/redis-messenger', Bridge\Redis\Transport\RedisTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.redis.factory')->addTag('messenger.transport_factory');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/amazon-sqs-messenger', Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory::class, ['symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/amazon-sqs-messenger', Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.sqs.factory')->addTag('messenger.transport_factory');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/beanstalkd-messenger', Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory::class, ['symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/beanstalkd-messenger', Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.beanstalkd.factory')->addTag('messenger.transport_factory');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/mongodb-messenger', Bridge\MongoDb\Transport\MongoDbTransportFactory::class, ['symfony/messenger'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/mongodb-messenger', Bridge\MongoDb\Transport\MongoDbTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.mongodb.factory')->addTag('messenger.transport_factory');
         }
 

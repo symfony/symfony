@@ -220,17 +220,17 @@ class NotifierBundle extends AbstractBundle
         ];
 
         foreach ($classToServices as $class => [$package, $service]) {
-            if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/notifier'])) {
+            if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/framework-bundle', 'symfony/notifier'])) {
                 $container->removeDefinition($service);
             }
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', NotifierBridge\Mercure\MercureTransportFactory::class, ['symfony/notifier']) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, ['symfony/notifier']) && \in_array(MercureBundle::class, $container->getParameter('kernel.bundles'), true)) {
+        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', NotifierBridge\Mercure\MercureTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier']) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, ['symfony/framework-bundle', 'symfony/notifier']) && \in_array(MercureBundle::class, $container->getParameter('kernel.bundles'), true)) {
             $container->getDefinition('notifier.transport_factory.mercure')
                 ->replaceArgument(0, new Reference(HubRegistry::class))
                 ->replaceArgument(1, new Reference('event_dispatcher', ContainerBuilder::NULL_ON_INVALID_REFERENCE))
                 ->addArgument(new Reference('http_client', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
-        } elseif (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', NotifierBridge\Mercure\MercureTransportFactory::class, ['symfony/notifier'])) {
+        } elseif (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', NotifierBridge\Mercure\MercureTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier'])) {
             $container->removeDefinition('notifier.transport_factory.mercure');
         }
 
@@ -256,7 +256,7 @@ class NotifierBundle extends AbstractBundle
             $container->removeDefinition('notifier.transport_factory.fake-sms');
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/bluesky-notifier', NotifierBridge\Bluesky\BlueskyTransportFactory::class, ['symfony/notifier'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/bluesky-notifier', NotifierBridge\Bluesky\BlueskyTransportFactory::class, ['symfony/framework-bundle', 'symfony/notifier'])) {
             $container->getDefinition('notifier.transport_factory.bluesky')
                 ->addArgument(new Reference('logger'))
                 ->addArgument(new Reference('clock', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
@@ -283,9 +283,10 @@ class NotifierBundle extends AbstractBundle
             ];
 
             foreach ($webhookRequestParsers as $class => [$package, $service]) {
-                if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/notifier'])) {
+                if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/framework-bundle', 'symfony/notifier'])) {
                     $container->removeDefinition($service);
                 }
             }
-        }    }
+        }
+    }
 }

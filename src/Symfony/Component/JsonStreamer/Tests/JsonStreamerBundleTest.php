@@ -25,6 +25,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\StreamableDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\HeightValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueObject\Height;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeInfoBundle;
 
 class JsonStreamerBundleTest extends TestCase
 {
@@ -32,7 +33,13 @@ class JsonStreamerBundleTest extends TestCase
 
     protected function setUp(): void
     {
+        // tearDown() cleans up whatever setUp() named, so skip only once the path is known
         $this->varDir = sys_get_temp_dir().'/sf_json_streamer_bundle_test';
+
+        if (!class_exists(TypeInfoBundle::class)) {
+            // the streamer needs the type_info configuration, which only TypeInfoBundle provides
+            $this->markTestSkipped('The installed TypeInfo component ships no bundle.');
+        }
     }
 
     protected function tearDown(): void

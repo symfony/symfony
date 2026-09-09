@@ -395,7 +395,7 @@ class MailerBundle extends AbstractBundle
         ];
 
         foreach ($classToServices as $class => [$package, $service]) {
-            if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/mailer'])) {
+            if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
                 $container->removeDefinition($service);
             }
         }
@@ -528,7 +528,7 @@ class MailerBundle extends AbstractBundle
             ];
 
             foreach ($webhookRequestParsers as $class => [$package, $service]) {
-                if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/mailer'])) {
+                if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
                     $container->removeDefinition($service);
                 } elseif ($debug && \defined($class.'::PROVIDER_IPS')) {
                     $container->getDefinition($service)->setArgument('$allowedIPs', [...$class::PROVIDER_IPS, '127.0.0.1']);

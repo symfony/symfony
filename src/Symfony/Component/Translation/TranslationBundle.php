@@ -229,7 +229,7 @@ class TranslationBundle extends AbstractBundle
             Bridge\PoEditor\PoEditorProviderFactory::class => ['symfony/po-editor-translation-provider', ['translation.provider_factory.poeditor']],
         ];
 
-        $parentPackages = ['symfony/translation', 'symfony/http-client'];
+        $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
 
         foreach ($classToServices as $class => [$package, $services]) {
             if (ContainerBuilder::willBeAvailable($package, $class, $parentPackages)) {
@@ -259,17 +259,17 @@ class TranslationBundle extends AbstractBundle
         $transPaths = [];
         $nonExistingDirs = [];
 
-        if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/translation'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/translation'])) {
             $r = new \ReflectionClass(Validation::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
-        if (ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/translation'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/framework-bundle', 'symfony/translation'])) {
             $r = new \ReflectionClass(Form::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
-        if (ContainerBuilder::willBeAvailable('symfony/security-core', AuthenticationException::class, ['symfony/translation'])) {
+        if (ContainerBuilder::willBeAvailable('symfony/security-core', AuthenticationException::class, ['symfony/framework-bundle', 'symfony/translation'])) {
             $r = new \ReflectionClass(AuthenticationException::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName(), 2).'/Resources/translations';

@@ -242,8 +242,9 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FragmentRendererPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new DefaultCachePoolsPass());
-        $this->addCompilerPassIfExists($container, FormPass::class);
+        // must run before FormPass, which collects the type extension tags this one can still remove
         $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
+        $this->addCompilerPassIfExists($container, FormPass::class);
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
         $container->addCompilerPass(new RemoveMissingRouterDependenciesPass());

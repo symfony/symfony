@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouterBundle;
 use Symfony\Component\Security\Http\HttpUtils;
 
 class AddSessionDomainConstraintPassTest extends TestCase
@@ -155,11 +154,18 @@ class AddSessionDomainConstraintPassTest extends TestCase
             new ServicesBundle()->getContainerExtension()->load([], $container);
         }
 
-        // the router lives in its own bundle, and loading FrameworkExtension by hand does not forward to it
-        new RouterBundle()->getContainerExtension()->load([['resource' => 'dummy']], $container);
+        $config = ['csrf_protection' => false];
+
+        // the router lives in its own bundle since 8.2, and loading FrameworkExtension by hand does not
+        // forward to it; named as a string so the same file works on the branch before it
+        if (class_exists($routerBundle = 'Symfony\\Component\\Routing\\RouterBundle')) {
+            new $routerBundle()->getContainerExtension()->load([['resource' => 'dummy']], $container);
+        } else {
+            $config['router'] = ['resource' => 'dummy'];
+        }
 
         $ext = new FrameworkExtension();
-        $ext->load([['csrf_protection' => false]], $container);
+        $ext->load([$config], $container);
 
         $config = [
             'security' => [

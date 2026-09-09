@@ -264,7 +264,6 @@ class FrameworkExtension extends Extension
         $container->getDefinition('uri_signer')->addArgument($config['uri_signer']['expiration']);
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale'], $config['enabled_locales']);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
-        $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
 
         $exceptionListener = $container->getDefinition('exception_listener');
@@ -411,6 +410,7 @@ class FrameworkExtension extends Extension
 
         $container->registerForAutoconfiguration(RouteLoaderInterface::class)
             ->addTag('routing.route_loader');
+
     }
 
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
@@ -646,76 +646,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerRouterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, array $enabledLocales): void
-    {
-        if (!$this->readConfigEnabled('router', $container, $config)) {
-            $container->removeDefinition('console.command.router_debug');
-            $container->removeDefinition('console.command.router_match');
-
-            return;
-        }
-
-        // Read the deprecated "router.request_context.{host,scheme}" parameters before routing.php
-        // sets their defaults, so that an explicit user value takes precedence. They are inlined as
-        // arguments of the "router.request_context" service below: this avoids both triggering their
-        // deprecation and eagerly resolving every env-var-based parameter through ParameterBag::all()
-        // at runtime.
-        $parameters = $container->getParameterBag()->all();
-        $requestContextHost = $parameters['router.request_context.host'] ?? 'localhost';
-        $requestContextScheme = $parameters['router.request_context.scheme'] ?? 'http';
-
-        $loader->load('routing.php');
-
-        $container->getDefinition('router.request_context')
-            ->setArgument(1, $requestContextHost)
-            ->setArgument(2, $requestContextScheme);
-
-        $container->deprecateParameter('router.request_context.scheme', 'symfony/framework-bundle', '8.1', 'Parameter "router.request_context.scheme" is deprecated, use "router.request_context.base_url" parameter or the "framework.router.default_uri" config option instead.');
-        $container->deprecateParameter('router.request_context.host', 'symfony/framework-bundle', '8.1', 'Parameter "router.request_context.host" is deprecated, use "router.request_context.base_url" parameter or the "framework.router.default_uri" config option instead.');
-
-        if ($config['utf8']) {
-            $container->getDefinition('routing.loader')->replaceArgument(1, ['utf8' => true]);
-        }
-
-        if ($enabledLocales) {
-            $usedEnvs = [];
-            $container->resolveEnvPlaceholders($enabledLocales, null, $usedEnvs);
-
-            if (!$usedEnvs) {
-                $locales = implode('|', array_map('preg_quote', $enabledLocales));
-            } else {
-                $locales = (new Definition('string'))
-                    ->setFactory('implode')
-                    ->setArguments(['|', (new Definition('array'))
-                        ->setFactory('array_map')
-                        ->setArguments(['preg_quote', $enabledLocales]),
-                    ]);
-            }
-
-            $container->getDefinition('routing.loader')->replaceArgument(2, ['_locale' => $locales]);
-        }
-
-        if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/framework-bundle', 'symfony/routing'])) {
-            $container->removeDefinition('router.expression_language_provider');
-        }
-
-        $container->setParameter('router.resource', $config['resource']);
-        $container->setParameter('router.cache_dir', '%kernel.build_dir%');
-        $router = $container->findDefinition('router.default');
-        $argument = $router->getArgument(2);
-        $argument['strict_requirements'] = $config['strict_requirements'];
-        if (isset($config['type'])) {
-            $argument['resource_type'] = $config['type'];
-        }
-        $router->replaceArgument(2, $argument);
-
-        $container->setParameter('request_listener.http_port', $config['http_port']);
-        $container->setParameter('request_listener.https_port', $config['https_port']);
-
-        if (null !== $config['default_uri']) {
-            $container->setParameter('router.request_context.base_url', $config['default_uri']);
-        }
-    }
 
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {

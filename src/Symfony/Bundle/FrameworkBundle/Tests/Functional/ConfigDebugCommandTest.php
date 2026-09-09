@@ -270,7 +270,9 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         yield 'name, no debug' => [false, [''], $name];
         yield 'name, debug' => [true, [''], $name];
 
-        $nameWithPath = ['secret', 'router.resource', 'router.utf8', 'router.enabled', 'validation.enabled', 'default_locale'];
+        // the forwarded keys are unset from the framework configuration, so "debug:config framework"
+        // no longer offers them; they are reachable under their own extension name instead
+        $nameWithPath = ['secret', 'validation.enabled', 'default_locale'];
         yield 'name with existing path, no debug' => [false, ['framework', ''], $nameWithPath];
         yield 'name with existing path, debug' => [true, ['framework', ''], $nameWithPath];
 

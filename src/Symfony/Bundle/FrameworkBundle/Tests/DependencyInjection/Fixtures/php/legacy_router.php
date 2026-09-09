@@ -1,0 +1,5 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'router' => ['resource' => '%kernel.project_dir%/config/routing.xml'],
+]);

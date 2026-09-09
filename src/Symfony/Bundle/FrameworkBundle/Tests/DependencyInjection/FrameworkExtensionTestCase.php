@@ -40,7 +40,6 @@ use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\CacheBundle;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -92,6 +91,7 @@ use Symfony\Component\RateLimiter\DependencyInjection\DefaultLockFactoryPass;
 use Symfony\Component\RateLimiter\RateLimiterBundle;
 use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventHandler;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
+use Symfony\Component\Routing\RouterBundle;
 use Symfony\Component\Scheduler\SchedulerBundle;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Semaphore\SemaphoreBundle;
@@ -440,6 +440,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['twilio' => 'null'], $container->getDefinition('texter.transports')->getArgument(0));
     }
 
+    public function testRouterConfigurationIsForwardedToRouterBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new RouterBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_router');
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+
+        $this->assertSame($container->getParameter('kernel.project_dir').'/config/routing.xml', $container->getParameter('router.resource'));
+    }
+
     public function testAssetsConfigurationIsForwardedToAssetBundle()
     {
         $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
@@ -650,79 +666,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'log_level' => null,
             'status_code' => 500,
         ], $configuration[ServiceUnavailableHttpException::class]);
-    }
-
-    public function testRouter()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $this->assertTrue($container->has('router'), '->registerRouterConfiguration() loads routing.xml');
-        $arguments = $container->findDefinition('router')->getArguments();
-        $this->assertEquals($container->getParameter('kernel.project_dir').'/config/routing.xml', $container->getParameter('router.resource'), '->registerRouterConfiguration() sets routing resource');
-        $this->assertEquals('%router.resource%', $arguments[1], '->registerRouterConfiguration() sets routing resource');
-        $this->assertEquals('xml', $arguments[2]['resource_type'], '->registerRouterConfiguration() sets routing resource type');
-
-        $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
-    }
-
-    public function testRouterRequestContextInlinesHostAndScheme()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        // The host and scheme are inlined as plain values instead of being read through
-        // ParameterBag::all() at runtime, which would eagerly resolve every env var and
-        // fail during cache warmup when one of them is missing.
-        $requestContext = $container->getDefinition('router.request_context');
-        $this->assertSame('localhost', $requestContext->getArgument(1));
-        $this->assertSame('http', $requestContext->getArgument(2));
-    }
-
-    public function testRouterRequestContextUsesHostAndSchemeParameters()
-    {
-        $container = $this->createContainerFromClosure(static function ($container) {
-            $container->setParameter('router.request_context.host', 'example.com');
-            $container->setParameter('router.request_context.scheme', 'https');
-            $container->loadFromExtension('framework', [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'router' => ['resource' => '%kernel.project_dir%/config/routing.xml'],
-            ]);
-        });
-
-        $requestContext = $container->getDefinition('router.request_context');
-        $this->assertSame('example.com', $requestContext->getArgument(1));
-        $this->assertSame('https', $requestContext->getArgument(2));
-    }
-
-    public function testRouterEnabledLocalesWithEnvPlaceholders()
-    {
-        $container = $this->createContainerFromFile('router_enabled_locales_env');
-        $requirements = $container->getDefinition('routing.loader')->getArgument(2);
-
-        $this->assertIsArray($requirements);
-        $this->assertArrayHasKey('_locale', $requirements);
-
-        $requirementDefinition = $requirements['_locale'];
-        $this->assertInstanceOf(Definition::class, $requirementDefinition);
-        $this->assertSame('implode', $requirementDefinition->getFactory());
-
-        $this->assertSame('|', $requirementDefinition->getArgument(0));
-
-        $arrayMap = $requirementDefinition->getArgument(1);
-        $this->assertInstanceOf(Definition::class, $arrayMap);
-        $this->assertSame('array_map', $arrayMap->getFactory());
-        $this->assertSame('preg_quote', $arrayMap->getArgument(0));
-    }
-
-    public function testRouterRequiresResourceOption()
-    {
-        $container = $this->createContainer();
-        $loader = new FrameworkExtension();
-
-        $this->expectException(InvalidConfigurationException::class);
-
-        $loader->load([['router' => true]], $container);
     }
 
     public function testSession()

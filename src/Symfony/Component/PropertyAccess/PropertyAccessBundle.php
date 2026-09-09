@@ -11,12 +11,18 @@
 
 namespace Symfony\Component\PropertyAccess;
 
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\PropertyAccess\DependencyInjection\RemovePropertyAccessCachePass;
 
 /**
  * Provides the property accessor services.
@@ -27,6 +33,11 @@ class PropertyAccessBundle extends AbstractBundle
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
+    }
+
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new RemovePropertyAccessCachePass());
     }
 
     public function configure(DefinitionConfigurator $definition): void
@@ -71,5 +82,21 @@ class PropertyAccessBundle extends AbstractBundle
             ->replaceArgument(1, $throw)
             ->replaceArgument(5, $config['wildcard_reads'])
         ;
+
+        if (!class_exists(ArrayAdapter::class)) {
+            return;
+        }
+
+        $cache = $container->register('cache.property_access', AdapterInterface::class);
+
+        if ($container->getParameter('kernel.debug')) {
+            $cache->setClass(ArrayAdapter::class);
+            $cache->setArguments([0, false]);
+        } else {
+            $cache->setFactory([PropertyAccessor::class, 'createCache']);
+            $cache->setArguments(['', 0, new Parameter('container.build_id'), new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]);
+            $cache->addTag('cache.pool', ['clearer' => 'cache.system_clearer']);
+            $cache->addTag('monolog.logger', ['channel' => 'cache']);
+        }
     }
 }

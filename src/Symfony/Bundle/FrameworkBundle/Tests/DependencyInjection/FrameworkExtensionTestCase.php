@@ -26,7 +26,6 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
@@ -36,6 +35,7 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\CacheBundle;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -43,6 +43,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -181,24 +182,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_CALL, $def->getArgument(0));
         $this->assertSame(PropertyAccessor::THROW_ON_INVALID_INDEX, $def->getArgument(1));
         $this->assertTrue($def->getArgument(5));
-    }
-
-    public function testPropertyAccessCache()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $cache = $container->getDefinition('cache.property_access');
-        $this->assertSame([PropertyAccessor::class, 'createCache'], $cache->getFactory(), 'PropertyAccessor::createCache() should be used in non-debug mode');
-        $this->assertSame(AdapterInterface::class, $cache->getClass());
-    }
-
-    public function testPropertyAccessCacheWithDebug()
-    {
-        $container = $this->createContainerFromFile('full', ['kernel.debug' => true]);
-
-        $cache = $container->getDefinition('cache.property_access');
-        $this->assertNull($cache->getFactory());
-        $this->assertSame(ArrayAdapter::class, $cache->getClass(), 'ArrayAdapter should be used in debug mode');
     }
 
     public function testRequestAndSessionValueResolversRunBeforeEntityValueResolver()
@@ -2074,6 +2057,32 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertInstanceOf(EventDispatcherInterface::class, $container->get('foo')->dispatcher);
     }
 
+    public function testCacheConfigurationIsForwardedToCacheBundle()
+    {
+        $container = $this->createContainerFromFile('legacy_cache');
+
+        $this->assertSame('my-app', $container->getParameter('cache.prefix.seed'));
+        $this->assertSame('cache.adapter.array', $container->getDefinition('cache.app')->getParent());
+        $this->assertSame('cache.app', (string) $container->getAlias('test_cache_app'));
+    }
+
+    #[DataProvider('provideSectionCachePools')]
+    public function testTheSectionPoolsAreRegisteredAlongsideTheirSection(string $file, string $id)
+    {
+        $this->assertTrue($this->createContainerFromFile($file)->has($id));
+        $this->assertFalse($this->createContainerFromFile('cache_pools_without_sections')->has($id));
+    }
+
+    public static function provideSectionCachePools(): iterable
+    {
+        yield ['full', 'cache.validator'];
+        yield ['full', 'cache.serializer'];
+        yield ['full', 'cache.property_info'];
+        yield ['messenger', 'cache.messenger.restart_workers_signal'];
+        yield ['messenger', 'cache.scheduler'];
+        yield ['asset_mapper_without_assets', 'cache.asset_mapper'];
+    }
+
     public function testCacheDefaultRedisProvider()
     {
         $container = $this->createContainerFromFile('cache');
@@ -3475,7 +3484,11 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $data)));
 
         new ServicesBundle()->getContainerExtension()->load([], $container);
+        $cacheBundle = new CacheBundle();
+        $cacheBundle->build($container);
+        $container->registerExtension($cacheBundle->getContainerExtension());
         $container->registerExtension(new LockBundle()->getContainerExtension());
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;
     }

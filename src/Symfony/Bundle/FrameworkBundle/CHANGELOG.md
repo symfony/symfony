@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.cache` an alias of the `cache` configuration provided by `CacheBundle`
+ * Register `CacheBundle` automatically
  * Make `framework.web_link` an alias of the `web_link` configuration provided by `WebLinkBundle`
  * Register `WebLinkBundle` automatically when the WebLink component is installed
  * Make `framework.lock` an alias of the `lock` configuration provided by `LockBundle`

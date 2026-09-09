@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
-use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -21,10 +20,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Mailer\Mailer;
@@ -227,53 +224,6 @@ class ConfigurationTest extends TestCase
         (new Processor())->processConfiguration(new Configuration(true), [[
             'profiler' => ['excluded_http_codes' => [404 => ['^/foo(']]],
         ]]);
-    }
-
-    public function testCacheAppAndDefaultProviderCannotBeCombined()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The "framework.cache.app" and "framework.cache.default_provider" options cannot be used together, the adapter is deduced from the DSN.');
-
-        (new Processor())->processConfiguration(new Configuration(true), [[
-            'cache' => ['app' => 'cache.adapter.redis', 'default_provider' => 'redis://localhost'],
-        ]]);
-    }
-
-    public function testCacheAppAndDefaultProviderCannotBeCombinedAcrossFiles()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-
-        (new Processor())->processConfiguration(new Configuration(true), [
-            ['cache' => ['app' => 'cache.adapter.redis']],
-            ['cache' => ['default_provider' => 'redis://localhost']],
-        ]);
-    }
-
-    public function testCacheAppSetToItsDefaultValueStillConflictsWithDefaultProvider()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-
-        (new Processor())->processConfiguration(new Configuration(true), [[
-            'cache' => ['app' => 'cache.adapter.filesystem', 'default_provider' => 'redis://localhost'],
-        ]]);
-    }
-
-    public function testCacheDefaultProviderAloneIsAllowed()
-    {
-        $config = (new Processor())->processConfiguration(new Configuration(true), [[
-            'cache' => ['default_provider' => 'redis://localhost'],
-        ]]);
-
-        $this->assertSame('redis://localhost', $config['cache']['default_provider']);
-    }
-
-    public function testCacheAppAloneIsAllowed()
-    {
-        $config = (new Processor())->processConfiguration(new Configuration(true), [[
-            'cache' => ['app' => 'cache.adapter.redis'],
-        ]]);
-
-        $this->assertSame('cache.adapter.redis', $config['cache']['app']);
     }
 
     #[DataProvider('getTestInvalidSessionName')]
@@ -523,33 +473,6 @@ class ConfigurationTest extends TestCase
             'cache_pool' => 'app.claim_check_pool',
             'max_size' => 200000,
         ], $config['messenger']['transports']['async']['claim_check']);
-    }
-
-    public function testMessengerClaimCheckCachePoolRequiresDefaultLifetime()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The cache pool "app.claim_check_pool" used by Messenger transport "async" for claim checks must define a "default_lifetime".');
-
-        (new Processor())->processConfiguration(new Configuration(true), [[
-            'cache' => [
-                'pools' => [
-                    'app.claim_check_pool' => [
-                        'adapter' => 'cache.adapter.pdo',
-                    ],
-                ],
-            ],
-            'messenger' => [
-                'transports' => [
-                    'async' => [
-                        'dsn' => 'in-memory:///',
-                        'claim_check' => [
-                            'cache_pool' => 'app.claim_check_pool',
-                            'max_size' => 200000,
-                        ],
-                    ],
-                ],
-            ],
-        ]]);
     }
 
     public function testBusMiddlewareDontMerge()
@@ -1024,19 +947,6 @@ class ConfigurationTest extends TestCase
                     'formats' => [],
                     'extensions' => CompressorInterface::DEFAULT_EXTENSIONS,
                 ],
-            ],
-            'cache' => [
-                'pools' => [],
-                'app' => 'cache.adapter.filesystem',
-                'system' => 'cache.adapter.system',
-                'directory' => '%kernel.share_dir%/pools/app',
-                'default_redis_provider' => 'redis://localhost',
-                'default_valkey_provider' => 'valkey://localhost',
-                'default_memcached_provider' => 'memcached://localhost',
-                'default_doctrine_dbal_provider' => 'database_connection',
-                'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null,
-                'default_mongodb_provider' => 'mongodb://localhost/app',
-                'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
             ],
             'php_errors' => [
                 'log' => true,

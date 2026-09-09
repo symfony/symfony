@@ -152,8 +152,8 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     public static function provideCompletionSuggestions(): iterable
     {
-        $aliases = ['foo', 'default_config_test', 'extension_without_config_test', 'services', 'console'];
-        $bundles = ['DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'ServicesBundle', 'ConsoleBundle'];
+        $aliases = ['foo', 'default_config_test', 'extension_without_config_test', 'services', 'cache', 'console'];
+        $bundles = ['DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'ServicesBundle', 'CacheBundle', 'ConsoleBundle'];
 
         // registered through #[RequiredBundle(..., ignoreOnInvalid: true)], so absent when the component is not installed
         foreach (['web_link' => WebLinkBundle::class, 'lock' => LockBundle::class, 'semaphore' => SemaphoreBundle::class, 'workflow' => WorkflowBundle::class, 'remote_event' => RemoteEventBundle::class, 'html_sanitizer' => HtmlSanitizerBundle::class, 'type_info' => TypeInfoBundle::class, 'property_access' => PropertyAccessBundle::class, 'uid' => UidBundle::class, 'process' => ProcessBundle::class, 'json_path' => JsonPathBundle::class, 'mime' => MimeBundle::class, 'object_mapper' => ObjectMapperBundle::class] as $alias => $class) {

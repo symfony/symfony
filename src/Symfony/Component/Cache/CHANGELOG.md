@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `CacheBundle`, which provides the `cache` configuration and the services previously provided by `FrameworkBundle` under `framework.cache`
  * Add `AbstractAdapter::createAdapter()` to create the adapter matching a connection
  * Add `MongoDbAdapter` and `MongoDbTagAwareAdapter`
  * Support the `mongodb:` and `mongodb+srv:` DSN in `AbstractAdapter::createConnection()`

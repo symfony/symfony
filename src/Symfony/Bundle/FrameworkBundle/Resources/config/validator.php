@@ -62,6 +62,11 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.cache_warmer')
 
+        ->set('cache.validator')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+
         ->set('validator.mapping.cache.adapter', PhpArrayAdapter::class)
             ->factory([PhpArrayAdapter::class, 'create'])
             ->args([

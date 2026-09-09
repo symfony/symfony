@@ -167,6 +167,11 @@ return static function (ContainerConfigurator $container) {
             ->args([abstract_arg('The serializer metadata loaders'), param('serializer.mapping.cache.file')])
             ->tag('kernel.cache_warmer')
 
+        ->set('cache.serializer')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+
         ->set('serializer.mapping.cache.symfony', CacheItemPoolInterface::class)
             ->factory([PhpArrayAdapter::class, 'create'])
             ->args([param('serializer.mapping.cache.file'), service('cache.serializer')])

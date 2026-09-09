@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorSecu
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CheckJsonStreamerTypeInfoPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultCachePoolsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultLockFactoryPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
@@ -38,10 +39,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
-use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
-use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
-use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
-use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
+use Symfony\Component\Cache\CacheBundle;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
@@ -122,6 +120,7 @@ class_exists(Registry::class);
  * @author Fabien Potencier <fabien@symfony.com>
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(CacheBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(LockBundle::class, ignoreOnInvalid: true)]
@@ -213,9 +212,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, PropertyInfoPass::class);
         $this->addCompilerPassIfExists($container, PropertyInfoConstructorPass::class);
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
-        $container->addCompilerPass(new CachePoolPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
-        $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new CachePoolPrunerPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new DefaultCachePoolsPass());
         $this->addCompilerPassIfExists($container, FormPass::class);
         $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
@@ -247,7 +244,6 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
-            $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
         }
     }
 

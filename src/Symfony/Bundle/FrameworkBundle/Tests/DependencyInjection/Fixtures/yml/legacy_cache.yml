@@ -1,0 +1,8 @@
+services:
+    test_cache_app:
+        alias: cache.app
+        public: true
+framework:
+    cache:
+        prefix_seed: my-app
+        app: cache.adapter.array

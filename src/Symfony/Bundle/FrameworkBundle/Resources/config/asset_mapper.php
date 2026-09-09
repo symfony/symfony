@@ -112,6 +112,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('dev server public prefix'),
             ])
 
+        ->set('cache.asset_mapper')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+
         ->set('asset_mapper.dev_server_subscriber', AssetMapperDevServerSubscriber::class)
             ->args([
                 service('asset_mapper'),

@@ -28,7 +28,7 @@ class SchedulerTransportFactory implements TransportFactoryInterface
     public function __construct(
         private readonly ContainerInterface $scheduleProviders,
         private readonly ClockInterface $clock = new Clock(),
-        private readonly bool $useMessengerRouting = false,
+        private readonly ?bool $useMessengerRouting = false,
     ) {
     }
 

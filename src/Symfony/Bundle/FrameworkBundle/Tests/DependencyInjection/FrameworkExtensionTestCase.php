@@ -899,15 +899,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
     }
 
-    #[Group('legacy')]
-    #[IgnoreDeprecations]
-    public function testLegacySchedulerUseMessengerRoutingNotSet()
+    public function testSchedulerUseMessengerRoutingNotSetKeepsTheParameterNull()
     {
-        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
+        // no deprecation is expected here: it is only triggered lazily by SchedulerTransport,
+        // when a scheduled message is actually redispatched, not on every container build
+        $container = $this->createContainerFromFile('scheduler_use_messenger_routing_unset');
 
-        $container = $this->createContainerFromFile('scheduler_use_messenger_routing_legacy');
-
-        $this->assertFalse($container->getParameter('.scheduler.use_messenger_routing'));
+        $this->assertNull($container->getParameter('.scheduler.use_messenger_routing'));
     }
 
     public function testSchedulerUseMessengerRoutingRejectsEnvVar()

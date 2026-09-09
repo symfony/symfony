@@ -21,7 +21,7 @@ class SchedulerTransport implements TransportInterface
 {
     public function __construct(
         private readonly MessageGeneratorInterface $messageGenerator,
-        private readonly bool $useMessengerRouting = false,
+        private readonly ?bool $useMessengerRouting = false,
     ) {
     }
 
@@ -33,13 +33,15 @@ class SchedulerTransport implements TransportInterface
         foreach ($this->messageGenerator->getMessages() as $context => $message) {
             $stamp = new ScheduledStamp($context);
 
-            if ($this->useMessengerRouting && !$message instanceof RedispatchMessage) {
-                $message = new RedispatchMessage(Envelope::wrap($message, [$stamp]));
-            } elseif ($message instanceof RedispatchMessage) {
+            if ($message instanceof RedispatchMessage) {
                 $message = new RedispatchMessage(
                     Envelope::wrap($message->envelope, [$stamp]),
                     $message->transportNames,
                 );
+            } elseif (null === $this->useMessengerRouting) {
+                trigger_deprecation('symfony/framework-bundle', '8.2', 'Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
+            } elseif ($this->useMessengerRouting) {
+                $message = new RedispatchMessage(Envelope::wrap($message, [$stamp]));
             }
 
             yield Envelope::wrap($message, [$stamp]);

@@ -2261,11 +2261,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.scheduler_debug');
         }
 
-        if (null === $config['use_messenger_routing']) {
-            trigger_deprecation('symfony/framework-bundle', '8.2', 'Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
-        }
-
-        $useMessengerRouting = $config['use_messenger_routing'] ?? false;
+        $useMessengerRouting = $config['use_messenger_routing'];
 
         if (\is_string($useMessengerRouting)) {
             $usedEnvs = [];
@@ -2278,6 +2274,9 @@ class FrameworkExtension extends Extension
 
         // the leading dot marks it as internal: it is consumed at build time only
         // and dropped from the compiled container by RemoveBuildParametersPass
+        // a "null" value is kept as-is so SchedulerTransport can warn lazily, only
+        // when a scheduled message is actually redispatched, instead of on every
+        // container build regardless of whether the scheduler is actually used
         $container->setParameter('.scheduler.use_messenger_routing', $useMessengerRouting);
     }
 

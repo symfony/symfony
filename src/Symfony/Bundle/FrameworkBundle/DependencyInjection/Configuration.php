@@ -1736,7 +1736,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('use_messenger_routing')
                             ->defaultNull()
-                            ->info('Whether scheduled messages are automatically wrapped in a "RedispatchMessage" so they go through the Messenger senders configured for their class instead of being handled synchronously by the scheduler worker. A "transports" option set explicitly on a task always takes precedence.')
+                            ->info('Whether scheduled messages are automatically wrapped in a "RedispatchMessage" so they go through the Messenger senders configured for their class instead of being handled synchronously by the scheduler worker. A "transports" option set explicitly on a task always takes precedence. When enabled, a message class routed to a transport (including a "*" catch-all route) is sent there instead of running inline: a consumer must be running for that transport or the task is queued and never executes, with nothing logged beyond "Sending message"; retries, the failure transport and argument serialization then apply as for any other async message. Route the class (or set "transports: \'sync\'" on the task) to a "sync" transport to keep it running inline.')
                         ->end()
                     ->end()
                 ->end()

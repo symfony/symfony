@@ -31,7 +31,7 @@
         "symfony/dependency-injection": "^7.4|^8.0",
         "symfony/event-dispatcher": "^7.4|^8.0",
         "symfony/lock": "^7.4|^8.0",
-        "symfony/messenger": "^7.4|^8.0",
+        "symfony/messenger": "^8.2",
         "symfony/serializer": "^7.4|^8.0"
     },
     "autoload": {

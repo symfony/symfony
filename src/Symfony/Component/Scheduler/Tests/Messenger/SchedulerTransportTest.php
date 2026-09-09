@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Scheduler\Tests\Messenger;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
@@ -90,6 +92,47 @@ class SchedulerTransportTest extends TestCase
             $envelopes[0]->getMessage()->envelope->last(ScheduledStamp::class),
             $envelopes[0]->last(ScheduledStamp::class)
         );
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testMessageTriggersDeprecationAndIsNotWrappedWhenUseMessengerRoutingIsNull()
+    {
+        $generator = $this->createStub(MessageGeneratorInterface::class);
+        $generator->method('getMessages')->willReturnCallback(function (): \Generator {
+            yield new MessageContext('default', 'id', $this->createStub(TriggerInterface::class), new \DateTimeImmutable()) => new \stdClass();
+        });
+
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
+
+        $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: null))->get());
+
+        $this->assertInstanceOf(\stdClass::class, $envelopes[0]->getMessage());
+    }
+
+    public function testExplicitRedispatchMessageDoesNotTriggerDeprecationWhenUseMessengerRoutingIsNull()
+    {
+        $generator = $this->createStub(MessageGeneratorInterface::class);
+        $generator->method('getMessages')->willReturnCallback(function (): \Generator {
+            yield new MessageContext('default', 'id', $this->createStub(TriggerInterface::class), new \DateTimeImmutable()) => new RedispatchMessage(new \stdClass(), ['transport']);
+        });
+
+        $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: null))->get());
+
+        $this->assertInstanceOf(RedispatchMessage::class, $envelopes[0]->getMessage());
+    }
+
+    public function testNoMessageMeansNoDeprecationWhenUseMessengerRoutingIsNull()
+    {
+        $generator = $this->createStub(MessageGeneratorInterface::class);
+        $generator->method('getMessages')->willReturnCallback(static function (): \Generator {
+            return;
+            yield;
+        });
+
+        $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: null))->get());
+
+        $this->assertSame([], $envelopes);
     }
 
     public function testAckIgnored()

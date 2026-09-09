@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.router` an alias of the `router` configuration provided by `RouterBundle`
+ * Register `RouterBundle` automatically
  * Make `framework.assets` an alias of the `asset` configuration provided by `AssetBundle`
  * Register `AssetBundle` automatically when the Asset component is installed
  * Make `framework.notifier` an alias of the `notifier` configuration provided by `NotifierBundle`

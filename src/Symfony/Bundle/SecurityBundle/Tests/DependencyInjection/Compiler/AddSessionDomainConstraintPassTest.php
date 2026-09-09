@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterBundle;
 use Symfony\Component\Security\Http\HttpUtils;
 
 class AddSessionDomainConstraintPassTest extends TestCase
@@ -150,19 +151,15 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $container->setParameter('request_listener.http_port', 80);
         $container->setParameter('request_listener.https_port', 443);
 
-        $config = [
-            'framework' => [
-                'csrf_protection' => false,
-                'router' => ['resource' => 'dummy'],
-            ],
-        ];
-
         if (class_exists(ServicesBundle::class)) {
             new ServicesBundle()->getContainerExtension()->load([], $container);
         }
 
+        // the router lives in its own bundle, and loading FrameworkExtension by hand does not forward to it
+        new RouterBundle()->getContainerExtension()->load([['resource' => 'dummy']], $container);
+
         $ext = new FrameworkExtension();
-        $ext->load($config, $container);
+        $ext->load([['csrf_protection' => false]], $container);
 
         $config = [
             'security' => [

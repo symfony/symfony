@@ -443,14 +443,6 @@ class ConfigurationTest extends TestCase
                 'mapping' => ['paths' => []],
                 'named_serializers' => [],
             ],
-            'router' => [
-                'enabled' => false,
-                'default_uri' => null,
-                'http_port' => 80,
-                'https_port' => 443,
-                'strict_requirements' => true,
-                'utf8' => true,
-            ],
             'session' => [
                 'enabled' => false,
                 'storage_factory_id' => 'session.storage.factory.native',

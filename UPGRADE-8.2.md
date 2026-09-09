@@ -154,6 +154,10 @@ FrameworkBundle
    then registered without any configuration; set `http_client.enabled` to `false` to disable them. The
    `framework.http_client` configuration is an alias of the `http_client` configuration provided by the bundle. The
    cache pool is dropped when no `cache.app` pool is registered, and the data collector when the profiler is disabled
+ * `RouterBundle` is registered automatically, and the `framework.router` configuration is an alias of the
+   `router` configuration it provides. The router stays off until it is configured, as before. Because the
+   forwarded keys are removed from the framework configuration, `debug:config framework router` no longer
+   resolves; use `debug:config router` instead
  * `AssetBundle` is registered automatically when the Asset component is installed, and its services are then
    registered without any configuration; set `asset.enabled` to `false` to disable them. The `framework.assets`
    configuration is an alias of the `asset` configuration provided by the bundle

@@ -142,9 +142,9 @@ class Configuration implements ConfigurationInterface
         $this->addUriSignerSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addWorkflowSection($rootNode);
-        $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
+        $this->addRouterSection($rootNode);
         $this->addAssetsSection($rootNode);
         $this->addAssetMapperSection($rootNode);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
@@ -445,38 +445,6 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRouterSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->arrayNode('router')
-                    ->info('Router configuration')
-                    ->canBeEnabled()
-                    ->children()
-                        ->scalarNode('resource')->isRequired()->end()
-                        ->scalarNode('type')->end()
-                        ->scalarNode('default_uri')
-                            ->info('The default URI used to generate URLs in a non-HTTP context.')
-                            ->defaultNull()
-                        ->end()
-                        ->scalarNode('http_port')->defaultValue(80)->end()
-                        ->scalarNode('https_port')->defaultValue(443)->end()
-                        ->scalarNode('strict_requirements')
-                            ->info(
-                                "set to true to throw an exception when a parameter does not match the requirements\n".
-                                "set to false to disable exceptions when a parameter does not match the requirements (and return null instead)\n".
-                                "set to null to disable parameter checks against requirements\n".
-                                "'true' is the preferred configuration in development mode, while 'false' or 'null' might be preferred in production"
-                            )
-                            ->defaultTrue()
-                        ->end()
-                        ->booleanNode('utf8')->defaultTrue()->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
-    }
-
     private function addSessionSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
@@ -550,6 +518,19 @@ class Configuration implements ConfigurationInterface
     /**
      * @param-immediately-invoked-callable $enableIfStandalone
      */
+    private function addRouterSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->variableNode('router')
+                    ->aliasOf('router')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addAssetsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode

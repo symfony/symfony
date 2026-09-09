@@ -24,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfig
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingRouterDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSerializerPropertyAccessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
@@ -84,6 +85,7 @@ use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingControllerPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
+use Symfony\Component\Routing\RouterBundle;
 use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Scheduler\SchedulerBundle;
 use Symfony\Component\Semaphore\SemaphoreBundle;
@@ -123,9 +125,10 @@ class_exists(Registry::class);
  * @author Fabien Potencier <fabien@symfony.com>
  */
 #[RequiredBundle(ServicesBundle::class)]
-#[RequiredBundle(AssetBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(RouterBundle::class)]
 #[RequiredBundle(CacheBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(AssetBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(LockBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MessengerBundle::class, ignoreOnInvalid: true)]
@@ -230,6 +233,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
         $container->addCompilerPass(new RemoveUnusedValidatorPropertyInfoLoaderPass());
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
+        $container->addCompilerPass(new RemoveMissingRouterDependenciesPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);

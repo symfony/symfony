@@ -36,15 +36,12 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
 
@@ -169,8 +166,8 @@ class Configuration implements ConfigurationInterface
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone);
         $this->addSerializerSection($rootNode, $enableIfStandalone);
-        $this->addPropertyAccessSection($rootNode, $willBeAvailable);
-        $this->addTypeInfoSection($rootNode, $enableIfStandalone);
+        $this->addPropertyAccessSection($rootNode);
+        $this->addTypeInfoSection($rootNode);
         $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
         $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
@@ -186,7 +183,7 @@ class Configuration implements ConfigurationInterface
         $this->addSecretsSection($rootNode);
         $this->addNotifierSection($rootNode, $enableIfStandalone);
         $this->addRateLimiterSection($rootNode, $enableIfStandalone);
-        $this->addUidSection($rootNode, $enableIfStandalone);
+        $this->addUidSection($rootNode);
         $this->addHtmlSanitizerSection($rootNode);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode);
@@ -1061,28 +1058,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $willBeAvailable
-     */
-    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
+    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('property_access')
-                    ->addDefaultsIfNotSet()
-                    ->info('Property access configuration')
-                    ->{$willBeAvailable('symfony/property-access', PropertyAccessor::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-                    ->children()
-                        ->booleanNode('magic_call')->defaultFalse()->end()
-                        ->booleanNode('magic_get')->defaultTrue()->end()
-                        ->booleanNode('magic_set')->defaultTrue()->end()
-                        ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
-                        ->booleanNode('throw_exception_on_invalid_property_path')->defaultTrue()->end()
-                        ->booleanNode('wildcard_reads')
-                            ->info('Enables reading every element of a collection through a "[*]" wildcard.')
-                            ->defaultFalse()
-                        ->end()
-                    ->end()
+                ->variableNode('property_access')
+                    ->aliasOf('property_access')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;
@@ -1109,26 +1092,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addTypeInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addTypeInfoSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('type_info')
-                    ->info('Type info configuration')
-                    ->{$enableIfStandalone('symfony/type-info', Type::class)}()
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->arrayNode('aliases', 'alias')
-                            ->info('Additional type aliases to be used during type context creation.')
-                            ->defaultValue([])
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('name')
-                            ->scalarPrototype()->end()
-                        ->end()
-                    ->end()
+                ->variableNode('type_info')
+                    ->aliasOf('type_info')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;
@@ -2558,41 +2529,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addUidSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('uid')
-                    ->info('Uid configuration')
-                    ->{$enableIfStandalone('symfony/uid', UuidFactory::class)}()
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->enumNode('default_uuid_version')
-                            ->values([7, 6, 4, 1])
-                            ->defaultValue(7)
-                        ->end()
-                        ->enumNode('name_based_uuid_version')
-                            ->defaultValue(5)
-                            ->values([5, 3])
-                        ->end()
-                        ->scalarNode('name_based_uuid_namespace')
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->enumNode('time_based_uuid_version')
-                            ->values([7, 6, 1])
-                            ->defaultValue(7)
-                        ->end()
-                        ->scalarNode('time_based_uuid_node')
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->scalarNode('uuid47_secret')
-                            ->info('A high-entropy secret used by the "uuid47_transformer" service. Defaults to "kernel.secret".')
-                            ->defaultNull()
-                        ->end()
-                    ->end()
+                ->variableNode('uid')
+                    ->aliasOf('uid')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

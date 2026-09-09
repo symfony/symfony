@@ -27,7 +27,6 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValue
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
 use Symfony\Component\HttpKernel\Controller\ErrorController;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
@@ -62,9 +61,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('argument_resolver.backed_enum_resolver', BackedEnumValueResolver::class)
             ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => BackedEnumValueResolver::class])
-
-        ->set('argument_resolver.uid', UidValueResolver::class)
-            ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => UidValueResolver::class])
 
         ->set('argument_resolver.datetime', DateTimeValueResolver::class)
             ->args([

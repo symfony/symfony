@@ -1,3 +1,7 @@
+services:
+    test_property_accessor:
+        alias: property_accessor
+        public: true
 framework:
     property_access:
         magic_call: true

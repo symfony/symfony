@@ -35,9 +35,12 @@ use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\Mime\MimeBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
+use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Semaphore\SemaphoreBundle;
+use Symfony\Component\TypeInfo\TypeInfoBundle;
+use Symfony\Component\Uid\UidBundle;
 use Symfony\Component\WebLink\WebLinkBundle;
 use Symfony\Component\Workflow\WorkflowBundle;
 
@@ -293,7 +296,7 @@ class MicroKernelTraitTest extends TestCase
         ];
 
         // registered with ignoreOnInvalid, so absent when the component is not installed
-        foreach ([WebLinkBundle::class, SemaphoreBundle::class, WorkflowBundle::class, RemoteEventBundle::class, HtmlSanitizerBundle::class, ProcessBundle::class, JsonPathBundle::class, MimeBundle::class, ObjectMapperBundle::class] as $class) {
+        foreach ([WebLinkBundle::class, SemaphoreBundle::class, WorkflowBundle::class, RemoteEventBundle::class, HtmlSanitizerBundle::class, TypeInfoBundle::class, PropertyAccessBundle::class, UidBundle::class, ProcessBundle::class, JsonPathBundle::class, MimeBundle::class, ObjectMapperBundle::class] as $class) {
             if (class_exists($class)) {
                 $expected[$class] = ['all' => true];
             }

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `TypeInfoBundle`, which provides the `type_info` configuration and the services previously provided by `FrameworkBundle` under `framework.type_info`
  * Add support for `@template-covariant` and its vendor prefixed synonyms
 
 8.1

@@ -186,13 +186,6 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\TypeResolver\PhpDocAwareReflectionTypeResolver;
-use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
-use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
-use Symfony\Component\Uid\Factory\UuidFactory;
-use Symfony\Component\Uid\Uuid47Transformer;
-use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\Attribute\ExtendsValidationFor;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
@@ -297,7 +290,6 @@ class FrameworkExtension extends Extension
 
         // warmup config enabled
         $this->readConfigEnabled('translator', $container, $config['translator']);
-        $this->readConfigEnabled('property_access', $container, $config['property_access']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
 
         // A translator must always be registered (as support is included by
@@ -414,7 +406,6 @@ class FrameworkExtension extends Extension
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale'], $config['enabled_locales']);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader, $config['enabled_locales']);
-        $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
 
         $exceptionListener = $container->getDefinition('exception_listener');
@@ -450,19 +441,11 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.serializer_debug');
         }
 
-        if ($typeInfoEnabled = $this->readConfigEnabled('type_info', $container, $config['type_info'])) {
-            $this->registerTypeInfoConfiguration($config['type_info'], $container, $loader);
-        }
-
         if ($propertyInfoEnabled) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('json_streamer', $container, $config['json_streamer'])) {
-            if (!$typeInfoEnabled) {
-                throw new LogicException('JsonStreamer support cannot be enabled as the TypeInfo component is not '.(interface_exists(TypeResolverInterface::class) ? 'enabled.' : 'installed. Try running "composer require symfony/type-info".'));
-            }
-
             $this->registerJsonStreamerConfiguration($config['json_streamer'], $container, $loader);
         }
 
@@ -476,16 +459,6 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
-        }
-
-        if ($this->readConfigEnabled('uid', $container, $config['uid'])) {
-            if (!class_exists(UuidFactory::class)) {
-                throw new LogicException('Uid support cannot be enabled as the Uid component is not installed. Try running "composer require symfony/uid".');
-            }
-
-            $this->registerUidConfiguration($config['uid'], $container, $loader);
-        } else {
-            $container->removeDefinition('argument_resolver.uid');
         }
 
         // register cache before session so both can share the connection services
@@ -1676,31 +1649,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!$this->readConfigEnabled('property_access', $container, $config)) {
-            return;
-        }
-
-        $loader->load('property_access.php');
-
-        $magicMethods = PropertyAccessor::DISALLOW_MAGIC_METHODS;
-        $magicMethods |= $config['magic_call'] ? PropertyAccessor::MAGIC_CALL : 0;
-        $magicMethods |= $config['magic_get'] ? PropertyAccessor::MAGIC_GET : 0;
-        $magicMethods |= $config['magic_set'] ? PropertyAccessor::MAGIC_SET : 0;
-
-        $throw = PropertyAccessor::DO_NOT_THROW;
-        $throw |= $config['throw_exception_on_invalid_index'] ? PropertyAccessor::THROW_ON_INVALID_INDEX : 0;
-        $throw |= $config['throw_exception_on_invalid_property_path'] ? PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH : 0;
-
-        $container
-            ->getDefinition('property_accessor')
-            ->replaceArgument(0, $magicMethods)
-            ->replaceArgument(1, $throw)
-            ->replaceArgument(5, $config['wildcard_reads'])
-        ;
-    }
-
     private function registerSecretsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, ?string $secret): void
     {
         if (!$this->readConfigEnabled('secrets', $container, $config)) {
@@ -1794,17 +1742,8 @@ class FrameworkExtension extends Extension
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
-        if (!$this->isInitializedConfigEnabled('property_access')) {
-            $container->removeAlias('serializer.property_accessor');
-            $container->removeDefinition('serializer.normalizer.object');
-        }
-
         if (!class_exists(Yaml::class)) {
             $container->removeDefinition('serializer.encoder.yaml');
-        }
-
-        if (!$this->isInitializedConfigEnabled('property_access')) {
-            $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 
         if (!class_exists(Headers::class)) {
@@ -1995,38 +1934,6 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('property_info.cache');
-        }
-    }
-
-    private function registerTypeInfoConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!class_exists(Type::class)) {
-            throw new LogicException('TypeInfo support cannot be enabled as the TypeInfo component is not installed. Try running "composer require symfony/type-info".');
-        }
-
-        $loader->load('type_info.php');
-
-        if (ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
-            $container->register('type_info.resolver.string', StringTypeResolver::class)
-                ->setArguments([null, null, $config['aliases']]);
-
-            $container->register('type_info.resolver.reflection_parameter.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
-                ->setArguments([new Reference('type_info.resolver.reflection_parameter'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);
-            $container->register('type_info.resolver.reflection_property.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
-                ->setArguments([new Reference('type_info.resolver.reflection_property'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);
-            $container->register('type_info.resolver.reflection_return.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
-                ->setArguments([new Reference('type_info.resolver.reflection_return'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);
-
-            /** @var ServiceLocatorArgument $resolversLocator */
-            $resolversLocator = $container->getDefinition('type_info.resolver')->getArgument(0);
-            $resolversLocator->setValues([
-                'string' => new Reference('type_info.resolver.string'),
-                \ReflectionParameter::class => new Reference('type_info.resolver.reflection_parameter.phpdoc_aware'),
-                \ReflectionProperty::class => new Reference('type_info.resolver.reflection_property.phpdoc_aware'),
-                \ReflectionFunctionAbstract::class => new Reference('type_info.resolver.reflection_return.phpdoc_aware'),
-            ] + $resolversLocator->getValues());
-
-            $container->getDefinition('type_info.type_context_factory')->replaceArgument(1, $config['aliases']);
         }
     }
 
@@ -3466,35 +3373,6 @@ class FrameworkExtension extends Extension
             $container->setAlias(RateLimiterBuilder::class, 'limiter_builder');
         } else {
             $container->removeDefinition('limiter_builder');
-        }
-    }
-
-    private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        $loader->load('uid.php');
-
-        $container->getDefinition('uuid.factory')
-            ->setArguments([
-                $config['default_uuid_version'],
-                $config['time_based_uuid_version'],
-                $config['name_based_uuid_version'],
-                UuidV4::class,
-                $config['time_based_uuid_node'] ?? null,
-                $config['name_based_uuid_namespace'] ?? null,
-            ])
-        ;
-
-        if (isset($config['name_based_uuid_namespace'])) {
-            $container->getDefinition('name_based_uuid.factory')
-                ->setArguments([$config['name_based_uuid_namespace']]);
-        }
-
-        if (!class_exists(Uuid47Transformer::class)) {
-            $container->removeDefinition('uuid47_transformer');
-            $container->removeAlias(Uuid47Transformer::class);
-        } elseif (null !== ($config['uuid47_secret'] ?? null)) {
-            $container->getDefinition('uuid47_transformer')
-                ->setArguments([$config['uuid47_secret']]);
         }
     }
 

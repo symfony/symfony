@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 use Symfony\Component\Uid\Factory\NameBasedUuidFactory;
 use Symfony\Component\Uid\Factory\RandomBasedUuidFactory;
 use Symfony\Component\Uid\Factory\TimeBasedUuidFactory;
@@ -28,7 +29,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('name_based_uuid.factory', NameBasedUuidFactory::class)
             ->factory([service('uuid.factory'), 'nameBased'])
-            ->args([abstract_arg('Please set the "framework.uid.name_based_uuid_namespace" configuration option to use the "name_based_uuid.factory" service')])
+            ->args([abstract_arg('Please set the "uid.name_based_uuid_namespace" configuration option to use the "name_based_uuid.factory" service')])
         ->alias(NameBasedUuidFactory::class, 'name_based_uuid.factory')
 
         ->set('random_based_uuid.factory', RandomBasedUuidFactory::class)
@@ -42,5 +43,8 @@ return static function (ContainerConfigurator $container) {
         ->set('uuid47_transformer', Uuid47Transformer::class)
             ->args([param('kernel.secret')])
         ->alias(Uuid47Transformer::class, 'uuid47_transformer')
+
+        ->set('argument_resolver.uid', UidValueResolver::class)
+            ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => UidValueResolver::class])
     ;
 };

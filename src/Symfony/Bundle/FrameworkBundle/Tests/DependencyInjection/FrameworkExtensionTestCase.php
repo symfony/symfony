@@ -100,6 +100,7 @@ use Symfony\Component\Mime\Crypto\PgpEncrypter;
 use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventHandler;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
@@ -123,6 +124,10 @@ use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Component\TypeInfo\TypeInfoBundle;
+use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Uid\UidBundle;
+use Symfony\Component\Uid\Uuid47Transformer;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
@@ -165,20 +170,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->createContainerFromFile('form_csrf_disabled');
     }
 
-    public function testPropertyAccessWithDefaultValue()
+    public function testPropertyAccessConfigurationIsForwardedToPropertyAccessBundle()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new PropertyAccessBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_property_access');
+        $container->compile();
 
-        $def = $container->getDefinition('property_accessor');
-        $this->assertSame(PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_GET, $def->getArgument(0));
-        $this->assertSame(PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, $def->getArgument(1));
-        $this->assertFalse($def->getArgument(5));
-    }
-
-    public function testPropertyAccessWithOverriddenValues()
-    {
-        $container = $this->createContainerFromFile('property_accessor');
-        $def = $container->getDefinition('property_accessor');
+        $def = $container->getDefinition('test_property_accessor');
         $this->assertSame(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_CALL, $def->getArgument(0));
         $this->assertSame(PropertyAccessor::THROW_ON_INVALID_INDEX, $def->getArgument(1));
         $this->assertTrue($def->getArgument(5));
@@ -186,7 +186,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testPropertyAccessCache()
     {
-        $container = $this->createContainerFromFile('property_accessor');
+        $container = $this->createContainerFromFile('full');
 
         $cache = $container->getDefinition('cache.property_access');
         $this->assertSame([PropertyAccessor::class, 'createCache'], $cache->getFactory(), 'PropertyAccessor::createCache() should be used in non-debug mode');
@@ -195,7 +195,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testPropertyAccessCacheWithDebug()
     {
-        $container = $this->createContainerFromFile('property_accessor', ['kernel.debug' => true]);
+        $container = $this->createContainerFromFile('full', ['kernel.debug' => true]);
 
         $cache = $container->getDefinition('cache.property_access');
         $this->assertNull($cache->getFactory());
@@ -483,6 +483,35 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame(HtmlSanitizer::class, $container->getDefinition('test_html_sanitizer')->getClass());
         $this->assertSame('custom', $container->getDefinition('test_html_sanitizer')->getTag('html_sanitizer')[0]['sanitizer']);
+    }
+
+    public function testTypeInfoConfigurationIsForwardedToTypeInfoBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new TypeInfoBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_type_info');
+        $container->compile();
+
+        $this->assertSame(['CustomAlias' => 'int'], $container->getDefinition('test_type_info_context_factory')->getArgument(1));
+    }
+
+    public function testUidConfigurationIsForwardedToUidBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $bundle = new UidBundle();
+        $bundle->build($container);
+        $container->registerExtension($bundle->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_uid');
+        $container->compile();
+
+        $definition = $container->getDefinition('test_uuid_factory');
+        $this->assertSame(UuidFactory::class, $definition->getClass());
+        $this->assertSame(6, $definition->getArgument(0));
+        $this->assertSame('73902feb-9b95-4fe5-9c6f-b3e6d29e77b5', $definition->getArgument(5));
+
+        $this->assertSame(Uuid47Transformer::class, $container->getDefinition('test_uuid47_transformer')->getClass());
     }
 
     public function testEnabledPhpErrorsConfig()
@@ -1991,12 +2020,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('serializer_disabled');
 
         $this->assertFalse($container->hasDefinition('serializer'));
-    }
-
-    public function testTypeInfoEnabled()
-    {
-        $container = $this->createContainerFromFile('type_info');
-        $this->assertTrue($container->has('type_info.resolver'));
     }
 
     public function testPropertyInfoEnabled()

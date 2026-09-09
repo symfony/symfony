@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-07T19:43:41Z
+
+Yes, that is the plan, and this PR is deliberately the easy part of it.
+
+These four are the only components left that own no `framework.*` configuration key, so they need nothing beyond moving the service file and the compiler pass registration. Everything else owns a key, and moving one means `framework.<key>` has to keep working. #65884 adds the mechanism for that, and #65885 is the first user of it.
+
+From surveying the rest, they fall into three groups.
+
+Ready once #65884 lands, with no other work: Semaphore, WebLink and RemoteEvent. Nothing else in `FrameworkExtension` reads their state.
+
+Ready, but each needs one coupling inverted into a compiler pass, because another section currently removes a definition based on `readConfigEnabled()`: HtmlSanitizer (the form extension), TypeInfo (the json_streamer error), PropertyAccess (two serializer services), Lock (five reads in RateLimiter and Messenger, all answerable with `$container->hasAlias('lock.factory')`, which is more accurate than today), and Uid (`argument_resolver.uid` moves into the bundle).
+
+Not yet: Scheduler, because `scheduler.php` needs `messenger.receiver_locator` and `AddScheduleMessengerPass` needs `messenger.transport_factory` and `messenger.default_serializer`, all of which only FrameworkBundle defines. A SchedulerBundle that cannot boot without FrameworkBundle would defeat the purpose, so it waits for Messenger.
+
+Messenger and Cache are the interesting ones you named, and they are the hardest. Cache is the substrate: `cache.validator`, `cache.serializer`, `cache.property_access` and friends are all created by `registerCacheConfiguration()`, so several other moves depend on how that is handled. The bigger obstacle for both, and for Serializer, Validator and Translation, is that their `*_debug.php` decorates a service with a `Traceable*` class. A data collector is easy, since `ProfilerPass` already does nothing when there is no `profiler` service, so the tag can simply always be there. A decorator is unconditional once declared, so those bundles need to know at load time whether the profiler is on, which is exactly what the isolated container in `MergeExtensionConfigurationPass` prevents. That needs its own answer before Cache or Messenger can move.
+
+So: yes for most of them, in stacked PRs, and no for Scheduler, Cache and Messenger until those two problems are solved.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-07T20:01:13Z
+
+Correcting myself on the previous comment: I claimed the `Traceable*` decorators were a blocker for Cache and Messenger, and that is wrong.
+
+I checked every `*_debug.php` in FrameworkBundle. The only reference any of them makes to a profiler-owned service is `profiler.is_disabled_state_checker` in `validator_debug.php`, and it is already `nullOnInvalid()`. Everything else each file references is either its own component's service or shared infrastructure such as `event_dispatcher` and `debug.file_link_formatter`. In particular the data collector is declared in the same file as the decorator that consumes it, so there is no missing service to work around.
+
+I verified by compiling a container with the `serializer_debug.php` shape and no `profiler` service at all: it compiles, and `serializer` still resolves to `TraceableSerializer`. `ProfilerPass` simply does nothing when there is no profiler, so the collector is never attached to anything.
+
+So a component bundle does not need load-time knowledge of whether the profiler is enabled. It gates on `kernel.debug`, which is a Kernel parameter every bundle can read, and uses ignore-on-invalid for anything profiler-owned. `WorkflowBundle` in #65885 already does exactly this: it imports `workflow_debug.php` under `kernel.debug`, and `WorkflowDebugPass` decorates each workflow with `TraceableWorkflow` while referencing `profiler.is_disabled_state_checker` with `IGNORE_ON_INVALID_REFERENCE`.
+
+The one real behavioral difference is narrow. FrameworkBundle loads these files when the profiler is enabled, whereas a component bundle would load them whenever `kernel.debug` is true. Those differ only when debug is on and the profiler is explicitly disabled, where you get a traceable wrapper that nothing reads. That is dev-only overhead, not a breakage, and a compiler pass can drop the decorator when `profiler` is absent if it is worth avoiding.
+
+Cache and Messenger are still the hardest of the set, but for their own reasons rather than this one. Cache is the substrate that `cache.validator`, `cache.serializer` and `cache.property_access` all come from, so several other moves depend on how it is handled, and Messenger is what Scheduler is waiting on.

@@ -32,7 +32,6 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
-use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\TypeInfo\Type;
@@ -615,53 +614,6 @@ class ConfigurationTest extends TestCase
             ],
             $config['lock']
         );
-    }
-
-    #[DataProvider('provideValidSemaphoreConfigurationTests')]
-    public function testValidSemaphoreConfiguration($semaphoreConfig, $processedConfig)
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [[
-            'semaphore' => $semaphoreConfig,
-        ]]);
-
-        $this->assertArrayHasKey('semaphore', $config);
-
-        $this->assertEquals($processedConfig, $config['semaphore']);
-    }
-
-    public static function provideValidSemaphoreConfigurationTests()
-    {
-        yield [null, ['enabled' => true, 'resources' => []]];
-
-        yield ['redis://default', ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
-        yield [['foo' => 'redis://foo', 'bar' => 'redis://bar'], ['enabled' => true, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
-        yield [['default' => 'redis://default'], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
-
-        yield [['enabled' => false, 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
-        yield [['enabled' => false, 'foo' => 'redis://foo', 'bar' => 'redis://bar'], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
-        yield [['enabled' => false, 'default' => 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
-
-        yield [['resources' => 'redis://default'], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
-        yield [['resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']], ['enabled' => true, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
-        yield [['resources' => ['default' => 'redis://default']], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
-
-        yield [['enabled' => false, 'resources' => 'redis://default'], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
-        yield [['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
-        yield [['enabled' => false, 'resources' => ['default' => 'redis://default']], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
-
-        // xml
-
-        yield [['resource' => ['redis://default']], ['enabled' => true, 'resources' => ['default' => 'redis://default']]];
-        yield [['resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
-        yield [['resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['foo' => 'redis://default']]];
-        yield [['resource' => [['name' => 'foo', 'value' => 'redis://default'], ['name' => 'bar', 'value' => 'redis://default']]], ['enabled' => true, 'resources' => ['foo' => 'redis://default', 'bar' => 'redis://default']]];
-
-        yield [['enabled' => false, 'resource' => ['redis://default']], ['enabled' => false, 'resources' => ['default' => 'redis://default']]];
-        yield [['enabled' => false, 'resource' => ['redis://default', ['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['default' => 'redis://default', 'foo' => 'redis://default']]];
-        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://default']]], ['enabled' => false, 'resources' => ['foo' => 'redis://default']]];
-        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://foo'], ['name' => 'bar', 'value' => 'redis://bar']]], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
     }
 
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
@@ -1263,20 +1215,12 @@ class ConfigurationTest extends TestCase
                 'log' => true,
                 'throw' => true,
             ],
-            'web_link' => [
-                'enabled' => !class_exists(FullStack::class),
-            ],
             'lock' => [
                 'enabled' => !class_exists(FullStack::class),
                 'resources' => [
                     'default' => [
                         class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock',
                     ],
-                ],
-            ],
-            'semaphore' => [
-                'enabled' => !class_exists(FullStack::class),
-                'resources' => [
                 ],
             ],
             'messenger' => [
@@ -1418,9 +1362,6 @@ class ConfigurationTest extends TestCase
                 'signing_algorithm' => 'sha256',
                 'signature_format' => 'legacy',
                 'timestamp_tolerance' => 300,
-            ],
-            'remote_event' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
             ],
             'json_streamer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(JsonStreamWriter::class),

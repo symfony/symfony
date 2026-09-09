@@ -103,8 +103,10 @@ use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventHandler;
+use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Security\Core\AuthenticationEvents;
-use Symfony\Component\Semaphore\Store\LockStore;
+use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Semaphore\Store\StoreFactory as SemaphoreStoreFactory;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
@@ -130,6 +132,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\Webhook\Server\SignatureFormat;
+use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
+use Symfony\Component\WebLink\WebLinkBundle;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\WorkflowBundle;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
@@ -423,6 +427,54 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('article', $container->getDefinition('test_workflow')->getTag('workflow')[0]['name']);
     }
 
+    public function testWebLinkConfigurationIsForwardedToWebLinkBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new WebLinkBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_web_link');
+        $container->compile();
+
+        $this->assertSame(AddLinkHeaderListener::class, $container->getDefinition('test_add_link_header_listener')->getClass());
+    }
+
+    #[DataProvider('provideRemoteEventConfigurationFixtures')]
+    public function testRemoteEventConfigurationIsForwardedToRemoteEventBundle(string $file)
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new RemoteEventBundle()->getContainerExtension());
+        $this->loadFromFile($container, $file);
+        $container->compile();
+
+        $this->assertSame(ConsumeRemoteEventHandler::class, $container->getDefinition('test_remote_event_handler')->getClass());
+    }
+
+    public static function provideRemoteEventConfigurationFixtures(): iterable
+    {
+        yield 'underscored' => ['legacy_remote_event'];
+        yield 'hyphenated' => ['legacy_hyphenated_remote_event'];
+    }
+
+    public function testSemaphoreConfigurationIsForwardedToSemaphoreBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new SemaphoreBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_semaphore');
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('semaphore.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
+        $this->assertSame([SemaphoreStoreFactory::class, 'createStore'], $storeDef->getFactory());
+        $this->assertSame('redis://localhost', $storeDef->getArgument(0));
+    }
+
     public function testEnabledPhpErrorsConfig()
     {
         $container = $this->createContainerFromFile('php_errors_enabled');
@@ -697,22 +749,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         // default package
         $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
         $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
-    }
-
-    public function testWebLink()
-    {
-        $container = $this->createContainerFromFile('web_link');
-        $this->assertTrue($container->hasDefinition('web_link.add_link_header_listener'));
-        $this->assertTrue($container->hasDefinition('web_link.http_header_serializer'));
-        $this->assertTrue($container->hasDefinition('web_link.http_header_parser'));
-        $this->assertTrue($container->hasDefinition('web_link.link_template_header_serializer'));
-        $this->assertTrue($container->hasDefinition('web_link.link_template_header_parser'));
-        $this->assertTrue($container->hasDefinition('web_link.json_linkset_serializer'));
-        $this->assertTrue($container->hasDefinition('web_link.json_linkset_parser'));
-
-        $listener = $container->getDefinition('web_link.add_link_header_listener');
-        $this->assertSame('web_link.http_header_serializer', (string) $listener->getArgument(0));
-        $this->assertSame('web_link.link_template_header_serializer', (string) $listener->getArgument(1));
     }
 
     public function testMessengerServicesRemovedWhenDisabled()
@@ -3519,72 +3555,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $connection = $storeDef->getArgument(0);
         $this->assertInstanceOf(Reference::class, $connection);
         $this->assertEquals('my_service', $connection->__toString());
-    }
-
-    public function testDefaultSemaphore()
-    {
-        $container = $this->createContainerFromFile('semaphore');
-
-        $this->assertTrue($container->hasDefinition('semaphore.default.factory'));
-        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
-        $this->assertSame('redis://localhost', $storeDef->getArgument(0));
-    }
-
-    public function testNamedSemaphores()
-    {
-        $container = $this->createContainerFromFile('semaphore_named');
-
-        $this->assertTrue($container->hasDefinition('semaphore.foo.factory'));
-        $storeDef = $container->getDefinition($container->getDefinition('semaphore.foo.factory')->getArgument(0));
-        $this->assertSame('redis://paas.com', $storeDef->getArgument(0));
-
-        $this->assertTrue($container->hasDefinition('semaphore.qux.factory'));
-        $storeDef = $container->getDefinition($container->getDefinition('semaphore.qux.factory')->getArgument(0));
-        $this->assertStringContainsString('REDIS_DSN', $storeDef->getArgument(0));
-    }
-
-    public function testSemaphoreWithService()
-    {
-        $container = $this->createContainerFromFile('semaphore_service', [], true, false);
-        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
-        $container->compile();
-
-        $this->assertTrue($container->hasDefinition('semaphore.default.factory'));
-        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
-        $this->assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
-    }
-
-    public function testSemaphoreWithLock()
-    {
-        if (!class_exists(LockStore::class)) {
-            $this->markTestSkipped('LockStore not available');
-        }
-
-        $container = $this->createContainerFromFile('semaphore_lock');
-
-        $this->assertTrue($container->hasDefinition('semaphore.default.factory'));
-        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
-        $this->assertSame([SemaphoreStoreFactory::class, 'createStore'], $storeDef->getFactory());
-        $this->assertEquals(new Reference('lock.default.factory'), $storeDef->getArgument(0));
-    }
-
-    public function testSemaphoreWithNamedLock()
-    {
-        if (!class_exists(LockStore::class)) {
-            $this->markTestSkipped('LockStore not available');
-        }
-
-        $container = $this->createContainerFromFile('semaphore_lock_named');
-
-        $this->assertTrue($container->hasDefinition('semaphore.default.factory'));
-        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
-        $this->assertSame([SemaphoreStoreFactory::class, 'createStore'], $storeDef->getFactory());
-        $this->assertEquals(new Reference('lock.default.factory'), $storeDef->getArgument(0));
-
-        $this->assertTrue($container->hasDefinition('semaphore.bar.factory'));
-        $storeDef = $container->getDefinition($container->getDefinition('semaphore.bar.factory')->getArgument(0));
-        $this->assertSame([SemaphoreStoreFactory::class, 'createStore'], $storeDef->getFactory());
-        $this->assertEquals(new Reference('lock.foo.factory'), $storeDef->getArgument(0));
     }
 
     public function testJsonStreamerEnabled()

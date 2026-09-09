@@ -23,7 +23,12 @@
         "psr/link": "^1.1|^2.0"
     },
     "require-dev": {
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
         "symfony/http-kernel": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<8.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\WebLink\\": "" },

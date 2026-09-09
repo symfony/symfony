@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `SemaphoreBundle`, which provides the `semaphore` configuration and the services previously provided by `FrameworkBundle` under `framework.semaphore`
+
 8.1
 ---
 

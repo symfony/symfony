@@ -34,7 +34,10 @@ use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\Mime\MimeBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
+use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Semaphore\SemaphoreBundle;
+use Symfony\Component\WebLink\WebLinkBundle;
 use Symfony\Component\Workflow\WorkflowBundle;
 
 require_once __DIR__.'/default/src/DefaultKernel.php';
@@ -289,7 +292,7 @@ class MicroKernelTraitTest extends TestCase
         ];
 
         // registered with ignoreOnInvalid, so absent when the component is not installed
-        foreach ([WorkflowBundle::class, ProcessBundle::class, JsonPathBundle::class, MimeBundle::class, ObjectMapperBundle::class] as $class) {
+        foreach ([WebLinkBundle::class, SemaphoreBundle::class, WorkflowBundle::class, RemoteEventBundle::class, ProcessBundle::class, JsonPathBundle::class, MimeBundle::class, ObjectMapperBundle::class] as $class) {
             if (class_exists($class)) {
                 $expected[$class] = ['all' => true];
             }

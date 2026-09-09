@@ -72,11 +72,13 @@ use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
+use Symfony\Component\RemoteEvent\RemoteEventBundle;
 use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingControllerPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
+use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass as SerializerAttributeMetadataPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass;
@@ -91,6 +93,7 @@ use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\WebLink\WebLinkBundle;
 use Symfony\Component\Workflow\WorkflowBundle;
 
 // Help opcache.preload discover always-needed symbols
@@ -111,7 +114,10 @@ class_exists(Registry::class);
  */
 #[RequiredBundle(ServicesBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(SemaphoreBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(RemoteEventBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]

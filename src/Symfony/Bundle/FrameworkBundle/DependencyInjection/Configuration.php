@@ -40,9 +40,7 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
-use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Scheduler\Schedule;
-use Symfony\Component\Semaphore\Semaphore;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -50,7 +48,6 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
-use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * FrameworkExtension configuration structure.
@@ -179,9 +176,9 @@ class Configuration implements ConfigurationInterface
         $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
         $this->addExceptionsSection($rootNode);
-        $this->addWebLinkSection($rootNode, $enableIfStandalone);
+        $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode, $enableIfStandalone);
-        $this->addSemaphoreSection($rootNode, $enableIfStandalone);
+        $this->addSemaphoreSection($rootNode);
         $this->addMessengerSection($rootNode, $enableIfStandalone);
         $this->addSchedulerSection($rootNode, $enableIfStandalone);
         $this->addRobotsIndexSection($rootNode);
@@ -193,7 +190,7 @@ class Configuration implements ConfigurationInterface
         $this->addUidSection($rootNode, $enableIfStandalone);
         $this->addHtmlSanitizerSection($rootNode, $enableIfStandalone);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
-        $this->addRemoteEventSection($rootNode, $enableIfStandalone);
+        $this->addRemoteEventSection($rootNode);
         $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
 
         $rootNode
@@ -1428,74 +1425,28 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addSemaphoreSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addSemaphoreSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('semaphore')
-                    ->info('Semaphore configuration')
-                    ->acceptAndWrap(['string'], 'resources')
-                    ->{$enableIfStandalone('symfony/semaphore', Semaphore::class)}()
-                    ->beforeNormalization()
-                        ->ifArray()
-                        ->then(static function ($v) {
-                            if (!isset($v['resources']) && !isset($v['resource'])) {
-                                $v = ['resources' => $v];
-                                if (\array_key_exists('enabled', $v['resources'])) {
-                                    $v['enabled'] = $v['resources']['enabled'];
-                                    unset($v['resources']['enabled']);
-                                }
-                            }
-
-                            return $v;
-                        })
-                    ->end()
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->arrayNode('resources', 'resource')
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('name')
-                            ->requiresAtLeastOneElement()
-                            ->acceptAndWrap(['string'], 'default')
-                            ->beforeNormalization()
-                                ->ifArray()
-                                ->then(static function ($v) {
-                                    if (!array_is_list($v)) {
-                                        return $v;
-                                    }
-
-                                    $resources = [];
-                                    foreach ($v as $resource) {
-                                        $resources[] = \is_array($resource) && isset($resource['name'])
-                                            ? [$resource['name'] => $resource['value']]
-                                            : ['default' => $resource]
-                                        ;
-                                    }
-
-                                    return array_merge_recursive([], ...$resources);
-                                })
-                            ->end()
-                            ->prototype('scalar')->end()
-                        ->end()
-                    ->end()
+                ->variableNode('semaphore')
+                    ->aliasOf('semaphore')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
+                    ->beforeNormalization()->ifString()->then(static fn ($v) => ['resources' => $v])->end()
                 ->end()
             ->end()
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addWebLinkSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addWebLinkSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('web_link')
-                    ->info('Web links configuration')
-                    ->{$enableIfStandalone('symfony/weblink', HttpHeaderSerializer::class)}()
+                ->variableNode('web_link')
+                    ->aliasOf('web_link')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;
@@ -2459,16 +2410,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addRemoteEventSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('remote_event')
-                    ->info('RemoteEvent configuration')
-                    ->{$enableIfStandalone('symfony/remote-event', RemoteEvent::class)}()
+                ->variableNode('remote_event')
+                    ->aliasOf('remote_event')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

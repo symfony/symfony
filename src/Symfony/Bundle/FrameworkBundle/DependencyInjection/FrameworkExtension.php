@@ -162,8 +162,6 @@ use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
-use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
-use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
@@ -172,12 +170,6 @@ use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Semaphore\PersistingStoreInterface as SemaphoreStoreInterface;
-use Symfony\Component\Semaphore\Semaphore;
-use Symfony\Component\Semaphore\SemaphoreFactory;
-use Symfony\Component\Semaphore\Serializer\SemaphoreKeyNormalizer;
-use Symfony\Component\Semaphore\Store\LockStore;
-use Symfony\Component\Semaphore\Store\StoreFactory as SemaphoreStoreFactory;
 use Symfony\Component\Serializer\Attribute as SerializerMapping;
 use Symfony\Component\Serializer\Attribute\ExtendsSerializationFor;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -215,7 +207,6 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\Webhook\Server\SignatureFormat;
-use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -483,24 +474,12 @@ class FrameworkExtension extends Extension
             $this->registerLockConfiguration($config['lock'], $container, $loader);
         }
 
-        if ($this->readConfigEnabled('semaphore', $container, $config['semaphore'])) {
-            $this->registerSemaphoreConfiguration($config['semaphore'], $container, $loader);
-        }
-
         if ($this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter'])) {
             if (!interface_exists(LimiterInterface::class)) {
                 throw new LogicException('Rate limiter support cannot be enabled as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
             }
 
             $this->registerRateLimiterConfiguration($config['rate_limiter'], $container, $loader);
-        }
-
-        if ($this->readConfigEnabled('web_link', $container, $config['web_link'])) {
-            if (!class_exists(HttpHeaderSerializer::class)) {
-                throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed. Try running "composer require symfony/weblink".');
-            }
-
-            $loader->load('web_link.php');
         }
 
         if ($this->readConfigEnabled('uid', $container, $config['uid'])) {
@@ -636,10 +615,6 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if ($this->readConfigEnabled('remote_event', $container, $config['remote_event'])) {
-            $this->registerRemoteEventConfiguration($loader);
-        }
-
         if ($this->readConfigEnabled('html_sanitizer', $container, $config['html_sanitizer'])) {
             if (!class_exists(HtmlSanitizerConfig::class)) {
                 throw new LogicException('HtmlSanitizer support cannot be enabled as the HtmlSanitizer component is not installed. Try running "composer require symfony/html-sanitizer".');
@@ -708,9 +683,6 @@ class FrameworkExtension extends Extension
         });
         $container->registerAttributeForAutoconfiguration(Route::class, static function (ChildDefinition $definition, Route $attribute, \ReflectionClass|\ReflectionMethod $reflection): void {
             $definition->addTag('controller.service_arguments')->addTag('routing.controller');
-        });
-        $container->registerAttributeForAutoconfiguration(AsRemoteEventConsumer::class, static function (ChildDefinition $definition, AsRemoteEventConsumer $attribute): void {
-            $definition->addTag('remote_event.consumer', ['consumer' => $attribute->name]);
         });
         $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
             $tagAttributes = get_object_vars($attribute);
@@ -2138,57 +2110,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSemaphoreConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!class_exists(Semaphore::class)) {
-            throw new LogicException('Semaphore support cannot be enabled as the Semaphore component is not installed. Try running "composer require symfony/semaphore".');
-        }
-
-        $loader->load('semaphore.php');
-
-        // BC layer Semaphore < 7.4
-        if (!interface_exists(DenormalizerInterface::class) || !class_exists(SemaphoreKeyNormalizer::class)) {
-            $container->removeDefinition('serializer.normalizer.semaphore_key');
-        }
-
-        foreach ($config['resources'] as $resourceName => $resourceStore) {
-            $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
-
-            if (str_starts_with($storeDsn, 'lock://') && !class_exists(LockStore::class)) {
-                throw new LogicException('Cannot use a lock store as the installed version of the Semaphore component does not support it. Try running "composer require symfony/semaphore:^8.1".');
-            }
-
-            $storeDefinition = new Definition(SemaphoreStoreInterface::class);
-            $storeDefinition->setFactory([SemaphoreStoreFactory::class, 'createStore']);
-            $storeDefinition->setArguments([match (true) {
-                $usedEnvs => $resourceStore,
-                str_starts_with($storeDsn, 'lock://') => new Reference('lock.'.(substr($storeDsn, 7) ?: 'default').'.factory'),
-                !str_contains($resourceStore, '://') => new Reference($resourceStore),
-                default => $resourceStore,
-            }]);
-
-            $container->setDefinition($storeDefinitionId = '.semaphore.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
-
-            // Generate factories for each resource
-            $factoryDefinition = new ChildDefinition('semaphore.factory.abstract');
-            $factoryDefinition->replaceArgument(0, new Reference($storeDefinitionId));
-            $container->setDefinition('semaphore.'.$resourceName.'.factory', $factoryDefinition);
-
-            // Generate services for semaphore instances
-            $semaphoreDefinition = new Definition(Semaphore::class);
-            $semaphoreDefinition->setFactory([new Reference('semaphore.'.$resourceName.'.factory'), 'createSemaphore']);
-            $semaphoreDefinition->setArguments([$resourceName]);
-
-            // provide alias for default resource
-            if ('default' === $resourceName) {
-                $container->setAlias('semaphore.factory', new Alias('semaphore.'.$resourceName.'.factory', false));
-                $container->setAlias(SemaphoreFactory::class, new Alias('semaphore.factory', false));
-            } else {
-                $container->registerAliasForArgument('semaphore.'.$resourceName.'.factory', SemaphoreFactory::class, $resourceName.'.semaphore.factory', $resourceName);
-            }
-        }
-    }
-
     private function registerSchedulerConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(SchedulerTransportFactory::class)) {
@@ -3448,15 +3369,6 @@ class FrameworkExtension extends Extension
         }
 
         $container->getDefinition('webhook.transport')->replaceArgument(0, new Reference($clientId));
-    }
-
-    private function registerRemoteEventConfiguration(PhpFileLoader $loader): void
-    {
-        if (!class_exists(RemoteEvent::class)) {
-            throw new LogicException('RemoteEvent support cannot be enabled as the component is not installed. Try running "composer require symfony/remote-event".');
-        }
-
-        $loader->load('remote_event.php');
     }
 
     private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

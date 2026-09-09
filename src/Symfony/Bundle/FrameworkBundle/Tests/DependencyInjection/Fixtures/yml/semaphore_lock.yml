@@ -1,3 +1,0 @@
-framework:
-    lock: flock
-    semaphore: lock://

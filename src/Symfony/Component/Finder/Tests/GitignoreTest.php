@@ -55,6 +55,19 @@ class GitignoreTest extends TestCase
         }
     }
 
+    public function testToRegexWithMorePatternsThanTheRegexNestingLimit()
+    {
+        $lines = array_map(static fn (int $i): string => "dir{$i}/", range(1, 300));
+
+        $regex = Gitignore::toRegex(implode("\n", $lines));
+        $this->assertMatchesRegularExpression($regex, 'dir300/file.txt');
+        $this->assertDoesNotMatchRegularExpression($regex, 'other/file.txt');
+
+        $negatedRegex = Gitignore::toRegexMatchingNegatedPatterns(implode("\n", array_map(static fn (string $line): string => '!'.$line, $lines)));
+        $this->assertMatchesRegularExpression($negatedRegex, 'dir300/file.txt');
+        $this->assertDoesNotMatchRegularExpression($negatedRegex, 'other/file.txt');
+    }
+
     public static function provider(): array
     {
         $cases = [

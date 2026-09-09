@@ -40,6 +40,7 @@ class Gitignore
         $gitignoreLines = preg_split('~\r\n?|\n~', $gitignoreFileContent);
 
         $res = self::lineToRegex('');
+        $alternatives = [];
         foreach ($gitignoreLines as $line) {
             $line = preg_replace('~(?<!\\\\)[ \t]+$~', '', $line);
 
@@ -52,14 +53,32 @@ class Gitignore
 
             if ('' !== $line) {
                 if ($isNegative xor $inverted) {
-                    $res = '(?!'.self::lineToRegex($line).'$)'.$res;
+                    // a negative pattern only cancels the patterns before it, so it opens a new nesting level
+                    $res = '(?!'.self::lineToRegex($line).'$)'.self::alternate($res, $alternatives);
                 } else {
-                    $res = '(?:'.$res.'|'.self::lineToRegex($line).')';
+                    $alternatives[] = self::lineToRegex($line);
                 }
             }
         }
 
-        return '~^(?:'.$res.')~s';
+        return '~^(?:'.self::alternate($res, $alternatives).')~s';
+    }
+
+    /**
+     * Consecutive patterns share a single group, so deep nesting stays proportional to the number of negative patterns.
+     *
+     * @param list<string> $alternatives
+     */
+    private static function alternate(string $res, array &$alternatives): string
+    {
+        if (!$alternatives) {
+            return $res;
+        }
+
+        $regex = '(?:'.$res.'|'.implode('|', $alternatives).')';
+        $alternatives = [];
+
+        return $regex;
     }
 
     private static function lineToRegex(string $gitignoreLine): string

@@ -100,6 +100,7 @@ FrameworkBundle
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
+ * Deprecate `JsonPathPass`, use the one from the JsonPath component instead
 
 HttpClient
 ----------

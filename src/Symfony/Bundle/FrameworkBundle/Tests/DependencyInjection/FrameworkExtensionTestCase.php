@@ -16,14 +16,11 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonPathPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\JsonPath\UppercaseFunction;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -45,7 +42,6 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
-use Symfony\Component\DependencyInjection\Compiler\CheckDefinitionValidityPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
@@ -81,12 +77,12 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
-use Symfony\Component\JsonPath\FunctionReturnType;
-use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
+use Symfony\Component\Mailer\EventListener\PgpMimeEncryptedMessageListener;
+use Symfony\Component\Mailer\EventListener\PgpMimeSignedMessageListener;
 use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
@@ -2608,8 +2604,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testMailerPgp()
     {
-        if (!class_exists(PgpSigner::class)) {
-            $this->markTestSkipped('This test requires symfony/mime 8.2 or higher.');
+        if (!class_exists(PgpSigner::class) || !class_exists(PgpMimeSignedMessageListener::class)) {
+            $this->markTestSkipped('This test requires symfony/mime 8.2 and symfony/mailer 8.2 or higher.');
         }
 
         $container = $this->createContainerFromFile('mailer_with_pgp');
@@ -2641,8 +2637,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testMailerPgpEncrypterFailsAndDoesNotEncryptForTheSenderByDefault()
     {
-        if (!class_exists(PgpEncrypter::class)) {
-            $this->markTestSkipped('This test requires symfony/mime 8.2 or higher.');
+        if (!class_exists(PgpEncrypter::class) || !class_exists(PgpMimeEncryptedMessageListener::class)) {
+            $this->markTestSkipped('This test requires symfony/mime 8.2 and symfony/mailer 8.2 or higher.');
         }
 
         $container = $this->createContainerFromFile('mailer_with_pgp_repository');
@@ -3595,64 +3591,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('json_streamer');
         $this->assertTrue($container->has('json_streamer.stream_writer'));
-    }
-
-    #[RequiresMethod(JsonPathCrawlerInterface::class, 'crawl')]
-    public function testJsonPathEnabled()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', []);
-        });
-
-        $this->assertTrue($container->hasDefinition('json_path.crawler'));
-        $this->assertSame('json_path.crawler', (string) $container->getAlias(JsonPathCrawlerInterface::class));
-
-        $locatorArgument = $container->getDefinition('json_path.crawler')->getArgument(0);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $locatorArgument);
-        $this->assertInstanceOf(TaggedIteratorArgument::class, $locatorArgument->getTaggedIteratorArgument());
-        $this->assertSame('json_path.function', $locatorArgument->getTaggedIteratorArgument()->getTag());
-    }
-
-    #[RequiresMethod(JsonPathCrawlerInterface::class, 'crawl')]
-    public function testJsonPathFunctionAttributeAutoconfiguration()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', []);
-            $container->register('json_path.function.upper', UppercaseFunction::class)
-                ->setAutoconfigured(true);
-        });
-
-        $this->assertSame([['name' => 'upper', 'return_type' => 'value', 'arity' => 1]], $container->getDefinition('json_path.function.upper')->getTag('json_path.function'));
-
-        $locatorArgument = $container->getDefinition('json_path.crawler')->getArgument(0);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $locatorArgument);
-        $this->assertInstanceOf(TaggedIteratorArgument::class, $locatorArgument->getTaggedIteratorArgument());
-        $this->assertSame('json_path.function', $locatorArgument->getTaggedIteratorArgument()->getTag());
-        $this->assertSame('name', $locatorArgument->getTaggedIteratorArgument()->getIndexAttribute());
-    }
-
-    #[RequiresMethod(JsonPathCrawlerInterface::class, 'crawl')]
-    public function testJsonPathFunctionMetadataIsCollectedOnCompilation()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', []);
-            $container->register('json_path.function.upper', UppercaseFunction::class)
-                ->setAutoconfigured(true);
-            $container->addCompilerPass(new JsonPathPass());
-        }, compile: false);
-
-        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass(), new CheckDefinitionValidityPass()]);
-        $container->compile();
-
-        $this->assertSame(['upper' => ['arity' => 1, 'return_type' => FunctionReturnType::Value]], $container->getDefinition('json_path.crawler')->getArgument(1));
-    }
-
-    public function testObjectMapperEnabled()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', []);
-        });
-        $this->assertTrue($container->has('object_mapper'));
     }
 
     public function testSecretsDecryptionEnvVarWithDot()

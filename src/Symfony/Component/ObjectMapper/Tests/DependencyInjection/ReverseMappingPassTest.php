@@ -104,7 +104,7 @@ final class ReverseMappingPassTest extends TestCase
     private function registerMappedResource(ContainerBuilder $container, string $targetClass, string $sourceClass, string $idSuffix = ''): Definition
     {
         $definition = new Definition($targetClass);
-        // as added by the #[Map] attribute autoconfiguration registered in FrameworkExtension
+        // as added by the #[Map] attribute autoconfiguration registered in ObjectMapperBundle
         $definition->addResourceTag('object_mapper.map', [
             'source' => $sourceClass,
             'target' => $targetClass,

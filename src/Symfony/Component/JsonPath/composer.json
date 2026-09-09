@@ -35,9 +35,15 @@
         "symfony/polyfill-mbstring": "^1.0"
     },
     "require-dev": {
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
+        "symfony/filesystem": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3",
         "symfony/json-streamer": "^7.4|^8.0",
         "jsonpath-standard/jsonpath-compliance-test-suite": "*"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<8.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\JsonPath\\": "" },

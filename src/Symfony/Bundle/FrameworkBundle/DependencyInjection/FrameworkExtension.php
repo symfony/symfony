@@ -101,8 +101,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
-use Symfony\Component\JsonPath\Attribute\AsJsonPathFunction;
-use Symfony\Component\JsonPath\JsonPathCrawler;
 use Symfony\Component\JsonStreamer\Attribute\JsonStreamable;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
@@ -140,8 +138,6 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Crypto\PgpEncrypter;
 use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Mime\Header\Headers;
-use Symfony\Component\Mime\MimeTypeGuesserInterface;
-use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge as NotifierBridge;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
@@ -150,13 +146,6 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
-use Symfony\Component\ObjectMapper\Attribute\Map;
-use Symfony\Component\ObjectMapper\ConditionCallableInterface;
-use Symfony\Component\ObjectMapper\Metadata\EnumMappingMetadataFactory;
-use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
-use Symfony\Component\ObjectMapper\TransformCallableInterface;
-use Symfony\Component\Process\Messenger\RunProcessMessageHandler;
 use Symfony\Component\Process\Process;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
@@ -283,12 +272,6 @@ class FrameworkExtension extends Extension
 
         if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/framework-bundle'])) {
             $container->removeDefinition('controller.expression_language');
-        }
-
-        $loader->load('process.php');
-
-        if (!class_exists(RunProcessMessageHandler::class)) {
-            $container->removeDefinition('process.messenger.process_message_handler');
         }
 
         if ($this->hasConsole()) {
@@ -665,47 +648,6 @@ class FrameworkExtension extends Extension
             $this->registerHtmlSanitizerConfiguration($config['html_sanitizer'], $container, $loader);
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
-            $loader->load('mime_type.php');
-        }
-
-        if (ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
-            $loader->load('object_mapper.php');
-            $container->registerForAutoconfiguration(TransformCallableInterface::class)
-                ->addTag('object_mapper.transform_callable');
-            $container->registerForAutoconfiguration(ConditionCallableInterface::class)
-                ->addTag('object_mapper.condition_callable');
-            $container->registerAttributeForAutoconfiguration(Map::class, static function (ChildDefinition $definition, Map $attribute, \ReflectionClass $reflector): void {
-                $definition->addResourceTag('object_mapper.map', [
-                    'source' => $attribute->source ?? $reflector->name,
-                    'target' => $attribute->target ?? $reflector->name,
-                ]);
-            });
-
-            if (!class_exists(ReverseClassObjectMapperMetadataFactory::class)) {
-                $container->removeDefinition('object_mapper.metadata_factory.reverse_class');
-            }
-
-            if (!class_exists(EnumMappingMetadataFactory::class)) {
-                $container->removeDefinition('object_mapper.metadata_factory.enum');
-            }
-        }
-
-        if (ContainerBuilder::willBeAvailable('symfony/json-path', JsonPathCrawler::class, ['symfony/framework-bundle'])) {
-            $loader->load('json_path.php');
-            $container->registerAttributeForAutoconfiguration(AsJsonPathFunction::class, static function (ChildDefinition $definition, AsJsonPathFunction $attribute, \ReflectionClass $reflector): void {
-                if (!$reflector->hasMethod('__invoke')) {
-                    throw new LogicException(\sprintf('The "%s" attribute can only be applied to invokable classes, "%s" is not invokable.', AsJsonPathFunction::class, $reflector->name));
-                }
-
-                $definition->addTag('json_path.function', [
-                    'name' => $attribute->name,
-                    'return_type' => $attribute->returnType->value,
-                    'arity' => $reflector->getMethod('__invoke')->getNumberOfRequiredParameters(),
-                ]);
-            });
-        }
-
         $container->registerForAutoconfiguration(PackageInterface::class)
             ->addTag('assets.package');
         $container->registerForAutoconfiguration(AssetCompilerInterface::class)
@@ -760,8 +702,6 @@ class FrameworkExtension extends Extension
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(MessengerTransportFactoryInterface::class)
             ->addTag('messenger.transport_factory');
-        $container->registerForAutoconfiguration(MimeTypeGuesserInterface::class)
-            ->addTag('mime.mime_type_guesser');
 
         $container->registerAttributeForAutoconfiguration(AsController::class, static function (ChildDefinition $definition, AsController $attribute): void {
             $definition->addTag('controller.service_arguments');

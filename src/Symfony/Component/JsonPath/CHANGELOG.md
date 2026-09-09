@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `JsonPathBundle`, which provides the services previously provided by `FrameworkBundle`
+
 8.1
 ---
 

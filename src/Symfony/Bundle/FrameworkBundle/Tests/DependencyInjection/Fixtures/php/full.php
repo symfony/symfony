@@ -43,10 +43,6 @@ $container->loadFromExtension('framework', [
         'paths' => ['%kernel.project_dir%/Fixtures/translations'],
         'cache_dir' => '%kernel.cache_dir%/translations',
     ],
-    'validation' => [
-        'enabled' => true,
-        'email_validation_mode' => 'html5',
-    ],
     'property_info' => true,
     'request' => [
         'formats' => [

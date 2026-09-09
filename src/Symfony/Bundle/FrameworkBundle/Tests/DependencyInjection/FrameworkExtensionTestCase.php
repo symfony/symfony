@@ -109,8 +109,9 @@ use Symfony\Component\Uid\UidBundle;
 use Symfony\Component\Uid\Uuid47Transformer;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
+use Symfony\Component\Validator\DependencyInjection\RemoveMissingDependenciesPass as ValidatorRemoveMissingDependenciesPass;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidationBundle;
 use Symfony\Component\Webhook\DependencyInjection\RemoveMissingDependenciesPass as WebhookRemoveMissingDependenciesPass;
 use Symfony\Component\Webhook\WebhookBundle;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
@@ -906,50 +907,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertCount(2, $calls);
     }
 
-    public function testValidation()
-    {
-        $container = $this->createContainerFromFile('full');
-        $projectDir = $container->getParameter('kernel.project_dir');
-
-        $ref = new \ReflectionClass(Form::class);
-        $xmlMappings = [];
-        if (!$ref->getAttributes(Traverse::class)) {
-            $xmlMappings[] = \dirname($ref->getFileName()).'/Resources/config/validation.xml';
-        }
-        $xmlMappings[] = strtr($projectDir.'/config/validator/foo.xml', '/', \DIRECTORY_SEPARATOR);
-
-        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-
-        $attributes = !class_exists(FullStack::class);
-
-        $this->assertCount($attributes ? 8 : 7, $calls);
-        $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
-        $this->assertEquals([new Reference('validator.validator_factory')], $calls[0][1]);
-        $this->assertSame('setGroupProviderLocator', $calls[1][0]);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $calls[1][1][0]);
-        $this->assertSame('setTranslator', $calls[2][0]);
-        $this->assertEquals([new Reference('translator', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)], $calls[2][1]);
-        $this->assertSame('setTranslationDomain', $calls[3][0]);
-        $this->assertSame(['%validator.translation_domain%'], $calls[3][1]);
-        $this->assertSame('addXmlMappings', $calls[4][0]);
-        $this->assertSame([$xmlMappings], $calls[4][1]);
-        $i = 4;
-        if ($attributes) {
-            $this->assertSame('enableAttributeMapping', $calls[++$i][0]);
-        }
-        $this->assertSame('addMethodMapping', $calls[++$i][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[$i][1]);
-        $this->assertSame('setMappingCache', $calls[++$i][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);
-    }
-
-    public function testValidationService()
-    {
-        $container = $this->createContainerFromFile('validation_attributes', ['kernel.charset' => 'UTF-8'], false);
-
-        $this->assertInstanceOf(ValidatorInterface::class, $container->get('validator.alias'));
-    }
-
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testFileLinkFormat()
@@ -972,29 +929,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals('file%link%format', $container->getParameter('debug.file_link_format'));
     }
 
-    public function testValidationAttributes()
-    {
-        $container = $this->createContainerFromFile('validation_attributes');
-
-        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-
-        $this->assertCount(8, $calls);
-        $this->assertSame('enableAttributeMapping', $calls[5][0]);
-        $this->assertSame('addMethodMapping', $calls[6][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
-        $this->assertSame('setMappingCache', $calls[7][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
-        // no cache this time
-    }
-
     public function testValidationPaths()
     {
         require_once __DIR__.'/Fixtures/TestBundle/TestBundle.php';
 
-        $container = $this->createContainerFromFile('validation_attributes', [
+        $container = $this->createContainerFromFile('legacy_validation_attributes', [
             'kernel.bundles' => ['TestBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\TestBundle'],
             'kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle']],
-        ]);
+        ], true, true, null, [new ValidationBundle()->getContainerExtension()]);
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
@@ -1031,10 +973,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         require_once __DIR__.'/Fixtures/CustomPathBundle/src/CustomPathBundle.php';
 
-        $container = $this->createContainerFromFile('validation_attributes', [
+        $container = $this->createContainerFromFile('legacy_validation_attributes', [
             'kernel.bundles' => ['CustomPathBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\CustomPathBundle'],
             'kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/CustomPathBundle']],
-        ]);
+        ], true, true, null, [new ValidationBundle()->getContainerExtension()]);
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
         $xmlMappings = $calls[4][1][0];
@@ -1057,52 +999,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertStringEndsWith('CustomPathBundle/Resources/config/validation.yml', $yamlMappings[0]);
     }
 
-    public function testValidationNoStaticMethod()
-    {
-        $container = $this->createContainerFromFile('validation_no_static_method');
-
-        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-
-        $attributes = !class_exists(FullStack::class);
-
-        $this->assertCount($attributes ? 7 : 6, $calls);
-        $this->assertSame('addXmlMappings', $calls[4][0]);
-        $i = 4;
-        if ($attributes) {
-            $this->assertSame('enableAttributeMapping', $calls[++$i][0]);
-        }
-        $this->assertSame('setMappingCache', $calls[++$i][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);
-        // no cache, no attributes, no static methods
-    }
-
-    public function testEmailValidationModeIsPassedToEmailValidator()
-    {
-        $container = $this->createContainerFromFile('validation_email_validation_mode');
-
-        $this->assertSame('html5-allow-no-tld', $container->getDefinition('validator.email')->getArgument(0));
-    }
-
     public function testValidationTranslationDomain()
     {
-        $container = $this->createContainerFromFile('validation_translation_domain');
+        $container = $this->createContainerFromFile('legacy_validation_translation_domain', [], true, true, null, [new ValidationBundle()->getContainerExtension()]);
 
         $this->assertSame('messages', $container->getParameter('validator.translation_domain'));
     }
 
-    public function testValidationPropertyMetadataExistenceCheck()
-    {
-        $container = $this->createContainerFromFile('validation_property_metadata_existence_check');
-
-        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-        $methods = array_column($calls, 0);
-
-        $this->assertContains('enablePropertyMetadataExistenceCheck', $methods);
-    }
-
     public function testValidationMapping()
     {
-        $container = $this->createContainerFromFile('validation_mapping');
+        $container = $this->createContainerFromFile('legacy_validation_mapping', [], true, true, null, [new ValidationBundle()->getContainerExtension()]);
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
@@ -1113,19 +1019,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertStringContainsString('foo.yml', $calls[5][1][0][0]);
         $this->assertStringContainsString('validation.yml', $calls[5][1][0][1]);
         $this->assertStringContainsString('validation.yaml', $calls[5][1][0][2]);
-    }
-
-    public function testValidationAutoMapping()
-    {
-        $container = $this->createContainerFromFile('validation_auto_mapping');
-        $parameter = [
-            'App\\' => ['services' => ['foo', 'bar']],
-            'Symfony\\' => ['services' => ['a', 'b']],
-            'Foo\\' => ['services' => []],
-        ];
-
-        $this->assertSame($parameter, $container->getParameter('validator.auto_mapping'));
-        $this->assertTrue($container->hasDefinition('validator.property_info_loader'));
     }
 
     public function testFormsCanBeEnabledWithoutCsrfProtection()
@@ -1209,7 +1102,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public static function provideSectionCachePools(): iterable
     {
-        yield ['full', 'cache.validator'];
         yield ['full', 'cache.property_info'];
         yield ['section_cache_pools', 'cache.messenger.restart_workers_signal'];
         yield ['section_cache_pools', 'cache.scheduler'];
@@ -2129,7 +2021,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new NotifierRemoveMissingDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new NotifierRemoveMissingDependenciesPass(), new ValidatorRemoveMissingDependenciesPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2156,6 +2048,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->addCompilerPass(new MailerRemoveMissingDependenciesPass());
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
         $container->addCompilerPass(new NotifierRemoveMissingDependenciesPass());
+        $container->addCompilerPass(new ValidatorRemoveMissingDependenciesPass());
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

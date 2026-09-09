@@ -340,23 +340,6 @@ class ConfigurationTest extends TestCase
                 'providers' => [],
                 'globals' => [],
             ],
-            'validation' => [
-                'enabled' => !class_exists(FullStack::class),
-                'enable_attributes' => !class_exists(FullStack::class),
-                'static_method' => ['loadValidatorMetadata'],
-                'translation_domain' => 'validators',
-                'disable_translation' => false,
-                'property_metadata_existence_check' => false,
-                'mapping' => [
-                    'paths' => [],
-                ],
-                'auto_mapping' => [],
-                'not_compromised_password' => [
-                    'enabled' => true,
-                    'endpoint' => null,
-                ],
-                'email_validation_mode' => 'html5',
-            ],
             'session' => [
                 'enabled' => false,
                 'storage_factory_id' => 'session.storage.factory.native',

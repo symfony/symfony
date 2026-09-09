@@ -21,6 +21,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingTranslatorDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -45,7 +46,6 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
-use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -100,9 +100,10 @@ use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\SerializerBundle;
 use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
+use Symfony\Component\Translation\DependencyInjection\RemoveMissingDependenciesPass as TranslatorRemoveMissingDependenciesPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
-use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Component\Translation\TranslationBundle;
 use Symfony\Component\TypeInfo\TypeInfoBundle;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UidBundle;
@@ -778,7 +779,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testTranslator()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('legacy_translator', [], true, true, null, [new TranslationBundle()->getContainerExtension()]);
         $this->assertTrue($container->hasDefinition('translator.default'), '->registerTranslatorConfiguration() loads translation.php');
         $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
         $options = $container->getDefinition('translator.default')->getArgument(4);
@@ -857,14 +858,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testTranslatorProvidersMergedEnabledLocales()
     {
-        $container = $this->createContainerFromFile('translator_providers');
+        $container = $this->createContainerFromFile('legacy_translator_providers', [], true, true, null, [new TranslationBundle()->getContainerExtension()]);
         $this->assertSame(['es', 'en', 'fr', 'de', 'pl'], $container->getDefinition('console.command.translation_pull')->getArgument(5));
         $this->assertSame(['es', 'en', 'fr', 'de', 'pl'], $container->getDefinition('console.command.translation_push')->getArgument(3));
     }
 
     public function testTranslatorMultipleFallbacks()
     {
-        $container = $this->createContainerFromFile('translator_fallbacks');
+        $container = $this->createContainerFromFile('legacy_translator_fallbacks', [], true, true, null, [new TranslationBundle()->getContainerExtension()]);
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals(['en', 'fr'], $calls[1][1][0]);
@@ -872,14 +873,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testTranslatorCacheDirDisabled()
     {
-        $container = $this->createContainerFromFile('translator_cache_dir_disabled');
+        $container = $this->createContainerFromFile('legacy_translator_cache_dir_disabled', [], true, true, null, [new TranslationBundle()->getContainerExtension()]);
         $options = $container->getDefinition('translator.default')->getArgument(4);
         $this->assertNull($options['cache_dir']);
     }
 
     public function testTranslatorGlobals()
     {
-        $container = $this->createContainerFromFile('translator_globals');
+        $container = $this->createContainerFromFile('legacy_translator_globals', [], true, true, null, [new TranslationBundle()->getContainerExtension()]);
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
 
@@ -900,7 +901,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testTranslatorWithoutGlobals()
     {
-        $container = $this->createContainerFromFile('translator_without_globals');
+        $container = $this->createContainerFromFile('legacy_translator_without_globals', [], true, true, null, [new TranslationBundle()->getContainerExtension()]);
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
 
@@ -1802,30 +1803,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $container->getParameter('container.behavior_describing_tags'));
     }
 
-    public function testLocaleSwitcherServiceRegistered()
-    {
-        if (!class_exists(LocaleSwitcher::class)) {
-            $this->markTestSkipped('LocaleSwitcher not available.');
-        }
-
-        $container = $this->createContainerFromFile('full', compile: false);
-        $container->addCompilerPass(new ResolveTaggedIteratorArgumentPass());
-        $container->compile();
-
-        $this->assertTrue($container->has('translation.locale_switcher'));
-
-        $switcherDef = $container->getDefinition('translation.locale_switcher');
-
-        $this->assertSame('%kernel.default_locale%', $switcherDef->getArgument(0));
-        $this->assertInstanceOf(TaggedIteratorArgument::class, $switcherDef->getArgument(1));
-        $this->assertSame('kernel.locale_aware', $switcherDef->getArgument(1)->getTag());
-        $this->assertEquals(new Reference('router.request_context', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $switcherDef->getArgument(2));
-
-        $localeAwareServices = array_map(static fn (Reference $r) => (string) $r, $switcherDef->getArgument(1)->getValues());
-
-        $this->assertNotContains('translation.locale_switcher', $localeAwareServices);
-    }
-
     public function testTrustedProxiesWithPrivateRanges()
     {
         $container = $this->createContainerFromFile('trusted_proxies_private_ranges');
@@ -2021,7 +1998,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new NotifierRemoveMissingDependenciesPass(), new ValidatorRemoveMissingDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new NotifierRemoveMissingDependenciesPass(), new ValidatorRemoveMissingDependenciesPass(), new TranslatorRemoveMissingDependenciesPass(), new RemoveMissingTranslatorDependenciesPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2049,6 +2026,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
         $container->addCompilerPass(new NotifierRemoveMissingDependenciesPass());
         $container->addCompilerPass(new ValidatorRemoveMissingDependenciesPass());
+        $container->addCompilerPass(new TranslatorRemoveMissingDependenciesPass());
+        $container->addCompilerPass(new RemoveMissingTranslatorDependenciesPass());
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

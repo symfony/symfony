@@ -15,7 +15,6 @@ use Composer\InstalledVersions;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
-use PhpParser\Parser;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +23,6 @@ use Symfony\Bundle\FullStack;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsTargetedValueResolver as AsTargetedConsoleValueResolver;
@@ -62,19 +60,14 @@ use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Translation\Bridge as TranslationBridge;
 use Symfony\Component\Translation\Command\TranslationLintCommand as BaseTranslationLintCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
-use Symfony\Component\Translation\LocaleSwitcher;
-use Symfony\Component\Translation\PseudoLocalizationTranslator;
-use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
@@ -163,21 +156,7 @@ class FrameworkExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         // warmup config enabled
-        $this->readConfigEnabled('translator', $container, $config['translator']);
         $this->readConfigEnabled('profiler', $container, $config['profiler']);
-
-        // A translator must always be registered (as support is included by
-        // default in the Form and Validator component). If disabled, an identity
-        // translator will be used and everything will still work as expected.
-        if ($this->readConfigEnabled('translator', $container, $config['translator']) || $this->readConfigEnabled('form', $container, $config['form']) || class_exists(Validation::class)) {
-            if (!class_exists(Translator::class) && $this->readConfigEnabled('translator', $container, $config['translator'])) {
-                throw new LogicException('Translation support cannot be enabled as the Translation component is not installed. Try running "composer require symfony/translation".');
-            }
-
-            if (class_exists(Translator::class)) {
-                $loader->load('identity_translator.php');
-            }
-        }
 
         $container->getDefinition('locale_listener')->replaceArgument(3, $config['set_locale_from_accept_language']);
         $container->getDefinition('response_listener')->replaceArgument(1, $config['set_content_language_from_locale']);
@@ -244,7 +223,6 @@ class FrameworkExtension extends Extension
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $container->getDefinition('uri_signer')->addArgument($config['uri_signer']['expiration']);
-        $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale'], $config['enabled_locales']);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
 
@@ -493,12 +471,6 @@ class FrameworkExtension extends Extension
             $loader->load('form_debug.php');
         }
 
-        if ($this->isInitializedConfigEnabled('translator')) {
-            $loader->load('translation_debug.php');
-
-            $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
-        }
-
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
         $container->setParameter('profiler_listener.only_main_requests', $config['only_main_requests']);
 
@@ -646,211 +618,6 @@ class FrameworkExtension extends Extension
      * Returns a definition for an asset package.
      */
 
-
-    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale, array $enabledLocales): void
-    {
-        if (!$this->readConfigEnabled('translator', $container, $config)) {
-            $container->removeDefinition('console.command.translation_debug');
-            $container->removeDefinition('console.command.translation_extract');
-            $container->removeDefinition('console.command.translation_pull');
-            $container->removeDefinition('console.command.translation_push');
-            $container->removeDefinition('console.command.translation_lint');
-            $container->removeDefinition('console.command.translation_xliff_update_sources');
-
-            return;
-        }
-
-        $loader->load('translation.php');
-
-        if (!ContainerBuilder::willBeAvailable('symfony/translation', LocaleSwitcher::class, ['symfony/framework-bundle'])) {
-            $container->removeDefinition('translation.locale_switcher');
-        }
-
-        // don't use ContainerBuilder::willBeAvailable() as these are not needed in production
-        if (interface_exists(Parser::class)) {
-            $container->removeDefinition('translation.extractor.php');
-        } else {
-            $container->removeDefinition('translation.extractor.php_ast');
-        }
-
-        $loader->load('translation_providers.php');
-
-        // Use the "real" translator instead of the identity default
-        $container->setAlias('translator', 'translator.default')->setPublic(true);
-        $container->setAlias('translator.formatter', new Alias($config['formatter'], false));
-        $translator = $container->findDefinition('translator.default');
-        $translator->addMethodCall('setFallbackLocales', [$config['fallbacks'] ?: [$defaultLocale]]);
-
-        $defaultOptions = $translator->getArgument(4);
-        $defaultOptions['cache_dir'] = $config['cache_dir'];
-        $translator->setArgument(4, $defaultOptions);
-        $translator->setArgument(5, $enabledLocales);
-
-        $container->setParameter('translator.logging', $config['logging']);
-        $container->setParameter('translator.default_path', $config['default_path']);
-
-        // Discover translation directories
-        $dirs = [];
-        $transPaths = [];
-        $nonExistingDirs = [];
-        if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/translation'])) {
-            $r = new \ReflectionClass(Validation::class);
-
-            $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
-        }
-        if (ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/framework-bundle', 'symfony/translation'])) {
-            $r = new \ReflectionClass(Form::class);
-
-            $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
-        }
-        if (ContainerBuilder::willBeAvailable('symfony/security-core', AuthenticationException::class, ['symfony/framework-bundle', 'symfony/translation'])) {
-            $r = new \ReflectionClass(AuthenticationException::class);
-
-            $dirs[] = $transPaths[] = \dirname($r->getFileName(), 2).'/Resources/translations';
-        }
-        $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
-        foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            if ($container->fileExists($dir = $bundle['path'].'/Resources/translations') || $container->fileExists($dir = $bundle['path'].'/translations')) {
-                $dirs[] = $transPaths[] = $dir;
-            } else {
-                $nonExistingDirs[] = $dir;
-            }
-        }
-
-        foreach ($config['paths'] as $dir) {
-            if ($container->fileExists($dir)) {
-                $dirs[] = $transPaths[] = $dir;
-            } else {
-                throw new \UnexpectedValueException(\sprintf('"%s" defined in translator.paths does not exist or is not a directory.', $dir));
-            }
-        }
-
-        if ($container->hasDefinition('console.command.translation_debug')) {
-            $container->getDefinition('console.command.translation_debug')->replaceArgument(5, $transPaths);
-        }
-
-        if ($container->hasDefinition('console.command.translation_extract')) {
-            $container->getDefinition('console.command.translation_extract')->replaceArgument(6, $transPaths);
-        }
-
-        if ($container->hasDefinition('console.command.translation_xliff_update_sources')) {
-            $container->getDefinition('console.command.translation_xliff_update_sources')->replaceArgument(3, array_merge($config['paths'], [$config['default_path']]));
-        }
-
-        if (null === $defaultDir) {
-            // allow null
-        } elseif ($container->fileExists($defaultDir)) {
-            $dirs[] = $defaultDir;
-        } else {
-            $nonExistingDirs[] = $defaultDir;
-        }
-
-        // Register translation resources
-        if ($dirs) {
-            $files = [];
-
-            foreach ($dirs as $dir) {
-                $finder = Finder::create()
-                    ->followLinks()
-                    ->files()
-                    ->filter(static fn (\SplFileInfo $file) => 2 <= substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename()))
-                    ->in($dir)
-                    ->sortByName()
-                ;
-                foreach ($finder as $file) {
-                    $fileNameParts = explode('.', basename($file));
-                    $locale = $fileNameParts[\count($fileNameParts) - 2];
-                    if (!isset($files[$locale])) {
-                        $files[$locale] = [];
-                    }
-
-                    $files[$locale][] = (string) $file;
-                }
-            }
-
-            $projectDir = $container->getParameter('kernel.project_dir');
-
-            $options = array_merge(
-                $translator->getArgument(4),
-                [
-                    'resource_files' => $files,
-                    'scanned_directories' => $scannedDirectories = array_merge($dirs, $nonExistingDirs),
-                    'cache_vary' => [
-                        'scanned_directories' => array_map(static fn ($dir) => str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir, $scannedDirectories),
-                    ],
-                ]
-            );
-
-            $translator->replaceArgument(4, $options);
-        }
-
-        foreach ($config['globals'] as $name => $global) {
-            $translator->addMethodCall('addGlobalParameter', [$name, $global['value'] ?? new Definition(TranslatableMessage::class, [$global['message'], $global['parameters'] ?? [], $global['domain'] ?? null])]);
-        }
-
-        if ($config['pseudo_localization']['enabled']) {
-            $options = $config['pseudo_localization'];
-            unset($options['enabled']);
-
-            $container
-                ->register('translator.pseudo', PseudoLocalizationTranslator::class)
-                ->setDecoratedService('translator', null, -1) // Lower priority than "translator.data_collector"
-                ->setArguments([
-                    new Reference('translator.pseudo.inner'),
-                    $options,
-                ]);
-        }
-
-        $classToServices = [
-            TranslationBridge\Crowdin\CrowdinProviderFactory::class => ['symfony/crowdin-translation-provider', ['translation.provider_factory.crowdin', 'translation.provider_factory.crowdin.http_client']],
-            TranslationBridge\Loco\LocoProviderFactory::class => ['symfony/loco-translation-provider', ['translation.provider_factory.loco', 'translation.provider_factory.loco.http_client']],
-            TranslationBridge\Lokalise\LokaliseProviderFactory::class => ['symfony/lokalise-translation-provider', ['translation.provider_factory.lokalise']],
-            TranslationBridge\Phrase\PhraseProviderFactory::class => ['symfony/phrase-translation-provider', ['translation.provider_factory.phrase']],
-            TranslationBridge\PoEditor\PoEditorProviderFactory::class => ['symfony/po-editor-translation-provider', ['translation.provider_factory.poeditor']],
-        ];
-
-        $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
-
-        foreach ($classToServices as $class => [$package, $services]) {
-            if (ContainerBuilder::willBeAvailable($package, $class, $parentPackages)) {
-                continue;
-            }
-
-            foreach ($services as $service) {
-                $container->removeDefinition($service);
-            }
-        }
-
-        if (!$config['providers']) {
-            return;
-        }
-
-        $locales = $enabledLocales;
-
-        foreach ($config['providers'] as $provider) {
-            if ($provider['locales']) {
-                $locales = array_merge($locales, $provider['locales']);
-            }
-        }
-
-        $locales = array_values(array_unique($locales));
-
-        $container->getDefinition('console.command.translation_pull')
-            ->replaceArgument(4, array_merge($transPaths, [$config['default_path']]))
-            ->replaceArgument(5, $locales)
-        ;
-
-        $container->getDefinition('console.command.translation_push')
-            ->replaceArgument(2, array_merge($transPaths, [$config['default_path']]))
-            ->replaceArgument(3, $locales)
-        ;
-
-        $container->getDefinition('translation.provider_collection_factory')
-            ->replaceArgument(1, $locales)
-        ;
-
-        $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);
-    }
 
     /**
      * @param-immediately-invoked-callable $fileRecorder

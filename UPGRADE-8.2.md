@@ -184,6 +184,12 @@ FrameworkBundle
    validator is no longer turned on implicitly by enabling forms, the traceable validator and its data collector
    are registered in debug mode and dropped when the profiler is disabled, the cache pools are dropped when no
    `cache.system` pool is registered, and the property-info loader when no property info extractor is
+ * `TranslationBundle` is registered automatically when the Translation component is installed, and its services
+   are then registered without any configuration; set `translation.enabled` to `false` to disable them. The
+   `framework.translator` configuration is an alias of the `translation` configuration provided by the bundle,
+   whose root key is `translation`, not `translator`. An identity translator answers whenever translation itself
+   is off, the traceable translator and its data collector are registered in debug mode and dropped when the
+   profiler is disabled, and the `translation:*` console commands are dropped when the translator is
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
@@ -363,6 +369,8 @@ String
 Translation
 -----------
 
+ * `TranslationBundle` provides the `translation` configuration and the services `FrameworkBundle` used to
+   provide under `framework.translator`
  * `FilteringProvider::read()` now returns an empty `TranslatorBag` when none of the requested locales match the configured ones, and a bag of empty catalogues when no requested domain matches, instead of delegating to the wrapped provider
 
 Tui

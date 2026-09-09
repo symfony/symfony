@@ -29,12 +29,6 @@ framework:
         gc_divisor:      108
         gc_maxlifetime:  90000
         save_path:       /path/to/sessions
-    translator:
-        enabled:  true
-        fallback: fr
-        default_path: '%kernel.project_dir%/translations'
-        cache_dir: '%kernel.cache_dir%/translations'
-        paths: ['%kernel.project_dir%/Fixtures/translations']
     property_info: ~
     request:
         formats:

@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.translator` an alias of the `translation` configuration provided by `TranslationBundle`
+ * Register `TranslationBundle` automatically when the Translation component is installed
  * Make `framework.validation` an alias of the `validation` configuration provided by `ValidationBundle`
  * Register `ValidationBundle` automatically when the Validator component is installed
  * Make `framework.serializer` an alias of the `serializer` configuration provided by `SerializerBundle`

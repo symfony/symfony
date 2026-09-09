@@ -26,6 +26,19 @@ abstract class AbstractKernel implements KernelInterface
 {
     /** @var array<string, BundleInterface> */
     protected array $bundles = [];
+
+    private array $bundleClassMap = [];
+
+    /**
+     * The class of every registered bundle in registration order; those missing from $bundles are instantiated on demand.
+     *
+     * @var array<string, class-string<BundleInterface>>
+     */
+    protected array $bundleClasses {
+        get => $this->bundleClassMap;
+        set (array $bundleClasses) { $this->bundleClassMap = $bundleClasses; }
+    }
+
     protected ?ContainerInterface $container = null;
     protected bool $booted = false;
     protected ?float $startTime = null;
@@ -104,16 +117,30 @@ abstract class AbstractKernel implements KernelInterface
      */
     public function getBundles(): array
     {
+        if (\count($this->bundles) < \count($this->bundleClasses)) {
+            foreach ($this->bundleClasses as $name => $class) {
+                if (!isset($this->bundles[$name])) {
+                    $this->loadBundle($name);
+                }
+            }
+
+            $this->bundles = array_replace($this->bundleClasses, $this->bundles);
+        }
+
         return $this->bundles;
     }
 
     public function getBundle(string $name): BundleInterface
     {
-        if (!isset($this->bundles[$name])) {
+        if (isset($this->bundles[$name])) {
+            return $this->bundles[$name];
+        }
+
+        if (!isset($this->bundleClasses[$name])) {
             throw new \InvalidArgumentException(\sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the "registerBundles()" method of your "%s.php" file?', $name, get_debug_type($this)));
         }
 
-        return $this->bundles[$name];
+        return $this->loadBundle($name);
     }
 
     public function locateResource(string $name): string
@@ -224,5 +251,26 @@ abstract class AbstractKernel implements KernelInterface
      */
     protected function build(ContainerBuilder $container): void
     {
+    }
+
+    /**
+     * Creates a bundle that has not been instantiated when booting the kernel.
+     *
+     * @param class-string<BundleInterface> $class
+     */
+    protected function instantiateBundle(string $class): BundleInterface
+    {
+        return new $class();
+    }
+
+    private function loadBundle(string $name): BundleInterface
+    {
+        $bundle = $this->instantiateBundle($this->bundleClasses[$name]);
+
+        if ($this->container) {
+            $bundle->setContainer($this->container);
+        }
+
+        return $this->bundles[$name] = $bundle;
     }
 }

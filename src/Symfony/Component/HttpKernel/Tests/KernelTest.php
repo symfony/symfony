@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -26,6 +27,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\BundleAdapter;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
@@ -131,12 +133,26 @@ class KernelTest extends TestCase
         $bundle->expects($this->once())
             ->method('setContainer');
 
-        $kernel = $this->getKernel(['initializeBundles', 'getBundles']);
-        $kernel->expects($this->once())
-            ->method('getBundles')
-            ->willReturn([$bundle]);
-
+        $kernel = new KernelForTest('test', false, true, [$bundle]);
         $kernel->boot();
+    }
+
+    public function testBundlesWithNothingToDoAtRuntimeAreInstantiatedOnDemand()
+    {
+        $kernel = new LazyBundleKernel();
+        $kernel->boot();
+        $kernel->shutdown();
+
+        $kernel = new LazyBundleKernel();
+        $kernel->boot();
+
+        $this->assertSame([], $kernel->getInstantiatedBundles());
+
+        $bundle = $kernel->getBundle('LazyDiBundle');
+
+        $this->assertInstanceOf(BundleAdapter::class, $bundle);
+        $this->assertInstanceOf(LazyDiBundle::class, $bundle->getInnerBundle());
+        $this->assertSame(['LazyDiBundle' => $bundle], $kernel->getBundles());
     }
 
     public function testDebugBootSetsShellVerbosity()
@@ -904,6 +920,37 @@ class KernelForTest extends Kernel
             parent::initializeContainer();
         }
     }
+}
+
+class LazyBundleKernel extends Kernel
+{
+    public function __construct()
+    {
+        parent::__construct('lazybundle', false);
+    }
+
+    public function registerBundles(): iterable
+    {
+        return [new LazyDiBundle()];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+    }
+
+    public function getProjectDir(): string
+    {
+        return __DIR__.'/Fixtures';
+    }
+
+    public function getInstantiatedBundles(): array
+    {
+        return $this->bundles;
+    }
+}
+
+class LazyDiBundle extends AbstractBundle
+{
 }
 
 class KernelForTestWithLoadClassCache extends KernelForTest

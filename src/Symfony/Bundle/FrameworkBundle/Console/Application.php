@@ -173,7 +173,11 @@ class Application extends BaseApplication implements ContainerProviderInterface
 
         $container = $this->kernel->getContainer();
 
-        foreach ($this->kernel->getBundles() as $bundle) {
+        $commandBundles = $container->hasParameter('console.command.bundles')
+            ? array_map($this->kernel->getBundle(...), $container->getParameter('console.command.bundles'))
+            : $this->kernel->getBundles();
+
+        foreach ($commandBundles as $bundle) {
             if ($bundle instanceof Bundle
                 && method_exists($bundle, 'registerCommands')
                 && Bundle::class !== new \ReflectionMethod($bundle, 'registerCommands')->getDeclaringClass()->getName()

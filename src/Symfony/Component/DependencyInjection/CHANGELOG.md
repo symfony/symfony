@@ -12,6 +12,7 @@ CHANGELOG
  * Add `Preloader::ignore()` to exclude classes or namespace prefixes from preloading
  * Allow computing resource tag attributes per tagged class when using `#[AutoconfigureResourceTag]`, `#[Autoconfigure]` or `_instanceof`, like for regular tags
  * Add `#[AutowireClassMap]` attribute, `TaggedClassMapArgument`, the `!tagged_class_map` YAML tag and the `tagged_class_map()` PHP-DSL function to inject a map of classes found by resource tag name
+ * Instantiate on demand the bundles that have nothing to do when the kernel boots, and add `AbstractKernel::instantiateBundle()` to control how they are created
 
 8.1
 ---

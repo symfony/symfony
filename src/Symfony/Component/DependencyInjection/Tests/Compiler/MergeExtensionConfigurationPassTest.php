@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader\UndefinedExtensionHandler;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -299,6 +300,19 @@ class MergeExtensionConfigurationPassTest extends TestCase
         (new MergeExtensionConfigurationPass())->process($container);
     }
 
+    public function testAnUnregisteredExtensionOwnedByAComponentNamesThePackageToInstall()
+    {
+        $container = new ContainerBuilder();
+        UndefinedExtensionHandler::addPackages($container, ['notifier' => 'symfony/notifier']);
+        $container->registerExtension(new AliasingExtension());
+        $container->loadFromExtension('aliasing', ['notifier' => []]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "aliasing.notifier" configuration is handled by the "notifier" extension, which is not registered. Try running "composer require symfony/notifier".');
+
+        (new MergeExtensionConfigurationPass())->process($container);
+    }
+
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testDeprecatedExtensionAliasesTriggerTheirDeprecation()
@@ -431,6 +445,7 @@ final class AliasingConfiguration implements ConfigurationInterface
                 ->variableNode('under_scored')->attribute('alias_of', 'target')->end()
                 ->variableNode('shorthand')->attribute('alias_of', 'target')->beforeNormalization()->ifString()->then(static fn ($v) => ['value' => $v])->end()->end()
                 ->variableNode('legacy')->attribute('alias_of', 'target')->setDeprecated('symfony/test', '1.0', 'The "%path%" configuration is deprecated, use "target" instead.')->end()
+                ->variableNode('notifier')->attribute('alias_of', 'notifier')->end()
             ->end();
 
         return $treeBuilder;

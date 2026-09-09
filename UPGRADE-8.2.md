@@ -154,6 +154,9 @@ FrameworkBundle
    then registered without any configuration; set `http_client.enabled` to `false` to disable them. The
    `framework.http_client` configuration is an alias of the `http_client` configuration provided by the bundle. The
    cache pool is dropped when no `cache.app` pool is registered, and the data collector when the profiler is disabled
+ * `AssetBundle` is registered automatically when the Asset component is installed, and its services are then
+   registered without any configuration; set `asset.enabled` to `false` to disable them. The `framework.assets`
+   configuration is an alias of the `asset` configuration provided by the bundle
  * `NotifierBundle` is registered automatically when the Notifier component is installed, and its services are then
    registered without any configuration; set `notifier.enabled` to `false` to disable them. The `framework.notifier`
    configuration is an alias of the `notifier` configuration provided by the bundle. The data collector is registered

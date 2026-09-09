@@ -42,9 +42,6 @@ $container->loadFromExtension('framework', [
         'gc_probability' => 1,
         'save_path' => '/path/to/sessions',
     ],
-    'assets' => [
-        'version' => 'v1',
-    ],
     'translator' => [
         'enabled' => true,
         'fallback' => 'fr',

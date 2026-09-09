@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\Asset\AssetBundle;
 use Symfony\Component\AssetMapper\AssetMapperBundle;
 use Symfony\Component\Cache\CacheBundle;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -304,6 +305,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame(['test', 'dev'], $parameters['.container.known_envs']);
         $expected = [
             ServicesBundle::class => ['all' => true],
+            AssetBundle::class => ['all' => true],
             CacheBundle::class => ['all' => true],
             ConsoleBundle::class => ['all' => true],
         ];

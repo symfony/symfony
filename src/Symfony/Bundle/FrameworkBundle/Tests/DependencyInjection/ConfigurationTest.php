@@ -216,105 +216,6 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    public function testAssetsCanBeEnabled()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [[
-            'assets' => null,
-        ]]);
-
-        $defaultConfig = [
-            'enabled' => true,
-            'version_strategy' => null,
-            'version' => null,
-            'version_format' => '%%s?%%s',
-            'base_path' => '',
-            'base_urls' => [],
-            'packages' => [],
-            'json_manifest_path' => null,
-            'strict_mode' => false,
-        ];
-
-        $this->assertEquals($defaultConfig, $config['assets']);
-    }
-
-    #[DataProvider('provideValidAssetsPackageNameConfigurationTests')]
-    public function testValidAssetsPackageNameConfiguration($packageName)
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [
-            [
-                'assets' => [
-                    'packages' => [
-                        $packageName => [],
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->assertArrayHasKey($packageName, $config['assets']['packages']);
-    }
-
-    public static function provideValidAssetsPackageNameConfigurationTests(): array
-    {
-        return [
-            ['foobar'],
-            ['foo-bar'],
-            ['foo_bar'],
-        ];
-    }
-
-    #[DataProvider('provideInvalidAssetConfigurationTests')]
-    public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($expectedMessage);
-
-        $processor->processConfiguration($configuration, [
-            [
-                'assets' => $assetConfig,
-            ],
-        ]);
-    }
-
-    public static function provideInvalidAssetConfigurationTests(): iterable
-    {
-        // helper to turn config into embedded package config
-        $createPackageConfig = static fn (array $packageConfig) => [
-            'base_urls' => '//example.com',
-            'version' => 1,
-            'packages' => [
-                'foo' => $packageConfig,
-            ],
-        ];
-
-        $config = [
-            'version' => 1,
-            'version_strategy' => 'foo',
-        ];
-        yield [$config, 'You cannot use both "version_strategy" and "version" at the same time under "assets".'];
-        yield [$createPackageConfig($config), 'You cannot use both "version_strategy" and "version" at the same time under "assets" packages.'];
-
-        $config = [
-            'json_manifest_path' => '/foo.json',
-            'version_strategy' => 'foo',
-        ];
-        yield [$config, 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".'];
-        yield [$createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.'];
-
-        $config = [
-            'json_manifest_path' => '/foo.json',
-            'version' => '1',
-        ];
-        yield [$config, 'You cannot use both "version" and "json_manifest_path" at the same time under "assets".'];
-        yield [$createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.'];
-    }
-
     public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured()
     {
         $processor = new Processor();
@@ -561,17 +462,6 @@ class ConfigurationTest extends TestCase
             'request' => [
                 'enabled' => false,
                 'formats' => [],
-            ],
-            'assets' => [
-                'enabled' => !class_exists(FullStack::class),
-                'version_strategy' => null,
-                'version' => null,
-                'version_format' => '%%s?%%s',
-                'base_path' => '',
-                'base_urls' => [],
-                'packages' => [],
-                'json_manifest_path' => null,
-                'strict_mode' => false,
             ],
             'php_errors' => [
                 'log' => true,

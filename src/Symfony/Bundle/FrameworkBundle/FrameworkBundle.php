@@ -34,6 +34,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationLintC
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationUpdateCommandPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\VirtualRequestStackPass;
+use Symfony\Component\Asset\AssetBundle;
 use Symfony\Component\AssetMapper\AssetMapperBundle;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -122,6 +123,7 @@ class_exists(Registry::class);
  * @author Fabien Potencier <fabien@symfony.com>
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(AssetBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(CacheBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]

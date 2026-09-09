@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `AssetBundle`, which provides the `asset` configuration and the services previously provided by `FrameworkBundle` under `framework.assets`
+
 6.1
 ---
 

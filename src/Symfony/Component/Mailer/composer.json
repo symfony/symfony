@@ -26,7 +26,9 @@
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
+        "symfony/config": "^7.4|^8.0",
         "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
@@ -34,6 +36,7 @@
         "symfony/twig-bridge": "^7.4|^8.0"
     },
     "conflict": {
+        "symfony/dependency-injection": "<8.1",
         "symfony/http-client-contracts": "<2.5"
     },
     "autoload": {

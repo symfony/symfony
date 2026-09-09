@@ -65,17 +65,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
-use Symfony\Component\Mailer\Bridge as MailerBridge;
-use Symfony\Component\Mailer\Command\MailerTestCommand;
-use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
-use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
-use Symfony\Component\Mailer\EventListener\PgpMimeEncryptedMessageListener;
-use Symfony\Component\Mailer\EventListener\PgpMimeSignedMessageListener;
-use Symfony\Component\Mailer\Header\TrackingHeader;
-use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
-use Symfony\Component\Mime\Crypto\PgpEncrypter;
-use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Notifier\Bridge as NotifierBridge;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
@@ -85,8 +75,6 @@ use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
-use Symfony\Component\Process\Process;
-use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -290,14 +278,6 @@ class FrameworkExtension extends Extension
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
         }
 
-        if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
-            $this->registerMailerConfiguration($config['mailer'], $container, $loader);
-
-            if (!$this->hasConsole() || !class_exists(MailerTestCommand::class)) {
-                $container->removeDefinition('console.command.mailer_test');
-            }
-        }
-
         $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override'], $config['allowed_http_method_override']);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
@@ -383,36 +363,23 @@ class FrameworkExtension extends Extension
         // validation depends on form, annotations being registered
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
 
-        // notifier depends on mailer being registered
         if ($this->readConfigEnabled('notifier', $container, $config['notifier'])) {
             $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
         }
 
-        // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier, serializer being registered. console is optional
+        // profiler depends on form, validation, translation, notifier and serializer being registered
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
-        // These listeners keep every message, attachments included, for the
-        // lifetime of the process. Only the profiler and the test assertions
-        // consume them, so drop them when neither is around, and let them skip
-        // messages nobody will collect otherwise. Test mode keeps collecting
-        // unconditionally because the assertions read the listeners directly.
-        if (!($config['test'] ?? false)) {
-            $loggerListeners = [
-                'mailer' => 'mailer.message_logger_listener',
-                'notifier' => 'notifier.notification_logger_listener',
-            ];
-
-            foreach ($loggerListeners as $extension => $id) {
-                if (!$this->isInitializedConfigEnabled($extension)) {
-                    continue;
-                }
-
-                if ($this->isInitializedConfigEnabled('profiler')) {
-                    $container->getDefinition($id)
-                        ->setArgument(0, new Reference('profiler.is_disabled_state_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-                } else {
-                    $container->removeDefinition($id);
-                }
+        // This listener keeps every notification for the lifetime of the process. Only the
+        // profiler and the test assertions consume them, so drop it when neither is around, and
+        // let it skip the notifications nobody will collect otherwise. Test mode keeps collecting
+        // unconditionally because the assertions read the listener directly.
+        if (!($config['test'] ?? false) && $this->isInitializedConfigEnabled('notifier')) {
+            if ($this->isInitializedConfigEnabled('profiler')) {
+                $container->getDefinition('notifier.notification_logger_listener')
+                    ->setArgument(0, new Reference('profiler.is_disabled_state_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+            } else {
+                $container->removeDefinition('notifier.notification_logger_listener');
             }
         }
 
@@ -631,10 +598,6 @@ class FrameworkExtension extends Extension
             $loader->load('translation_debug.php');
 
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
-        }
-
-        if ($this->isInitializedConfigEnabled('mailer')) {
-            $loader->load('mailer_debug.php');
         }
 
         if ($this->isInitializedConfigEnabled('notifier')) {
@@ -1505,239 +1468,6 @@ class FrameworkExtension extends Extension
         });
     }
 
-    private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!class_exists(Mailer::class)) {
-            throw new LogicException('Mailer support cannot be enabled as the component is not installed. Try running "composer require symfony/mailer".');
-        }
-
-        $loader->load('mailer.php');
-        $loader->load('mailer_transports.php');
-        if (!$config['transports'] && null === $config['dsn']) {
-            $config['dsn'] = 'smtp://null';
-        }
-        $transports = $config['dsn'] ? ['main' => $config['dsn']] : $config['transports'];
-        $transports = array_map(static function (array|string $transport): array {
-            if (\is_array($transport)) {
-                return $transport;
-            }
-
-            return ['dsn' => $transport];
-        }, $transports);
-
-        $container->getDefinition('mailer.transports')->setArgument(0, array_combine(array_keys($transports), array_column($transports, 'dsn')));
-
-        $transportRateLimiterReferences = [];
-
-        foreach ($transports as $name => $transport) {
-            if ($transport['rate_limiter'] ?? null) {
-                if (!interface_exists(LimiterInterface::class)) {
-                    throw new LogicException('Rate limiter cannot be used within Mailer as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
-                }
-
-                $transportRateLimiterReferences[$name] = new Reference('limiter.'.$transport['rate_limiter']);
-            }
-        }
-
-        if (!$transportRateLimiterReferences) {
-            $container->removeDefinition('mailer.rate_limiter_locator');
-        } else {
-            $container->getDefinition('mailer.rate_limiter_locator')->replaceArgument(0, $transportRateLimiterReferences);
-        }
-
-        $mailer = $container->getDefinition('mailer.mailer');
-        if (false === $messageBus = $config['message_bus']) {
-            $mailer->replaceArgument(1, null);
-        } else {
-            $mailer->replaceArgument(1, $messageBus ? new Reference($messageBus) : new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        }
-
-        $classToServices = [
-            MailerBridge\AhaSend\Transport\AhaSendTransportFactory::class => ['symfony/aha-send-mailer', 'mailer.transport_factory.ahasend'],
-            MailerBridge\Azure\Transport\AzureTransportFactory::class => ['symfony/azure-mailer', 'mailer.transport_factory.azure'],
-            MailerBridge\Brevo\Transport\BrevoTransportFactory::class => ['symfony/brevo-mailer', 'mailer.transport_factory.brevo'],
-            MailerBridge\Cloudflare\Transport\CloudflareTransportFactory::class => ['symfony/cloudflare-mailer', 'mailer.transport_factory.cloudflare'],
-            MailerBridge\Google\Transport\GmailTransportFactory::class => ['symfony/google-mailer', 'mailer.transport_factory.gmail'],
-            MailerBridge\Infobip\Transport\InfobipTransportFactory::class => ['symfony/infobip-mailer', 'mailer.transport_factory.infobip'],
-            MailerBridge\MailerSend\Transport\MailerSendTransportFactory::class => ['symfony/mailer-send-mailer', 'mailer.transport_factory.mailersend'],
-            MailerBridge\Mailgun\Transport\MailgunTransportFactory::class => ['symfony/mailgun-mailer', 'mailer.transport_factory.mailgun'],
-            MailerBridge\Mailjet\Transport\MailjetTransportFactory::class => ['symfony/mailjet-mailer', 'mailer.transport_factory.mailjet'],
-            MailerBridge\MailKite\Transport\MailKiteTransportFactory::class => ['symfony/mail-kite-mailer', 'mailer.transport_factory.mailkite'],
-            MailerBridge\Mailomat\Transport\MailomatTransportFactory::class => ['symfony/mailomat-mailer', 'mailer.transport_factory.mailomat'],
-            MailerBridge\MailPace\Transport\MailPaceTransportFactory::class => ['symfony/mail-pace-mailer', 'mailer.transport_factory.mailpace'],
-            MailerBridge\Mailchimp\Transport\MandrillTransportFactory::class => ['symfony/mailchimp-mailer', 'mailer.transport_factory.mailchimp'],
-            MailerBridge\MicrosoftGraph\Transport\MicrosoftGraphTransportFactory::class => ['symfony/microsoft-graph-mailer', 'mailer.transport_factory.microsoftgraph'],
-            MailerBridge\Postal\Transport\PostalTransportFactory::class => ['symfony/postal-mailer', 'mailer.transport_factory.postal'],
-            MailerBridge\Postmark\Transport\PostmarkTransportFactory::class => ['symfony/postmark-mailer', 'mailer.transport_factory.postmark'],
-            MailerBridge\PufferPost\Transport\PufferPostTransportFactory::class => ['symfony/puffer-post-mailer', 'mailer.transport_factory.pufferpost'],
-            MailerBridge\Mailtrap\Transport\MailtrapTransportFactory::class => ['symfony/mailtrap-mailer', 'mailer.transport_factory.mailtrap'],
-            MailerBridge\Resend\Transport\ResendTransportFactory::class => ['symfony/resend-mailer', 'mailer.transport_factory.resend'],
-            MailerBridge\Scaleway\Transport\ScalewayTransportFactory::class => ['symfony/scaleway-mailer', 'mailer.transport_factory.scaleway'],
-            MailerBridge\Sendgrid\Transport\SendgridTransportFactory::class => ['symfony/sendgrid-mailer', 'mailer.transport_factory.sendgrid'],
-            MailerBridge\Amazon\Transport\SesTransportFactory::class => ['symfony/amazon-mailer', 'mailer.transport_factory.amazon'],
-            MailerBridge\Sweego\Transport\SweegoTransportFactory::class => ['symfony/sweego-mailer', 'mailer.transport_factory.sweego'],
-            MailerBridge\TurboSmtp\Transport\TurboSmtpTransportFactory::class => ['symfony/turbo-smtp-mailer', 'mailer.transport_factory.turbosmtp'],
-        ];
-
-        foreach ($classToServices as $class => [$package, $service]) {
-            if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
-                $container->removeDefinition($service);
-            }
-        }
-
-        $envelopeListener = $container->getDefinition('mailer.envelope_listener');
-        $envelopeListener->setArgument(0, $config['envelope']['sender'] ?? null);
-        $envelopeListener->setArgument(1, $config['envelope']['recipients'] ?? null);
-        $envelopeListener->setArgument(2, $config['envelope']['allowed_recipients'] ?? []);
-
-        $tracking = $config['tracking'];
-        $hasTracking = null !== $tracking['opens'] || null !== $tracking['clicks'];
-
-        if ($hasTracking && !class_exists(TrackingHeader::class)) {
-            throw new LogicException('Configuring "framework.mailer.tracking" requires symfony/mailer 8.2 or higher.');
-        }
-
-        if ($config['headers'] || $hasTracking) {
-            $headers = new Definition(Headers::class);
-            if ($hasTracking && !isset(array_change_key_case($config['headers'])['x-track'])) {
-                $headers->addMethodCall('add', [new Definition(TrackingHeader::class, [$tracking['opens'], $tracking['clicks']])]);
-            }
-            foreach ($config['headers'] as $name => $data) {
-                $value = $data['value'];
-                if (\in_array(strtolower($name), ['from', 'to', 'cc', 'bcc', 'reply-to'], true)) {
-                    $value = (array) $value;
-                }
-                $headers->addMethodCall('addHeader', [$name, $value]);
-            }
-            $messageListener = $container->getDefinition('mailer.message_listener');
-            $messageListener->setArgument(0, $headers);
-        } else {
-            $container->removeDefinition('mailer.message_listener');
-        }
-
-        if ($config['dkim_signer']['enabled']) {
-            $dkimSigner = $container->getDefinition('mailer.dkim_signer');
-            $dkimSigner->setArgument(0, $config['dkim_signer']['key']);
-            $dkimSigner->setArgument(1, $config['dkim_signer']['domain']);
-            $dkimSigner->setArgument(2, $config['dkim_signer']['select']);
-            $dkimSigner->setArgument(3, $config['dkim_signer']['options']);
-            $dkimSigner->setArgument(4, $config['dkim_signer']['passphrase']);
-        } else {
-            $container->removeDefinition('mailer.dkim_signer');
-            $container->removeDefinition('mailer.dkim_signer.listener');
-        }
-
-        if ($config['smime_signer']['enabled']) {
-            $smimeSigner = $container->getDefinition('mailer.smime_signer');
-            $smimeSigner->setArgument(0, $config['smime_signer']['certificate']);
-            $smimeSigner->setArgument(1, $config['smime_signer']['key']);
-            $smimeSigner->setArgument(2, $config['smime_signer']['passphrase']);
-            $smimeSigner->setArgument(3, $config['smime_signer']['extra_certificates']);
-            $smimeSigner->setArgument(4, $config['smime_signer']['sign_options']);
-        } else {
-            $container->removeDefinition('mailer.smime_signer');
-            $container->removeDefinition('mailer.smime_signer.listener');
-        }
-
-        if ($config['smime_encrypter']['enabled']) {
-            if ($config['smime_encrypter']['certificates']) {
-                $container->setDefinition('mailer.smime_encrypter.repository', new Definition(InMemorySmimeCertificateRepository::class, [$config['smime_encrypter']['certificates']]));
-            } else {
-                $container->setAlias('mailer.smime_encrypter.repository', $config['smime_encrypter']['repository']);
-            }
-            $container->setParameter('mailer.smime_encrypter.cipher', $config['smime_encrypter']['cipher']);
-            $container->getDefinition('mailer.smime_encrypter.listener')
-                ->setArgument(2, $config['smime_encrypter']['on_missing_certificate'])
-                ->setArgument(3, $config['smime_encrypter']['encrypt_for_sender']);
-        } else {
-            $container->removeDefinition('mailer.smime_encrypter.listener');
-        }
-
-        if ($config['pgp_signer']['enabled']) {
-            if (!class_exists(PgpSigner::class)) {
-                throw new LogicException('PGP/MIME signed messages support cannot be enabled as this version of the Mime component does not support it. Try upgrading "symfony/mime".');
-            }
-            if (!class_exists(PgpMimeSignedMessageListener::class)) {
-                throw new LogicException('PGP/MIME signed messages support cannot be enabled as this version of the Mailer component does not support it.');
-            }
-            if (!class_exists(Process::class)) {
-                throw new LogicException('PGP/MIME signed messages support cannot be enabled as the Process component is not installed. Try running "composer require symfony/process".');
-            }
-            $pgpSigner = $container->getDefinition('mailer.pgp_signer');
-            $pgpSigner->setArgument(0, $config['pgp_signer']['secret_key']);
-            $pgpSigner->setArgument(1, $config['pgp_signer']['public_key']);
-            $pgpSigner->setArgument(2, $config['pgp_signer']['passphrase']);
-            $pgpSigner->setArgument(3, [
-                'binary' => $config['pgp_signer']['binary'],
-                'digest_algorithm' => $config['pgp_signer']['digest_algorithm'],
-            ]);
-        } else {
-            $container->removeDefinition('mailer.pgp_signer');
-            $container->removeDefinition('mailer.pgp_signer.listener');
-        }
-
-        if ($config['pgp_encrypter']['enabled']) {
-            if (!class_exists(PgpEncrypter::class)) {
-                throw new LogicException('PGP/MIME encrypted messages support cannot be enabled as this version of the Mime component does not support it. Try upgrading "symfony/mime".');
-            }
-            if (!class_exists(PgpMimeEncryptedMessageListener::class)) {
-                throw new LogicException('PGP/MIME encrypted messages support cannot be enabled as this version of the Mailer component does not support it.');
-            }
-            if (!class_exists(Process::class)) {
-                throw new LogicException('PGP/MIME encrypted messages support cannot be enabled as the Process component is not installed. Try running "composer require symfony/process".');
-            }
-            if ($config['pgp_encrypter']['keys']) {
-                $container->setDefinition('mailer.pgp_encrypter.repository', new Definition(InMemoryPgpPublicKeyRepository::class, [$config['pgp_encrypter']['keys']]));
-            } else {
-                $container->setAlias('mailer.pgp_encrypter.repository', $config['pgp_encrypter']['repository']);
-            }
-            $pgpEncrypter = $container->getDefinition('mailer.pgp_encrypter');
-            $pgpEncrypter->setArgument(0, [
-                'binary' => $config['pgp_encrypter']['binary'],
-                'cipher_algorithm' => $config['pgp_encrypter']['cipher_algorithm'],
-                'timeout' => $config['pgp_encrypter']['timeout'],
-                'hide_recipients' => $config['pgp_encrypter']['hide_recipients'],
-            ]);
-            $container->getDefinition('mailer.pgp_encrypter.listener')
-                ->setArgument(2, $config['pgp_encrypter']['on_missing_key'])
-                ->setArgument(3, $config['pgp_encrypter']['encrypt_for_sender']);
-        } else {
-            $container->removeDefinition('mailer.pgp_encrypter');
-            $container->removeDefinition('mailer.pgp_encrypter.listener');
-        }
-
-        if (class_exists(WebhookController::class)) {
-            $loader->load('mailer_webhook.php');
-
-            $debug = $container->getParameter('kernel.debug');
-            $webhookRequestParsers = [
-                MailerBridge\AhaSend\Webhook\AhaSendRequestParser::class => ['symfony/aha-send-mailer', 'mailer.webhook.request_parser.ahasend'],
-                MailerBridge\Azure\Webhook\AzureRequestParser::class => ['symfony/azure-mailer', 'mailer.webhook.request_parser.azure'],
-                MailerBridge\Brevo\Webhook\BrevoRequestParser::class => ['symfony/brevo-mailer', 'mailer.webhook.request_parser.brevo'],
-                MailerBridge\MailerSend\Webhook\MailerSendRequestParser::class => ['symfony/mailer-send-mailer', 'mailer.webhook.request_parser.mailersend'],
-                MailerBridge\Mailchimp\Webhook\MailchimpRequestParser::class => ['symfony/mailchimp-mailer', 'mailer.webhook.request_parser.mailchimp'],
-                MailerBridge\Mailgun\Webhook\MailgunRequestParser::class => ['symfony/mailgun-mailer', 'mailer.webhook.request_parser.mailgun'],
-                MailerBridge\Mailjet\Webhook\MailjetRequestParser::class => ['symfony/mailjet-mailer', 'mailer.webhook.request_parser.mailjet'],
-                MailerBridge\Mailomat\Webhook\MailomatRequestParser::class => ['symfony/mailomat-mailer', 'mailer.webhook.request_parser.mailomat'],
-                MailerBridge\Postmark\Webhook\PostmarkRequestParser::class => ['symfony/postmark-mailer', 'mailer.webhook.request_parser.postmark'],
-                MailerBridge\Mailtrap\Webhook\MailtrapRequestParser::class => ['symfony/mailtrap-mailer', 'mailer.webhook.request_parser.mailtrap'],
-                MailerBridge\Resend\Webhook\ResendRequestParser::class => ['symfony/resend-mailer', 'mailer.webhook.request_parser.resend'],
-                MailerBridge\Scaleway\Webhook\ScalewayRequestParser::class => ['symfony/scaleway-mailer', 'mailer.webhook.request_parser.scaleway'],
-                MailerBridge\Sendgrid\Webhook\SendgridRequestParser::class => ['symfony/sendgrid-mailer', 'mailer.webhook.request_parser.sendgrid'],
-                MailerBridge\Sweego\Webhook\SweegoRequestParser::class => ['symfony/sweego-mailer', 'mailer.webhook.request_parser.sweego'],
-                MailerBridge\TurboSmtp\Webhook\TurboSmtpRequestParser::class => ['symfony/turbo-smtp-mailer', 'mailer.webhook.request_parser.turbosmtp'],
-            ];
-
-            foreach ($webhookRequestParsers as $class => [$package, $service]) {
-                if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
-                    $container->removeDefinition($service);
-                } elseif ($debug && \defined($class.'::PROVIDER_IPS')) {
-                    $container->getDefinition($service)->setArgument('$allowedIPs', [...$class::PROVIDER_IPS, '127.0.0.1']);
-                }
-            }
-        }
-    }
-
     private function registerNotifierConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(Notifier::class)) {
@@ -1758,13 +1488,6 @@ class FrameworkExtension extends Extension
         } else {
             $container->removeDefinition('texter');
             $container->removeAlias(TexterInterface::class);
-        }
-
-        if ($this->isInitializedConfigEnabled('mailer')) {
-            $sender = $container->getDefinition('mailer.envelope_listener')->getArgument(0);
-            $container->getDefinition('notifier.channel.email')->setArgument(2, $sender);
-        } else {
-            $container->removeDefinition('notifier.channel.email');
         }
 
         foreach (['texter', 'chatter', 'notifier.channel.chat', 'notifier.channel.email', 'notifier.channel.sms', 'notifier.channel.push', 'notifier.channel.desktop'] as $serviceId) {

@@ -1,8 +1,0 @@
-framework:
-    mailer:
-        dsn: 'smtp://example.com'
-        headers:
-            X-Track: 'opens=true; clicks=default'
-        tracking:
-            opens: false
-            clicks: false

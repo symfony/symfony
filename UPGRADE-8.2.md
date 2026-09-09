@@ -154,6 +154,12 @@ FrameworkBundle
    then registered without any configuration; set `http_client.enabled` to `false` to disable them. The
    `framework.http_client` configuration is an alias of the `http_client` configuration provided by the bundle. The
    cache pool is dropped when no `cache.app` pool is registered, and the data collector when the profiler is disabled
+ * `MailerBundle` is registered automatically when the Mailer component is installed, and its services are then
+   registered without any configuration; set `mailer.enabled` to `false` to disable them. The `framework.mailer`
+   configuration is an alias of the `mailer` configuration provided by the bundle. The data collector is registered
+   in debug mode and dropped when the profiler is disabled, the message logger listener is dropped when neither the
+   profiler nor the test client collects the sent messages, and the notifier email channel is dropped when the mailer
+   is missing
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

@@ -1,0 +1,327 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        .sf-profiler-kms .kms-detail {
+            display: block;
+            font-size: 12px;
+        }
+        .sf-profiler-kms .kms-ops .badge {
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+        .sf-profiler-kms .kms-keys {
+            font-size: 12px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block toolbar %}
+    {% if collector.operationCount %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/key-management.svg') }}
+            <span class="sf-toolbar-value">{{ collector.kmsCallCount }}</span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>KMS round trips</b>
+                <span class="sf-toolbar-status">{{ collector.kmsCallCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Operations</b>
+                <span class="sf-toolbar-status">{{ collector.operationCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Keys and scopes</b>
+                <span class="sf-toolbar-status">{{ collector.keys|length }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Errors</b>
+                <span class="sf-toolbar-status {{ collector.errorCount ? 'sf-toolbar-status-red' }}">{{ collector.errorCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Total time</b>
+                <span>{{ '%.2f'|format(collector.totalTime * 1000) }} <span class="unit">ms</span></span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: collector.errorCount ? 'red' : ''}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.operationCount == 0 ? 'disabled' }}">
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/key-management.svg') }}</span>
+        <strong>Key Management</strong>
+        {% if collector.operationCount %}
+            <span class="count">
+                <span>{{ collector.operationCount }}</span>
+            </span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Key Management</h2>
+
+    {% if collector.operationCount == 0 %}
+        <div class="empty empty-panel">
+            <p>Nothing was encrypted or decrypted.</p>
+        </div>
+
+        {{ _self.render_clients(collector) }}
+    {% else %}
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">{{ collector.kmsCallCount }}</span>
+                <span class="label">KMS round trips</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.operationCount }}</span>
+                <span class="label">Operations</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.keys|length }}</span>
+                <span class="label">Keys and scopes</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.errorCount }}</span>
+                <span class="label">Errors</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ '%.2f'|format(collector.totalTime * 1000) }} <span class="unit">ms</span></span>
+                <span class="label">Total time</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ '%.2f'|format(collector.kmsTime * 1000) }} <span class="unit">ms</span></span>
+                <span class="label">Spent in a KMS</span>
+            </div>
+        </div>
+
+        <div class="sf-tabs sf-profiler-kms">
+            <div class="tab">
+                <h3 class="tab-title">By caller <span class="badge">{{ collector.callers|length }}</span></h3>
+
+                <div class="tab-content">
+                    <p class="text-muted">What each piece of code asked for, whatever the number of values it went through.</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Caller</th>
+                                <th>Operations</th>
+                                <th>KMS</th>
+                                <th>Keys and scopes</th>
+                                <th>Bytes</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for caller in collector.callers %}
+                                <tr>
+                                    <td>
+                                        {{ _self.render_caller(caller) }}
+                                        {{ _self.render_error(caller) }}
+                                    </td>
+                                    <td class="kms-ops">{{ _self.render_operations(caller) }}</td>
+                                    <td class="nowrap {{ caller.layers.kms ? '' : 'text-muted' }}">{{ caller.layers.kms }}</td>
+                                    <td>
+                                        <ul class="kms-keys">
+                                            {% for key in caller.keys|slice(0, 6) %}
+                                                <li><code>{{ key }}</code></li>
+                                            {% endfor %}
+                                            {% if caller.keys|length > 6 %}
+                                                <li class="text-muted">and {{ caller.keys|length - 6 }} more</li>
+                                            {% endif %}
+                                        </ul>
+                                    </td>
+                                    <td class="nowrap">{{ _self.render_bytes(caller.in) }} &rarr; {{ _self.render_bytes(caller.out) }}</td>
+                                    <td class="nowrap">{{ _self.render_time(caller) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab">
+                <h3 class="tab-title">By key <span class="badge">{{ collector.keys|length }}</span></h3>
+
+                <div class="tab-content">
+                    <p class="text-muted">What each master key, scope and data key was used for. A scope reusing one data key over many payloads is a store doing its job.</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Operations</th>
+                                <th>KMS</th>
+                                <th>Data keys</th>
+                                <th>Bytes</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key in collector.keys %}
+                                <tr>
+                                    <td>
+                                        <code>{{ key.label }}</code>
+                                        <span class="kms-detail text-muted">
+                                            {{ key.kind|replace({_: ' '}) }}
+                                            {%- for backend in key.backends %} &bull; {{ backend|split('\\')|last }}{% endfor %}
+                                        </span>
+                                        {{ _self.render_error(key) }}
+                                    </td>
+                                    <td class="kms-ops">
+                                        {{ _self.render_operations(key) }}
+                                        {% if key.aad %}
+                                            <span class="kms-detail text-muted">{{ key.aad }} with an AAD</span>
+                                        {% endif %}
+                                        {% if key.deterministic %}
+                                            <span class="kms-detail text-muted">{{ key.deterministic }} deterministic</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="nowrap {{ key.layers.kms ? '' : 'text-muted' }}">
+                                        {{ key.layers.kms }}
+                                        <span class="kms-detail text-muted">{{ key.origins.bridge ? 'bridge' : 'core' }}</span>
+                                    </td>
+                                    <td>
+                                        {% if key.data_keys is empty %}
+                                            <span class="text-muted">&ndash;</span>
+                                        {% else %}
+                                            <ul class="kms-keys">
+                                                {% for reference in key.data_keys %}
+                                                    <li><code>{{ reference }}</code></li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    </td>
+                                    <td class="nowrap">{{ _self.render_bytes(key.in) }} &rarr; {{ _self.render_bytes(key.out) }}</td>
+                                    <td class="nowrap">{{ _self.render_time(key) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab">
+                <h3 class="tab-title">Services <span class="badge">{{ collector.services|reduce((total, services) => total + services|length, 0) }}</span></h3>
+
+                <div class="tab-content">
+                    <p class="text-muted">Which configured service did the work. The origin is read from the backend class: a bridge reaches a provider, core is one of the backends the component ships, which may still load its key material from elsewhere.</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Layer</th>
+                                <th>Service</th>
+                                <th>Class</th>
+                                <th>Origin</th>
+                                <th>Operations</th>
+                                <th>Time</th>
+                                <th>Errors</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for layer, services in collector.services %}
+                                {% for name, service in services %}
+                                    <tr>
+                                        <td class="nowrap">{{ layer }}</td>
+                                        <td class="nowrap">{{ name }}</td>
+                                        <td><code>{{ service.backend|default('(unknown)') }}</code></td>
+                                        <td class="nowrap">{{ service.origins.bridge ? 'bridge' : 'core' }}</td>
+                                        <td class="nowrap">{{ service.ops }}</td>
+                                        <td class="nowrap">{{ _self.render_time(service) }}</td>
+                                        <td class="nowrap {{ service.errors ? 'text-danger' }}">{{ service.errors }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {{ _self.render_clients(collector) }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% macro render_time(group) %}
+    {%- set average = group.time * 1000 / group.ops -%}
+    {{ '%.2f'|format(group.time * 1000) }} ms
+    <span class="kms-detail text-muted">
+        {%- if average < 0.01 -%}
+            {{ '%.0f'|format(average * 1000) }} &micro;s / operation
+        {%- else -%}
+            {{ '%.2f'|format(average) }} ms / operation
+        {%- endif -%}
+    </span>
+{% endmacro %}
+
+{% macro render_operations(group) %}
+    {%- for operation, count in group.operations -%}
+        <span class="badge">{{ count }} {{ operation|replace({_: ' '}) }}</span>
+    {%- endfor -%}
+{% endmacro %}
+
+{% macro render_error(group) %}
+    {%- if group.error -%}
+        <span class="kms-detail text-danger">
+            {{- group.errors }} &times; {{ group.error.class|split('\\')|last }}: {{ group.error.message -}}
+        </span>
+    {%- endif -%}
+{% endmacro %}
+
+{% macro render_clients(collector) %}
+    {% if collector.clients %}
+        <h3>Configured clients</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Operations</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for name in collector.clients %}
+                    <tr>
+                        <td class="nowrap">{{ name }}</td>
+                        <td class="nowrap">{{ collector.services.kms[name].ops|default(0) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_bytes(bytes) %}
+    {%- if bytes is null or bytes == 0 -%}
+        <span class="text-muted">&ndash;</span>
+    {%- elseif bytes < 1024 -%}
+        {{- bytes }} B
+    {%- else -%}
+        {{- (bytes / 1024)|number_format(1) }} KiB
+    {%- endif -%}
+{% endmacro %}
+
+{% macro render_caller(caller) %}
+    {%- if caller.file is null -%}
+        <span class="text-muted">unknown</span>
+    {%- else -%}
+        {%- set link = caller.file|file_link(caller.line) -%}
+        {%- if link -%}
+            <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
+        {%- else -%}
+            <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
+        {%- endif -%}
+        <span class="kms-detail text-muted">line {{ caller.line }}</span>
+    {%- endif -%}
+{% endmacro %}

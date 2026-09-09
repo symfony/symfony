@@ -1,0 +1,41 @@
+{
+    "name": "symfony/flysystem-key-management",
+    "type": "symfony-key-management-bridge",
+    "description": "Symfony Flysystem Key Management Bridge",
+    "keywords": ["kms", "flysystem", "encryption"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérôme Tamarelle",
+            "email": "jerome@tamarelle.net"
+        },
+        {
+            "name": "Florent Morselli",
+            "email": "florent.morselli@spomky-labs.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "league/flysystem": "^3.0",
+        "psr/container": "^1.1|^2.0",
+        "symfony/key-management": "^8.2"
+    },
+    "require-dev": {
+        "symfony/dependency-injection": "^7.4|^8.0"
+    },
+    "suggest": {
+        "symfony/dependency-injection": "Required to use the RegisterFlysystemStoragesPass, which exposes the storages of league/flysystem-bundle to the \"...+fly://\" DSN schemes"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\KeyManagement\\Bridge\\Flysystem\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

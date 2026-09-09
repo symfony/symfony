@@ -1,0 +1,35 @@
+{
+    "name": "symfony/aws-key-management",
+    "type": "symfony-key-management-bridge",
+    "description": "Symfony AWS Key Management Bridge",
+    "keywords": ["kms", "aws", "amazon", "encryption"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérôme Tamarelle",
+            "email": "jerome@tamarelle.net"
+        },
+        {
+            "name": "Florent Morselli",
+            "email": "florent.morselli@spomky-labs.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "async-aws/core": "^1.7",
+        "async-aws/kms": "^1.0",
+        "symfony/key-management": "^8.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\KeyManagement\\Bridge\\AwsKms\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

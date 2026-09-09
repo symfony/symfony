@@ -93,7 +93,7 @@
         "symfony/mailer": "<7.4.17|>=8.0,<8.1.5",
         "symfony/security-csrf": "<7.4",
         "symfony/serializer": "<7.4",
-        "symfony/messenger": "<7.4.10|>=8.0,<8.0.10",
+        "symfony/messenger": "<7.4.10|>=8.0,<8.2",
         "symfony/mime": "<7.4.9|>=8.0,<8.0.9",
         "symfony/rate-limiter": "<8.2",
         "symfony/translation": "<7.4",

@@ -899,6 +899,30 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
     }
 
+    public function testSchedulerUseMessengerRoutingNotSetKeepsTheParameterNull()
+    {
+        // no deprecation is expected here: it is only triggered lazily by SchedulerTransport,
+        // when a scheduled message is actually redispatched, not on every container build
+        $container = $this->createContainerFromFile('scheduler_use_messenger_routing_unset');
+
+        $this->assertNull($container->getParameter('.scheduler.use_messenger_routing'));
+    }
+
+    public function testSchedulerUseMessengerRoutingRejectsEnvVar()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "framework.scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%"). Set a static boolean instead.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'messenger' => true,
+                'scheduler' => [
+                    'use_messenger_routing' => '%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%',
+                ],
+            ]);
+        });
+    }
+
     public function testMessengerMultipleFailureTransports()
     {
         $container = $this->createContainerFromFile('messenger_multiple_failure_transports', [], true, false);

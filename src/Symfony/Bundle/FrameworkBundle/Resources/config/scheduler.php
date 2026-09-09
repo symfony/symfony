@@ -27,6 +27,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 tagged_locator('scheduler.schedule_provider', 'name'),
                 service('clock'),
+                param('.scheduler.use_messenger_routing'),
             ])
             ->tag('messenger.transport_factory')
         ->set('scheduler.event_listener', DispatchSchedulerEventListener::class)

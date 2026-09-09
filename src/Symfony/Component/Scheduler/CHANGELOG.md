@@ -7,6 +7,11 @@ CHANGELOG
  * Add a "Next Run In" column to `debug:scheduler` showing the time until the next run
  * Add `env` option to `#[AsCronTask]` and `#[AsPeriodicTask]` to restrict a task to one or more environments
  * Deprecate `Schedule::with()`, use `add()` on a new `Schedule` instead
+ * Add `$useMessengerRouting` constructor argument to `SchedulerTransport` and `SchedulerTransportFactory`: when
+   `true`, every scheduled message (attribute-declared tasks and `#[AsSchedule]` provider messages alike), unless
+   already an explicit `RedispatchMessage`, is wrapped in one so it goes through the Messenger senders configured
+   for its class instead of being handled synchronously by the scheduler worker
+   (see `framework.scheduler.use_messenger_routing` in FrameworkBundle)
 
 8.1
 ---

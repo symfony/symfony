@@ -492,6 +492,41 @@ class OAuth2TokenHandlerTest extends TestCase
         $this->assertContains($metadataUrl, $requested);
     }
 
+    /**
+     * The options are asserted after the call: the handler turns every exception the response
+     * factory raises into a BadCredentialsException, a failed assertion included.
+     */
+    #[RequiresPhpExtension('openssl')]
+    public function testMetadataJwksDoesNotFollowRedirects()
+    {
+        $jwksOptions = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$jwksOptions): MockResponse {
+            if (str_contains($url, '/.well-known/')) {
+                return new JsonMockResponse(['issuer' => self::ISSUER, 'jwks_uri' => 'https://as.example.com/jwks']);
+            }
+
+            if (str_contains($url, '/jwks')) {
+                $jwksOptions = $options;
+
+                return new MockResponse('', ['http_code' => 301, 'response_headers' => ['location' => 'https://other.example.com/jwks']]);
+            }
+
+            return self::jwtResponse(self::signedResponsePayload(self::activeClaims(['sub' => 'jdoe'])));
+        }, self::ENDPOINT);
+
+        $handler = self::createHandler($client, [self::AUDIENCE], self::ISSUER);
+        $handler->enableSignedResponse(new AlgorithmManager([new ES256()]), null);
+        $handler->enableSignedResponseDiscovery(new ArrayAdapter(), $client, 'metadata.');
+
+        try {
+            $handler->getUserBadgeFrom('a-secret-token');
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException) {
+        }
+
+        $this->assertSame(0, $jwksOptions['max_redirects'] ?? null);
+    }
+
     public static function provideIssuersAndMetadataUrls(): iterable
     {
         yield 'a bare origin' => ['https://as.example.com', 'https://as.example.com/.well-known/oauth-authorization-server'];

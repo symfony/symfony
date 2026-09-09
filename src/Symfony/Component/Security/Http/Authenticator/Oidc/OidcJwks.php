@@ -96,7 +96,7 @@ final class OidcJwks
      */
     public static function fetchKeys(HttpClientInterface $httpClient, string $jwksUri, ItemInterface $item, int $defaultTtl = 3600, bool $enforceKeyUsageVerification = true): array
     {
-        [$keys, $ttl] = self::fromResponse($httpClient->request('GET', $jwksUri), $enforceKeyUsageVerification);
+        [$keys, $ttl] = self::fromResponse($httpClient->request('GET', $jwksUri, ['max_redirects' => 0]), $enforceKeyUsageVerification);
 
         $item->expiresAfter(null === $ttl ? $defaultTtl : min($ttl, self::MAX_TTL));
 

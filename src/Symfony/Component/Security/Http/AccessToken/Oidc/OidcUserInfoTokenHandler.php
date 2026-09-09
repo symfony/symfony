@@ -90,6 +90,7 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
             // If the token is invalid or expired, the OIDC server will return an error
             $claims = $this->client->request('GET', $userInfoEndpoint, [
                 'auth_bearer' => $accessToken,
+                'max_redirects' => 0,
             ])->toArray();
 
             if (empty($claims[$this->claim])) {

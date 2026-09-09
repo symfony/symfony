@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `TranslationBundle`, which provides the `translation` configuration and the services previously provided by `FrameworkBundle` under `framework.translator`
  * Preserve the XLIFF `<source>` element when loading and dumping a file, instead of overwriting it with the message key
  * Add a locale-aware `Plural-Forms` header to the output of `PoFileDumper`
  * Re-add `PoEditorProvider`

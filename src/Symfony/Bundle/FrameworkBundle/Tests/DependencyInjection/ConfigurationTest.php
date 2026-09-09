@@ -33,27 +33,6 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
 
-    public function testTranslatorProviderDomainsCanBeKeyed()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [[
-            'translator' => [
-                'providers' => [
-                    'loco' => [
-                        'dsn' => 'loco://API_KEY@default',
-                        // as an XML configuration is converted
-                        'domains' => [
-                            ['key' => 'foo', 'value' => 'bar'],
-                            ['key' => '', 'value' => '*'],
-                        ],
-                    ],
-                ],
-            ],
-        ]]);
-
-        $this->assertSame(['foo' => 'bar', '' => '*'], $config['translator']['providers']['loco']['domains']);
-    }
-
     public function getTestValidSessionName()
     {
         return [
@@ -320,25 +299,6 @@ class ConfigurationTest extends TestCase
                 'collect' => true,
                 'collect_parameter' => null,
                 'collect_serializer_data' => true,
-            ],
-            'translator' => [
-                'enabled' => !class_exists(FullStack::class),
-                'fallbacks' => [],
-                'cache_dir' => '%kernel.cache_dir%/translations',
-                'logging' => false,
-                'formatter' => 'translator.formatter.default',
-                'paths' => [],
-                'default_path' => '%kernel.project_dir%/translations',
-                'pseudo_localization' => [
-                    'enabled' => false,
-                    'accents' => true,
-                    'expansion_factor' => 1.0,
-                    'brackets' => true,
-                    'parse_html' => false,
-                    'localizable_html_attributes' => [],
-                ],
-                'providers' => [],
-                'globals' => [],
             ],
             'session' => [
                 'enabled' => false,

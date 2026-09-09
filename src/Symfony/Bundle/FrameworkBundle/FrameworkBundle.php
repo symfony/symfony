@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingRouterDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingSerializerDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingTranslatorDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingValidatorDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSerializerPropertyAccessorPass;
@@ -91,12 +92,7 @@ use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Scheduler\SchedulerBundle;
 use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Serializer\SerializerBundle;
-use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass;
-use Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass;
-use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
-use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
-use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
-use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
+use Symfony\Component\Translation\TranslationBundle;
 use Symfony\Component\TypeInfo\TypeInfoBundle;
 use Symfony\Component\Uid\UidBundle;
 use Symfony\Component\Validator\ValidationBundle;
@@ -129,6 +125,7 @@ class_exists(Registry::class);
 #[RequiredBundle(AssetBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(SerializerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ValidationBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(TranslationBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(LockBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MessengerBundle::class, ignoreOnInvalid: true)]
@@ -207,19 +204,11 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RoutingResolverPass());
         $this->addCompilerPassIfExists($container, RoutingControllerPass::class);
-        $this->addCompilerPassIfExists($container, DataCollectorTranslatorPass::class);
         $container->addCompilerPass(new ProfilerPass());
         $this->addCompilerPassIfExists($container, ControllerAttributesListenerPass::class, PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new AddValidatorSecurityExpressionLanguageProviderPass());
         $container->addCompilerPass(new TranslationLintCommandPass(), PassConfig::TYPE_BEFORE_REMOVING, 10);
-        // must be registered as late as possible to get access to all Twig paths registered in
-        // twig.template_iterator definition
-        $this->addCompilerPassIfExists($container, TranslatorPass::class, PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
-        $this->addCompilerPassIfExists($container, TranslatorPathsPass::class, PassConfig::TYPE_AFTER_REMOVING);
-        $this->addCompilerPassIfExists($container, LoggingTranslatorPass::class);
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
-        $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);
-        $this->addCompilerPassIfExists($container, TranslationDumperPass::class);
         $container->addCompilerPass(new FragmentRendererPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new DefaultCachePoolsPass());
@@ -230,6 +219,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RemoveMissingRouterDependenciesPass());
         $container->addCompilerPass(new RemoveMissingSerializerDependenciesPass());
         $container->addCompilerPass(new RemoveMissingValidatorDependenciesPass());
+        $container->addCompilerPass(new RemoveMissingTranslatorDependenciesPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);

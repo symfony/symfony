@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Symfony\Component\Translation\Translator;
 
 /**
  * FrameworkExtension configuration structure.
@@ -142,7 +141,7 @@ class Configuration implements ConfigurationInterface
         $this->addRouterSection($rootNode);
         $this->addAssetsSection($rootNode);
         $this->addAssetMapperSection($rootNode);
-        $this->addTranslatorSection($rootNode, $enableIfStandalone);
+        $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
         $this->addSerializerSection($rootNode);
         $this->addPropertyAccessSection($rootNode);
@@ -568,89 +567,14 @@ class Configuration implements ConfigurationInterface
     /**
      * @param-immediately-invoked-callable $enableIfStandalone
      */
-    private function addTranslatorSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addTranslatorSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('translator')
-                    ->info('Translator configuration')
-                    ->{$enableIfStandalone('symfony/translation', Translator::class)}()
-                    ->children()
-                        ->arrayNode('fallbacks', 'fallback')
-                            ->info('Defaults to the value of "default_locale".')
-                            ->acceptAndWrap(['string'])
-                            ->prototype('scalar')->end()
-                            ->defaultValue([])
-                        ->end()
-                        ->booleanNode('logging')->defaultFalse()->end()
-                        ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
-                        ->scalarNode('cache_dir')->defaultValue('%kernel.cache_dir%/translations')->end()
-                        ->scalarNode('default_path')
-                            ->info('The default path used to load translations.')
-                            ->defaultValue('%kernel.project_dir%/translations')
-                        ->end()
-                        ->arrayNode('paths', 'path')
-                            ->prototype('scalar')->end()
-                        ->end()
-                        ->arrayNode('pseudo_localization')
-                            ->canBeEnabled()
-                            ->children()
-                                ->booleanNode('accents')->defaultTrue()->end()
-                                ->floatNode('expansion_factor')
-                                    ->min(1.0)
-                                    ->defaultValue(1.0)
-                                ->end()
-                                ->booleanNode('brackets')->defaultTrue()->end()
-                                ->booleanNode('parse_html')->defaultFalse()->end()
-                                ->arrayNode('localizable_html_attributes', 'localizable_html_attribute')
-                                    ->prototype('scalar')->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('providers', 'provider')
-                            ->info('Translation providers you can read/write your translations from.')
-                            ->useAttributeAsKey('name')
-                            ->prototype('array')
-                                ->children()
-                                    ->scalarNode('dsn')->end()
-                                    ->arrayNode('domains', 'domain')
-                                        ->useAttributeAsKey('key')
-                                        ->prototype('scalar')->end()
-                                        ->defaultValue([])
-                                    ->end()
-                                    ->arrayNode('locales', 'locale')
-                                        ->prototype('scalar')->end()
-                                        ->defaultValue([])
-                                        ->info('If not set, all locales listed under framework.enabled_locales are used.')
-                                    ->end()
-                                ->end()
-                            ->end()
-                            ->defaultValue([])
-                        ->end()
-                        ->arrayNode('globals', 'global')
-                            ->info('Global parameters.')
-                            ->example(['app_version' => 3.14])
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('name')
-                            ->arrayPrototype()
-                                ->acceptAndWrap(['string'], 'value')
-                                ->children()
-                                    ->variableNode('value')->end()
-                                    ->stringNode('message')->end()
-                                    ->arrayNode('parameters', 'parameter')
-                                        ->normalizeKeys(false)
-                                        ->useAttributeAsKey('name')
-                                        ->scalarPrototype()->end()
-                                    ->end()
-                                    ->stringNode('domain')->end()
-                                ->end()
-                                ->validate()
-                                    ->ifTrue(static fn ($v) => !(isset($v['value']) xor isset($v['message'])))
-                                    ->thenInvalid('The "globals" parameter should be either a string or an array with a "value" or a "message" key')
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('translator')
+                    ->aliasOf('translation')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

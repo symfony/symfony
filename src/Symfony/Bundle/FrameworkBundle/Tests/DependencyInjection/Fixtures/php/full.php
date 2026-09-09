@@ -37,12 +37,6 @@ $container->loadFromExtension('framework', [
         'gc_probability' => 1,
         'save_path' => '/path/to/sessions',
     ],
-    'translator' => [
-        'enabled' => true,
-        'fallback' => 'fr',
-        'paths' => ['%kernel.project_dir%/Fixtures/translations'],
-        'cache_dir' => '%kernel.cache_dir%/translations',
-    ],
     'property_info' => true,
     'request' => [
         'formats' => [

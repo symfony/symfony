@@ -59,6 +59,32 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
 
     public static function getAcceptData(): iterable
     {
+        yield 'a hash in the middle of a line is not a comment' => [
+            [
+                '.gitignore' => "fi#le.txt\n",
+            ],
+            [
+                'fi#le.txt',
+                'fi',
+            ],
+            [
+                'fi',
+            ],
+        ];
+
+        yield 'a negated pattern starting with a hash' => [
+            [
+                '.gitignore' => "*\n!#a.txt\n",
+            ],
+            [
+                '#a.txt',
+                'b.txt',
+            ],
+            [
+                '#a.txt',
+            ],
+        ];
+
         yield 'simple file' => [
             [
                 '.gitignore' => 'a.txt',

@@ -445,6 +445,31 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
         $this->assertIterator([__FILE__], $iterator);
     }
 
+    public function testAcceptWithSymlinkedBaseDirectory()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('symlinks are not supported on Windows');
+        }
+
+        mkdir("{$this->tmpDir}/a");
+        touch("{$this->tmpDir}/a/file.txt");
+        touch("{$this->tmpDir}/b.txt");
+        file_put_contents("{$this->tmpDir}/.gitignore", "a/\n");
+
+        $link = "{$this->tmpDir}_link";
+        symlink($this->tmpDir, $link);
+
+        try {
+            $inner = new InnerNameIterator(["{$link}/a/file.txt", "{$link}/b.txt"]);
+
+            $iterator = new VcsIgnoredFilterIterator($inner, $link);
+
+            $this->assertIterator(["{$link}/b.txt"], $iterator);
+        } finally {
+            unlink($link);
+        }
+    }
+
     private function toAbsolute(array $files): array
     {
         foreach ($files as &$path) {

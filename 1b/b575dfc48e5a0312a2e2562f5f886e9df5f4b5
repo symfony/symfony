@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T16:26:25Z
+
+@stof yes, done: `TreeBuilder::buildTree()` now throws an `InvalidDefinitionException` when the attribute sits anywhere but on a direct child of a root node, so the state the dumpers honored and the pass ignored can no longer be built. Prototypes are walked too. The rest of your comments is answered inline.

@@ -47,8 +47,6 @@ class_exists(ConfigCache::class);
  */
 trait KernelTrait
 {
-    private array $bundleClasses = [];
-
     public function getCacheDir(): string
     {
         if (null !== $dir = $_SERVER['APP_CACHE_DIR'] ?? null) {
@@ -102,10 +100,14 @@ trait KernelTrait
             is_file($cachePath)
             && (!$this->debug || is_file($bundlesPath = $this->getBundlesPath()) && filemtime($cachePath) > filemtime($bundlesPath))
         ) {
-            $this->bundles = require $cachePath;
-            $this->bundleClasses = array_map('get_class', $this->bundles);
+            $cached = require $cachePath;
 
-            return;
+            // ignore files dumped by an older version of this trait
+            if (\is_array($cached[1] ?? null)) {
+                [$this->bundleClasses, $this->bundles] = $cached;
+
+                return;
+            }
         }
 
         $this->bundles = [];
@@ -318,7 +320,7 @@ trait KernelTrait
      */
     protected function prepareContainer(ContainerBuilder $container): void
     {
-        foreach ($this->bundles as $bundle) {
+        foreach ($this->getBundles() as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
             }
@@ -330,7 +332,7 @@ trait KernelTrait
             }
         }
 
-        foreach ($this->bundles as $bundle) {
+        foreach ($this->getBundles() as $bundle) {
             $bundle->build($container);
         }
 
@@ -403,12 +405,18 @@ trait KernelTrait
 
         $cache->write($rootCode, $container->getResources());
 
-        // Dump resolved bundle list so initializeBundles() can skip reflection on next boot
-        $code = "<?php\n\nreturn [\n";
+        // Dump resolved bundle list so initializeBundles() can skip reflection on next boot,
+        // instantiating only the bundles that have something to do at runtime
+        $code = "<?php\n\nreturn [[\n";
+        $runtimeBundles = '';
         foreach ($this->bundleClasses as $name => $bundleClass) {
-            $code .= \sprintf("    %s => new \\%s(),\n", var_export($name, true), $bundleClass);
+            $code .= \sprintf("    %s => %s,\n", var_export($name, true), var_export($bundleClass, true));
+
+            if (!$this->isLazyBundle($bundleClass)) {
+                $runtimeBundles .= \sprintf("    %s => new \\%s(),\n", var_export($name, true), $bundleClass);
+            }
         }
-        $code .= "];\n";
+        $code .= "], [\n".$runtimeBundles."]];\n";
         $fs->dumpFile($this->getEffectiveBuildDir().'/'.$class.'.bundles.php', $code);
     }
 
@@ -577,7 +585,7 @@ trait KernelTrait
         $bundles = [];
         $bundlesMetadata = [];
 
-        foreach ($this->bundles as $name => $bundle) {
+        foreach ($this->getBundles() as $name => $bundle) {
             $bundles[$name] = $bundle::class;
             $bundlesMetadata[$name] = [
                 'path' => $bundle->getPath(),
@@ -682,5 +690,27 @@ trait KernelTrait
             throw new \LogicException(\sprintf('Trying to register two bundles with the same name "%s".', $name));
         }
         $this->bundles[$name] = $bundle;
+    }
+
+    /**
+     * Tells whether a bundle can be instantiated on demand because nothing it declares runs when booting the kernel.
+     *
+     * @param class-string<BundleInterface> $class
+     */
+    private function isLazyBundle(string $class): bool
+    {
+        $r = new \ReflectionClass($class);
+
+        if ($r->hasMethod('__construct') || $r->hasMethod('__destruct')) {
+            return false;
+        }
+
+        foreach (['boot', 'shutdown', 'setContainer'] as $method) {
+            if (AbstractBundle::class !== $r->getMethod($method)->getDeclaringClass()->name) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

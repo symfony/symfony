@@ -28,7 +28,8 @@
         "symfony/yaml": "^7.4|^8.0"
     },
     "conflict": {
-        "ext-psr": "<1.1|>=2"
+        "ext-psr": "<1.1|>=2",
+        "symfony/http-kernel": "<8.2"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",

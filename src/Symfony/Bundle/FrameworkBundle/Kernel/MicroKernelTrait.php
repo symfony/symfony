@@ -149,7 +149,7 @@ trait MicroKernelTrait
         $parameters = $this->doGetKernelParameters();
         $parameters['kernel.charset'] = $this->getCharset();
 
-        foreach ($this->bundles as $name => $bundle) {
+        foreach ($this->getBundles() as $name => $bundle) {
             $parameters['kernel.bundles_metadata'][$name]['namespace'] = $bundle->getNamespace();
         }
 

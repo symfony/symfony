@@ -55,6 +55,31 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(['list']), new NullOutput());
     }
 
+    public function testNoBundleIsInstantiatedWhenNoneRegistersCommands()
+    {
+        $kernel = $this->getKernelWithCommandBundles([]);
+
+        $application = new Application($kernel);
+
+        $this->assertArrayNotHasKey('example', $application->all());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testOnlyTheBundlesRegisteringCommandsAreInstantiated()
+    {
+        $command = new Command('example');
+        $bundle = $this->createBundleMock([$command]);
+
+        $kernel = $this->getKernelWithCommandBundles(['CommandBundle' => $bundle]);
+
+        $application = new Application($kernel);
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/framework-bundle 8.1: Overriding the "Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', get_debug_type($bundle)));
+
+        $this->assertSame($command, $application->get('example'));
+    }
+
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testBundleCommandsAreRegistered()
@@ -323,6 +348,32 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn($bundles)
+        ;
+        $kernel
+            ->method('getContainer')
+            ->willReturn($container)
+        ;
+
+        return $kernel;
+    }
+
+    /**
+     * @param array<string, BundleInterface> $bundles
+     */
+    private function getKernelWithCommandBundles(array $bundles): KernelInterface&MockObject
+    {
+        $container = new Container(new ParameterBag([
+            'console.command.ids' => [],
+            'console.lazy_command.ids' => [],
+            'console.command.bundles' => array_keys($bundles),
+        ]));
+
+        $kernel = $this->createMock(KernelInterface::class);
+        $kernel->expects($this->once())->method('boot');
+        $kernel->expects($this->never())->method('getBundles');
+        $kernel
+            ->method('getBundle')
+            ->willReturnCallback(static fn (string $name) => $bundles[$name])
         ;
         $kernel
             ->method('getContainer')

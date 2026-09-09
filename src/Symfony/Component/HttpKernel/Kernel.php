@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
+use Symfony\Component\DependencyInjection\Kernel\BundleInterface as BaseBundleInterface;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,7 +84,7 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
             $this->preBoot();
         }
 
-        foreach ($this->getBundles() as $bundle) {
+        foreach ($this->bundles as $bundle) {
             $bundle->setContainer($this->container);
             $bundle->boot();
         }
@@ -153,11 +154,7 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
 
     public function getBundle(string $name): BundleInterface
     {
-        if (!isset($this->bundles[$name])) {
-            throw new \InvalidArgumentException(\sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the "registerBundles()" method of your "%s.php" file?', $name, get_debug_type($this)));
-        }
-
-        return $this->bundles[$name];
+        return parent::getBundle($name);
     }
 
     public function getCacheDir(): string
@@ -230,7 +227,7 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
             'kernel.charset' => $this->getCharset(),
         ];
 
-        foreach ($this->bundles as $name => $bundle) {
+        foreach ($this->getBundles() as $name => $bundle) {
             if ($bundle instanceof BundleAdapter) {
                 $parameters['kernel.bundles'][$name] = $bundle->getInnerBundle()::class;
             }
@@ -238,6 +235,16 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
         }
 
         return $parameters;
+    }
+
+    /**
+     * @param class-string<BaseBundleInterface> $class
+     */
+    protected function instantiateBundle(string $class): BundleInterface
+    {
+        $bundle = new $class();
+
+        return $bundle instanceof BundleInterface ? $bundle : new BundleAdapter($bundle);
     }
 
     private function preBoot(): void

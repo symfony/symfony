@@ -1,7 +1,5 @@
 <?php
 
 $container->loadFromExtension('framework', [
-    'assets' => [
-        'enabled' => false,
-    ],
+    'assets' => ['version' => 'v1'],
 ]);

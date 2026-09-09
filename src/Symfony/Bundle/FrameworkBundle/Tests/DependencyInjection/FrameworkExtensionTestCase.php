@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\Asset\AssetBundle;
 use Symfony\Component\AssetMapper\AssetMapperBundle;
 use Symfony\Component\AssetMapper\DependencyInjection\RemoveMissingDependenciesPass as AssetMapperRemoveMissingDependenciesPass;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
@@ -439,6 +440,23 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['twilio' => 'null'], $container->getDefinition('texter.transports')->getArgument(0));
     }
 
+    public function testAssetsConfigurationIsForwardedToAssetBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new AssetBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_assets');
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+
+        $version = $container->getDefinition((string) $container->getDefinition('assets._default_package')->getArgument(1));
+        $this->assertSame('v1', $version->getArgument(0));
+    }
+
     public function testMailerConfigurationIsForwardedToMailerBundle()
     {
         $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
@@ -756,79 +774,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('request');
 
         $this->assertFalse($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() does not load request.xml when no request formats are defined');
-    }
-
-    public function testAssets()
-    {
-        $container = $this->createContainerFromFile('assets');
-        $packages = $container->getDefinition('assets.packages');
-
-        // default package
-        $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
-        $this->assertUrlPackage($container, $defaultPackage, ['http://cdn.example.com'], 'SomeVersionScheme', '%%s?version=%%s');
-
-        // packages
-        $packageTags = $container->findTaggedServiceIds('assets.package');
-        $this->assertCount(10, $packageTags);
-
-        $packages = [];
-        foreach ($packageTags as $serviceId => $tagAttributes) {
-            $packages[$tagAttributes[0]['package']] = $serviceId;
-        }
-
-        $package = $container->getDefinition((string) $packages['images_path']);
-        $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
-
-        $package = $container->getDefinition((string) $packages['images']);
-        $this->assertUrlPackage($container, $package, ['http://images1.example.com', 'http://images2.example.com'], '1.0.0', '%%s?version=%%s');
-
-        $package = $container->getDefinition((string) $packages['foo']);
-        $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
-
-        $package = $container->getDefinition((string) $packages['bar']);
-        $this->assertUrlPackage($container, $package, ['https://bar2.example.com'], 'SomeVersionScheme', '%%s?version=%%s');
-
-        $package = $container->getDefinition((string) $packages['bar_version_strategy']);
-        $this->assertEquals('assets.custom_version_strategy', (string) $package->getArgument(1));
-
-        $package = $container->getDefinition((string) $packages['json_manifest_strategy']);
-        $versionStrategy = $container->getDefinition((string) $package->getArgument(1));
-        $this->assertEquals('assets.json_manifest_version_strategy', $versionStrategy->getParent());
-        $this->assertEquals('/path/to/manifest.json', $versionStrategy->getArgument(0));
-        $this->assertFalse($versionStrategy->getArgument(2));
-
-        $package = $container->getDefinition($packages['remote_manifest']);
-        $versionStrategy = $container->getDefinition($package->getArgument(1));
-        $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
-        $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
-
-        $package = $container->getDefinition($packages['var_manifest']);
-        $versionStrategy = $container->getDefinition($package->getArgument(1));
-        $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
-        $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
-        $this->assertFalse($versionStrategy->getArgument(2));
-
-        $package = $container->getDefinition($packages['env_manifest']);
-        $versionStrategy = $container->getDefinition($package->getArgument(1));
-        $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
-        $this->assertStringMatchesFormat('env_%s', $versionStrategy->getArgument(0));
-        $this->assertFalse($versionStrategy->getArgument(2));
-
-        $package = $container->getDefinition((string) $packages['strict_manifest_strategy']);
-        $versionStrategy = $container->getDefinition((string) $package->getArgument(1));
-        $this->assertEquals('assets.json_manifest_version_strategy', $versionStrategy->getParent());
-        $this->assertEquals('/path/to/manifest.json', $versionStrategy->getArgument(0));
-        $this->assertTrue($versionStrategy->getArgument(2));
-    }
-
-    public function testAssetsDefaultVersionStrategyAsService()
-    {
-        $container = $this->createContainerFromFile('assets_version_strategy_as_service');
-        $packages = $container->getDefinition('assets.packages');
-
-        // default package
-        $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
-        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
     public function testFormDataClassAttributeAutoconfiguration()
@@ -2285,6 +2230,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testAssetMapperDevServerPrefix(bool $server, ?string $expectedPrefix)
     {
         $container = $this->createContainerFromClosure(static function ($container) use ($server) {
+            $container->registerExtension(new AssetBundle()->getContainerExtension());
             $container->loadFromExtension('framework', [
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
@@ -2311,6 +2257,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testAssetMapperImportmapEntries()
     {
         $container = $this->createContainerFromClosure(static function ($container) {
+            $container->registerExtension(new AssetBundle()->getContainerExtension());
             $container->loadFromExtension('framework', [
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
@@ -2483,32 +2430,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
 
         return $container;
-    }
-
-    private function assertPathPackage(ContainerBuilder $container, ChildDefinition $package, $basePath, $version, $format)
-    {
-        $this->assertEquals('assets.path_package', $package->getParent());
-        $this->assertEquals($basePath, $package->getArgument(0));
-        $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
-    }
-
-    private function assertUrlPackage(ContainerBuilder $container, ChildDefinition $package, $baseUrls, $version, $format)
-    {
-        $this->assertEquals('assets.url_package', $package->getParent());
-        $this->assertEquals($baseUrls, $package->getArgument(0));
-        $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
-    }
-
-    private function assertVersionStrategy(ContainerBuilder $container, Reference $reference, $version, $format)
-    {
-        $versionStrategy = $container->getDefinition((string) $reference);
-        if (null === $version) {
-            $this->assertEquals('assets.empty_version_strategy', (string) $reference);
-        } else {
-            $this->assertEquals('assets.static_version_strategy', $versionStrategy->getParent());
-            $this->assertEquals($version, $versionStrategy->getArgument(0));
-            $this->assertEquals($format, $versionStrategy->getArgument(1));
-        }
     }
 
     private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $id, $adapter, $defaultLifetime)

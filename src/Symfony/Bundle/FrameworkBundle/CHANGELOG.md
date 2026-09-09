@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.assets` an alias of the `asset` configuration provided by `AssetBundle`
+ * Register `AssetBundle` automatically when the Asset component is installed
  * Make `framework.notifier` an alias of the `notifier` configuration provided by `NotifierBundle`
  * Register `NotifierBundle` automatically when the Notifier component is installed
  * Make `framework.cache` an alias of the `cache` configuration provided by `CacheBundle`

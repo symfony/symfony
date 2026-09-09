@@ -21,8 +21,6 @@ use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
-use Symfony\Component\Asset\Package;
-use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -259,14 +257,6 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
-        if ($this->readConfigEnabled('assets', $container, $config['assets'])) {
-            if (!class_exists(Package::class)) {
-                throw new LogicException('Asset support cannot be enabled as the Asset component is not installed. Try running "composer require symfony/asset".');
-            }
-
-            $this->registerAssetsConfiguration($config['assets'], $container, $loader);
-        }
-
         $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override'], $config['allowed_http_method_override']);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
@@ -355,8 +345,6 @@ class FrameworkExtension extends Extension
         // profiler depends on form, validation, translation and serializer being registered
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
-        $container->registerForAutoconfiguration(PackageInterface::class)
-            ->addTag('assets.package');
         $container->registerForAutoconfiguration(CallbackInterface::class)
             ->addTag('container.reversible');
         $container->registerForAutoconfiguration(ValueResolverInterface::class)
@@ -788,82 +776,11 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerAssetsConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        $loader->load('assets.php');
-
-        if ($config['version_strategy']) {
-            $defaultVersion = new Reference($config['version_strategy']);
-        } else {
-            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], '_default', $config['strict_mode']);
-        }
-
-        $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
-        $container->setDefinition('assets._default_package', $defaultPackage);
-
-        foreach ($config['packages'] as $name => $package) {
-            if (null !== $package['version_strategy']) {
-                $version = new Reference($package['version_strategy']);
-            } elseif (!\array_key_exists('version', $package) && null === $package['json_manifest_path']) {
-                // if neither version nor json_manifest_path are specified, use the default
-                $version = $defaultVersion;
-            } else {
-                // let format fallback to main version_format
-                $format = $package['version_format'] ?: $config['version_format'];
-                $version = $package['version'] ?? null;
-                $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name, $package['strict_mode']);
-            }
-
-            $packageDefinition = $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version)
-                ->addTag('assets.package', ['package' => $name]);
-            $container->setDefinition('assets._package_'.$name, $packageDefinition);
-            $container->registerAliasForArgument('assets._package_'.$name, PackageInterface::class, $name.'.package', $name);
-        }
-    }
 
     /**
      * Returns a definition for an asset package.
      */
-    private function createPackageDefinition(?string $basePath, array $baseUrls, Reference $version): Definition
-    {
-        if ($basePath && $baseUrls) {
-            throw new \LogicException('An asset package cannot have base URLs and base paths.');
-        }
 
-        $package = new ChildDefinition($baseUrls ? 'assets.url_package' : 'assets.path_package');
-        $package
-            ->replaceArgument(0, $baseUrls ?: $basePath)
-            ->replaceArgument(1, $version)
-        ;
-
-        return $package;
-    }
-
-    private function createVersion(ContainerBuilder $container, ?string $version, ?string $format, ?string $jsonManifestPath, string $name, bool $strictMode): Reference
-    {
-        // Configuration prevents $version and $jsonManifestPath from being set
-        if (null !== $version) {
-            $def = new ChildDefinition('assets.static_version_strategy');
-            $def
-                ->replaceArgument(0, $version)
-                ->replaceArgument(1, $format)
-            ;
-            $container->setDefinition('assets._version_'.$name, $def);
-
-            return new Reference('assets._version_'.$name);
-        }
-
-        if (null !== $jsonManifestPath) {
-            $def = new ChildDefinition('assets.json_manifest_version_strategy');
-            $def->replaceArgument(0, $jsonManifestPath);
-            $def->replaceArgument(2, $strictMode);
-            $container->setDefinition('assets._version_'.$name, $def);
-
-            return new Reference('assets._version_'.$name);
-        }
-
-        return new Reference('assets.empty_version_strategy');
-    }
 
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, string $defaultLocale, array $enabledLocales): void
     {

@@ -17,6 +17,7 @@ use Pheanstalk\Contract\PheanstalkSubscriberInterface;
 use Pheanstalk\Contract\SocketFactoryInterface;
 use Pheanstalk\Exception;
 use Pheanstalk\Exception\ConnectionException;
+use Pheanstalk\Exception\JobNotFoundException;
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\Values\JobId;
 use Pheanstalk\Values\TubeName;
@@ -46,6 +47,7 @@ class Connection
 
     private bool $usingTube = false;
     private bool $watchingTube = false;
+    private bool $busy = false;
 
     /**
      * Constructor.
@@ -182,31 +184,43 @@ class Connection
 
     public function ack(string $id): void
     {
-        $this->withReconnect(function () use ($id) {
+        $jobId = new JobId($id);
+
+        $this->withReconnect(function () use ($jobId) {
             $this->useTube();
-            $this->client->delete(new JobId($id));
-        });
+            $this->client->delete($jobId);
+        }, $jobId);
     }
 
     public function reject(string $id, ?int $priority = null, bool $forceDelete = false): void
     {
-        $this->withReconnect(function () use ($id, $priority, $forceDelete) {
+        $jobId = new JobId($id);
+
+        $this->withReconnect(function () use ($jobId, $priority, $forceDelete) {
             $this->useTube();
 
             if (!$forceDelete && $this->buryOnReject) {
-                $this->client->bury(new JobId($id), $priority ?? PheanstalkPublisherInterface::DEFAULT_PRIORITY);
+                $this->client->bury($jobId, $priority ?? PheanstalkPublisherInterface::DEFAULT_PRIORITY);
             } else {
-                $this->client->delete(new JobId($id));
+                $this->client->delete($jobId);
             }
-        });
+        }, $jobId);
     }
 
     public function keepalive(string $id): void
     {
-        $this->withReconnect(function () use ($id) {
+        // keepalive can be triggered by a signal while another command awaits its
+        // response; a touch sent now would cross replies with it on the shared socket
+        if ($this->busy) {
+            return;
+        }
+
+        $jobId = new JobId($id);
+
+        $this->withReconnect(function () use ($jobId) {
             $this->useTube();
-            $this->client->touch(new JobId($id));
-        });
+            $this->client->touch($jobId);
+        }, $jobId);
     }
 
     public function getMessageCount(): int
@@ -256,10 +270,16 @@ class Connection
     }
 
     /**
+     * @param ?JobId $reservedJobId The id of a job the command may only run on while holding its
+     *                              reservation, which then has to be reacquired after a reconnect
+     *                              before the command can be retried
+     *
      * @param-immediately-invoked-callable $command
      */
-    private function withReconnect(callable $command): mixed
+    private function withReconnect(callable $command, ?JobId $reservedJobId = null): mixed
     {
+        $this->busy = true;
+
         try {
             try {
                 return $command();
@@ -269,10 +289,20 @@ class Connection
                 $this->usingTube = false;
                 $this->watchingTube = false;
 
+                if (null !== $reservedJobId) {
+                    try {
+                        $this->client->reserveJob($reservedJobId);
+                    } catch (JobNotFoundException $exception) {
+                        throw new TransportException(\sprintf('Failed to reacquire the reservation for the Beanstalkd job "%s": the job no longer exists or was reserved by another consumer.', $reservedJobId->getId()), 0, $exception);
+                    }
+                }
+
                 return $command();
             }
         } catch (Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
+        } finally {
+            $this->busy = false;
         }
     }
 }

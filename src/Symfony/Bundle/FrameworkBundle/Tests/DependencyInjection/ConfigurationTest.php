@@ -20,7 +20,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 
 class ConfigurationTest extends TestCase
@@ -579,15 +578,6 @@ class ConfigurationTest extends TestCase
                 'throw' => true,
             ],
             'disallow_search_engine_index' => true,
-            'notifier' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
-                'message_bus' => null,
-                'chatter_transports' => [],
-                'texter_transports' => [],
-                'channel_policy' => [],
-                'admin_recipients' => [],
-                'notification_on_failed_messages' => false,
-            ],
             'error_controller' => 'error_controller',
             'secrets' => [
                 'enabled' => true,

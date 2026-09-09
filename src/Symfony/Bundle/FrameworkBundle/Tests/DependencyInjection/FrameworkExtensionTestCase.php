@@ -21,7 +21,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingMailerDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -58,7 +57,6 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Attribute\AsFormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
@@ -84,8 +82,8 @@ use Symfony\Component\Mailer\DependencyInjection\RemoveMissingDependenciesPass a
 use Symfony\Component\Mailer\MailerBundle;
 use Symfony\Component\Messenger\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Messenger\MessengerBundle;
-use Symfony\Component\Notifier\ChatterInterface;
-use Symfony\Component\Notifier\TexterInterface;
+use Symfony\Component\Notifier\DependencyInjection\RemoveMissingDependenciesPass as NotifierRemoveMissingDependenciesPass;
+use Symfony\Component\Notifier\NotifierBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoBundle;
@@ -423,6 +421,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         yield 'underscored' => ['legacy_remote_event'];
         yield 'hyphenated' => ['legacy_hyphenated_remote_event'];
+    }
+
+    public function testNotifierConfigurationIsForwardedToNotifierBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $container->registerExtension(new NotifierBundle()->getContainerExtension());
+        $this->loadFromFile($container, 'legacy_notifier');
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+
+        $this->assertSame(['twilio' => 'null'], $container->getDefinition('texter.transports')->getArgument(0));
     }
 
     public function testMailerConfigurationIsForwardedToMailerBundle()
@@ -2030,7 +2044,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'php_errors' => ['log' => true],
                 'secret' => 's3cr3t',
                 'mailer' => ['dsn' => 'smtp://null'],
-                'notifier' => ['texter_transports' => ['twilio' => 'twilio://ACCOUNT:TOKEN@default?from=FROM']],
             ], $extraConfig));
         });
 
@@ -2052,20 +2065,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public static function provideLoggerListenerRegistration(): iterable
     {
         $profiler = ['profiler' => ['enabled' => true]];
+        $serviceId = 'mailer.message_logger_listener';
 
-        foreach (['mailer.message_logger_listener', 'notifier.notification_logger_listener'] as $serviceId) {
-            $name = substr($serviceId, 0, strpos($serviceId, '.'));
+        // Nothing consumes the retained messages, so the listener is dropped.
+        yield 'neither profiler nor test' => [$serviceId, [], false, false];
 
-            // Nothing consumes the retained messages, so the listener is dropped.
-            yield $name.': neither profiler nor test' => [$serviceId, [], false, false];
+        // The profiler consumes them, but only while it is collecting.
+        yield 'profiler only' => [$serviceId, $profiler, true, true];
 
-            // The profiler consumes them, but only while it is collecting.
-            yield $name.': profiler only' => [$serviceId, $profiler, true, true];
-
-            // The assertions read the listener directly, so it must always collect.
-            yield $name.': test only' => [$serviceId, ['test' => true], true, false];
-            yield $name.': profiler and test' => [$serviceId, $profiler + ['test' => true], true, false];
-        }
+        // The assertions read the listener directly, so it must always collect.
+        yield 'test only' => [$serviceId, ['test' => true], true, false];
+        yield 'profiler and test' => [$serviceId, $profiler + ['test' => true], true, false];
     }
 
     public function testHttpClientNoMock()
@@ -2228,89 +2238,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         ], $container->getParameter('container.behavior_describing_tags'));
     }
 
-    public function testNotifierEmailChannelIsWiredWithTheMailerEnvelopeSender()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'mailer' => ['dsn' => 'smtp://example.com', 'envelope' => ['sender' => 'sender@example.org']],
-                'notifier' => ['texter_transports' => ['twilio' => 'twilio://ACCOUNT:TOKEN@default?from=FROM']],
-            ]);
-        });
-
-        $this->assertSame('sender@example.org', $container->getDefinition('notifier.channel.email')->getArgument(2));
-    }
-
-    public function testNotifierWithoutMailer()
-    {
-        $container = $this->createContainerFromFile('notifier_without_mailer');
-
-        $this->assertFalse($container->hasDefinition('notifier.channel.email'));
-    }
-
-    public function testNotifierWithoutMessenger()
-    {
-        $container = $this->createContainerFromFile('notifier_without_messenger');
-
-        $this->assertFalse($container->getDefinition('notifier.failed_message_listener')->hasTag('kernel.event_subscriber'));
-    }
-
-    public function testNotificationLoggerListenerIsResettable()
-    {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'secret' => 's3cr3t',
-                'test' => true,
-                'notifier' => ['texter_transports' => ['twilio' => 'twilio://ACCOUNT:TOKEN@default?from=FROM']],
-            ]);
-        });
-
-        // Otherwise a worker keeps every notification it ever sent, and the
-        // collector reports the ones from previous messages.
-        $this->assertSame([['method' => 'reset']], $container->getDefinition('notifier.notification_logger_listener')->getTag('kernel.reset'));
-    }
-
-    public function testNotifierWithMailerAndMessenger()
-    {
-        $container = $this->createContainerFromFile('notifier');
-
-        $this->assertTrue($container->hasDefinition('notifier'));
-        $this->assertTrue($container->hasDefinition('chatter'));
-        $this->assertTrue($container->hasDefinition('texter'));
-        $this->assertTrue($container->hasDefinition('notifier.channel.chat'));
-        $this->assertTrue($container->hasDefinition('notifier.channel.email'));
-        $this->assertTrue($container->hasDefinition('notifier.channel.sms'));
-        $this->assertTrue($container->hasDefinition('notifier.channel_policy'));
-        $this->assertTrue($container->getDefinition('notifier.failed_message_listener')->hasTag('kernel.event_subscriber'));
-    }
-
-    public function testNotifierWithoutTransports()
-    {
-        $container = $this->createContainerFromFile('notifier_without_transports');
-
-        $this->assertTrue($container->hasDefinition('notifier'));
-        $this->assertFalse($container->hasDefinition('chatter'));
-        $this->assertFalse($container->hasAlias(ChatterInterface::class));
-        $this->assertFalse($container->hasDefinition('texter'));
-        $this->assertFalse($container->hasAlias(TexterInterface::class));
-    }
-
-    public function testIfNotifierTransportsAreKnownByFrameworkExtension()
-    {
-        if (!class_exists(FullStack::class)) {
-            $this->markTestSkipped('This test can only run in fullstack test suites');
-        }
-
-        $container = $this->createContainerFromFile('notifier');
-
-        foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {
-            $transportFactoryName = strtolower(preg_replace('/(.)([A-Z])/', '$1-$2', $bridgeDirectory->getFilename()));
-            $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), \sprintf('Did you forget to add the "%s" TransportFactory to the $classToServices array in FrameworkExtension?', $bridgeDirectory->getFilename()));
-        }
-    }
-
     public function testLocaleSwitcherServiceRegistered()
     {
         if (!class_exists(LocaleSwitcher::class)) {
@@ -2333,28 +2260,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $localeAwareServices = array_map(static fn (Reference $r) => (string) $r, $switcherDef->getArgument(1)->getValues());
 
         $this->assertNotContains('translation.locale_switcher', $localeAwareServices);
-    }
-
-    public function testNotifierWithDisabledMessageBus()
-    {
-        $container = $this->createContainerFromFile('notifier_with_disabled_message_bus');
-
-        $this->assertNull($container->getDefinition('chatter')->getArgument(1));
-        $this->assertNull($container->getDefinition('texter')->getArgument(1));
-        $this->assertNull($container->getDefinition('notifier.channel.chat')->getArgument(1));
-        $this->assertNull($container->getDefinition('notifier.channel.email')->getArgument(1));
-        $this->assertNull($container->getDefinition('notifier.channel.sms')->getArgument(1));
-    }
-
-    public function testNotifierWithSpecificMessageBus()
-    {
-        $container = $this->createContainerFromFile('notifier_with_specific_message_bus');
-
-        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('chatter')->getArgument(1));
-        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('texter')->getArgument(1));
-        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.chat')->getArgument(1));
-        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.email')->getArgument(1));
-        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('notifier.channel.sms')->getArgument(1));
     }
 
     public function testTrustedProxiesWithPrivateRanges()
@@ -2542,7 +2447,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new RemoveMissingMailerDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new NotifierRemoveMissingDependenciesPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2568,7 +2473,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->addCompilerPass(new HttpClientRemoveMissingDependenciesPass());
         $container->addCompilerPass(new MailerRemoveMissingDependenciesPass());
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
-        $container->addCompilerPass(new RemoveMissingMailerDependenciesPass());
+        $container->addCompilerPass(new NotifierRemoveMissingDependenciesPass());
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

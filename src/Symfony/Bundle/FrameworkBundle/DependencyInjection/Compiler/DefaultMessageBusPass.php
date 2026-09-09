@@ -25,10 +25,6 @@ class DefaultMessageBusPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $notifyOnFailedMessages = $container->hasParameter('.notifier.notification_on_failed_messages')
-            && $container->getParameter('.notifier.notification_on_failed_messages');
-        $container->getParameterBag()->remove('.notifier.notification_on_failed_messages');
-
         if (!$container->hasAlias('messenger.default_bus')) {
             if ($container->hasDefinition('scheduler.event_listener')) {
                 throw new LogicException('Scheduler support cannot be enabled as the Messenger component is not '.(interface_exists(MessageBusInterface::class) ? 'enabled.' : 'installed. Try running "composer require symfony/messenger".'));
@@ -57,19 +53,5 @@ class DefaultMessageBusPass implements CompilerPassInterface
             }
         }
 
-        if (!$container->hasDefinition('notifier')) {
-            return;
-        }
-
-        if ($notifyOnFailedMessages) {
-            $container->getDefinition('notifier.failed_message_listener')->addTag('kernel.event_subscriber');
-        }
-
-        // as we have a bus, the channels don't need the transports
-        foreach (['notifier.channel.chat', 'notifier.channel.email', 'notifier.channel.sms', 'notifier.channel.push', 'notifier.channel.desktop'] as $channelId) {
-            if ($container->hasDefinition($channelId)) {
-                $container->getDefinition($channelId)->setArgument(0, null);
-            }
-        }
     }
 }

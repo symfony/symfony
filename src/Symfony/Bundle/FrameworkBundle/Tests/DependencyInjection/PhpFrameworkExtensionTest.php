@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,7 +24,6 @@ use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Serializer\SerializerBundle;
-use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
@@ -333,27 +331,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                 ],
             ]);
         });
-    }
-
-    #[DataProvider('emailValidationModeProvider')]
-    public function testValidatorEmailValidationMode(string $mode)
-    {
-        $this->expectNotToPerformAssertions();
-
-        $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($mode) {
-            $container->loadFromExtension('framework', [
-                'validation' => [
-                    'email_validation_mode' => $mode,
-                ],
-            ]);
-        });
-    }
-
-    public static function emailValidationModeProvider()
-    {
-        foreach (Email::VALIDATION_MODES as $mode) {
-            yield [$mode];
-        }
     }
 
     public function testMailerWebhookProdExcludesLocalhost()

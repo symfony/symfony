@@ -28,7 +28,6 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsTargetedValueResolver as AsTargetedConsoleValueResolver;
-use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -77,13 +76,6 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Validator\Attribute\ExtendsValidationFor;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
-use Symfony\Component\Validator\GroupProviderInterface;
-use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
-use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
@@ -117,9 +109,9 @@ class FrameworkExtension extends Extension
             throw new \LogicException('Requiring the "symfony/symfony" package is unsupported; replace it with standalone components instead.');
         }
 
-        // registerValidationConfiguration() overrides this with the configured domain; the default has
-        // to exist either way, because services such as argument_resolver.request_payload reference it
-        // whether or not validation is enabled
+        // ValidationBundle overrides this with the configured domain; the default has to exist either
+        // way, because services such as argument_resolver.request_payload reference it whether or not
+        // validation is enabled
         $container->setParameter('validator.translation_domain', 'validators');
 
         $loader->load('web.php');
@@ -177,7 +169,7 @@ class FrameworkExtension extends Extension
         // A translator must always be registered (as support is included by
         // default in the Form and Validator component). If disabled, an identity
         // translator will be used and everything will still work as expected.
-        if ($this->readConfigEnabled('translator', $container, $config['translator']) || $this->readConfigEnabled('form', $container, $config['form']) || $this->readConfigEnabled('validation', $container, $config['validation'])) {
+        if ($this->readConfigEnabled('translator', $container, $config['translator']) || $this->readConfigEnabled('form', $container, $config['form']) || class_exists(Validation::class)) {
             if (!class_exists(Translator::class) && $this->readConfigEnabled('translator', $container, $config['translator'])) {
                 throw new LogicException('Translation support cannot be enabled as the Translation component is not installed. Try running "composer require symfony/translation".');
             }
@@ -300,18 +292,13 @@ class FrameworkExtension extends Extension
 
             $this->registerFormConfiguration($config, $container, $loader);
 
-            if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/form'])) {
-                $this->writeConfigEnabled('validation', true, $config['validation']);
-            } else {
+            if (!ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/form'])) {
                 $container->removeDefinition('form.type_extension.form.validator');
                 $container->removeDefinition('form.type_guesser.validator');
             }
         } else {
             $container->removeDefinition('console.command.form_debug');
         }
-
-        // validation depends on form, annotations being registered
-        $this->registerValidationConfiguration($config['validation'], $container, $loader);
 
         // profiler depends on form, validation, translation and serializer being registered
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
@@ -336,12 +323,6 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(LocaleAwareInterface::class)
             ->addTag('kernel.locale_aware');
-        $container->registerForAutoconfiguration(ConstraintValidatorInterface::class)
-            ->addTag('validator.constraint_validator');
-        $container->registerForAutoconfiguration(GroupProviderInterface::class)
-            ->addTag('validator.group_provider');
-        $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
-            ->addTag('validator.initializer');
 
         $container->registerAttributeForAutoconfiguration(AsController::class, static function (ChildDefinition $definition, AsController $attribute): void {
             $definition->addTag('controller.service_arguments');
@@ -356,8 +337,6 @@ class FrameworkExtension extends Extension
             $definition->addTag('console.targeted_value_resolver', $attribute->name ? ['name' => $attribute->name] : []);
         });
 
-        $container->registerForAutoconfiguration(Constraint::class)
-            ->addTag('container.excluded', ['source' => 'because it\'s a validation constraint']);
         $container->registerAttributeForAutoconfiguration(Entity::class, static function (ChildDefinition $definition) {
             $definition->addTag('container.excluded', ['source' => 'because it\'s a Doctrine entity'])->addTag('doctrine.orm.entity');
         });
@@ -512,10 +491,6 @@ class FrameworkExtension extends Extension
 
         if ($this->isInitializedConfigEnabled('form')) {
             $loader->load('form_debug.php');
-        }
-
-        if ($this->isInitializedConfigEnabled('validation')) {
-            $loader->load('validator_debug.php');
         }
 
         if ($this->isInitializedConfigEnabled('translator')) {
@@ -875,136 +850,6 @@ class FrameworkExtension extends Extension
         ;
 
         $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);
-    }
-
-    private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!$this->readConfigEnabled('validation', $container, $config)) {
-            $container->removeDefinition('console.command.validator_debug');
-            $container->removeDefinition('.console.validate_question_input_listener');
-
-            return;
-        }
-
-        if (!class_exists(Validation::class)) {
-            throw new LogicException('Validation support cannot be enabled as the Validator component is not installed. Try running "composer require symfony/validator".');
-        }
-
-        if (!class_exists(ValidateQuestionInputListener::class)) {
-            $container->removeDefinition('.console.validate_question_input_listener');
-        }
-
-        $loader->load('validator.php');
-
-        $validatorBuilder = $container->getDefinition('validator.builder');
-
-        $container->setParameter('validator.translation_domain', $config['translation_domain']);
-
-        $files = ['xml' => [], 'yml' => []];
-        $this->registerValidatorMapping($container, $config, $files);
-
-        if ($files['xml']) {
-            $validatorBuilder->addMethodCall('addXmlMappings', [$files['xml']]);
-        }
-
-        if ($files['yml']) {
-            $validatorBuilder->addMethodCall('addYamlMappings', [$files['yml']]);
-        }
-
-        $definition = $container->findDefinition('validator.email');
-        $definition->replaceArgument(0, $config['email_validation_mode']);
-
-        // When attributes are disabled, it means from runtime-discovery only; autoconfiguration should still happen.
-        // And when runtime-discovery of attributes is enabled, we can skip compile-time autoconfiguration in debug mode.
-        if (!($config['enable_attributes'] ?? false) || !$container->getParameter('kernel.debug')) {
-            // The $reflector argument hints at where the attribute could be used
-            $container->registerAttributeForAutoconfiguration(Constraint::class, static function (ChildDefinition $definition, Constraint $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflector) {
-                $definition->addTag('validator.attribute_metadata');
-            });
-        }
-
-        $container->registerAttributeForAutoconfiguration(ExtendsValidationFor::class, static function (ChildDefinition $definition, ExtendsValidationFor $attribute) {
-            $definition->addTag('validator.attribute_metadata', ['for' => $attribute->class])
-                ->addTag('container.excluded', ['source' => 'because it\'s a validator constraint extension']);
-        });
-
-        if ($config['enable_attributes'] ?? false) {
-            $validatorBuilder->addMethodCall('enableAttributeMapping');
-        }
-
-        if ($config['static_method'] ?? false) {
-            foreach ($config['static_method'] as $methodName) {
-                $validatorBuilder->addMethodCall('addMethodMapping', [$methodName]);
-            }
-        }
-
-        if (!$container->getParameter('kernel.debug')) {
-            $validatorBuilder->addMethodCall('setMappingCache', [new Reference('validator.mapping.cache.adapter')]);
-        }
-
-        if ($config['disable_translation'] ?? false) {
-            $validatorBuilder->addMethodCall('disableTranslation');
-        }
-
-        if ($config['property_metadata_existence_check'] ?? false) {
-            $validatorBuilder->addMethodCall('enablePropertyMetadataExistenceCheck');
-        }
-
-        $container->setParameter('validator.auto_mapping', $config['auto_mapping']);
-
-        if (!class_exists(PropertyInfoLoader::class)) {
-            $container->removeDefinition('validator.property_info_loader');
-        }
-
-        $container
-            ->getDefinition('validator.not_compromised_password')
-            ->setArgument(2, $config['not_compromised_password']['enabled'])
-            ->setArgument(3, $config['not_compromised_password']['endpoint'])
-        ;
-
-        if (!class_exists(ExpressionLanguage::class)) {
-            $container->removeDefinition('validator.expression_language');
-            $container->removeDefinition('validator.expression_language_provider');
-        } elseif (!class_exists(ExpressionLanguageProvider::class)) {
-            $container->removeDefinition('validator.expression_language_provider');
-        }
-    }
-
-    private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files): void
-    {
-        $fileRecorder = static function ($extension, $path) use (&$files) {
-            $files['yaml' === $extension ? 'yml' : $extension][] = $path;
-        };
-
-        if (!ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/framework-bundle', 'symfony/validator'])) {
-            $container->removeDefinition('validator.form.attribute_metadata');
-        }
-
-        foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
-            $configDir = is_dir($bundle['path'].'/Resources/config') ? $bundle['path'].'/Resources/config' : $bundle['path'].'/config';
-
-            if (
-                $container->fileExists($file = $configDir.'/validation.yaml', false)
-                || $container->fileExists($file = $configDir.'/validation.yml', false)
-            ) {
-                $fileRecorder('yml', $file);
-            }
-
-            if ($container->fileExists($file = $configDir.'/validation.xml', false)) {
-                $fileRecorder('xml', $file);
-            }
-
-            if ($container->fileExists($dir = $configDir.'/validation', '/^$/')) {
-                $this->registerMappingFilesFromDir($dir, $fileRecorder);
-            }
-        }
-
-        $projectDir = $container->getParameter('kernel.project_dir');
-        if ($container->fileExists($dir = $projectDir.'/config/validator', '/^$/')) {
-            $this->registerMappingFilesFromDir($dir, $fileRecorder);
-        }
-
-        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
     }
 
     /**

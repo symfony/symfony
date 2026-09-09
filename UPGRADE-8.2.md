@@ -178,6 +178,12 @@ FrameworkBundle
    traceable serializer and its data collector are registered in debug mode and dropped when the profiler is
    disabled, the cache pool is dropped when no `cache.system` pool is registered, and the translatable normalizer
    when no translator is
+ * `ValidationBundle` is registered automatically when the Validator component is installed, and its services are
+   then registered without any configuration; set `validation.enabled` to `false` to disable them. The
+   `framework.validation` configuration is an alias of the `validation` configuration provided by the bundle. The
+   validator is no longer turned on implicitly by enabling forms, the traceable validator and its data collector
+   are registered in debug mode and dropped when the profiler is disabled, the cache pools are dropped when no
+   `cache.system` pool is registered, and the property-info loader when no property info extractor is
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
@@ -376,6 +382,8 @@ TwigBridge
 Validator
 ---------
 
+ * `ValidationBundle` provides the `validation` configuration and the services `FrameworkBundle` used to provide
+   under `framework.validation`
  * Add argument `$restrictGroups` to `Valid::__construct()`
  * [BC BREAK] Remove the `GroupSequence::$cascadedGroup` property, it has had no effect since the validator stopped reading it in 2014, and reading it has thrown since 7.4 typed it without a default
  * Add argument `$cascadeCurrentGroup` to `GroupSequenceProvider::__construct()`

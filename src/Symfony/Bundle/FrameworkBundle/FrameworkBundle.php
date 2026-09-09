@@ -26,10 +26,10 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingRouterDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingSerializerDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingValidatorDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSerializerPropertyAccessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedValidatorPropertyInfoLoaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationLintCommandPass;
@@ -99,10 +99,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
 use Symfony\Component\TypeInfo\TypeInfoBundle;
 use Symfony\Component\Uid\UidBundle;
-use Symfony\Component\Validator\DependencyInjection\AddAutoMappingConfigurationPass;
-use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
-use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
-use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
+use Symfony\Component\Validator\ValidationBundle;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
 use Symfony\Component\VarExporter\Internal\Registry;
 use Symfony\Component\Webhook\WebhookBundle;
@@ -131,6 +128,7 @@ class_exists(Registry::class);
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(AssetBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(SerializerBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(ValidationBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(LockBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MessengerBundle::class, ignoreOnInvalid: true)]
@@ -212,10 +210,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, DataCollectorTranslatorPass::class);
         $container->addCompilerPass(new ProfilerPass());
         $this->addCompilerPassIfExists($container, ControllerAttributesListenerPass::class, PassConfig::TYPE_BEFORE_REMOVING);
-        $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class);
-        $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
         $container->addCompilerPass(new AddValidatorSecurityExpressionLanguageProviderPass());
-        $this->addCompilerPassIfExists($container, AttributeMetadataPass::class);
         $container->addCompilerPass(new TranslationLintCommandPass(), PassConfig::TYPE_BEFORE_REMOVING, 10);
         // must be registered as late as possible to get access to all Twig paths registered in
         // twig.template_iterator definition
@@ -231,16 +226,15 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, FormPass::class);
         $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
-        $container->addCompilerPass(new RemoveUnusedValidatorPropertyInfoLoaderPass());
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
         $container->addCompilerPass(new RemoveMissingRouterDependenciesPass());
         $container->addCompilerPass(new RemoveMissingSerializerDependenciesPass());
+        $container->addCompilerPass(new RemoveMissingValidatorDependenciesPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
         // must run before CachePoolPass, which wires the pools this pass can still remove
         $container->addCompilerPass(new DefaultMessageBusPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 33);
-        $this->addCompilerPassIfExists($container, AddAutoMappingConfigurationPass::class);
         $container->addCompilerPass(new RegisterReverseContainerPass(true));
         $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new RemoveUnusedSessionMarshallingHandlerPass());

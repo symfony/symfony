@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.validation` an alias of the `validation` configuration provided by `ValidationBundle`
+ * Register `ValidationBundle` automatically when the Validator component is installed
  * Make `framework.serializer` an alias of the `serializer` configuration provided by `SerializerBundle`
  * Register `SerializerBundle` automatically when the Serializer component is installed
  * Make `framework.router` an alias of the `router` configuration provided by `RouterBundle`

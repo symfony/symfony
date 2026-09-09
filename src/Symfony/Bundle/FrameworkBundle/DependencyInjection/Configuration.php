@@ -23,7 +23,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * FrameworkExtension configuration structure.
@@ -144,7 +143,7 @@ class Configuration implements ConfigurationInterface
         $this->addAssetsSection($rootNode);
         $this->addAssetMapperSection($rootNode);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
-        $this->addValidationSection($rootNode, $enableIfStandalone);
+        $this->addValidationSection($rootNode);
         $this->addSerializerSection($rootNode);
         $this->addPropertyAccessSection($rootNode);
         $this->addTypeInfoSection($rootNode);
@@ -660,91 +659,14 @@ class Configuration implements ConfigurationInterface
     /**
      * @param-immediately-invoked-callable $enableIfStandalone
      */
-    private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addValidationSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('validation')
-                    ->info('Validation configuration')
-                    ->{$enableIfStandalone('symfony/validator', Validation::class)}()
-                    ->children()
-                        ->booleanNode('enable_attributes')->{class_exists(FullStack::class) ? 'defaultFalse' : 'defaultTrue'}()->end()
-                        ->arrayNode('static_method')
-                            ->acceptAndWrap(['string'])
-                            ->defaultValue(['loadValidatorMetadata'])
-                            ->prototype('scalar')->end()
-                            ->treatFalseLike([])
-                        ->end()
-                        ->scalarNode('translation_domain')->defaultValue('validators')->end()
-                        ->enumNode('email_validation_mode')->values(['html5', 'html5-allow-no-tld', 'strict'])->defaultValue('html5')->end()
-                        ->arrayNode('mapping')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->arrayNode('paths', 'path')
-                                    ->prototype('scalar')->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('not_compromised_password')
-                            ->canBeDisabled('When disabled, compromised passwords will be accepted as valid.')
-                            ->children()
-                                ->scalarNode('endpoint')
-                                    ->defaultNull()
-                                    ->info('API endpoint for the NotCompromisedPassword Validator.')
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->booleanNode('disable_translation')
-                            ->defaultFalse()
-                        ->end()
-                        ->booleanNode('property_metadata_existence_check')
-                            ->info('When enabled, validateProperty() and validatePropertyValue() throw an exception if no metadata is found for the given property.')
-                            ->defaultFalse()
-                        ->end()
-                        ->arrayNode('auto_mapping')
-                            ->info('A collection of namespaces for which auto-mapping will be enabled by default, or null to opt-in with the EnableAutoMapping constraint.')
-                            ->example([
-                                'App\\Entity\\' => [],
-                                'App\\WithSpecificLoaders\\' => ['validator.property_info_loader'],
-                            ])
-                            ->useAttributeAsKey('namespace')
-                            ->normalizeKeys(false)
-                            ->beforeNormalization()
-                                ->ifArray()
-                                ->then(static function ($values) {
-                                    foreach ($values as $k => $v) {
-                                        if (isset($v['service'])) {
-                                            continue;
-                                        }
-
-                                        if (isset($v['namespace'])) {
-                                            $values[$k]['services'] = [];
-                                            continue;
-                                        }
-
-                                        if (!\is_array($v)) {
-                                            $values[$v]['services'] = [];
-                                            unset($values[$k]);
-                                            continue;
-                                        }
-
-                                        $tmp = $v;
-                                        unset($values[$k]);
-                                        $values[$k]['services'] = $tmp;
-                                    }
-
-                                    return $values;
-                                })
-                            ->end()
-                            ->arrayPrototype()
-                                ->children()
-                                    ->arrayNode('services', 'service')
-                                        ->prototype('scalar')->end()
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('validation')
+                    ->aliasOf('validation')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

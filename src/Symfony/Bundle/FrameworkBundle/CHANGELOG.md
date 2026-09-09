@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.notifier` an alias of the `notifier` configuration provided by `NotifierBundle`
+ * Register `NotifierBundle` automatically when the Notifier component is installed
  * Make `framework.cache` an alias of the `cache` configuration provided by `CacheBundle`
  * Register `CacheBundle` automatically
  * Make `framework.web_link` an alias of the `web_link` configuration provided by `WebLinkBundle`

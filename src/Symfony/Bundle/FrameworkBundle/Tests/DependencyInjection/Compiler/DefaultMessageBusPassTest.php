@@ -39,19 +39,6 @@ class DefaultMessageBusPassTest extends TestCase
         new DefaultMessageBusPass()->process($container);
     }
 
-    public function testTheNotifierChannelsDropTheirTransportWhenABusIsRegistered()
-    {
-        $container = $this->createContainer(true);
-        $container->setParameter('.notifier.notification_on_failed_messages', true);
-
-        new DefaultMessageBusPass()->process($container);
-
-        $this->assertNull($container->getDefinition('notifier.channel.chat')->getArgument(0));
-        $this->assertNull($container->getDefinition('notifier.channel.sms')->getArgument(0));
-        $this->assertTrue($container->getDefinition('notifier.failed_message_listener')->hasTag('kernel.event_subscriber'));
-        $this->assertFalse($container->hasParameter('.notifier.notification_on_failed_messages'));
-    }
-
     public function testTheNotifierChannelsKeepTheirTransportWhenNoBusIsRegistered()
     {
         $container = $this->createContainer(false);

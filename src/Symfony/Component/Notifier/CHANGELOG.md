@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `NotifierBundle`, which provides the `notifier` configuration and the services previously provided by `FrameworkBundle` under `framework.notifier`
  * Add `AdminRecipientsProviderInterface`
  * Deprecate declaring `getAdminRecipients()` without implementing `AdminRecipientsProviderInterface`
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0

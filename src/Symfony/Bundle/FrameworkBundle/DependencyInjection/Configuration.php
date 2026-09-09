@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -166,7 +165,7 @@ class Configuration implements ConfigurationInterface
         $this->addHttpClientSection($rootNode);
         $this->addMailerSection($rootNode);
         $this->addSecretsSection($rootNode);
-        $this->addNotifierSection($rootNode, $enableIfStandalone);
+        $this->addNotifierSection($rootNode);
         $this->addRateLimiterSection($rootNode);
         $this->addUidSection($rootNode);
         $this->addHtmlSanitizerSection($rootNode);
@@ -1150,40 +1149,14 @@ class Configuration implements ConfigurationInterface
     /**
      * @param-immediately-invoked-callable $enableIfStandalone
      */
-    private function addNotifierSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addNotifierSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('notifier')
-                    ->info('Notifier configuration')
-                    ->{$enableIfStandalone('symfony/notifier', Notifier::class)}()
-                    ->children()
-                        ->scalarNode('message_bus')->defaultNull()->info('The message bus to use. Defaults to the default bus if the Messenger component is installed.')->end()
-                        ->arrayNode('chatter_transports', 'chatter_transport')
-                            ->useAttributeAsKey('name')
-                            ->prototype('scalar')->end()
-                        ->end()
-                        ->arrayNode('texter_transports', 'texter_transport')
-                            ->useAttributeAsKey('name')
-                            ->prototype('scalar')->end()
-                        ->end()
-                        ->booleanNode('notification_on_failed_messages')->defaultFalse()->end()
-                        ->arrayNode('channel_policy')
-                            ->useAttributeAsKey('name')
-                            ->prototype('array')
-                                ->acceptAndWrap(['string'])
-                                ->prototype('scalar')->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('admin_recipients', 'admin_recipient')
-                            ->prototype('array')
-                                ->children()
-                                    ->scalarNode('email')->cannotBeEmpty()->end()
-                                    ->scalarNode('phone')->defaultValue('')->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('notifier')
+                    ->aliasOf('notifier')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

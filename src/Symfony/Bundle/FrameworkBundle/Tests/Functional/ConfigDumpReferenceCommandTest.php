@@ -29,6 +29,7 @@ use Symfony\Component\Lock\LockBundle;
 use Symfony\Component\Mailer\MailerBundle;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Mime\MimeBundle;
+use Symfony\Component\Notifier\NotifierBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
@@ -165,7 +166,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $bundles = ['DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'ServicesBundle', 'CacheBundle', 'ConsoleBundle'];
 
         // registered through #[RequiredBundle(..., ignoreOnInvalid: true)], so absent when the component is not installed
-        foreach (['web_link' => WebLinkBundle::class, 'lock' => LockBundle::class, 'messenger' => MessengerBundle::class, 'semaphore' => SemaphoreBundle::class, 'workflow' => WorkflowBundle::class, 'remote_event' => RemoteEventBundle::class, 'html_sanitizer' => HtmlSanitizerBundle::class, 'type_info' => TypeInfoBundle::class, 'property_access' => PropertyAccessBundle::class, 'property_info' => PropertyInfoBundle::class, 'uid' => UidBundle::class, 'scheduler' => SchedulerBundle::class, 'json_streamer' => JsonStreamerBundle::class, 'asset_mapper' => AssetMapperBundle::class, 'rate_limiter' => RateLimiterBundle::class, 'webhook' => WebhookBundle::class, 'http_client' => HttpClientBundle::class, 'mailer' => MailerBundle::class, 'process' => ProcessBundle::class, 'json_path' => JsonPathBundle::class, 'mime' => MimeBundle::class, 'object_mapper' => ObjectMapperBundle::class] as $alias => $class) {
+        foreach (['web_link' => WebLinkBundle::class, 'lock' => LockBundle::class, 'messenger' => MessengerBundle::class, 'semaphore' => SemaphoreBundle::class, 'workflow' => WorkflowBundle::class, 'remote_event' => RemoteEventBundle::class, 'html_sanitizer' => HtmlSanitizerBundle::class, 'type_info' => TypeInfoBundle::class, 'property_access' => PropertyAccessBundle::class, 'property_info' => PropertyInfoBundle::class, 'uid' => UidBundle::class, 'scheduler' => SchedulerBundle::class, 'json_streamer' => JsonStreamerBundle::class, 'asset_mapper' => AssetMapperBundle::class, 'rate_limiter' => RateLimiterBundle::class, 'webhook' => WebhookBundle::class, 'http_client' => HttpClientBundle::class, 'mailer' => MailerBundle::class, 'notifier' => NotifierBundle::class, 'process' => ProcessBundle::class, 'json_path' => JsonPathBundle::class, 'mime' => MimeBundle::class, 'object_mapper' => ObjectMapperBundle::class] as $alias => $class) {
             if (class_exists($class)) {
                 $aliases[] = $alias;
                 $bundles[] = substr($class, 1 + strrpos($class, '\\'));

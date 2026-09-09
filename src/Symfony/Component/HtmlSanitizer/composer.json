@@ -20,6 +20,13 @@
         "ext-dom": "*",
         "league/uri": "^6.5|^7.0"
     },
+    "require-dev": {
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<8.1"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HtmlSanitizer\\": "" },
         "exclude-from-classmap": [

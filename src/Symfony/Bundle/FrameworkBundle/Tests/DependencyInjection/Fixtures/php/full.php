@@ -81,7 +81,4 @@ $container->loadFromExtension('framework', [
             'pdf' => 'application/pdf',
         ],
     ],
-    'html_sanitizer' => [
-        'enabled' => true,
-    ],
 ]);

@@ -25,7 +25,6 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -1336,10 +1335,6 @@ class ConfigurationTest extends TestCase
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 7,
                 'uuid47_secret' => null,
-            ],
-            'html_sanitizer' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
-                'sanitizers' => [],
             ],
             'scheduler' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(SchedulerTransportFactory::class),

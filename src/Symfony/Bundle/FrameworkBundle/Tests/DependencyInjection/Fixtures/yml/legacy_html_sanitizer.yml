@@ -1,0 +1,9 @@
+services:
+    test_html_sanitizer:
+        alias: html_sanitizer.sanitizer.custom
+        public: true
+framework:
+    html_sanitizer:
+        sanitizers:
+            custom:
+                default_action: block

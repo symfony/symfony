@@ -74,6 +74,47 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertSame([], iterator_to_array($receiver->get()));
     }
 
+    public function testItConsumesMessagesWithAPrefetchCount()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), ['prefetch_count' => 10, 'read_timeout' => 0.5]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection, $serializer);
+        $receiver = new AmqpReceiver($connection, $serializer);
+
+        $sender->send($first = new Envelope(new DummyMessage('First')));
+        $sender->send($second = new Envelope(new DummyMessage('Second')));
+        $sender->send($third = new Envelope(new DummyMessage('Third')));
+
+        $envelopes = iterator_to_array($receiver->get(2));
+        $this->assertCount(2, $envelopes);
+        $this->assertEquals($first->getMessage(), $envelopes[0]->getMessage());
+        $this->assertEquals($second->getMessage(), $envelopes[1]->getMessage());
+        $this->assertInstanceOf(AmqpReceivedStamp::class, $envelopes[0]->last(AmqpReceivedStamp::class));
+
+        foreach ($envelopes as $envelope) {
+            $receiver->ack($envelope);
+        }
+
+        // the consumer stays registered from one call to the next
+        $envelopes = iterator_to_array($receiver->get(2));
+        $this->assertCount(1, $envelopes);
+        $this->assertEquals($third->getMessage(), $envelopes[0]->getMessage());
+        $receiver->ack($envelopes[0]);
+
+        // an empty queue returns once the read timeout expires
+        $this->assertSame([], iterator_to_array($receiver->get(2)));
+
+        // registering a consumer makes the channel and the queue reference each other, so the
+        // connection has to be closed explicitly or the consumer keeps taking the messages the
+        // next tests send
+        $connection->channel()->getConnection()->disconnect();
+        $connection->clear();
+    }
+
     public function testItSendsAndReceivesMessagesThroughDefaultExchange()
     {
         $serializer = $this->createSerializer();

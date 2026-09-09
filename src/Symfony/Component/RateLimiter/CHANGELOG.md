@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `RateLimiterBundle`, which provides the `rate_limiter` configuration and the services previously provided by `FrameworkBundle` under `framework.rate_limiter`
  * Add `RateLimitExceededEvent`
  * `CompoundLimiter::consume()` now stops consuming at the first limiter that rejects the request
  * Add `RateLimiterBuilder`

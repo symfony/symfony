@@ -28,7 +28,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
-use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -172,7 +171,7 @@ class Configuration implements ConfigurationInterface
         $this->addMailerSection($rootNode, $enableIfStandalone);
         $this->addSecretsSection($rootNode);
         $this->addNotifierSection($rootNode, $enableIfStandalone);
-        $this->addRateLimiterSection($rootNode, $enableIfStandalone);
+        $this->addRateLimiterSection($rootNode);
         $this->addUidSection($rootNode);
         $this->addHtmlSanitizerSection($rootNode);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
@@ -1847,137 +1846,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addRateLimiterSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addRateLimiterSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('rate_limiter')
-                    ->info('Rate limiter configuration')
-                    ->{$enableIfStandalone('symfony/rate-limiter', TokenBucketLimiter::class)}()
-                    ->beforeNormalization()
-                        ->ifArray()
-                        ->then(static function ($v) {
-                            if (!isset($v['limiters']) && !isset($v['limiter'])) {
-                                $v = ['limiters' => $v];
-
-                                // hoist back the keys the shorthand would otherwise read as limiter names
-                                foreach (['enabled', 'builder'] as $key) {
-                                    if (\array_key_exists($key, $v['limiters'])) {
-                                        $v[$key] = $v['limiters'][$key];
-                                        unset($v['limiters'][$key]);
-                                    }
-                                }
-                            }
-
-                            return $v;
-                        })
-                    ->end()
-                    ->children()
-                        ->arrayNode('builder')
-                            ->info('Configuration for the RateLimiterBuilder service.')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('lock_factory')
-                                    ->info('The service ID of the lock factory to use with the RateLimiterBuilder.')
-                                    ->defaultValue('auto')
-                                ->end()
-                                ->scalarNode('cache_pool')
-                                    ->info('The cache pool to use with RateLimiterBuilder.')
-                                    ->defaultValue('cache.rate_limiter')
-                                ->end()
-                                ->scalarNode('storage_service')
-                                    ->info('The service ID of a custom storage implementation, this precedes any configured "cache_pool".')
-                                    ->defaultNull()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('limiters', 'limiter')
-                            ->useAttributeAsKey('name')
-                            ->arrayPrototype()
-                                ->children()
-                                    ->scalarNode('lock_factory')
-                                        ->info('The service ID of the lock factory used by this limiter (or null to disable locking).')
-                                        ->defaultValue('auto')
-                                    ->end()
-                                    ->scalarNode('cache_pool')
-                                        ->info('The cache pool to use for storing the current limiter state.')
-                                        ->defaultValue('cache.rate_limiter')
-                                    ->end()
-                                    ->scalarNode('storage_service')
-                                        ->info('The service ID of a custom storage implementation, this precedes any configured "cache_pool".')
-                                        ->defaultNull()
-                                    ->end()
-                                    ->enumNode('policy')
-                                        ->info('The algorithm to be used by this limiter.')
-                                        ->isRequired()
-                                        ->values(['fixed_window', 'token_bucket', 'sliding_window', 'compound', 'no_limit'])
-                                    ->end()
-                                    ->arrayNode('limiters', 'limiter')
-                                        ->info('The limiters to use when using the "compound" policy.')
-                                        ->acceptAndWrap(['string'])
-                                        ->beforeNormalization()
-                                            ->ifArray()
-                                            ->then(static function (array $v) {
-                                                $limiters = [];
-                                                foreach ($v as $name => $config) {
-                                                    if (\is_int($name) && \is_string($config)) {
-                                                        $limiters[$config] = [];
-                                                    } else {
-                                                        $limiters[$name] = $config ?? [];
-                                                    }
-                                                }
-
-                                                return $limiters;
-                                            })
-                                        ->end()
-                                        ->useAttributeAsKey('name')
-                                        ->arrayPrototype()
-                                            ->children()
-                                                ->scalarNode('key')
-                                                    ->info('The key to pass to this limiter, instead of the one passed to the compound limiter\'s create() method.')
-                                                    ->defaultNull()
-                                                ->end()
-                                            ->end()
-                                        ->end()
-                                    ->end()
-                                    ->integerNode('limit')
-                                        ->info('The maximum allowed hits in a fixed interval or burst.')
-                                    ->end()
-                                    ->scalarNode('interval')
-                                        ->info('Configures the fixed interval if "policy" is set to "fixed_window" or "sliding_window". The value must be a number followed by "second", "minute", "hour", "day", "week" or "month" (or their plural equivalent).')
-                                    ->end()
-                                    ->arrayNode('rate')
-                                        ->info('Configures the fill rate if "policy" is set to "token_bucket".')
-                                        ->children()
-                                            ->scalarNode('interval')
-                                                ->info('Configures the rate interval. The value must be a number followed by "second", "minute", "hour", "day", "week" or "month" (or their plural equivalent).')
-                                            ->end()
-                                            ->integerNode('amount')->info('Amount of tokens to add each interval.')->defaultValue(1)->end()
-                                        ->end()
-                                    ->end()
-                                    ->scalarNode('anchor_at')
-                                        ->info('Aligns the "fixed_window" policy to a calendar (e.g. "2024-01-05 00:00:00 UTC" combined with `interval: 1 month` resets the counter on the 5th of each month). UTC if not specified.')
-                                        ->defaultNull()
-                                    ->end()
-                                ->end()
-                                ->validate()
-                                    ->ifTrue(static fn ($v) => !\in_array($v['policy'], ['no_limit', 'compound'], true) && !isset($v['limit']))
-                                    ->thenInvalid('A limit must be provided when using a policy different than "compound" or "no_limit".')
-                                ->end()
-                                ->validate()
-                                    ->ifTrue(static fn ($v) => isset($v['anchor_at']) && 'fixed_window' !== $v['policy'])
-                                    ->thenInvalid('The "anchor_at" option is only supported with the "fixed_window" policy.')
-                                ->end()
-                                ->validate()
-                                    ->ifTrue(static fn ($v) => isset($v['anchor_at']) && isset($v['interval']) && !preg_match('/\b(months?|years?)\b/i', $v['interval']))
-                                    ->thenInvalid('The "anchor_at" option requires an "interval" of at least one month.')
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('rate_limiter')
+                    ->aliasOf('rate_limiter')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

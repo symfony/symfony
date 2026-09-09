@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\RateLimiter\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultLockFactoryPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\RateLimiter\DependencyInjection\DefaultLockFactoryPass;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 class DefaultLockFactoryPassTest extends TestCase

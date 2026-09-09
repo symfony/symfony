@@ -62,6 +62,7 @@ final class OidcClient implements OidcClientInterface
         }
 
         $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
+        $options['max_redirects'] = 0;
 
         try {
             return $this->httpClient->request('POST', $tokenEndpoint, $options)->toArray();
@@ -85,6 +86,7 @@ final class OidcClient implements OidcClientInterface
         }
 
         $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
+        $options['max_redirects'] = 0;
 
         try {
             $response = $this->httpClient->request('POST', $tokenEndpoint, $options);
@@ -111,6 +113,7 @@ final class OidcClient implements OidcClientInterface
         try {
             return $this->httpClient->request('GET', $userInfoEndpoint, [
                 'auth_bearer' => $accessToken,
+                'max_redirects' => 0,
             ])->toArray();
         } catch (HttpClientExceptionInterface $e) {
             throw new AuthenticationException(\sprintf('The OIDC userinfo endpoint request failed: "%s"', $e->getMessage()), previous: $e);

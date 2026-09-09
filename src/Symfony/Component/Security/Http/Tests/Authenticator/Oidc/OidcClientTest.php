@@ -60,6 +60,7 @@ class OidcClientTest extends TestCase
                 $this->assertSame('auth-code', $options['body']['code']);
                 $this->assertSame('https://app.example.com/callback', $options['body']['redirect_uri']);
                 $this->assertSame('test-client-id', $options['body']['client_id']);
+                $this->assertSame(0, $options['max_redirects']);
 
                 return true;
             }))
@@ -167,7 +168,7 @@ class OidcClientTest extends TestCase
 
         $this->httpClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'https://provider.example.com/userinfo', ['auth_bearer' => 'access-token'])
+            ->with('GET', 'https://provider.example.com/userinfo', ['auth_bearer' => 'access-token', 'max_redirects' => 0])
             ->willReturn($response);
 
         $claims = $this->createClient($clientAuthentication)->fetchUserInfo('access-token');
@@ -230,6 +231,7 @@ class OidcClientTest extends TestCase
         $this->assertArrayNotHasKey('scope', $body);
         $this->assertSame('access-456', $tokens['access_token']);
         $this->assertSame('refresh-456', $tokens['refresh_token']);
+        $this->assertSame(0, $mockResponse->getRequestOptions()['max_redirects']);
     }
 
     public function testTheRefreshRequestIsMadeWithTheOptionsTheClientAuthenticationReturns()

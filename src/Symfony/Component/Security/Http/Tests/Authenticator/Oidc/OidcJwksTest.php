@@ -167,6 +167,23 @@ class OidcJwksTest extends TestCase
         OidcJwks::fetchKeys($httpClient, 'https://provider.example.com/jwks', $item);
     }
 
+    public function testFetchKeysDoesNotFollowRedirects()
+    {
+        $response = new MockResponse('', ['http_code' => 301, 'response_headers' => ['location' => 'https://other.example.com/jwks']]);
+        $httpClient = new MockHttpClient($response);
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->never())->method('expiresAfter');
+
+        try {
+            OidcJwks::fetchKeys($httpClient, 'https://provider.example.com/jwks', $item);
+            $this->fail('An AuthenticationException should have been thrown.');
+        } catch (AuthenticationException) {
+        }
+
+        $this->assertSame(0, $response->getRequestOptions()['max_redirects'] ?? null);
+    }
+
     public function testFetchKeysIsUsableAsACacheCallback()
     {
         $httpClient = new MockHttpClient(new JsonMockResponse(['keys' => [['kid' => 'sig-key', 'kty' => 'EC', 'use' => 'sig']]]));

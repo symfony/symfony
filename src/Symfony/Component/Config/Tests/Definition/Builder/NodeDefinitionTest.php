@@ -42,6 +42,14 @@ class NodeDefinitionTest extends TestCase
         $parentNode->setPathSeparator('/');
     }
 
+    public function testAliasOf()
+    {
+        $node = new VariableNodeDefinition('foo');
+        $node->aliasOf('bar');
+
+        $this->assertSame('bar', $node->getNode()->getAttribute('alias_of'));
+    }
+
     public function testDocUrl()
     {
         $node = new ArrayNodeDefinition('node');

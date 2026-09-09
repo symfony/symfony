@@ -132,6 +132,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         count?: int|Param,
  *     },
  *     fromBundle?: bool|Param, // Default: false
+ *     app_alias?: AppConfig, // Deprecated: The child node "app_alias" at path "test.app_alias" is deprecated.
+ *     unknown_alias?: mixed,
  * }
  * @psalm-type AppConfig = bool|Param
  * @psalm-type PrototypedConfigConfig = array<string, array{ // Default: []

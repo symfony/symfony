@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\BooleanNode;
 use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 use Symfony\Component\Config\Tests\Fixtures\BarNode;
 use Symfony\Component\Config\Tests\Fixtures\Builder\BarNodeDefinition;
 use Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder as CustomNodeBuilder;
@@ -193,5 +194,92 @@ class TreeBuilderTest extends TestCase
         $this->assertArrayHasKey('foo', $childChildren);
         $this->assertInstanceOf(BaseNode::class, $childChildren['foo']);
         $this->assertSame('propagation/child/foo', $childChildren['foo']->getPath());
+    }
+
+    public function testAliasesCanBeDeclaredOnTheDirectChildrenOfTheRootNode()
+    {
+        $builder = new TreeBuilder('root');
+
+        $builder->getRootNode()
+            ->children()
+                ->variableNode('alias')->aliasOf('target')->end()
+            ->end();
+
+        $this->assertSame('target', $builder->buildTree()->getChildren()['alias']->getAttribute('alias_of'));
+    }
+
+    public function testAliasesCannotBeDeclaredOnNodesThatCannotHoldAnArray()
+    {
+        $builder = new TreeBuilder('root');
+
+        $builder->getRootNode()
+            ->children()
+                ->booleanNode('alias')->aliasOf('target')->end()
+            ->end();
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The value of a node declaring an "alias_of" attribute is forwarded as the configuration of the aliased extension, so the node must accept arrays, but "root.alias" does not.');
+
+        $builder->buildTree();
+    }
+
+    public function testAliasesCanBeDeclaredOnArrayNodes()
+    {
+        $builder = new TreeBuilder('root');
+
+        $builder->getRootNode()
+            ->children()
+                ->arrayNode('alias')->aliasOf('target')->end()
+            ->end();
+
+        $this->assertSame('target', $builder->buildTree()->getChildren()['alias']->getAttribute('alias_of'));
+    }
+
+    public function testAliasesCannotBeDeclaredOnTheRootNode()
+    {
+        $builder = new TreeBuilder('root');
+
+        $builder->getRootNode()->aliasOf('target');
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('Only the direct children of a root node can declare an "alias_of" attribute, but "root" does.');
+
+        $builder->buildTree();
+    }
+
+    public function testAliasesCannotBeDeclaredOnNestedNodes()
+    {
+        $builder = new TreeBuilder('root');
+
+        $builder->getRootNode()
+            ->children()
+                ->arrayNode('nested')
+                    ->children()
+                        ->variableNode('alias')->aliasOf('target')->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('Only the direct children of a root node can declare an "alias_of" attribute, but "root.nested.alias" does.');
+
+        $builder->buildTree();
+    }
+
+    public function testAliasesCannotBeDeclaredOnPrototypes()
+    {
+        $builder = new TreeBuilder('root');
+
+        $builder->getRootNode()
+            ->children()
+                ->arrayNode('nested')
+                    ->prototype('variable')->aliasOf('target')->end()
+                ->end()
+            ->end();
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('Only the direct children of a root node can declare an "alias_of" attribute, but "root.nested[]" does.');
+
+        $builder->buildTree();
     }
 }

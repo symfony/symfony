@@ -284,6 +284,26 @@ class JsonSchemaDumperTest extends TestCase
         yield [$node, ['anyOf' => [['enum' => ['a', 'b']], self::param(), ['type' => ['string']]]]];
     }
 
+    public function testAliasReferencesTheSchemaOfTheAliasedConfiguration()
+    {
+        $root = new ArrayNodeDefinition('root');
+        $root
+            ->children()
+                ->variableNode('foo')->aliasOf('foo_extension')->setDeprecated('symfony/test', '1.0')->end()
+                ->variableNode('bar')->aliasOf('unknown')->end()
+            ->end();
+        $node = $root->getNode();
+
+        $properties = (new JsonSchemaDumper())->dumpNode($node)['properties'];
+        $this->assertSame(['$ref' => '#/$defs/types/variable', 'deprecated' => true, 'description' => 'Deprecated since symfony/test 1.0: The child node "foo" at path "root.foo" is deprecated.'], $properties['foo']);
+        $this->assertSame(['$ref' => '#/$defs/types/variable'], $properties['bar']);
+
+        $dumper = new JsonSchemaDumper(resolveAlias: static fn (string $alias): ?string => 'foo_extension' === $alias ? '#/$defs/nodes/foo_extension' : null);
+        $properties = $dumper->dumpNode($node)['properties'];
+        $this->assertSame(['$ref' => '#/$defs/nodes/foo_extension', 'deprecated' => true, 'description' => 'Deprecated since symfony/test 1.0: The child node "foo" at path "root.foo" is deprecated.'], $properties['foo']);
+        $this->assertSame(['$ref' => '#/$defs/types/variable'], $properties['bar']);
+    }
+
     public function testGetAllDefs()
     {
         $allDefs = (new JsonSchemaDumper())->getAllDefs();

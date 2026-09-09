@@ -78,6 +78,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $this->assertSame('object', $schema['type']);
         $this->assertArrayHasKey('json_schema_test', $schema['$defs']['nodes']);
         $this->assertSame(['$ref' => '#/$defs/nodes/json_schema_test'], $schema['properties']['json_schema_test']);
+        $this->assertSame(['$ref' => '#/$defs/types/variable'], $schema['$defs']['nodes']['json_schema_test']['properties']['dev']);
         $this->assertArrayNotHasKey('when@all', $schema['properties']);
         // patternProperties allows any when@<custom-env> with 'all' bundles
         $this->assertSame(['$ref' => '#/$defs/nodes/json_schema_test'], $schema['patternProperties']['^when@[a-zA-Z0-9]+$']['properties']['json_schema_test']);
@@ -114,6 +115,8 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $schema = json_decode(file_get_contents($this->tempDir.'/schema_mixed.json'), true);
         // 'all' bundle in root properties
         $this->assertSame(['$ref' => '#/$defs/nodes/json_schema_test'], $schema['properties']['json_schema_test']);
+        // the alias node references the schema of the aliased extension
+        $this->assertSame(['$ref' => '#/$defs/nodes/json_schema_dev'], $schema['$defs']['nodes']['json_schema_test']['properties']['dev']);
         // dev-only bundle not in root properties
         $this->assertArrayNotHasKey('json_schema_dev', $schema['properties']);
         // when@dev contains both the 'all' bundle and the dev-only bundle, with additionalProperties: false
@@ -232,6 +235,7 @@ class JsonSchemaTestConfiguration implements ConfigurationInterface
             ->children()
                 ->scalarNode('name')->end()
                 ->booleanNode('enabled')->defaultFalse()->end()
+                ->variableNode('dev')->aliasOf('json_schema_dev')->end()
             ->end();
 
         return $treeBuilder;

@@ -43,9 +43,7 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
             return;
         }
 
-        $generator = new JsonSchemaDumper(parameterSchemas: [['$ref' => '#/$defs/types/param']]);
-
-        $defs = [];
+        $trees = [];
         $allAliases = [];
         $envAliases = [];
 
@@ -74,7 +72,7 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
                 continue;
             }
 
-            $defs[$extensionAlias] = $generator->dumpNode($tree);
+            $trees[$extensionAlias] = $tree;
 
             if ($envs['all'] ?? false) {
                 $allAliases[] = $extensionAlias;
@@ -96,8 +94,15 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
                 continue;
             }
 
-            $defs[$alias] = $generator->dumpNode($tree);
+            $trees[$alias] = $tree;
             $allAliases[] = $alias;
+        }
+
+        $generator = new JsonSchemaDumper([['$ref' => '#/$defs/types/param']], static fn (string $alias): ?string => isset($trees[$alias]) ? '#/$defs/nodes/'.$alias : null);
+
+        $defs = [];
+        foreach ($trees as $alias => $tree) {
+            $defs[$alias] = $generator->dumpNode($tree);
         }
 
         $allDefs = $generator->getAllDefs();

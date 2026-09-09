@@ -119,6 +119,21 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
+     * Declares that the value of this node belongs to the configuration rooted at the given name.
+     *
+     * The value is not processed by this tree, and dumpers reference that
+     * configuration instead of describing the node.
+     *
+     * Only the direct children of a root node can be aliases.
+     *
+     * @return $this
+     */
+    public function aliasOf(string $alias): static
+    {
+        return $this->attribute('alias_of', $alias);
+    }
+
+    /**
      * Sets an attribute on the node.
      *
      * @return $this

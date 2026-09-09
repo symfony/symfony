@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add `NodeDefinition::aliasOf()` to declare that the value of a node belongs to the configuration rooted at another name
+ * Add argument `$resolveAlias` to `ArrayShapeGenerator::generate()` and to the constructor of `JsonSchemaDumper` to dump the nodes declared with `NodeDefinition::aliasOf()` as references
  * Add `JsonSchemaDumper` to dump JSON Schema from configuration node definitions
  * Add `BaseNode::isNullable()` to check if a node accepts null as input
  * Add `BaseNode::hasNormalizationClosures()` to check if closures are used to normalize the value

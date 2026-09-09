@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -58,6 +62,10 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             if ($extension instanceof PrependExtensionInterface) {
                 $extension->prepend($container);
             }
+        }
+
+        if ($configAvailable) {
+            $this->forwardExtensionAliases($container);
         }
 
         foreach ($container->getExtensions() as $name => $extension) {
@@ -114,6 +122,106 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
         $container->addDefinitions($definitions);
         $container->addAliases($aliases);
+    }
+
+    /**
+     * Moves the values of the nodes declared with NodeDefinition::aliasOf() to the configuration of the extension with that alias.
+     */
+    private function forwardExtensionAliases(ContainerBuilder $container): void
+    {
+        foreach ($container->getExtensions() as $name => $extension) {
+            if (!$configs = $container->getExtensionConfig($name)) {
+                continue;
+            }
+
+            if ($extension instanceof ConfigurationInterface) {
+                $configuration = $extension;
+            } elseif (!$extension instanceof ConfigurationExtensionInterface || null === $configuration = $extension->getConfiguration($configs, $container)) {
+                continue;
+            }
+
+            $tree = $configuration->getConfigTreeBuilder()->buildTree();
+
+            if (!$tree instanceof ArrayNode) {
+                continue;
+            }
+
+            $aliases = [];
+            foreach ($tree->getChildren() as $key => $child) {
+                if ($child instanceof BaseNode && null !== $child->getAttribute('alias_of')) {
+                    $aliases[$key] = $child;
+                }
+            }
+
+            if (!$aliases) {
+                continue;
+            }
+
+            $forwarded = [];
+            foreach ($configs as $i => $config) {
+                foreach ($tree->getXmlRemappings() as [$singular, $plural]) {
+                    if (isset($aliases[$plural]) && isset($config[$singular])) {
+                        $config[$plural] = Processor::normalizeConfig($config, $singular, $plural);
+                        unset($config[$singular]);
+                    }
+                }
+
+                foreach ($aliases as $key => $node) {
+                    $configKey = $key;
+
+                    if (!\array_key_exists($key, $config)) {
+                        // ArrayNode::preNormalize() turns hyphenated keys into their underscored form
+                        if (!str_contains($key, '_') || !\array_key_exists($configKey = str_replace('_', '-', $key), $config)) {
+                            continue;
+                        }
+                    }
+
+                    $alias = $node->getAttribute('alias_of');
+
+                    if (!$container->hasExtension($alias)) {
+                        throw new LogicException(\sprintf('The "%s.%s" configuration is handled by the "%s" extension, which is not registered.', $name, $key, $alias));
+                    }
+
+                    if ($node->isDeprecated()) {
+                        $deprecation = $node->getDeprecation($key, $node->getPath());
+                        trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
+                    }
+
+                    try {
+                        // the value is merged into another extension's configuration, which is resolved
+                        // before that extension is loaded, so resolve it before normalizing it here
+                        $value = $container->getParameterBag()->resolveValue($config[$configKey]);
+                    } catch (ParameterNotFoundException $e) {
+                        $e->setSourceExtensionName($name);
+
+                        throw $e;
+                    }
+
+                    $value = $node->normalize($value) ?? [];
+
+                    if (!\is_array($value)) {
+                        throw new InvalidArgumentException(\sprintf('The "%s.%s" configuration must be an array or null, "%s" given.', $name, $key, get_debug_type($value)));
+                    }
+
+                    $forwarded[$container->getExtension($alias)->getAlias()][] = $value;
+                    unset($config[$configKey]);
+                }
+
+                $configs[$i] = $config;
+            }
+
+            if (!$forwarded) {
+                continue;
+            }
+
+            $container->setExtensionConfig($name, $configs);
+
+            foreach ($forwarded as $alias => $values) {
+                foreach (array_reverse($values) as $value) {
+                    $container->prependExtensionConfig($alias, $value);
+                }
+            }
+        }
     }
 }
 

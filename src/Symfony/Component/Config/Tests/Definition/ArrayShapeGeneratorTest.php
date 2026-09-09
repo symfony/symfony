@@ -274,6 +274,41 @@ class ArrayShapeGeneratorTest extends TestCase
             CODE, ArrayShapeGenerator::generate($root->getNode()));
     }
 
+    public function testAliasReferencesTheTypeOfTheAliasedConfiguration()
+    {
+        $root = new ArrayNodeDefinition('root');
+        $root
+            ->children()
+                ->variableNode('foo')->aliasOf('foo_extension')->setDeprecated('symfony/test', '1.0')->end()
+            ->end();
+
+        $resolveAlias = static fn (string $alias): ?string => 'foo_extension' === $alias ? 'FooExtensionConfig' : null;
+
+        $this->assertSame(<<<'CODE'
+            array{
+             *     foo?: FooExtensionConfig, // Deprecated: The child node "foo" at path "root.foo" is deprecated.
+             * }
+            CODE, ArrayShapeGenerator::generate($root->getNode(), $resolveAlias));
+    }
+
+    public function testUnresolvedAliasIsDumpedAsMixed()
+    {
+        $root = new ArrayNodeDefinition('root');
+        $root
+            ->children()
+                ->variableNode('foo')->aliasOf('foo_extension')->end()
+            ->end();
+
+        $expected = <<<'CODE'
+            array{
+             *     foo?: mixed,
+             * }
+            CODE;
+
+        $this->assertSame($expected, ArrayShapeGenerator::generate($root->getNode()));
+        $this->assertSame($expected, ArrayShapeGenerator::generate($root->getNode(), static fn (): ?string => null));
+    }
+
     public function testBeforeNormalizationIfTrueMakesArrayShapeUnsealed()
     {
         $root = new ArrayNodeDefinition('root');

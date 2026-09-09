@@ -54,10 +54,12 @@ final class JsonSchemaDumper
     private array $typeDefs;
 
     /**
-     * @param array<array<string, mixed>> $parameterSchemas additional JSON Schema fragments included as anyOf options for scalar nodes
+     * @param array<array<string, mixed>>             $parameterSchemas additional JSON Schema fragments included as anyOf options for scalar nodes
+     * @param (\Closure(string $alias): ?string)|null $resolveAlias     returns the "$ref" pointer to the schema of the configuration rooted at the given name, or null when unknown
      */
     public function __construct(
         private readonly array $parameterSchemas = [],
+        private readonly ?\Closure $resolveAlias = null,
     ) {
         $this->typeDefs = $this->buildTypeDefs();
     }
@@ -90,7 +92,9 @@ final class JsonSchemaDumper
 
     public function dumpNode(NodeInterface $node): array
     {
-        if ($node instanceof PrototypedArrayNode) {
+        if ($node instanceof BaseNode && null !== ($alias = $node->getAttribute('alias_of')) && null !== $ref = $this->resolveAlias?->__invoke($alias)) {
+            $schema = ['$ref' => $ref];
+        } elseif ($node instanceof PrototypedArrayNode) {
             $prototypeSchema = $this->dumpNode($node->getPrototype());
 
             if ($node->getKeyAttribute()) {

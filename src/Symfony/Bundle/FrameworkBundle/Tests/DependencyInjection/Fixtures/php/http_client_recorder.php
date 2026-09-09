@@ -1,0 +1,13 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'http_client' => [
+        'recorder' => [
+            'enabled' => true,
+            'redact' => ['headers' => ['X-Custom-Secret'], 'query' => ['sig'], 'body' => ['pin']],
+        ],
+        'default_options' => [
+            'headers' => ['X-Foo' => 'bar'],
+        ],
+    ],
+]);

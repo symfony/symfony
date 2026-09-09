@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Tests\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Recorder\Matcher\MatcherInterface;
 use Symfony\Component\HttpClient\Test\HarFileResponseFactory;
 
 class HarFileResponseFactoryTest extends TestCase
@@ -86,5 +87,26 @@ class HarFileResponseFactoryTest extends TestCase
         $client = new MockHttpClient($factory, 'https://symfony.com');
 
         $client->request('GET', '/releases.json');
+    }
+
+    public function testCustomMatcherIsUsed()
+    {
+        // Create a custom matcher that matches on method only
+        $matcher = new class implements MatcherInterface {
+            public function matches(array $harEntry, string $method, string $url, array $options): bool
+            {
+                return ($harEntry['request']['method'] ?? null) === $method;
+            }
+        };
+
+        $factory = new HarFileResponseFactory("{$this->fixtureDir}/symfony.com_archive.har", $matcher);
+        $client = new MockHttpClient($factory, 'https://symfony.com');
+
+        // This should match the first GET request in the HAR regardless of URL
+        $response = $client->request('GET', '/releases.json');
+        $this->assertSame(200, $response->getStatusCode());
+
+        $body = $response->toArray();
+        $this->assertArrayHasKey('symfony_versions', $body);
     }
 }

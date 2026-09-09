@@ -24,7 +24,8 @@
     },
     "require-dev": {
         "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/error-handler": "^6.4.3|^7.0.3|^8.0"
+        "symfony/error-handler": "^6.4.3|^7.0.3|^8.0",
+        "symfony/http-client": "^7.4|^8.0"
     },
     "autoload": {
         "files": [ "bootstrap.php" ],

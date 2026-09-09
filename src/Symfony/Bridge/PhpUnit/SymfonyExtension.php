@@ -30,10 +30,12 @@ use PHPUnit\TextUI\Configuration\Configuration;
 use Symfony\Bridge\PhpUnit\Attribute\DnsSensitive;
 use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
 use Symfony\Bridge\PhpUnit\Extension\EnableClockMockSubscriber;
+use Symfony\Bridge\PhpUnit\Extension\RecorderSubscriber;
 use Symfony\Bridge\PhpUnit\Extension\RegisterClockMockSubscriber;
 use Symfony\Bridge\PhpUnit\Extension\RegisterDnsMockSubscriber;
 use Symfony\Bridge\PhpUnit\Metadata\AttributeReader;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
+use Symfony\Component\HttpClient\RecorderHttpClient;
 
 class SymfonyExtension implements Extension
 {
@@ -126,6 +128,22 @@ class SymfonyExtension implements Extension
         }
 
         $facade->registerSubscriber(new RegisterDnsMockSubscriber($reader));
+
+        if (class_exists(RecorderHttpClient::class)) {
+            $baseDirectory = $configuration->hasConfigurationFile() ? \dirname($configuration->configurationFile()) : (getcwd() ?: '.');
+            $recordsDirectory = $baseDirectory.'/tests/fixtures/records';
+
+            if ($parameters->has('http-recorder-directory')) {
+                $recordsDirectory = $parameters->get('http-recorder-directory');
+
+                // relative directories are resolved against the PHPUnit configuration file, not the current working directory
+                if (!RecorderSubscriber::isAbsolutePath($recordsDirectory)) {
+                    $recordsDirectory = $baseDirectory.'/'.$recordsDirectory;
+                }
+            }
+
+            $facade->registerSubscriber(new RecorderSubscriber($reader, rtrim($recordsDirectory, '/\\').'/'));
+        }
     }
 
     /**

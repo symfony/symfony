@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\AssetMapper\AssetMapperBundle;
 use Symfony\Component\Cache\CacheBundle;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\ConsoleBundle;
@@ -303,7 +304,7 @@ class MicroKernelTraitTest extends TestCase
         ];
 
         // registered with ignoreOnInvalid, so absent when the component is not installed
-        foreach ([WebLinkBundle::class, LockBundle::class, MessengerBundle::class, SemaphoreBundle::class, WorkflowBundle::class, RemoteEventBundle::class, HtmlSanitizerBundle::class, TypeInfoBundle::class, PropertyAccessBundle::class, PropertyInfoBundle::class, UidBundle::class, SchedulerBundle::class, JsonStreamerBundle::class, ProcessBundle::class, JsonPathBundle::class, MimeBundle::class, ObjectMapperBundle::class] as $class) {
+        foreach ([WebLinkBundle::class, LockBundle::class, MessengerBundle::class, SemaphoreBundle::class, WorkflowBundle::class, RemoteEventBundle::class, HtmlSanitizerBundle::class, TypeInfoBundle::class, PropertyAccessBundle::class, PropertyInfoBundle::class, UidBundle::class, SchedulerBundle::class, JsonStreamerBundle::class, AssetMapperBundle::class, ProcessBundle::class, JsonPathBundle::class, MimeBundle::class, ObjectMapperBundle::class] as $class) {
             if (class_exists($class)) {
                 $expected[$class] = ['all' => true];
             }

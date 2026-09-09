@@ -19,7 +19,6 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
-use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpClient\HttpClient;
@@ -272,85 +271,6 @@ class ConfigurationTest extends TestCase
         ];
 
         $this->assertEquals($defaultConfig, $config['assets']);
-    }
-
-    public function testAssetMapperCanBeEnabled()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [[
-            'asset_mapper' => null,
-        ]]);
-
-        $defaultConfig = [
-            'enabled' => true,
-            'paths' => [],
-            'excluded_patterns' => [],
-            'server' => true,
-            'public_prefix' => '/assets/',
-            'missing_import_mode' => 'warn',
-            'extensions' => [],
-            'importmap_path' => '%kernel.project_dir%/importmap.php',
-            'importmap_polyfill' => 'es-module-shims',
-            'importmap_entries' => 'all',
-            'vendor_dir' => '%kernel.project_dir%/assets/vendor',
-            'minimum_release_age' => 0,
-            'importmap_script_attributes' => [],
-            'importmap_integrity_algorithms' => [],
-            'exclude_dotfiles' => true,
-            'precompress' => [
-                'enabled' => false,
-                'formats' => [],
-                'extensions' => CompressorInterface::DEFAULT_EXTENSIONS,
-            ],
-        ];
-
-        $this->assertEquals($defaultConfig, $config['asset_mapper']);
-    }
-
-    #[DataProvider('provideImportmapPolyfillTests')]
-    public function testAssetMapperPolyfillValue(mixed $polyfillValue, bool $isValid, mixed $expected)
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        if (!$isValid) {
-            $this->expectException(InvalidConfigurationException::class);
-            $this->expectExceptionMessage($expected);
-        }
-
-        $config = $processor->processConfiguration($configuration, [[
-            'asset_mapper' => null === $polyfillValue ? [] : [
-                'importmap_polyfill' => $polyfillValue,
-            ],
-        ]]);
-
-        if ($isValid) {
-            $this->assertEquals($expected, $config['asset_mapper']['importmap_polyfill']);
-        }
-    }
-
-    public function testAssetMapperImportmapIntegrityAlgorithms()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $config = $processor->processConfiguration($configuration, [[
-            'asset_mapper' => [
-                'importmap_integrity_algorithms' => ['sha384'],
-            ],
-        ]]);
-
-        $this->assertSame(['sha384'], $config['asset_mapper']['importmap_integrity_algorithms']);
-    }
-
-    public static function provideImportmapPolyfillTests()
-    {
-        yield [true, false, 'Must be either an importmap name or false.'];
-        yield [null, true, 'es-module-shims'];
-        yield ['es-module-shims', true, 'es-module-shims'];
-        yield ['foo', true, 'foo'];
-        yield [false, true, false];
     }
 
     #[DataProvider('provideValidAssetsPackageNameConfigurationTests')]
@@ -798,28 +718,6 @@ class ConfigurationTest extends TestCase
                 'packages' => [],
                 'json_manifest_path' => null,
                 'strict_mode' => false,
-            ],
-            'asset_mapper' => [
-                'enabled' => !class_exists(FullStack::class),
-                'paths' => [],
-                'excluded_patterns' => [],
-                'server' => true,
-                'public_prefix' => '/assets/',
-                'missing_import_mode' => 'warn',
-                'extensions' => [],
-                'importmap_path' => '%kernel.project_dir%/importmap.php',
-                'importmap_polyfill' => 'es-module-shims',
-                'importmap_entries' => 'all',
-                'vendor_dir' => '%kernel.project_dir%/assets/vendor',
-                'minimum_release_age' => 0,
-                'importmap_script_attributes' => [],
-                'importmap_integrity_algorithms' => [],
-                'exclude_dotfiles' => true,
-                'precompress' => [
-                    'enabled' => false,
-                    'formats' => [],
-                    'extensions' => CompressorInterface::DEFAULT_EXTENSIONS,
-                ],
             ],
             'php_errors' => [
                 'log' => true,

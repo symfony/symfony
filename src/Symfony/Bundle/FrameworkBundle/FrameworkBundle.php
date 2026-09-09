@@ -34,6 +34,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationLintC
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationUpdateCommandPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\VirtualRequestStackPass;
+use Symfony\Component\AssetMapper\AssetMapperBundle;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
@@ -133,6 +134,7 @@ class_exists(Registry::class);
 #[RequiredBundle(UidBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(SchedulerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonStreamerBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(AssetMapperBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]

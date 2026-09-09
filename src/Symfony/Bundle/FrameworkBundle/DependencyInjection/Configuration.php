@@ -15,8 +15,6 @@ use Psr\Log\LogLevel;
 use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
-use Symfony\Component\AssetMapper\AssetMapper;
-use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -154,7 +152,7 @@ class Configuration implements ConfigurationInterface
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
         $this->addAssetsSection($rootNode, $enableIfStandalone);
-        $this->addAssetMapperSection($rootNode, $enableIfStandalone);
+        $this->addAssetMapperSection($rootNode);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone);
         $this->addSerializerSection($rootNode, $enableIfStandalone);
@@ -639,140 +637,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addAssetMapperSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addAssetMapperSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('asset_mapper')
-                    ->info('Asset Mapper configuration')
-                    ->{$enableIfStandalone('symfony/asset-mapper', AssetMapper::class)}()
-                    ->children()
-                        // add array node called "paths" that will be an array of strings
-                        ->arrayNode('paths', 'path')
-                            ->info('Directories that hold assets that should be in the mapper. Can be a simple array of an array of ["path/to/assets": "namespace"].')
-                            ->example(['assets/'])
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('namespace')
-                            ->acceptAndWrap(['string'])
-                            ->beforeNormalization()
-                                ->ifArray()
-                                ->then(static function ($v) {
-                                    $result = [];
-                                    foreach ($v as $key => $item) {
-                                        // "dir" => "namespace"
-                                        if (\is_string($key)) {
-                                            $result[$key] = $item;
-
-                                            continue;
-                                        }
-
-                                        if (\is_array($item)) {
-                                            // $item = ["namespace" => "the/namespace", "value" => "the/dir"]
-                                            $result[$item['value']] = $item['namespace'] ?? '';
-                                        } else {
-                                            // $item = "the/dir"
-                                            $result[$item] = '';
-                                        }
-                                    }
-
-                                    return $result;
-                                })
-                            ->end()
-                            ->prototype('scalar')->end()
-                        ->end()
-                        ->arrayNode('excluded_patterns', 'excluded_pattern')
-                            ->info('Array of glob patterns of asset file paths that should not be in the asset mapper.')
-                            ->prototype('scalar')->end()
-                            ->example(['*/assets/build/*', '*/*_.scss'])
-                        ->end()
-                        // boolean called defaulting to true
-                        ->booleanNode('exclude_dotfiles')
-                            ->info('If true, any files starting with "." will be excluded from the asset mapper.')
-                            ->defaultTrue()
-                        ->end()
-                        ->booleanNode('server')
-                            ->info('If true, a "dev server" will return the assets from the public directory (true in "debug" mode only by default).')
-                            ->defaultValue($this->debug)
-                        ->end()
-                        ->scalarNode('public_prefix')
-                            ->info('The public path where the assets will be written to (and served from when "server" is true).')
-                            ->defaultValue('/assets/')
-                        ->end()
-                        ->enumNode('missing_import_mode')
-                            ->values(['strict', 'warn', 'ignore'])
-                            ->info('Behavior if an asset cannot be found when imported from JavaScript or CSS files - e.g. "import \'./non-existent.js\'". "strict" means an exception is thrown, "warn" means a warning is logged, "ignore" means the import is left as-is.')
-                            ->defaultValue('warn')
-                        ->end()
-                        ->arrayNode('extensions', 'extension')
-                            ->info('Key-value pair of file extensions set to their mime type.')
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('extension')
-                            ->example(['.zip' => 'application/zip'])
-                            ->prototype('scalar')->end()
-                        ->end()
-                        ->scalarNode('importmap_path')
-                            ->info('The path of the importmap.php file.')
-                            ->defaultValue('%kernel.project_dir%/importmap.php')
-                        ->end()
-                        ->scalarNode('importmap_polyfill')
-                            ->info('The importmap name that will be used to load the polyfill. Set to false to disable.')
-                            ->validate()
-                                ->ifTrue()
-                                ->thenInvalid('Invalid "importmap_polyfill" value. Must be either an importmap name or false.')
-                            ->end()
-                            ->defaultValue('es-module-shims')
-                        ->end()
-                        ->enumNode('importmap_entries')
-                            ->info('Which entries end up in the rendered importmap: "all" of them, or only the ones "reachable" from the rendered entrypoints (their eager and lazy import chains) plus the polyfill.')
-                            ->values(['all', 'reachable'])
-                            ->defaultValue('all')
-                        ->end()
-                        ->arrayNode('importmap_script_attributes', 'importmap_script_attribute')
-                            ->info('Key-value pair of attributes to add to script tags output for the importmap.')
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('key')
-                            ->example(['data-turbo-track' => 'reload'])
-                            ->prototype('scalar')->end()
-                        ->end()
-                        ->arrayNode('importmap_integrity_algorithms', 'importmap_integrity_algorithm')
-                            ->info('Algorithms used to compute the integrity of the importmap resources.')
-                            ->enumPrototype()->values(['sha256', 'sha384', 'sha512'])->end()
-                            ->defaultValue([])
-                        ->end()
-                        ->scalarNode('vendor_dir')
-                            ->info('The directory to store JavaScript vendors.')
-                            ->defaultValue('%kernel.project_dir%/assets/vendor')
-                        ->end()
-                        ->integerNode('minimum_release_age')
-                            ->info('Minimum age in seconds a package version must have to be considered when checking for updates (0 disables the check). Enabling it makes update checks download the full npm metadata document, which is larger than the abbreviated one.')
-                            ->min(0)
-                            ->defaultValue(0)
-                        ->end()
-                        ->arrayNode('precompress')
-                            ->info('Precompress assets with Brotli, Zstandard and gzip.')
-                            ->canBeEnabled()
-                            ->children()
-                                ->arrayNode('formats', 'format')
-                                    ->info('Array of formats to enable. "brotli", "zstandard" and "gzip" are supported. Defaults to all formats supported by the system. The entire list must be provided.')
-                                    ->prototype('scalar')->end()
-                                    ->performNoDeepMerging()
-                                    ->validate()
-                                        ->ifTrue(static fn ($v) => array_diff($v, ['brotli', 'zstandard', 'gzip']))
-                                        ->thenInvalid('Unsupported format: "brotli", "zstandard" and "gzip" are supported.')
-                                    ->end()
-                                ->end()
-                                ->arrayNode('extensions', 'extension')
-                                    ->info('Array of extensions to compress. The entire list must be provided, no merging occurs.')
-                                    ->prototype('scalar')->end()
-                                    ->performNoDeepMerging()
-                                    ->defaultValue(interface_exists(CompressorInterface::class) ? CompressorInterface::DEFAULT_EXTENSIONS : [])
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('asset_mapper')
+                    ->aliasOf('asset_mapper')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

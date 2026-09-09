@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Component\AssetMapper\AssetMapperBundle;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\JsonSchemaDumper;
@@ -152,7 +153,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
 
-        (new JsonSchemaConfigDumpPass($schemaFile, [FrameworkBundle::class => ['all' => true]]))->process($container);
+        (new JsonSchemaConfigDumpPass($schemaFile, [FrameworkBundle::class => ['all' => true], AssetMapperBundle::class => ['all' => true]]))->process($container);
 
         // The asset-mapper recipe configures "paths" as a list, which a
         // normalization closure turns into a map keyed by path.

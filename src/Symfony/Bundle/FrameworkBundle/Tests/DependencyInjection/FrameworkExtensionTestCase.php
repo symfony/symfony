@@ -25,6 +25,8 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\AssetMapper\AssetMapperBundle;
+use Symfony\Component\AssetMapper\DependencyInjection\RemoveMissingDependenciesPass as AssetMapperRemoveMissingDependenciesPass;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -2912,6 +2914,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->registerExtension(new SchedulerBundle()->getContainerExtension());
         $container->registerExtension(new JsonStreamerBundle()->getContainerExtension());
         $container->registerExtension(new PropertyInfoBundle()->getContainerExtension());
+        $container->registerExtension(new AssetMapperBundle()->getContainerExtension());
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;
@@ -2932,7 +2935,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2953,6 +2956,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->addCompilerPass(new DefaultLockFactoryPass());
         $container->addCompilerPass(new DefaultMessageBusPass());
         $container->addCompilerPass(new RemoveMissingDependenciesPass());
+        $container->addCompilerPass(new AssetMapperRemoveMissingDependenciesPass());
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

@@ -16,15 +16,6 @@ use Symfony\Component\AssetMapper\AssetMapperCompiler;
 use Symfony\Component\AssetMapper\AssetMapperDevServerSubscriber;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
-use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
-use Symfony\Component\AssetMapper\Command\CompressAssetsCommand;
-use Symfony\Component\AssetMapper\Command\DebugAssetMapperCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapAuditCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapInstallCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapOutdatedCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapRemoveCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
-use Symfony\Component\AssetMapper\Command\ImportMapUpdateCommand;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Compiler\JavaScriptImportPathCompiler;
@@ -122,30 +113,10 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper'),
                 abstract_arg('asset public prefix'),
                 abstract_arg('extensions map'),
-                service('cache.asset_mapper'),
+                service('cache.asset_mapper')->nullOnInvalid(),
                 service('profiler')->nullOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
-
-        ->set('asset_mapper.command.compile', AssetMapperCompileCommand::class)
-            ->args([
-                service('asset_mapper.compiled_asset_mapper_config_reader'),
-                service('asset_mapper'),
-                service('asset_mapper.importmap.generator'),
-                service('asset_mapper.local_public_assets_filesystem'),
-                param('kernel.project_dir'),
-                param('kernel.debug'),
-                service('event_dispatcher')->nullOnInvalid(),
-            ])
-            ->tag('console.command')
-
-            ->set('asset_mapper.command.debug', DebugAssetMapperCommand::class)
-                ->args([
-                    service('asset_mapper'),
-                    service('asset_mapper.repository'),
-                    param('kernel.project_dir'),
-                ])
-                ->tag('console.command')
 
         ->set('asset_mapper_compiler', AssetMapperCompiler::class)
             ->args([
@@ -243,40 +214,6 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('monolog.logger', ['channel' => 'asset_mapper'])
 
-        ->set('asset_mapper.importmap.command.require', ImportMapRequireCommand::class)
-            ->args([
-                service('asset_mapper.importmap.manager'),
-                service('asset_mapper.importmap.version_checker'),
-                param('kernel.project_dir'),
-            ])
-            ->tag('console.command')
-
-        ->set('asset_mapper.importmap.command.remove', ImportMapRemoveCommand::class)
-            ->args([service('asset_mapper.importmap.manager')])
-            ->tag('console.command')
-
-        ->set('asset_mapper.importmap.command.update', ImportMapUpdateCommand::class)
-            ->args([
-                service('asset_mapper.importmap.manager'),
-                service('asset_mapper.importmap.version_checker'),
-            ])
-            ->tag('console.command')
-
-        ->set('asset_mapper.importmap.command.install', ImportMapInstallCommand::class)
-            ->args([
-                service('asset_mapper.importmap.remote_package_downloader'),
-                param('kernel.project_dir'),
-            ])
-            ->tag('console.command')
-
-        ->set('asset_mapper.importmap.command.audit', ImportMapAuditCommand::class)
-            ->args([service('asset_mapper.importmap.auditor')])
-            ->tag('console.command')
-
-        ->set('asset_mapper.importmap.command.outdated', ImportMapOutdatedCommand::class)
-            ->args([service('asset_mapper.importmap.update_checker')])
-            ->tag('console.command')
-
         ->set('asset_mapper.compressor.brotli', BrotliCompressor::class)
         ->set('asset_mapper.compressor.zstandard', ZstandardCompressor::class)
         ->set('asset_mapper.compressor.gzip', GzipCompressor::class)
@@ -287,9 +224,5 @@ return static function (ContainerConfigurator $container) {
                 service('logger'),
             ])
         ->alias(CompressorInterface::class, 'asset_mapper.compressor')
-
-        ->set('asset_mapper.assets.command.compress', CompressAssetsCommand::class)
-            ->args([service('asset_mapper.compressor')])
-            ->tag('console.command')
     ;
 };

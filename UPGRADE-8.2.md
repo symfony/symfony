@@ -137,6 +137,11 @@ FrameworkBundle
  * `JsonStreamerBundle` is registered automatically when the JsonStreamer component is installed, and its services are
    then registered without any configuration; set `json_streamer.enabled` to `false` to disable them. The
    `framework.json_streamer` configuration is an alias of the `json_streamer` configuration provided by the bundle
+ * `AssetMapperBundle` is registered automatically when the AssetMapper component is installed, and its services are
+   then registered without any configuration; set `asset_mapper.enabled` to `false` to disable them. The
+   `framework.asset_mapper` configuration is an alias of the `asset_mapper` configuration provided by the bundle. The
+   asset package is dropped when the Asset component is not enabled, and the cache pool when no `cache.system` pool
+   is registered
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

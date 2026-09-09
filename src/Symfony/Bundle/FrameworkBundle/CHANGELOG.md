@@ -28,6 +28,8 @@ CHANGELOG
  * Register `SchedulerBundle` automatically when the Scheduler component is installed
  * Make `framework.json_streamer` an alias of the `json_streamer` configuration provided by `JsonStreamerBundle`
  * Register `JsonStreamerBundle` automatically when the JsonStreamer component is installed
+ * Make `framework.asset_mapper` an alias of the `asset_mapper` configuration provided by `AssetMapperBundle`
+ * Register `AssetMapperBundle` automatically when the AssetMapper component is installed
  * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
  * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Make `framework.remote_event` an alias of the `remote_event` configuration provided by `RemoteEventBundle`

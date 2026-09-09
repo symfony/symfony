@@ -30,7 +30,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
@@ -171,7 +170,7 @@ class Configuration implements ConfigurationInterface
         $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode);
         $this->addSemaphoreSection($rootNode);
-        $this->addMessengerSection($rootNode, $enableIfStandalone);
+        $this->addMessengerSection($rootNode);
         $this->addSchedulerSection($rootNode, $enableIfStandalone);
         $this->addRobotsIndexSection($rootNode);
         $this->addHttpClientSection($rootNode, $enableIfStandalone);
@@ -1227,220 +1226,14 @@ class Configuration implements ConfigurationInterface
     /**
      * @param-immediately-invoked-callable $enableIfStandalone
      */
-    private function addMessengerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addMessengerSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('messenger')
-                    ->info('Messenger configuration')
-                    ->{$enableIfStandalone('symfony/messenger', MessageBusInterface::class)}()
-                    ->validate()
-                        ->ifTrue(static fn ($v) => isset($v['buses']) && \count($v['buses']) > 1 && null === $v['default_bus'])
-                        ->thenInvalid('You must specify the "default_bus" if you define more than one bus.')
-                    ->end()
-                    ->validate()
-                        ->ifTrue(static fn ($v) => isset($v['buses']) && null !== $v['default_bus'] && !isset($v['buses'][$v['default_bus']]))
-                        ->then(static fn ($v) => throw new InvalidConfigurationException(\sprintf('The specified default bus "%s" is not configured. Available buses are "%s".', $v['default_bus'], implode('", "', array_keys($v['buses'])))))
-                    ->end()
-                    ->children()
-                        ->arrayNode('routing')
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('message_class')
-                            ->beforeNormalization()
-                                ->ifArray()
-                                ->then(static function ($config) {
-                                    $newConfig = [];
-                                    foreach ($config as $k => $v) {
-                                        if (isset($v['senders'])) {
-                                            trigger_deprecation('symfony/framework-bundle', '8.1', 'Using the "senders" nesting level for messenger routing configuration is deprecated and will be removed in version 9.0. Use a flat list of senders instead.');
-                                        }
-                                        $newConfig[$k] = $v['senders'] ?? (\is_array($v) ? array_values($v) : [$v]);
-                                    }
-
-                                    return $newConfig;
-                                })
-                            ->end()
-                            ->arrayPrototype()
-                                ->requiresAtLeastOneElement()
-                                ->acceptAndWrap(['string'])
-                                ->performNoDeepMerging()
-                                ->scalarPrototype()->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('serializer')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('default_serializer')
-                                    ->defaultValue('messenger.transport.native_php_serializer')
-                                    ->info('Service id to use as the default serializer for the transports.')
-                                ->end()
-                                ->arrayNode('symfony_serializer')
-                                    ->addDefaultsIfNotSet()
-                                    ->children()
-                                        ->scalarNode('format')->defaultValue('json')->info('Serialization format for the messenger.transport.symfony_serializer service (which is not the serializer used by default).')->end()
-                                        ->arrayNode('context')
-                                            ->normalizeKeys(false)
-                                            ->useAttributeAsKey('name')
-                                            ->defaultValue([])
-                                            ->info('Context array for the messenger.transport.symfony_serializer service (which is not the serializer used by default).')
-                                            ->prototype('variable')->end()
-                                        ->end()
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('transports', 'transport')
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('name')
-                            ->arrayPrototype()
-                                ->acceptAndWrap(['string'], 'dsn')
-                                ->children()
-                                    ->scalarNode('dsn')->end()
-                                    ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
-                                    ->arrayNode('claim_check')
-                                        ->children()
-                                            ->scalarNode('cache_pool')->isRequired()->cannotBeEmpty()->info('Service id of the dedicated cache pool used to store claims. Pools declared under "framework.cache.pools" must define a "default_lifetime".')->end()
-                                            ->integerNode('max_size')->isRequired()->min(1)->info('Maximum encoded message size in bytes before using a claim check.')->end()
-                                        ->end()
-                                    ->end()
-                                    ->arrayNode('options', 'option')
-                                        ->useAttributeAsKey('key')
-                                        ->normalizeKeys(false)
-                                        ->defaultValue([])
-                                        ->prototype('variable')
-                                        ->end()
-                                    ->end()
-                                    ->scalarNode('failure_transport')
-                                        ->defaultNull()
-                                        ->info('Transport name to send failed messages to (after all retries have failed).')
-                                    ->end()
-                                    ->arrayNode('retry_strategy')
-                                        ->addDefaultsIfNotSet()
-                                        ->acceptAndWrap(['string'], 'service')
-                                        ->beforeNormalization()
-                                            ->ifArray()
-                                            ->then(static function ($v) {
-                                                if (isset($v['service']) && (isset($v['max_retries']) || isset($v['delay']) || isset($v['multiplier']) || isset($v['max_delay']))) {
-                                                    throw new \InvalidArgumentException('The "service" cannot be used along with the other "retry_strategy" options.');
-                                                }
-
-                                                return $v;
-                                            })
-                                        ->end()
-                                        ->children()
-                                            ->scalarNode('service')->defaultNull()->info('Service id to override the retry strategy entirely.')->end()
-                                            ->integerNode('max_retries')->defaultValue(3)->min(0)->end()
-                                            ->integerNode('delay')->defaultValue(1000)->min(0)->info('Time in ms to delay (or the initial value when multiplier is used).')->end()
-                                            ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, delay will grow exponentially for each retry: this delay = (delay * (multiple ^ retries)).')->end()
-                                            ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite).')->end()
-                                            ->floatNode('jitter')->defaultValue(0.1)->min(0)->max(1)->info('Randomness to apply to the delay (between 0 and 1).')->end()
-                                        ->end()
-                                    ->end()
-                                    ->scalarNode('rate_limiter')
-                                        ->defaultNull()
-                                        ->info('Rate limiter name to use when processing messages.')
-                                    ->end()
-                                    ->integerNode('priority')
-                                        ->defaultValue(0)
-                                        ->info('Order in which "messenger:consume --all" consumes this transport, higher comes first.')
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->scalarNode('failure_transport')
-                            ->defaultNull()
-                            ->info('Transport name to send failed messages to (after all retries have failed).')
-                        ->end()
-                        ->arrayNode('stop_worker_on_signals', 'stop_worker_on_signal')
-                            ->defaultValue([])
-                            ->info('A list of signals that should stop the worker; defaults to SIGTERM and SIGINT.')
-                            ->acceptAndWrap(['int', 'string'])
-                            ->beforeNormalization()
-                                ->ifArray()
-                                ->then(static function ($signals) {
-                                    return array_map(static function ($v) {
-                                        if (\is_string($v) && str_starts_with($v, 'SIG') && \array_key_exists($v, get_defined_constants(true)['pcntl'])) {
-                                            return \constant($v);
-                                        }
-
-                                        if (!\is_int($v)) {
-                                            throw new InvalidConfigurationException('The "stop_worker_on_signals" option must be an array of pcntl signals in messenger configuration.');
-                                        }
-
-                                        return $v;
-                                    }, $signals);
-                                })
-                            ->end()
-                            ->scalarPrototype()->end()
-                        ->end()
-                        ->booleanNode('reject_redelivered_messages')
-                            ->defaultTrue()
-                            ->info('Whether redeliveries should be rejected and retried through a new message instead of being handled directly. This mostly makes sense for AMQP, which redelivers messages that were neither acknowledged nor rejected. Disabling it avoids losing a message when the retry or the failure transport is unreachable, at the risk of a redelivery loop that blocks the queue.')
-                        ->end()
-                        ->scalarNode('default_bus')->defaultNull()->end()
-                        ->arrayNode('buses', 'bus')
-                            ->defaultValue(['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]])
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('name')
-                            ->arrayPrototype()
-                                ->addDefaultsIfNotSet()
-                                ->children()
-                                    ->arrayNode('default_middleware')
-                                        ->beforeNormalization()
-                                            ->ifString()
-                                            ->then(static fn ($v) => [
-                                                'enabled' => 'allow_no_handlers' === $v,
-                                                'allow_no_handlers' => 'allow_no_handlers' === $v,
-                                            ])
-                                        ->end()
-                                        ->beforeNormalization()->ifTrue()->then(static fn () => ['enabled' => true])->end()
-                                        ->beforeNormalization()->ifFalse()->then(static fn () => ['enabled' => false])->end()
-                                        ->canBeDisabled()
-                                        ->children()
-                                            ->booleanNode('allow_no_handlers')->defaultFalse()->end()
-                                            ->booleanNode('allow_no_senders')->defaultTrue()->end()
-                                        ->end()
-                                    ->end()
-                                    ->arrayNode('middleware')
-                                        ->performNoDeepMerging()
-                                        ->acceptAndWrap(['string'])
-                                        ->beforeNormalization()
-                                            ->ifArray()
-                                            ->then(static fn ($v) => \is_string(key($v)) ? [$v] : $v)
-                                        ->end()
-                                        ->defaultValue([])
-                                        ->arrayPrototype()
-                                            ->acceptAndWrap(['string'], 'id')
-                                            ->beforeNormalization()
-                                                ->ifArray()
-                                                ->then(static function ($middleware): array {
-                                                    if (isset($middleware['id'])) {
-                                                        return $middleware;
-                                                    }
-                                                    if (1 < \count($middleware)) {
-                                                        throw new \InvalidArgumentException('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, '.json_encode($middleware).' given.');
-                                                    }
-
-                                                    return [
-                                                        'id' => key($middleware),
-                                                        'arguments' => current($middleware),
-                                                    ];
-                                                })
-                                            ->end()
-                                            ->children()
-                                                ->scalarNode('id')->isRequired()->cannotBeEmpty()->end()
-                                                ->arrayNode('arguments', 'argument')
-                                                    ->normalizeKeys(false)
-                                                    ->defaultValue([])
-                                                    ->prototype('variable')
-                                                ->end()
-                                            ->end()
-                                        ->end()
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('messenger')
+                    ->aliasOf('messenger')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike([])
                 ->end()
             ->end()
         ;

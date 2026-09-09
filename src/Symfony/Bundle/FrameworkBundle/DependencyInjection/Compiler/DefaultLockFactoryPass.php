@@ -25,9 +25,8 @@ class DefaultLockFactoryPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $hasDefaultFactory = $container->hasAlias('lock.factory');
-
         if ($container->hasParameter('.rate_limiter.lock_factories')) {
+            $hasDefaultFactory = $container->hasAlias('lock.factory');
             $lockFactories = $container->getParameter('.rate_limiter.lock_factories');
             $container->getParameterBag()->remove('.rate_limiter.lock_factories');
 
@@ -38,22 +37,6 @@ class DefaultLockFactoryPass implements CompilerPassInterface
                     throw new LogicException(\sprintf('%s requires the Lock component to be configured.', $requiredBy));
                 }
             }
-        }
-
-        if ($hasDefaultFactory || !$container->hasDefinition('messenger.middleware.deduplicate_middleware')) {
-            return;
-        }
-
-        $container->removeDefinition('messenger.middleware.deduplicate_middleware');
-        $container->removeDefinition('messenger.failure.release_deduplication_lock_on_failure_listener');
-
-        foreach ($container->findTaggedServiceIds('messenger.bus') as $busId => $tags) {
-            if (!$container->hasParameter($busMiddleware = $busId.'.middleware')) {
-                continue;
-            }
-
-            $middleware = array_filter($container->getParameter($busMiddleware), static fn ($item) => 'deduplicate_middleware' !== $item['id']);
-            $container->setParameter($busMiddleware, array_values($middleware));
         }
     }
 }

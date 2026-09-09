@@ -19,7 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 class DefaultLockFactoryPassTest extends TestCase
@@ -61,29 +60,6 @@ class DefaultLockFactoryPassTest extends TestCase
         new DefaultLockFactoryPass()->process($container);
     }
 
-    public function testTheDeduplicateMiddlewareIsKeptWhenTheDefaultFactoryIsRegistered()
-    {
-        $container = $this->createContainer(true);
-        $this->registerBus($container);
-
-        new DefaultLockFactoryPass()->process($container);
-
-        $this->assertTrue($container->hasDefinition('messenger.middleware.deduplicate_middleware'));
-        $this->assertSame([['id' => 'send_message'], ['id' => 'deduplicate_middleware']], $container->getParameter('messenger.bus.default.middleware'));
-    }
-
-    public function testTheDeduplicateMiddlewareIsRemovedWhenNoDefaultFactoryIsRegistered()
-    {
-        $container = $this->createContainer(false);
-        $this->registerBus($container);
-
-        new DefaultLockFactoryPass()->process($container);
-
-        $this->assertFalse($container->hasDefinition('messenger.middleware.deduplicate_middleware'));
-        $this->assertFalse($container->hasDefinition('messenger.failure.release_deduplication_lock_on_failure_listener'));
-        $this->assertSame([['id' => 'send_message']], $container->getParameter('messenger.bus.default.middleware'));
-    }
-
     private function createContainer(bool $withDefaultFactory): ContainerBuilder
     {
         $container = new ContainerBuilder();
@@ -95,13 +71,5 @@ class DefaultLockFactoryPassTest extends TestCase
         }
 
         return $container;
-    }
-
-    private function registerBus(ContainerBuilder $container): void
-    {
-        $container->register('messenger.middleware.deduplicate_middleware', DeduplicateMiddleware::class);
-        $container->register('messenger.failure.release_deduplication_lock_on_failure_listener', \stdClass::class);
-        $container->register('messenger.bus.default', \stdClass::class)->addTag('messenger.bus');
-        $container->setParameter('messenger.bus.default.middleware', [['id' => 'send_message'], ['id' => 'deduplicate_middleware']]);
     }
 }

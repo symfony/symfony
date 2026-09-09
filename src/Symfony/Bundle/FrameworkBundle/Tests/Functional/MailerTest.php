@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FullStack;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\SentMessage;
@@ -78,17 +77,11 @@ class MailerTest extends AbstractWebTestCase
         $client->request('GET', '/send_email');
 
         $this->assertEmailCount(2);
-        $firstSent = 0;
-        $secondSent = 1;
-        if (!class_exists(FullStack::class)) {
-            $this->assertQueuedEmailCount(2);
-            $firstSent = 1;
-            $secondSent = 3;
-            $this->assertEmailIsQueued($this->getMailerEvent(0));
-            $this->assertEmailIsQueued($this->getMailerEvent(2));
-        }
-        $this->assertEmailIsNotQueued($this->getMailerEvent($firstSent));
-        $this->assertEmailIsNotQueued($this->getMailerEvent($secondSent));
+        $this->assertQueuedEmailCount(2);
+        $this->assertEmailIsQueued($this->getMailerEvent(0));
+        $this->assertEmailIsQueued($this->getMailerEvent(2));
+        $this->assertEmailIsNotQueued($this->getMailerEvent(1));
+        $this->assertEmailIsNotQueued($this->getMailerEvent(3));
 
         // queued and sent emails are reported by two events but by a single message
         $email = $this->getMailerMessage(0);

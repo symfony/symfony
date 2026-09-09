@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-09T19:45:44Z
+
+Thank you for the patch and for the analysis behind it, both were right.
+
+What I added on top while reviewing:
+
+ * two more requests in the same threat model. `OidcJwks::fetchKeys()`, used by `OidcSignatureVerifier`, and the JWKS the OAuth2 authorization server metadata announces in `Oauth2TokenHandler`. Those matter more than the token endpoint: the keys an ID token is verified against came from wherever the redirect pointed, so a token signed by the redirect target verified. Probed against a local TLS provider whose `jwks_uri` answers a 307 to a plain-http origin: before, `fetchKeys()` returned `[{"kty":"oct","kid":"ATTACKER-KEY","use":"sig",...}]`; now it raises `The OIDC provider JWKS could not be fetched: "HTTP/1.1 307 Temporary Redirect returned for ..."`.
+ * a test for each, plus one detail worth knowing here: an assertion made inside a `MockHttpClient` response factory is swallowed by these classes, which turn every `\Exception` into an `AuthenticationException` or a `BadCredentialsException`. The new tests capture the options and assert after the call instead.
+
+The same flaw reaches further back in the access-token handlers, so it is fixed on the branches that carry them: #65952 on 6.4 for `OidcUserInfoTokenHandler`, #65953 on 7.4 for the `OidcTokenHandler` JWKS fetch, the OAuth2 introspection request and the CAS ticket validation.
+
+Two probes stated the case end to end on this branch. Against a TLS token endpoint answering a 307 to a plain-http origin, `exchangeCode()` used to POST `code`, `code_verifier`, `redirect_uri`, `client_id` and `client_secret` there in clear, and returned the attacker's payload as the token response. Both `CurlHttpClient` and `NativeHttpClient` behave the same way, and neither strips the body across origins.
+
+The two red CI jobs are pre-existing on the base commit, with the same six components on low-deps and the same 128 `form.type_extension.form.html_sanitizer` errors on the 8.1 leg of high-deps.

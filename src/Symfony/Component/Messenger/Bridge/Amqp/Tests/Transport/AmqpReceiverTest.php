@@ -50,6 +50,32 @@ class AmqpReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
 
+    public function testItConsumesWhenAPrefetchCountIsSet()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['queueName', 'otherQueueName']);
+        $connection->method('getPrefetchCount')->willReturn(20);
+        $connection->expects($this->never())->method('get');
+        $connection->expects($this->once())->method('consume')
+            ->with(['queueName', 'otherQueueName'], 3)
+            ->willReturn([
+                ['queueName', $this->createAMQPEnvelope()],
+                ['otherQueueName', $this->createAMQPEnvelope()],
+            ]);
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        $envelopes = iterator_to_array($receiver->get(3));
+
+        $this->assertCount(2, $envelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $envelopes[0]->getMessage());
+        $this->assertSame('queueName', $envelopes[0]->last(AmqpReceivedStamp::class)->getQueueName());
+        $this->assertSame('otherQueueName', $envelopes[1]->last(AmqpReceivedStamp::class)->getQueueName());
+    }
+
     public function testGetAcceptsFetchSize()
     {
         $serializer = new Serializer(

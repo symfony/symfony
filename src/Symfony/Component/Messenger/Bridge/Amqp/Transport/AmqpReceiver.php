@@ -54,6 +54,13 @@ class AmqpReceiver implements QueueReceiverInterface, KeepaliveReceiverInterface
     public function getFromQueues(array $queueNames/* , int $fetchSize = 1 */): iterable
     {
         $fetchSize = \func_num_args() > 1 ? max(1, func_get_arg(1)) : 1;
+
+        if (0 < $this->connection->getPrefetchCount()) {
+            yield from $this->consumeFromQueues($queueNames, $fetchSize);
+
+            return;
+        }
+
         $remaining = $fetchSize;
         $activeQueues = array_values($queueNames);
         $firstRound = true;
@@ -83,6 +90,27 @@ class AmqpReceiver implements QueueReceiverInterface, KeepaliveReceiverInterface
         }
     }
 
+    private function consumeFromQueues(array $queueNames, int $fetchSize): iterable
+    {
+        try {
+            $messages = $this->connection->consume($queueNames, $fetchSize);
+        } catch (\AMQPConnectionException) {
+            // reconnect once, as getEnvelope() does
+            try {
+                $this->connection->clear();
+                $messages = $this->connection->consume($queueNames, $fetchSize);
+            } catch (\AMQPException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
+            }
+        } catch (\AMQPException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        foreach ($messages as [$queueName, $amqpEnvelope]) {
+            yield $this->createEnvelope($queueName, $amqpEnvelope);
+        }
+    }
+
     private function getEnvelope(string $queueName): ?Envelope
     {
         try {
@@ -105,6 +133,11 @@ class AmqpReceiver implements QueueReceiverInterface, KeepaliveReceiverInterface
             return null;
         }
 
+        return $this->createEnvelope($queueName, $amqpEnvelope);
+    }
+
+    private function createEnvelope(string $queueName, \AMQPEnvelope $amqpEnvelope): Envelope
+    {
         $body = $amqpEnvelope->getBody();
         $id = $amqpEnvelope->getMessageId();
         $stamps = [

@@ -80,7 +80,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
 
         $clientMock = $this->createMock(HttpClientInterface::class);
         $clientMock->expects($this->once())
-            ->method('request')->with('GET', '', ['auth_bearer' => $accessToken])
+            ->method('request')->with('GET', '', ['auth_bearer' => $accessToken, 'max_redirects' => 0])
             ->willReturn($responseMock);
 
         $userBadge = (new OidcUserInfoTokenHandler($clientMock, null, $claim))->getUserBadgeFrom($accessToken);
@@ -110,7 +110,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
 
         $clientMock = $this->createMock(HttpClientInterface::class);
         $clientMock->expects($this->once())
-            ->method('request')->with('GET', '', ['auth_bearer' => 'a-secret-token'])
+            ->method('request')->with('GET', '', ['auth_bearer' => 'a-secret-token', 'max_redirects' => 0])
             ->willReturn($responseMock);
 
         $loggerMock = $this->createMock(LoggerInterface::class);

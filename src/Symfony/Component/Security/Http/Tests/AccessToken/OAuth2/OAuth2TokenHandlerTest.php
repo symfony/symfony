@@ -189,6 +189,26 @@ class OAuth2TokenHandlerTest extends TestCase
         yield 'anything else' => ['maybe', null];
     }
 
+    public function testIntrospectionDoesNotFollowRedirects()
+    {
+        // the options are asserted after the call: the handler turns every exception the
+        // response factory raises into a BadCredentialsException, a failed assertion included
+        $requestOptions = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$requestOptions) {
+            $requestOptions = $options;
+
+            return new MockResponse('', ['http_code' => 307, 'response_headers' => ['location' => 'https://other.example.com/introspect']]);
+        });
+
+        try {
+            (new Oauth2TokenHandler($client))->getUserBadgeFrom('a-secret-token');
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException) {
+        }
+
+        $this->assertSame(0, $requestOptions['max_redirects'] ?? null);
+    }
+
     #[DataProvider('unusableTokens')]
     public function testRejectsATokenTheServerReportsAsUnusable(array $claims, string $message)
     {

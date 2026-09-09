@@ -836,6 +836,48 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame(1, $httpClient->getRequestsCount());
     }
 
+    public function testJwksDoesNotFollowRedirects()
+    {
+        // the options are asserted after the call: the handler turns every exception the
+        // response factory raises into a BadCredentialsException, a failed assertion included
+        $jwksOptions = [];
+        $httpClient = new MockHttpClient(static function (string $method, string $url, array $options) use (&$jwksOptions) {
+            if (str_ends_with($url, '/.well-known/openid-configuration')) {
+                return new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']);
+            }
+
+            $jwksOptions = $options;
+
+            return new MockResponse('', ['http_code' => 301, 'response_headers' => ['location' => 'https://other.example.com/jwks.json']]);
+        });
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com'],
+            'sub',
+            null,
+            new Clock(),
+            0,
+            true,
+        );
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_redirected_jwks');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->never())->method('expiresAfter');
+
+        try {
+            $handler->computeDiscoveryKeys($item);
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException) {
+        }
+
+        $this->assertSame(0, $jwksOptions['max_redirects'] ?? null);
+        $this->assertSame(2, $httpClient->getRequestsCount());
+    }
+
     public function testDiscoveryRejectsJwksUriDowngradedToHttp()
     {
         $httpClient = new MockHttpClient([

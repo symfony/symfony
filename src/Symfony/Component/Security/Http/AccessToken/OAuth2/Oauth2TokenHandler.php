@@ -297,6 +297,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
                 'token' => $accessToken,
                 'token_type_hint' => 'access_token',
             ],
+            'max_redirects' => 0,
         ]);
         $contentType = strtolower(trim(strtok($response->getHeaders()['content-type'][0] ?? '', ';')));
 

@@ -226,7 +226,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
                 // the configuration was cached, so only the announcement is enforced here
                 $jwksUri = self::checkDiscoveredEndpoint($discovery->getConfiguration()['jwks_uri'] ?? null, 'jwks_uri', null);
 
-                $jwkSetResponses[] = $this->discoveryClients[$i]->request('GET', $jwksUri);
+                $jwkSetResponses[] = $this->discoveryClients[$i]->request('GET', $jwksUri, ['max_redirects' => 0]);
             }
 
             foreach ($jwkSetResponses as $response) {

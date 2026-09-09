@@ -90,10 +90,7 @@ use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
 use Symfony\Component\VarExporter\Internal\Registry;
-use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
-use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
-use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
-use Symfony\Component\Workflow\WorkflowEvents;
+use Symfony\Component\Workflow\WorkflowBundle;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(ApcuAdapter::class);
@@ -113,6 +110,7 @@ class_exists(Registry::class);
  */
 #[RequiredBundle(ServicesBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
 class FrameworkBundle extends Bundle
 {
     public function boot(): void
@@ -156,7 +154,6 @@ class FrameworkBundle extends Bundle
             array_merge(
                 KernelEvents::ALIASES,
                 class_exists(FormEvents::class) ? FormEvents::ALIASES : [],
-                class_exists(WorkflowEvents::class) ? WorkflowEvents::ALIASES : [],
             ),
             [
                 KernelEvents::REQUEST,
@@ -201,8 +198,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new CachePoolPrunerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, FormPass::class);
-        $this->addCompilerPassIfExists($container, WorkflowGuardListenerPass::class);
-        $this->addCompilerPassIfExists($container, WorkflowValidatorPass::class);
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
@@ -233,7 +228,6 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
-            $this->addCompilerPassIfExists($container, WorkflowDebugPass::class);
         }
     }
 

@@ -1,0 +1,18 @@
+services:
+    test_workflow:
+        alias: workflow.article
+        public: true
+framework:
+    workflows:
+        article:
+            type: workflow
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
+            initial_marking: [draft]
+            places:
+                - draft
+                - published
+            transitions:
+                publish:
+                    from: [draft]
+                    to: [published]

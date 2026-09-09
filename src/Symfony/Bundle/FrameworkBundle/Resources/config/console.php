@@ -62,7 +62,6 @@ use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
 use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
 use Symfony\Component\Validator\Command\DebugCommand as ValidatorDebugCommand;
-use Symfony\Component\Workflow\Command\WorkflowDumpCommand;
 use Symfony\Component\Yaml\Schema\FileHeaderSchemaResolver;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
@@ -316,13 +315,6 @@ return static function (ContainerConfigurator $container) {
                 [], // Enabled locales
             ])
             ->tag('console.command', ['command' => 'translation:push'])
-
-        ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
-            ->args([
-                tagged_locator('workflow', 'name'),
-                service('event_dispatcher')->nullOnInvalid(),
-            ])
-            ->tag('console.command')
 
         ->set('console.command.xliff_lint', XliffLintCommand::class)
             ->tag('console.command')

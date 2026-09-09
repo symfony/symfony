@@ -94,6 +94,9 @@ FrameworkBundle
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
  * BrowserKit assertions are no longer verbose by default. Failed response assertions no longer include the response body unless `setBrowserKitAssertionsAsVerbose(true)` is called or `verbose: true` is passed to the assertion.
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use the `esi` or `inline` fragment renderer, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
+ * `WorkflowBundle` is registered automatically when the Workflow component is installed, and its services are then
+   registered without any configuration; set `workflow.enabled` to `false` to disable them. The `framework.workflows`
+   configuration is an alias of the `workflow` configuration provided by the bundle
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

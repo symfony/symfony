@@ -105,9 +105,6 @@ use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\Lock\PersistingStoreInterface;
-use Symfony\Component\Lock\Serializer\LockKeyNormalizer;
-use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Mailer\Bridge as MailerBridge;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
 use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
@@ -449,10 +446,6 @@ class FrameworkExtension extends Extension
             $this->registerJsonStreamerConfiguration($config['json_streamer'], $container, $loader);
         }
 
-        if ($this->readConfigEnabled('lock', $container, $config['lock'])) {
-            $this->registerLockConfiguration($config['lock'], $container, $loader);
-        }
-
         if ($this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter'])) {
             if (!interface_exists(LimiterInterface::class)) {
                 throw new LogicException('Rate limiter support cannot be enabled as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
@@ -518,9 +511,9 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.scheduler_debug');
         }
 
-        // messenger depends on validation, and lock being registered
+        // messenger depends on validation
         if ($messengerEnabled) {
-            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $this->readConfigEnabled('validation', $container, $config['validation']), $this->readConfigEnabled('lock', $container, $config['lock']) && ($config['lock']['resources']['default'] ?? false));
+            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $this->readConfigEnabled('validation', $container, $config['validation']));
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
             $container->removeDefinition('console.command.messenger_stats');
@@ -1937,71 +1930,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerLockConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        $loader->load('lock.php');
-
-        // BC layer Lock < 7.4
-        if (!interface_exists(DenormalizerInterface::class) || !class_exists(LockKeyNormalizer::class)) {
-            $container->removeDefinition('serializer.normalizer.lock_key');
-        }
-
-        foreach ($config['resources'] as $resourceName => $resourceStores) {
-            if (!$resourceStores) {
-                continue;
-            }
-
-            // Generate stores
-            $storeDefinitions = [];
-            foreach ($resourceStores as $resourceStore) {
-                if (\in_array($resourceStore, ['flock', 'semaphore'], true)) {
-                    $storeDefinitionId = \sprintf('.lock.%s.store', $resourceStore);
-                    $storeDefinitions[] = new Reference($storeDefinitionId);
-                    $container->getDefinition($storeDefinitionId)->addTag('lock.store');
-                    continue;
-                }
-                $usedEnvs = [];
-                $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
-                $advisory = false;
-                if (\is_array($resourceStore)) {
-                    $advisory = $resourceStore['advisory'];
-                    $resourceStore = new Reference($resourceStore['service_id']);
-                } elseif (!$usedEnvs && !str_contains($resourceStore, ':') && !\in_array($resourceStore, ['flock', 'semaphore', 'in-memory', 'null'], true)) {
-                    $resourceStore = new Reference($resourceStore);
-                }
-                $storeDefinition = new Definition(PersistingStoreInterface::class);
-                $storeDefinition
-                    ->setFactory([StoreFactory::class, 'createStore'])
-                    ->setArguments($advisory ? [$resourceStore, true] : [$resourceStore])
-                    ->addTag('lock.store');
-
-                $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
-
-                $storeDefinitions[] = new Reference($storeDefinitionId);
-            }
-
-            // Wrap array of stores with CombinedStore
-            if (\count($storeDefinitions) > 1) {
-                $combinedDefinition = new ChildDefinition('lock.store.combined.abstract');
-                $combinedDefinition->replaceArgument(0, $storeDefinitions);
-                $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($resourceStores), $combinedDefinition);
-            }
-
-            // Generate factories for each resource
-            $factoryDefinition = new ChildDefinition('lock.factory.abstract');
-            $factoryDefinition->replaceArgument(0, new Reference($storeDefinitionId));
-            $container->setDefinition('lock.'.$resourceName.'.factory', $factoryDefinition);
-
-            // provide alias for default resource
-            if ('default' === $resourceName) {
-                $container->setAlias('lock.factory', new Alias('lock.'.$resourceName.'.factory', false));
-                $container->setAlias(LockFactory::class, new Alias('lock.factory', false));
-            } else {
-                $container->registerAliasForArgument('lock.'.$resourceName.'.factory', LockFactory::class, $resourceName.'.lock.factory', $resourceName);
-            }
-        }
-    }
-
     private function registerSchedulerConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(SchedulerTransportFactory::class)) {
@@ -2015,7 +1943,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $validationEnabled, bool $lockEnabled): void
+    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $validationEnabled): void
     {
         if (!interface_exists(MessageBusInterface::class)) {
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
@@ -2085,7 +2013,8 @@ class FrameworkExtension extends Extension
             ],
         ];
 
-        if ($lockEnabled && class_exists(LockFactory::class)) {
+        // DefaultLockFactoryPass drops the middleware again when no default lock factory is registered
+        if (class_exists(LockFactory::class)) {
             $defaultMiddleware['before'][] = ['id' => 'deduplicate_middleware'];
         } else {
             $container->removeDefinition('messenger.middleware.deduplicate_middleware');
@@ -3269,6 +3198,7 @@ class FrameworkExtension extends Extension
 
         $limiters = [];
         $compoundLimiters = [];
+        $lockFactories = [];
 
         foreach ($config['limiters'] as $name => $limiterConfig) {
             if ('compound' === $limiterConfig['policy']) {
@@ -3288,19 +3218,17 @@ class FrameworkExtension extends Extension
                 ->addTag('rate_limiter', ['name' => $name]);
 
             if ('auto' === $limiterConfig['lock_factory']) {
-                $limiterConfig['lock_factory'] = $container->hasAlias('lock.factory') ? 'lock.factory' : null;
-            }
-
-            if (null !== $limiterConfig['lock_factory']) {
+                $lockFactories[$limiterId] = [2, null];
+            } elseif (null !== $limiterConfig['lock_factory']) {
                 if (!interface_exists(LockInterface::class)) {
                     throw new LogicException(\sprintf('Rate limiter "%s" requires the Lock component to be installed. Try running "composer require symfony/lock".', $name));
                 }
 
-                if (!$this->isInitializedConfigEnabled('lock')) {
-                    throw new LogicException(\sprintf('Rate limiter "%s" requires the Lock component to be configured.', $name));
+                if ('lock.factory' === $limiterConfig['lock_factory']) {
+                    $lockFactories[$limiterId] = [2, \sprintf('Rate limiter "%s"', $name)];
+                } else {
+                    $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
                 }
-
-                $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
             }
             unset($limiterConfig['lock_factory']);
 
@@ -3346,10 +3274,6 @@ class FrameworkExtension extends Extension
         if (class_exists(RateLimiterBuilder::class)) {
             $builderConfig = $config['builder'];
 
-            if ('auto' === $builderConfig['lock_factory']) {
-                $builderConfig['lock_factory'] = interface_exists(LockInterface::class) && $container->hasAlias('lock.factory') ? 'lock.factory' : null;
-            }
-
             $builder = $container->getDefinition('limiter_builder');
 
             if (null === $storageId = $builderConfig['storage_service']) {
@@ -3358,21 +3282,29 @@ class FrameworkExtension extends Extension
 
             $builder->replaceArgument(0, new Reference($storageId));
 
-            if ($builderConfig['lock_factory']) {
+            if ('auto' === $builderConfig['lock_factory']) {
+                if (interface_exists(LockInterface::class)) {
+                    $lockFactories['limiter_builder'] = [1, null];
+                }
+            } elseif ($builderConfig['lock_factory']) {
                 if (!interface_exists(LockInterface::class)) {
                     throw new LogicException('Rate Limiter Builder requires the Lock component to be installed. Try running "composer require symfony/lock".');
                 }
 
-                if (!$this->isInitializedConfigEnabled('lock')) {
-                    throw new LogicException('Rate Limiter Builder requires the Lock component to be configured.');
+                if ('lock.factory' === $builderConfig['lock_factory']) {
+                    $lockFactories['limiter_builder'] = [1, 'Rate Limiter Builder'];
+                } else {
+                    $builder->replaceArgument(1, new Reference($builderConfig['lock_factory']));
                 }
-
-                $builder->replaceArgument(1, new Reference($builderConfig['lock_factory']));
             }
 
             $container->setAlias(RateLimiterBuilder::class, 'limiter_builder');
         } else {
             $container->removeDefinition('limiter_builder');
+        }
+
+        if ($lockFactories) {
+            $container->setParameter('.rate_limiter.lock_factories', $lockFactories);
         }
     }
 

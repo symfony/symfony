@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorSecu
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CheckJsonStreamerTypeInfoPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultLockFactoryPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FindCommandBundlesPass;
@@ -70,6 +71,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
 use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
+use Symfony\Component\Lock\LockBundle;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Mime\MimeBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
@@ -122,6 +124,7 @@ class_exists(Registry::class);
 #[RequiredBundle(ServicesBundle::class)]
 #[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebLinkBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(LockBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(SemaphoreBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WorkflowBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(RemoteEventBundle::class, ignoreOnInvalid: true)]
@@ -216,6 +219,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, FormPass::class);
         $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
+        $container->addCompilerPass(new DefaultLockFactoryPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);

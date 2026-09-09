@@ -12,11 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Psr\Log\LogLevel;
-use Seld\JsonLint\JsonParser;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -24,8 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
 
@@ -149,7 +145,7 @@ class Configuration implements ConfigurationInterface
         $this->addAssetMapperSection($rootNode);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone);
-        $this->addSerializerSection($rootNode, $enableIfStandalone);
+        $this->addSerializerSection($rootNode);
         $this->addPropertyAccessSection($rootNode);
         $this->addTypeInfoSection($rootNode);
         $this->addPropertyInfoSection($rootNode);
@@ -518,6 +514,19 @@ class Configuration implements ConfigurationInterface
     /**
      * @param-immediately-invoked-callable $enableIfStandalone
      */
+    private function addSerializerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->variableNode('serializer')
+                    ->aliasOf('serializer')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addRouterSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
@@ -744,74 +753,6 @@ class Configuration implements ConfigurationInterface
     /**
      * @param-immediately-invoked-callable $enableIfStandalone
      */
-    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
-    {
-        $defaultContextNode = fn () => (new NodeBuilder())
-            ->arrayNode('default_context')
-                ->useAttributeAsKey('key')
-                ->normalizeKeys(false)
-                ->validate()
-                    ->ifTrue(fn () => $this->debug && class_exists(JsonParser::class))
-                    ->then(static fn (array $v) => $v + [JsonDecode::DETAILED_ERROR_MESSAGES => true])
-                ->end()
-                ->defaultValue([])
-                ->prototype('variable')->end()
-        ;
-
-        $rootNode
-            ->children()
-                ->arrayNode('serializer')
-                    ->info('Serializer configuration')
-                    ->{$enableIfStandalone('symfony/serializer', Serializer::class)}()
-                    ->children()
-                        ->booleanNode('enable_attributes')->{class_exists(FullStack::class) ? 'defaultFalse' : 'defaultTrue'}()->end()
-                        ->scalarNode('name_converter')->end()
-                        ->scalarNode('circular_reference_handler')->end()
-                        ->scalarNode('max_depth_handler')->end()
-                        ->arrayNode('mapping')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->arrayNode('paths', 'path')
-                                    ->prototype('scalar')->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->append($defaultContextNode())
-                        ->arrayNode('named_serializers', 'named_serializer')
-                            ->useAttributeAsKey('name')
-                            ->arrayPrototype()
-                                ->children()
-                                    ->scalarNode('name_converter')->end()
-                                    ->append($defaultContextNode())
-                                    ->booleanNode('include_built_in_normalizers')
-                                        ->info('Whether to include the built-in normalizers')
-                                        ->defaultTrue()
-                                    ->end()
-                                    ->booleanNode('include_built_in_encoders')
-                                        ->info('Whether to include the built-in encoders')
-                                        ->defaultTrue()
-                                    ->end()
-                                ->end()
-                            ->end()
-                            ->validate()
-                                ->ifTrue(static fn ($v) => isset($v['default']))
-                                ->thenInvalid('"default" is a reserved name.')
-                            ->end()
-                        ->end()
-                    ->end()
-                    ->validate()
-                        ->ifTrue(fn ($v) => $this->debug && class_exists(JsonParser::class) && !isset($v['default_context'][JsonDecode::DETAILED_ERROR_MESSAGES]))
-                        ->then(static function ($v) {
-                            $v['default_context'][JsonDecode::DETAILED_ERROR_MESSAGES] = true;
-
-                            return $v;
-                        })
-                    ->end()
-                ->end()
-            ->end()
-        ;
-    }
-
     private function addPropertyAccessSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode

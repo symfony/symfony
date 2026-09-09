@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Serializer\SerializerBundle;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
 use Symfony\Component\Yaml\Yaml;
 
@@ -175,14 +176,13 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
 
-        (new JsonSchemaConfigDumpPass($schemaFile, [FrameworkBundle::class => ['all' => true]]))->process($container);
+        (new JsonSchemaConfigDumpPass($schemaFile, [SerializerBundle::class => ['all' => true]]))->process($container);
 
         // A list here would configure a context entry named "0" instead of "enable_max_depth".
         $config = Yaml::parse(<<<YAML
-            framework:
-                serializer:
-                    default_context:
-                        - enable_max_depth
+            serializer:
+                default_context:
+                    - enable_max_depth
             YAML);
 
         $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));

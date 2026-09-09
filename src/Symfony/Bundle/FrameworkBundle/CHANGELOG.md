@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `framework.serializer` an alias of the `serializer` configuration provided by `SerializerBundle`
+ * Register `SerializerBundle` automatically when the Serializer component is installed
  * Make `framework.router` an alias of the `router` configuration provided by `RouterBundle`
  * Register `RouterBundle` automatically
  * Make `framework.assets` an alias of the `asset` configuration provided by `AssetBundle`

@@ -62,20 +62,10 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
-use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Serializer\Attribute as SerializerMapping;
-use Symfony\Component\Serializer\Attribute\ExtendsSerializationFor;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
-use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -97,7 +87,6 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CallbackInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
@@ -128,9 +117,10 @@ class FrameworkExtension extends Extension
             throw new \LogicException('Requiring the "symfony/symfony" package is unsupported; replace it with standalone components instead.');
         }
 
-        if (!ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/form'])) {
-            $container->setParameter('validator.translation_domain', 'validators');
-        }
+        // registerValidationConfiguration() overrides this with the configured domain; the default has
+        // to exist either way, because services such as argument_resolver.request_payload reference it
+        // whether or not validation is enabled
+        $container->setParameter('validator.translation_domain', 'validators');
 
         $loader->load('web.php');
         $loader->load('services.php');
@@ -281,24 +271,6 @@ class FrameworkExtension extends Extension
             ->setArgument(4, $loggers)
         ;
 
-        if ($this->readConfigEnabled('serializer', $container, $config['serializer'])) {
-            if (!class_exists(Serializer::class)) {
-                throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
-            }
-
-            $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
-        } else {
-            $container->getDefinition('argument_resolver.request_payload')
-                ->setArguments([])
-                ->addError('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
-                    .(class_exists(Serializer::class) ? 'enabled. Try setting "framework.serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".')
-                )
-                ->addTag('container.error')
-                ->clearTag('kernel.event_subscriber');
-
-            $container->removeDefinition('console.command.serializer_debug');
-        }
-
         if ($this->readConfigEnabled('session', $container, $config['session'])) {
             if (!\extension_loaded('session')) {
                 throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
@@ -364,14 +336,6 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(LocaleAwareInterface::class)
             ->addTag('kernel.locale_aware');
-        $container->registerForAutoconfiguration(EncoderInterface::class)
-            ->addTag('serializer.encoder');
-        $container->registerForAutoconfiguration(DecoderInterface::class)
-            ->addTag('serializer.encoder');
-        $container->registerForAutoconfiguration(NormalizerInterface::class)
-            ->addTag('serializer.normalizer');
-        $container->registerForAutoconfiguration(DenormalizerInterface::class)
-            ->addTag('serializer.normalizer');
         $container->registerForAutoconfiguration(ConstraintValidatorInterface::class)
             ->addTag('validator.constraint_validator');
         $container->registerForAutoconfiguration(GroupProviderInterface::class)
@@ -558,10 +522,6 @@ class FrameworkExtension extends Extension
             $loader->load('translation_debug.php');
 
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
-        }
-
-        if ($this->isInitializedConfigEnabled('serializer')) {
-            $loader->load('serializer_debug.php');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
@@ -1164,124 +1124,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSerializerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        $loader->load('serializer.php');
-
-        $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
-
-        if (!class_exists(Yaml::class)) {
-            $container->removeDefinition('serializer.encoder.yaml');
-        }
-
-        if (!class_exists(Headers::class)) {
-            $container->removeDefinition('serializer.normalizer.mime_message');
-        }
-
-        if ($container->getParameter('kernel.debug')) {
-            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
-        }
-
-        if (!$this->readConfigEnabled('translator', $container, $config)) {
-            $container->removeDefinition('serializer.normalizer.translatable');
-        }
-
-        $serializerLoaders = [];
-
-        // When attributes are disabled, it means from runtime-discovery only; autoconfiguration should still happen.
-        // And when runtime-discovery of attributes is enabled, we can skip compile-time autoconfiguration in debug mode.
-        if (!($config['enable_attributes'] ?? false) || !$container->getParameter('kernel.debug')) {
-            // The $reflector argument hints at where the attribute could be used
-            $configurator = static function (ChildDefinition $definition, object $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflector) {
-                $definition->addTag('serializer.attribute_metadata');
-            };
-            $container->registerAttributeForAutoconfiguration(SerializerMapping\Context::class, $configurator);
-            $container->registerAttributeForAutoconfiguration(SerializerMapping\Groups::class, $configurator);
-
-            $configurator = static function (ChildDefinition $definition, object $attribute, \ReflectionMethod|\ReflectionProperty $reflector) {
-                $definition->addTag('serializer.attribute_metadata');
-            };
-            $container->registerAttributeForAutoconfiguration(SerializerMapping\Ignore::class, $configurator);
-            $container->registerAttributeForAutoconfiguration(SerializerMapping\MaxDepth::class, $configurator);
-            $container->registerAttributeForAutoconfiguration(SerializerMapping\SerializedName::class, $configurator);
-            $container->registerAttributeForAutoconfiguration(SerializerMapping\SerializedPath::class, $configurator);
-
-            $container->registerAttributeForAutoconfiguration(SerializerMapping\DiscriminatorMap::class, static function (ChildDefinition $definition) {
-                $definition->addTag('serializer.attribute_metadata');
-            });
-        }
-
-        $container->registerAttributeForAutoconfiguration(SerializerMapping\DiscriminatorMapType::class, static function (ChildDefinition $definition, SerializerMapping\DiscriminatorMapType $attribute) {
-            $definition->addTag('serializer.attribute_metadata', ['for' => $attribute->class, 'type' => $attribute->type, 'discriminator_map_type' => true]);
-        });
-
-        $serializerLoaders[] = new Reference('serializer.mapping.attribute_loader');
-
-        $container->getDefinition('serializer.mapping.attribute_loader')
-            ->replaceArgument(0, $config['enable_attributes'] ?? false);
-
-        $fileRecorder = static function ($extension, $path) use (&$serializerLoaders) {
-            $definition = new Definition(\in_array($extension, ['yaml', 'yml'], true) ? YamlFileLoader::class : XmlFileLoader::class, [$path]);
-            $serializerLoaders[] = $definition;
-        };
-
-        foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
-            $configDir = is_dir($bundle['path'].'/Resources/config') ? $bundle['path'].'/Resources/config' : $bundle['path'].'/config';
-
-            if ($container->fileExists($file = $configDir.'/serialization.xml', false)) {
-                $fileRecorder('xml', $file);
-            }
-
-            if (
-                $container->fileExists($file = $configDir.'/serialization.yaml', false)
-                || $container->fileExists($file = $configDir.'/serialization.yml', false)
-            ) {
-                $fileRecorder('yml', $file);
-            }
-
-            if ($container->fileExists($dir = $configDir.'/serialization', '/^$/')) {
-                $this->registerMappingFilesFromDir($dir, $fileRecorder);
-            }
-        }
-
-        $projectDir = $container->getParameter('kernel.project_dir');
-        if ($container->fileExists($dir = $projectDir.'/config/serializer', '/^$/')) {
-            $this->registerMappingFilesFromDir($dir, $fileRecorder);
-        }
-
-        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
-
-        $chainLoader->replaceArgument(0, $serializerLoaders);
-        $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
-
-        if ($config['name_converter'] ?? false) {
-            $container->setParameter('.serializer.name_converter', $config['name_converter']);
-            $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument(1, new Reference($config['name_converter']));
-        }
-
-        $defaultContext = $config['default_context'] ?? [];
-
-        if ($defaultContext) {
-            $container->setParameter('serializer.default_context', $defaultContext);
-        }
-
-        if ($config['circular_reference_handler'] ?? false) {
-            $container->setParameter('.serializer.circular_reference_handler', $config['circular_reference_handler']);
-        }
-
-        if ($config['max_depth_handler'] ?? false) {
-            $container->setParameter('.serializer.max_depth_handler', $config['max_depth_handler']);
-        }
-
-        $container->getDefinition('serializer.normalizer.property')->setArgument(5, $defaultContext);
-
-        $container->setParameter('.serializer.named_serializers', $config['named_serializers'] ?? []);
-
-        $container->registerAttributeForAutoconfiguration(ExtendsSerializationFor::class, static function (ChildDefinition $definition, ExtendsSerializationFor $attribute) {
-            $definition->addTag('serializer.attribute_metadata', ['for' => $attribute->class])
-                ->addTag('container.excluded', ['source' => 'because it\'s a serializer metadata extension']);
-        });
-    }
 
     protected function isConfigEnabled(ContainerBuilder $container, array $config): bool
     {

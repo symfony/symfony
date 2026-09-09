@@ -215,7 +215,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('property_info.list_extractor', ['priority' => -999])
 
         // ErrorRenderer integration
-        ->alias('error_renderer', 'error_renderer.serializer')
         ->alias('error_renderer.serializer', 'error_handler.error_renderer.serializer')
 
         ->set('error_handler.error_renderer.serializer', SerializerErrorRenderer::class)

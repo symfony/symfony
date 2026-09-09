@@ -172,6 +172,12 @@ FrameworkBundle
    in debug mode and dropped when the profiler is disabled, the message logger listener is dropped when neither the
    profiler nor the test client collects the sent messages, and the notifier email channel is dropped when the mailer
    is missing
+ * `SerializerBundle` is registered automatically when the Serializer component is installed, and its services are
+   then registered without any configuration; set `serializer.enabled` to `false` to disable them. The
+   `framework.serializer` configuration is an alias of the `serializer` configuration provided by the bundle. The
+   traceable serializer and its data collector are registered in debug mode and dropped when the profiler is
+   disabled, the cache pool is dropped when no `cache.system` pool is registered, and the translatable normalizer
+   when no translator is
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
@@ -337,6 +343,8 @@ SecurityBundle
 Serializer
 ----------
 
+ * `SerializerBundle` provides the `serializer` configuration and the services `FrameworkBundle` used to provide
+   under `framework.serializer`
  * Deprecate denormalizing an array that is not a list into a `list`-typed property, in version 9.0 a `Symfony\Component\Serializer\Exception\NotNormalizableValueException` will be thrown when the input does not satisfy `array_is_list()`
  * Denormalize the elements of a union-typed collection, e.g. `array<Foo|Bar>`, instead of returning the raw data. An element that matches no member of the union, or a key whose type does not match, now throws instead of being returned as-is
 

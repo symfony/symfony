@@ -83,7 +83,7 @@ use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProviders
 use Symfony\Component\Routing\DependencyInjection\RoutingControllerPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Runtime\SymfonyRuntime;
-use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
+use Symfony\Component\Scheduler\SchedulerBundle;
 use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass as SerializerAttributeMetadataPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
@@ -133,6 +133,7 @@ class_exists(Registry::class);
 #[RequiredBundle(TypeInfoBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(PropertyAccessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(UidBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(SchedulerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
@@ -222,7 +223,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $this->addCompilerPassIfExists($container, AddScheduleMessengerPass::class);
         // must run before CachePoolPass, which wires the pools this pass can still remove
         $container->addCompilerPass(new DefaultMessageBusPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 33);
         $this->addCompilerPassIfExists($container, HttpClientPass::class);

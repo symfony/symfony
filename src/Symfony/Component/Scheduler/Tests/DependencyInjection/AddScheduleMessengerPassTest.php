@@ -17,6 +17,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
 use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 
@@ -255,6 +256,58 @@ class AddScheduleMessengerPassTest extends TestCase
         (new AddScheduleMessengerPass())->process($container);
 
         $this->assertTrue($container->hasDefinition('scheduler.provider.default'));
+    }
+
+    public function testSchedulerServicesAreDroppedWhenMessengerIsMissing()
+    {
+        $container = new ContainerBuilder();
+        $container->register('scheduler.messenger_transport_factory');
+        $container->register('scheduler.event_listener');
+        $container->register('console.command.scheduler_debug');
+        $container->register('cache.scheduler');
+
+        (new AddScheduleMessengerPass())->process($container);
+
+        $this->assertFalse($container->hasDefinition('scheduler.messenger_transport_factory'));
+        $this->assertFalse($container->hasDefinition('scheduler.event_listener'));
+        $this->assertFalse($container->hasDefinition('console.command.scheduler_debug'));
+        $this->assertFalse($container->hasDefinition('cache.scheduler'));
+    }
+
+    public function testTheCachePoolIsDroppedWithoutAnApplicationPool()
+    {
+        $container = new ContainerBuilder();
+        $container->register('scheduler.messenger_transport_factory');
+        $container->register('messenger.transport_factory');
+        $container->register('cache.scheduler');
+
+        (new AddScheduleMessengerPass())->process($container);
+
+        $this->assertFalse($container->hasDefinition('cache.scheduler'));
+
+        $container = new ContainerBuilder();
+        $container->register('scheduler.messenger_transport_factory');
+        $container->register('messenger.transport_factory');
+        $container->register('cache.app');
+        $container->register('cache.scheduler');
+
+        (new AddScheduleMessengerPass())->process($container);
+
+        $this->assertTrue($container->hasDefinition('cache.scheduler'));
+    }
+
+    public function testMissingMessengerIsReportedWhenATaskIsDeclared()
+    {
+        $container = new ContainerBuilder();
+        $container->register('scheduler.messenger_transport_factory');
+        $container->register(SchedulableCommand::class, SchedulableCommand::class)
+            ->addTag('console.command')
+            ->addTag('scheduler.task', ['trigger' => 'every', 'frequency' => '1 hour']);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Scheduler support cannot be enabled as the Messenger component is not enabled.');
+
+        (new AddScheduleMessengerPass())->process($container);
     }
 
     public static function processSchedulerTaskCommandProvider(): iterable

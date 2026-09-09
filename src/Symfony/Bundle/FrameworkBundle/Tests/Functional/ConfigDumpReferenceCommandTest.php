@@ -29,6 +29,7 @@ use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\Process\ProcessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
+use Symfony\Component\Scheduler\SchedulerBundle;
 use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\TypeInfo\TypeInfoBundle;
 use Symfony\Component\Uid\UidBundle;
@@ -157,7 +158,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $bundles = ['DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'ServicesBundle', 'CacheBundle', 'ConsoleBundle'];
 
         // registered through #[RequiredBundle(..., ignoreOnInvalid: true)], so absent when the component is not installed
-        foreach (['web_link' => WebLinkBundle::class, 'lock' => LockBundle::class, 'messenger' => MessengerBundle::class, 'semaphore' => SemaphoreBundle::class, 'workflow' => WorkflowBundle::class, 'remote_event' => RemoteEventBundle::class, 'html_sanitizer' => HtmlSanitizerBundle::class, 'type_info' => TypeInfoBundle::class, 'property_access' => PropertyAccessBundle::class, 'uid' => UidBundle::class, 'process' => ProcessBundle::class, 'json_path' => JsonPathBundle::class, 'mime' => MimeBundle::class, 'object_mapper' => ObjectMapperBundle::class] as $alias => $class) {
+        foreach (['web_link' => WebLinkBundle::class, 'lock' => LockBundle::class, 'messenger' => MessengerBundle::class, 'semaphore' => SemaphoreBundle::class, 'workflow' => WorkflowBundle::class, 'remote_event' => RemoteEventBundle::class, 'html_sanitizer' => HtmlSanitizerBundle::class, 'type_info' => TypeInfoBundle::class, 'property_access' => PropertyAccessBundle::class, 'uid' => UidBundle::class, 'scheduler' => SchedulerBundle::class, 'process' => ProcessBundle::class, 'json_path' => JsonPathBundle::class, 'mime' => MimeBundle::class, 'object_mapper' => ObjectMapperBundle::class] as $alias => $class) {
             if (class_exists($class)) {
                 $aliases[] = $alias;
                 $bundles[] = substr($class, 1 + strrpos($class, '\\'));

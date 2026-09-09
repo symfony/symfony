@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Scheduler\Command\DebugCommand as SchedulerDebugCommand;
 use Symfony\Component\Scheduler\EventListener\DispatchSchedulerEventListener;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Scheduler\Messenger\Serializer\Normalizer\SchedulerTriggerNormalizer;
@@ -43,5 +44,16 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
         ->set('serializer.normalizer.scheduler_trigger', SchedulerTriggerNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
+
+        ->set('console.command.scheduler_debug', SchedulerDebugCommand::class)
+            ->args([
+                tagged_locator('scheduler.schedule_provider', 'name'),
+            ])
+            ->tag('console.command')
+
+        ->set('cache.scheduler')
+            ->parent('cache.app')
+            ->private()
+            ->tag('cache.pool')
     ;
 };

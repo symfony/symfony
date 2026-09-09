@@ -91,6 +91,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessBundle;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventHandler;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
+use Symfony\Component\Scheduler\SchedulerBundle;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Semaphore\Store\StoreFactory as SemaphoreStoreFactory;
@@ -2926,6 +2927,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->registerExtension($cacheBundle->getContainerExtension());
         $container->registerExtension(new LockBundle()->getContainerExtension());
         $container->registerExtension(new MessengerBundle()->getContainerExtension());
+        $container->registerExtension(new SchedulerBundle()->getContainerExtension());
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;

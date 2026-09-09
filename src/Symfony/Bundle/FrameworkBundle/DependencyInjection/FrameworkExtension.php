@@ -131,10 +131,6 @@ use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Scheduler\Attribute\AsCronTask;
-use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
-use Symfony\Component\Scheduler\Attribute\AsSchedule;
-use Symfony\Component\Scheduler\Messenger\SchedulerTransportFactory;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -463,13 +459,6 @@ class FrameworkExtension extends Extension
         // validation depends on form, annotations being registered
         $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
 
-        // DefaultMessageBusPass reports the failure when the scheduler has no message bus to run on
-        if ($this->readConfigEnabled('scheduler', $container, $config['scheduler'])) {
-            $this->registerSchedulerConfiguration($container, $loader);
-        } else {
-            $container->removeDefinition('console.command.scheduler_debug');
-        }
-
         // notifier depends on mailer being registered
         if ($this->readConfigEnabled('notifier', $container, $config['notifier'])) {
             $this->registerNotifierConfiguration($config['notifier'], $container, $loader, $this->readConfigEnabled('webhook', $container, $config['webhook']));
@@ -580,29 +569,6 @@ class FrameworkExtension extends Extension
         $container->registerAttributeForAutoconfiguration(AsTargetedConsoleValueResolver::class, static function (ChildDefinition $definition, AsTargetedConsoleValueResolver $attribute): void {
             $definition->addTag('console.targeted_value_resolver', $attribute->name ? ['name' => $attribute->name] : []);
         });
-        $container->registerAttributeForAutoconfiguration(AsSchedule::class, static function (ChildDefinition $definition, AsSchedule $attribute): void {
-            $definition->addTag('scheduler.schedule_provider', ['name' => $attribute->name]);
-        });
-        foreach ([AsPeriodicTask::class, AsCronTask::class] as $taskAttributeClass) {
-            $container->registerAttributeForAutoconfiguration(
-                $taskAttributeClass,
-                static function (ChildDefinition $definition, AsPeriodicTask|AsCronTask $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
-                    $tagAttributes = get_object_vars($attribute) + [
-                        'trigger' => match (true) {
-                            $attribute instanceof AsPeriodicTask => 'every',
-                            $attribute instanceof AsCronTask => 'cron',
-                        },
-                    ];
-                    if ($reflector instanceof \ReflectionMethod) {
-                        if (isset($tagAttributes['method'])) {
-                            throw new LogicException(\sprintf('"%s" attribute cannot declare a method on "%s::%s()".', $attribute::class, $reflector->class, $reflector->name));
-                        }
-                        $tagAttributes['method'] = $reflector->getName();
-                    }
-                    $definition->addTag('scheduler.task', $tagAttributes);
-                }
-            );
-        }
 
         $container->registerForAutoconfiguration(Constraint::class)
             ->addTag('container.excluded', ['source' => 'because it\'s a validation constraint']);
@@ -1837,19 +1803,6 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('property_info.cache');
-        }
-    }
-
-    private function registerSchedulerConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
-    {
-        if (!class_exists(SchedulerTransportFactory::class)) {
-            throw new LogicException('Scheduler support cannot be enabled as the Scheduler component is not installed. Try running "composer require symfony/scheduler".');
-        }
-
-        $loader->load('scheduler.php');
-
-        if (!$this->hasConsole()) {
-            $container->removeDefinition('console.command.scheduler_debug');
         }
     }
 

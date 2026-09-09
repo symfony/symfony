@@ -18,8 +18,10 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -30,10 +32,36 @@ use Symfony\Component\Scheduler\Schedule;
  */
 class AddScheduleMessengerPass implements CompilerPassInterface
 {
+    private const MESSENGER_DEPENDENT_SERVICES = [
+        'scheduler.messenger.service_call_message_handler',
+        'scheduler.messenger_transport_factory',
+        'scheduler.event_listener',
+        'serializer.normalizer.scheduler_trigger',
+        'console.command.scheduler_debug',
+        'cache.scheduler',
+    ];
+
     public function process(ContainerBuilder $container): void
     {
+        if ($container->hasDefinition('scheduler.messenger_transport_factory') && !$container->hasDefinition('messenger.transport_factory')) {
+            if ($container->findTaggedServiceIds('scheduler.task') || $container->findTaggedServiceIds('scheduler.schedule_provider')) {
+                throw new LogicException('Scheduler support cannot be enabled as the Messenger component is not '.(interface_exists(MessageBusInterface::class) ? 'enabled.' : 'installed. Try running "composer require symfony/messenger".'));
+            }
+
+            // the scheduler only provides Messenger transports, there is nothing to register without it
+            foreach (self::MESSENGER_DEPENDENT_SERVICES as $id) {
+                $container->removeDefinition($id);
+            }
+
+            return;
+        }
+
         if (!$container->has('event_dispatcher')) {
             $container->removeDefinition('scheduler.event_listener');
+        }
+
+        if (!$container->has('cache.app')) {
+            $container->removeDefinition('cache.scheduler');
         }
 
         $receivers = [];

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `SchedulerBundle`, which provides the `scheduler` configuration and the services previously provided by `FrameworkBundle` under `framework.scheduler`
  * Add a "Next Run In" column to `debug:scheduler` showing the time until the next run
  * Add `env` option to `#[AsCronTask]` and `#[AsPeriodicTask]` to restrict a task to one or more environments
  * Deprecate `Schedule::with()`, use `add()` on a new `Schedule` instead

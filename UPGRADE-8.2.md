@@ -150,6 +150,10 @@ FrameworkBundle
    configuration is an alias of the `webhook` configuration provided by the bundle. The transport reports an error
    when the configured HTTP client is missing, the controller when the configured message bus is, and the payload is
    serialized with `json_encode()` when the Serializer component is not enabled
+ * `HttpClientBundle` is registered automatically when the HttpClient component is installed, and its services are
+   then registered without any configuration; set `http_client.enabled` to `false` to disable them. The
+   `framework.http_client` configuration is an alias of the `http_client` configuration provided by the bundle. The
+   cache pool is dropped when no `cache.app` pool is registered, and the data collector when the profiler is disabled
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

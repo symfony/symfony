@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `HttpClientBundle` to provide the HTTP client services and the `http_client` configuration
  * Add the `extra.cache_policy` option to `CachingHttpClient` to tag cached responses and force their lifetime
  * Allow passing a stream or a closure to `HttpOptions::buffer()`
  * Add `QUERY` to the list of cacheable HTTP methods in `CachingHttpClient`

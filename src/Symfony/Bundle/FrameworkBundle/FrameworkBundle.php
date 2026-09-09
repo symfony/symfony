@@ -23,6 +23,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FindCommandBundl
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSerializerPropertyAccessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
@@ -54,7 +55,7 @@ use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
-use Symfony\Component\HttpClient\DependencyInjection\HttpClientPass;
+use Symfony\Component\HttpClient\HttpClientBundle;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -138,6 +139,7 @@ class_exists(Registry::class);
 #[RequiredBundle(AssetMapperBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(RateLimiterBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(WebhookBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(HttpClientBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
@@ -222,12 +224,12 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
         $container->addCompilerPass(new RemoveUnusedValidatorPropertyInfoLoaderPass());
+        $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
         // must run before CachePoolPass, which wires the pools this pass can still remove
         $container->addCompilerPass(new DefaultMessageBusPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 33);
-        $this->addCompilerPassIfExists($container, HttpClientPass::class);
         $this->addCompilerPassIfExists($container, AddAutoMappingConfigurationPass::class);
         $container->addCompilerPass(new RegisterReverseContainerPass(true));
         $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);

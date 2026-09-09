@@ -727,6 +727,48 @@ final class ConnectionTest extends TestCase
         $connection->keepalive($id);
     }
 
+    public function testKeepaliveIsSkippedWhileAnotherCommandIsInFlight()
+    {
+        $id = '123456';
+
+        $tube = 'baz';
+
+        $connection = null;
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->never())->method('touch');
+        $client->expects($this->once())->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturnCallback(static function () use (&$connection, $id): void {
+            $connection->keepalive($id);
+        });
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        $connection->ack($id);
+    }
+
+    public function testKeepaliveAfterAFailedCommand()
+    {
+        $id = '123456';
+
+        $tube = 'baz';
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
+        $client->expects($this->once())->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException(new ServerException('baz error'));
+        $client->expects($this->once())->method('touch')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id));
+
+        $connection = new Connection(['tube_name' => $tube], $client);
+
+        try {
+            $connection->ack($id);
+            $this->fail(TransportException::class.' should have been thrown.');
+        } catch (TransportException) {
+        }
+
+        $connection->keepalive($id);
+    }
+
     public function testSendWithRoundedDelay()
     {
         $tube = 'xyz';

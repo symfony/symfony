@@ -47,6 +47,7 @@ class Connection
 
     private bool $usingTube = false;
     private bool $watchingTube = false;
+    private bool $busy = false;
 
     /**
      * Constructor.
@@ -208,6 +209,12 @@ class Connection
 
     public function keepalive(string $id): void
     {
+        // keepalive can be triggered by a signal while another command awaits its
+        // response; a touch sent now would cross replies with it on the shared socket
+        if ($this->busy) {
+            return;
+        }
+
         $jobId = new JobId($id);
 
         $this->withReconnect(function () use ($jobId) {
@@ -269,6 +276,8 @@ class Connection
      */
     private function withReconnect(callable $command, ?JobId $reservedJobId = null): mixed
     {
+        $this->busy = true;
+
         try {
             try {
                 return $command();
@@ -290,6 +299,8 @@ class Connection
             }
         } catch (Exception $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
+        } finally {
+            $this->busy = false;
         }
     }
 }

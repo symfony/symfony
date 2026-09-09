@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\JsonStreamer\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,7 +25,7 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
  *
  * @internal
  */
-class CheckJsonStreamerTypeInfoPass implements CompilerPassInterface
+class CheckTypeInfoPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

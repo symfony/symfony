@@ -17,9 +17,7 @@ use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader as ReadAttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Read\DateTimeTypePropertyMetadataLoader as ReadDateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader as WriteAttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Write\DateTimeTypePropertyMetadataLoader as WriteDateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Transformer\BcMathNumberValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateIntervalValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
@@ -63,12 +61,6 @@ return static function (ContainerConfigurator $container) {
                 service('.inner'),
                 service('type_info.type_context_factory'),
             ])
-        ->set('.json_streamer.write.property_metadata_loader.date_time', WriteDateTimeTypePropertyMetadataLoader::class)
-            ->decorate('json_streamer.write.property_metadata_loader')
-            ->args([
-                service('.inner'),
-            ])
-            ->deprecate('symfony/json-streamer', '8.1', 'The "%service_id%" is deprecated. Date times are handled as value objects.')
         ->set('.json_streamer.write.property_metadata_loader.attribute', WriteAttributePropertyMetadataLoader::class)
             ->decorate('json_streamer.write.property_metadata_loader')
             ->args([
@@ -87,12 +79,6 @@ return static function (ContainerConfigurator $container) {
                 service('.inner'),
                 service('type_info.type_context_factory'),
             ])
-        ->set('.json_streamer.read.property_metadata_loader.date_time', ReadDateTimeTypePropertyMetadataLoader::class)
-            ->decorate('json_streamer.read.property_metadata_loader')
-            ->args([
-                service('.inner'),
-            ])
-            ->deprecate('symfony/json-streamer', '8.1', 'The "%service_id%" is deprecated. Date times are handled as value objects.')
         ->set('.json_streamer.read.property_metadata_loader.attribute', ReadAttributePropertyMetadataLoader::class)
             ->decorate('json_streamer.read.property_metadata_loader')
             ->args([
@@ -103,11 +89,9 @@ return static function (ContainerConfigurator $container) {
 
         // transformers
         ->set('json_streamer.value_transformer.date_time_to_string', DateTimeToStringValueTransformer::class)
-            ->tag('json_streamer.value_transformer')
             ->deprecate('symfony/json-streamer', '8.1', 'The "%service_id%" is deprecated. Date times will be transformed thanks to "'.DateTimeValueObjectTransformer::class.'" instead.')
 
         ->set('json_streamer.value_transformer.string_to_date_time', StringToDateTimeValueTransformer::class)
-            ->tag('json_streamer.value_transformer')
             ->deprecate('symfony/json-streamer', '8.1', 'The "%service_id%" is deprecated. Date times will be transformed thanks to "'.DateTimeValueObjectTransformer::class.'" instead.')
 
         ->set('.json_streamer.value_object_transformer.date_time', DateTimeValueObjectTransformer::class)

@@ -75,6 +75,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
+use Symfony\Component\JsonStreamer\JsonStreamerBundle;
 use Symfony\Component\Lock\LockBundle;
 use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
@@ -2840,10 +2841,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('my-polyfill', $container->getDefinition('asset_mapper.importmap.renderer')->getArgument(3));
     }
 
-    public function testJsonStreamerEnabled()
+    public function testJsonStreamerConfigurationIsForwardedToJsonStreamerBundle()
     {
-        $container = $this->createContainerFromFile('json_streamer');
-        $this->assertTrue($container->has('json_streamer.stream_writer'));
+        $container = $this->createContainerFromFile('legacy_json_streamer');
+
+        $this->assertTrue($container->has('test_json_streamer_stream_writer'));
+        $this->assertSame(['include_null_properties' => true], $container->getParameter('.json_streamer.default_options'));
     }
 
     public function testSecretsDecryptionEnvVarWithDot()
@@ -2928,6 +2931,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->registerExtension(new LockBundle()->getContainerExtension());
         $container->registerExtension(new MessengerBundle()->getContainerExtension());
         $container->registerExtension(new SchedulerBundle()->getContainerExtension());
+        $container->registerExtension(new JsonStreamerBundle()->getContainerExtension());
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;

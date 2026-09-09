@@ -39,4 +39,16 @@ class StreamablePassTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $pass->process($container);
     }
+
+    public function testRemoveCacheWarmerWhenNothingIsStreamable()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('json_streamer.stream_writer');
+        $container->register('.json_streamer.cache_warmer.streamer')->setArguments([null]);
+
+        new StreamablePass()->process($container);
+
+        $this->assertFalse($container->hasDefinition('.json_streamer.cache_warmer.streamer'));
+    }
 }

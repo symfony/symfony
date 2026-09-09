@@ -15,12 +15,10 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CheckJsonStreamerTypeInfoPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultCachePoolsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultLockFactoryPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FindCommandBundlesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
@@ -68,8 +66,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterLocaleAwareServices
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\JsonPath\JsonPathBundle;
-use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
-use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
+use Symfony\Component\JsonStreamer\JsonStreamerBundle;
 use Symfony\Component\Lock\LockBundle;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Mime\MimeBundle;
@@ -134,6 +131,7 @@ class_exists(Registry::class);
 #[RequiredBundle(PropertyAccessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(UidBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(SchedulerBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(JsonStreamerBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ProcessBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
@@ -234,10 +232,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ErrorLoggerCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new VirtualRequestStackPass());
         $container->addCompilerPass(new TranslationUpdateCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->addCompilerPass(new CheckJsonStreamerTypeInfoPass());
-        $this->addCompilerPassIfExists($container, DeprecateJsonStreamerValueTransformerTagPass::class);
-        $this->addCompilerPassIfExists($container, StreamablePass::class);
-        $this->addCompilerPassIfExists($container, TransformerPass::class);
 
         if ($container->getParameter('kernel.debug')) {
             if ($container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {

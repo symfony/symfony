@@ -28,7 +28,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -181,7 +180,7 @@ class Configuration implements ConfigurationInterface
         $this->addHtmlSanitizerSection($rootNode);
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode);
-        $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
+        $this->addJsonStreamerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -2147,28 +2146,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addJsonStreamerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addJsonStreamerSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('json_streamer')
-                    ->info('JSON streamer configuration')
-                    ->{$enableIfStandalone('symfony/json-streamer', StreamWriterInterface::class)}()
-                    ->children()
-                        ->arrayNode('default_options')
-                            ->addDefaultsIfNotSet()
-                            ->ignoreExtraKeys(false)
-                            ->children()
-                                ->booleanNode('include_null_properties')
-                                    ->info('Encode the properties with null value')
-                                    ->defaultFalse()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('json_streamer')
+                    ->aliasOf('json_streamer')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

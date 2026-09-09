@@ -45,12 +45,12 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
-use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -96,19 +96,9 @@ use Symfony\Component\Scheduler\SchedulerBundle;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Semaphore\Store\StoreFactory as SemaphoreStoreFactory;
-use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
-use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
-use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
-use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Normalizer\FormErrorNormalizer;
-use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerBundle;
 use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -360,15 +350,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('.data_collector.command'));
     }
 
-    public function testProfilerCollectSerializerDataEnabled()
-    {
-        $container = $this->createContainerFromFile('profiler');
-
-        $this->assertTrue($container->hasDefinition('profiler'));
-        $this->assertTrue($container->hasDefinition('serializer.data_collector'));
-        $this->assertTrue($container->hasDefinition('debug.serializer'));
-    }
-
     public function testProfilerExclusions()
     {
         if (8 > (new \ReflectionMethod(ProfilerListener::class, '__construct'))->getNumberOfParameters()) {
@@ -454,6 +435,49 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->compile();
 
         $this->assertSame($container->getParameter('kernel.project_dir').'/config/routing.xml', $container->getParameter('router.resource'));
+    }
+
+    public function testRegisterSerializerExtractor()
+    {
+        $container = $this->createContainerFromFile('legacy_serializer', [], true, true, null, [new SerializerBundle()->getContainerExtension()]);
+
+        $serializerExtractorDefinition = $container->getDefinition('property_info.serializer_extractor');
+
+        $this->assertEquals('serializer.mapping.class_metadata_factory', $serializerExtractorDefinition->getArgument(0)->__toString());
+        $this->assertTrue($serializerExtractorDefinition->isPrivate());
+        $tag = $serializerExtractorDefinition->getTag('property_info.list_extractor');
+        $this->assertEquals(['priority' => -999], $tag[0]);
+    }
+
+    public function testSerializerMapping()
+    {
+        $container = $this->createContainerFromFile('serializer_mapping_without_attributes', ['kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle']]], true, true, null, [new SerializerBundle()->getContainerExtension()]);
+        $projectDir = $container->getParameter('kernel.project_dir');
+        $configDir = __DIR__.'/Fixtures/TestBundle/Resources/config';
+        $expectedLoaders = [
+            new Reference('serializer.mapping.attribute_loader'),
+            new Definition(XmlFileLoader::class, [$configDir.'/serialization.xml']),
+            new Definition(YamlFileLoader::class, [$configDir.'/serialization.yml']),
+            new Definition(YamlFileLoader::class, [$projectDir.'/config/serializer/foo.yml']),
+            new Definition(XmlFileLoader::class, [$configDir.'/serializer_mapping/files/foo.xml']),
+            new Definition(YamlFileLoader::class, [$configDir.'/serializer_mapping/files/foo.yml']),
+            new Definition(YamlFileLoader::class, [$configDir.'/serializer_mapping/serialization.yml']),
+            new Definition(YamlFileLoader::class, [$configDir.'/serializer_mapping/serialization.yaml']),
+        ];
+
+        foreach ($expectedLoaders as $loader) {
+            if ($loader instanceof Definition && is_file($arg = $loader->getArgument(0))) {
+                $loader->replaceArgument(0, strtr($arg, '/', \DIRECTORY_SEPARATOR));
+            }
+        }
+
+        $loaders = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
+        foreach ($loaders as $loader) {
+            if ($loader instanceof Definition && is_file($arg = $loader->getArgument(0))) {
+                $loader->replaceArgument(0, strtr($arg, '/', \DIRECTORY_SEPARATOR));
+            }
+        }
+        $this->assertEquals($expectedLoaders, $loaders);
     }
 
     public function testAssetsConfigurationIsForwardedToAssetBundle()
@@ -1141,248 +1165,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->has('debug.stopwatch'));
     }
 
-    public function testSerializerDisabled()
-    {
-        $container = $this->createContainerFromFile('default_config');
-        $this->assertSame(!class_exists(FullStack::class) && class_exists(Serializer::class), $container->has('serializer'));
-    }
-
-    public function testSerializerEnabled()
-    {
-        $container = $this->createContainerFromFile('full');
-        $this->assertTrue($container->has('serializer'));
-
-        $argument = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
-
-        $this->assertCount(2, $argument);
-        $this->assertEquals(new Reference('serializer.mapping.attribute_loader'), $argument[0]);
-        $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.name_converter.metadata_aware')->getArgument(1));
-        $this->assertEquals(new Reference('property_info', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $container->getDefinition('serializer.normalizer.object')->getArgument(3));
-    }
-
-    public function testSerializerWithoutTranslator()
-    {
-        $container = $this->createContainerFromFile('serializer_without_translator');
-        $this->assertFalse($container->hasDefinition('serializer.normalizer.translatable'));
-    }
-
-    public function testSerializerDefaultParameters()
-    {
-        $container = $this->createContainerFromFile('serializer_enabled');
-        $this->assertFalse($container->hasParameter('.serializer.name_converter'));
-        $this->assertFalse($container->hasParameter('serializer.default_context'));
-        $this->assertTrue($container->hasParameter('.serializer.named_serializers'));
-        $this->assertSame([], $container->getParameter('.serializer.named_serializers'));
-    }
-
-    public function testSerializerParametersAreSet()
-    {
-        $container = $this->createContainerFromFile('full');
-        $this->assertTrue($container->hasParameter('.serializer.name_converter'));
-        $this->assertSame('serializer.name_converter.camel_case_to_snake_case', $container->getParameter('.serializer.name_converter'));
-        $this->assertTrue($container->hasParameter('serializer.default_context'));
-        $this->assertSame(['enable_max_depth' => true], $container->getParameter('serializer.default_context'));
-        $this->assertTrue($container->hasParameter('.serializer.named_serializers'));
-        $this->assertSame(['api' => ['include_built_in_normalizers' => true, 'include_built_in_encoders' => true, 'default_context' => ['enable_max_depth' => false]]], $container->getParameter('.serializer.named_serializers'));
-    }
-
-    public function testRegisterSerializerExtractor()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $serializerExtractorDefinition = $container->getDefinition('property_info.serializer_extractor');
-
-        $this->assertEquals('serializer.mapping.class_metadata_factory', $serializerExtractorDefinition->getArgument(0)->__toString());
-        $this->assertTrue($serializerExtractorDefinition->isPrivate());
-        $tag = $serializerExtractorDefinition->getTag('property_info.list_extractor');
-        $this->assertEquals(['priority' => -999], $tag[0]);
-    }
-
-    public function testDataUriNormalizerRegistered()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $definition = $container->getDefinition('serializer.normalizer.data_uri');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertEquals(DataUriNormalizer::class, $definition->getClass());
-        $this->assertEquals(-920, $tag[0]['priority']);
-    }
-
-    public function testDateIntervalNormalizerRegistered()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $definition = $container->getDefinition('serializer.normalizer.dateinterval');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertEquals(DateIntervalNormalizer::class, $definition->getClass());
-        $this->assertEquals(-915, $tag[0]['priority']);
-    }
-
-    public function testDateTimeNormalizerRegistered()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $definition = $container->getDefinition('serializer.normalizer.datetime');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertEquals(DateTimeNormalizer::class, $definition->getClass());
-        $this->assertEquals(-910, $tag[0]['priority']);
-    }
-
-    public function testFormErrorNormalizerRegistred()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $definition = $container->getDefinition('serializer.normalizer.form_error');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertEquals(FormErrorNormalizer::class, $definition->getClass());
-        $this->assertEquals(-915, $tag[0]['priority']);
-    }
-
-    public function testJsonSerializableNormalizerRegistered()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $definition = $container->getDefinition('serializer.normalizer.json_serializable');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertEquals(JsonSerializableNormalizer::class, $definition->getClass());
-        $this->assertEquals(-950, $tag[0]['priority']);
-    }
-
-    public function testObjectNormalizerRegistered()
-    {
-        $container = $this->createContainerFromFile('full', compile: false);
-        $container->addCompilerPass(new SerializerPass());
-        $container->addCompilerPass(new ResolveBindingsPass());
-        $container->compile();
-
-        $definition = $container->getDefinition('serializer.normalizer.object');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertEquals(ObjectNormalizer::class, $definition->getClass());
-        $this->assertEquals(-1000, $tag[0]['priority']);
-
-        $this->assertEquals([
-            'enable_max_depth' => true,
-            'circular_reference_handler' => new Reference('my.circular.reference.handler'),
-            'max_depth_handler' => new Reference('my.max.depth.handler'),
-        ], $definition->getArgument(6));
-    }
-
-    public function testConstraintViolationListNormalizerRegistered()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $definition = $container->getDefinition('serializer.normalizer.constraint_violation_list');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertEquals(ConstraintViolationListNormalizer::class, $definition->getClass());
-        $this->assertEquals(-915, $tag[0]['priority']);
-        $this->assertEquals(new Reference('serializer.name_converter.metadata_aware'), $definition->getArgument(1));
-    }
-
-    public function testTranslatableNormalizerRegistered()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $definition = $container->getDefinition('serializer.normalizer.translatable');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertSame(TranslatableNormalizer::class, $definition->getClass());
-        $this->assertSame(-920, $tag[0]['priority']);
-        $this->assertEquals(new Reference('translator'), $definition->getArgument('$translator'));
-    }
-
     /**
      * @see https://github.com/symfony/symfony/issues/54478
      */
-    public function testBackedEnumNormalizerRegistered()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $definition = $container->getDefinition('serializer.normalizer.backed_enum');
-        $tag = $definition->getTag('serializer.normalizer');
-
-        $this->assertSame(BackedEnumNormalizer::class, $definition->getClass());
-        $this->assertSame(-915, $tag[0]['priority']);
-    }
-
-    public function testSerializerCacheActivated()
-    {
-        $container = $this->createContainerFromFile('serializer_enabled');
-
-        $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-
-        $cache = $container->getDefinition('serializer.mapping.cache_class_metadata_factory')->getArgument(1);
-        $this->assertEquals(new Reference('serializer.mapping.cache.symfony'), $cache);
-    }
-
-    public function testSerializerCacheUsedWithoutAttributesAndMappingFiles()
-    {
-        $container = $this->createContainerFromFile('serializer_mapping_without_attributes', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
-        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-    }
-
-    public function testSerializerCacheUsedWithoutAttributesAndMappingFilesNoDebug()
-    {
-        $container = $this->createContainerFromFile('serializer_mapping_without_attributes', ['kernel.debug' => false, 'kernel.container_class' => __CLASS__]);
-        $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-    }
-
-    public function testSerializerCacheNotActivatedWithAttributes()
-    {
-        $container = $this->createContainerFromFile('serializer_mapping', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
-        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-    }
-
-    public function testSerializerMapping()
-    {
-        $container = $this->createContainerFromFile('serializer_mapping_without_attributes', ['kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle']]]);
-        $projectDir = $container->getParameter('kernel.project_dir');
-        $configDir = __DIR__.'/Fixtures/TestBundle/Resources/config';
-        $expectedLoaders = [
-            new Reference('serializer.mapping.attribute_loader'),
-            new Definition(XmlFileLoader::class, [$configDir.'/serialization.xml']),
-            new Definition(YamlFileLoader::class, [$configDir.'/serialization.yml']),
-            new Definition(YamlFileLoader::class, [$projectDir.'/config/serializer/foo.yml']),
-            new Definition(XmlFileLoader::class, [$configDir.'/serializer_mapping/files/foo.xml']),
-            new Definition(YamlFileLoader::class, [$configDir.'/serializer_mapping/files/foo.yml']),
-            new Definition(YamlFileLoader::class, [$configDir.'/serializer_mapping/serialization.yml']),
-            new Definition(YamlFileLoader::class, [$configDir.'/serializer_mapping/serialization.yaml']),
-        ];
-
-        foreach ($expectedLoaders as $loader) {
-            if ($loader instanceof Definition && is_file($arg = $loader->getArgument(0))) {
-                $loader->replaceArgument(0, strtr($arg, '/', \DIRECTORY_SEPARATOR));
-            }
-        }
-
-        $loaders = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
-        foreach ($loaders as $loader) {
-            if ($loader instanceof Definition && is_file($arg = $loader->getArgument(0))) {
-                $loader->replaceArgument(0, strtr($arg, '/', \DIRECTORY_SEPARATOR));
-            }
-        }
-        $this->assertEquals($expectedLoaders, $loaders);
-    }
-
-    public function testSerializerServiceIsRegisteredWhenEnabled()
-    {
-        $container = $this->createContainerFromFile('serializer_enabled');
-
-        $this->assertTrue($container->hasDefinition('serializer'));
-    }
-
-    public function testSerializerServiceIsNotRegisteredWhenDisabled()
-    {
-        $container = $this->createContainerFromFile('serializer_disabled');
-
-        $this->assertFalse($container->hasDefinition('serializer'));
-    }
 
     public function testPropertyInfoConfigurationIsForwardedToPropertyInfoBundle()
     {
@@ -1425,7 +1210,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public static function provideSectionCachePools(): iterable
     {
         yield ['full', 'cache.validator'];
-        yield ['full', 'cache.serializer'];
         yield ['full', 'cache.property_info'];
         yield ['section_cache_pools', 'cache.messenger.restart_workers_signal'];
         yield ['section_cache_pools', 'cache.scheduler'];
@@ -2322,14 +2106,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
         return $container;
     }
 
-    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, ?FrameworkExtension $extension = null): ContainerBuilder
+    /**
+     * @param list<ExtensionInterface> $extraExtensions extensions a forwarded configuration key needs
+     */
+    protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, ?FrameworkExtension $extension = null, array $extraExtensions = []): ContainerBuilder
     {
-        $cacheKey = md5(static::class.$file.serialize($data));
+        $cacheKey = md5(static::class.$file.serialize($data).serialize(array_map(get_class(...), $extraExtensions)));
         if ($compile && isset(self::$containerCache[$cacheKey])) {
             return self::$containerCache[$cacheKey];
         }
         $container = $this->createContainer($data);
         $container->registerExtension($extension ?: new FrameworkExtension());
+
+        foreach ($extraExtensions as $extraExtension) {
+            $container->registerExtension($extraExtension);
+        }
+
         $this->loadFromFile($container, $file);
 
         if ($resetCompilerPasses) {

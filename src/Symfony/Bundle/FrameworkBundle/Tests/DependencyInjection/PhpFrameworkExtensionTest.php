@@ -24,6 +24,7 @@ use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
+use Symfony\Component\Serializer\SerializerBundle;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
 
@@ -367,6 +368,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         }
 
         $container = $this->createContainerFromClosure(static function ($container) {
+            $container->registerExtension(new SerializerBundle()->getContainerExtension());
             $container->loadFromExtension('framework', [
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],
@@ -394,6 +396,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         }
 
         $container = $this->createContainerFromClosure(static function ($container) {
+            $container->registerExtension(new SerializerBundle()->getContainerExtension());
             $container->loadFromExtension('framework', [
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],

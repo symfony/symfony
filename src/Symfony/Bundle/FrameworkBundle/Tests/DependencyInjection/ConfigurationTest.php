@@ -20,7 +20,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
 
 class ConfigurationTest extends TestCase
 {
@@ -29,7 +28,6 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [[
             'secret' => 's3cr3t',
-            'serializer' => ['default_context' => ['foo' => 'bar']],
         ]]);
 
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
@@ -216,83 +214,6 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [[
-            'serializer' => [
-                'default_context' => [
-                    'foo' => 'bar',
-                ],
-            ],
-        ]]);
-
-        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
-    }
-
-    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabled()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [[
-            'serializer' => [
-                'default_context' => [
-                    'foo' => 'bar',
-                    JsonDecode::DETAILED_ERROR_MESSAGES => false,
-                ],
-            ],
-        ]]);
-
-        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false], $config['serializer']['default_context'] ?? []);
-    }
-
-    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabledWithSeveralConfigsBeingMerged()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [
-            [
-                'serializer' => [
-                    'default_context' => [
-                        'foo' => 'bar',
-                        JsonDecode::DETAILED_ERROR_MESSAGES => false,
-                    ],
-                ],
-            ],
-            [
-                'serializer' => [
-                    'default_context' => [
-                        'foobar' => 'baz',
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false, 'foobar' => 'baz'], $config['serializer']['default_context'] ?? []);
-    }
-
-    public function testSerializerJsonDetailedErrorMessagesEnabledByDefaultWithDebugEnabled()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [
-            [
-                'serializer' => null,
-            ],
-        ]);
-
-        $this->assertSame([JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
-    }
-
-    public function testSerializerJsonDetailedErrorMessagesNotSetByDefaultWithDebugDisabled()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(false), [
-            [
-                'serializer' => null,
-            ],
-        ]);
-
-        $this->assertSame([], $config['serializer']['default_context'] ?? []);
-    }
-
     public function testFormCsrfProtectionFieldAttrDoNotNormalizeKeys()
     {
         $processor = new Processor();
@@ -436,13 +357,6 @@ class ConfigurationTest extends TestCase
                 ],
                 'email_validation_mode' => 'html5',
             ],
-            'serializer' => [
-                'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
-                'enabled' => true,
-                'enable_attributes' => !class_exists(FullStack::class),
-                'mapping' => ['paths' => []],
-                'named_serializers' => [],
-            ],
             'session' => [
                 'enabled' => false,
                 'storage_factory_id' => 'session.storage.factory.native',
@@ -475,23 +389,6 @@ class ConfigurationTest extends TestCase
             ],
             'exceptions' => [],
         ];
-    }
-
-    public function testNamedSerializersReservedName()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "framework.serializer.named_serializers": "default" is a reserved name.');
-
-        $processor->processConfiguration($configuration, [[
-            'serializer' => [
-                'named_serializers' => [
-                    'default' => ['include_built_in_normalizers' => false],
-                ],
-            ],
-        ]]);
     }
 
     #[Group('legacy')]

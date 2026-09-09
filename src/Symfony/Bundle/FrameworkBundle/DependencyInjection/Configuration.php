@@ -32,7 +32,6 @@ use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Webhook\Controller\WebhookController;
 
 /**
  * FrameworkExtension configuration structure.
@@ -174,7 +173,7 @@ class Configuration implements ConfigurationInterface
         $this->addRateLimiterSection($rootNode);
         $this->addUidSection($rootNode);
         $this->addHtmlSanitizerSection($rootNode);
-        $this->addWebhookSection($rootNode, $enableIfStandalone);
+        $this->addWebhookSection($rootNode);
         $this->addRemoteEventSection($rootNode);
         $this->addJsonStreamerSection($rootNode);
 
@@ -1767,67 +1766,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addWebhookSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    private function addWebhookSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
-                ->arrayNode('webhook')
-                    ->info('Webhook configuration')
-                    ->{$enableIfStandalone('symfony/webhook', WebhookController::class)}()
-                    ->children()
-                        ->scalarNode('message_bus')->defaultValue('messenger.default_bus')->info('The message bus to use.')->end()
-                        ->scalarNode('http_client')->defaultValue('http_client')->info('The HTTP client to use to send webhooks.')->end()
-                        ->arrayNode('no_private_network')
-                            ->info('Refuse to send webhooks to URLs that resolve to a private network.')
-                            ->canBeEnabled()
-                            ->children()
-                                ->arrayNode('subnets')
-                                    ->info('Subnets in CIDR notation to consider private. Defaults to the standard private subnets.')
-                                    ->beforeNormalization()->ifString()->then(static fn ($v) => [$v])->end()
-                                    ->scalarPrototype()->end()
-                                    ->defaultNull()
-                                ->end()
-                                ->arrayNode('allow_list')
-                                    ->info('IPs or subnets in CIDR notation to send to even when they match the private subnets.')
-                                    ->beforeNormalization()->ifString()->then(static fn ($v) => [$v])->end()
-                                    ->scalarPrototype()->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->scalarNode('event_header_name')->defaultValue('Webhook-Event')->end()
-                        ->scalarNode('id_header_name')->defaultValue('Webhook-Id')->end()
-                        ->scalarNode('timestamp_header_name')->defaultValue('Webhook-Timestamp')->end()
-                        ->scalarNode('signature_header_name')->defaultValue('Webhook-Signature')->end()
-                        ->scalarNode('signing_algorithm')->defaultValue('sha256')->end()
-                        ->enumNode('signature_format')
-                            ->info('The signature scheme to emit and to require: "legacy" (default) for Symfony\'s historical "<algo>=<hex>" over the event name, the id and the body; "standard" for the Standard Webhooks "v1,<base64>" over the id, the timestamp and the body, which moves the event name from the "Webhook-Event" header to the payload\'s "type" key; "transitional" for both at once, during a migration.')
-                            ->values(['legacy', 'standard', 'transitional'])
-                            ->defaultValue('legacy')
-                        ->end()
-                        ->integerNode('timestamp_tolerance')
-                            ->info('How far, in seconds, an incoming Standard Webhooks timestamp may be from the current time before the request is rejected as a replay. Set to 0 to accept any timestamp. Legacy signatures carry no timestamp and are never bounded.')
-                            ->defaultValue(300)
-                            ->min(0)
-                        ->end()
-                        ->arrayNode('routing')
-                            ->normalizeKeys(false)
-                            ->useAttributeAsKey('type')
-                            ->prototype('array')
-                                ->children()
-                                ->scalarNode('service')
-                                    ->isRequired()
-                                    ->cannotBeEmpty()
-                                ->end()
-                                ->scalarNode('secret')
-                                    ->defaultValue('')
-                                    ->info('The secret used to verify incoming request signatures. It must be set in production: with an empty value, requests from any sender are accepted.')
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+                ->variableNode('webhook')
+                    ->aliasOf('webhook')
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

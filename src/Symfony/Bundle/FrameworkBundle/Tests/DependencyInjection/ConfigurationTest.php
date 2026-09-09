@@ -25,7 +25,6 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\Webhook\Controller\WebhookController;
 
 class ConfigurationTest extends TestCase
 {
@@ -776,24 +775,6 @@ class ConfigurationTest extends TestCase
                 'skip_response_headers' => [],
             ],
             'exceptions' => [],
-            'webhook' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(WebhookController::class),
-                'routing' => [],
-                'message_bus' => 'messenger.default_bus',
-                'http_client' => 'http_client',
-                'no_private_network' => [
-                    'enabled' => false,
-                    'subnets' => null,
-                    'allow_list' => [],
-                ],
-                'event_header_name' => 'Webhook-Event',
-                'id_header_name' => 'Webhook-Id',
-                'timestamp_header_name' => 'Webhook-Timestamp',
-                'signature_header_name' => 'Webhook-Signature',
-                'signing_algorithm' => 'sha256',
-                'signature_format' => 'legacy',
-                'timestamp_tolerance' => 300,
-            ],
         ];
     }
 

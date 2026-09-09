@@ -32,6 +32,8 @@ CHANGELOG
  * Register `AssetMapperBundle` automatically when the AssetMapper component is installed
  * Make `framework.rate_limiter` an alias of the `rate_limiter` configuration provided by `RateLimiterBundle`
  * Register `RateLimiterBundle` automatically when the RateLimiter component is installed
+ * Make `framework.webhook` an alias of the `webhook` configuration provided by `WebhookBundle`
+ * Register `WebhookBundle` automatically when the Webhook component is installed
  * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
  * Register `WorkflowBundle` automatically when the Workflow component is installed
  * Make `framework.remote_event` an alias of the `remote_event` configuration provided by `RemoteEventBundle`

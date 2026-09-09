@@ -63,8 +63,6 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -125,9 +123,8 @@ use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Webhook\Client\RequestParser;
-use Symfony\Component\Webhook\Controller\WebhookController;
-use Symfony\Component\Webhook\Server\SignatureFormat;
+use Symfony\Component\Webhook\DependencyInjection\RemoveMissingDependenciesPass as WebhookRemoveMissingDependenciesPass;
+use Symfony\Component\Webhook\WebhookBundle;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\WebLinkBundle;
 use Symfony\Component\Workflow\Workflow;
@@ -427,6 +424,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         yield 'underscored' => ['legacy_remote_event'];
         yield 'hyphenated' => ['legacy_hyphenated_remote_event'];
+    }
+
+    public function testWebhookConfigurationIsForwardedToWebhookBundle()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);
+        $container->registerExtension(new FrameworkExtension());
+        $this->loadFromFile($container, 'legacy_webhook');
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+
+        $this->assertSame('sha512', $container->getDefinition('webhook.signer')->getArgument(0));
     }
 
     public function testSemaphoreConfigurationIsForwardedToSemaphoreBundle()
@@ -2533,235 +2545,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(IpUtils::PRIVATE_SUBNETS, $container->getParameter('kernel.trusted_proxies'));
     }
 
-    public function testWebhook()
-    {
-        if (!class_exists(WebhookController::class)) {
-            $this->markTestSkipped('Webhook not available.');
-        }
-
-        $container = $this->createContainerFromFile('webhook');
-
-        $this->assertTrue($container->hasAlias(RequestParser::class));
-        $this->assertSame('webhook.request_parser', (string) $container->getAlias(RequestParser::class));
-        $this->assertSame(RequestParser::class, $container->getDefinition('webhook.request_parser')->getClass());
-
-        $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
-        $this->assertEquals('webhook.payload_serializer.serializer', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
-
-        $this->assertSame('Webhook-Event', $container->getDefinition('webhook.headers_configurator')->getArgument(0));
-        $this->assertSame('Webhook-Id', $container->getDefinition('webhook.headers_configurator')->getArgument(1));
-        $this->assertSame('Webhook-Timestamp', $container->getDefinition('webhook.headers_configurator')->getArgument(2));
-        $this->assertSame('sha256', $container->getDefinition('webhook.signer')->getArgument(0));
-        $this->assertSame('Webhook-Signature', $container->getDefinition('webhook.signer')->getArgument(1));
-
-        if (class_exists(SignatureFormat::class)) {
-            foreach (['webhook.headers_configurator' => 4, 'webhook.body_configurator.json' => 1, 'webhook.signer' => 2, 'webhook.request_parser' => 5] as $id => $index) {
-                $this->assertSame(SignatureFormat::Legacy, $container->getDefinition($id)->getArgument($index));
-            }
-        }
-    }
-
-    public function testWebhookRequestParserIsWiredWithTheConfiguredHeaderNames()
-    {
-        if (!class_exists(WebhookController::class)) {
-            $this->markTestSkipped('Webhook not available.');
-        }
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'http_client' => ['enabled' => true],
-                'webhook' => [
-                    'enabled' => true,
-                    'signing_algorithm' => 'sha512',
-                    'signature_header_name' => 'X-Signature',
-                    'event_header_name' => 'X-Event',
-                    'id_header_name' => 'X-Id',
-                ],
-            ]);
-        });
-
-        $arguments = $container->getDefinition('webhook.request_parser')->getArguments();
-        $this->assertSame(['sha512', 'X-Signature', 'X-Event', 'X-Id'], \array_slice($arguments, 0, 4));
-    }
-
-    public function testWebhookStandardWebhooksOptions()
-    {
-        if (!class_exists(SignatureFormat::class)) {
-            $this->markTestSkipped('The installed symfony/webhook has no signature format.');
-        }
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'http_client' => ['enabled' => true],
-                'webhook' => [
-                    'enabled' => true,
-                    'timestamp_header_name' => 'X-Timestamp',
-                    'signature_format' => 'transitional',
-                    'timestamp_tolerance' => 60,
-                ],
-            ]);
-        });
-
-        $arguments = $container->getDefinition('webhook.request_parser')->getArguments();
-        $this->assertEquals(new Reference('clock', ContainerInterface::NULL_ON_INVALID_REFERENCE), array_pop($arguments));
-        $this->assertSame(
-            ['sha256', 'Webhook-Signature', 'Webhook-Event', 'Webhook-Id', 'X-Timestamp', SignatureFormat::Transitional, 60],
-            $arguments
-        );
-
-        $this->assertSame('X-Timestamp', $container->getDefinition('webhook.headers_configurator')->getArgument(2));
-        $this->assertSame(SignatureFormat::Transitional, $container->getDefinition('webhook.headers_configurator')->getArgument(4));
-        $this->assertSame(SignatureFormat::Transitional, $container->getDefinition('webhook.body_configurator.json')->getArgument(1));
-        $this->assertSame(SignatureFormat::Transitional, $container->getDefinition('webhook.signer')->getArgument(2));
-        $this->assertSame('X-Timestamp', $container->getDefinition('webhook.signer')->getArgument(3));
-    }
-
-    public function testWebhookSignatureFormatNeedsANewEnoughComponent()
-    {
-        if (class_exists(SignatureFormat::class)) {
-            $this->markTestSkipped('The installed symfony/webhook supports every signature format.');
-        }
-
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Configuring "framework.webhook.signature_format" requires symfony/webhook 8.2 or higher.');
-
-        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'http_client' => ['enabled' => true],
-                'webhook' => ['enabled' => true, 'signature_format' => 'standard'],
-            ]);
-        });
-    }
-
-    public function testWebhookUsesTheDefaultHttpClient()
-    {
-        if (!class_exists(WebhookController::class)) {
-            $this->markTestSkipped('Webhook not available.');
-        }
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'http_client' => ['enabled' => true],
-                'webhook' => ['enabled' => true],
-            ]);
-        });
-
-        $this->assertFalse($container->hasDefinition('webhook.http_client'));
-        $this->assertEquals(new Reference('http_client'), $container->getDefinition('webhook.transport')->getArgument(0));
-    }
-
-    public function testWebhookUsesTheConfiguredHttpClient()
-    {
-        if (!class_exists(WebhookController::class)) {
-            $this->markTestSkipped('Webhook not available.');
-        }
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->register('my_http_client', MockHttpClient::class);
-            $container->loadFromExtension('framework', [
-                'http_client' => ['enabled' => true],
-                'webhook' => ['enabled' => true, 'http_client' => 'my_http_client'],
-            ]);
-        });
-
-        $this->assertFalse($container->hasDefinition('webhook.http_client'));
-        $this->assertEquals(new Reference('my_http_client'), $container->getDefinition('webhook.transport')->getArgument(0));
-    }
-
-    public function testWebhookNoPrivateNetwork()
-    {
-        if (!class_exists(NoPrivateNetworkHttpClient::class)) {
-            $this->markTestSkipped('The installed symfony/http-client has no NoPrivateNetworkHttpClient.');
-        }
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'http_client' => ['enabled' => true],
-                'webhook' => ['enabled' => true, 'no_private_network' => true],
-            ]);
-        });
-
-        $definition = $container->getDefinition('webhook.http_client');
-        $this->assertSame(NoPrivateNetworkHttpClient::class, $definition->getClass());
-        $this->assertEquals([new Reference('http_client'), null, []], $definition->getArguments());
-        $this->assertSame([['method' => 'reset']], $definition->getTag('kernel.reset'));
-
-        $this->assertEquals(new Reference('webhook.http_client'), $container->getDefinition('webhook.transport')->getArgument(0));
-    }
-
-    public function testWebhookNoPrivateNetworkWrapsTheConfiguredHttpClient()
-    {
-        if (!class_exists(NoPrivateNetworkHttpClient::class)) {
-            $this->markTestSkipped('The installed symfony/http-client has no NoPrivateNetworkHttpClient.');
-        }
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->register('my_http_client', MockHttpClient::class);
-            $container->loadFromExtension('framework', [
-                'http_client' => ['enabled' => true],
-                'webhook' => [
-                    'enabled' => true,
-                    'http_client' => 'my_http_client',
-                    'no_private_network' => [
-                        'subnets' => '10.0.0.0/8',
-                        'allow_list' => ['10.1.2.3', '10.2.0.0/16'],
-                    ],
-                ],
-            ]);
-        });
-
-        $definition = $container->getDefinition('webhook.http_client');
-        $this->assertEquals([new Reference('my_http_client'), ['10.0.0.0/8'], ['10.1.2.3', '10.2.0.0/16']], $definition->getArguments());
-
-        $this->assertEquals(new Reference('webhook.http_client'), $container->getDefinition('webhook.transport')->getArgument(0));
-        $this->assertFalse($container->hasDefinition('my_http_client.no_private_network'));
-    }
-
-    public function testWebhookNoPrivateNetworkLeavesTheGlobalHttpClientAlone()
-    {
-        if (!class_exists(NoPrivateNetworkHttpClient::class)) {
-            $this->markTestSkipped('The installed symfony/http-client has no NoPrivateNetworkHttpClient.');
-        }
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'http_client' => ['enabled' => true],
-                'webhook' => ['enabled' => true, 'no_private_network' => true],
-            ]);
-        });
-
-        $this->assertNull($container->getDefinition('webhook.http_client')->getDecoratedService());
-        $this->assertSame(HttpClientInterface::class, $container->getDefinition('http_client')->getClass());
-    }
-
-    public function testWebhookNoPrivateNetworkNeedsHttpClient()
-    {
-        if (class_exists(NoPrivateNetworkHttpClient::class)) {
-            $this->markTestSkipped('The installed symfony/http-client provides NoPrivateNetworkHttpClient.');
-        }
-
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Configuring "framework.webhook.no_private_network" requires the HttpClient component. Try running "composer require symfony/http-client".');
-
-        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', [
-                'webhook' => ['enabled' => true, 'no_private_network' => true],
-            ]);
-        });
-    }
-
-    public function testWebhookWithoutSerializer()
-    {
-        if (!class_exists(WebhookController::class)) {
-            $this->markTestSkipped('Webhook not available.');
-        }
-
-        $container = $this->createContainerFromFile('webhook_without_serializer');
-
-        $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
-        $this->assertEquals('webhook.payload_serializer.json', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
-    }
-
     public function testAssetMapperWithoutAssets()
     {
         $container = $this->createContainerFromFile('asset_mapper_without_assets');
@@ -2917,6 +2700,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->registerExtension(new PropertyInfoBundle()->getContainerExtension());
         $container->registerExtension(new AssetMapperBundle()->getContainerExtension());
         $container->registerExtension(new RateLimiterBundle()->getContainerExtension());
+        $container->registerExtension(new WebhookBundle()->getContainerExtension());
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass(['cache']));
 
         return $container;
@@ -2937,7 +2721,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2959,6 +2743,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->addCompilerPass(new DefaultMessageBusPass());
         $container->addCompilerPass(new RemoveMissingDependenciesPass());
         $container->addCompilerPass(new AssetMapperRemoveMissingDependenciesPass());
+        $container->addCompilerPass(new WebhookRemoveMissingDependenciesPass());
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

@@ -60,7 +60,6 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -132,7 +131,6 @@ use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
-use Symfony\Component\Webhook\Server\SignatureFormat;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -309,7 +307,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
-            $this->registerMailerConfiguration($config['mailer'], $container, $loader, $this->readConfigEnabled('webhook', $container, $config['webhook']));
+            $this->registerMailerConfiguration($config['mailer'], $container, $loader);
 
             if (!$this->hasConsole() || !class_exists(MailerTestCommand::class)) {
                 $container->removeDefinition('console.command.mailer_test');
@@ -403,7 +401,7 @@ class FrameworkExtension extends Extension
 
         // notifier depends on mailer being registered
         if ($this->readConfigEnabled('notifier', $container, $config['notifier'])) {
-            $this->registerNotifierConfiguration($config['notifier'], $container, $loader, $this->readConfigEnabled('webhook', $container, $config['webhook']));
+            $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
         }
 
         // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier, serializer being registered. console is optional
@@ -431,20 +429,6 @@ class FrameworkExtension extends Extension
                 } else {
                     $container->removeDefinition($id);
                 }
-            }
-        }
-
-        if ($this->readConfigEnabled('webhook', $container, $config['webhook'])) {
-            $this->registerWebhookConfiguration($config['webhook'], $container, $loader, $this->readConfigEnabled('serializer', $container, $config['serializer']));
-
-            // If Webhook is installed but the HttpClient component is not available, we should throw an error
-            if (!$this->readConfigEnabled('http_client', $container, $config['http_client'])) {
-                $container->getDefinition('webhook.transport')
-                    ->setArguments([])
-                    ->addError('You cannot use the "webhook transport" service since the HttpClient component is not '
-                        .(class_exists(ScopingHttpClient::class) ? 'enabled. Try setting "framework.http_client.enabled" to true.' : 'installed. Try running "composer require symfony/http-client".')
-                    )
-                    ->addTag('container.error');
             }
         }
 
@@ -1805,7 +1789,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $webhookEnabled): void
+    private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(Mailer::class)) {
             throw new LogicException('Mailer support cannot be enabled as the component is not installed. Try running "composer require symfony/mailer".');
@@ -2006,7 +1990,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('mailer.pgp_encrypter.listener');
         }
 
-        if ($webhookEnabled) {
+        if (class_exists(WebhookController::class)) {
             $loader->load('mailer_webhook.php');
 
             $debug = $container->getParameter('kernel.debug');
@@ -2038,7 +2022,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $webhookEnabled): void
+    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(Notifier::class)) {
             throw new LogicException('Notifier support cannot be enabled as the component is not installed. Try running "composer require symfony/notifier".');
@@ -2232,7 +2216,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if ($webhookEnabled) {
+        if (class_exists(WebhookController::class)) {
             $loader->load('notifier_webhook.php');
 
             $webhookRequestParsers = [
@@ -2249,82 +2233,6 @@ class FrameworkExtension extends Extension
                 }
             }
         }
-    }
-
-    private function registerWebhookConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $serializerEnabled): void
-    {
-        if (!class_exists(WebhookController::class)) {
-            throw new LogicException('Webhook support cannot be enabled as the component is not installed. Try running "composer require symfony/webhook".');
-        }
-
-        $loader->load('webhook.php');
-
-        $parsers = [];
-        foreach ($config['routing'] as $type => $cfg) {
-            $parsers[$type] = [
-                'parser' => new Reference($cfg['service']),
-                'secret' => $cfg['secret'],
-            ];
-        }
-
-        $controller = $container->getDefinition('webhook.controller');
-        $controller->replaceArgument(0, $parsers);
-        $controller->replaceArgument(1, new Reference($config['message_bus']));
-
-        $jsonBodyConfigurator = $container->getDefinition('webhook.body_configurator.json');
-        $jsonBodyConfigurator->replaceArgument(0, new Reference($serializerEnabled ? 'webhook.payload_serializer.serializer' : 'webhook.payload_serializer.json'));
-
-        if (!class_exists(SignatureFormat::class)) {
-            foreach (['signature_format' => 'legacy', 'timestamp_header_name' => 'Webhook-Timestamp', 'timestamp_tolerance' => 300] as $option => $default) {
-                if ($default !== $config[$option]) {
-                    throw new LogicException(\sprintf('Configuring "framework.webhook.%s" requires symfony/webhook 8.2 or higher. Try running "composer update symfony/webhook".', $option));
-                }
-            }
-        }
-        $signatureFormat = class_exists(SignatureFormat::class) ? SignatureFormat::from($config['signature_format']) : null;
-
-        $jsonBodyConfigurator->replaceArgument(1, $signatureFormat);
-
-        $container->getDefinition('webhook.headers_configurator')
-            ->replaceArgument(0, $config['event_header_name'])
-            ->replaceArgument(1, $config['id_header_name'])
-            ->replaceArgument(2, $config['timestamp_header_name'])
-            ->replaceArgument(4, $signatureFormat);
-
-        $container->getDefinition('webhook.signer')
-            ->replaceArgument(0, $config['signing_algorithm'])
-            ->replaceArgument(1, $config['signature_header_name'])
-            ->replaceArgument(2, $signatureFormat)
-            ->replaceArgument(3, $config['timestamp_header_name']);
-
-        $container->getDefinition('webhook.request_parser')
-            ->replaceArgument(0, $config['signing_algorithm'])
-            ->replaceArgument(1, $config['signature_header_name'])
-            ->replaceArgument(2, $config['event_header_name'])
-            ->replaceArgument(3, $config['id_header_name'])
-            ->replaceArgument(4, $config['timestamp_header_name'])
-            ->replaceArgument(5, $signatureFormat)
-            ->replaceArgument(6, $config['timestamp_tolerance']);
-
-        $clientId = $config['http_client'];
-
-        if ($this->readConfigEnabled('webhook.no_private_network', $container, $config['no_private_network'])) {
-            if (!class_exists(NoPrivateNetworkHttpClient::class)) {
-                throw new LogicException('Configuring "framework.webhook.no_private_network" requires the HttpClient component. Try running "composer require symfony/http-client".');
-            }
-
-            $container->register('webhook.http_client', NoPrivateNetworkHttpClient::class)
-                ->setArguments([
-                    new Reference($clientId),
-                    $config['no_private_network']['subnets'],
-                    $config['no_private_network']['allow_list'],
-                ])
-                ->addTag('kernel.reset', ['method' => 'reset']);
-
-            $clientId = 'webhook.http_client';
-        }
-
-        $container->getDefinition('webhook.transport')->replaceArgument(0, new Reference($clientId));
     }
 
     protected function isConfigEnabled(ContainerBuilder $container, array $config): bool

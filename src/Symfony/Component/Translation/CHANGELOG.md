@@ -8,6 +8,7 @@ CHANGELOG
  * Register all the `translation:*` and `lint:translations` commands, which `FrameworkBundle` used to declare
  * Add `TranslationBundle`, which provides the `translation` configuration and the services previously provided by `FrameworkBundle` under `framework.translator`
  * Add `DependencyInjection\Translator`, which `FrameworkBundle` used to provide
+ * Add `DependencyInjection\TranslationLintCommandPass` and `DependencyInjection\TranslationUpdateCommandPass`, which `FrameworkBundle` used to provide
  * Preserve the XLIFF `<source>` element when loading and dumping a file, instead of overwriting it with the message key
  * Add a locale-aware `Plural-Forms` header to the output of `PoFileDumper`
  * Re-add `PoEditorProvider`

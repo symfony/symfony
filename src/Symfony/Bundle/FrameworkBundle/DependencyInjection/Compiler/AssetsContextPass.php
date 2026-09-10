@@ -11,34 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Asset\DependencyInjection\AssetsContextPass as BaseAssetsContextPass;
 
-class AssetsContextPass implements CompilerPassInterface
-{
-    public function process(ContainerBuilder $container): void
-    {
-        if (!$container->hasDefinition('assets.context')) {
-            return;
-        }
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass', BaseAssetsContextPass::class);
 
-        if (!$container->hasDefinition('router.request_context')) {
-            $container->setParameter('asset.request_context.base_path', $container->getParameter('asset.request_context.base_path') ?? '');
-            $container->setParameter('asset.request_context.secure', $container->getParameter('asset.request_context.secure') ?? false);
-
-            return;
-        }
-
-        $context = $container->getDefinition('assets.context');
-
-        if (null === $container->getParameter('asset.request_context.base_path')) {
-            $context->replaceArgument(1, (new Definition('string'))->setFactory([new Reference('router.request_context'), 'getBaseUrl']));
-        }
-
-        if (null === $container->getParameter('asset.request_context.secure')) {
-            $context->replaceArgument(2, (new Definition('bool'))->setFactory([new Reference('router.request_context'), 'isSecure']));
-        }
-    }
-}
+class_alias(BaseAssetsContextPass::class, 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass');

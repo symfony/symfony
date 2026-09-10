@@ -9,15 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
+namespace Symfony\Component\Routing\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\Command\RouterMatchCommand;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -31,7 +33,8 @@ class RouterMatchCommandTest extends TestCase
         $ret = $tester->execute(['path_info' => '/foo', 'foo'], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('Route Name   | foo', $tester->getDisplay());
+        $this->assertStringContainsString('Route "foo" matches', $tester->getDisplay());
+        $this->assertStringContainsString('debug:router called with "foo"', $tester->getDisplay());
     }
 
     public function testWithNotMatchPath()
@@ -45,9 +48,9 @@ class RouterMatchCommandTest extends TestCase
 
     private function createCommandTester(): CommandTester
     {
-        $application = new Application($this->getKernel());
+        $application = new Application();
         $application->addCommand(new RouterMatchCommand($this->getRouter()));
-        $application->addCommand(new RouterDebugCommand($this->getRouter()));
+        $application->addCommand(new RouterDebugCommandStub());
 
         return new CommandTester($application->find('router:match'));
     }
@@ -67,20 +70,20 @@ class RouterMatchCommandTest extends TestCase
 
         return $router;
     }
+}
 
-    private function getKernel()
+#[AsCommand(name: 'debug:router')]
+class RouterDebugCommandStub extends Command
+{
+    protected function configure(): void
     {
-        $kernel = $this->createMock(KernelInterface::class);
-        $kernel
-            ->method('getContainer')
-            ->willReturn(new Container())
-        ;
-        $kernel
-            ->expects($this->once())
-            ->method('getBundles')
-            ->willReturn([])
-        ;
+        $this->addArgument('name', InputArgument::OPTIONAL);
+    }
 
-        return $kernel;
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $output->writeln(\sprintf('debug:router called with "%s"', $input->getArgument('name')));
+
+        return 0;
     }
 }

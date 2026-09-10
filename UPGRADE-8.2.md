@@ -134,6 +134,11 @@ FrameworkBundle
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
  * Deprecate `JsonPathPass`, use the one from the JsonPath component instead
+ * Deprecate `Command\RouterMatchCommand`, use `Symfony\Component\Routing\Command\RouterMatchCommand` instead
+ * Deprecate the `TranslationLintCommandPass`, `TranslationUpdateCommandPass`, `AssetsContextPass` and
+   `AddValidatorSecurityExpressionLanguageProviderPass` compiler passes, use their counterparts from the
+   Translation, Asset and Validator components instead; each is now registered by the bundle of the
+   component that declares the services it acts on
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component
    instead. Unlike the interface, the attribute is not inherited: a class extending an annotated one has to
    carry it too

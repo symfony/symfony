@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Add `ValidationBundle`, which provides the `validation` configuration and the services previously provided by `FrameworkBundle` under `framework.validation`
- * Add `CacheWarmer\ValidatorCacheWarmer`, which `FrameworkBundle` used to provide
+ * Add `CacheWarmer\ValidatorCacheWarmer` and `DependencyInjection\AddValidatorSecurityExpressionLanguageProviderPass`, which `FrameworkBundle` used to provide
  * Accept the `::class` constant of the annotated class in `GroupSequence` definitions
  * Add the `cascadeCurrentGroup` option to `GroupSequence` and `GroupSequenceProvider`
  * Remove the unused `GroupSequence::$cascadedGroup` property

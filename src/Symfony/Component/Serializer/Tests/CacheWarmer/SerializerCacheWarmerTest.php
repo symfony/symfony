@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
+namespace Symfony\Component\Serializer\Tests\CacheWarmer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Serializer\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -52,8 +52,8 @@ class SerializerCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony_Component_Serializer_Tests_Fixtures_Serialization_Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony_Component_Serializer_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
     #[DataProvider('loaderProvider')]
@@ -72,8 +72,8 @@ class SerializerCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony_Component_Serializer_Tests_Fixtures_Serialization_Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony_Component_Serializer_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
     #[DataProvider('loaderProvider')]
@@ -89,8 +89,8 @@ class SerializerCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $this->assertFalse($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
-        $this->assertFalse($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+        $this->assertFalse($arrayPool->getItem('Symfony_Component_Serializer_Tests_Fixtures_Serialization_Person')->isHit());
+        $this->assertFalse($arrayPool->getItem('Symfony_Component_Serializer_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
     public static function loaderProvider(): array

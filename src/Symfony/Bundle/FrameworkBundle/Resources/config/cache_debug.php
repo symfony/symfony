@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\CachePoolClearerCacheWarmer;
+use Symfony\Component\Cache\CacheWarmer\CachePoolClearerCacheWarmer;
 use Symfony\Component\Cache\DataCollector\CacheDataCollector;
 
 return static function (ContainerConfigurator $container) {

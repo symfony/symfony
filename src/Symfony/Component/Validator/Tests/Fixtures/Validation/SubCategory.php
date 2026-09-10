@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation;
+namespace Symfony\Component\Validator\Tests\Fixtures\Validation;
 
 // Missing "use" for Assert\Type is on purpose
 

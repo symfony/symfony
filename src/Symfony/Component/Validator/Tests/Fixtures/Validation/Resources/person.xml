@@ -3,7 +3,7 @@
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                     xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
-    <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Person">
+    <class name="Symfony\Component\Validator\Tests\Fixtures\Validation\Person">
         <property name="eyeColor">
             <constraint name="Choice">
                 <option name="choices">
@@ -16,7 +16,7 @@
         </property>
     </class>
 
-    <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Article">
+    <class name="Symfony\Component\Validator\Tests\Fixtures\Validation\Article">
         <property name="category">
             <constraint name="Choice">
                 <option name="choices">

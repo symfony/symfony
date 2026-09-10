@@ -39,6 +39,7 @@
     "conflict": {
         "nikic/php-parser": "<5.0",
         "symfony/dependency-injection": "<8.2",
+        "symfony/framework-bundle": "<8.2",
         "symfony/http-client-contracts": "<2.5",
         "symfony/service-contracts": "<2.5"
     },

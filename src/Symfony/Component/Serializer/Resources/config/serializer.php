@@ -12,12 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
+use Symfony\Component\Serializer\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;

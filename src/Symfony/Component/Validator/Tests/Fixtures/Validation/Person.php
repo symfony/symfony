@@ -1,0 +1,8 @@
+<?php
+
+namespace Symfony\Component\Validator\Tests\Fixtures\Validation;
+
+class Person
+{
+    public $eyeColor;
+}

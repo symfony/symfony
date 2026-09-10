@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Name the package to install when an extension is missing, for the configuration keys declared in the `.container.extension_packages` build parameter
+ * Add the `container.remove_if_missing` tag to drop a definition when a service, a class or a package it needs is not there
  * Add `ContainerBuilder::setExtensionConfig()`
  * Forward the configuration of the nodes declared with `NodeDefinition::aliasOf()` to the extension with that alias in `MergeExtensionConfigurationPass`
  * Allow computing tag attributes per tagged service when using `#[AutoconfigureTag]`, `#[Autoconfigure]` or `_instanceof`: pass a `\Closure` receiving the concrete class-string (requires PHP 8.5), or a `[class-string, method]` callable resolved against each concrete class (works on PHP 8.4)

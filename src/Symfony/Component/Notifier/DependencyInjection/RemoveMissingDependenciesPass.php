@@ -55,24 +55,14 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
             }
         }
 
-        $hasProfiler = $container->has('profiler');
-
-        if (!$hasProfiler) {
-            $container->removeDefinition('notifier.data_collector');
-        }
-
         if (!$container->hasDefinition('notifier.notification_logger_listener') || $container->has('test.client')) {
             // the test assertions read the listener directly, so it must keep collecting unconditionally
             return;
         }
 
-        // this listener keeps every notification for the lifetime of the process, so drop it when
-        // nothing consumes them, and let it skip the notifications nobody will collect otherwise
-        if ($hasProfiler) {
-            $container->getDefinition('notifier.notification_logger_listener')
-                ->setArgument(0, new Reference('profiler.is_disabled_state_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        } else {
-            $container->removeDefinition('notifier.notification_logger_listener');
-        }
+        // the listener keeps every one of them for the lifetime of the process, so let it skip
+        // the notifications nobody will collect
+        $container->getDefinition('notifier.notification_logger_listener')
+            ->setArgument(0, new Reference('profiler.is_disabled_state_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 }

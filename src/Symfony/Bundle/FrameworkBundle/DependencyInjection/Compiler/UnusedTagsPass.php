@@ -40,6 +40,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'container.no_preload',
         'container.preload',
         'container.private',
+        'container.remove_if_missing',
         'container.reversible',
         'container.service_locator',
         'container.service_locator_context',

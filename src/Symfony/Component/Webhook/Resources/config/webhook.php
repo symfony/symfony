@@ -52,6 +52,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('serializer'),
             ])
+            ->tag('container.remove_if_missing', ['service' => 'serializer'])
 
         ->set('webhook.signer', HeaderSignatureConfigurator::class)
             ->args([

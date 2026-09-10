@@ -11,51 +11,70 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ReportMissingDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Form\DependencyInjection\FormPass;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\SerializerBundle;
 
-class RemoveMissingDependenciesPassTest extends TestCase
+class ReportMissingDependenciesPassTest extends TestCase
 {
-    public function testEverythingIsKeptWhenEveryBundleRegisteredItsService()
+    /**
+     * @param array<string, string> $dependents  service id => the service it needs
+     */
+    #[DataProvider('provideDependents')]
+    public function testTheContainerDropsWhatThisBundleCannotWire(string $file, array $dependents)
     {
-        $container = $this->createContainer();
-        foreach (['html_sanitizer' => HtmlSanitizer::class, 'http_client' => \stdClass::class, 'router' => \stdClass::class, 'serializer' => \stdClass::class, 'validator' => \stdClass::class] as $id => $class) {
-            $container->register($id, $class);
+        $kept = $this->loadConfig($file);
+        foreach (array_values(array_unique($dependents)) as $needed) {
+            $kept->register($needed);
         }
+        new RemoveMissingDependenciesPass()->process($kept);
 
-        new RemoveMissingDependenciesPass()->process($container);
+        $dropped = $this->loadConfig($file);
+        new RemoveMissingDependenciesPass()->process($dropped);
 
-        foreach (array_keys($this->dependents()) as $id) {
-            $this->assertTrue($container->has($id), $id);
+        foreach ($dependents as $id => $needed) {
+            $this->assertTrue($kept->has($id), $id);
+            $this->assertFalse($dropped->has($id), \sprintf('"%s" is dropped without "%s".', $id, $needed));
         }
-        $this->assertSame([], $container->getDefinition('webhook.transport')->getErrors());
-        $this->assertSame([], $container->getDefinition('argument_resolver.request_payload')->getErrors());
     }
 
-    public function testEachServiceGoesWithTheBundleThatWouldProvideWhatItNeeds()
+    public static function provideDependents(): iterable
     {
-        $container = $this->createContainer();
+        yield 'console' => ['console.php', [
+            'console.command.router_debug' => 'router',
+            'console.command.router_match' => 'router',
+            'console.command.serializer_debug' => 'serializer',
+            'console.command.validator_debug' => 'validator',
+            '.console.validate_question_input_listener' => 'validator',
+        ]];
 
-        new RemoveMissingDependenciesPass()->process($container);
+        yield 'form' => ['form.php', [
+            'form.type_extension.form.html_sanitizer' => 'html_sanitizer',
+        ]];
+    }
 
-        foreach ($this->dependents() as $id => $missing) {
-            $this->assertFalse($container->has($id), \sprintf('"%s" is dropped without "%s".', $id, $missing));
-        }
+    private function loadConfig(string $file): ContainerBuilder
+    {
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
+        new PhpFileLoader($container, new FileLocator(\dirname(__DIR__, 3).'/Resources/config'))->load($file);
+
+        return $container;
     }
 
     public function testTheServicesThatCannotBeDroppedReportWhatIsMissing()
     {
         $container = $this->createContainer();
 
-        new RemoveMissingDependenciesPass()->process($container);
+        new ReportMissingDependenciesPass()->process($container);
 
         $transport = $container->getDefinition('webhook.transport');
         $this->assertTrue($transport->hasTag('container.error'));
@@ -67,10 +86,10 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $this->assertStringContainsString('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]"', $resolver->getErrors()[0]);
     }
 
-    public function testItRunsBeforeThePassesThatCollectWhatItRemoves()
+    public function testTheContainerDropsTheUnwirableServicesBeforeAnythingCollectsThem()
     {
-        // SerializerBundle is a required bundle, so it registers SerializerPass while building
-        // before this one; the priority, not the registration order, is what puts this pass first
+        // the bundles register their passes at the default priority, and SerializerBundle builds
+        // before this one, so only a pass the container itself registers can beat both collectors
         $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
         new SerializerBundle()->build($container);
         new FrameworkBundle()->build($container);
@@ -90,23 +109,9 @@ class RemoveMissingDependenciesPassTest extends TestCase
     /**
      * @return array<string, string> service id => the service it needs
      */
-    private function dependents(): array
-    {
-        return [
-            'form.type_extension.form.html_sanitizer' => 'html_sanitizer',
-            'console.command.router_debug' => 'router',
-            'console.command.serializer_debug' => 'serializer',
-            'console.command.validator_debug' => 'validator',
-        ];
-    }
-
     private function createContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder();
-        $container->register('form.type_extension.form.html_sanitizer', TextType::class);
-        $container->register('console.command.router_debug');
-        $container->register('console.command.serializer_debug');
-        $container->register('console.command.validator_debug');
         $container->register('webhook.transport');
         $container->register('argument_resolver.request_payload')->addTag('kernel.event_subscriber');
 

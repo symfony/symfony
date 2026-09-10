@@ -57,6 +57,7 @@ return static function (ContainerConfigurator $container) {
                 service('cache.messenger.restart_workers_signal'),
             ])
             ->tag('console.command')
+            ->tag('container.remove_if_missing', ['service' => 'cache.messenger.restart_workers_signal'])
 
         ->set('console.command.messenger_failed_messages_retry', FailedMessagesRetryCommand::class)
             ->args([

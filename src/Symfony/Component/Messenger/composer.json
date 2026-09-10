@@ -26,7 +26,7 @@
         "psr/cache": "^1.0|^2.0|^3.0",
         "symfony/config": "^7.4|^8.0",
         "symfony/console": "^7.4|^8.0",
-        "symfony/dependency-injection": "^8.1",
+        "symfony/dependency-injection": "^8.2",
         "symfony/event-dispatcher": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/lock": "^7.4|^8.0",
@@ -42,7 +42,7 @@
     },
     "conflict": {
         "symfony/console": "<7.4",
-        "symfony/dependency-injection": "<8.1",
+        "symfony/dependency-injection": "<8.2",
         "symfony/event-dispatcher-contracts": "<2.5",
         "symfony/lock": "<7.4",
         "symfony/routing": "<8.2",

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -34,6 +35,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     public function testTheDeduplicationServicesAreKeptWithALockFactory()
     {
         $container = $this->process(static function (ContainerBuilder $container) {
+            $container->register('my_lock_factory');
             $container->setAlias('lock.factory', 'my_lock_factory');
         });
 
@@ -120,7 +122,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
             }
         };
 
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([$configurePass, new RemoveMissingDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([$configurePass, new ContainerRemoveMissingDependenciesPass(), new RemoveMissingDependenciesPass()]);
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);

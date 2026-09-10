@@ -25,24 +25,14 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $hasProfiler = $container->has('profiler');
-
-        if (!$hasProfiler) {
-            $container->removeDefinition('mailer.data_collector');
-        }
-
         if (!$container->hasDefinition('mailer.message_logger_listener') || $container->has('test.client')) {
             // the test assertions read the listener directly, so it must keep collecting unconditionally
             return;
         }
 
-        // this listener keeps every message, attachments included, for the lifetime of the process,
-        // so drop it when nothing consumes them, and let it skip messages nobody will collect otherwise
-        if ($hasProfiler) {
-            $container->getDefinition('mailer.message_logger_listener')
-                ->setArgument(0, new Reference('profiler.is_disabled_state_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        } else {
-            $container->removeDefinition('mailer.message_logger_listener');
-        }
+        // the listener keeps every one of them for the lifetime of the process, so let it skip
+        // the messages nobody will collect
+        $container->getDefinition('mailer.message_logger_listener')
+            ->setArgument(0, new Reference('profiler.is_disabled_state_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 }

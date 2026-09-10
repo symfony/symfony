@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -317,6 +318,7 @@ class SerializerBundleTest extends TestCase
 
         if (!$merge) {
             // the caller compiles, which runs MergeExtensionConfigurationPass itself
+            $container->addCompilerPass(new ContainerRemoveMissingDependenciesPass());
             $container->addCompilerPass(new RemoveMissingDependenciesPass());
             $container->getCompilerPassConfig()->setRemovingPasses([]);
 
@@ -324,6 +326,7 @@ class SerializerBundleTest extends TestCase
         }
 
         new MergeExtensionConfigurationPass()->process($container);
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         return $container;

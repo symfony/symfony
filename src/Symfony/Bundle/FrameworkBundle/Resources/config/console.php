@@ -55,6 +55,7 @@ return static function (ContainerConfigurator $container) {
                 service('validator'),
             ])
             ->tag('kernel.event_subscriber')
+            ->tag('container.remove_if_missing', ['service' => 'validator'])
 
         ->set('console.command.about', AboutCommand::class)
             ->tag('console.command')
@@ -113,6 +114,7 @@ return static function (ContainerConfigurator $container) {
                 service('debug.file_link_formatter')->nullOnInvalid(),
             ])
             ->tag('console.command')
+            ->tag('container.remove_if_missing', ['service' => 'router'])
 
         ->set('console.command.router_match', RouterMatchCommand::class)
             ->args([
@@ -120,18 +122,21 @@ return static function (ContainerConfigurator $container) {
                 tagged_iterator('routing.expression_language_provider'),
             ])
             ->tag('console.command')
+            ->tag('container.remove_if_missing', ['service' => 'router'])
 
         ->set('console.command.serializer_debug', SerializerDebugCommand::class)
             ->args([
                 service('serializer.mapping.class_metadata_factory'),
             ])
             ->tag('console.command')
+            ->tag('container.remove_if_missing', ['service' => 'serializer'])
 
         ->set('console.command.validator_debug', ValidatorDebugCommand::class)
             ->args([
                 service('validator'),
             ])
             ->tag('console.command')
+            ->tag('container.remove_if_missing', ['service' => 'validator'])
 
         ->set('console.command.xliff_lint', XliffLintCommand::class)
             ->tag('console.command')

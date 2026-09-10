@@ -19,6 +19,7 @@ return static function (ContainerConfigurator $container) {
         ->set('translator.data_collector', DataCollectorTranslator::class)
             ->args([service('translator.data_collector.inner')])
             ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
 
         ->set('data_collector.translation', TranslationDataCollector::class)
             ->args([service('translator.data_collector')])
@@ -27,5 +28,6 @@ return static function (ContainerConfigurator $container) {
                 'id' => 'translation',
                 'priority' => 275,
             ])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
     ;
 };

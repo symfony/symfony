@@ -36,10 +36,6 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
 
     private function registerCsrfProtectionListener(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('cache.system')) {
-            $container->removeDefinition('cache.security_is_csrf_token_valid_attribute_expression_language');
-        }
-
         if (!$container->has('security.authenticator.manager') || !$container->has('security.csrf.token_manager')) {
             return;
         }

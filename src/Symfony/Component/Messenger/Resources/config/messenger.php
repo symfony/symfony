@@ -122,6 +122,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('lock.factory'),
             ])
+            ->tag('container.remove_if_missing', ['service' => 'lock.factory'])
 
         ->set('messenger.middleware.add_default_stamps_middleware', AddDefaultStampsMiddleware::class)
 
@@ -153,6 +154,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('debug.stopwatch'),
             ])
+            ->tag('container.remove_if_missing', ['service' => 'debug.stopwatch'])
 
         ->set('messenger.middleware.router_context', RouterContextMiddleware::class)
             ->args([
@@ -249,6 +251,7 @@ return static function (ContainerConfigurator $container) {
                 service('lock.factory'),
             ])
             ->tag('kernel.event_subscriber')
+            ->tag('container.remove_if_missing', ['service' => 'lock.factory'])
 
         ->set('messenger.failure.send_failed_message_to_failure_transport_listener', SendFailedMessageToFailureTransportListener::class)
             ->args([
@@ -266,6 +269,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.app')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.app'])
 
         ->set('messenger.listener.stop_worker_on_restart_signal_listener', StopWorkerOnRestartSignalListener::class)
             ->args([
@@ -274,6 +278,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])
+            ->tag('container.remove_if_missing', ['service' => 'cache.messenger.restart_workers_signal'])
 
         ->set('messenger.listener.stop_worker_on_stop_exception_listener', StopWorkerOnCustomStopExceptionListener::class)
             ->tag('kernel.event_subscriber')
@@ -282,6 +287,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('services_resetter'),
             ])
+            ->tag('container.remove_if_missing', ['service' => 'console.command.messenger_consume_messages'])
 
         ->set('messenger.listener.reset_memory_usage', ResetMemoryUsageListener::class)
             ->tag('kernel.event_subscriber')

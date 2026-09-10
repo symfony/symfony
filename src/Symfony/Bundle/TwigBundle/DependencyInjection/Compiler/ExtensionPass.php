@@ -12,16 +12,10 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Emoji\EmojiTransliterator;
-use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Component\Workflow\Workflow;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -30,32 +24,6 @@ class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!class_exists(Packages::class)) {
-            $container->removeDefinition('twig.extension.assets');
-        }
-
-        if (!class_exists(\Transliterator::class) || !class_exists(EmojiTransliterator::class)) {
-            $container->removeDefinition('twig.extension.emoji');
-        }
-
-        if (!class_exists(Expression::class)) {
-            $container->removeDefinition('twig.extension.expression');
-        }
-
-        if (!interface_exists(UrlGeneratorInterface::class)) {
-            $container->removeDefinition('twig.extension.routing');
-        }
-
-        if (!class_exists(Yaml::class)) {
-            $container->removeDefinition('twig.extension.yaml');
-        }
-
-        if (!$container->has('asset_mapper')) {
-            // edge case where AssetMapper is installed, but not enabled
-            $container->removeDefinition('twig.extension.importmap');
-            $container->removeDefinition('twig.runtime.importmap');
-        }
-
         $viewDir = \dirname((new \ReflectionClass(FormExtension::class))->getFileName(), 2).'/Resources/views';
         $templateIterator = $container->getDefinition('twig.template_iterator');
         $templatePaths = $templateIterator->getArgument(1);
@@ -136,9 +104,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.emoji')->addTag('twig.extension');
         }
 
-        if (!class_exists(Workflow::class) || !$container->has('workflow.registry')) {
-            $container->removeDefinition('workflow.twig_extension');
-        } else {
+        if ($container->hasDefinition('workflow.twig_extension')) {
             $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');
         }
 

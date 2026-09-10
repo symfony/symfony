@@ -28,7 +28,7 @@
     "require-dev": {
         "symfony/config": "^8.2",
         "symfony/console": "^7.4|^8.0",
-        "symfony/dependency-injection": "^8.1",
+        "symfony/dependency-injection": "^8.2",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
@@ -38,7 +38,7 @@
     },
     "conflict": {
         "symfony/config": "<8.2",
-        "symfony/dependency-injection": "<8.1",
+        "symfony/dependency-injection": "<8.2",
         "symfony/http-client-contracts": "<2.5"
     },
     "autoload": {

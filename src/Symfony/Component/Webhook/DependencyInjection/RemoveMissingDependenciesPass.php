@@ -29,8 +29,7 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
             return;
         }
 
-        if (!$container->has('serializer')) {
-            $container->removeDefinition('webhook.payload_serializer.serializer');
+        if (!$container->hasDefinition('webhook.payload_serializer.serializer')) {
             $container->getDefinition('webhook.body_configurator.json')
                 ->replaceArgument(0, new Reference('webhook.payload_serializer.json'));
         }

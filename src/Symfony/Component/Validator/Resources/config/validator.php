@@ -66,6 +66,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         ->set('validator.mapping.cache.adapter', PhpArrayAdapter::class)
             ->factory([PhpArrayAdapter::class, 'create'])
@@ -73,6 +74,7 @@ return static function (ContainerConfigurator $container) {
                 param('validator.mapping.cache.file'),
                 service('cache.validator'),
             ])
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         ->set('validator.validator_factory', ContainerConstraintValidatorFactory::class)
             ->args([
@@ -101,6 +103,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         ->set('validator.expression_language_provider', ExpressionLanguageProvider::class)
 
@@ -135,6 +138,7 @@ return static function (ContainerConfigurator $container) {
                 service('property_info'),
             ])
             ->tag('validator.auto_mapper')
+            ->tag('container.remove_if_missing', ['service' => 'property_info'])
 
         ->set('validator.form.attribute_metadata', Form::class)
             ->tag('container.excluded')

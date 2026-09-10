@@ -27,7 +27,6 @@ use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpClient\DependencyInjection\HttpClientPass;
-use Symfony\Component\HttpClient\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -46,8 +45,7 @@ class HttpClientBundle extends AbstractBundle
 
     public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new RemoveMissingDependenciesPass());
-        // must run after RemoveMissingDependenciesPass, which can drop the data collector this pass looks for
+        // the container can drop the data collector this pass looks for, so run after it
         $container->addCompilerPass(new HttpClientPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
     }
 

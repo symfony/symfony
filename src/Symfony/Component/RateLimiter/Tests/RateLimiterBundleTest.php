@@ -13,6 +13,8 @@ namespace Symfony\Component\RateLimiter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
@@ -68,6 +70,24 @@ class RateLimiterBundleTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
 
         $this->assertInstanceOf(RateLimiterBuilder::class, $container->get('test.builder'));
+    }
+
+    public function testTheCachePoolGoesWithTheAppPool()
+    {
+        $container = new ContainerBuilder();
+        new RateLimiterBundle()->getContainerExtension()->load([[]], $container);
+
+        new ContainerRemoveMissingDependenciesPass()->process($container);
+        new RemoveMissingDependenciesPass()->process($container);
+        $this->assertFalse($container->hasDefinition('cache.rate_limiter'), 'dropped without "cache.app"');
+
+        $container = new ContainerBuilder();
+        $container->register('cache.app');
+        new RateLimiterBundle()->getContainerExtension()->load([[]], $container);
+
+        new ContainerRemoveMissingDependenciesPass()->process($container);
+        new RemoveMissingDependenciesPass()->process($container);
+        $this->assertTrue($container->hasDefinition('cache.rate_limiter'));
     }
 
     public function testNothingIsRegisteredWhenDisabled()

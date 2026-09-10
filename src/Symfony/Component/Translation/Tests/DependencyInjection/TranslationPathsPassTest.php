@@ -31,10 +31,10 @@ class TranslationPathsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('translator');
         $debugCommand = $container->register('console.command.translation_debug')
-            ->setArguments([null, null, null, null, null, [], []])
+            ->setArguments([null, null, null, null, null, null, [], []])
         ;
         $updateCommand = $container->register('console.command.translation_extract')
-            ->setArguments([null, null, null, null, null, null, [], []])
+            ->setArguments([null, null, null, null, null, null, null, [], []])
         ;
         $container->register(ControllerArguments::class, ControllerArguments::class)
             ->setTags(['controller.service_arguments'])
@@ -83,7 +83,7 @@ class TranslationPathsPassTest extends TestCase
             $container->getReflectionClass(ServiceSubscriber::class)->getFileName(),
         ];
 
-        $this->assertSame($expectedPaths, $debugCommand->getArgument(6));
-        $this->assertSame($expectedPaths, $updateCommand->getArgument(7));
+        $this->assertSame($expectedPaths, $debugCommand->getArgument(7));
+        $this->assertSame($expectedPaths, $updateCommand->getArgument(8));
     }
 }

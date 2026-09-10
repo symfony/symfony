@@ -67,10 +67,10 @@ class TranslatorPassTest extends TestCase
             ->setArguments([null, null, null, null])
         ;
         $debugCommand = $container->register('console.command.translation_debug')
-            ->setArguments([null, null, null, null, null, [], []])
+            ->setArguments([null, null, null, null, null, null, [], []])
         ;
         $updateCommand = $container->register('console.command.translation_extract')
-            ->setArguments([null, null, null, null, null, null, [], []])
+            ->setArguments([null, null, null, null, null, null, null, [], []])
         ;
         $container->register('twig.template_iterator')
             ->setArguments([null, ['other/templates' => null, 'tpl' => 'App']])
@@ -82,10 +82,10 @@ class TranslatorPassTest extends TestCase
 
         $expectedViewPaths = ['other/templates', 'tpl'];
 
-        $this->assertSame('templates', $debugCommand->getArgument(4));
-        $this->assertSame('templates', $updateCommand->getArgument(5));
-        $this->assertSame($expectedViewPaths, $debugCommand->getArgument(6));
-        $this->assertSame($expectedViewPaths, $updateCommand->getArgument(7));
+        $this->assertSame('templates', $debugCommand->getArgument(5));
+        $this->assertSame('templates', $updateCommand->getArgument(6));
+        $this->assertSame($expectedViewPaths, $debugCommand->getArgument(7));
+        $this->assertSame($expectedViewPaths, $updateCommand->getArgument(8));
     }
 
     public function testCommandsViewPathsArgumentsAreIgnoredWithOldServiceDefinitions()
@@ -96,6 +96,7 @@ class TranslatorPassTest extends TestCase
         ;
         $debugCommand = $container->register('console.command.translation_debug')
             ->setArguments([
+                new Reference('kernel'),
                 new Reference('translator'),
                 new Reference('translation.reader'),
                 new Reference('translation.extractor'),
@@ -105,6 +106,7 @@ class TranslatorPassTest extends TestCase
         ;
         $updateCommand = $container->register('console.command.translation_extract')
             ->setArguments([
+                new Reference('kernel'),
                 new Reference('translation.writer'),
                 new Reference('translation.reader'),
                 new Reference('translation.extractor'),
@@ -121,8 +123,8 @@ class TranslatorPassTest extends TestCase
         $pass = new TranslatorPass();
         $pass->process($container);
 
-        $this->assertSame('templates', $debugCommand->getArgument(4));
-        $this->assertSame('templates', $updateCommand->getArgument(5));
+        $this->assertSame('templates', $debugCommand->getArgument(5));
+        $this->assertSame('templates', $updateCommand->getArgument(6));
     }
 
     public function testValidPhpAstExtractorConstraintVisitorArguments()

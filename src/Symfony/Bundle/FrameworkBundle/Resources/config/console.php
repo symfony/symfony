@@ -14,11 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\Command\AboutCommand;
 use Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolInvalidateTagsCommand;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
@@ -35,8 +30,6 @@ use Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsRemoveCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsRevealCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintSchemaResolver;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -46,11 +39,7 @@ use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Serializer\Command\DebugCommand as SerializerDebugCommand;
-use Symfony\Component\Translation\Command\TranslationLintCommand;
-use Symfony\Component\Translation\Command\TranslationPullCommand;
-use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
-use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
 use Symfony\Component\Validator\Command\DebugCommand as ValidatorDebugCommand;
 use Symfony\Component\Yaml\Schema\FileHeaderSchemaResolver;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
@@ -81,36 +70,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('cache_clearer'),
                 service('filesystem'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.cache_pool_clear', CachePoolClearCommand::class)
-            ->args([
-                service('cache.global_clearer'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.cache_pool_prune', CachePoolPruneCommand::class)
-            ->args([
-                [],
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.cache_pool_invalidate_tags', CachePoolInvalidateTagsCommand::class)
-            ->args([
-                tagged_locator('cache.taggable', 'pool'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.cache_pool_delete', CachePoolDeleteCommand::class)
-            ->args([
-                service('cache.global_clearer'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.cache_pool_list', CachePoolListCommand::class)
-            ->args([
-                null,
             ])
             ->tag('console.command')
 
@@ -168,70 +127,13 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('console.command')
 
-        ->set('console.command.translation_debug', TranslationDebugCommand::class)
-            ->args([
-                service('translator'),
-                service('translation.reader'),
-                service('translation.extractor'),
-                param('translator.default_path'),
-                null, // twig.default_path
-                [], // Translator paths
-                [], // Twig paths
-                param('kernel.enabled_locales'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.translation_extract', TranslationExtractCommand::class)
-            ->args([
-                service('translation.writer'),
-                service('translation.reader'),
-                service('translation.extractor'),
-                param('kernel.default_locale'),
-                param('translator.default_path'),
-                null, // twig.default_path
-                [], // Translator paths
-                [], // Twig paths
-                param('kernel.enabled_locales'),
-            ])
-            ->tag('console.command')
-
         ->set('console.command.validator_debug', ValidatorDebugCommand::class)
             ->args([
                 service('validator'),
             ])
             ->tag('console.command')
 
-        ->set('console.command.translation_pull', TranslationPullCommand::class)
-            ->args([
-                service('translation.provider_collection'),
-                service('translation.writer'),
-                service('translation.reader'),
-                param('kernel.default_locale'),
-                [], // Translator paths
-                [], // Enabled locales
-            ])
-            ->tag('console.command', ['command' => 'translation:pull'])
-
-        ->set('console.command.translation_push', TranslationPushCommand::class)
-            ->args([
-                service('translation.provider_collection'),
-                service('translation.reader'),
-                [], // Translator paths
-                [], // Enabled locales
-            ])
-            ->tag('console.command', ['command' => 'translation:push'])
-
         ->set('console.command.xliff_lint', XliffLintCommand::class)
-            ->tag('console.command')
-
-        ->set('console.command.translation_xliff_update_sources', XliffUpdateSourcesCommand::class)
-            ->args([
-                service('translation.writer'),
-                service('translation.reader'),
-                param('kernel.default_locale'),
-                [], // Translator paths
-                param('kernel.enabled_locales'),
-            ])
             ->tag('console.command')
 
         ->set('console.command.yaml_lint', YamlLintCommand::class)
@@ -240,13 +142,6 @@ return static function (ContainerConfigurator $container) {
                     ->args([null, inline_service(FileHeaderSchemaResolver::class)]),
                 inline_service(SchemaValidator::class),
                 param('kernel.project_dir'),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.translation_lint', TranslationLintCommand::class)
-            ->args([
-                service('translator'),
-                param('kernel.enabled_locales'),
             ])
             ->tag('console.command')
 

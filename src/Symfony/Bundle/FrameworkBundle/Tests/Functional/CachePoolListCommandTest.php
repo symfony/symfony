@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Cache\Command\CachePoolListCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[Group('functional')]

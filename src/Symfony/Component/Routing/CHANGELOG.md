@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `RouterBundle`, which provides the `router` configuration and the services previously provided by `FrameworkBundle` under `framework.router`
+ * Add `CacheWarmer\RouterCacheWarmer`, `Controller\RedirectController`, `Loader\AttributeRouteControllerLoader`, `Loader\DelegatingLoader` and `Matcher\RedirectableCompiledUrlMatcher`, which `FrameworkBundle` used to provide
  * Add a `firewall` option to route definitions, exposed as the `_firewall` route default
  * Allow defining default query parameters with the `_query` route default
  * Add `RequestContext::runWith()` to generate and match URLs for another host, scheme or base URL without leaking the change

@@ -26,7 +26,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingRouterDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingSerializerDependenciesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingTranslatorDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingValidatorDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSerializerPropertyAccessorPass;
@@ -249,7 +248,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RemoveMissingRouterDependenciesPass());
         $container->addCompilerPass(new RemoveMissingSerializerDependenciesPass());
         $container->addCompilerPass(new RemoveMissingValidatorDependenciesPass());
-        $container->addCompilerPass(new RemoveMissingTranslatorDependenciesPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);

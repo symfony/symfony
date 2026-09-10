@@ -12,9 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Translation\Command\TranslationDebugCommand;
 
 #[Group('functional')]
 class TranslationDebugCommandTest extends AbstractWebTestCase

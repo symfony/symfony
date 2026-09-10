@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Routing\Fixtures;
+namespace Symfony\Component\Routing\Tests\Loader\Fixtures;
 
 use Symfony\Component\Routing\Attribute\Route;
 

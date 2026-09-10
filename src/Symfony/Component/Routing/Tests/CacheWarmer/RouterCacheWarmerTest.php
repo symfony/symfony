@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
+namespace Symfony\Component\Routing\Tests\CacheWarmer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Routing\CacheWarmer\RouterCacheWarmer;
 use Symfony\Component\Routing\RouterInterface;
 
 class RouterCacheWarmerTest extends TestCase

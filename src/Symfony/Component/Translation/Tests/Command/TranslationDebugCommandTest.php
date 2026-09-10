@@ -9,20 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
+namespace Symfony\Component\Translation\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\ExtensionWithoutConfigTestBundle\ExtensionWithoutConfigTestBundle;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Translation\Command\TranslationDebugCommand;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Translator;
@@ -213,21 +213,37 @@ class TranslationDebugCommandTest extends TestCase
             ->method('getContainer')
             ->willReturn($container);
 
-        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths, $enabledLocales);
+        $command = new TranslationDebugCommand($kernel, $translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths, $enabledLocales);
 
-        $application = new Application($kernel);
+        $application = new Application();
         $application->addCommand($command);
 
         return $application->find('debug:translation');
     }
 
-    private function getBundle($path)
+    private function getBundle($path, string $name = '', ?string $alias = null)
     {
         $bundle = $this->createStub(BundleInterface::class);
         $bundle
             ->method('getPath')
             ->willReturn($path)
         ;
+        $bundle
+            ->method('getName')
+            ->willReturn($name)
+        ;
+
+        if (null !== $alias) {
+            $extension = $this->createStub(ExtensionInterface::class);
+            $extension
+                ->method('getAlias')
+                ->willReturn($alias)
+            ;
+            $bundle
+                ->method('getContainerExtension')
+                ->willReturn($extension)
+            ;
+        }
 
         return $bundle;
     }
@@ -257,7 +273,7 @@ class TranslationDebugCommandTest extends TestCase
                 }
             );
 
-        $tester = new CommandCompletionTester($this->createCommand([], [], null, [], [], $extractor, [new ExtensionWithoutConfigTestBundle()], ['fr', 'nl']));
+        $tester = new CommandCompletionTester($this->createCommand([], [], null, [], [], $extractor, [$this->getBundle('foo', 'FooBundle', 'foo')], ['fr', 'nl']));
         $suggestions = $tester->complete($input);
         $this->assertSame($expectedSuggestions, $suggestions);
     }
@@ -271,7 +287,7 @@ class TranslationDebugCommandTest extends TestCase
 
         yield 'bundle' => [
             ['fr', '--domain', 'messages', ''],
-            ['ExtensionWithoutConfigTestBundle', 'extension_without_config_test'],
+            ['FooBundle', 'foo'],
         ];
 
         yield 'option --domain' => [

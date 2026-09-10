@@ -9,11 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
+namespace Symfony\Component\Routing\Tests\Matcher;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Routing\RedirectableCompiledUrlMatcher;
+use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
+use Symfony\Component\Routing\Matcher\RedirectableCompiledUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -29,7 +30,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $this->assertEquals(
             [
-                '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
+                '_controller' => RedirectController::class.'::urlRedirectAction',
                 'path' => '/foo/',
                 'permanent' => true,
                 'scheme' => null,
@@ -51,7 +52,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $this->assertEquals(
             [
-                '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
+                '_controller' => RedirectController::class.'::urlRedirectAction',
                 'path' => '/foo',
                 'permanent' => true,
                 'scheme' => 'https',

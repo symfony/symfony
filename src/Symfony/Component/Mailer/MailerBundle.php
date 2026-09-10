@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer;
 
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -36,6 +37,7 @@ use Symfony\Component\Webhook\Controller\WebhookController;
  * Provides the services that send emails.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MessengerBundle::class, ignoreOnInvalid: true)]
 class MailerBundle extends AbstractBundle
 {

@@ -11,27 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
-use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
+use Symfony\Component\Routing\Matcher\RedirectableCompiledUrlMatcher as BaseRedirectableCompiledUrlMatcher;
+
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', RedirectableCompiledUrlMatcher::class, BaseRedirectableCompiledUrlMatcher::class);
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- *
- * @internal
+ * @deprecated since Symfony 8.2, use Symfony\Component\Routing\Matcher\RedirectableCompiledUrlMatcher instead
  */
-class RedirectableCompiledUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface
+class RedirectableCompiledUrlMatcher extends BaseRedirectableCompiledUrlMatcher
 {
-    public function redirect(string $path, string $route, ?string $scheme = null): array
-    {
-        return [
-            '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction',
-            'path' => $path,
-            'permanent' => true,
-            'scheme' => $scheme,
-            'httpPort' => $this->context->getHttpPort(),
-            'httpsPort' => $this->context->getHttpsPort(),
-            '_route' => $route,
-            '_route_mapping' => [],
-        ];
-    }
 }

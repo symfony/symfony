@@ -17,6 +17,7 @@ use Symfony\Component\AssetMapper\DependencyInjection\RemoveMissingDependenciesP
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
@@ -30,6 +31,7 @@ use Symfony\Component\Finder\Glob;
  * Provides the asset mapper services.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 class AssetMapperBundle extends AbstractBundle
 {
     public function getPath(): string

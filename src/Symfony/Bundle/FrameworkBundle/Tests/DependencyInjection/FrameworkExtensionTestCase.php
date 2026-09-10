@@ -21,7 +21,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingTranslatorDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -1998,7 +1997,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new NotifierRemoveMissingDependenciesPass(), new ValidatorRemoveMissingDependenciesPass(), new TranslatorRemoveMissingDependenciesPass(), new RemoveMissingTranslatorDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new NotifierRemoveMissingDependenciesPass(), new ValidatorRemoveMissingDependenciesPass(), new TranslatorRemoveMissingDependenciesPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2027,7 +2026,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->addCompilerPass(new NotifierRemoveMissingDependenciesPass());
         $container->addCompilerPass(new ValidatorRemoveMissingDependenciesPass());
         $container->addCompilerPass(new TranslatorRemoveMissingDependenciesPass());
-        $container->addCompilerPass(new RemoveMissingTranslatorDependenciesPass());
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

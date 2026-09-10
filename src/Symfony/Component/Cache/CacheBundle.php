@@ -22,6 +22,8 @@ use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -42,6 +44,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  * Provides the cache pools and their adapters.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 class CacheBundle extends AbstractBundle
 {
     public function getPath(): string
@@ -172,6 +175,10 @@ class CacheBundle extends AbstractBundle
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
     {
         $configurator->import('Resources/config/cache.php');
+
+        if (class_exists(Application::class)) {
+            $configurator->import('Resources/config/console.php');
+        }
 
         $version = new Parameter('container.build_id');
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);

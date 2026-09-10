@@ -9,26 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
+namespace Symfony\Component\Cache\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Command\CachePoolClearCommand;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolClearCommandTest extends TestCase
 {
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        $application = new Application($this->getKernel());
-        $application->addCommand(new CachePoolClearCommand(new Psr6CacheClearer(['foo' => new ArrayAdapter()]), ['foo']));
+        $application = new Application();
+        $application->addCommand(new CachePoolClearCommand(new Container(), new Psr6CacheClearer(['foo' => new ArrayAdapter()]), ['foo']));
         $tester = new CommandCompletionTester($application->get('cache:pool:clear'));
 
         $suggestions = $tester->complete($input);
@@ -42,20 +40,5 @@ class CachePoolClearCommandTest extends TestCase
             ['f'],
             ['foo'],
         ];
-    }
-
-    private function getKernel(): MockObject&KernelInterface
-    {
-        $kernel = $this->createMock(KernelInterface::class);
-        $kernel
-            ->method('getContainer')
-            ->willReturn(new Container());
-
-        $kernel
-            ->expects($this->once())
-            ->method('getBundles')
-            ->willReturn([]);
-
-        return $kernel;
     }
 }

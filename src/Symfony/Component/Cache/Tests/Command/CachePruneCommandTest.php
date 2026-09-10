@@ -9,30 +9,34 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
+namespace Symfony\Component\Cache\Tests\Command;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Command\CachePoolPruneCommand;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePruneCommandTest extends TestCase
 {
     public function testCommandWithPools()
     {
-        $tester = $this->getCommandTester($this->getKernel(), $this->getRewindableGenerator());
+        $tester = $this->getCommandTester($this->getRewindableGenerator());
         $tester->execute([]);
+
+        $this->assertStringContainsString('Pruning cache pool: foo_pool', $tester->getDisplay());
+        $this->assertStringContainsString('Pruning cache pool: bar_pool', $tester->getDisplay());
     }
 
     public function testCommandWithNoPools()
     {
-        $tester = $this->getCommandTester($this->getKernel(), $this->getEmptyRewindableGenerator());
+        $tester = $this->getCommandTester($this->getEmptyRewindableGenerator());
         $tester->execute([]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[OK] Successfully pruned cache pool(s).', $tester->getDisplay());
     }
 
     public function testCommandFailsOnPruneError()
@@ -44,7 +48,7 @@ class CachePruneCommandTest extends TestCase
             yield 'failed_pool' => $failedPool;
         }, 1);
 
-        $tester = $this->getCommandTester($this->getKernel(), $generator);
+        $tester = $this->getCommandTester($generator);
         $tester->execute([]);
 
         $this->assertSame(1, $tester->getStatusCode());
@@ -64,7 +68,7 @@ class CachePruneCommandTest extends TestCase
             yield 'success_pool' => $successPool;
         }, 2);
 
-        $tester = $this->getCommandTester($this->getKernel(), $generator);
+        $tester = $this->getCommandTester($generator);
         $tester->execute([]);
 
         $this->assertSame(1, $tester->getStatusCode());
@@ -86,21 +90,6 @@ class CachePruneCommandTest extends TestCase
         return new RewindableGenerator(static fn () => new \ArrayIterator([]), 0);
     }
 
-    private function getKernel(): MockObject&KernelInterface
-    {
-        $kernel = $this->createMock(KernelInterface::class);
-        $kernel
-            ->method('getContainer')
-            ->willReturn(new Container());
-
-        $kernel
-            ->expects($this->once())
-            ->method('getBundles')
-            ->willReturn([]);
-
-        return $kernel;
-    }
-
     private function getPruneableInterfaceMock(): MockObject&PruneableInterface
     {
         $pruneable = $this->createMock(PruneableInterface::class);
@@ -111,9 +100,9 @@ class CachePruneCommandTest extends TestCase
         return $pruneable;
     }
 
-    private function getCommandTester(KernelInterface $kernel, RewindableGenerator $generator): CommandTester
+    private function getCommandTester(RewindableGenerator $generator): CommandTester
     {
-        $application = new Application($kernel);
+        $application = new Application();
         $application->addCommand(new CachePoolPruneCommand($generator));
 
         return new CommandTester($application->find('cache:pool:prune'));

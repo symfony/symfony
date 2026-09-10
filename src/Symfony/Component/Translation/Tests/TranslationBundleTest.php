@@ -69,7 +69,9 @@ class TranslationBundleTest extends TestCase
     {
         $options = $this->load(['paths' => [__DIR__.'/Fixtures/translations']])->getDefinition('translator.default')->getArgument(4);
 
-        $this->assertContains(__DIR__.'/Fixtures/translations/messages.en.yaml', $options['resource_files']['en']);
+        // the finder appends to the directory it was given, so the separators are mixed on Windows
+        $files = array_map(static fn ($file) => str_replace('\\', '/', $file), $options['resource_files']['en']);
+        $this->assertContains(str_replace('\\', '/', __DIR__).'/Fixtures/translations/messages.en.yaml', $files);
         $this->assertContains(__DIR__.'/Fixtures/translations', $options['scanned_directories']);
     }
 
@@ -119,8 +121,9 @@ class TranslationBundleTest extends TestCase
             'bar_provider' => ['locales' => ['de', 'pl']],
         ]], enabledLocales: ['es']);
 
-        $this->assertSame(['es', 'en', 'fr', 'de', 'pl'], $container->getParameter(TranslationBundle::PROVIDER_LOCALES_PARAMETER));
         $this->assertSame(['es', 'en', 'fr', 'de', 'pl'], $container->getDefinition('translation.provider_collection_factory')->getArgument(1));
+        $this->assertSame(['es', 'en', 'fr', 'de', 'pl'], $container->getDefinition('console.command.translation_pull')->getArgument(5));
+        $this->assertSame(['es', 'en', 'fr', 'de', 'pl'], $container->getDefinition('console.command.translation_push')->getArgument(3));
     }
 
     public function testProviderDomainsCanBeKeyed()

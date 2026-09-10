@@ -12,9 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Command\CachePoolClearCommand;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -145,7 +145,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
     private function createCommandTester(?array $poolNames = null)
     {
         $application = new Application(static::$kernel);
-        $application->addCommand(new CachePoolClearCommand(static::getContainer()->get('cache.global_clearer'), $poolNames));
+        $application->addCommand(new CachePoolClearCommand(static::$kernel->getContainer(), static::getContainer()->get('cache.global_clearer'), $poolNames));
 
         return new CommandTester($application->find('cache:pool:clear'));
     }

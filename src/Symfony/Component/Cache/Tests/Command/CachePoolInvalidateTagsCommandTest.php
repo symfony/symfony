@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
+namespace Symfony\Component\Cache\Tests\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\CachePoolInvalidateTagsCommand;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Command\CachePoolInvalidateTagsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;

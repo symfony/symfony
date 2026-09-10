@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
+namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader;
-use Symfony\Bundle\FrameworkBundle\Tests\Routing\Fixtures\InvokableController;
-use Symfony\Bundle\FrameworkBundle\Tests\Routing\Fixtures\MethodActionControllers;
+use Symfony\Component\Routing\Loader\AttributeRouteControllerLoader;
+use Symfony\Component\Routing\Tests\Loader\Fixtures\InvokableController;
+use Symfony\Component\Routing\Tests\Loader\Fixtures\MethodActionControllers;
 
 class AttributeRouteControllerLoaderTest extends TestCase
 {

@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
@@ -27,6 +28,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\AbstractClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
@@ -99,6 +101,55 @@ class FileLoaderTest extends TestCase
             array_keys($container->getDefinitions())
         );
         $this->assertEquals([BarInterface::class], array_keys($container->getAliases()));
+    }
+
+    public function testRegisterClassesSharesImmutablePrototypeParts()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->noAutoRegisterAliasesForSinglyImplementedInterfaces();
+
+        $prototype = new Definition();
+        $prototype->setArguments([new Reference('foo')]);
+        $prototype->setBindings(['string $foo' => new BoundArgument('bar'), 'Bar $baz' => new BoundArgument(new Reference('baz'))]);
+
+        $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/Sub/*');
+
+        $bar = $container->getDefinition(Bar::class);
+        $barInterface = $container->getDefinition('.abstract.'.BarInterface::class);
+
+        $this->assertSame($prototype->getArguments()[0], $bar->getArguments()[0]);
+        $this->assertSame($bar->getArguments()[0], $barInterface->getArguments()[0]);
+
+        $this->assertSame($prototype->getBindings()['string $foo'], $bar->getBindings()['string $foo']);
+        $this->assertSame($bar->getBindings()['Bar $baz'], $barInterface->getBindings()['Bar $baz']);
+    }
+
+    public function testRegisterClassesDeepClonesMutablePrototypeParts()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->noAutoRegisterAliasesForSinglyImplementedInterfaces();
+
+        $prototype = new Definition();
+        $prototype->setArguments([new Definition(\stdClass::class)]);
+        $prototype->addMethodCall('setFoo', [new TaggedIteratorArgument('foo')]);
+        $prototype->setBindings(['string $foo' => new BoundArgument('bar'), 'iterable $bar' => new BoundArgument(new TaggedIteratorArgument('bar'))]);
+
+        $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/Sub/*');
+
+        $bar = $container->getDefinition(Bar::class);
+        $barInterface = $container->getDefinition('.abstract.'.BarInterface::class);
+
+        $this->assertNotSame($prototype->getArguments()[0], $bar->getArguments()[0]);
+        $this->assertNotSame($bar->getArguments()[0], $barInterface->getArguments()[0]);
+        $this->assertEquals($prototype->getArguments(), $bar->getArguments());
+
+        $this->assertNotSame($bar->getMethodCalls()[0][1][0], $barInterface->getMethodCalls()[0][1][0]);
+        $this->assertEquals($prototype->getMethodCalls(), $bar->getMethodCalls());
+
+        $this->assertNotSame($bar->getBindings()['string $foo'], $barInterface->getBindings()['string $foo']);
+        $this->assertEquals($prototype->getBindings(), $bar->getBindings());
     }
 
     public function testRegisterClassesWithExclude()

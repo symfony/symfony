@@ -59,6 +59,32 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
 
     public static function getAcceptData(): iterable
     {
+        yield 'a hash in the middle of a line is not a comment' => [
+            [
+                '.gitignore' => "fi#le.txt\n",
+            ],
+            [
+                'fi#le.txt',
+                'fi',
+            ],
+            [
+                'fi',
+            ],
+        ];
+
+        yield 'a negated pattern starting with a hash' => [
+            [
+                '.gitignore' => "*\n!#a.txt\n",
+            ],
+            [
+                '#a.txt',
+                'b.txt',
+            ],
+            [
+                '#a.txt',
+            ],
+        ];
+
         yield 'simple file' => [
             [
                 '.gitignore' => 'a.txt',
@@ -443,6 +469,31 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
         $iterator = new VcsIgnoredFilterIterator($inner, '/');
 
         $this->assertIterator([__FILE__], $iterator);
+    }
+
+    public function testAcceptWithSymlinkedBaseDirectory()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('symlinks are not supported on Windows');
+        }
+
+        mkdir("{$this->tmpDir}/a");
+        touch("{$this->tmpDir}/a/file.txt");
+        touch("{$this->tmpDir}/b.txt");
+        file_put_contents("{$this->tmpDir}/.gitignore", "a/\n");
+
+        $link = "{$this->tmpDir}_link";
+        symlink($this->tmpDir, $link);
+
+        try {
+            $inner = new InnerNameIterator(["{$link}/a/file.txt", "{$link}/b.txt"]);
+
+            $iterator = new VcsIgnoredFilterIterator($inner, $link);
+
+            $this->assertIterator(["{$link}/b.txt"], $iterator);
+        } finally {
+            unlink($link);
+        }
     }
 
     private function toAbsolute(array $files): array

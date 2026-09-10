@@ -111,12 +111,12 @@ final class CachePoolClearCommand extends Command
 
             if ($pool instanceof CacheItemPoolInterface) {
                 if (!$pool->clear()) {
-                    $io->warning(\sprintf('Cache pool "%s" could not be cleared.', $pool));
+                    $io->warning(\sprintf('Cache pool "%s" could not be cleared.', $id));
                     $failure = true;
                 }
             } else {
                 if (!$this->poolClearer->clearPool($id)) {
-                    $io->warning(\sprintf('Cache pool "%s" could not be cleared.', $pool));
+                    $io->warning(\sprintf('Cache pool "%s" could not be cleared.', $id));
                     $failure = true;
                 }
             }

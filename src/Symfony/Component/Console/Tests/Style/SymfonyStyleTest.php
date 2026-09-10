@@ -113,6 +113,24 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringContainsString('Second line.', $display);
     }
 
+    public function testErrorWithMalformedUtf8()
+    {
+        $message = "Cannot read the log file at /var/log/app/deep/path.log: \xB3 check the file permissions, then retry the command and report the result";
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) use ($message) {
+            (new SymfonyStyle($input, $output))->error($message);
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $display = $this->tester->getDisplay(true);
+        $lines = array_filter(explode("\n", $display), static fn (string $line): bool => '' !== trim($line));
+
+        $this->assertStringContainsString("\xB3", $display);
+        $this->assertSame(str_replace(' ', '', $message), str_replace(' ', '', implode('', array_map(static fn (string $line): string => substr($line, 9), $lines))));
+        $this->assertGreaterThan(1, \count($lines), 'The message is wrapped over several lines.');
+        $this->assertCount(1, array_unique(array_map('strlen', $lines)), 'Every line of the block is padded to the same width.');
+    }
+
     public function testGetErrorStyle()
     {
         $input = $this->createStub(InputInterface::class);

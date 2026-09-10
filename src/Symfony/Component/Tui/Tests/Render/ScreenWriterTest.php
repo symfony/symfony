@@ -394,13 +394,13 @@ class ScreenWriterTest extends TestCase
     {
         $marker = AnsiUtils::cursorMarker();
 
-        yield 'marker present, showHardwareCursor off' => [false, true, self::HIDE_CURSOR, self::SHOW_CURSOR];
-        yield 'marker present, showHardwareCursor on' => [true, true, self::SHOW_CURSOR, self::HIDE_CURSOR];
-        yield 'no marker, showHardwareCursor on' => [true, false, self::HIDE_CURSOR, self::SHOW_CURSOR];
+        yield 'marker present, showHardwareCursor off' => [false, true, self::HIDE_CURSOR];
+        yield 'marker present, showHardwareCursor on' => [true, true, self::SHOW_CURSOR];
+        yield 'no marker, showHardwareCursor on' => [true, false, self::HIDE_CURSOR];
     }
 
     #[DataProvider('cursorVisibilityProvider')]
-    public function testCursorVisibility(bool $showHardwareCursor, bool $hasMarker, string $expectedContains, string $expectedNotContains)
+    public function testCursorVisibility(bool $showHardwareCursor, bool $hasMarker, string $expectedVisibility)
     {
         $terminal = new VirtualTerminal(80, 24);
         $writer = new ScreenWriter($terminal);
@@ -412,8 +412,8 @@ class ScreenWriterTest extends TestCase
 
         $output = $terminal->getOutput();
 
-        $this->assertStringContainsString($expectedContains, $output);
-        $this->assertStringNotContainsString($expectedNotContains, $output);
+        $this->assertStringContainsString(self::SYNC_START.self::HIDE_CURSOR, $output);
+        $this->assertStringEndsWith($expectedVisibility.self::SYNC_END, $output);
     }
 
     public function testDisablingShowHardwareCursorHidesCursorImmediately()
@@ -541,7 +541,7 @@ class ScreenWriterTest extends TestCase
 
     // --- RenderException tests (pre-existing) ---
 
-    public function testRenderExceptionDoesNotCallStopOnTerminal()
+    public function testRenderExceptionLeavesTheTerminalUsable()
     {
         $terminal = new VirtualTerminal(20, 24);
         $screenWriter = new ScreenWriter($terminal);
@@ -561,13 +561,10 @@ class ScreenWriterTest extends TestCase
             $this->assertSame(20, $e->getTerminalWidth());
         }
 
-        // The output should NOT contain showCursor sequence
-        // which would indicate stop()/showCursor() were called
+        // The terminal must be left usable: the cursor restored, since painting hides
+        // it, and synchronized output ended
         $output = $terminal->getOutput();
-        $this->assertStringNotContainsString(self::SHOW_CURSOR, $output, 'showCursor() should not be called');
-
-        // The output should end synchronized output properly
-        $this->assertStringContainsString("\x1b[?2026l", $output, 'Synchronized output should be ended');
+        $this->assertStringEndsWith(self::SHOW_CURSOR.self::SYNC_END, $output);
     }
 
     public function testScreenWriterCanRenderAfterRenderException()
@@ -658,5 +655,61 @@ class ScreenWriterTest extends TestCase
         yield 'three trailing lines removed' => [['A', 'B', 'C', 'D']];
         yield 'two leading lines removed' => [['C', 'D', 'E', 'F', 'G']];
         yield 'all but one line removed' => [['A']];
+    }
+
+    #[DataProvider('renderPathFrames')]
+    public function testRestoresTheCursorBeforeEndingSynchronizedOutput(array $first, array $second)
+    {
+        $marker = AnsiUtils::cursorMarker();
+        $terminal = new VirtualTerminal(20, 5);
+        $writer = new ScreenWriter($terminal);
+        $writer->writeLines($first);
+
+        $terminal->clearOutput();
+        $writer->writeLines($second);
+
+        $output = $terminal->getOutput();
+
+        $this->assertStringStartsWith(self::SYNC_START.self::HIDE_CURSOR, $output);
+        $this->assertStringEndsWith(self::SHOW_CURSOR.self::SYNC_END, $output);
+        $this->assertSame(1, substr_count($output, self::SYNC_END));
+    }
+
+    public static function renderPathFrames(): iterable
+    {
+        $marker = AnsiUtils::cursorMarker();
+
+        yield 'full render' => [[], ["a{$marker}b"]];
+        yield 'differential render' => [['ab', 'cd'], ['ab', "c{$marker}e"]];
+        yield 'trailing lines deleted' => [['ab', 'cd', 'ef'], ["a{$marker}b"]];
+        yield 'overheight redraw' => [['a', 'b', 'c', 'd', 'e', 'f'], ['a', 'b', 'c', 'd', 'e', "f{$marker}g"]];
+    }
+
+    #[DataProvider('overheightFrames')]
+    public function testOverheightFrameKeepsTheViewportInSync(array $previous, array $frame)
+    {
+        $screen = new ScreenBuffer(40, 5);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(40);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+
+        $writer = new ScreenWriter($terminal);
+        $writer->writeLines($previous);
+        $writer->writeLines($frame);
+
+        $expected = array_pad(\array_slice($frame, max(0, \count($frame) - 5), 5), 5, '');
+
+        $this->assertSame($expected, array_map(rtrim(...), $screen->getLines()));
+    }
+
+    public static function overheightFrames(): iterable
+    {
+        $six = ['L0', 'L1', 'L2', 'L3', 'L4', 'L5'];
+
+        yield 'one line appended' => [$six, [...$six, 'L6']];
+        yield 'two lines appended' => [$six, [...$six, 'L6', 'L7']];
+        yield 'last line edited' => [[...$six, 'L6'], [...$six, 'L6x']];
     }
 }

@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\DependencyInjection\DefaultLockFactoryPass;
-use Symfony\Component\RateLimiter\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 
 /**
@@ -41,7 +40,6 @@ class RateLimiterBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new DefaultLockFactoryPass());
-        $container->addCompilerPass(new RemoveMissingDependenciesPass());
     }
 
     public function configure(DefinitionConfigurator $definition): void

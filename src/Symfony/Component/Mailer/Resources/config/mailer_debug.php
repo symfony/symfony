@@ -23,5 +23,6 @@ return static function (ContainerConfigurator $container) {
                 'template' => '@WebProfiler/Collector/mailer.html.twig',
                 'id' => 'mailer',
             ])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
     ;
 };

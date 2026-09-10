@@ -36,7 +36,7 @@
         "php-http/httplug": "^1.0|^2.0",
         "psr/http-client": "^1.0",
         "symfony/config": "^8.2",
-        "symfony/dependency-injection": "^8.1",
+        "symfony/dependency-injection": "^8.2",
         "symfony/cache": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
@@ -48,7 +48,7 @@
         "amphp/amp": "<3",
         "php-http/discovery": "<1.15",
         "symfony/config": "<8.2",
-        "symfony/dependency-injection": "<8.1"
+        "symfony/dependency-injection": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },

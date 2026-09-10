@@ -15,10 +15,13 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\HttpClientBundle;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -75,6 +78,31 @@ class HttpClientBundleTest extends TestCase
 
         $this->assertSame(1, $collector->getRequestCount());
         $this->assertSame(['http_client', 'scoped_client', 'cached_client'], array_keys($collector->getClients()));
+    }
+
+    public function testTheCachePoolAndTheDataCollectorGoWithWhatTheyNeed()
+    {
+        $container = $this->createContainer();
+        new HttpClientBundle()->getContainerExtension()->load([[]], $container);
+
+        new ContainerRemoveMissingDependenciesPass()->process($container);
+        new RemoveMissingDependenciesPass()->process($container);
+        $this->assertFalse($container->hasDefinition('cache.http_client.pool'), 'dropped without "cache.app"');
+        $this->assertFalse($container->hasDefinition('cache.http_client'), 'and the tag-aware adapter goes with the pool');
+
+        $container = $this->createContainer();
+        $container->register('cache.app');
+        new HttpClientBundle()->getContainerExtension()->load([[]], $container);
+
+        new ContainerRemoveMissingDependenciesPass()->process($container);
+        new RemoveMissingDependenciesPass()->process($container);
+        $this->assertTrue($container->hasDefinition('cache.http_client.pool'));
+        $this->assertTrue($container->hasDefinition('cache.http_client'));
+    }
+
+    private function createContainer(): ContainerBuilder
+    {
+        return new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
     }
 
     public function testNothingIsRegisteredWhenDisabled()

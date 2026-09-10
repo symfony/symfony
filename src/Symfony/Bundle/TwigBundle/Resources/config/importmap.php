@@ -20,8 +20,10 @@ return static function (ContainerConfigurator $container) {
         ->set('twig.runtime.importmap', ImportMapRuntime::class)
             ->args([service('asset_mapper.importmap.renderer')])
             ->tag('twig.runtime')
+            ->tag('container.remove_if_missing', ['service' => 'asset_mapper'])
 
         ->set('twig.extension.importmap', ImportMapExtension::class)
             ->tag('twig.extension')
+            ->tag('container.remove_if_missing', ['service' => 'asset_mapper'])
     ;
 };

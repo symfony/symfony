@@ -37,6 +37,12 @@ use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer;
 use Symfony\Bundle\TwigBundle\Controller\TemplateController;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator;
 use Symfony\Bundle\TwigBundle\TemplateIterator;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\Emoji\EmojiTransliterator;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Yaml\Yaml;
 use Twig\Cache\ChainCache;
 use Twig\Cache\FilesystemCache;
 use Twig\Cache\ReadOnlyFilesystemCache;
@@ -128,18 +134,24 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.extension.assets', AssetExtension::class)
             ->args([service('assets.packages')])
+            ->tag('container.remove_if_missing', ['class' => Packages::class])
 
         ->set('twig.extension.routing', RoutingExtension::class)
             ->args([service('router')])
+            ->tag('container.remove_if_missing', ['class' => UrlGeneratorInterface::class])
 
         ->set('twig.extension.yaml', YamlExtension::class)
+            ->tag('container.remove_if_missing', ['class' => Yaml::class])
 
         ->set('twig.extension.debug.stopwatch', StopwatchExtension::class)
             ->args([service('debug.stopwatch')->ignoreOnInvalid(), param('kernel.debug')])
 
         ->set('twig.extension.expression', ExpressionExtension::class)
+            ->tag('container.remove_if_missing', ['class' => Expression::class])
 
         ->set('twig.extension.emoji', EmojiExtension::class)
+            ->tag('container.remove_if_missing', ['class' => \Transliterator::class])
+            ->tag('container.remove_if_missing', ['class' => EmojiTransliterator::class])
 
         ->set('twig.extension.htmlsanitizer', HtmlSanitizerExtension::class)
             ->args([tagged_locator('html_sanitizer', 'sanitizer')])
@@ -163,6 +175,8 @@ return static function (ContainerConfigurator $container) {
 
         ->set('workflow.twig_extension', WorkflowExtension::class)
             ->args([service('workflow.registry')])
+            ->tag('container.remove_if_missing', ['class' => Workflow::class])
+            ->tag('container.remove_if_missing', ['service' => 'workflow.registry'])
 
         ->set('twig.configurator.environment', EnvironmentConfigurator::class)
             ->args([

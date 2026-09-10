@@ -12,7 +12,11 @@
 namespace Symfony\Component\Serializer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Serializer\DependencyInjection\RemoveMissingDependenciesPass;
 
 class RemoveMissingDependenciesPassTest extends TestCase
@@ -22,6 +26,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container = $this->createContainer();
         $container->register('property_accessor');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertTrue($container->has('serializer.property_accessor'));
@@ -33,6 +38,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer();
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->has('serializer.property_accessor'));
@@ -44,6 +50,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer();
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->has('serializer.normalizer.translatable'));
@@ -51,16 +58,14 @@ class RemoveMissingDependenciesPassTest extends TestCase
 
     private function createContainer(): ContainerBuilder
     {
-        $container = new ContainerBuilder();
-        $container->setAlias('serializer.property_accessor', 'property_accessor');
-
-        foreach ([
-            'serializer.normalizer.object',
-            'serializer.denormalizer.unwrapping',
-            'serializer.normalizer.translatable',
-        ] as $id) {
-            $container->register($id);
-        }
+        $container = new ContainerBuilder(new ParameterBag([
+            'kernel.debug' => false,
+            'kernel.project_dir' => '/app',
+            'kernel.build_dir' => sys_get_temp_dir(),
+            'kernel.cache_dir' => sys_get_temp_dir(),
+        ]));
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__, 2).'/Resources/config'));
+        $loader->load('serializer.php');
 
         return $container;
     }

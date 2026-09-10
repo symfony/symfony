@@ -102,11 +102,13 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 abstract_arg('dev server public prefix'),
             ])
+            ->tag('container.remove_if_missing', ['service' => 'assets._default_package'])
 
         ->set('cache.asset_mapper')
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         ->set('asset_mapper.dev_server_subscriber', AssetMapperDevServerSubscriber::class)
             ->args([

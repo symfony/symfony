@@ -12,6 +12,7 @@
 namespace Symfony\Component\Webhook\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Webhook\DependencyInjection\RemoveMissingDependenciesPass;
@@ -24,6 +25,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container = $this->createContainer();
         $container->register('serializer');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertEquals(new Reference('webhook.payload_serializer.serializer'), $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
@@ -34,6 +36,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer();
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertEquals(new Reference('webhook.payload_serializer.json'), $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
@@ -45,6 +48,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container = $this->createContainer();
         $container->register('http_client');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
@@ -55,6 +59,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer();
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $transport = $container->getDefinition('webhook.transport');
@@ -67,6 +72,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer(['no_private_network' => true]);
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->hasDefinition('webhook.http_client'));
@@ -78,6 +84,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container = $this->createContainer(['no_private_network' => true]);
         $container->register('http_client');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertTrue($container->hasDefinition('webhook.http_client'));
@@ -89,6 +96,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container = $this->createContainer();
         $container->register('messenger.default_bus');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->getDefinition('webhook.controller')->hasErrors());
@@ -98,6 +106,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer();
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $controller = $container->getDefinition('webhook.controller');
@@ -110,6 +119,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer(['enabled' => false]);
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->hasDefinition('webhook.transport'));

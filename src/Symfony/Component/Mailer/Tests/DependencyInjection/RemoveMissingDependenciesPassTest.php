@@ -12,12 +12,14 @@
 namespace Symfony\Component\Mailer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Mailer\DataCollector\MessageDataCollector;
 use Symfony\Component\Mailer\DependencyInjection\RemoveMissingDependenciesPass;
-use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 
 class RemoveMissingDependenciesPassTest extends TestCase
 {
@@ -26,6 +28,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container = $this->createContainer();
         $container->register('profiler');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertTrue($container->hasDefinition('mailer.data_collector'));
@@ -35,6 +38,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer();
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->hasDefinition('mailer.data_collector'));
@@ -45,6 +49,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container = $this->createContainer();
         $container->register('profiler');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertEquals(
@@ -59,6 +64,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container->register('profiler');
         $container->register('test.client');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertSame([], $container->getDefinition('mailer.message_logger_listener')->getArguments());
@@ -68,6 +74,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer();
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->hasDefinition('mailer.message_logger_listener'));
@@ -75,10 +82,15 @@ class RemoveMissingDependenciesPassTest extends TestCase
 
     private function createContainer(): ContainerBuilder
     {
-        $container = new ContainerBuilder();
-        $container->register('mailer.message_logger_listener', MessageLoggerListener::class);
-        $container->register('mailer.data_collector', MessageDataCollector::class)
-            ->addArgument(new Reference('mailer.message_logger_listener'));
+        $container = new ContainerBuilder(new ParameterBag([
+            'kernel.debug' => false,
+            'kernel.project_dir' => '/app',
+            'kernel.build_dir' => sys_get_temp_dir(),
+            'kernel.cache_dir' => sys_get_temp_dir(),
+        ]));
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__, 2).'/Resources/config'));
+        $loader->load('mailer.php');
+        $loader->load('mailer_debug.php');
 
         return $container;
     }

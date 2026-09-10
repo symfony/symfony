@@ -21,5 +21,6 @@ return static function (ContainerConfigurator $container) {
                 'id' => 'messenger',
                 'priority' => 100,
             ])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
     ;
 };

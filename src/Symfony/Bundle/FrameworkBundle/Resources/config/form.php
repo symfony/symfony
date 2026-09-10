@@ -133,6 +133,7 @@ return static function (ContainerConfigurator $container) {
         ->set('form.type_extension.form.html_sanitizer', TextTypeHtmlSanitizerExtension::class)
             ->args([tagged_locator('html_sanitizer', 'sanitizer')])
             ->tag('form.type_extension', ['extended-type' => TextType::class])
+            ->tag('container.remove_if_missing', ['service' => 'html_sanitizer'])
 
         ->set('form.type_extension.form.http_foundation', FormTypeHttpFoundationExtension::class)
             ->args([service('form.type_extension.form.request_handler')])

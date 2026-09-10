@@ -23,25 +23,6 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->has('profiler')) {
-            $container->removeDefinition('data_collector.translation');
-            $container->removeDefinition('translator.data_collector');
-        }
-
-        if (!$container->has('http_client')) {
-            foreach ([
-                'translation.provider_factory.crowdin',
-                'translation.provider_factory.crowdin.http_client',
-                'translation.provider_factory.loco',
-                'translation.provider_factory.loco.http_client',
-                'translation.provider_factory.lokalise',
-                'translation.provider_factory.phrase',
-                'translation.provider_factory.poeditor',
-            ] as $id) {
-                $container->removeDefinition($id);
-            }
-        }
-
         if (!$container->hasParameter('.translator.provider_locales')) {
             return;
         }

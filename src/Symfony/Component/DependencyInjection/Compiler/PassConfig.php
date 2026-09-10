@@ -48,6 +48,7 @@ class PassConfig
                 new AttributeAutoconfigurationPass(),
                 new ResolveInstanceofConditionalsPass(),
                 new RegisterEnvVarProcessorsPass(),
+                new RemoveMissingDependenciesPass(),
             ],
             -1000 => [new ExtensionCompilerPass()],
         ];

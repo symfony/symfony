@@ -20,6 +20,7 @@ return static function (ContainerConfigurator $container) {
         ->set('cache.rate_limiter')
             ->parent('cache.app')
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.app'])
 
         ->set('limiter', RateLimiterFactory::class)
             ->abstract()

@@ -99,5 +99,6 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
     ;
 };

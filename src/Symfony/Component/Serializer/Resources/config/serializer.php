@@ -113,6 +113,7 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.denormalizer.unwrapping', UnwrappingDenormalizer::class)
             ->args([service('serializer.property_accessor')])
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => 1000])
+            ->tag('container.remove_if_missing', ['service' => 'property_accessor'])
 
         ->set('serializer.normalizer.uid', UidNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -890])
@@ -120,6 +121,7 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.normalizer.translatable', TranslatableNormalizer::class)
             ->args(['$translator' => service('translator')])
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -920])
+            ->tag('container.remove_if_missing', ['service' => 'translator'])
 
         ->set('serializer.normalizer.form_error', FormErrorNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -915])
@@ -136,6 +138,7 @@ return static function (ContainerConfigurator $container) {
                 service('property_info')->ignoreOnInvalid(),
             ])
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -1000])
+            ->tag('container.remove_if_missing', ['service' => 'property_accessor'])
 
         ->set('serializer.normalizer.property', PropertyNormalizer::class)
             ->args([
@@ -171,6 +174,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         ->set('serializer.mapping.cache.symfony', CacheItemPoolInterface::class)
             ->factory([PhpArrayAdapter::class, 'create'])
@@ -182,6 +186,7 @@ return static function (ContainerConfigurator $container) {
                 service('serializer.mapping.cache_class_metadata_factory.inner'),
                 service('serializer.mapping.cache.symfony'),
             ])
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         // Encoders
         ->set('serializer.encoder.xml', XmlEncoder::class)

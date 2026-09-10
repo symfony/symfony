@@ -342,6 +342,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         // Cache Warmers
         ->set('security.cache_warmer.expression', ExpressionCacheWarmer::class)
@@ -365,6 +366,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         ->set('security.is_csrf_token_valid_attribute_expression_language', BaseExpressionLanguage::class)
             ->args([service('cache.security_is_csrf_token_valid_attribute_expression_language')->nullOnInvalid()])
@@ -373,5 +375,6 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.system')
             ->private()
             ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
     ;
 };

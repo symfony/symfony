@@ -23,11 +23,13 @@ return static function (ContainerConfigurator $container) {
                 service('serializer.data_collector'),
                 'default',
             ])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
 
         ->set('serializer.data_collector', SerializerDataCollector::class)
             ->tag('data_collector', [
                 'template' => '@WebProfiler/Collector/serializer.html.twig',
                 'id' => 'serializer',
             ])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
     ;
 };

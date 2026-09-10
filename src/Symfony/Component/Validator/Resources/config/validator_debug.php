@@ -25,6 +25,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.reset', [
                 'method' => 'reset',
             ])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
 
         ->set('data_collector.validator', ValidatorDataCollector::class)
             ->args([
@@ -35,5 +36,6 @@ return static function (ContainerConfigurator $container) {
                 'id' => 'validator',
                 'priority' => 320,
             ])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
     ;
 };

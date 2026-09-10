@@ -48,6 +48,7 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')])
             ->tag('http_client.client')
             ->tag('monolog.logger', ['channel' => 'http_client'])
+            ->tag('container.remove_if_missing', ['service' => 'http_client'])
 
         ->set('translation.provider_factory.crowdin', CrowdinProviderFactory::class)
             ->args([
@@ -58,6 +59,7 @@ return static function (ContainerConfigurator $container) {
                 service('translation.dumper.xliff'),
             ])
             ->tag('translation.provider_factory')
+            ->tag('container.remove_if_missing', ['service' => 'http_client'])
 
         ->set('translation.provider_factory.loco.http_client', HttpClientInterface::class)
             ->factory([HttpClient::class, 'create'])
@@ -68,6 +70,7 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')])
             ->tag('http_client.client')
             ->tag('monolog.logger', ['channel' => 'http_client'])
+            ->tag('container.remove_if_missing', ['service' => 'http_client'])
 
         ->set('translation.provider_factory.loco', LocoProviderFactory::class)
             ->args([
@@ -78,6 +81,7 @@ return static function (ContainerConfigurator $container) {
                 service('translation.dumper.xliff'),
             ])
             ->tag('translation.provider_factory')
+            ->tag('container.remove_if_missing', ['service' => 'http_client'])
 
         ->set('translation.provider_factory.lokalise', LokaliseProviderFactory::class)
             ->args([
@@ -87,6 +91,7 @@ return static function (ContainerConfigurator $container) {
                 service('translation.loader.xliff'),
             ])
             ->tag('translation.provider_factory')
+            ->tag('container.remove_if_missing', ['service' => 'http_client'])
 
         ->set('translation.provider_factory.phrase', PhraseProviderFactory::class)
             ->args([
@@ -98,6 +103,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.default_locale'),
             ])
             ->tag('translation.provider_factory')
+            ->tag('container.remove_if_missing', ['service' => 'http_client'])
 
         ->set('translation.provider_factory.poeditor', PoEditorProviderFactory::class)
             ->args([
@@ -107,5 +113,6 @@ return static function (ContainerConfigurator $container) {
                 service('translation.loader.xliff'),
             ])
             ->tag('translation.provider_factory')
+            ->tag('container.remove_if_missing', ['service' => 'http_client'])
     ;
 };

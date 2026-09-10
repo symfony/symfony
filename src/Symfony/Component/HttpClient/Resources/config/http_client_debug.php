@@ -21,5 +21,6 @@ return static function (ContainerConfigurator $container) {
                 'id' => 'http_client',
                 'priority' => 250,
             ])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
     ;
 };

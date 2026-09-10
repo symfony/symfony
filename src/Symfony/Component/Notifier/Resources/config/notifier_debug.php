@@ -18,5 +18,6 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.data_collector', NotificationDataCollector::class)
             ->args([service('notifier.notification_logger_listener')])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/notifier.html.twig', 'id' => 'notifier'])
+            ->tag('container.remove_if_missing', ['service' => 'profiler'])
     ;
 };

@@ -12,10 +12,13 @@
 namespace Symfony\Component\Validator\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Validator\DependencyInjection\RemoveMissingDependenciesPass;
-use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 
 class RemoveMissingDependenciesPassTest extends TestCase
 {
@@ -24,6 +27,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container = $this->createContainer();
         $container->register('property_info', PropertyInfoExtractor::class);
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertTrue($container->hasDefinition('validator.property_info_loader'));
@@ -33,6 +37,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
     {
         $container = $this->createContainer();
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertFalse($container->hasDefinition('validator.property_info_loader'));
@@ -44,6 +49,7 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $container->setParameter('validator.translation_domain', 'validators');
         $container->setParameter('.validator.translation_domain', 'messages');
 
+        new ContainerRemoveMissingDependenciesPass()->process($container);
         new RemoveMissingDependenciesPass()->process($container);
 
         $this->assertSame('messages', $container->getParameter('validator.translation_domain'));
@@ -52,8 +58,14 @@ class RemoveMissingDependenciesPassTest extends TestCase
 
     private function createContainer(): ContainerBuilder
     {
-        $container = new ContainerBuilder();
-        $container->register('validator.property_info_loader', PropertyInfoLoader::class);
+        $container = new ContainerBuilder(new ParameterBag([
+            'kernel.debug' => false,
+            'kernel.project_dir' => '/app',
+            'kernel.build_dir' => sys_get_temp_dir(),
+            'kernel.cache_dir' => sys_get_temp_dir(),
+        ]));
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__, 2).'/Resources/config'));
+        $loader->load('validator.php');
 
         return $container;
     }

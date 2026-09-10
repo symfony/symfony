@@ -81,6 +81,7 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.message_logger_listener', MessageLoggerListener::class)
             ->tag('kernel.event_subscriber')
             ->tag('kernel.reset', ['method' => 'reset'])
+            ->tag('container.remove_if_missing', ['service' => ['profiler', 'test.client']])
 
         ->set('mailer.messenger_transport_listener', MessengerTransportListener::class)
             ->tag('kernel.event_subscriber')

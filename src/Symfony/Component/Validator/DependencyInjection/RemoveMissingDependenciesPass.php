@@ -30,23 +30,8 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
             $container->getParameterBag()->remove('.validator.translation_domain');
         }
 
-        if (!$container->has('property_info')) {
-            $container->removeDefinition('validator.property_info_loader');
-        }
-
-        if (!$container->has('profiler')) {
-            $container->removeDefinition('data_collector.validator');
-            $container->removeDefinition('debug.validator');
-        }
-
-        if (!$container->has('cache.system')) {
-            $container->removeDefinition('cache.validator');
-            $container->removeDefinition('cache.validator_expression_language');
-            $container->removeDefinition('validator.mapping.cache.adapter');
-
-            if ($container->hasDefinition('validator.builder')) {
-                $container->getDefinition('validator.builder')->removeMethodCall('setMappingCache');
-            }
+        if (!$container->hasDefinition('validator.mapping.cache.adapter') && $container->hasDefinition('validator.builder')) {
+            $container->getDefinition('validator.builder')->removeMethodCall('setMappingCache');
         }
     }
 }

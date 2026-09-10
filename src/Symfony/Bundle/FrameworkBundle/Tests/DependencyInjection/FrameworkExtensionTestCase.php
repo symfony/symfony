@@ -20,7 +20,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingDependenciesPass as FrameworkRemoveMissingDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ReportMissingDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -46,6 +46,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -62,7 +63,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
 use Symfony\Component\HttpClient\CachingHttpClient;
-use Symfony\Component\HttpClient\DependencyInjection\RemoveMissingDependenciesPass as HttpClientRemoveMissingDependenciesPass;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\HttpClientBundle;
 use Symfony\Component\HttpClient\RetryableHttpClient;
@@ -2017,17 +2017,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
     protected static function bundlePasses(): array
     {
         return [
+            new ContainerRemoveMissingDependenciesPass(),
             new DefaultLockFactoryPass(),
             new DefaultMessageBusPass(),
             new RemoveMissingDependenciesPass(),
             new AssetMapperRemoveMissingDependenciesPass(),
             new WebhookRemoveMissingDependenciesPass(),
-            new HttpClientRemoveMissingDependenciesPass(),
             new MailerRemoveMissingDependenciesPass(),
             new NotifierRemoveMissingDependenciesPass(),
             new ValidatorRemoveMissingDependenciesPass(),
             new TranslatorRemoveMissingDependenciesPass(),
-            new FrameworkRemoveMissingDependenciesPass(),
+            new ReportMissingDependenciesPass(),
         ];
     }
 

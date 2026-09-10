@@ -25,32 +25,10 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
     {
         $droppedMiddleware = [];
 
-        if (!$container->has('lock.factory')) {
-            $container->removeDefinition('messenger.middleware.deduplicate_middleware');
-            $container->removeDefinition('messenger.failure.release_deduplication_lock_on_failure_listener');
-            $droppedMiddleware[] = 'deduplicate_middleware';
-        }
-
-        if (!$container->has('debug.stopwatch')) {
-            $container->removeDefinition('messenger.middleware.traceable');
-            $droppedMiddleware[] = 'traceable';
-        }
-
-        if (!$container->has('profiler')) {
-            $container->removeDefinition('data_collector.messenger');
-        }
-
-        if (!$container->has('cache.app')) {
-            $container->removeDefinition('cache.messenger.restart_workers_signal');
-        }
-
-        if (!$container->has('cache.messenger.restart_workers_signal')) {
-            $container->removeDefinition('messenger.listener.stop_worker_on_restart_signal_listener');
-            $container->removeDefinition('console.command.messenger_stop_workers');
-        }
-
-        if (!$container->has('console.command.messenger_consume_messages')) {
-            $container->removeDefinition('messenger.listener.reset_services');
+        foreach (['deduplicate_middleware', 'traceable'] as $name) {
+            if (!$container->hasDefinition('messenger.middleware.'.$name)) {
+                $droppedMiddleware[] = $name;
+            }
         }
 
         if (!$droppedMiddleware) {

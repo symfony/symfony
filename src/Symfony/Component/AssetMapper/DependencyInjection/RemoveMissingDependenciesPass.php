@@ -28,18 +28,10 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
             return;
         }
 
-        if (!$container->has('assets._default_package')) {
-            $container->removeDefinition('asset_mapper.asset_package');
-        }
-
         if (!$container->has('http_client')) {
             $container->register('asset_mapper.http_client', HttpClientInterface::class)
                 ->addTag('container.error')
                 ->addError('You cannot use the AssetMapper integration since the HttpClient component is not enabled. Try enabling the "framework.http_client" config option.');
-        }
-
-        if (!$container->has('cache.system')) {
-            $container->removeDefinition('cache.asset_mapper');
         }
     }
 }

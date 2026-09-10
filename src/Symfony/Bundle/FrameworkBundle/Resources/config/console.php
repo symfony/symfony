@@ -22,7 +22,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
 use Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsDecryptToLocalCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsEncryptFromLocalCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsGenerateKeysCommand;
@@ -112,14 +111,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('router'),
                 service('debug.file_link_formatter')->nullOnInvalid(),
-            ])
-            ->tag('console.command')
-            ->tag('container.remove_if_missing', ['service' => 'router'])
-
-        ->set('console.command.router_match', RouterMatchCommand::class)
-            ->args([
-                service('router'),
-                tagged_iterator('routing.expression_language_provider'),
             ])
             ->tag('console.command')
             ->tag('container.remove_if_missing', ['service' => 'router'])

@@ -11,23 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Translation\TranslatorBagInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\DependencyInjection\TranslationLintCommandPass as BaseTranslationLintCommandPass;
 
-final class TranslationLintCommandPass implements CompilerPassInterface
-{
-    public function process(ContainerBuilder $container): void
-    {
-        if (!$container->hasDefinition('console.command.translation_lint') || !$container->has('translator')) {
-            return;
-        }
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationLintCommandPass', BaseTranslationLintCommandPass::class);
 
-        $translatorClass = $container->getParameterBag()->resolveValue($container->findDefinition('translator')->getClass());
-
-        if (!is_subclass_of($translatorClass, TranslatorInterface::class) || !is_subclass_of($translatorClass, TranslatorBagInterface::class)) {
-            $container->removeDefinition('console.command.translation_lint');
-        }
-    }
-}
+class_alias(BaseTranslationLintCommandPass::class, 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationLintCommandPass');

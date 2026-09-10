@@ -12,6 +12,8 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
@@ -27,6 +29,7 @@ use Symfony\Component\Routing\DependencyInjection\LocalizedRoutesPass;
  * Provides the router and the services that load and generate routes.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 class RouterBundle extends AbstractBundle
 {
     public function getPath(): string
@@ -111,6 +114,10 @@ class RouterBundle extends AbstractBundle
         $requestContextScheme = $parameters['router.request_context.scheme'] ?? 'http';
 
         $configurator->import('Resources/config/routing.php');
+
+        if (class_exists(Application::class)) {
+            $configurator->import('Resources/config/console.php');
+        }
 
         $container->getDefinition('router.request_context')
             ->setArgument(1, $requestContextHost)

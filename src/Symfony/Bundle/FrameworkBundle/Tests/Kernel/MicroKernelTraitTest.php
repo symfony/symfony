@@ -309,8 +309,8 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame(['test', 'dev'], $parameters['.container.known_envs']);
         $expected = [
             ServicesBundle::class => ['all' => true],
-            RouterBundle::class => ['all' => true],
             ConsoleBundle::class => ['all' => true],
+            RouterBundle::class => ['all' => true],
             CacheBundle::class => ['all' => true],
         ];
 

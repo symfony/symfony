@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\DependencyInjection\AddAutoMappingConfigurationPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
+use Symfony\Component\Validator\DependencyInjection\AddValidatorSecurityExpressionLanguageProviderPass;
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Validator\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
@@ -46,6 +47,7 @@ class ValidationBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new RemoveMissingDependenciesPass());
+        $container->addCompilerPass(new AddValidatorSecurityExpressionLanguageProviderPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass());
         $container->addCompilerPass(new AddValidatorInitializersPass());
         $container->addCompilerPass(new AttributeMetadataPass());

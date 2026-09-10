@@ -32,6 +32,8 @@ use Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass;
 use Symfony\Component\Translation\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
+use Symfony\Component\Translation\DependencyInjection\TranslationLintCommandPass;
+use Symfony\Component\Translation\DependencyInjection\TranslationUpdateCommandPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
 use Symfony\Component\Validator\Validation;
@@ -51,6 +53,8 @@ class TranslationBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new RemoveMissingDependenciesPass());
+        $container->addCompilerPass(new TranslationLintCommandPass(), PassConfig::TYPE_BEFORE_REMOVING, 10);
+        $container->addCompilerPass(new TranslationUpdateCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new DataCollectorTranslatorPass());
         $container->addCompilerPass(new LoggingTranslatorPass());
         $container->addCompilerPass(new TranslationExtractorPass());

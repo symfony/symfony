@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `RouterBundle`, which provides the `router` configuration and the services previously provided by `FrameworkBundle` under `framework.router`
  * Add the `#[AsRouteLoader]` attribute, which replaces `FrameworkBundle`'s `RouteLoaderInterface`
+ * Add `Command\RouterMatchCommand`, which `FrameworkBundle` used to provide
  * Add `DependencyInjection\Router` and `Attribute\AsRoutingConditionService`, which `FrameworkBundle` used to provide; the attribute no longer extends `AutoconfigureTag`, so it tags only the classes that carry it, not their subclasses
  * Add `CacheWarmer\RouterCacheWarmer`, `Controller\RedirectController`, `Loader\AttributeRouteControllerLoader`, `Loader\DelegatingLoader` and `Matcher\RedirectableCompiledUrlMatcher`, which `FrameworkBundle` used to provide
  * Add a `firewall` option to route definitions, exposed as the `_firewall` route default

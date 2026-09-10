@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `DependencyInjection\AssetsContextPass`, which `FrameworkBundle` used to provide
  * Add `AssetBundle`, which provides the `asset` configuration and the services previously provided by `FrameworkBundle` under `framework.assets`
 
 6.1

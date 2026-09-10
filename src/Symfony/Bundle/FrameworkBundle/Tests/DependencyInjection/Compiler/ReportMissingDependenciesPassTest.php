@@ -51,7 +51,6 @@ class ReportMissingDependenciesPassTest extends TestCase
     {
         yield 'console' => ['console.php', [
             'console.command.router_debug' => 'router',
-            'console.command.router_match' => 'router',
             'console.command.serializer_debug' => 'serializer',
             'console.command.validator_debug' => 'validator',
             '.console.validate_question_input_listener' => 'validator',

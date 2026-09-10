@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset;
 
+use Symfony\Component\Asset\DependencyInjection\AssetsContextPass;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,6 +31,11 @@ class AssetBundle extends AbstractBundle
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
+    }
+
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new AssetsContextPass());
     }
 
     public function configure(DefinitionConfigurator $definition): void

@@ -142,7 +142,7 @@ class SmtpTransport extends AbstractTransport
             $message = parent::send($message, $envelope);
         } catch (TransportExceptionInterface $e) {
             if ($this->started) {
-                if ($e instanceof UnexpectedResponseException) {
+                if ($e instanceof UnexpectedResponseException && 421 !== $e->getCode()) {
                     // The server replied with an unexpected code: the connection is
                     // still in sync, so it can be reused after resetting the session.
                     try {
@@ -151,7 +151,8 @@ class SmtpTransport extends AbstractTransport
                         // ignore this exception as it probably means that the server error was final
                     }
                 } else {
-                    // Any other failure (timeout, broken pipe, ...) may have left an
+                    // A 421 means the server is closing the channel, and any other
+                    // failure (timeout, broken pipe, ...) may have left an
                     // unread reply in the socket buffer. Reusing the connection would
                     // desync every following command, so close it and reconnect on the
                     // next message.
@@ -280,8 +281,16 @@ class SmtpTransport extends AbstractTransport
         $this->getLogger()->debug(\sprintf('Email transport "%s" starting', __CLASS__));
 
         $this->stream->initialize();
-        $this->assertResponseCode($this->getFullResponse(), [220]);
-        $this->doHeloCommand();
+
+        try {
+            $this->assertResponseCode($this->getFullResponse(), [220]);
+            $this->doHeloCommand();
+        } catch (TransportExceptionInterface $e) {
+            $this->stream->terminate();
+
+            throw $e;
+        }
+
         $this->started = true;
         $this->lastMessageTime = 0;
 
@@ -321,6 +330,12 @@ class SmtpTransport extends AbstractTransport
 
         try {
             $this->executeCommand("NOOP\r\n", [250]);
+
+            if ($this->stream->hasPendingData()) {
+                // The server queued another reply, typically a 421 closing the channel.
+                // The next command would read it as its own reply, so reconnect instead.
+                $this->stop();
+            }
         } catch (TransportExceptionInterface) {
             $this->stop();
         }

@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
-use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
+use Symfony\Bundle\TwigBundle\Controller\TemplateController;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;

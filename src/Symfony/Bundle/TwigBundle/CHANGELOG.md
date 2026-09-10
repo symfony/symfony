@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `Controller\TemplateController`, which `FrameworkBundle` used to provide
+
 8.1
 ---
 

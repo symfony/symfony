@@ -17,11 +17,24 @@ use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPa
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\Routing\Attribute\AsRouteLoader;
 use Symfony\Component\Routing\DependencyInjection\LocalizedRoutesPass;
 use Symfony\Component\Routing\RouterBundle;
 
 class RouterBundleTest extends TestCase
 {
+    public function testTheAttributeTagsARouteLoader()
+    {
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
+        new RouterBundle()->build($container);
+        $container->register('some_route_loader', SomeRouteLoader::class)->setAutoconfigured(true);
+        $container->getCompiler()->getPassConfig()->setRemovingPasses([]);
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('some_route_loader')->hasTag('routing.route_loader'));
+    }
+
     public function testTheRouterIsOffUntilItIsConfigured()
     {
         // an auto-registered bundle is loaded with an empty configuration, which must not enable it
@@ -117,4 +130,9 @@ class RouterBundleTest extends TestCase
 
         return $container;
     }
+}
+
+#[AsRouteLoader]
+class SomeRouteLoader
+{
 }

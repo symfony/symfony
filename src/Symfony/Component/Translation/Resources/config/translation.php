@@ -12,8 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Translation\CacheWarmer\TranslationsCacheWarmer;
+use Symfony\Component\Translation\DependencyInjection\Translator;
 use Symfony\Component\Translation\Dumper\CsvFileDumper;
 use Symfony\Component\Translation\Dumper\IcuResFileDumper;
 use Symfony\Component\Translation\Dumper\IniFileDumper;

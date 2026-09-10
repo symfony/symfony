@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-10T19:10:15Z
+
+I verified the root cause and the fix, and pushed two additions.
+
+Revert-verified the `ScreenWriter` change on its own, keeping the `ScreenBuffer` scrollback support so the signal was clean: all five new cases fail on 8.1 with an empty scrollback where `L0..L3` is expected. #65966's own tests are untouched by this and still pass, so the narrower guard does not give its symptom back. Full Tui suite green at 1815.
+
+The line feed is safe on the column: `$buffer .= "\r"` already follows the motion, so a terminal in newline mode cannot shift the starting column.
+
+**`scrollUp()` could push `null` into the scrollback.** `array_shift()` returns `null` on an empty array, and `clear()` leaves `$this->cells` empty when the terminal reports zero rows, so `getScrollback()` then died:
+
+```
+new ScreenBuffer(20, 0), write("a\nb\nc\n")
+  TypeError: ScreenBuffer::renderCells(): Argument #1 ($cells) must be of type array, null given
+```
+
+This is what Psalm was reporting as `InvalidPropertyAssignmentValue` at `ScreenBuffer.php:394`, so the red check was a real defect rather than an annotation gap. Fixed with `?? []` and covered by `testScrollbackOfAZeroHeightBuffer`, which fails with exactly that `TypeError` without the fix. I also added `testErasingTheScrollbackDropsTheLinesThatScrolledOff`, which protects the new `ED 3` behaviour rather than proving the fix.
+
+Fabbot stays red on a pre-existing line: `RenderException`'s `Line preview: %s%s` comes from `a81867921ed [Tui] Add the component` and this PR does not touch it. The check lints whole touched files, so any PR touching `ScreenWriter.php` inherits it, as #65966 did before merging. I left it alone rather than fold an unrelated message change in here.
+
+I recorded the 8.2 resolution in the description: `ScreenWriter.php` conflicts there, and the new test merges cleanly and then fails, because 8.2 has no `writeLines()`.

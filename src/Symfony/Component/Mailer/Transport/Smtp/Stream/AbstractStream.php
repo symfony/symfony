@@ -96,6 +96,25 @@ abstract class AbstractStream
         return $line;
     }
 
+    /**
+     * Tells whether the server sent data that has not been read yet.
+     */
+    public function hasPendingData(): bool
+    {
+        if (!\is_resource($this->out)) {
+            return false;
+        }
+
+        if (0 < stream_get_meta_data($this->out)['unread_bytes']) {
+            return true;
+        }
+
+        $read = [$this->out];
+        $write = $except = [];
+
+        return 0 < @stream_select($read, $write, $except, 0);
+    }
+
     public function getDebug(): string
     {
         $debug = $this->debug;

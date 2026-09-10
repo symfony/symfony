@@ -310,8 +310,8 @@ class MicroKernelTraitTest extends TestCase
         $expected = [
             ServicesBundle::class => ['all' => true],
             RouterBundle::class => ['all' => true],
-            CacheBundle::class => ['all' => true],
             ConsoleBundle::class => ['all' => true],
+            CacheBundle::class => ['all' => true],
         ];
 
         // registered with ignoreOnInvalid, so absent when the component is not installed

@@ -11,49 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\CacheWarmer\TranslationsCacheWarmer as BaseTranslationsCacheWarmer;
 
-/**
- * Generates the catalogues for translations.
- *
- * @author Xavier Leune <xavier.leune@gmail.com>
- */
-final class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
-{
-    private TranslatorInterface $translator;
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer', BaseTranslationsCacheWarmer::class);
 
-    /**
-     * As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
-     */
-    public function __construct(
-        private ContainerInterface $container,
-    ) {
-    }
-
-    public function warmUp(string $cacheDir, ?string $buildDir = null): array
-    {
-        $this->translator ??= $this->container->get('translator');
-
-        if ($this->translator instanceof WarmableInterface) {
-            return $this->translator->warmUp($cacheDir, $buildDir);
-        }
-
-        return [];
-    }
-
-    public function isOptional(): bool
-    {
-        return true;
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return [
-            'translator' => TranslatorInterface::class,
-        ];
-    }
-}
+class_alias(BaseTranslationsCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer');

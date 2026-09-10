@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler;
 
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -30,6 +31,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  * Provides the scheduler services.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 class SchedulerBundle extends AbstractBundle
 {
     public function getPath(): string

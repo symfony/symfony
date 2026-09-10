@@ -4,6 +4,11 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate the five `Command\CachePool*Command` classes, use the ones from the Cache component instead
+ * Deprecate `Command\TranslationDebugCommand` and `Command\TranslationExtractCommand`, use the ones from the Translation component instead
+ * Deprecate `CacheWarmer\TranslationsCacheWarmer`, use `Symfony\Component\Translation\CacheWarmer\TranslationsCacheWarmer` instead
+ * Deprecate `CacheWarmer\RouterCacheWarmer`, `Controller\RedirectController`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader` and `Routing\RedirectableCompiledUrlMatcher`, use their counterparts from the Routing component instead
+ * Let `TranslationBundle` declare all the `translation:*` and `lint:translations` commands
  * Make `framework.translator` an alias of the `translation` configuration provided by `TranslationBundle`
  * Register `TranslationBundle` automatically when the Translation component is installed
  * Make `framework.validation` an alias of the `validation` configuration provided by `ValidationBundle`

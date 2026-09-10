@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -46,6 +47,7 @@ use Symfony\Component\Workflow\Validator\WorkflowValidator;
  * Provides the workflow and state machine services.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 class WorkflowBundle extends AbstractBundle
 {
     public function getPath(): string

@@ -11,13 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DataCollector;
 
-use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\DataCollector\RouterDataCollector;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\Controller\RedirectController;
 
 class RouterDataCollectorTest extends TestCase
 {

@@ -13,6 +13,8 @@ namespace Symfony\Component\Translation;
 
 use PhpParser\Parser;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -38,16 +40,9 @@ use Symfony\Component\Validator\Validation;
  * Provides the services that translate messages.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 class TranslationBundle extends AbstractBundle
 {
-    /**
-     * The paths the translation console commands of FrameworkBundle read, and the locales they push and pull.
-     */
-    public const TRANS_PATHS_PARAMETER = '.translator.trans_paths';
-    public const PATHS_PARAMETER = '.translator.paths';
-    public const DEFAULT_PATH_PARAMETER = '.translator.default_path';
-    public const PROVIDER_LOCALES_PARAMETER = '.translator.provider_locales';
-
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
@@ -162,6 +157,10 @@ class TranslationBundle extends AbstractBundle
         $configurator->import('Resources/config/translation.php');
         $configurator->import('Resources/config/translation_providers.php');
 
+        if ($hasConsole = class_exists(Application::class)) {
+            $configurator->import('Resources/config/console.php');
+        }
+
         if ($container->getParameter('kernel.debug')) {
             $configurator->import('Resources/config/translation_debug.php');
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
@@ -193,9 +192,18 @@ class TranslationBundle extends AbstractBundle
 
         [$dirs, $transPaths, $nonExistingDirs] = $this->discoverTranslationDirs($config, $container);
 
-        $container->setParameter(self::TRANS_PATHS_PARAMETER, $transPaths);
-        $container->setParameter(self::PATHS_PARAMETER, $config['paths']);
-        $container->setParameter(self::DEFAULT_PATH_PARAMETER, $config['default_path']);
+        if ($hasConsole) {
+            $container->getDefinition('console.command.translation_xliff_update_sources')
+                ->replaceArgument(3, [...$config['paths'], $config['default_path']]);
+
+            foreach (['console.command.translation_debug' => 6, 'console.command.translation_extract' => 7] as $id => $argument) {
+                $container->getDefinition($id)->replaceArgument($argument, $transPaths);
+            }
+
+            foreach (['console.command.translation_pull' => 4, 'console.command.translation_push' => 2] as $id => $argument) {
+                $container->getDefinition($id)->replaceArgument($argument, [...$transPaths, $config['default_path']]);
+            }
+        }
 
         if ($dirs) {
             $translator->replaceArgument(4, [
@@ -245,8 +253,9 @@ class TranslationBundle extends AbstractBundle
             return;
         }
 
-        // RemoveMissingDependenciesPass merges these with the enabled locales, which are known by then
-        $container->setParameter(self::PROVIDER_LOCALES_PARAMETER, array_merge(...array_column($config['providers'], 'locales')));
+        // the enabled locales come from another extension, so the pull and push commands only learn the
+        // full list once RemoveMissingDependenciesPass merges the two
+        $container->setParameter('.translator.provider_locales', array_merge(...array_column($config['providers'], 'locales')));
         $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);
     }
 

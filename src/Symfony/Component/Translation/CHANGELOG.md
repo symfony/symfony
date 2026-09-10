@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand` and `CacheWarmer\TranslationsCacheWarmer`, which `FrameworkBundle` used to provide
+ * Register all the `translation:*` and `lint:translations` commands, which `FrameworkBundle` used to declare
  * Add `TranslationBundle`, which provides the `translation` configuration and the services previously provided by `FrameworkBundle` under `framework.translator`
  * Preserve the XLIFF `<source>` element when loading and dumping a file, instead of overwriting it with the message key
  * Add a locale-aware `Plural-Forms` header to the output of `PoFileDumper`

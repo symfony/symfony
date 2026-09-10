@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -44,6 +45,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Provides the message buses, their middleware and the transports.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 class MessengerBundle extends AbstractBundle
 {
     public function getPath(): string

@@ -65,9 +65,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Translation\Command\TranslationLintCommand as BaseTranslationLintCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
-use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
@@ -136,14 +134,6 @@ class FrameworkExtension extends Extension
                 $container->getDefinition('console.command.yaml_lint')->setArguments([]);
             } elseif ($container->hasParameter('.kernel.config_dir')) {
                 $container->getDefinition('console.command.yaml_lint')->getArgument(0)->replaceArgument(0, $container->getParameter('.kernel.config_dir'));
-            }
-
-            if (!class_exists(BaseTranslationLintCommand::class)) {
-                $container->removeDefinition('console.command.translation_lint');
-            }
-
-            if (!class_exists(XliffUpdateSourcesCommand::class)) {
-                $container->removeDefinition('console.command.translation_xliff_update_sources');
             }
 
             if (!class_exists(RunCommandMessageHandler::class)) {

@@ -149,8 +149,9 @@ class ValidationBundleTest extends TestCase
         $xmlMappings = array_column(array_filter($calls, static fn ($call) => 'addXmlMappings' === $call[0]), 1);
         $yamlMappings = array_column(array_filter($calls, static fn ($call) => 'addYamlMappings' === $call[0]), 1);
 
-        $this->assertSame([[[$dir.'/validation.xml']]], $xmlMappings);
-        $this->assertSame([[[$dir.'/validation.yml']]], $yamlMappings);
+        // the finder reports the paths with the separator of the platform
+        $this->assertSame([[[strtr($dir.'/validation.xml', '/', \DIRECTORY_SEPARATOR)]]], $xmlMappings);
+        $this->assertSame([[[strtr($dir.'/validation.yml', '/', \DIRECTORY_SEPARATOR)]]], $yamlMappings);
     }
 
     public function testAnUnsupportedMappingPathIsRejected()

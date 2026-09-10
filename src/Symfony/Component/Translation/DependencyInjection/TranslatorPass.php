@@ -73,18 +73,18 @@ class TranslatorPass implements CompilerPassInterface
         $paths = array_keys($container->getDefinition('twig.template_iterator')->getArgument(1));
         if ($container->hasDefinition('console.command.translation_debug')) {
             $definition = $container->getDefinition('console.command.translation_debug');
-            $definition->replaceArgument(4, $container->getParameter('twig.default_path'));
-
-            if (\count($definition->getArguments()) > 6) {
-                $definition->replaceArgument(6, $paths);
-            }
-        }
-        if ($container->hasDefinition('console.command.translation_extract')) {
-            $definition = $container->getDefinition('console.command.translation_extract');
             $definition->replaceArgument(5, $container->getParameter('twig.default_path'));
 
             if (\count($definition->getArguments()) > 7) {
                 $definition->replaceArgument(7, $paths);
+            }
+        }
+        if ($container->hasDefinition('console.command.translation_extract')) {
+            $definition = $container->getDefinition('console.command.translation_extract');
+            $definition->replaceArgument(6, $container->getParameter('twig.default_path'));
+
+            if (\count($definition->getArguments()) > 8) {
+                $definition->replaceArgument(8, $paths);
             }
         }
     }

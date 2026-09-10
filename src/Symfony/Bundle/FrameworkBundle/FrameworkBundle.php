@@ -23,12 +23,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FindCommandBundl
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingRouterDependenciesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingSerializerDependenciesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingValidatorDependenciesPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSerializerPropertyAccessorPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
@@ -241,17 +236,11 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FragmentRendererPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new DefaultCachePoolsPass());
-        // FormPass collects the form.type_extension services, so the ones this bundle
-        // cannot wire have to be gone before it runs
-        $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
+        // must run before FormPass and SerializerPass, which collect the tags this one can still
+        // remove; SerializerBundle registers SerializerPass while building before this bundle, so
+        // the priority is what puts this pass first, not the order it is registered in
+        $container->addCompilerPass(new RemoveMissingDependenciesPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1);
         $this->addCompilerPassIfExists($container, FormPass::class);
-        // SerializerPass collects the serializer.normalizer services, and SerializerBundle
-        // registers it while building before this bundle, so ordering here is not enough
-        $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1);
-        $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
-        $container->addCompilerPass(new RemoveMissingRouterDependenciesPass());
-        $container->addCompilerPass(new RemoveMissingSerializerDependenciesPass());
-        $container->addCompilerPass(new RemoveMissingValidatorDependenciesPass());
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);

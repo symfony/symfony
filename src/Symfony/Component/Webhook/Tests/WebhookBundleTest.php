@@ -21,6 +21,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Webhook\Subscriber;
 use Symfony\Component\Webhook\Tests\Fixtures\TestConsumer;
@@ -33,7 +34,13 @@ class WebhookBundleTest extends TestCase
 
     protected function setUp(): void
     {
+        // tearDown() cleans up whatever setUp() named, so skip only once the path is known
         $this->varDir = sys_get_temp_dir().'/sf_webhook_bundle_test';
+
+        if (!class_exists(MessengerBundle::class)) {
+            // the controller dispatches to a message bus, which only MessengerBundle provides
+            $this->markTestSkipped('The installed Messenger component ships no bundle.');
+        }
     }
 
     protected function tearDown(): void

@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
+namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Bundle\TwigBundle\Controller\TemplateController;
+use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 

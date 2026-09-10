@@ -34,6 +34,7 @@ use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Bridge\Twig\Extension\YamlExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer;
+use Symfony\Bundle\TwigBundle\Controller\TemplateController;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator;
 use Symfony\Bundle\TwigBundle\TemplateIterator;
 use Twig\Cache\ChainCache;
@@ -198,5 +199,17 @@ return static function (ContainerConfigurator $container) {
         ->set('controller.template_attribute_listener', TemplateAttributeListener::class)
             ->args([service('twig')])
             ->tag('kernel.event_subscriber')
+
+        ->set(TemplateController::class)
+            ->args([
+                service('twig'),
+            ])
+            ->public()
+
+        // applications reference the old id from their route definitions, and this bundle is the
+        // only one that can answer for it now that it provides the controller
+        ->alias('Symfony\\Bundle\\FrameworkBundle\\Controller\\TemplateController', TemplateController::class)
+            ->public()
+            ->deprecate('symfony/twig-bundle', '8.2', 'The "%alias_id%" service is deprecated, use "Symfony\\Bundle\\TwigBundle\\Controller\\TemplateController" instead.')
     ;
 };

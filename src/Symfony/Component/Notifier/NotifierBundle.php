@@ -287,5 +287,6 @@ class NotifierBundle extends AbstractBundle
                     $container->removeDefinition($service);
                 }
             }
-        }    }
+        }
+    }
 }

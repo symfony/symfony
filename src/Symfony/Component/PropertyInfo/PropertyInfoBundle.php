@@ -85,15 +85,15 @@ class PropertyInfoBundle extends AbstractBundle
         }
 
         if (
-            ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/property-info'])
-            && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', ContextFactory::class, ['symfony/property-info'])
+            ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/property-info'])
+            && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', ContextFactory::class, ['symfony/framework-bundle', 'symfony/property-info'])
         ) {
             $container->register('property_info.phpstan_extractor', PhpStanExtractor::class)
                 ->addTag('property_info.type_extractor', ['priority' => -1000])
                 ->addTag('property_info.constructor_extractor', ['priority' => -1000]);
         }
 
-        if (ContainerBuilder::willBeAvailable('phpdocumentor/reflection-docblock', DocBlockFactoryInterface::class, ['symfony/property-info'])) {
+        if (ContainerBuilder::willBeAvailable('phpdocumentor/reflection-docblock', DocBlockFactoryInterface::class, ['symfony/framework-bundle', 'symfony/property-info'])) {
             $container->register('property_info.php_doc_extractor', PhpDocExtractor::class)
                 ->addTag('property_info.description_extractor', ['priority' => -1000])
                 ->addTag('property_info.type_extractor', ['priority' => -1001])

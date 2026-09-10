@@ -236,7 +236,7 @@ class ValidationBundle extends AbstractBundle
             $files['yaml' === $extension ? 'yml' : $extension][] = $path;
         };
 
-        if (!ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/validator'])) {
+        if (!ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/framework-bundle', 'symfony/validator'])) {
             $container->removeDefinition('validator.form.attribute_metadata');
         }
 

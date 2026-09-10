@@ -12,12 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\Routing\CacheWarmer\RouterCacheWarmer;
 use Symfony\Component\Routing\Controller\RedirectController;
+use Symfony\Component\Routing\DependencyInjection\Router;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -192,6 +191,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'request'])
 
+        ->alias('Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController', RedirectController::class)
+            ->public()
+            ->deprecate('symfony/routing', '8.2', 'The "%alias_id%" service is deprecated, use "Symfony\\Component\\Routing\\Controller\\RedirectController" instead.')
+
         ->set(RedirectController::class)
             ->public()
             ->args([
@@ -202,10 +205,12 @@ return static function (ContainerConfigurator $container) {
                     ->factory([service('router.request_context'), 'getHttpsPort']),
             ])
 
-        ->set(TemplateController::class)
-            ->args([
-                service('twig')->ignoreOnInvalid(),
-            ])
+        ->set('container.get_routing_condition_service', \Closure::class)
             ->public()
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([
+                [tagged_locator('routing.condition_service', 'alias'), 'get'],
+            ])
+            ->tag('routing.expression_language_function', ['function' => 'service'])
     ;
 };

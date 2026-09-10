@@ -4,6 +4,10 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead
+ * Deprecate `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use the ones from the Routing component instead
+ * Deprecate `Translation\Translator`, use `Symfony\Component\Translation\DependencyInjection\Translator` instead
+ * Deprecate `Controller\TemplateController`, use `Symfony\Bundle\TwigBundle\Controller\TemplateController` instead
  * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, use the ones from the Cache component instead
  * Deprecate `CacheWarmer\SerializerCacheWarmer` and `CacheWarmer\ValidatorCacheWarmer`, use the ones from the Serializer and Validator components instead
  * Deprecate the five `Command\CachePool*Command` classes, use the ones from the Cache component instead
@@ -11,61 +15,9 @@ CHANGELOG
  * Deprecate `CacheWarmer\TranslationsCacheWarmer`, use `Symfony\Component\Translation\CacheWarmer\TranslationsCacheWarmer` instead
  * Deprecate `CacheWarmer\RouterCacheWarmer`, `Controller\RedirectController`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader` and `Routing\RedirectableCompiledUrlMatcher`, use their counterparts from the Routing component instead
  * Let `TranslationBundle` declare all the `translation:*` and `lint:translations` commands
- * Make `framework.translator` an alias of the `translation` configuration provided by `TranslationBundle`
- * Register `TranslationBundle` automatically when the Translation component is installed
- * Make `framework.validation` an alias of the `validation` configuration provided by `ValidationBundle`
- * Register `ValidationBundle` automatically when the Validator component is installed
- * Make `framework.serializer` an alias of the `serializer` configuration provided by `SerializerBundle`
- * Register `SerializerBundle` automatically when the Serializer component is installed
- * Make `framework.router` an alias of the `router` configuration provided by `RouterBundle`
- * Register `RouterBundle` automatically
- * Make `framework.assets` an alias of the `asset` configuration provided by `AssetBundle`
- * Register `AssetBundle` automatically when the Asset component is installed
- * Make `framework.notifier` an alias of the `notifier` configuration provided by `NotifierBundle`
- * Register `NotifierBundle` automatically when the Notifier component is installed
- * Make `framework.cache` an alias of the `cache` configuration provided by `CacheBundle`
- * Register `CacheBundle` automatically
- * Make `framework.web_link` an alias of the `web_link` configuration provided by `WebLinkBundle`
- * Register `WebLinkBundle` automatically when the WebLink component is installed
- * Make `framework.lock` an alias of the `lock` configuration provided by `LockBundle`
- * Register `LockBundle` automatically when the Lock component is installed
- * Make `framework.messenger` an alias of the `messenger` configuration provided by `MessengerBundle`
- * Register `MessengerBundle` automatically when the Messenger component is installed
- * Make `framework.semaphore` an alias of the `semaphore` configuration provided by `SemaphoreBundle`
- * Register `SemaphoreBundle` automatically when the Semaphore component is installed
- * Make `framework.html_sanitizer` an alias of the `html_sanitizer` configuration provided by `HtmlSanitizerBundle`
- * Register `HtmlSanitizerBundle` automatically when the HtmlSanitizer component is installed
- * Make `framework.type_info` an alias of the `type_info` configuration provided by `TypeInfoBundle`
- * Register `TypeInfoBundle` automatically when the TypeInfo component is installed
- * Make `framework.property_access` an alias of the `property_access` configuration provided by `PropertyAccessBundle`
- * Register `PropertyAccessBundle` automatically when the PropertyAccess component is installed
- * Make `framework.property_info` an alias of the `property_info` configuration provided by `PropertyInfoBundle`
- * Register `PropertyInfoBundle` automatically when the PropertyInfo component is installed
- * Make `framework.uid` an alias of the `uid` configuration provided by `UidBundle`
- * Register `UidBundle` automatically when the Uid component is installed
- * Make `framework.scheduler` an alias of the `scheduler` configuration provided by `SchedulerBundle`
- * Register `SchedulerBundle` automatically when the Scheduler component is installed
- * Make `framework.json_streamer` an alias of the `json_streamer` configuration provided by `JsonStreamerBundle`
- * Register `JsonStreamerBundle` automatically when the JsonStreamer component is installed
- * Make `framework.asset_mapper` an alias of the `asset_mapper` configuration provided by `AssetMapperBundle`
- * Register `AssetMapperBundle` automatically when the AssetMapper component is installed
- * Make `framework.rate_limiter` an alias of the `rate_limiter` configuration provided by `RateLimiterBundle`
- * Register `RateLimiterBundle` automatically when the RateLimiter component is installed
- * Make `framework.webhook` an alias of the `webhook` configuration provided by `WebhookBundle`
- * Register `WebhookBundle` automatically when the Webhook component is installed
- * Make `framework.http_client` an alias of the `http_client` configuration provided by `HttpClientBundle`
- * Register `HttpClientBundle` automatically when the HttpClient component is installed
- * Make `framework.mailer` an alias of the `mailer` configuration provided by `MailerBundle`
- * Register `MailerBundle` automatically when the Mailer component is installed
- * Make `framework.workflows` an alias of the `workflow` configuration provided by `WorkflowBundle`
- * Register `WorkflowBundle` automatically when the Workflow component is installed
- * Make `framework.remote_event` an alias of the `remote_event` configuration provided by `RemoteEventBundle`
- * Register `RemoteEventBundle` automatically when the RemoteEvent component is installed
+ * Register the bundle each installed component now ships: `AssetBundle`, `AssetMapperBundle`, `CacheBundle`, `HtmlSanitizerBundle`, `HttpClientBundle`, `JsonPathBundle`, `JsonStreamerBundle`, `LockBundle`, `MailerBundle`, `MessengerBundle`, `MimeBundle`, `NotifierBundle`, `ObjectMapperBundle`, `ProcessBundle`, `PropertyAccessBundle`, `PropertyInfoBundle`, `RateLimiterBundle`, `RemoteEventBundle`, `RouterBundle`, `SchedulerBundle`, `SemaphoreBundle`, `SerializerBundle`, `TranslationBundle`, `TypeInfoBundle`, `UidBundle`, `ValidationBundle`, `WebLinkBundle`, `WebhookBundle` and `WorkflowBundle`
+ * Make every `framework.*` key an alias of the configuration of the bundle that provides it; three are spelled differently at the root: `framework.assets` for `asset`, `framework.translator` for `translation` and `framework.workflows` for `workflow`
  * Deprecate `JsonPathPass`, use the one from the JsonPath component instead
- * Register `ProcessBundle` automatically when the Process component is installed
- * Register `JsonPathBundle` automatically when the JsonPath component is installed
- * Register `MimeBundle` automatically when the Mime component is installed
- * Register `ObjectMapperBundle` automatically when the ObjectMapper component is installed
  * Auto-configure the `form.data_class` resource tag for classes with the `#[AsFormType]` attribute
  * Add the `cache.adapter.mongodb` and `cache.adapter.mongodb_tag_aware` cache adapters, and the `framework.cache.default_mongodb_provider` option
  * Add Messenger routing and failure transport information to the `debug:messenger` command

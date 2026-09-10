@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
-use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
@@ -47,7 +46,7 @@ return static function (ContainerConfigurator $container) {
                 service('service_container'),
                 service('logger')->ignoreOnInvalid(),
             ])
-            ->call('allowControllers', [[AbstractController::class, TemplateController::class]])
+            ->call('allowControllers', [[AbstractController::class]])
             ->tag('monolog.logger', ['channel' => 'request'])
 
         ->set('argument_metadata_factory', ArgumentMetadataFactory::class)

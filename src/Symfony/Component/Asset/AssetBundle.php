@@ -145,7 +145,8 @@ class AssetBundle extends AbstractBundle
                 ->addTag('assets.package', ['package' => $name]);
             $container->setDefinition('assets._package_'.$name, $packageDefinition);
             $container->registerAliasForArgument('assets._package_'.$name, PackageInterface::class, $name.'.package', $name);
-        }    }
+        }
+    }
 
     private function createPackageDefinition(?string $basePath, array $baseUrls, Reference $version): Definition
     {
@@ -161,6 +162,7 @@ class AssetBundle extends AbstractBundle
 
         return $package;
     }
+
     private function createVersion(ContainerBuilder $container, ?string $version, ?string $format, ?string $jsonManifestPath, string $name, bool $strictMode): Reference
     {
         // Configuration prevents $version and $jsonManifestPath from being set

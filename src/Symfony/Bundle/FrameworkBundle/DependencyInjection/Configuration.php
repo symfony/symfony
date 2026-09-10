@@ -135,37 +135,13 @@ class Configuration implements ConfigurationInterface
         $this->addFragmentsSection($rootNode);
         $this->addUriSignerSection($rootNode);
         $this->addProfilerSection($rootNode);
-        $this->addWorkflowSection($rootNode);
+        $this->addExtensionAliasSections($rootNode);
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
-        $this->addRouterSection($rootNode);
-        $this->addAssetsSection($rootNode);
-        $this->addAssetMapperSection($rootNode);
-        $this->addTranslatorSection($rootNode);
-        $this->addValidationSection($rootNode);
-        $this->addSerializerSection($rootNode);
-        $this->addPropertyAccessSection($rootNode);
-        $this->addTypeInfoSection($rootNode);
-        $this->addPropertyInfoSection($rootNode);
-        $this->addCacheSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
         $this->addExceptionsSection($rootNode);
-        $this->addWebLinkSection($rootNode);
-        $this->addLockSection($rootNode);
-        $this->addSemaphoreSection($rootNode);
-        $this->addMessengerSection($rootNode);
-        $this->addSchedulerSection($rootNode);
         $this->addRobotsIndexSection($rootNode);
-        $this->addHttpClientSection($rootNode);
-        $this->addMailerSection($rootNode);
         $this->addSecretsSection($rootNode);
-        $this->addNotifierSection($rootNode);
-        $this->addRateLimiterSection($rootNode);
-        $this->addUidSection($rootNode);
-        $this->addHtmlSanitizerSection($rootNode);
-        $this->addWebhookSection($rootNode);
-        $this->addRemoteEventSection($rootNode);
-        $this->addJsonStreamerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -349,6 +325,59 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * Declares the keys whose value belongs to the configuration of a component's own bundle.
+     *
+     * MergeExtensionConfigurationPass forwards each of them to the extension named by aliasOf().
+     */
+    private function addExtensionAliasSections(ArrayNodeDefinition $rootNode): void
+    {
+        $enabled = ['enabled' => true];
+        $children = $rootNode->children();
+
+        // key => [aliased extension, what "true" stands for or null when there is no enabled flag,
+        //         accepts a bare string of resources]
+        foreach ([
+            'workflows' => ['workflow', $enabled, false],
+            'router' => ['router', $enabled, false],
+            'assets' => ['asset', $enabled, false],
+            'asset_mapper' => ['asset_mapper', $enabled, false],
+            'translator' => ['translation', $enabled, false],
+            'validation' => ['validation', $enabled, false],
+            'serializer' => ['serializer', $enabled, false],
+            'property_access' => ['property_access', $enabled, false],
+            'type_info' => ['type_info', $enabled, false],
+            'property_info' => ['property_info', $enabled, false],
+            'cache' => ['cache', null, false],
+            'web_link' => ['web_link', $enabled, false],
+            'lock' => ['lock', [], true],
+            'semaphore' => ['semaphore', $enabled, true],
+            'messenger' => ['messenger', [], false],
+            'scheduler' => ['scheduler', $enabled, false],
+            'http_client' => ['http_client', $enabled, false],
+            'mailer' => ['mailer', $enabled, false],
+            'notifier' => ['notifier', $enabled, false],
+            'rate_limiter' => ['rate_limiter', $enabled, false],
+            'uid' => ['uid', $enabled, false],
+            'html_sanitizer' => ['html_sanitizer', $enabled, false],
+            'webhook' => ['webhook', $enabled, false],
+            'remote_event' => ['remote_event', $enabled, false],
+            'json_streamer' => ['json_streamer', $enabled, false],
+        ] as $key => [$alias, $treatTrueLike, $acceptsResourcesAsString]) {
+            $node = $children->variableNode($key)->aliasOf($alias);
+
+            if (null !== $treatTrueLike) {
+                $node->treatFalseLike(['enabled' => false])->treatTrueLike($treatTrueLike);
+            }
+
+            if ($acceptsResourcesAsString) {
+                $node->beforeNormalization()->ifString()->then(static fn ($v) => ['resources' => $v])->end();
+            }
+
+            $node->end();
+        }
+    }
+
     private function addProfilerSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
@@ -426,19 +455,6 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addWorkflowSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('workflows')
-                    ->aliasOf('workflow')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
     private function addSessionSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
@@ -504,146 +520,6 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
-                ->end()
-            ->end()
-        ;
-    }
-
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addSerializerSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('serializer')
-                    ->aliasOf('serializer')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addRouterSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('router')
-                    ->aliasOf('router')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addAssetsSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('assets')
-                    ->aliasOf('asset')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addAssetMapperSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('asset_mapper')
-                    ->aliasOf('asset_mapper')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addTranslatorSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('translator')
-                    ->aliasOf('translation')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addValidationSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('validation')
-                    ->aliasOf('validation')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('property_access')
-                    ->aliasOf('property_access')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('property_info')
-                    ->aliasOf('property_info')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addTypeInfoSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('type_info')
-                    ->aliasOf('type_info')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addCacheSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('cache')
-                    ->aliasOf('cache')
                 ->end()
             ->end()
         ;
@@ -737,76 +613,6 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addLockSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('lock')
-                    ->aliasOf('lock')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike([])
-                    ->beforeNormalization()->ifString()->then(static fn ($v) => ['resources' => $v])->end()
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addSemaphoreSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('semaphore')
-                    ->aliasOf('semaphore')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                    ->beforeNormalization()->ifString()->then(static fn ($v) => ['resources' => $v])->end()
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addWebLinkSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('web_link')
-                    ->aliasOf('web_link')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addMessengerSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('messenger')
-                    ->aliasOf('messenger')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike([])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addSchedulerSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('scheduler')
-                    ->aliasOf('scheduler')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
     private function addRobotsIndexSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
@@ -815,126 +621,6 @@ class Configuration implements ConfigurationInterface
                     ->info('Enabled by default when debug is enabled.')
                     ->defaultValue($this->debug)
                     ->treatNullLike($this->debug)
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addHttpClientSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('http_client')
-                    ->aliasOf('http_client')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addMailerSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('mailer')
-                    ->aliasOf('mailer')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    /**
-     * @param-immediately-invoked-callable $enableIfStandalone
-     */
-    private function addNotifierSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('notifier')
-                    ->aliasOf('notifier')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addWebhookSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('webhook')
-                    ->aliasOf('webhook')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addRemoteEventSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('remote_event')
-                    ->aliasOf('remote_event')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addRateLimiterSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('rate_limiter')
-                    ->aliasOf('rate_limiter')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addUidSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('uid')
-                    ->aliasOf('uid')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addHtmlSanitizerSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('html_sanitizer')
-                    ->aliasOf('html_sanitizer')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addJsonStreamerSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->variableNode('json_streamer')
-                    ->aliasOf('json_streamer')
-                    ->treatFalseLike(['enabled' => false])
-                    ->treatTrueLike(['enabled' => true])
                 ->end()
             ->end()
         ;

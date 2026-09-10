@@ -45,6 +45,11 @@ class TwigExtension extends Extension
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
 
+        // the enabled locales come from a bundle this one does not require
+        if (!$container->hasParameter('kernel.enabled_locales')) {
+            $container->getDefinition('twig.app_variable')->removeMethodCall('setEnabledLocales');
+        }
+
         if ($container::willBeAvailable('symfony/form', Form::class, ['symfony/twig-bundle'])) {
             $loader->load('form.php');
         }

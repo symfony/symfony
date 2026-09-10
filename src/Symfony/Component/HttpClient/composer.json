@@ -35,7 +35,7 @@
         "nyholm/psr7": "^1.0",
         "php-http/httplug": "^1.0|^2.0",
         "psr/http-client": "^1.0",
-        "symfony/config": "^7.4|^8.0",
+        "symfony/config": "^8.2",
         "symfony/dependency-injection": "^8.1",
         "symfony/cache": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
@@ -47,6 +47,7 @@
     "conflict": {
         "amphp/amp": "<3",
         "php-http/discovery": "<1.15",
+        "symfony/config": "<8.2",
         "symfony/dependency-injection": "<8.1"
     },
     "autoload": {

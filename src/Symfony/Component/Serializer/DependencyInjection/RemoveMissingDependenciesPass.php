@@ -34,6 +34,12 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
             $container->removeDefinition('serializer.normalizer.translatable');
         }
 
+        if (!$container->has('property_accessor')) {
+            $container->removeAlias('serializer.property_accessor');
+            $container->removeDefinition('serializer.normalizer.object');
+            $container->removeDefinition('serializer.denormalizer.unwrapping');
+        }
+
         if (!$container->has('profiler')) {
             $container->removeDefinition('serializer.data_collector');
             $container->removeDefinition('debug.serializer');

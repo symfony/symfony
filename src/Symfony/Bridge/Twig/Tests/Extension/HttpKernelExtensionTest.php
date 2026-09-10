@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
-use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
+use Symfony\Bundle\TwigBundle\Controller\TemplateController;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -101,7 +101,7 @@ class HttpKernelExtensionTest extends TestCase
         ]));
         $twig->addRuntimeLoader($loader);
 
-        $this->assertMatchesRegularExpression('#/_fragment\?(?:_expiration=.+&amp;)?_hash=.+&amp;_path=template%3Dfoo.html.twig%26_format%3Dhtml%26_locale%3Den%26_controller%3DSymfony%255CBundle%255CFrameworkBundle%255CController%255CTemplateController%253A%253AtemplateAction$#', $twig->render('index'));
+        $this->assertMatchesRegularExpression('#/_fragment\?(?:_expiration=.+&amp;)?_hash=.+&amp;_path=template%3Dfoo.html.twig%26_format%3Dhtml%26_locale%3Den%26_controller%3DSymfony%255CBundle%255CTwigBundle%255CController%255CTemplateController%253A%253AtemplateAction$#', $twig->render('index'));
     }
 
     protected function getFragmentHandler($returnOrException): FragmentHandler

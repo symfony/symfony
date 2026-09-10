@@ -649,4 +649,23 @@ class ScreenBufferTest extends TestCase
 
         $this->assertStringContainsString("\x1b[31mfghij", $buffer->getStyledScreen());
     }
+
+    public function testScrollbackOfAZeroHeightBuffer()
+    {
+        $buffer = new ScreenBuffer(20, 0);
+        $buffer->write("a\nb\n");
+
+        $this->assertSame(['', ''], $buffer->getScrollback());
+    }
+
+    public function testErasingTheScrollbackDropsTheLinesThatScrolledOff()
+    {
+        $buffer = new ScreenBuffer(20, 2);
+        $buffer->write("a\nb\nc\n");
+        $this->assertSame(['a', 'b'], $buffer->getScrollback());
+
+        $buffer->write("\x1b[3J");
+
+        $this->assertSame([], $buffer->getScrollback());
+    }
 }

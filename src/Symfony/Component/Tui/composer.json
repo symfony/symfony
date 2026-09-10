@@ -19,6 +19,7 @@
         "php": ">=8.4.1",
         "revolt/event-loop": "^1.0",
         "symfony/event-dispatcher": "^8.0",
+        "symfony/polyfill-intl-grapheme": "^1.42.1",
         "symfony/string": "^8.0"
     },
     "require-dev": {

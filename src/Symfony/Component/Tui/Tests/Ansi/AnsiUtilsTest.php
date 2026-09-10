@@ -622,4 +622,32 @@ class AnsiUtilsTest extends TestCase
             $this->assertLessThanOrEqual(8, AnsiUtils::visibleWidth($chunk));
         }
     }
+
+    public function testGraphemeWidthOfMalformedUtf8()
+    {
+        $this->assertSame(1, AnsiUtils::graphemeWidth("\xC3\u{0301}"));
+    }
+
+    public function testGraphemeWidthOfBytesThatCarryNoCharacterIsZero()
+    {
+        $this->assertSame(0, AnsiUtils::graphemeWidth("\xC3\xC3"));
+    }
+
+    public function testSliceByColumnKeepsSlicingMalformedUtf8()
+    {
+        $line = "ab\xC3\u{0301}cdef";
+
+        $this->assertSame('ab', AnsiUtils::sliceByColumn($line, 0, 2));
+        $this->assertSame('cdef', AnsiUtils::sliceByColumn($line, 3, 4));
+        $this->assertLessThanOrEqual(4, AnsiUtils::visibleWidth(AnsiUtils::sliceByColumn($line, 0, 4)));
+    }
+
+    public function testTruncateToWidthKeepsTruncatingMalformedUtf8()
+    {
+        $truncated = AnsiUtils::truncateToWidth("ab\xC3\u{0301}cdefghij", 6);
+
+        $this->assertStringStartsWith("ab\xC3\u{0301}", $truncated);
+        $this->assertStringEndsWith('...', $truncated);
+        $this->assertLessThanOrEqual(6, AnsiUtils::visibleWidth($truncated));
+    }
 }

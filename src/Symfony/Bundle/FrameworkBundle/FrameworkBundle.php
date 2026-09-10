@@ -241,8 +241,8 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FragmentRendererPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new DefaultCachePoolsPass());
+        $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1);
         $this->addCompilerPassIfExists($container, FormPass::class);
-        $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
         $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
         $container->addCompilerPass(new RemoveMissingRouterDependenciesPass());

@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-10T09:23:26Z
+
+Thanks for taking this one on. The 421 handling was indeed missing, and your greeting test covers a case that `stop()` cannot reach, so it is kept as is.
+
+I reworked the rest before making this ready. Two things came out of the review.
+
+**Handling the 421 inside `assertResponseCode()` breaks the callers that recover from a failed reply.** That method sits on the shared validation path for every command, and several callers continue after it throws. Terminating the stream there sets `$in` to `null`, so the next write reaches `@fwrite(null, ...)`, which raises a `TypeError`. The `@` cannot suppress it, and it does not implement `TransportExceptionInterface`, so it escapes `FailoverTransport`, `RoundRobinTransport` and every user `catch (TransportExceptionInterface)`.
+
+Against a server answering `421` to EHLO:
+
+```
+before   started OK          (the HELO fallback in doEhloCommand() runs)
+patch    TypeError: fwrite(): Argument #1 ($stream) must be of type resource, null given
+```
+
+Against a server answering `421` to the AUTH password line:
+
+```
+before   TransportException: Failed to authenticate on SMTP server ...
+patch    TypeError: fwrite(): Argument #1 ($stream) must be of type resource, null given
+```
+
+`EsmtpTransport::handleAuth()` catches the exception, writes `RSET`, and tries the next authenticator, all on the terminated stream.
+
+The 421 case therefore moved to `send()`'s catch, where the fate of the connection is already what is being decided, and `start()` now terminates after any failed handshake rather than for 421 alone.
+
+**The patch did not fix #49744.** Replaying the reported scenario, a server that queues a `421` behind the `NOOP` reply and then closes, gives the same result on both sides:
+
+```
+before   msg1 OK | msg2 fails | msg3 OK
+patch    msg1 OK | msg2 fails | msg3 OK
+```
+
+One message is still lost per idle timeout. The branch already recovered on the following send, through `ping()` instead of through `started`, so only the private flag differed.
+
+The missing half is that the ping itself succeeds while the `421` is still sitting in the buffer. `ping()` now checks for pending data after `NOOP` and reconnects before the transaction opens, which is what stops the message being lost. Measured over STARTTLS with six messages and a ping before each one: 5 of 6 delivered before, 6 of 6 after, and no extra reconnect against a healthy server.

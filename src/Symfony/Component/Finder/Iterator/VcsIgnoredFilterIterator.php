@@ -35,7 +35,8 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
      */
     public function __construct(\Iterator $iterator, string $baseDir)
     {
-        $this->baseDir = $this->normalizePath($baseDir);
+        // paths are compared to the real path of each file, so the base directory needs the same treatment
+        $this->baseDir = $this->normalizePath(realpath($baseDir) ?: $baseDir);
 
         foreach ([$this->baseDir, ...$this->parentDirectoriesUpwards($this->baseDir)] as $directory) {
             if (@is_dir("{$directory}/.git")) {
@@ -161,8 +162,12 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
         $rules = [];
 
         foreach (preg_split('~\r\n?|\n~', file_get_contents($path)) as $line) {
-            $line = preg_replace('~(?<!\\\\)#[^\n\r]*~', '', $line);
-            $line = preg_replace('~(?<!\\\\)[ \t]+$~', '', $line);
+            // only a line starting with "#" is a comment, and only trailing spaces are stripped
+            if (str_starts_with($line, '#')) {
+                continue;
+            }
+
+            $line = preg_replace('~(?<!\\\\) +$~', '', $line);
 
             if ($isNegated = str_starts_with($line, '!')) {
                 $line = substr($line, 1);
@@ -174,6 +179,11 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
 
             if ('' === $line) {
                 continue;
+            }
+
+            if (str_starts_with($line, '#')) {
+                // the leading "!" is already stripped, so a "#" here starts a pattern, not a comment
+                $line = '\\'.$line;
             }
 
             $rules[] = [Gitignore::toRegex($line), $isNegated, $isDirOnly];

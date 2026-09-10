@@ -13,11 +13,14 @@ namespace Symfony\Component\Cache\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Command\CachePoolClearCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 class CachePoolClearCommandTest extends TestCase
@@ -32,6 +35,24 @@ class CachePoolClearCommandTest extends TestCase
         $suggestions = $tester->complete($input);
 
         $this->assertSame($expectedSuggestions, $suggestions);
+    }
+
+    public function testTheWarningNamesThePoolThatCouldNotBeCleared()
+    {
+        $pool = $this->createMock(CacheItemPoolInterface::class);
+        $pool->expects($this->once())->method('clear')->willReturn(false);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->once())->method('get')->with('foo')->willReturn($pool);
+
+        $application = new Application();
+        $application->addCommand(new CachePoolClearCommand($container, new Psr6CacheClearer()));
+
+        $tester = new CommandTester($application->find('cache:pool:clear'));
+        $tester->execute(['pools' => ['foo']]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString('Cache pool "foo" could not be cleared.', $tester->getDisplay());
     }
 
     public static function provideCompletionSuggestions(): iterable

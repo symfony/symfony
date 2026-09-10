@@ -176,9 +176,10 @@ final class ScreenWriter
 
         $lineCount = \count($lines);
 
-        // Overflowing content that shrinks moves every visible line up, which
-        // cannot be expressed by erasing the trailing ones.
-        if (!$this->terminal->isVirtual() && \count($this->previousLines) > $rows && $lineCount < \count($this->previousLines)) {
+        // Rows are addressed by relative cursor motion, which clamps at the screen
+        // edges instead of scrolling, so no frame taller than the screen can be
+        // updated that way, in either direction.
+        if (!$this->terminal->isVirtual() && ($lineCount > $rows || \count($this->previousLines) > $rows)) {
             $this->redrawViewport($lines, $cursorPos, $rows);
 
             return;
@@ -231,7 +232,7 @@ final class ScreenWriter
      */
     private function fullRender(LineBufferInterface $newLines, ?array $cursorPos, bool $clear): void
     {
-        $buffer = "\x1b[?2026h"; // Begin synchronized output
+        $buffer = "\x1b[?2026h\x1b[?25l"; // Begin synchronized output with the cursor hidden
 
         if ($clear) {
             $buffer .= "\x1b[2J\x1b[3J\x1b[H"; // Clear screen, clear scrollback, and home
@@ -246,8 +247,6 @@ final class ScreenWriter
             $first = false;
         }
 
-        $buffer .= "\x1b[?2026l"; // End synchronized output
-
         $this->terminal->write($buffer);
         $this->hardwareCursorRow = max(0, \count($newLines) - 1);
 
@@ -258,6 +257,7 @@ final class ScreenWriter
         }
 
         $this->positionHardwareCursor($cursorPos, \count($newLines));
+        $this->terminal->write("\x1b[?2026l"); // Publish the content and the restored cursor together
         $this->previousWidth = $this->terminal->getColumns();
     }
 
@@ -272,7 +272,7 @@ final class ScreenWriter
     {
         $lineCount = \count($newLines);
         $visibleLines = $newLines->slice(max(0, $lineCount - $rows), min($lineCount, $rows));
-        $buffer = "\x1b[?2026h\x1b[2J\x1b[H";
+        $buffer = "\x1b[?2026h\x1b[?25l\x1b[2J\x1b[H"; // Begin synchronized output with the cursor hidden, clear screen and home
 
         foreach ($visibleLines as $i => $line) {
             if ($i > 0) {
@@ -281,13 +281,12 @@ final class ScreenWriter
             $buffer .= $this->prepareLine($line);
         }
 
-        $buffer .= "\x1b[?2026l";
-
         $this->terminal->write($buffer);
         $this->hardwareCursorRow = max(0, $lineCount - 1);
         $this->maxLinesRendered = $lineCount;
 
         $this->positionHardwareCursor($cursorPos, $lineCount);
+        $this->terminal->write("\x1b[?2026l"); // Publish the content and the restored cursor together
         $this->previousWidth = $this->terminal->getColumns();
     }
 
@@ -297,7 +296,7 @@ final class ScreenWriter
     private function handleDeletedLines(LineBufferInterface $newLines, ?array $cursorPos, int $height): void
     {
         $previousLineCount = \count($this->previousLines ?? throw new LogicException('Previous lines are not available.'));
-        $buffer = "\x1b[?2026h";
+        $buffer = "\x1b[?2026h\x1b[?25l"; // Begin synchronized output with the cursor hidden
 
         $targetRow = max(0, \count($newLines) - 1);
         $lineDiff = $targetRow - $this->hardwareCursorRow;
@@ -336,12 +335,11 @@ final class ScreenWriter
             $buffer .= "\x1b[{$moveUp}A";
         }
 
-        $buffer .= "\x1b[?2026l";
-
         $this->terminal->write($buffer);
         $this->hardwareCursorRow = $targetRow;
 
         $this->positionHardwareCursor($cursorPos, \count($newLines));
+        $this->terminal->write("\x1b[?2026l"); // Publish the content and the restored cursor together
         $this->previousWidth = $this->terminal->getColumns();
     }
 
@@ -351,7 +349,7 @@ final class ScreenWriter
     private function differentialRender(LineBufferInterface $newLines, ?array $cursorPos, int $firstChanged, int $lastChanged, int $width): void
     {
         $previousLineCount = \count($this->previousLines ?? throw new LogicException('Previous lines are not available.'));
-        $buffer = "\x1b[?2026h"; // Begin synchronized output
+        $buffer = "\x1b[?2026h\x1b[?25l"; // Begin synchronized output with the cursor hidden
 
         // Move cursor to first changed line
         $lineDiff = $firstChanged - $this->hardwareCursorRow;
@@ -383,8 +381,11 @@ final class ScreenWriter
             }
 
             if (null !== $lineWidth && $lineWidth > $width) {
-                // End synchronized output before throwing so the terminal
-                // is not left in buffered mode and ScreenWriter state stays consistent
+                // Restore the cursor and end synchronized output before throwing so the
+                // terminal is left neither in buffered mode nor without a cursor
+                if ($this->showHardwareCursor) {
+                    $buffer .= "\x1b[?25h";
+                }
                 $buffer .= "\x1b[?2026l";
                 $this->terminal->write($buffer);
 
@@ -412,14 +413,13 @@ final class ScreenWriter
             $buffer .= "\x1b[{$extraLines}A";
         }
 
-        $buffer .= "\x1b[?2026l"; // End synchronized output
-
         $this->terminal->write($buffer);
 
         $this->hardwareCursorRow = $finalCursorRow;
         $this->maxLinesRendered = max($this->maxLinesRendered, \count($newLines));
 
         $this->positionHardwareCursor($cursorPos, \count($newLines));
+        $this->terminal->write("\x1b[?2026l"); // Publish the content and the restored cursor together
         $this->previousWidth = $this->terminal->getColumns();
     }
 

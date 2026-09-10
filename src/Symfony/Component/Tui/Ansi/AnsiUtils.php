@@ -662,11 +662,25 @@ final class AnsiUtils
      * falling back to UnicodeString::width() for multi-codepoint graphemes
      * (ZWJ emoji sequences, skin tone modifiers, decomposed combining chars)
      * where mb_strwidth() overcounts by summing component widths.
+     *
+     * Malformed UTF-8 is measured on what is left once the invalid bytes are
+     * dropped, so it never throws.
      */
     public static function graphemeWidth(string $grapheme): int
     {
         if (1 === mb_strlen($grapheme, 'UTF-8')) {
             return mb_strwidth($grapheme, 'UTF-8');
+        }
+
+        if (!preg_match('//u', $grapheme)) {
+            // UnicodeString rejects malformed UTF-8. Drop the invalid bytes the
+            // way visibleWidth() does, so text that reaches a measure unscrubbed
+            // comes out as a wrong glyph instead of aborting the render.
+            $grapheme = @iconv('UTF-8', 'UTF-8//IGNORE', $grapheme) ?: '';
+
+            if (1 >= mb_strlen($grapheme, 'UTF-8')) {
+                return mb_strwidth($grapheme, 'UTF-8');
+            }
         }
 
         return new UnicodeString($grapheme)->width(false);

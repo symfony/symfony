@@ -25,6 +25,32 @@ class OutputWrapperTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testWrapReplacesMalformedUtf8()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("Lorem\n\u{FFFD}\nipsum", $wrapper->wrap("Lorem \xB3 ipsum", 5));
+        $this->assertSame("Lorem\n\u{FFFD}", $wrapper->wrap("Lorem \xF0\x9F", 5));
+        $this->assertSame("<info>Lore\nm \u{FFFD}</info>\nhttps://example.com/\nipsum ", $wrapper->wrap("<info>Lorem \xB3</info> https://example.com/\nipsum \n", 5));
+    }
+
+    public function testWrapBreaksMalformedUtf8LikeValidText()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame($wrapper->wrap('Lorem X ipsum', 5), str_replace("\u{FFFD}", 'X', $wrapper->wrap("Lorem \xB3 ipsum", 5)));
+    }
+
+    public function testWrapKeepsTheWholeMessageOfMalformedUtf8()
+    {
+        $text = "Cannot read the log file: \xB3 check the permissions";
+
+        $wrapped = (new OutputWrapper())->wrap($text, 20);
+
+        $this->assertNotSame($text, $wrapped);
+        $this->assertSame(str_replace([' ', "\xB3"], ['', "\u{FFFD}"], $text), str_replace(["\n", ' '], '', $wrapped));
+    }
+
     public static function textProvider(): iterable
     {
         $baseTextWithUtf8AndUrl = 'Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna maximus porttitor. Donec ullamcorper risus at <error>libero ornare</error> efficitur.';

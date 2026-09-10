@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TreeHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\Input;
@@ -182,6 +183,26 @@ class SymfonyStyleTest extends TestCase
         $display = stream_get_contents($output->getStream());
 
         $this->assertStringNotContainsString("\e[", $display);
+    }
+
+    public function testErrorWithMalformedUtf8()
+    {
+        $message = "Cannot read the log file at /var/log/app/deep/path.log: \xB3 check the file permissions, then retry the command and report the result";
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) use ($message) {
+            (new SymfonyStyle($input, $output))->error($message);
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $display = $this->tester->getDisplay(true);
+        $lines = array_filter(explode("\n", $display), static fn (string $line): bool => '' !== trim($line));
+
+        $this->assertStringContainsString("\u{FFFD}", $display);
+        $this->assertSame(str_replace([' ', "\xB3"], ['', "\u{FFFD}"], $message), str_replace(' ', '', implode('', array_map(static fn (string $line): string => substr($line, 9), $lines))));
+        $this->assertGreaterThan(1, \count($lines), 'The message is wrapped over several lines.');
+        $this->assertCount(1, array_unique(array_map(Helper::width(...), $lines)), 'Every line of the block is padded to the same width.');
     }
 
     public function testGetErrorStyle()

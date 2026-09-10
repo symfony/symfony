@@ -59,6 +59,19 @@ final class OutputWrapper
             return $text;
         }
 
+        if (!preg_match('//u', $text)) {
+            // everything below counts characters, which malformed UTF-8 has none of: the fold
+            // would return null and empty the text. Invalid bytes become U+FFFD, which is what
+            // a terminal displays for them anyway, and each takes one position like any character
+            $substitute = mb_substitute_character();
+            mb_substitute_character(0xFFFD);
+            try {
+                $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+            } finally {
+                mb_substitute_character($substitute);
+            }
+        }
+
         $tagPattern = \sprintf('<(?:(?:%s)|/(?:%s)?)>', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
         $patternBlocks = [$tagPattern];
         if (!$this->allowCutUrls) {

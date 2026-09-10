@@ -33,6 +33,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[Group('time-sensitive')]
 class SmtpTransportTest extends TestCase
 {
+    private const CLOCK_TICK_MICROSECONDS = 1;
+
     public function testToString()
     {
         $t = new SmtpTransport();
@@ -72,6 +74,129 @@ class SmtpTransportTest extends TestCase
             }
         }
         $this->assertSame(2, $heloCommands, 'The transport must reconnect after a read timeout.');
+    }
+
+    public function testConnectionIsResetAfterServiceUnavailableResponse()
+    {
+        $stream = new class extends DummyStream {
+            private array $responses = [];
+            private bool $failNextPing = true;
+
+            public function write(string $bytes, $debug = true): void
+            {
+                parent::write($bytes, $debug);
+
+                if ($this->failNextPing && "NOOP\r\n" === $bytes) {
+                    $this->failNextPing = false;
+                    $this->responses = [
+                        "250 2.0.0 OK\r\n",
+                        "421 4.4.1 Connection timed out.\r\n",
+                    ];
+                }
+            }
+
+            public function readLine(): string
+            {
+                return array_shift($this->responses) ?? parent::readLine();
+            }
+        };
+        $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
+
+        $transport = new SmtpTransport($stream);
+        $transport->setPingThreshold(0);
+        $transport->send(new RawMessage('Message 1'), $envelope);
+        usleep(self::CLOCK_TICK_MICROSECONDS);
+
+        try {
+            $transport->send(new RawMessage('Message 2'), $envelope);
+            $this->fail('The second message is expected to receive a service unavailable response.');
+        } catch (TransportException $e) {
+            $this->assertSame(421, $e->getCode());
+        }
+
+        $this->assertTrue($stream->isClosed(), 'The transport must disconnect when the server closes the transmission channel.');
+
+        // Ensure the next send reconnects because the transport was stopped, not
+        // because the ping path happened to detect the closed stream.
+        $transport->setPingThreshold(\PHP_INT_MAX);
+        $transport->send(new RawMessage('Message 3'), $envelope);
+        $this->assertFalse($stream->isClosed());
+    }
+
+    public function testConnectionIsResetAfterServiceUnavailableGreeting()
+    {
+        $stream = new class extends DummyStream {
+            private bool $failGreeting = true;
+
+            public function readLine(): string
+            {
+                if ($this->failGreeting) {
+                    $this->failGreeting = false;
+
+                    return "421 4.3.2 Service not available\r\n";
+                }
+
+                return parent::readLine();
+            }
+        };
+        $transport = new SmtpTransport($stream);
+
+        try {
+            $transport->start();
+            $this->fail('The server is expected to reject the connection.');
+        } catch (TransportException $e) {
+            $this->assertSame(421, $e->getCode());
+        }
+
+        $this->assertTrue($stream->isClosed(), 'The transport must disconnect after a service unavailable greeting.');
+    }
+
+    public function testPingReconnectsWhenTheServerQueuedAnotherReply()
+    {
+        $stream = new class extends DummyStream {
+            private array $responses = [];
+            private bool $armed = true;
+
+            public function write(string $bytes, $debug = true): void
+            {
+                parent::write($bytes, $debug);
+
+                if ($this->armed && "NOOP\r\n" === $bytes) {
+                    $this->armed = false;
+                    $this->responses = ["250 2.0.0 OK\r\n", "421 4.4.1 Connection timed out.\r\n"];
+                }
+            }
+
+            public function readLine(): string
+            {
+                return array_shift($this->responses) ?? parent::readLine();
+            }
+
+            public function hasPendingData(): bool
+            {
+                return (bool) $this->responses;
+            }
+
+            public function terminate(): void
+            {
+                parent::terminate();
+                $this->responses = [];
+            }
+        };
+        $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
+
+        $transport = new SmtpTransport($stream);
+        $transport->setPingThreshold(-1);
+        $transport->send(new RawMessage('Message 1'), $envelope);
+        $transport->send(new RawMessage('Message 2'), $envelope);
+
+        $heloCommands = 0;
+        foreach ($stream->getCommands() as $command) {
+            if (str_starts_with($command, 'HELO')) {
+                ++$heloCommands;
+            }
+        }
+        $this->assertSame(2, $heloCommands, 'The transport must reconnect when the server queued another reply.');
     }
 
     public function testSendDoesNotPingBelowThreshold()

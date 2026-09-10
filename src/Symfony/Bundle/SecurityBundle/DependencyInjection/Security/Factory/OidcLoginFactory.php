@@ -58,7 +58,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
 
                         return !OidcDiscovery::isSecureUrl((string) $v);
                     })
-                    ->thenInvalid('The OIDC "provider_uri" must use HTTPS (got %s): the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS. Use HTTPS, or a loopback host (localhost, 127.0.0.1, ::1) or a name reserved for testing (*.localhost, *.test) for local development.')
+                    ->thenInvalid('The OIDC "provider_uri" must use HTTPS (got %s): the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS. Use HTTPS, or a loopback host (localhost, 127.0.0.1, ::1, *.localhost) for local development.')
                 ->end()
                 ->info('The OIDC Issuer URL (e.g. "https://accounts.example.com"). Used for .well-known/openid-configuration discovery.')
             ->end()

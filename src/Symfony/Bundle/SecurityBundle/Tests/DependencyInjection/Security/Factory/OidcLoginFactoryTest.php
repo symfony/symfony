@@ -476,7 +476,7 @@ class OidcLoginFactoryTest extends TestCase
     }
 
     /**
-     * @param string $providerUri a loopback host or a name reserved for testing (RFC 2606, RFC 6761)
+     * @param string $providerUri a loopback host or a name RFC 6761, Section 6.3 reserves for the loopback interface
      */
     #[DataProvider('provideLocalDevelopmentProviderUris')]
     public function testAllowsHttpProviderUriForLocalDevelopment(string $providerUri)
@@ -498,7 +498,22 @@ class OidcLoginFactoryTest extends TestCase
         yield 'IPv4 loopback' => ['http://127.0.0.1:8080'];
         yield 'IPv6 loopback' => ['http://[::1]:8080'];
         yield 'localhost subdomain' => ['http://keycloak.localhost'];
-        yield 'test TLD' => ['http://keycloak.test'];
+    }
+
+    public function testRejectsATestDomainProviderUri()
+    {
+        // RFC 6761, Section 6.2 reserves ".test" without tying it to the loopback interface,
+        // so the name resolves like any other and plain HTTP is not confidential there
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The OIDC "provider_uri" must use HTTPS');
+
+        $this->processConfig([
+            'provider_uri' => 'http://keycloak.test',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+        ], $factory);
     }
 
     public function testPkceCanBeDisabled()

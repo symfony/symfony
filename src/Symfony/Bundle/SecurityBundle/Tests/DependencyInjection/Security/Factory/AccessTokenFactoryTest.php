@@ -988,6 +988,7 @@ class AccessTokenFactoryTest extends TestCase
         // route is declared, so a value the container cannot parse cannot be served
         yield 'an environment variable used as the whole value' => ['env_2b0d1a_API_RESOURCE_4f8c'];
         yield 'not HTTPS' => ['http://api.example.com'];
+        yield 'a test domain over HTTP' => ['http://api.example.test'];
         yield 'with a fragment' => ['https://api.example.com/v1#api'];
         yield 'no URL at all' => ['https://api.example.com:port/v1'];
     }
@@ -1012,7 +1013,7 @@ class AccessTokenFactoryTest extends TestCase
     {
         yield 'HTTPS' => ['https://api.example.com', '/.well-known/oauth-protected-resource', 'https://api.example.com/.well-known/oauth-protected-resource'];
         yield 'a loopback host over HTTP' => ['http://127.0.0.1:8000/api', '/.well-known/oauth-protected-resource/api', 'http://127.0.0.1:8000/.well-known/oauth-protected-resource/api'];
-        yield 'a host reserved for testing' => ['http://api.example.test', '/.well-known/oauth-protected-resource', 'http://api.example.test/.well-known/oauth-protected-resource'];
+        yield 'a localhost subdomain over HTTP' => ['http://api.localhost', '/.well-known/oauth-protected-resource', 'http://api.localhost/.well-known/oauth-protected-resource'];
         // a query is only a SHOULD NOT, and RFC 9728, Section 3.1 keeps it after the path
         yield 'with a query' => ['https://api.example.com/v1?tenant=acme', '/.well-known/oauth-protected-resource/v1', 'https://api.example.com/.well-known/oauth-protected-resource/v1?tenant=acme'];
         // an environment variable interpolated into the URL still leaves the path readable

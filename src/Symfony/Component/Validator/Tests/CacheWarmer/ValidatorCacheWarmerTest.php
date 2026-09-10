@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
+namespace Symfony\Component\Validator\Tests\CacheWarmer;
 
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Validator\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\ValidatorBuilder;
 
@@ -55,8 +55,8 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony.Component.Validator.Tests.Fixtures.Validation.Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony.Component.Validator.Tests.Fixtures.Validation.Author')->isHit());
     }
 
     public function testWarmUpAbsoluteFilePath()
@@ -80,8 +80,8 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony.Component.Validator.Tests.Fixtures.Validation.Person')->isHit());
+        $this->assertTrue($arrayPool->getItem('Symfony.Component.Validator.Tests.Fixtures.Validation.Author')->isHit());
     }
 
     public function testWarmUpWithoutBuilDir()
@@ -102,8 +102,8 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $this->assertFalse($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person')->isHit());
-        $this->assertFalse($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
+        $this->assertFalse($arrayPool->getItem('Symfony.Component.Validator.Tests.Fixtures.Validation.Person')->isHit());
+        $this->assertFalse($arrayPool->getItem('Symfony.Component.Validator.Tests.Fixtures.Validation.Author')->isHit());
     }
 
     public function testWarmUpWithAnnotations()
@@ -122,7 +122,7 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $arrayPool = $this->getArrayPool($file);
 
-        $item = $arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category');
+        $item = $arrayPool->getItem('Symfony.Component.Validator.Tests.Fixtures.Validation.Category');
         $this->assertTrue($item->isHit());
 
         $this->assertInstanceOf(ClassMetadata::class, $item->get());

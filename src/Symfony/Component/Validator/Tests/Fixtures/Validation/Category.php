@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation;
+namespace Symfony\Component\Validator\Tests\Fixtures\Validation;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

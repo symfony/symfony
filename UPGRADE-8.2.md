@@ -194,6 +194,10 @@ FrameworkBundle
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
  * Deprecate `JsonPathPass`, use the one from the JsonPath component instead
+ * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, use
+   their counterparts from the Cache component instead
+ * Deprecate `CacheWarmer\SerializerCacheWarmer` and `CacheWarmer\ValidatorCacheWarmer`, use their
+   counterparts from the Serializer and Validator components instead
  * Deprecate `Command\CachePoolClearCommand`, `Command\CachePoolDeleteCommand`,
    `Command\CachePoolInvalidateTagsCommand`, `Command\CachePoolListCommand` and
    `Command\CachePoolPruneCommand`, use their counterparts from the Cache component instead

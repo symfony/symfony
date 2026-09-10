@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, use the ones from the Cache component instead
+ * Deprecate `CacheWarmer\SerializerCacheWarmer` and `CacheWarmer\ValidatorCacheWarmer`, use the ones from the Serializer and Validator components instead
  * Deprecate the five `Command\CachePool*Command` classes, use the ones from the Cache component instead
  * Deprecate `Command\TranslationDebugCommand` and `Command\TranslationExtractCommand`, use the ones from the Translation component instead
  * Deprecate `CacheWarmer\TranslationsCacheWarmer`, use `Symfony\Component\Translation\CacheWarmer\TranslationsCacheWarmer` instead

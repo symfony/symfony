@@ -11,43 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\Cache\CacheWarmer\CachePoolClearerCacheWarmer as BaseCachePoolClearerCacheWarmer;
 
-/**
- * Clears the cache pools when warming up the cache.
- *
- * Do not use in production!
- *
- * @author Teoh Han Hui <teohhanhui@gmail.com>
- *
- * @internal
- */
-final class CachePoolClearerCacheWarmer implements CacheWarmerInterface
-{
-    /**
-     * @param string[] $pools
-     */
-    public function __construct(
-        private Psr6CacheClearer $poolClearer,
-        private array $pools = [],
-    ) {
-    }
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\CachePoolClearerCacheWarmer', BaseCachePoolClearerCacheWarmer::class);
 
-    public function warmUp(string $cacheDir, ?string $buildDir = null): array
-    {
-        foreach ($this->pools as $pool) {
-            if ($this->poolClearer->hasPool($pool)) {
-                $this->poolClearer->clearPool($pool);
-            }
-        }
-
-        return [];
-    }
-
-    public function isOptional(): bool
-    {
-        // optional cache warmers are not run when handling the request
-        return false;
-    }
-}
+class_alias(BaseCachePoolClearerCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\CachePoolClearerCacheWarmer');

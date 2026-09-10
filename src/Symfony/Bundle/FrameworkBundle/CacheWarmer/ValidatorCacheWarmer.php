@@ -11,85 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
-use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
-use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
-use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
-use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Validator\ValidatorBuilder;
+use Symfony\Component\Validator\CacheWarmer\ValidatorCacheWarmer as BaseValidatorCacheWarmer;
 
-/**
- * Warms up validator metadata.
- *
- * @author Titouan Galopin <galopintitouan@gmail.com>
- */
-final class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
-{
-    /**
-     * @param string $phpArrayFile The PHP file where metadata are cached
-     */
-    public function __construct(
-        private ValidatorBuilder $validatorBuilder,
-        string $phpArrayFile,
-    ) {
-        parent::__construct($phpArrayFile);
-    }
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer', BaseValidatorCacheWarmer::class);
 
-    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool
-    {
-        if (!$buildDir) {
-            return false;
-        }
-
-        $loaders = $this->validatorBuilder->getLoaders();
-        $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $arrayAdapter);
-
-        foreach ($this->extractSupportedLoaders($loaders) as $loader) {
-            foreach ($loader->getMappedClasses() as $mappedClass) {
-                try {
-                    if ($metadataFactory->hasMetadataFor($mappedClass)) {
-                        $metadataFactory->getMetadataFor($mappedClass);
-                    }
-                } catch (\Exception $e) {
-                    $this->ignoreAutoloadException($mappedClass, $e);
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @return string[] A list of classes to preload on PHP 7.4+
-     */
-    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values): array
-    {
-        // make sure we don't cache null values
-        $values = array_filter($values, static fn ($val) => null !== $val);
-
-        return parent::warmUpPhpArrayAdapter($phpArrayAdapter, $values);
-    }
-
-    /**
-     * @param LoaderInterface[] $loaders
-     *
-     * @return list<XmlFileLoader|YamlFileLoader|AttributeLoader>
-     */
-    private function extractSupportedLoaders(array $loaders): array
-    {
-        $supportedLoaders = [];
-
-        foreach ($loaders as $loader) {
-            if (method_exists($loader, 'getMappedClasses')) {
-                $supportedLoaders[] = $loader;
-            } elseif ($loader instanceof LoaderChain) {
-                $supportedLoaders = array_merge($supportedLoaders, $this->extractSupportedLoaders($loader->getLoaders()));
-            }
-        }
-
-        return $supportedLoaders;
-    }
-}
+class_alias(BaseValidatorCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer');

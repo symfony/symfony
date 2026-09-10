@@ -29,7 +29,6 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Bridge/Doctrine/Middleware/Debug/'):
         case false !== strpos($file, '/src/Symfony/Bridge/Doctrine/Tests/Fixtures/LegacyQueryMock.php'):
         case false !== strpos($file, '/src/Symfony/Bridge/PhpUnit/'):
-        case false !== strpos($file, '/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Validation/Article.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/BadFileName.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/BadParent.php'):
         case false !== strpos($file, '/src/Symfony/Component/Config/Tests/Fixtures/ParseError.php'):
@@ -65,6 +64,7 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Constraints/Fixtures/WhenTestWithClosure.php'):
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/EntityWithHook.php'):
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/NestedAttribute/Entity.php'):
+        case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/Validation/Article.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/NotLoadableClass.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/DeepCloner'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Internal'):

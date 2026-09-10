@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2026-09-10T09:42:01Z
+
+I've fixed the tests failure that where introduced by this PR, the remaining test failures looks unrelated (and the 8.2 branch fails on the same jobs).

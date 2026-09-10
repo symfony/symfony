@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-10T10:44:07Z
+
+Thanks for the report and the patch. The diagnosis is right: `preg_replace()` returns `null` for a malformed subject when the `u` modifier is set, and `rtrim(null, ...)` both deprecates and empties the message.
+
+I changed the remedy before making this ready. Returning the text unwrapped fixes the disappearing message, but it moves the problem into the block: the line is then longer than the terminal width and the padding goes with it. Rendering the same message through `SymfonyStyle::error()` at 80 columns, undecorated:
+
+```
+base          | [ERROR]                                                                        |   80 bytes
+return early  | [ERROR] Cannot read log file at /var/log/app/deep/path.log: ? check the file permissions and retry the command now|  115 bytes
+byte wrapping | [ERROR] Cannot read log file at /var/log/app/deep/path.log: ? check the file   |   80 bytes
+              |         permissions and retry the command now                                  |   80 bytes
+```
+
+So the pattern now drops the `u` modifier for malformed text rather than giving up on wrapping it. That also matches what `Helper::width()`, `length()` and `substr()` already do a few files away: they guard with the same `preg_match('//u', $string)` and fall back to a non-UTF-8 path instead of returning early.
+
+Two checks on that fallback:
+
+* it is a no-op for valid UTF-8. I compared the old and new `wrap()` over 24000 valid inputs at widths 1 to 30, with and without `allowCutUrls`, mixing tags, URLs, accented characters, CJK and emoji: no difference, and 10487 of those were actually rewrapped, so the comparison was exercising the path.
+* it never drops content. Over 4000 malformed inputs, nothing came back empty and no non-whitespace byte was lost. The only losses are the spaces `wrap()` already removes at a break point.
+
+A malformed byte also ends up laid out exactly like a valid character in the same position. `wrap("Lorem \xB3 ipsum", 5)` gives `Lorem\n\xB3\nipsum`, which is `wrap('Lorem X ipsum', 5)` with the byte put back.
+
+I replaced the data provider with plain assertions. 6.4 runs PHPUnit 9 while 7.4 and above run PHPUnit 13, so a docblock `@dataProvider` merges up cleanly and then fails there with `ArgumentCountError`, and inlining the cases removes the trap rather than documenting it.
+
+One thing worth knowing beyond this PR: 8.2 has the same bug, but not the same code. `wrap()` was rewritten there to fold tags and URLs to private-use codepoints, and the `preg_replace_callback()` that builds the fold returns `null` on malformed UTF-8 too. Dropping the `u` modifier is not the fix there, since the placeholders are multi-byte and would each eat four positions of the width budget. I noted that in the description so the merge is not resolved by taking one side.

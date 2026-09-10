@@ -28,6 +28,8 @@ final class ScreenBuffer
 {
     /** @var array<int, array<int, array{char: string, style: string}>> */
     private array $cells = [];
+    /** @var list<array<int, array{char: string, style: string}>> */
+    private array $scrollback = [];
     private int $cursorRow = 0;
     private int $cursorCol = 0;
     private int $width;
@@ -210,6 +212,16 @@ final class ScreenBuffer
     }
 
     /**
+     * Get the lines that scrolled off the top of the screen, oldest first.
+     *
+     * @return string[]
+     */
+    public function getScrollback(): array
+    {
+        return array_map($this->renderCells(...), $this->scrollback);
+    }
+
+    /**
      * Get the cell data for external processing (e.g., HTML conversion).
      *
      * @return array<int, array<int, array{char: string, style: string}>>
@@ -232,15 +244,23 @@ final class ScreenBuffer
      */
     private function getLineText(int $row): string
     {
-        if (!isset($this->cells[$row]) || !$this->cells[$row]) {
+        return $this->renderCells($this->cells[$row] ?? []);
+    }
+
+    /**
+     * @param array<int, array{char: string, style: string}> $cells
+     */
+    private function renderCells(array $cells): string
+    {
+        if (!$cells) {
             return '';
         }
 
         $line = '';
-        $maxCol = max(array_keys($this->cells[$row]));
+        $maxCol = max(array_keys($cells));
 
         for ($col = 0; $col <= $maxCol; ++$col) {
-            $char = $this->cells[$row][$col]['char'] ?? ' ';
+            $char = $cells[$col]['char'] ?? ' ';
             // Skip wide character continuation cells (empty string placeholders)
             if ('' === $char) {
                 continue;
@@ -371,7 +391,7 @@ final class ScreenBuffer
      */
     private function scrollUp(): void
     {
-        array_shift($this->cells);
+        $this->scrollback[] = array_shift($this->cells) ?? [];
         $this->cells[] = [];
     }
 
@@ -566,8 +586,10 @@ final class ScreenBuffer
                 $this->eraseInLine(1);
                 break;
 
+            case 3: // Erase the scrollback as well
+                $this->scrollback = [];
+                // no break
             case 2: // Erase entire screen (but don't move cursor)
-            case 3:
                 for ($i = 0; $i < $this->height; ++$i) {
                     $this->cells[$i] = [];
                 }

@@ -122,7 +122,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                                 // relaxes for the cases that need one, so it is accepted here
                                 return isset($parts['fragment']) || !OidcDiscovery::isSecureUrl((string) $v);
                             })
-                            ->thenInvalid('The protected resource "resource" identifier must be an HTTPS URL without a fragment (got %s), as RFC 9728, Section 1.2 requires. A loopback host (localhost, 127.0.0.1, ::1) or a name reserved for testing (*.localhost, *.test) is accepted over HTTP for local development. It is read when the route is declared, so an environment variable holding the whole value leaves the path unknown: interpolate it into the URL instead, as in "https://%%env(API_HOST)%%/v1".')
+                            ->thenInvalid('The protected resource "resource" identifier must be an HTTPS URL without a fragment (got %s), as RFC 9728, Section 1.2 requires. A loopback host (localhost, 127.0.0.1, ::1, *.localhost) is accepted over HTTP for local development. It is read when the route is declared, so an environment variable holding the whole value leaves the path unknown: interpolate it into the URL instead, as in "https://%%env(API_HOST)%%/v1".')
                         ->end()
                     ->end()
                     ->arrayNode('authorization_servers', 'authorization_server')

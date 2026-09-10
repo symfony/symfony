@@ -109,7 +109,7 @@ class OidcDiscoveryTest extends TestCase
     }
 
     /**
-     * @param string $issuer a loopback host or a name reserved for testing (RFC 2606, RFC 6761)
+     * @param string $issuer a loopback host or a name RFC 6761, Section 6.3 reserves for the loopback interface
      */
     #[DataProvider('provideLocalDevelopmentIssuers')]
     public function testGetConfigurationAllowsInsecureIssuersForLocalDevelopment(string $issuer)
@@ -127,7 +127,20 @@ class OidcDiscoveryTest extends TestCase
         yield 'IPv4 loopback' => ['http://127.0.0.1:8080'];
         yield 'IPv6 loopback' => ['http://[::1]:8080'];
         yield 'localhost subdomain' => ['http://keycloak.localhost'];
-        yield 'test TLD' => ['http://keycloak.test'];
+    }
+
+    public function testGetConfigurationRejectsATestDomainIssuer()
+    {
+        // RFC 6761, Section 6.2 reserves ".test" without tying it to the loopback interface,
+        // so the name resolves like any other and plain HTTP is not confidential there
+        $httpClient = new MockHttpClient(new JsonMockResponse(['issuer' => 'http://keycloak.test']));
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), 'http://keycloak.test/.well-known/openid-configuration', 'http://keycloak.test');
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('must use HTTPS');
+
+        $discovery->getConfiguration();
     }
 
     public function testGetConfigurationSkipsTheIssuerCheckWhenNoIssuerIsExpected()
@@ -242,7 +255,7 @@ class OidcDiscoveryTest extends TestCase
         $discovery->getSecureEndpoint('token_endpoint');
     }
 
-    public function testGetSecureEndpointAllowsALoopbackAuthorizationEndpointForLocalDevelopment()
+    public function testGetSecureEndpointAllowsALoopbackAuthorizationEndpoint()
     {
         $httpClient = new MockHttpClient(new JsonMockResponse([
             'issuer' => 'http://localhost:8080',
@@ -254,7 +267,7 @@ class OidcDiscoveryTest extends TestCase
         $this->assertSame('http://localhost:8080/authorize', $discovery->getSecureEndpoint('authorization_endpoint'));
     }
 
-    public function testGetSecureEndpointRejectsALoopbackTokenEndpoint()
+    public function testGetSecureEndpointAllowsALoopbackTokenEndpoint()
     {
         $httpClient = new MockHttpClient(new JsonMockResponse([
             'issuer' => 'http://localhost:8080',
@@ -263,10 +276,7 @@ class OidcDiscoveryTest extends TestCase
 
         $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), 'http://localhost:8080/.well-known/openid-configuration', 'http://localhost:8080');
 
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('must use HTTPS');
-
-        $discovery->getSecureEndpoint('token_endpoint');
+        $this->assertSame('http://localhost:8080/token', $discovery->getSecureEndpoint('token_endpoint'));
     }
 
     public function testGetConfigurationAppendsARelativeUrlToTheIssuer()

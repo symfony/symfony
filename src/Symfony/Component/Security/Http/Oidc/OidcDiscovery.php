@@ -192,11 +192,7 @@ final class OidcDiscovery implements ResetInterface
             throw new AuthenticationException(\sprintf('The OIDC provider does not announce any "%s".', $endpoint));
         }
 
-        // The token endpoint carries the authorization code and the PKCE verifier one way,
-        // and returns the ID and access tokens the other, so its transport must be secure even
-        // for the loopback and test-domain issuers allowed during local development. A public
-        // client sends no secret there, and still needs this.
-        if (!self::isSecureUrl($url) || ('token_endpoint' === $endpoint && 'https' !== strtolower((string) parse_url($url, \PHP_URL_SCHEME)))) {
+        if (!self::isSecureUrl($url)) {
             throw new AuthenticationException(\sprintf('The "%s" announced by the OIDC provider must use HTTPS (got "%s"): the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS.', $endpoint, $url));
         }
 
@@ -207,8 +203,7 @@ final class OidcDiscovery implements ResetInterface
      * Tells whether the given URL provides the transport security the OIDC flow relies on.
      *
      * The authorization code, the PKCE verifier and the tokens it is exchanged for are only
-     * confidential over TLS, so HTTPS is mandatory, loopback hosts and the names reserved for
-     * testing excepted, for local development.
+     * confidential over TLS, so HTTPS is mandatory, loopback hosts excepted, for local development.
      */
     public static function isSecureUrl(string $url): bool
     {
@@ -224,8 +219,9 @@ final class OidcDiscovery implements ResetInterface
             return true;
         }
 
-        // special-use domain names reserved for testing: RFC 2606 §2, RFC 6761 §6.2 and §6.3
-        return str_ends_with($host, '.localhost') || str_ends_with($host, '.test');
+        // domain names that can be considered secure because DNS resolvers should always return
+        // the IP loopback address: RFC 6761 §6.3
+        return str_ends_with($host, '.localhost');
     }
 
     private function request(): ResponseInterface

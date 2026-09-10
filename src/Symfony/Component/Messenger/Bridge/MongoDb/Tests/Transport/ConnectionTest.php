@@ -15,10 +15,12 @@ require_once __DIR__.'/../Stubs/mongodb.php';
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
+use MongoDB\ChangeStream;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\DeleteResult;
 use MongoDB\Driver\CursorInterface;
+use MongoDB\Driver\Exception\CommandException;
 use MongoDB\Driver\Exception\RuntimeException;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\InsertOneResult;
@@ -57,6 +59,24 @@ class ConnectionTest extends TestCase
         $this->assertInstanceOf(Connection::class, Connection::fromDsn('mongodb://localhost:27017', ['database' => 'some_db', 'collection_name' => 'some_collection'], $client));
     }
 
+    public function testFromDsnWithWaitTimeZeroDisablesChangeStreams()
+    {
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->never())
+            ->method('watch');
+        $collection->method('findOneAndUpdate')
+            ->willReturn(null);
+
+        $client = $this->createMock(Client::class);
+        $client->expects($this->once())
+            ->method('getCollection')
+            ->willReturn($collection);
+
+        $connection = Connection::fromDsn('mongodb://localhost/db', ['wait_time' => 0], $client);
+
+        $this->assertNull($connection->get());
+    }
+
     /**
      * @param array{database: string, collection_name: string, queue_name: string, redeliver_timeout: int} $expectedConfiguration
      */
@@ -76,6 +96,7 @@ class ConnectionTest extends TestCase
             'collection_name' => 'messenger_messages',
             'queue_name' => 'default',
             'redeliver_timeout' => 3600,
+            'wait_time' => 1,
         ];
 
         yield 'database from the DSN path' => [
@@ -92,6 +113,20 @@ class ConnectionTest extends TestCase
             'mongodb://localhost:27017/db',
         ];
 
+        yield 'wait_time from the DSN query string is extracted' => [
+            'mongodb://localhost:27017/db?wait_time=2',
+            [],
+            ['wait_time' => 2] + $defaultConfiguration,
+            'mongodb://localhost:27017/db',
+        ];
+
+        yield 'change streams are disabled by a zero wait_time' => [
+            'mongodb://localhost:27017/db?wait_time=0',
+            [],
+            ['wait_time' => 0] + $defaultConfiguration,
+            'mongodb://localhost:27017/db',
+        ];
+
         yield 'driver options in the query string are kept' => [
             'mongodb+srv://localhost/db?replicaSet=repl&queue_name=my_queue&appname=my_app',
             [],
@@ -100,9 +135,9 @@ class ConnectionTest extends TestCase
         ];
 
         yield 'options take precedence over the DSN' => [
-            'mongodb://localhost:27017/db?queue_name=from_query',
-            ['database' => 'other_db', 'queue_name' => 'from_options'],
-            ['database' => 'other_db', 'queue_name' => 'from_options'] + $defaultConfiguration,
+            'mongodb://localhost:27017/db?queue_name=from_query&wait_time=2',
+            ['database' => 'other_db', 'queue_name' => 'from_options', 'wait_time' => 3],
+            ['database' => 'other_db', 'queue_name' => 'from_options', 'wait_time' => 3] + $defaultConfiguration,
             'mongodb://localhost:27017/db',
         ];
     }
@@ -133,13 +168,25 @@ class ConnectionTest extends TestCase
         yield 'unknown option' => [
             'mongodb://localhost:27017/db',
             ['foo' => 'bar'],
-            'Unknown option found: [foo]. Allowed options are [database, collection_name, queue_name, redeliver_timeout].',
+            'Unknown option found: [foo]. Allowed options are [database, collection_name, queue_name, redeliver_timeout, wait_time].',
         ];
 
         yield 'invalid redeliver_timeout' => [
             'mongodb://localhost:27017/db',
             ['redeliver_timeout' => 'invalid'],
-            'The "redeliver_timeout" option must be an integer, "string" given.',
+            'The "redeliver_timeout" option must be an integer, "invalid" given.',
+        ];
+
+        yield 'invalid wait_time' => [
+            'mongodb://localhost:27017/db',
+            ['wait_time' => 'invalid'],
+            'The "wait_time" option must be an integer, "invalid" given.',
+        ];
+
+        yield 'wait_time above the maximum' => [
+            'mongodb://localhost:27017/db',
+            ['wait_time' => 301],
+            'The "wait_time" option must be lower than or equal to 300 seconds, "301" given.',
         ];
     }
 
@@ -198,11 +245,18 @@ class ConnectionTest extends TestCase
 
     public function testGetWithEmptyCollection()
     {
+        $changeStream = $this->createStub(ChangeStream::class);
+        $changeStream->method('valid')
+            ->willReturn(false);
+
         $collection = $this->createMock(Collection::class);
         $collection
             ->expects($this->once())
             ->method('findOneAndUpdate')
             ->willReturn(null);
+        $collection
+            ->method('watch')
+            ->willReturn($changeStream);
         $connection = new Connection($collection, 'default', 3_600);
 
         $this->assertNull($connection->get());
@@ -210,12 +264,186 @@ class ConnectionTest extends TestCase
 
     public function testGetWithUnmatchedDeliveredAt()
     {
+        $changeStream = $this->createStub(ChangeStream::class);
+        $changeStream->method('valid')
+            ->willReturn(false);
+
         $collection = $this->createMock(Collection::class);
         $collection->expects($this->once())
             ->method('findOneAndUpdate')
             ->willReturn($this->createDocumentDeliveredTo('someoneElse'));
+        $collection
+            ->method('watch')
+            ->willReturn($changeStream);
         $connection = new Connection($collection, 'default', 3_600);
 
+        $this->assertNull($connection->get());
+    }
+
+    public function testGetClaimsThroughTheStreamWhenThePollFindsNothing()
+    {
+        $changeStream = $this->createMock(ChangeStream::class);
+        $changeStream->method('valid')
+            ->willReturn(true);
+        $changeStream->expects($this->once())
+            ->method('rewind');
+
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())
+            ->method('watch')
+            ->with(
+                $this->equalTo([
+                    ['$match' => ['operationType' => 'insert', 'fullDocument.queueName' => 'my_queue']],
+                    ['$project' => ['_id' => 1]],
+                ]),
+                $this->callback(static function (array $options): bool {
+                    self::assertLessThanOrEqual(1000, $options['maxAwaitTimeMS']);
+                    self::assertGreaterThan(0, $options['maxAwaitTimeMS']);
+                    self::assertSame(['root' => 'bson'], $options['typeMap']);
+
+                    return true;
+                })
+            )
+            ->willReturn($changeStream);
+
+        $connection = new Connection($collection, 'my_queue');
+        $document = $this->createDocumentDeliveredTo($connection->getUniqueId());
+
+        // the outer claim finds nothing, then the stream wake-up claim returns the document
+        $collection->method('findOneAndUpdate')
+            ->willReturnOnConsecutiveCalls(null, $document);
+
+        $this->assertSame($document, $connection->get());
+    }
+
+    public function testGetReturnsNullWhenThePollAndTheStreamAreIdle()
+    {
+        $changeStream = $this->createMock(ChangeStream::class);
+        $changeStream->method('valid')
+            ->willReturn(false);
+        $changeStream->expects($this->once())
+            ->method('rewind');
+        $changeStream->expects($this->once())
+            ->method('next');
+
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())
+            ->method('watch')
+            ->willReturn($changeStream);
+        $collection->method('findOneAndUpdate')
+            ->willReturn(null);
+
+        $connection = new Connection($collection, 'my_queue');
+
+        $this->assertNull($connection->get());
+    }
+
+    public function testGetOpensAStreamPerCall()
+    {
+        $changeStream = $this->createStub(ChangeStream::class);
+        $changeStream->method('valid')
+            ->willReturn(false);
+
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->exactly(2))
+            ->method('watch')
+            ->willReturn($changeStream);
+        $collection->method('findOneAndUpdate')
+            ->willReturn(null);
+
+        $connection = new Connection($collection, 'my_queue');
+
+        $this->assertNull($connection->get());
+        $this->assertNull($connection->get());
+    }
+
+    public function testGetKeepsListeningWhenAnotherWorkerClaimsTheMessage()
+    {
+        $changeStream = $this->createStub(ChangeStream::class);
+        $changeStream->method('valid')
+            ->willReturn(true);
+
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->exactly(2))
+            ->method('watch')
+            ->willReturn($changeStream);
+
+        $connection = new Connection($collection, 'my_queue');
+        $document = $this->createDocumentDeliveredTo($connection->getUniqueId());
+
+        // the outer poll and the first wake-up claim both lose to another
+        // worker, so the connection re-opens the stream and claims on the
+        // second wake-up instead of going back to sleep
+        $collection->method('findOneAndUpdate')
+            ->willReturnOnConsecutiveCalls(null, null, $document);
+
+        $this->assertSame($document, $connection->get());
+    }
+
+    public function testGetDisablesTheStreamWhenTheServerIsNotAReplicaSet()
+    {
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())
+            ->method('watch')
+            ->willThrowException(new CommandException('The $changeStream stage is only supported on replica sets or mongos', 40573));
+        $collection->method('findOneAndUpdate')
+            ->willReturn(null);
+
+        $connection = new Connection($collection, 'my_queue');
+
+        $this->assertNull($connection->get());
+
+        // a standalone server cannot run change streams: they are disabled for
+        // good and the connection falls back to polling, without reopening
+        $this->assertNull($connection->get());
+    }
+
+    public function testGetRetriesTheStreamWhenItCannotBeOpenedForAnotherReason()
+    {
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->exactly(2))
+            ->method('watch')
+            ->willThrowException(new RuntimeException('watch failed'));
+        $collection->method('findOneAndUpdate')
+            ->willReturn(null);
+
+        $connection = new Connection($collection, 'my_queue');
+
+        $this->assertNull($connection->get());
+        $this->assertNull($connection->get());
+    }
+
+    public function testGetDisabledModeDoesNotOpenAStream()
+    {
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->never())
+            ->method('watch');
+        $collection->method('findOneAndUpdate')
+            ->willReturn(null);
+
+        $connection = new Connection($collection, 'my_queue', 3_600, null, 0);
+
+        $this->assertNull($connection->get());
+    }
+
+    public function testGetRetriesTheStreamWhenIterationFails()
+    {
+        $changeStream = $this->createStub(ChangeStream::class);
+        $changeStream->method('valid')
+            ->willReturn(false);
+        $changeStream->method('next')
+            ->willThrowException(new RuntimeException('stream failed'));
+
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->exactly(2))
+            ->method('watch')
+            ->willReturn($changeStream);
+        $collection->method('findOneAndUpdate')
+            ->willReturn(null);
+
+        $connection = new Connection($collection, 'my_queue');
+
+        $this->assertNull($connection->get());
         $this->assertNull($connection->get());
     }
 
@@ -305,7 +533,7 @@ class ConnectionTest extends TestCase
     }
 
     #[DataProvider('deleteCountProvider')]
-    public function testAck(int $deletedCount, bool $expectedResult)
+    public function testDelete(int $deletedCount, bool $expectedResult)
     {
         $collection = $this->createMock(Collection::class);
         $objectId = new ObjectId();
@@ -319,10 +547,10 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection($collection, 'queueName', 100);
 
-        $this->assertSame($expectedResult, $connection->ack((string) $objectId));
+        $this->assertSame($expectedResult, $connection->delete((string) $objectId));
     }
 
-    public function testAckWrapsMongoExceptions()
+    public function testDeleteWrapsMongoExceptions()
     {
         $collection = $this->createStub(Collection::class);
         $collection->method('deleteOne')
@@ -333,25 +561,7 @@ class ConnectionTest extends TestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Foo bar baz');
 
-        $connection->ack((string) new ObjectId());
-    }
-
-    #[DataProvider('deleteCountProvider')]
-    public function testReject(int $deletedCount, bool $expectedResult)
-    {
-        $collection = $this->createMock(Collection::class);
-        $objectId = new ObjectId();
-        $deleteResult = $this->createStub(DeleteResult::class);
-        $deleteResult->method('getDeletedCount')
-            ->willReturn($deletedCount);
-        $collection->expects($this->once())
-            ->method('deleteOne')
-            ->with($this->equalTo(['_id' => $objectId]), $this->anything())
-            ->willReturn($deleteResult);
-
-        $connection = new Connection($collection, 'queueName', 100);
-
-        $this->assertSame($expectedResult, $connection->reject((string) $objectId));
+        $connection->delete((string) new ObjectId());
     }
 
     public function testGetMessageCount()

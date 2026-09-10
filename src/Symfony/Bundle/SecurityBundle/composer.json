@@ -43,6 +43,7 @@
         "symfony/framework-bundle": "^8.1",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/ldap": "^7.4|^8.0",
+        "symfony/lock": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
         "symfony/property-info": "^7.4|^8.0",
         "symfony/rate-limiter": "^7.4|^8.0",

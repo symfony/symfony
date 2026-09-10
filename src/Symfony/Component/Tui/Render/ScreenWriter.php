@@ -176,10 +176,9 @@ final class ScreenWriter
 
         $lineCount = \count($lines);
 
-        // Rows are addressed by relative cursor motion, which clamps at the screen
-        // edges instead of scrolling, so no frame taller than the screen can be
-        // updated that way, in either direction.
-        if (!$this->terminal->isVirtual() && ($lineCount > $rows || \count($this->previousLines) > $rows)) {
+        // Overflowing content that shrinks moves every visible line up, which
+        // cannot be expressed by erasing the trailing ones.
+        if (!$this->terminal->isVirtual() && \count($this->previousLines) > $rows && $lineCount < \count($this->previousLines)) {
             $this->redrawViewport($lines, $cursorPos, $rows);
 
             return;
@@ -351,10 +350,12 @@ final class ScreenWriter
         $previousLineCount = \count($this->previousLines ?? throw new LogicException('Previous lines are not available.'));
         $buffer = "\x1b[?2026h\x1b[?25l"; // Begin synchronized output with the cursor hidden
 
-        // Move cursor to first changed line
+        // Move cursor to first changed line. Line feeds instead of downward cursor
+        // motion, which clamps at the last row: on the bottom of the screen they
+        // scroll, which is how content that grew past it reaches the scrollback.
         $lineDiff = $firstChanged - $this->hardwareCursorRow;
         if ($lineDiff > 0) {
-            $buffer .= "\x1b[{$lineDiff}B";
+            $buffer .= str_repeat("\n", $lineDiff);
         } elseif ($lineDiff < 0) {
             $buffer .= "\x1b[".(-$lineDiff).'A';
         }

@@ -761,4 +761,58 @@ class ScreenWriterTest extends TestCase
         yield 'two lines appended' => [$six, [...$six, 'L6', 'L7']];
         yield 'last line edited' => [[...$six, 'L6'], [...$six, 'L6x']];
     }
+
+    #[DataProvider('growingFrames')]
+    public function testGrowingContentScrollsTheLinesLeavingTheViewportIntoTheScrollback(array $frames, array $expectedScrollback, array $expectedScreen)
+    {
+        $screen = new ScreenBuffer(20, 5);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+
+        $writer = new ScreenWriter($terminal);
+        foreach ($frames as $frame) {
+            $writer->writeFrame(new ArrayLineBuffer($frame));
+        }
+
+        $this->assertSame($expectedScrollback, array_map(rtrim(...), $screen->getScrollback()));
+        $this->assertSame($expectedScreen, array_map(rtrim(...), $screen->getLines()));
+    }
+
+    public static function growingFrames(): iterable
+    {
+        $lines = static fn (int $from, int $to): array => array_map(static fn (int $i): string => 'L'.$i, range($from, $to));
+
+        yield 'grown past the screen at once' => [
+            [$lines(0, 4), $lines(0, 8)],
+            $lines(0, 3),
+            $lines(4, 8),
+        ];
+
+        yield 'grown one line at a time' => [
+            [$lines(0, 4), $lines(0, 5), $lines(0, 6), $lines(0, 7)],
+            $lines(0, 2),
+            $lines(3, 7),
+        ];
+
+        yield 'grown by more than a screen' => [
+            [$lines(0, 4), $lines(0, 14)],
+            $lines(0, 9),
+            $lines(10, 14),
+        ];
+
+        yield 'last line edited while growing' => [
+            [$lines(0, 4), [...$lines(0, 3), 'L4x', 'L5', 'L6']],
+            ['L0', 'L1'],
+            ['L2', 'L3', 'L4x', 'L5', 'L6'],
+        ];
+
+        yield 'grown while already overflowing' => [
+            [$lines(0, 8), $lines(0, 10)],
+            $lines(0, 5),
+            $lines(6, 10),
+        ];
+    }
 }

@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-10T07:41:13Z
+
+Amended during review, rebased on 8.1.
+
+The `minimal-exts` job was not flaky. There `grapheme_str_split()` comes from `symfony/polyfill-intl-grapheme`, and the polyfill returns `false` for a subject carrying invalid bytes where the extension returns the clusters, so `sliceByColumn()` came back empty. Reproduced locally by running the suite with intl disabled. The three tests that split an unscrubbed line now carry `#[RequiresPhpExtension('intl')]`.
+
+Two of those were also passing for the wrong reason on that runtime: `wrapTextWithAnsi()` returned `[""]` and `truncateToWidth()` returned just the ellipsis, and an `assertLessThanOrEqual()` bound accepts an empty result. They now assert the content, so the wrapper has to give the word back unchanged once the chunks are joined, and the truncation has to keep the malformed grapheme and end with the ellipsis.
+
+`testGraphemeWidthOfMalformedUtf8MatchesVisibleWidth` asserted `visibleWidth() === graphemeWidth()`, which both routes satisfy by construction because they end in the same `mb_strwidth()` call. It now pins the width at 1 and is named after what it checks. Those two width tests need no extension and still run everywhere.
+
+Retitled, because the parity with `visibleWidth()` holds for a multi-codepoint cluster but not for a lone invalid byte: `mb_strlen()` is 1 there, so the fast path returns `mb_strwidth()` = 1 while `visibleWidth()` scrubs to `''` and returns 0. That is the shape `grapheme_str_split()` produces most often, and 1 matches the replacement glyph a terminal draws, so the behavior is worth keeping and the claim is not.
+
+The polyfill side is symfony/polyfill#649. Once that ships, the gated tests pass without the extension as well.
+
+Checks run: full Tui suite with the extension (1803 tests, 4972 assertions) and with intl disabled (1803 tests, 4955 assertions, 3 skipped), php-cs-fixer clean, and all five tests still fail on the base source with `InvalidArgumentException: Invalid UTF-8 string.`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-10T08:30:35Z
+
+Follow-up: the `#[RequiresPhpExtension('intl')]` guards are gone, and `symfony/tui` now requires `symfony/polyfill-intl-grapheme: ^1.42.1` instead. The component calls `grapheme_str_split()` and `grapheme_extract()` itself, so the dependency belongs in its own `composer.json` rather than arriving through `symfony/string`, and the floor is what states that the polyfill has to keep the ill-formed bytes.
+
+That fix is symfony/polyfill#649, so **this one has to land after it**. Measured in the meantime, running the Tui suite with intl disabled:
+
+| polyfill | result |
+| --- | --- |
+| released | 1803 tests, 3 failures |
+| symfony/polyfill#649 | 1803 tests, 4972 assertions, OK |
+
+The second line is byte for byte what the extension gives, so the guards are not needed once the polyfill is fixed.
+
+The monorepo installs the polyfill as `1.x-dev`, since the root `composer.json` sets `minimum-stability: dev` and the Windows job runs a plain `composer update`. So `minimal-exts` turns green the moment symfony/polyfill#649 is merged, without waiting for the 1.42.1 tag. The `^1.42.1` floor is there for people installing the component, not for CI.

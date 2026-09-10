@@ -13,7 +13,10 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedFormHtmlSanitizerPass;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 
@@ -25,7 +28,7 @@ class RemoveUnusedFormHtmlSanitizerPassTest extends TestCase
         $container->register('form.type_extension.form.html_sanitizer', TextType::class);
         $container->register('html_sanitizer', HtmlSanitizer::class);
 
-        (new RemoveUnusedFormHtmlSanitizerPass())->process($container);
+        new RemoveUnusedFormHtmlSanitizerPass()->process($container);
 
         $this->assertTrue($container->hasDefinition('form.type_extension.form.html_sanitizer'));
     }
@@ -35,8 +38,25 @@ class RemoveUnusedFormHtmlSanitizerPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('form.type_extension.form.html_sanitizer', TextType::class);
 
-        (new RemoveUnusedFormHtmlSanitizerPass())->process($container);
+        new RemoveUnusedFormHtmlSanitizerPass()->process($container);
 
         $this->assertFalse($container->hasDefinition('form.type_extension.form.html_sanitizer'));
+    }
+
+    public function testTheTypeExtensionIsRemovedBeforeFormPassCollectsIt()
+    {
+        // both passes are registered by this bundle at the same priority, so the order
+        // they are registered in is the order they run in
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
+        new FrameworkBundle()->build($container);
+
+        $order = [];
+        foreach ($container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses() as $i => $pass) {
+            $order[$pass::class] = $i;
+        }
+
+        $this->assertArrayHasKey(FormPass::class, $order);
+        $this->assertArrayHasKey(RemoveUnusedFormHtmlSanitizerPass::class, $order);
+        $this->assertLessThan($order[FormPass::class], $order[RemoveUnusedFormHtmlSanitizerPass::class]);
     }
 }

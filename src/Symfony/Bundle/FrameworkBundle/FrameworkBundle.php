@@ -241,9 +241,13 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FragmentRendererPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new DefaultCachePoolsPass());
-        $this->addCompilerPassIfExists($container, FormPass::class);
+        // FormPass collects the form.type_extension services, so the ones this bundle
+        // cannot wire have to be gone before it runs
         $container->addCompilerPass(new RemoveUnusedFormHtmlSanitizerPass());
-        $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass());
+        $this->addCompilerPassIfExists($container, FormPass::class);
+        // SerializerPass collects the serializer.normalizer services, and SerializerBundle
+        // registers it while building before this bundle, so ordering here is not enough
+        $container->addCompilerPass(new RemoveUnusedSerializerPropertyAccessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1);
         $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
         $container->addCompilerPass(new RemoveMissingRouterDependenciesPass());
         $container->addCompilerPass(new RemoveMissingSerializerDependenciesPass());

@@ -52,7 +52,7 @@ class CachePoolClearCommandTest extends TestCase
         $kernel->expects($this->once())->method('getBundles')->willReturn([]);
 
         $application = new Application($kernel);
-        $application->add(new CachePoolClearCommand(new Psr6CacheClearer()));
+        $application->addCommand(new CachePoolClearCommand(new Psr6CacheClearer()));
 
         $tester = new CommandTester($application->find('cache:pool:clear'));
         $tester->execute(['pools' => ['foo']]);

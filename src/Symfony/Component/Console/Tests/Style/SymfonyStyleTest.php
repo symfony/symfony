@@ -118,6 +118,8 @@ class SymfonyStyleTest extends TestCase
         $message = "Cannot read the log file at /var/log/app/deep/path.log: \xB3 check the file permissions, then retry the command and report the result";
         $this->command->setCode(static function (InputInterface $input, OutputInterface $output) use ($message) {
             (new SymfonyStyle($input, $output))->error($message);
+
+            return Command::SUCCESS;
         });
 
         $this->tester->execute([], ['interactive' => false, 'decorated' => false]);

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\RoutingConditionServiceBundle\Service;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Attribute\AsRoutingConditionService;
+use Symfony\Component\Routing\Attribute\AsRoutingConditionService;
 
 #[AsRoutingConditionService('auto_configured')]
 class AutoConfiguredService

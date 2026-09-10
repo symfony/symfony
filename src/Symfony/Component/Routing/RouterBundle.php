@@ -12,12 +12,15 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Routing\Attribute\AsRouteLoader;
+use Symfony\Component\Routing\Attribute\AsRoutingConditionService;
 use Symfony\Component\Routing\DependencyInjection\LocalizedRoutesPass;
 
 /**
@@ -34,6 +37,13 @@ class RouterBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new LocalizedRoutesPass());
+
+        $container->registerAttributeForAutoconfiguration(AsRouteLoader::class, static function (ChildDefinition $definition): void {
+            $definition->addTag('routing.route_loader');
+        });
+        $container->registerAttributeForAutoconfiguration(AsRoutingConditionService::class, static function (ChildDefinition $definition, AsRoutingConditionService $attribute): void {
+            $definition->addTag('routing.condition_service', ['alias' => $attribute->alias, 'priority' => $attribute->priority]);
+        });
     }
 
     public function configure(DefinitionConfigurator $definition): void

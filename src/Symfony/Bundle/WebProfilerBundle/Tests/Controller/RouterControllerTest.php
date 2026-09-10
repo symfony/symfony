@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\WebProfilerBundle\Tests\Functional\WebProfilerBundleKernel;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Routing\DependencyInjection\Router;
 use Symfony\Component\Routing\Route;
 
 class RouterControllerTest extends WebTestCase

@@ -194,6 +194,22 @@ FrameworkBundle
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
  * Deprecate `JsonPathPass`, use the one from the JsonPath component instead
+ * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component
+   instead. Unlike the interface, the attribute is not inherited: a class extending an annotated one has to
+   carry it too
+ * Deprecate `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use their counterparts from
+   the Routing component instead. `AsRoutingConditionService` no longer extends `AutoconfigureTag`: it is wired
+   by an autoconfiguration rule that `RouterBundle` registers, so it tags only the classes that carry it and no
+   longer their subclasses, which used to inherit the parent's alias
+ * Deprecate `Translation\Translator`, use
+   `Symfony\Component\Translation\DependencyInjection\Translator` instead
+ * Deprecate `Controller\TemplateController`, use `Symfony\Bundle\TwigBundle\Controller\TemplateController`
+   instead. Its service is now declared by TwigBundle rather than by the routing configuration, so it exists
+   when TwigBundle is registered instead of whenever routing is; the old service id keeps working as a
+   deprecated alias
+ * The `Symfony\Bundle\FrameworkBundle\Controller\RedirectController` service id is deprecated, use
+   `Symfony\Component\Routing\Controller\RedirectController`; the old id, which route definitions
+   reference, keeps working as a deprecated alias
  * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, use
    their counterparts from the Cache component instead
  * Deprecate `CacheWarmer\SerializerCacheWarmer` and `CacheWarmer\ValidatorCacheWarmer`, use their

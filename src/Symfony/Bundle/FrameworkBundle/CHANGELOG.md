@@ -4,6 +4,10 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead
+ * Deprecate `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use the ones from the Routing component instead
+ * Deprecate `Translation\Translator`, use `Symfony\Component\Translation\DependencyInjection\Translator` instead
+ * Deprecate `Controller\TemplateController`, use `Symfony\Bundle\TwigBundle\Controller\TemplateController` instead
  * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, use the ones from the Cache component instead
  * Deprecate `CacheWarmer\SerializerCacheWarmer` and `CacheWarmer\ValidatorCacheWarmer`, use the ones from the Serializer and Validator components instead
  * Deprecate the five `Command\CachePool*Command` classes, use the ones from the Cache component instead

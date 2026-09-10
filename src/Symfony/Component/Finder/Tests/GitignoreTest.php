@@ -133,13 +133,13 @@ class GitignoreTest extends TestCase
             ],
             [
                 ['#', ' #', '/ #', '  #', '/  #', '  \ #', '   \  #', 'a #', 'a  #', 'a  \ #', 'a   \  #'],
-                ['   ', '    ', 'a', 'a   ', 'a    '],
-                [' ', '  ', 'a ', 'a  '],
+                [' #', '  #', '   #', '     #', 'a #', 'a  #', 'a   #', 'a     #'],
+                ['#', '    #', 'a    #', ' ', '  ', '   ', '    ', 'a', 'a ', 'a  ', 'a   '],
             ],
             [
                 ["\t", "\t\\\t", " \t\\\t ", "\t#", "a\t#", "a\t\t#", "a \t#", "a\t\t\\\t#", "a \t\t\\\t\t#"],
-                ["\t\t", " \t\t", 'a', "a\t\t\t", "a \t\t\t"],
-                ["\t", "\t\t ", " \t\t ", "a\t", 'a ', "a \t", "a\t\t"],
+                ["\t", "\t\t", " \t\t", "\t#", "a\t#", "a\t\t#", "a\t\t\t#", "a \t#", "a \t\t\t\t#"],
+                ["\t\t\t", 'a', 'a ', "a\t", " \t", "\t\t#", "a \t\t#"],
             ],
             [
                 [' a', 'b ', '\ ', 'c\ '],
@@ -166,9 +166,14 @@ class GitignoreTest extends TestCase
                 ['bin/bash'],
             ],
             [
-                ['fi#le.txt'],
-                [],
-                ['#file.txt'],
+                ['fi#le.txt', 'a#b'],
+                ['fi#le.txt', 'a#b'],
+                ['#file.txt', 'fi', 'a'],
+            ],
+            [
+                ["y\t", 'z '],
+                ["y\t", 'z'],
+                ['y', 'z '],
             ],
             [
                 [
@@ -568,14 +573,14 @@ class GitignoreTest extends TestCase
 
         yield [
             ['!\#', '! #', '!/ #', '!  #', '!/  #', '!  \ #', '!   \  #', '!a #', '!a  #', '!a  \ #', '!a   \  #'],
-            ['   ', '    ', 'a', 'a   ', 'a    '],
-            [' ', '  ', 'a ', 'a  '],
+            ['#', ' #', '  #', '   #', '     #', 'a #', 'a  #', 'a   #', 'a     #'],
+            ['    #', 'a    #', ' ', '  ', '   ', 'a', 'a ', 'a  '],
         ];
 
         yield [
             ["!\t", "!\t\\\t", "! \t\\\t ", "!\t#", "!a\t#", "!a\t\t#", "!a \t#", "!a\t\t\\\t#", "!a \t\t\\\t\t#"],
-            ["\t\t", " \t\t", 'a', "a\t\t\t", "a \t\t\t"],
-            ["\t", "\t\t ", " \t\t ", "a\t", 'a ', "a \t", "a\t\t"],
+            ["\t", "\t\t", " \t\t", "\t#", "a\t#", "a\t\t#", "a\t\t\t#", "a \t#", "a \t\t\t\t#"],
+            ["\t\t\t", 'a', 'a ', "a\t", " \t", "\t\t#", "a \t\t#"],
         ];
 
         yield [
@@ -607,9 +612,15 @@ class GitignoreTest extends TestCase
         ];
 
         yield [
-            ['!fi#le.txt'],
-            [],
-            ['#file.txt'],
+            ['!fi#le.txt', '!a#b'],
+            ['fi#le.txt', 'a#b'],
+            ['#file.txt', 'fi', 'a'],
+        ];
+
+        yield [
+            ["!y\t", '!z '],
+            ["y\t", 'z'],
+            ['y', 'z '],
         ];
 
         yield [

@@ -94,102 +94,42 @@ FrameworkBundle
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
  * BrowserKit assertions are no longer verbose by default. Failed response assertions no longer include the response body unless `setBrowserKitAssertionsAsVerbose(true)` is called or `verbose: true` is passed to the assertion.
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use the `esi` or `inline` fragment renderer, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
- * `CacheBundle` is registered automatically, and its services are then registered without any configuration.
-   The `framework.cache` configuration is an alias of the `cache` configuration provided by the bundle
- * `LockBundle` is registered automatically when the Lock component is installed, and its services are then
-   registered without any configuration; set `lock.enabled` to `false` to disable them. The `framework.lock`
-   configuration is an alias of the `lock` configuration provided by the bundle
- * `MessengerBundle` is registered automatically when the Messenger component is installed, and its services are then
-   registered without any configuration; set `messenger.enabled` to `false` to disable them. The `framework.messenger`
-   configuration is an alias of the `messenger` configuration provided by the bundle
- * `SemaphoreBundle` is registered automatically when the Semaphore component is installed, and its services are then
-   registered without any configuration; set `semaphore.enabled` to `false` to disable them. The `framework.semaphore`
-   configuration is an alias of the `semaphore` configuration provided by the bundle
- * `WorkflowBundle` is registered automatically when the Workflow component is installed, and its services are then
-   registered without any configuration; set `workflow.enabled` to `false` to disable them. The `framework.workflows`
-   configuration is an alias of the `workflow` configuration provided by the bundle
- * `WebLinkBundle` is registered automatically when the WebLink component is installed, and its services are then
-   registered without any configuration; set `web_link.enabled` to `false` to disable them. The `framework.web_link`
-   configuration is an alias of the `web_link` configuration provided by the bundle
- * `RemoteEventBundle` is registered automatically when the RemoteEvent component is installed, and its services are
-   then registered without any configuration; set `remote_event.enabled` to `false` to disable them. The
-   `framework.remote_event` configuration is an alias of the `remote_event` configuration provided by the bundle
- * `HtmlSanitizerBundle` is registered automatically when the HtmlSanitizer component is installed, and its services are
-   then registered without any configuration; set `html_sanitizer.enabled` to `false` to disable them. The
-   `framework.html_sanitizer` configuration is an alias of the `html_sanitizer` configuration provided by the bundle
- * `TypeInfoBundle` is registered automatically when the TypeInfo component is installed, and its services are
-   then registered without any configuration; set `type_info.enabled` to `false` to disable them. The
-   `framework.type_info` configuration is an alias of the `type_info` configuration provided by the bundle
- * `PropertyAccessBundle` is registered automatically when the PropertyAccess component is installed, and its services
-   are then registered as before; set `property_access.enabled` to `false` to disable them. The
-   `framework.property_access` configuration is an alias of the `property_access` configuration provided by the bundle
- * `PropertyInfoBundle` is registered automatically when the PropertyInfo component is installed, and its services are
-   then registered without any configuration; set `property_info.enabled` to `false` to disable them. The
-   `framework.property_info` configuration is an alias of the `property_info` configuration provided by the bundle
- * `UidBundle` is registered automatically when the Uid component is installed, and its services are then registered
-   without any configuration; set `uid.enabled` to `false` to disable them. The `framework.uid` configuration is an
-   alias of the `uid` configuration provided by the bundle
- * `SchedulerBundle` is registered automatically when the Scheduler component is installed, and its services are then
-   registered without any configuration; set `scheduler.enabled` to `false` to disable them. The `framework.scheduler`
-   configuration is an alias of the `scheduler` configuration provided by the bundle. The services are dropped when no
-   Messenger transport factory is registered, and enabling Messenger is only required when a schedule or a task is
-   declared
- * `JsonStreamerBundle` is registered automatically when the JsonStreamer component is installed, and its services are
-   then registered without any configuration; set `json_streamer.enabled` to `false` to disable them. The
-   `framework.json_streamer` configuration is an alias of the `json_streamer` configuration provided by the bundle
- * `AssetMapperBundle` is registered automatically when the AssetMapper component is installed, and its services are
-   then registered without any configuration; set `asset_mapper.enabled` to `false` to disable them. The
-   `framework.asset_mapper` configuration is an alias of the `asset_mapper` configuration provided by the bundle. The
-   asset package is dropped when the Asset component is not enabled, and the cache pool when no `cache.system` pool
-   is registered
- * `RateLimiterBundle` is registered automatically when the RateLimiter component is installed, and its services are
-   then registered without any configuration; set `rate_limiter.enabled` to `false` to disable them. The
-   `framework.rate_limiter` configuration is an alias of the `rate_limiter` configuration provided by the bundle
- * `WebhookBundle` is registered automatically when the Webhook component is installed, and its services are then
-   registered without any configuration; set `webhook.enabled` to `false` to disable them. The `framework.webhook`
-   configuration is an alias of the `webhook` configuration provided by the bundle. The transport reports an error
-   when the configured HTTP client is missing, the controller when the configured message bus is, and the payload is
-   serialized with `json_encode()` when the Serializer component is not enabled
- * `HttpClientBundle` is registered automatically when the HttpClient component is installed, and its services are
-   then registered without any configuration; set `http_client.enabled` to `false` to disable them. The
-   `framework.http_client` configuration is an alias of the `http_client` configuration provided by the bundle. The
-   cache pool is dropped when no `cache.app` pool is registered, and the data collector when the profiler is disabled
- * `RouterBundle` is registered automatically, and the `framework.router` configuration is an alias of the
-   `router` configuration it provides. The router stays off until it is configured, as before. Because the
-   forwarded keys are removed from the framework configuration, `debug:config framework router` no longer
-   resolves; use `debug:config router` instead
- * `AssetBundle` is registered automatically when the Asset component is installed, and its services are then
-   registered without any configuration; set `asset.enabled` to `false` to disable them. The `framework.assets`
-   configuration is an alias of the `asset` configuration provided by the bundle
- * `NotifierBundle` is registered automatically when the Notifier component is installed, and its services are then
-   registered without any configuration; set `notifier.enabled` to `false` to disable them. The `framework.notifier`
-   configuration is an alias of the `notifier` configuration provided by the bundle. The data collector is registered
-   in debug mode and dropped when the profiler is disabled, and the notification logger listener is dropped when
-   neither the profiler nor the test client consumes what it retains
- * `MailerBundle` is registered automatically when the Mailer component is installed, and its services are then
-   registered without any configuration; set `mailer.enabled` to `false` to disable them. The `framework.mailer`
-   configuration is an alias of the `mailer` configuration provided by the bundle. The data collector is registered
-   in debug mode and dropped when the profiler is disabled, the message logger listener is dropped when neither the
-   profiler nor the test client collects the sent messages, and the notifier email channel is dropped when the mailer
-   is missing
- * `SerializerBundle` is registered automatically when the Serializer component is installed, and its services are
-   then registered without any configuration; set `serializer.enabled` to `false` to disable them. The
-   `framework.serializer` configuration is an alias of the `serializer` configuration provided by the bundle. The
-   traceable serializer and its data collector are registered in debug mode and dropped when the profiler is
-   disabled, the cache pool is dropped when no `cache.system` pool is registered, and the translatable normalizer
-   when no translator is
- * `ValidationBundle` is registered automatically when the Validator component is installed, and its services are
-   then registered without any configuration; set `validation.enabled` to `false` to disable them. The
-   `framework.validation` configuration is an alias of the `validation` configuration provided by the bundle. The
-   validator is no longer turned on implicitly by enabling forms, the traceable validator and its data collector
-   are registered in debug mode and dropped when the profiler is disabled, the cache pools are dropped when no
-   `cache.system` pool is registered, and the property-info loader when no property info extractor is
- * `TranslationBundle` is registered automatically when the Translation component is installed, and its services
-   are then registered without any configuration; set `translation.enabled` to `false` to disable them. The
-   `framework.translator` configuration is an alias of the `translation` configuration provided by the bundle,
-   whose root key is `translation`, not `translator`. An identity translator answers whenever translation itself
-   is off, the traceable translator and its data collector are registered in debug mode and dropped when the
-   profiler is disabled, and the `translation:*` console commands are dropped when the translator is
+ * Most of what this bundle configured now lives in a bundle shipped by the component itself: `asset`,
+   `asset_mapper`, `cache`, `html_sanitizer`, `http_client`, `json_streamer`, `lock`, `mailer`, `messenger`,
+   `notifier`, `property_access`, `property_info`, `rate_limiter`, `remote_event`, `router`, `scheduler`,
+   `semaphore`, `serializer`, `translation`, `type_info`, `uid`, `validation`, `web_link`, `webhook` and
+   `workflow`. Each of them is registered automatically when its component is installed, and its services are
+   then registered without any configuration; set `<key>.enabled` to `false` to disable them. The matching
+   `framework.*` key keeps working, as an alias of the bundle's own configuration. Three are spelled
+   differently at the root: `framework.assets` is `asset`, `framework.translator` is `translation` and
+   `framework.workflows` is `workflow`
+ * Because the forwarded keys are removed from the framework configuration, `debug:config framework <key>` no
+   longer resolves; use `debug:config <key>` instead
+ * `CacheBundle` and `RouterBundle` are registered whether or not their configuration is set, `symfony/cache`
+   and `symfony/routing` being hard requirements of this bundle; `cache` has no `enabled` flag, and the router
+   stays off until it is configured, as before
+ * Every traceable decorator and data collector the moved sections own is registered in debug mode and dropped
+   when the profiler is disabled, where some of them used to follow the profiler alone
+ * Beyond moving their section, some of these bundles now decide at compile time what the container can wire:
+    * `AssetMapperBundle` drops the asset package when the Asset component is not enabled, and the cache pool
+      when no `cache.system` pool is registered
+    * `HttpClientBundle` drops the cache pool when no `cache.app` pool is registered
+    * `MailerBundle` drops the message logger listener when neither the profiler nor the test client collects
+      the sent messages, and the notifier email channel when the mailer is missing
+    * `NotifierBundle` drops the notification logger listener when neither the profiler nor the test client
+      consumes what it retains
+    * `SchedulerBundle` drops its services when no Messenger transport factory is registered; enabling
+      Messenger is only required when a schedule or a task is declared
+    * `SerializerBundle` drops the cache pool when no `cache.system` pool is registered, and the translatable
+      normalizer when no translator is
+    * `TranslationBundle` answers with an identity translator whenever translation itself is off, and its
+      `translation:*` console commands are dropped when there is no translator
+    * `ValidationBundle` no longer turns the validator on implicitly when forms are enabled; its cache pools
+      are dropped when no `cache.system` pool is registered, and its property-info loader when no property
+      info extractor is
+    * `WebhookBundle` reports an error from the transport when the configured HTTP client is missing and from
+      the controller when the configured message bus is, and serializes the payload with `json_encode()` when
+      the Serializer component is not enabled
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0

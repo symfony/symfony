@@ -20,7 +20,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingHttpClientDependenciesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveMissingDependenciesPass as FrameworkRemoveMissingDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -44,6 +44,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -1997,7 +1998,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), new DefaultLockFactoryPass(), new DefaultMessageBusPass(), new RemoveMissingDependenciesPass(), new AssetMapperRemoveMissingDependenciesPass(), new WebhookRemoveMissingDependenciesPass(), new HttpClientRemoveMissingDependenciesPass(), new MailerRemoveMissingDependenciesPass(), new RemoveMissingHttpClientDependenciesPass(), new NotifierRemoveMissingDependenciesPass(), new ValidatorRemoveMissingDependenciesPass(), new TranslatorRemoveMissingDependenciesPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass(), ...self::bundlePasses()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {
@@ -2008,6 +2009,28 @@ abstract class FrameworkExtensionTestCase extends TestCase
         return self::$containerCache[$cacheKey] = $container;
     }
 
+    /**
+     * The passes each bundle registers in build(), which a container built from FrameworkExtension alone misses.
+     *
+     * @return list<CompilerPassInterface>
+     */
+    protected static function bundlePasses(): array
+    {
+        return [
+            new DefaultLockFactoryPass(),
+            new DefaultMessageBusPass(),
+            new RemoveMissingDependenciesPass(),
+            new AssetMapperRemoveMissingDependenciesPass(),
+            new WebhookRemoveMissingDependenciesPass(),
+            new HttpClientRemoveMissingDependenciesPass(),
+            new MailerRemoveMissingDependenciesPass(),
+            new NotifierRemoveMissingDependenciesPass(),
+            new ValidatorRemoveMissingDependenciesPass(),
+            new TranslatorRemoveMissingDependenciesPass(),
+            new FrameworkRemoveMissingDependenciesPass(),
+        ];
+    }
+
     protected function createContainerFromClosure($closure, $data = [], bool $compile = true): ContainerBuilder
     {
         $container = $this->createContainer($data);
@@ -2015,17 +2038,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $loader = new ClosureLoader($container);
         $loader->load($closure);
 
-        $container->addCompilerPass(new DefaultLockFactoryPass());
-        $container->addCompilerPass(new DefaultMessageBusPass());
-        $container->addCompilerPass(new RemoveMissingDependenciesPass());
-        $container->addCompilerPass(new AssetMapperRemoveMissingDependenciesPass());
-        $container->addCompilerPass(new WebhookRemoveMissingDependenciesPass());
-        $container->addCompilerPass(new HttpClientRemoveMissingDependenciesPass());
-        $container->addCompilerPass(new MailerRemoveMissingDependenciesPass());
-        $container->addCompilerPass(new RemoveMissingHttpClientDependenciesPass());
-        $container->addCompilerPass(new NotifierRemoveMissingDependenciesPass());
-        $container->addCompilerPass(new ValidatorRemoveMissingDependenciesPass());
-        $container->addCompilerPass(new TranslatorRemoveMissingDependenciesPass());
+        foreach (self::bundlePasses() as $pass) {
+            $container->addCompilerPass($pass);
+        }
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

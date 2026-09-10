@@ -58,7 +58,7 @@ class TypeInfoBundle extends AbstractBundle
 
         $configurator->import('Resources/config/type_info.php');
 
-        if (ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/type-info'])) {
+        if (ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
             $container->register('type_info.resolver.string', StringTypeResolver::class)
                 ->setArguments([null, null, $config['aliases']]);
 

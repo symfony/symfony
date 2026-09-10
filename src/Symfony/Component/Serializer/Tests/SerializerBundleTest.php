@@ -298,6 +298,8 @@ class SerializerBundleTest extends TestCase
         ]));
 
         // what the neighbouring bundles would have registered
+        $container->register('property_accessor', \stdClass::class);
+
         if ($cache) {
             $container->register('cache.system', \stdClass::class);
         }

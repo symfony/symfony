@@ -123,7 +123,7 @@ class RouterBundle extends AbstractBundle
             $container->getDefinition('routing.loader')->replaceArgument(1, ['utf8' => true]);
         }
 
-        if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/routing'])) {
+        if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/framework-bundle', 'symfony/routing'])) {
             $container->removeDefinition('router.expression_language_provider');
         }
 

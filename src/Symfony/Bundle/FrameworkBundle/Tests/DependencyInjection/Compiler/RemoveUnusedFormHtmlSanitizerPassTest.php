@@ -28,7 +28,7 @@ class RemoveUnusedFormHtmlSanitizerPassTest extends TestCase
         $container->register('form.type_extension.form.html_sanitizer', TextType::class);
         $container->register('html_sanitizer', HtmlSanitizer::class);
 
-        (new RemoveUnusedFormHtmlSanitizerPass())->process($container);
+        new RemoveUnusedFormHtmlSanitizerPass()->process($container);
 
         $this->assertTrue($container->hasDefinition('form.type_extension.form.html_sanitizer'));
     }
@@ -38,15 +38,17 @@ class RemoveUnusedFormHtmlSanitizerPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('form.type_extension.form.html_sanitizer', TextType::class);
 
-        (new RemoveUnusedFormHtmlSanitizerPass())->process($container);
+        new RemoveUnusedFormHtmlSanitizerPass()->process($container);
 
         $this->assertFalse($container->hasDefinition('form.type_extension.form.html_sanitizer'));
     }
 
     public function testTheTypeExtensionIsRemovedBeforeFormPassCollectsIt()
     {
+        // both passes are registered by this bundle at the same priority, so the order
+        // they are registered in is the order they run in
         $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
-        (new FrameworkBundle())->build($container);
+        new FrameworkBundle()->build($container);
 
         $order = [];
         foreach ($container->getCompiler()->getPassConfig()->getBeforeOptimizationPasses() as $i => $pass) {

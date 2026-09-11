@@ -1173,6 +1173,20 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/user', $url);
     }
 
+    public function testQueryParametersDefinedAsDefaultsCanBeRemovedByParameters()
+    {
+        $routes = $this->getRoutes('user', new Route('/user', [
+            '_query' => [
+                'page' => 1,
+                'sort' => 'name',
+            ],
+        ]));
+
+        $url = $this->getGenerator($routes)->generate('user', ['sort' => null]);
+
+        $this->assertSame('/app.php/user?page=1', $url);
+    }
+
     public function testQueryParametersDefinedAsDefaultsMustBeAnArray()
     {
         $routes = $this->getRoutes('user', new Route('/user', ['_query' => 'page=1']));

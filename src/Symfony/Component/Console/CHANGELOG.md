@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `LockableTrait::setLockFactory()`, autowired with the lock factory of the resource named `console` when the app declares one
  * Allow `#[AsCommand]` to list `InputOption`s to add after the ones the parameters of the command declare
  * Register a class-level `#[AsCommand]` without `__invoke()` as the command grouping its method-level ones
  * Resolve spaced sub-command invocations through the tree derived from registered command names, with per-level options and `--` binding the remaining tokens to the current command

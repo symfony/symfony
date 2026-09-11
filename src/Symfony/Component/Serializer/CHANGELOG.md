@@ -20,6 +20,7 @@ CHANGELOG
  * Add `DiscriminatorMapType` to extend discriminator maps from mapped child classes
  * Make the `mapping` argument of `DiscriminatorMap` optional and validate it together with `defaultType` at metadata loading time
  * Add `LoaderChainAwareInterface` so that loaders in a `LoaderChain` can defer work until all loaders have run; `LoaderChain` then validates discriminator maps declared in any format
+ * Resolve generic template types during denormalization, e.g. `T` in a `Box<Circle>`-typed property is denormalized as `Circle`
 
 8.1
 ---

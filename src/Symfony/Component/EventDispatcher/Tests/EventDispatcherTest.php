@@ -196,6 +196,49 @@ class EventDispatcherTest extends TestCase
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
     }
 
+    public function testAddSubscriberWithNamedKeys()
+    {
+        $eventSubscriber = new TestEventSubscriberWithNamedKeys();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+
+        $this->assertTrue($this->dispatcher->hasListeners('pre.foo'));
+        $this->assertTrue($this->dispatcher->hasListeners('post.foo'));
+        $this->assertSame(10, $this->dispatcher->getListenerPriority('pre.foo', [$eventSubscriber, 'preFoo']));
+        $this->assertSame(0, $this->dispatcher->getListenerPriority('post.foo', [$eventSubscriber, 'postFoo']));
+    }
+
+    public function testAddSubscriberWithNamedKeysAndMultipleListeners()
+    {
+        $this->dispatcher->addSubscriber(new TestEventSubscriberWithNamedKeysAndMultipleListeners());
+
+        $listeners = $this->dispatcher->getListeners('pre.foo');
+        $this->assertCount(3, $listeners);
+        $this->assertSame('preFoo3', $listeners[0][1]);
+        $this->assertSame('preFoo2', $listeners[1][1]);
+        $this->assertSame('preFoo1', $listeners[2][1]);
+    }
+
+    public function testRemoveSubscriberWithNamedKeys()
+    {
+        $eventSubscriber = new TestEventSubscriberWithNamedKeys();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+        $this->assertTrue($this->dispatcher->hasListeners('pre.foo'));
+
+        $this->dispatcher->removeSubscriber($eventSubscriber);
+        $this->assertFalse($this->dispatcher->hasListeners('pre.foo'));
+        $this->assertFalse($this->dispatcher->hasListeners('post.foo'));
+    }
+
+    public function testRemoveSubscriberWithNamedKeysAndMultipleListeners()
+    {
+        $eventSubscriber = new TestEventSubscriberWithNamedKeysAndMultipleListeners();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+        $this->assertCount(3, $this->dispatcher->getListeners('pre.foo'));
+
+        $this->dispatcher->removeSubscriber($eventSubscriber);
+        $this->assertFalse($this->dispatcher->hasListeners('pre.foo'));
+    }
+
     public function testAddSubscriberWithPriorities()
     {
         $eventSubscriber = new TestEventSubscriber();
@@ -638,6 +681,29 @@ class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterfa
         return ['pre.foo' => [
             ['preFoo1'],
             ['preFoo2', 10],
+        ]];
+    }
+}
+
+class TestEventSubscriberWithNamedKeys implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            'pre.foo' => ['method' => 'preFoo', 'priority' => 10],
+            'post.foo' => ['method' => 'postFoo'],
+        ];
+    }
+}
+
+class TestEventSubscriberWithNamedKeysAndMultipleListeners implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return ['pre.foo' => [
+            ['method' => 'preFoo1'],
+            ['method' => 'preFoo2', 'priority' => 10],
+            ['preFoo3', 20],
         ]];
     }
 }

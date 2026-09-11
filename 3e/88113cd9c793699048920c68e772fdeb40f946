@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-11T13:40:45Z
+
+Thanks for this Yonel, the design is right: carrying the variable types down and substituting the templates is what JsonStreamer does, and the test matrix covers the shapes that matter.
+
+I reviewed it and pushed two changes.
+
+**The templates were read from the wrong class.** `getTemplateTypes()` paired the variable types against `createFromClassName($mappedClass, $class)->templates`, which is `templates($mappedClass) + templates($class)`. When a discriminator map resolves to a child that declares templates of its own, the child's come first, so index 0 bound the child's template instead of the parent's:
+
+```php
+/** @template T of Shape */
+#[DiscriminatorMap('type', ['gift' => GiftBox::class])]
+abstract class AbstractBox { /** @var T */ public mixed $item = null; }
+
+/** @template U */
+class GiftBox extends AbstractBox { /** @var U */ public mixed $wrapping = null; }
+
+/** @var AbstractBox<Circle> */ public AbstractBox $box;
+// NotNormalizableValueException: Failed to create object because the class "Shape" is not instantiable.
+```
+
+`Circle` went to `U` and `T` fell back to its bound. The list now comes from the class the variable types are actually given for, `$genericClass->getClassName()`, which makes the unused `$class` parameter go away. `testDenormalizeGenericTypeWithDiscriminatorMap` was extended to cover it: `$box->item` is a `Circle` and `$box->wrapping` keeps its bound.
+
+**A separate ordering bug in TypeInfo, fixed in #66013.** `TypeContextFactory::collectTemplates()` builds its tag list by concatenating `getTagsByName()` per tag name, so a class that mixes `@template` with `@template-covariant` gets its templates back grouped by tag name instead of in declaration order. Positional pairing then binds the wrong variable type, silently:
+
+```php
+/**
+ * @template-covariant K
+ * @template V
+ */
+class Pair { /** @var K */ public mixed $first = null; /** @var V */ public mixed $second = null; }
+
+/** @var Pair<Circle, Square> */ public Pair $pair;
+// $pair->first is a Square, $pair->second is a Circle
+```
+
+That one is not yours: JsonStreamer already reads `Pair<A, B>` as `Pair<B, A>` on 8.2 today. It is fixed on its own in #66013, which this PR benefits from once it lands.
+
+I also rebased on the 8.2 tip and filled in the description: the three shapes that are not covered (`@extends Box<Circle>` on a child class, templates declared by a discriminator target, a generic at the root of a payload) and the points the documentation will need.
+
+Checked along the way, all clean: the 13 new tests fail on base except the three that pin existing behavior, and Serializer, PropertyInfo, TypeInfo and JsonStreamer are green. Nullable templates, unions, nested and recursive generics, template keys in `array<K, V>` and a `mixed` variable type all behave. The only red CI job is `PgpEncrypterTest` timing out on gpg under Windows, unrelated.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-09-11T13:42:59Z
+
+Finally! Thanks @yceruto for taking care of this 🙂

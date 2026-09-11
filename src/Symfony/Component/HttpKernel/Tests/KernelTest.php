@@ -435,6 +435,25 @@ class KernelTest extends TestCase
         $this->assertSame(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures', $kernel->getContainer()->getParameter('kernel.project_dir'));
     }
 
+    public function testProjectDirContainingAPercentSign()
+    {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $projectDir = sys_get_temp_dir().'/sf_percent_my%2Fother%2Fbranch_'.substr(md5(__METHOD__), 0, 8);
+        @mkdir($projectDir.'/var/cache/percent', 0o777, true);
+        @mkdir($projectDir.'/var/log', 0o777, true);
+
+        try {
+            $kernel = new PercentProjectDirKernel($projectDir);
+            $kernel->boot();
+
+            $container = $kernel->getContainer();
+            $this->assertSame(realpath($projectDir), $container->getParameter('kernel.project_dir'));
+            $this->assertSame(realpath($projectDir).'/config', $container->getParameter('percent.interpolated'));
+        } finally {
+            (new Filesystem())->remove($projectDir);
+        }
+    }
+
     public function testKernelReset()
     {
         $this->tearDown();
@@ -755,6 +774,44 @@ class TestKernel implements HttpKernelInterface
     public function getProjectDir(): string
     {
         return __DIR__.'/Fixtures';
+    }
+}
+
+class PercentProjectDirKernel extends Kernel
+{
+    public function __construct(
+        private readonly string $projectDir,
+    ) {
+        parent::__construct('percent', true);
+    }
+
+    public function registerBundles(): iterable
+    {
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->projectDir;
+    }
+
+    public function getCacheDir(): string
+    {
+        return $this->projectDir.'/var/cache/percent';
+    }
+
+    public function getLogDir(): string
+    {
+        return $this->projectDir.'/var/log';
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->setParameter('percent.interpolated', '%kernel.project_dir%/config');
     }
 }
 

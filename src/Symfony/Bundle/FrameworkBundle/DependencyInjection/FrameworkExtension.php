@@ -624,7 +624,7 @@ class FrameworkExtension extends Extension
      */
     private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder): void
     {
-        foreach ($config['mapping']['paths'] as $path) {
+        foreach ($container->getParameterBag()->unescapeValue($config['mapping']['paths']) as $path) {
             if (is_dir($path)) {
                 $this->registerMappingFilesFromDir($path, $fileRecorder);
                 $container->addResource(new DirectoryResource($path, '/^$/'));

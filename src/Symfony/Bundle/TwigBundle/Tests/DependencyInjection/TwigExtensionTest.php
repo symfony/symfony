@@ -20,6 +20,7 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -347,12 +348,38 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(new Reference('my_converter'), $bodyRenderer->getArgument('$converter'));
     }
 
-    private function createContainer(?string $buildDir = null): ContainerBuilder
+    public function testDefaultPathContainingAPercentSign()
     {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $projectDir = sys_get_temp_dir().'/sf_twig_my%2Fother%2Fbranch_'.substr(md5(__METHOD__), 0, 8);
+        @mkdir($projectDir.'/templates', 0o777, true);
+
+        try {
+            $container = $this->createContainer(projectDir: $projectDir);
+            $container->registerExtension(new TwigExtension());
+            $container->loadFromExtension('twig', ['default_path' => '%kernel.project_dir%/templates']);
+            $this->compileContainer($container);
+
+            $paths = [];
+            foreach ($container->getDefinition('twig.loader.native_filesystem')->getMethodCalls() as $call) {
+                if ('addPath' === $call[0] && 1 === \count($call[1])) {
+                    $paths[] = str_replace('%%', '%', $call[1][0]);
+                }
+            }
+
+            $this->assertContains($projectDir.'/templates', $paths);
+        } finally {
+            (new Filesystem())->remove($projectDir);
+        }
+    }
+
+    private function createContainer(?string $buildDir = null, ?string $projectDir = null): ContainerBuilder
+    {
+        $projectDir ??= __DIR__;
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
             'kernel.build_dir' => $buildDir ?? __DIR__,
-            'kernel.project_dir' => __DIR__,
+            'kernel.project_dir' => str_replace('%', '%%', $projectDir),
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => false,
             'kernel.bundles' => [

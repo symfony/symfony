@@ -1,7 +1,8 @@
 LINE Notifier
 =============
 
-Provides [LINE Notify](https://notify-bot.line.me/) integration for Symfony Notifier.
+The LINE Notify bridge is deprecated as LINE Notify was shut down on 2025-03-31,
+use the LineBot bridge instead.
 
 DSN example
 -----------

@@ -17,6 +17,8 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 /**
  * @author Akira Kurozumi <info@a-zumi.net>
+ *
+ * @deprecated since Symfony 8.2, use the LineBot bridge instead
  */
 final class LineNotifyTransportFactory extends AbstractTransportFactory
 {
@@ -29,6 +31,8 @@ final class LineNotifyTransportFactory extends AbstractTransportFactory
 
     public function create(Dsn $dsn): LineNotifyTransport
     {
+        trigger_deprecation('symfony/line-notify-notifier', '8.2', 'The "symfony/line-notify-notifier" package is deprecated as LINE Notify was shut down, use "symfony/line-bot-notifier" instead.');
+
         if (self::SCHEME !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, self::SCHEME, $this->getSupportedSchemes());
         }

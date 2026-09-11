@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\LineBot;
 
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Exception\UnsupportedOptionsException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -43,20 +44,25 @@ final class LineBotTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
+        if (($options = $message->getOptions()) && !$options instanceof LineBotOptions) {
+            throw new UnsupportedOptionsException(__CLASS__, LineBotOptions::class, $options);
+        }
+
+        $options = $options?->toArray() ?? [];
+        $options['to'] ??= $message->getRecipientId() ?: $this->receiver;
+        $options['messages'] = [
+            [
+                'type' => 'text',
+                'text' => $message->getSubject(),
+            ],
+        ];
+
         $response = $this->client->request(
             'POST',
             \sprintf('%s://%s/v2/bot/message/push', $this->getHttpScheme(), $this->getEndpoint()),
             [
                 'auth_bearer' => $this->accessToken,
-                'json' => [
-                    'to' => $this->receiver,
-                    'messages' => [
-                        [
-                            'type' => 'text',
-                            'text' => $message->getSubject(),
-                        ],
-                    ],
-                ],
+                'json' => $options,
             ],
         );
 
@@ -82,7 +88,7 @@ final class LineBotTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage;
+        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof LineBotOptions);
     }
 
     public function __toString(): string

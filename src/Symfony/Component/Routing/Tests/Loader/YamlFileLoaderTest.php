@@ -122,6 +122,17 @@ class YamlFileLoaderTest extends TestCase
         }
     }
 
+    public function testLoadWithAddCondition()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routeCollection = $loader->load('add_condition.yml');
+
+        $this->assertSame('(context.getMethod() == "GET") and (request.isSecure())', $routeCollection->get('route_with_conditions')->getCondition());
+        $this->assertSame('(context.getMethod() == "GET") and (request.isSecure())', $routeCollection->get('added_blog_show')->getCondition());
+        $this->assertSame('request.isSecure()', $routeCollection->get('added_blog_show_inherited')->getCondition());
+        $this->assertSame('(context.getMethod() == "POST") and (request.isSecure())', $routeCollection->get('replaced_blog_show')->getCondition());
+    }
+
     public function testLoadRouteWithControllerAttribute()
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));

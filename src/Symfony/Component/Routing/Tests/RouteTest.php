@@ -217,6 +217,19 @@ class RouteTest extends TestCase
         $this->assertSame('context.getMethod() == "GET"', $route->getCondition());
     }
 
+    public function testAddCondition()
+    {
+        $route = new Route('/');
+        $route->addCondition('request.isSecure()');
+        $this->assertSame('request.isSecure()', $route->getCondition());
+
+        $route->addCondition('context.getMethod() == "GET"');
+        $this->assertSame('(request.isSecure()) and (context.getMethod() == "GET")', $route->getCondition());
+
+        $route->addCondition('');
+        $this->assertSame('(request.isSecure()) and (context.getMethod() == "GET")', $route->getCondition());
+    }
+
     public function testCompile()
     {
         $route = new Route('/{foo}');

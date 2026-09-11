@@ -265,6 +265,20 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals('context.getMethod() == "POST"', $routeb->getCondition());
     }
 
+    public function testAddCondition()
+    {
+        $collection = new RouteCollection();
+        $routea = new Route('/a');
+        $routeb = new Route('/b', [], [], [], '', [], [], 'context.getMethod() == "GET"');
+        $collection->add('a', $routea);
+        $collection->add('b', $routeb);
+
+        $collection->addCondition('request.isSecure()');
+
+        $this->assertSame('request.isSecure()', $routea->getCondition());
+        $this->assertSame('(context.getMethod() == "GET") and (request.isSecure())', $routeb->getCondition());
+    }
+
     public function testClone()
     {
         $collection = new RouteCollection();

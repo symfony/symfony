@@ -247,6 +247,17 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedCollectionObject, $routeCollectionObject);
     }
 
+    public function testRoutingConfiguratorAddCondition()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_add_condition.php');
+
+        $this->assertSame('(context.getMethod() == "GET") and (request.isSecure())', $routeCollection->get('with_condition')->getCondition());
+        $this->assertSame('request.isSecure()', $routeCollection->get('without_condition')->getCondition());
+        $this->assertSame('(request.isSecure()) and (context.getMethod() == "GET")', $routeCollection->get('c_foo')->getCondition());
+    }
+
     public function testRoutingConfiguratorCanImportGlobPatterns()
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures/glob']);

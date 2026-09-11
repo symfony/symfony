@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
@@ -36,14 +37,17 @@ use Symfony\Component\TypeInfo\Exception\LogicException as TypeInfoLogicExceptio
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\ReflectionTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 /**
  * Base class for a normalizer dealing with objects.
@@ -136,6 +140,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private array $typeCache = [];
     private array $attributesCache = [];
     private array $typePropertiesCache = [];
+    private ?TypeContextFactory $typeContextFactory = null;
     private readonly \Closure $objectClassResolver;
 
     public function __construct(
@@ -340,6 +345,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $mappedClass = $this->getMappedClass($normalizedData, $type, $context);
 
+        // the parent normalizer passes the generic type of this object so that its template types can be resolved
+        $templateTypes = $this->getTemplateTypes($mappedClass, $context['generic_type'] ?? null);
+        unset($context['generic_type']);
+        if ($templateTypes) {
+            $context['template_types'] = $templateTypes;
+        } else {
+            unset($context['template_types']);
+        }
+
         $nestedAttributes = $this->getNestedAttributes($mappedClass, $context);
         $nestedData = $originalNestedData = [];
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()->enableExceptionOnInvalidIndex()->getPropertyAccessor();
@@ -358,6 +372,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $originalNormalizedData = $normalizedData;
         $object = $this->instantiateObject($normalizedData, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
+        unset($context['template_types']);
         $resolvedClass = ($this->objectClassResolver)($object);
         $skipInvalidAttributes = $context[self::SKIP_INVALID_ATTRIBUTES] ?? $this->defaultContext[self::SKIP_INVALID_ATTRIBUTES] ?? false;
 
@@ -414,6 +429,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             if (null !== $type = $this->getType($resolvedClass, $attribute)) {
+                if ($templateTypes) {
+                    $type = $this->replaceTemplateTypes($type, $templateTypes);
+                }
+
                 try {
                     $value = $this->validateAndDenormalize($type, $resolvedClass, $attribute, $value, $format, $attributeContext);
                 } catch (NotNormalizableValueException $exception) {
@@ -497,6 +516,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $isList = $t->isList();
             }
 
+            $genericType = self::findGenericType($t);
             while ($t instanceof WrappingTypeInterface) {
                 $t = $t->getWrappedType();
             }
@@ -596,6 +616,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         $class = $collectionValueBaseType->getClassName().'[]';
                         $context['key_type'] = $collectionKeyType;
                         $context['value_type'] = $collectionValueType;
+                        $genericType = self::findGenericType($collectionValueType);
                     } elseif ($collectionValueBaseType instanceof UnionType) {
                         if (!\is_array($data)) {
                             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute for class "%s" must be one of "array" ("%s" given).', $attribute, $currentClass, get_debug_type($data)), $data, [Type::array()], $context['deserialization_path'] ?? null);
@@ -682,6 +703,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             }
                         }
 
+                        $innerGenericType = self::findGenericType($innerType);
                         while ($innerType instanceof WrappingTypeInterface) {
                             $innerType = $innerType->getWrappedType();
                         }
@@ -692,6 +714,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             $class = $innerType->getClassName().$dimensions;
                             $context['key_type'] = $collectionKeyType;
                             $context['value_type'] = $collectionValueType;
+                            $genericType = $innerGenericType;
                         } else {
                             // default fallback (keep it as array)
                             if ($t instanceof ObjectType) {
@@ -731,6 +754,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     }
 
                     $childContext = $this->createChildContext($context, $attribute, $format);
+                    if ($genericType) {
+                        $childContext['generic_type'] = $genericType;
+                    }
                     if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
                         return $this->serializer->denormalize($data, $class, $format, $childContext);
                     }
@@ -831,6 +857,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
         }
 
+        if ($templateTypes = $context['template_types'] ?? []) {
+            $type = $this->replaceTemplateTypes($type, $templateTypes);
+        }
+
         $parameterType = $parameter->getType();
         static $parameterTypeResolver;
         static $parameterTypeContextFactory;
@@ -880,6 +910,100 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         return $collectionValueBaseType instanceof BuiltinType && \in_array($collectionValueBaseType->getTypeIdentifier(), [TypeIdentifier::BOOL, TypeIdentifier::FLOAT, TypeIdentifier::INT, TypeIdentifier::STRING], true);
+    }
+
+    /**
+     * Returns the generic type that declares the variable types of the given type, if any.
+     *
+     * Collections are skipped: their variable types describe keys and values, not templates.
+     */
+    private static function findGenericType(Type $type): ?GenericType
+    {
+        while ($type instanceof WrappingTypeInterface) {
+            if ($type instanceof CollectionType) {
+                return null;
+            }
+
+            if ($type instanceof GenericType) {
+                return $type->getWrappedType() instanceof ObjectType ? $type : null;
+            }
+
+            $type = $type->getWrappedType();
+        }
+
+        return null;
+    }
+
+    /**
+     * Pairs the variable types of a generic type with the templates declared by the generic class.
+     *
+     * Templates that have no variable type are left as is, so that they fall back to their bound.
+     *
+     * @return array<string, Type>
+     */
+    private function getTemplateTypes(string $mappedClass, mixed $genericType): array
+    {
+        if (!$genericType instanceof GenericType
+            || !($variableTypes = $genericType->getVariableTypes())
+            || !($genericClass = $genericType->getWrappedType()) instanceof ObjectType
+            || !is_a($mappedClass, $genericClass->getClassName(), true)
+            || !class_exists(PhpDocParser::class)
+        ) {
+            return [];
+        }
+
+        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver());
+        $templateTypes = [];
+
+        // the templates of the generic class are the ones the variable types are given for, not those of a mapped child class
+        foreach (array_keys($this->typeContextFactory->createFromClassName($genericClass->getClassName())->templates) as $i => $template) {
+            if (isset($variableTypes[$i])) {
+                $templateTypes[$template] = $variableTypes[$i];
+            }
+        }
+
+        return $templateTypes;
+    }
+
+    /**
+     * @param array<string, Type> $templateTypes
+     */
+    private function replaceTemplateTypes(Type $type, array $templateTypes): Type
+    {
+        if ($type instanceof TemplateType) {
+            return $templateTypes[$type->getName()] ?? $type;
+        }
+
+        if ($type instanceof NullableType) {
+            return Type::nullable($this->replaceTemplateTypes($type->getWrappedType(), $templateTypes));
+        }
+
+        if ($type instanceof UnionType) {
+            $types = array_map(fn (Type $t): Type => $this->replaceTemplateTypes($t, $templateTypes), $type->getTypes());
+
+            foreach ($types as $t) {
+                // a union with "mixed" is "mixed", and creating such a union is not allowed
+                if ($t instanceof BuiltinType && TypeIdentifier::MIXED === $t->getTypeIdentifier()) {
+                    return $t;
+                }
+            }
+
+            return Type::union(...$types);
+        }
+
+        if ($type instanceof IntersectionType) {
+            return Type::intersection(...array_map(fn (Type $t): Type => $this->replaceTemplateTypes($t, $templateTypes), $type->getTypes()));
+        }
+
+        if ($type instanceof CollectionType) {
+            return new CollectionType($this->replaceTemplateTypes($type->getWrappedType(), $templateTypes), $type->isList());
+        }
+
+        if ($type instanceof GenericType) {
+            return Type::generic($type->getWrappedType(), ...array_map(fn (Type $t): Type => $this->replaceTemplateTypes($t, $templateTypes), $type->getVariableTypes()));
+        }
+
+        return $type;
     }
 
     private function getType(string $currentClass, string $attribute): ?Type

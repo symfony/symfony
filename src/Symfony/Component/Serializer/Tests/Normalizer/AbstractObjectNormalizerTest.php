@@ -1831,6 +1831,180 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('dummy', $denormalizedData->values[0]->type);
     }
 
+    public function testDenormalizeGenericType()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['box' => ['item' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericDrawing::class, $drawing);
+        $this->assertInstanceOf(GenericBox::class, $drawing->box);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->box->item);
+        $this->assertSame('circle', $drawing->box->item->kind);
+        $this->assertSame(2.0, $drawing->box->item->radius);
+    }
+
+    public function testDenormalizeGenericTypeWithUnboundedTemplate()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['unboundedBox' => ['item' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericCircle::class, $drawing->unboundedBox->item);
+        $this->assertSame(2.0, $drawing->unboundedBox->item->radius);
+    }
+
+    public function testDenormalizeGenericTypeInCollections()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize([
+            'box' => ['items' => [['kind' => 'circle', 'radius' => 1.0], ['kind' => 'circle', 'radius' => 2.0]]],
+            'boxes' => [['item' => ['kind' => 'circle', 'radius' => 3.0]], ['item' => ['kind' => 'circle', 'radius' => 4.0]]],
+            'boxesByName' => ['small' => ['item' => ['kind' => 'circle', 'radius' => 5.0]]],
+        ], GenericDrawing::class);
+
+        $this->assertCount(2, $drawing->box->items);
+        $this->assertContainsOnlyInstancesOf(GenericCircle::class, $drawing->box->items);
+        $this->assertSame([1.0, 2.0], array_map(static fn (GenericCircle $circle) => $circle->radius, $drawing->box->items));
+
+        $this->assertCount(2, $drawing->boxes);
+        $this->assertContainsOnlyInstancesOf(GenericBox::class, $drawing->boxes);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->boxes[0]->item);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->boxes[1]->item);
+        $this->assertSame(4.0, $drawing->boxes[1]->item->radius);
+
+        $this->assertInstanceOf(GenericBox::class, $drawing->boxesByName['small']);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->boxesByName['small']->item);
+        $this->assertSame(5.0, $drawing->boxesByName['small']->item->radius);
+    }
+
+    public function testDenormalizeGenericTypeWithNullableTemplate()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['box' => ['optionalItem' => null], 'nullableBox' => null], GenericDrawing::class);
+
+        $this->assertNull($drawing->box->optionalItem);
+        $this->assertNull($drawing->nullableBox);
+
+        $drawing = $serializer->denormalize(['box' => ['optionalItem' => ['kind' => 'circle', 'radius' => 1.0]], 'nullableBox' => ['item' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericCircle::class, $drawing->box->optionalItem);
+        $this->assertSame(1.0, $drawing->box->optionalItem->radius);
+        $this->assertInstanceOf(GenericBox::class, $drawing->nullableBox);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->nullableBox->item);
+        $this->assertSame(2.0, $drawing->nullableBox->item->radius);
+    }
+
+    public function testDenormalizeGenericTypeInUnionType()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['unboundedBox' => ['itemOrLabel' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericCircle::class, $drawing->unboundedBox->itemOrLabel);
+        $this->assertSame(2.0, $drawing->unboundedBox->itemOrLabel->radius);
+    }
+
+    public function testDenormalizeGenericTypeWithMixedVariableType()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['mixedBox' => ['item' => ['kind' => 'circle'], 'itemOrLabel' => ['kind' => 'circle']]], GenericDrawing::class);
+
+        $this->assertSame(['kind' => 'circle'], $drawing->mixedBox->item);
+        $this->assertSame(['kind' => 'circle'], $drawing->mixedBox->itemOrLabel);
+    }
+
+    public function testDenormalizeNestedGenericType()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['nestedBox' => ['item' => ['item' => ['kind' => 'circle', 'radius' => 2.0]]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericUnboundedBox::class, $drawing->nestedBox);
+        $this->assertInstanceOf(GenericUnboundedBox::class, $drawing->nestedBox->item);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->nestedBox->item->item);
+        $this->assertSame(2.0, $drawing->nestedBox->item->item->radius);
+    }
+
+    public function testDenormalizeGenericTypeWithSeveralTemplates()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['pair' => ['first' => ['kind' => 'circle', 'radius' => 1.0], 'second' => ['kind' => 'square', 'side' => 2.0]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericCircle::class, $drawing->pair->first);
+        $this->assertSame(1.0, $drawing->pair->first->radius);
+        $this->assertInstanceOf(GenericSquare::class, $drawing->pair->second);
+        $this->assertSame(2.0, $drawing->pair->second->side);
+    }
+
+    public function testDenormalizeGenericTypeKeepsTemplatesWithoutVariableType()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['partialPair' => ['first' => ['kind' => 'circle', 'radius' => 1.0], 'second' => ['kind' => 'square', 'side' => 2.0]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericCircle::class, $drawing->partialPair->first);
+        // "V" has no variable type, so it falls back to its bound, which is "mixed"
+        $this->assertSame(['kind' => 'square', 'side' => 2.0], $drawing->partialPair->second);
+    }
+
+    public function testDenormalizeGenericTypeInConstructor()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['constructedBox' => ['item' => ['kind' => 'circle', 'radius' => 2.0], 'label' => 'round']], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericBoxWithConstructor::class, $drawing->constructedBox);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->constructedBox->item);
+        $this->assertSame(2.0, $drawing->constructedBox->item->radius);
+        $this->assertSame('round', $drawing->constructedBox->label);
+    }
+
+    public function testDenormalizeGenericTypeWithDiscriminatorMap()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['mappedBox' => ['type' => 'gift', 'item' => ['kind' => 'circle', 'radius' => 2.0], 'wrapping' => ['kind' => 'circle']]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericGiftBox::class, $drawing->mappedBox);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->mappedBox->item);
+        $this->assertSame(2.0, $drawing->mappedBox->item->radius);
+        // the variable type is given for "T" of the declared class, while "U" belongs to the mapped one
+        $this->assertSame(['kind' => 'circle'], $drawing->mappedBox->wrapping);
+    }
+
+    public function testDenormalizeGenericTypeDoesNotLeakToNestedObjects()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['box' => ['inner' => ['item' => ['kind' => 'circle', 'radius' => 2.0]]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericUnboundedBox::class, $drawing->box->inner);
+        // the inner box is not declared as a generic type, so its template keeps its "mixed" bound
+        $this->assertSame(['kind' => 'circle', 'radius' => 2.0], $drawing->box->inner->item);
+    }
+
+    public function testDenormalizeGenericTypeWithoutVariableTypesFallsBackToBound()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Failed to create object because the class "'.GenericShape::class.'" is not instantiable.');
+
+        $serializer->denormalize(['plainBox' => ['item' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+    }
+
+    private static function createGenericTypeSerializer(): Serializer
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(), new ReflectionExtractor()]));
+
+        return new Serializer([new ArrayDenormalizer(), $normalizer]);
+    }
+
     public function testNotNormalizableValueExceptionCurrentTypeUsesAttributeValue()
     {
         $serializer = new Serializer([new ObjectNormalizer(propertyAccessor: PropertyAccess::createPropertyAccessor())]);
@@ -2597,4 +2771,133 @@ class DummyWithArrayObjectOfDtos
     {
         $this->items = new \ArrayObject(iterator_to_array($items));
     }
+}
+
+abstract class GenericShape
+{
+    public string $kind = '';
+}
+
+class GenericCircle extends GenericShape
+{
+    public float $radius = 0.0;
+}
+
+class GenericSquare extends GenericShape
+{
+    public float $side = 0.0;
+}
+
+/**
+ * @template T of GenericShape
+ */
+class GenericBox
+{
+    /** @var T */
+    public mixed $item = null;
+
+    /** @var ?T */
+    public mixed $optionalItem = null;
+
+    /** @var list<T> */
+    public array $items = [];
+
+    public ?GenericUnboundedBox $inner = null;
+}
+
+/**
+ * @template T
+ */
+class GenericUnboundedBox
+{
+    /** @var T */
+    public mixed $item = null;
+
+    /** @var T|string */
+    public mixed $itemOrLabel = null;
+}
+
+/**
+ * @template T of GenericShape
+ */
+class GenericBoxWithConstructor
+{
+    /**
+     * @param T $item
+     */
+    public function __construct(
+        public mixed $item,
+        public string $label = '',
+    ) {
+    }
+}
+
+/**
+ * @template K
+ * @template V
+ */
+class GenericPair
+{
+    /** @var K */
+    public mixed $first = null;
+
+    /** @var V */
+    public mixed $second = null;
+}
+
+/**
+ * @template T of GenericShape
+ */
+#[DiscriminatorMap('type', ['gift' => GenericGiftBox::class])]
+abstract class AbstractGenericBox
+{
+    /** @var T */
+    public mixed $item = null;
+}
+
+/**
+ * @template U
+ */
+class GenericGiftBox extends AbstractGenericBox
+{
+    /** @var U */
+    public mixed $wrapping = null;
+}
+
+class GenericDrawing
+{
+    /** @var GenericBox<GenericCircle> */
+    public GenericBox $box;
+
+    /** @var GenericUnboundedBox<GenericCircle> */
+    public GenericUnboundedBox $unboundedBox;
+
+    /** @var ?GenericBox<GenericCircle> */
+    public ?GenericBox $nullableBox = null;
+
+    /** @var list<GenericBox<GenericCircle>> */
+    public array $boxes = [];
+
+    /** @var array<string, GenericBox<GenericCircle>> */
+    public array $boxesByName = [];
+
+    /** @var GenericUnboundedBox<mixed> */
+    public GenericUnboundedBox $mixedBox;
+
+    /** @var GenericUnboundedBox<GenericUnboundedBox<GenericCircle>> */
+    public GenericUnboundedBox $nestedBox;
+
+    /** @var GenericPair<GenericCircle, GenericSquare> */
+    public GenericPair $pair;
+
+    /** @var GenericPair<GenericCircle> */
+    public GenericPair $partialPair;
+
+    /** @var GenericBoxWithConstructor<GenericCircle> */
+    public GenericBoxWithConstructor $constructedBox;
+
+    /** @var AbstractGenericBox<GenericCircle> */
+    public AbstractGenericBox $mappedBox;
+
+    public GenericBox $plainBox;
 }

@@ -188,6 +188,28 @@ class DoctrineExtensionTest extends TestCase
         ], $expectedEm2));
     }
 
+    public function testMappingPathsContainingAPercentSignAreEscaped()
+    {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $path = '/tmp/sf_doctrine_my%2Fother%2Fbranch/Entity';
+
+        $this->extension
+            ->method('getMetadataDriverClass')
+            ->willReturn(SimplifiedXmlDriverStub::class);
+
+        $container = new ContainerBuilder(new ParameterBag());
+
+        $reflection = new \ReflectionClass(AbstractDoctrineExtension::class);
+        $drivers = $reflection->getProperty('drivers');
+        $drivers->setValue($this->extension, ['xml' => ['Prefix' => $path]]);
+
+        $reflection->getMethod('registerMappingDrivers')->invoke($this->extension, ['name' => 'default'], $container);
+
+        $arguments = $container->getDefinition('doctrine.orm.default_xml_metadata_driver')->getArguments();
+
+        $this->assertSame(['/tmp/sf_doctrine_my%%2Fother%%2Fbranch/Entity' => 'Prefix'], $arguments[0]);
+    }
+
     public function testMappingTypeDetection()
     {
         $container = $this->createContainer();
@@ -370,4 +392,8 @@ class DoctrineExtensionTest extends TestCase
             'kernel.project_dir' => __DIR__,
         ], $data)));
     }
+}
+
+class SimplifiedXmlDriverStub
+{
 }

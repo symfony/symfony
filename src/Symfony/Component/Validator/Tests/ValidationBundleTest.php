@@ -167,7 +167,8 @@ class ValidationBundleTest extends TestCase
             $xmlMappings = array_column(array_filter($calls, static fn ($call) => 'addXmlMappings' === $call[0]), 1);
             $files = array_map(static fn ($file) => str_replace(['%%', '\\'], ['%', '/'], $file), $xmlMappings[0][0]);
 
-            $this->assertContains($projectDir.'/config/validator/validation.xml', $files);
+            // getRealPath() expands the 8.3 short names Windows uses in the temp path
+            $this->assertContains(str_replace('\\', '/', realpath($projectDir.'/config/validator/validation.xml')), $files);
         } finally {
             @unlink($projectDir.'/config/validator/validation.xml');
             @rmdir($projectDir.'/config/validator');

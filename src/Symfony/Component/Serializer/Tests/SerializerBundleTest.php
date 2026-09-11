@@ -74,7 +74,8 @@ class SerializerBundleTest extends TestCase
                 }
             }
 
-            $this->assertContains($projectDir.'/config/serializer/serialization.xml', $files);
+            // getRealPath() expands the 8.3 short names Windows uses in the temp path
+            $this->assertContains(str_replace('\\', '/', realpath($projectDir.'/config/serializer/serialization.xml')), $files);
         } finally {
             @unlink($projectDir.'/config/serializer/serialization.xml');
             @rmdir($projectDir.'/config/serializer');

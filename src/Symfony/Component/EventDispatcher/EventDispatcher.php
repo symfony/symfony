@@ -189,11 +189,13 @@ class EventDispatcher implements EventDispatcherInterface
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (\is_string($params)) {
                 $this->addListener($eventName, [$subscriber, $params]);
+            } elseif (isset($params['method'])) {
+                $this->addListener($eventName, [$subscriber, $params['method']], $params['priority'] ?? 0);
             } elseif (\is_string($params[0])) {
                 $this->addListener($eventName, [$subscriber, $params[0]], $params[1] ?? 0);
             } else {
                 foreach ($params as $listener) {
-                    $this->addListener($eventName, [$subscriber, $listener[0]], $listener[1] ?? 0);
+                    $this->addListener($eventName, [$subscriber, $listener['method'] ?? $listener[0]], $listener['priority'] ?? $listener[1] ?? 0);
                 }
             }
         }
@@ -202,12 +204,12 @@ class EventDispatcher implements EventDispatcherInterface
     public function removeSubscriber(EventSubscriberInterface $subscriber): void
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
-            if (\is_array($params) && \is_array($params[0])) {
+            if (\is_array($params) && !isset($params['method']) && \is_array($params[0])) {
                 foreach ($params as $listener) {
-                    $this->removeListener($eventName, [$subscriber, $listener[0]]);
+                    $this->removeListener($eventName, [$subscriber, $listener['method'] ?? $listener[0]]);
                 }
             } else {
-                $this->removeListener($eventName, [$subscriber, \is_string($params) ? $params : $params[0]]);
+                $this->removeListener($eventName, [$subscriber, \is_string($params) ? $params : ($params['method'] ?? $params[0])]);
             }
         }
     }

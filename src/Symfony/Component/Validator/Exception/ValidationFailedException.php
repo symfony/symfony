@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Validator\Exception;
 
+use Symfony\Component\HttpKernel\Attribute\WithHttpStatus;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * @author Jan Vernieuwe <jan.vernieuwe@phpro.be>
  */
+#[WithHttpStatus(422)]
 class ValidationFailedException extends RuntimeException
 {
     public function __construct(

@@ -24,6 +24,10 @@ use Symfony\Component\Security\Http\SecurityEvents;
  * a sensitive action can require the user to prove possession of their credentials
  * again rather than relying on a session that was opened long ago.
  *
+ * An authenticator that knows when the user actually authenticated, such as an OIDC
+ * client reading the "auth_time" claim, may stamp the token itself in createToken();
+ * this listener only fills the gap, it never overwrites such a value.
+ *
  * @see AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY
  */
 final class AuthenticationTimeListener implements EventSubscriberInterface
@@ -35,7 +39,11 @@ final class AuthenticationTimeListener implements EventSubscriberInterface
 
     public function onInteractiveLogin(InteractiveLoginEvent $event): void
     {
-        $event->getAuthenticationToken()->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, $this->clock?->now()->getTimestamp() ?? time());
+        $token = $event->getAuthenticationToken();
+
+        if (!$token->hasAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE)) {
+            $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, $this->clock?->now()->getTimestamp() ?? time());
+        }
     }
 
     public static function getSubscribedEvents(): array

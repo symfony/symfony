@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `#[WithHttpStatus(422)]` to `ValidationFailedException`, so that an uncaught one renders as an "Unprocessable Content" response instead of a 500 one
  * Add `ValidationBundle`, which provides the `validation` configuration and the services previously provided by `FrameworkBundle` under `framework.validation`
  * Add `CacheWarmer\ValidatorCacheWarmer` and `DependencyInjection\AddValidatorSecurityExpressionLanguageProviderPass`, which `FrameworkBundle` used to provide
  * Accept the `::class` constant of the annotated class in `GroupSequence` definitions

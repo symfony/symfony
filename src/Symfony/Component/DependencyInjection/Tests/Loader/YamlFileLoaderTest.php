@@ -374,6 +374,26 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame($expected, $container->getExtensionConfig('project'));
     }
 
+    public function testExtensionWithScalarConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \ProjectExtension());
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('scalar_config.yml');
+
+        $this->assertSame(['a scalar'], $container->getExtensionConfig('project'));
+    }
+
+    public function testPrependExtensionConfigWithScalarConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->prependExtensionConfig('project', ['foo' => 'bar']);
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), prepend: true);
+        $loader->load('scalar_config.yml');
+
+        $this->assertSame(['a scalar', ['foo' => 'bar']], $container->getExtensionConfig('project'));
+    }
+
     public function testExtensionWithNullConfig()
     {
         $container = new ContainerBuilder();

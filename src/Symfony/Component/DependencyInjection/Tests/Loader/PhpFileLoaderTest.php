@@ -87,6 +87,17 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame($expected, $container->getExtensionConfig('acme'));
     }
 
+    public function testExtensionWithScalarConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'));
+        $loader->load('scalar_extension_config.php');
+        $loader->load('scalar_extension_config_returned.php');
+
+        $this->assertSame(['from the DSL', 'from a returned array'], $container->getExtensionConfig('acme'));
+    }
+
     public function testConfigServices()
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');

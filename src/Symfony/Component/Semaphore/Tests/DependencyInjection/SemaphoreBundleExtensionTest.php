@@ -35,6 +35,16 @@ class SemaphoreBundleExtensionTest extends TestCase
         $this->assertSame('semaphore.factory', (string) $container->getAlias(SemaphoreFactory::class));
     }
 
+    public function testSemaphoreFromARootLevelDsn()
+    {
+        $container = $this->createContainerFromFile('semaphore_dsn');
+
+        $this->assertTrue($container->hasDefinition('semaphore.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('semaphore.default.factory')->getArgument(0));
+        $this->assertSame([StoreFactory::class, 'createStore'], $storeDef->getFactory());
+        $this->assertSame('redis://example.com', $storeDef->getArgument(0));
+    }
+
     public function testNamedSemaphores()
     {
         $container = $this->createContainerFromFile('semaphore_named');

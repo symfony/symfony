@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Stamp the `auth_time` token attribute from the OIDC ID token claim of the same name, so `max_age` and `IS_AUTHENTICATED_RECENTLY` agree
  * Add `AuthenticationTimeListener`, which records the time of the last interactive authentication as the `auth_time` token attribute
  * Add `allowed_time_drift` option to `OidcTokenHandler` to configure time tolerance for token validation (`iat`, `nbf`, `exp` claims)
  * Expose the OAuth2 scopes an access token was granted as the `oauth2_scope` token attribute, read from the `scope` or `scp` claim

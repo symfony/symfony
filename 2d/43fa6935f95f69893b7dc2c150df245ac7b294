@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-11T16:29:04Z
+
+PR updated - this now add two attr on the setter: `#[Required]` & `#[Target('console')]`. See updated description above.

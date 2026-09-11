@@ -160,6 +160,10 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
             $forwarded = [];
             foreach ($configs as $i => $config) {
+                if (!\is_array($config)) {
+                    continue;
+                }
+
                 foreach ($tree->getXmlRemappings() as [$singular, $plural]) {
                     if (isset($aliases[$plural]) && isset($config[$singular])) {
                         $config[$plural] = Processor::normalizeConfig($config, $singular, $plural);

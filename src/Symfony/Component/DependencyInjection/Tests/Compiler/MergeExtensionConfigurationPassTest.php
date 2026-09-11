@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
@@ -313,6 +314,43 @@ class MergeExtensionConfigurationPassTest extends TestCase
         (new MergeExtensionConfigurationPass())->process($container);
     }
 
+    public function testRootScalarConfigIsWrappedByTheConfigurationTree()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new ShorthandExtension());
+        $container->setExtensionConfig('shorthand', ['redis://localhost', ['value' => 'explicit']]);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->assertSame(['value' => 'explicit'], $container->getParameter('shorthand.config'));
+        $this->assertSame(['redis://localhost', ['value' => 'explicit']], $container->getParameter('shorthand.configs'));
+    }
+
+    public function testRootScalarConfigIsRejectedWhenTheConfigurationTreeExpectsAnArray()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->setExtensionConfig('foo', ['not an array']);
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('Invalid type for path "foo". Expected "array", but got "string"');
+
+        (new MergeExtensionConfigurationPass())->process($container);
+    }
+
+    public function testExtensionAliasesLeaveRootValuesThatAreNotArraysAlone()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new AliasingExtension());
+        $container->registerExtension(new TargetExtension());
+        $container->setExtensionConfig('aliasing', ['not an array', ['target' => ['value' => 'forwarded']]]);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->assertSame(['not an array', []], $container->getParameter('aliasing.configs'));
+        $this->assertSame([['value' => 'forwarded']], $container->getParameter('target.configs'));
+    }
+
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testDeprecatedExtensionAliasesTriggerTheirDeprecation()
@@ -428,6 +466,40 @@ final class TestCccExtension extends Extension
     {
         $configuration = $this->getConfiguration($configs, $container);
         $this->processConfiguration($configuration, $configs);
+    }
+}
+
+final class ShorthandConfiguration implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('shorthand');
+        $treeBuilder->getRootNode()
+            ->acceptAndWrap(['string'], 'value')
+            ->children()
+                ->scalarNode('value')->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+}
+
+final class ShorthandExtension extends Extension
+{
+    public function getAlias(): string
+    {
+        return 'shorthand';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
+    {
+        return new ShorthandConfiguration();
+    }
+
+    public function load(array $configs, ContainerBuilder $container): void
+    {
+        $container->setParameter('shorthand.configs', $configs);
+        $container->setParameter('shorthand.config', $this->processConfiguration(new ShorthandConfiguration(), $configs));
     }
 }
 

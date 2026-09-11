@@ -738,9 +738,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Returns the configuration array for the given extension.
+     * Returns the list of configs for the given extension.
      *
-     * @return array<array<string, mixed>>
+     * An element is usually an array, but it can hold any value the configuration
+     * tree of the extension accepts at its root.
+     *
+     * @return list<mixed>
      */
     public function getExtensionConfig(string $name): array
     {
@@ -766,9 +769,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Replaces the configuration arrays of the given extension.
+     * Replaces the list of configs of the given extension.
      *
-     * @param array<array<string, mixed>> $configs
+     * An element is usually an array, but it can hold any value the configuration
+     * tree of the extension accepts at its root.
+     *
+     * @param list<mixed> $configs
      */
     public function setExtensionConfig(string $name, array $configs): void
     {

@@ -967,10 +967,6 @@ trait ContentLoaderTrait
                 continue;
             }
 
-            if (!\is_array($values)) {
-                $values = [];
-            }
-
             $this->loadExtensionConfig($namespace, $values);
         }
 

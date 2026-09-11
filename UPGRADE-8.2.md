@@ -35,6 +35,10 @@ Crowdin Translation Provider
 DependencyInjection
 -------------------
 
+ * [BC BREAK] A top-level extension key that holds a value which is not an array is now passed to that
+   extension instead of being replaced by an empty array. `lock: 'redis://example.com'` configures the lock,
+   where it used to be ignored. An extension whose configuration tree does not accept the value now reports
+   an `InvalidTypeException` instead of ignoring it
  * Bundles that declare no constructor and inherit `boot()`, `shutdown()` and `setContainer()` from
    `AbstractBundle` are now instantiated on demand instead of on every boot. The `$bundles` property of
    the kernel holds only the bundles that have been instantiated, call `getBundles()` to get them all

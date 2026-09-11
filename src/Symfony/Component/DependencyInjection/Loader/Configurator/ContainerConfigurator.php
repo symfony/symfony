@@ -47,10 +47,20 @@ class ContainerConfigurator extends AbstractConfigurator
         $this->instanceof = &$instanceof;
     }
 
-    final public function extension(string $namespace, array $config, bool $prepend = false): void
+    final public function extension(string $namespace, mixed $config, bool $prepend = false): void
     {
+        $config = static::processValue($config) ?? [];
+
         if ($prepend) {
-            $this->container->prependExtensionConfig($namespace, static::processValue($config));
+            if (\is_array($config)) {
+                $this->container->prependExtensionConfig($namespace, $config);
+
+                return;
+            }
+
+            $configs = $this->container->getExtensionConfig($namespace);
+            array_unshift($configs, $config);
+            $this->container->setExtensionConfig($namespace, $configs);
 
             return;
         }
@@ -60,7 +70,19 @@ class ContainerConfigurator extends AbstractConfigurator
             throw new InvalidArgumentException(UndefinedExtensionHandler::getErrorMessage($namespace, $this->file, $namespace, $extensions, UndefinedExtensionHandler::getPackages($this->container)));
         }
 
-        $this->container->loadFromExtension($namespace, static::processValue($config));
+        if (\is_array($config)) {
+            $this->container->loadFromExtension($namespace, $config);
+
+            return;
+        }
+
+        // loadFromExtension() takes an array; let it check the container and resolve the
+        // extension, then swap the empty config it appended for the value it cannot take
+        $this->container->loadFromExtension($namespace);
+        $namespace = $this->container->getExtension($namespace)->getAlias();
+        $configs = $this->container->getExtensionConfig($namespace);
+        $configs[array_key_last($configs)] = $config;
+        $this->container->setExtensionConfig($namespace, $configs);
     }
 
     final public function import(string $resource, ?string $type = null, bool|string $ignoreErrors = false, string|array|null $exclude = null): void

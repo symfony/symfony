@@ -50,6 +50,15 @@ class LockBundleExtensionTest extends TestCase
         $this->assertSame('lock.factory', (string) $container->getAlias(LockFactory::class));
     }
 
+    public function testLockFromARootLevelDsn()
+    {
+        $container = $this->createContainerFromFile('lock_dsn');
+
+        $this->assertTrue($container->hasDefinition('lock.default.factory'));
+        $storeDef = $container->getDefinition($container->getDefinition('lock.default.factory')->getArgument(0));
+        $this->assertSame('redis://example.com', $storeDef->getArgument(0));
+    }
+
     public function testNamedLocks()
     {
         $container = $this->createContainerFromFile('lock_named');

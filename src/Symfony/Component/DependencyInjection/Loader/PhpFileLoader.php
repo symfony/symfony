@@ -77,13 +77,13 @@ class PhpFileLoader extends FileLoader
                     ], $path);
 
                     foreach ($result as $namespace => $config) {
-                        if (!\is_array($config)) {
-                            throw new InvalidArgumentException(\sprintf('The "%s" key should contain an array in "%s".', $namespace, $path));
-                        }
                         if (\in_array($namespace, ['imports', 'parameters', 'services'], true)) {
                             continue;
                         }
                         if (str_starts_with($namespace, 'when@')) {
+                            if (!\is_array($config)) {
+                                throw new InvalidArgumentException(\sprintf('The "%s" key should contain an array in "%s".', $namespace, $path));
+                            }
                             $knownEnvs = $this->container->hasParameter('.container.known_envs') ? array_flip($this->container->getParameter('.container.known_envs')) : [];
                             $this->container->setParameter('.container.known_envs', array_keys($knownEnvs + [substr($namespace, 5) => true]));
                             continue;
@@ -104,9 +104,6 @@ class PhpFileLoader extends FileLoader
                         ], $path);
 
                         foreach ($result[$when] as $namespace => $config) {
-                            if (!\is_array($config)) {
-                                throw new InvalidArgumentException(\sprintf('The "%s" key should contain an array in "%s".', $namespace, $path));
-                            }
                             if (!\in_array($namespace, ['imports', 'parameters', 'services'], true) && !str_starts_with($namespace, 'when@')) {
                                 $this->loadExtensionConfig($namespace, ContainerConfigurator::processValue($config));
                             }

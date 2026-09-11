@@ -273,10 +273,12 @@ abstract class FileLoader extends BaseFileLoader
         $this->interfaces = $this->singlyImplemented = $this->aliases = $this->aliasedTargets = [];
     }
 
-    final protected function loadExtensionConfig(string $namespace, array $config, string $file = '?'): void
+    final protected function loadExtensionConfig(string $namespace, mixed $config, string $file = '?'): void
     {
+        $config ??= [];
+
         if (!$this->prepend) {
-            $this->container->loadFromExtension($namespace, $config);
+            $this->appendExtensionConfig($namespace, $config);
 
             return;
         }
@@ -290,7 +292,7 @@ abstract class FileLoader extends BaseFileLoader
             return;
         }
 
-        $this->container->prependExtensionConfig($namespace, $config);
+        $this->unshiftExtensionConfig($namespace, $config);
     }
 
     final protected function loadExtensionConfigs(): void
@@ -301,7 +303,7 @@ abstract class FileLoader extends BaseFileLoader
 
         foreach ($this->extensionConfigs as $namespace => $configs) {
             foreach ($configs as $config) {
-                $this->container->prependExtensionConfig($namespace, $config);
+                $this->unshiftExtensionConfig($namespace, $config);
             }
         }
 
@@ -422,6 +424,36 @@ abstract class FileLoader extends BaseFileLoader
         $this->container->register($class, $class)
             ->setAbstract(true)
             ->addTag('container.excluded', null !== $source ? $attributes[$source] : []);
+    }
+
+    private function appendExtensionConfig(string $namespace, mixed $config): void
+    {
+        if (\is_array($config)) {
+            $this->container->loadFromExtension($namespace, $config);
+
+            return;
+        }
+
+        // loadFromExtension() takes an array; let it check the container and resolve the
+        // extension, then swap the empty config it appended for the value it cannot take
+        $this->container->loadFromExtension($namespace);
+        $namespace = $this->container->getExtension($namespace)->getAlias();
+        $configs = $this->container->getExtensionConfig($namespace);
+        $configs[array_key_last($configs)] = $config;
+        $this->container->setExtensionConfig($namespace, $configs);
+    }
+
+    private function unshiftExtensionConfig(string $namespace, mixed $config): void
+    {
+        if (\is_array($config)) {
+            $this->container->prependExtensionConfig($namespace, $config);
+
+            return;
+        }
+
+        $configs = $this->container->getExtensionConfig($namespace);
+        array_unshift($configs, $config);
+        $this->container->setExtensionConfig($namespace, $configs);
     }
 
     /**

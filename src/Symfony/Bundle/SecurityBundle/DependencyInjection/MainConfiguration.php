@@ -20,6 +20,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\EntryPoint\ReAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
@@ -229,6 +230,9 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('access_denied_handler')->end()
             ->scalarNode('entry_point')
                 ->info(\sprintf('An enabled authenticator name or a service id that implements "%s".', AuthenticationEntryPointInterface::class))
+            ->end()
+            ->scalarNode('re_authentication_entry_point')
+                ->info(\sprintf('Service id implementing "%s", asking an already authenticated user to prove possession of their credentials again when IS_AUTHENTICATED_RECENTLY is denied. Defaults to the firewall entry point when that one implements it.', ReAuthenticationEntryPointInterface::class))
             ->end()
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()

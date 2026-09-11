@@ -34,6 +34,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
+use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -209,6 +210,33 @@ class MessengerBundleExtensionTest extends TestCase
             'transport_1' => 'failure_transport_1',
             'transport_3' => 'failure_transport_3',
         ], $container->getDefinition('console.command.messenger_debug')->getArgument(4));
+    }
+
+    public function testItRegistersTheFailedMessageRepository()
+    {
+        $container = $this->createContainerFromFile('messenger_multiple_failure_transports_global', false);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
+
+        $definition = $container->getDefinition('messenger.failed_message_repository');
+
+        $this->assertSame('failure_transport_global', $definition->getArgument(1));
+
+        $locator = $container->getDefinition((string) $definition->getArgument(0));
+        $this->assertSame(
+            ['failure_transport_global', 'failure_transport_1', 'failure_transport_3'],
+            array_keys($locator->getArgument(0))
+        );
+    }
+
+    public function testTheFailedMessageRepositoryIsRemovedWithoutAnyFailureTransport()
+    {
+        $container = $this->createContainerFromFile('messenger', false);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
+
+        $this->assertFalse($container->has('messenger.failed_message_repository'));
+        $this->assertFalse($container->has(FailedMessageRepository::class));
     }
 
     public function testMessengerMultipleFailureTransportsWithGlobalFailureTransport()

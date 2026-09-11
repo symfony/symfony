@@ -13,6 +13,8 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 class FormLoginTest extends AbstractWebTestCase
 {
@@ -31,6 +33,31 @@ class FormLoginTest extends AbstractWebTestCase
         $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/profile".', $text);
+    }
+
+    public function testAuthenticationTimeIsRecordedAndSurvivesTheSession()
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $client->submit($form);
+        $client->followRedirect();
+
+        // a second request, so the asserted token is the one restored from the session
+        $client->request('GET', '/profile');
+
+        $token = static::getContainer()->get('security.token_storage')->getToken();
+
+        $this->assertTrue($token->hasAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
+        $this->assertGreaterThanOrEqual(time() - 60, $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
+        $this->assertTrue(static::getContainer()->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_RECENTLY'));
+
+        // the optional clock must actually be injected, otherwise both services
+        // silently fall back to time() and the wiring could rot unnoticed
+        $voter = static::getContainer()->get('security.access.authenticated_voter');
+        $this->assertInstanceOf(ClockInterface::class, (new \ReflectionProperty($voter, 'clock'))->getValue($voter));
     }
 
     #[DataProvider('provideClientOptions')]

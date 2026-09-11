@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * [BC BREAK] Answer a scheme redirect from `RouterListener` itself, so that no other listener runs on a request whose route is not served over the requested scheme
  * Add the `cache_status` option to `HttpCache` to emit the RFC 9211 `Cache-Status` header
  * Add `#[AsControllerAttributeListener]` attribute to declare event listeners for controller attributes
  * Add the `$expiration` argument to `FragmentUriGenerator::__construct()` and sign fragment URIs with a 5-year expiration by default

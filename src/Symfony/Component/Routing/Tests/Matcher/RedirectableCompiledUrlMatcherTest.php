@@ -60,9 +60,20 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
                 'httpsPort' => $context->getHttpsPort(),
                 '_route' => 'foo',
                 '_route_mapping' => [],
+                '_scheme_redirect' => true,
             ],
             $matcher->match('/foo')
         );
+    }
+
+    public function testSlashRedirectIsNotFlaggedAsASchemeRedirect()
+    {
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/foo/'));
+
+        $matcher = $this->getMatcher($routes, new RequestContext());
+
+        $this->assertArrayNotHasKey('_scheme_redirect', $matcher->match('/foo'));
     }
 
     private function getMatcher(RouteCollection $routes, RequestContext $context)

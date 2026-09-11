@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +31,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
@@ -69,6 +71,82 @@ class RouterListenerTest extends TestCase
             [80, 443, 'https://localhost/', 80, 443],
             [80, 443, 'https://localhost:90/', 80, 90],
         ];
+    }
+
+    public function testSchemeRedirectIsPerformedBeforeOtherListenersRun()
+    {
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = Request::create('http://localhost/foo?bar=baz');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $urlMatcher = $this->createStub(UrlMatcherInterface::class);
+        $urlMatcher->method('match')->willReturn([
+            '_controller' => RedirectController::class.'::urlRedirectAction',
+            'path' => '/foo',
+            'permanent' => true,
+            'scheme' => 'https',
+            'httpPort' => 80,
+            'httpsPort' => 443,
+            '_route' => 'foo',
+            '_scheme_redirect' => true,
+        ]);
+
+        $listener = new RouterListener($urlMatcher, new RequestStack(), new RequestContext());
+        $listener->onKernelRequest($event);
+
+        $response = $event->getResponse();
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(301, $response->getStatusCode());
+        $this->assertSame('https://localhost/foo?bar=baz', $response->getTargetUrl());
+
+        // nothing downstream, the firewall included, may act on a request that is not served here
+        $this->assertFalse($request->attributes->has('_route'));
+        $this->assertFalse($request->attributes->has('_controller'));
+        $this->assertTrue($event->isPropagationStopped());
+    }
+
+    public function testSchemeRedirectIsLeftAloneWhenTheMatcherBuildsItsOwnPayload()
+    {
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = Request::create('http://localhost/foo');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $urlMatcher = $this->createStub(UrlMatcherInterface::class);
+        $urlMatcher->method('match')->willReturn([
+            '_scheme_redirect' => true,
+            '_controller' => 'app.custom_redirect_controller',
+            '_route' => 'foo',
+        ]);
+
+        $listener = new RouterListener($urlMatcher, new RequestStack(), new RequestContext());
+        $listener->onKernelRequest($event);
+
+        $this->assertNull($event->getResponse());
+        $this->assertSame('app.custom_redirect_controller', $request->attributes->get('_controller'));
+    }
+
+    public function testSlashRedirectStillGoesThroughTheController()
+    {
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = Request::create('http://localhost/foo');
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $urlMatcher = $this->createStub(UrlMatcherInterface::class);
+        $urlMatcher->method('match')->willReturn([
+            '_controller' => RedirectController::class.'::urlRedirectAction',
+            'path' => '/foo/',
+            'permanent' => true,
+            'scheme' => null,
+            'httpPort' => 80,
+            'httpsPort' => 443,
+            '_route' => 'foo',
+        ]);
+
+        $listener = new RouterListener($urlMatcher, new RequestStack(), new RequestContext());
+        $listener->onKernelRequest($event);
+
+        $this->assertNull($event->getResponse());
+        $this->assertSame('foo', $request->attributes->get('_route'));
     }
 
     private function createRequestEventForUri(string $uri): RequestEvent

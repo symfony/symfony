@@ -35,7 +35,7 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
                 try {
                     $ret = parent::match($pathinfo);
 
-                    return $this->redirect($pathinfo, $ret['_route'] ?? null, $this->context->getScheme()) + $ret;
+                    return ['_scheme_redirect' => true] + $this->redirect($pathinfo, $ret['_route'] ?? null, $this->context->getScheme()) + $ret;
                 } catch (ExceptionInterface) {
                     throw $e;
                 } finally {

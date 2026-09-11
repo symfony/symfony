@@ -576,6 +576,94 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertArrayHasKey('custom_key', $services);
         $this->assertSame('decorator2.tagged_service', (string) $services['custom_key']);
     }
+
+    public function testBeforeAndAfterTagAttributesReorderServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag');
+        $container->register('b')->addTag('my_tag');
+        $container->register('c')->addTag('my_tag', ['before' => 'a']);
+
+        $this->assertSame(['c', 'a', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testAConstraintCanInsertAServiceBetweenTwoOthers()
+    {
+        $container = new ContainerBuilder();
+        $container->register('b')->addTag('my_tag');
+        $container->register('c')->addTag('my_tag');
+        $container->register('e')->addTag('my_tag', ['after' => 'b', 'before' => 'c']);
+
+        $this->assertSame(['b', 'e', 'c'], $this->getTaggedIds($container));
+    }
+
+    public function testConstraintsApplyOnTopOfPriorities()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag', ['priority' => 10]);
+        $container->register('b')->addTag('my_tag', ['priority' => 5]);
+        $container->register('c')->addTag('my_tag', ['priority' => -10, 'before' => 'a']);
+
+        $this->assertSame(['c', 'a', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testSeveralTargetsAreSupported()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag');
+        $container->register('b')->addTag('my_tag');
+        $container->register('c')->addTag('my_tag', ['before' => ['a', 'b']]);
+
+        $this->assertSame(['c', 'a', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testAConstraintCanTargetAClass()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', HelloNamedService2::class)->addTag('my_tag');
+        $container->register('b')->addTag('my_tag', ['before' => HelloNamedService2::class]);
+
+        $this->assertSame(['b', 'a'], $this->getTaggedIds($container));
+    }
+
+    public function testConstraintsTargetingAnUninstalledServiceAreIgnored()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag');
+        $container->register('b')->addTag('my_tag', ['after' => 'from_a_bundle_that_is_not_installed']);
+
+        $this->assertSame(['a', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testCyclicConstraintsAreReported()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag', ['before' => 'b']);
+        $container->register('b')->addTag('my_tag', ['before' => 'a']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "before"/"after" constraints on tag "my_tag": cycle detected in the "before"/"after" constraints: "a" -> "b" -> "a".');
+
+        $this->getTaggedIds($container);
+    }
+
+    public function testBeforeAndAfterAreReadFromAsTaggedItem()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', HelloNamedService2::class)->addTag('my_tag')->setAutoconfigured(true);
+        $container->register('b', OrderedAfterHelloService::class)->addTag('my_tag')->setAutoconfigured(true);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame(['b', 'a'], $this->getTaggedIds($container));
+    }
+
+    private function getTaggedIds(ContainerBuilder $container): array
+    {
+        $refs = (new PriorityTaggedServiceTraitImplementation())->test('my_tag', $container);
+
+        return array_map(strval(...), array_values($refs));
+    }
 }
 
 class PriorityTaggedServiceTraitImplementation
@@ -669,5 +757,10 @@ class MultiTagNonStaticClass
 
 #[AsTaggedItem(index: 'custom_key', priority: 1)]
 class DecoratedAsTaggedItemService
+{
+}
+
+#[AsTaggedItem(before: HelloNamedService2::class)]
+class OrderedAfterHelloService
 {
 }

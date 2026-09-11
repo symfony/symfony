@@ -57,6 +57,16 @@ class AsListenerTest extends TestCase
         yield [Attribute\AsTransitionListener::class, 'workflow.w.transition.n', 'w', 'n'];
     }
 
+    public function testBeforeAndAfterReachTheParentAttribute()
+    {
+        $attribute = new Attribute\AsEnterListener('w', 'n', before: 'app.first', after: [\stdClass::class]);
+
+        $this->assertSame('workflow.w.enter.n', $attribute->event);
+        $this->assertNull($attribute->priority);
+        $this->assertSame('app.first', $attribute->before);
+        $this->assertSame([\stdClass::class], $attribute->after);
+    }
+
     #[DataProvider('provideTransitionThrowException')]
     public function testTransitionThrowException(string $class)
     {

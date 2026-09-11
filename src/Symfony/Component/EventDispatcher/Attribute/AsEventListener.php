@@ -20,16 +20,20 @@ namespace Symfony\Component\EventDispatcher\Attribute;
 class AsEventListener
 {
     /**
-     * @param string|null $event      The event name to listen to
-     * @param string|null $method     The method to run when the listened event is triggered
-     * @param int         $priority   The priority of this listener if several are declared for the same event
-     * @param string|null $dispatcher The service id of the event dispatcher to listen to
+     * @param string|null              $event      The event name to listen to
+     * @param string|null              $method     The method to run when the listened event is triggered
+     * @param int|null                 $priority   The priority of this listener; null lets "before"/"after" decide it, else they only reorder within that priority
+     * @param string|null              $dispatcher The service id of the event dispatcher to listen to
+     * @param string|list<string>|null $before     Listeners this one runs before, as service ids, classes or "service::method"
+     * @param string|list<string>|null $after      Listeners this one runs after, as service ids, classes or "service::method"
      */
     public function __construct(
         public ?string $event = null,
         public ?string $method = null,
-        public int $priority = 0,
+        public ?int $priority = null,
         public ?string $dispatcher = null,
+        public string|array|null $before = null,
+        public string|array|null $after = null,
     ) {
     }
 }

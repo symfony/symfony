@@ -239,6 +239,36 @@ class EventDispatcherTest extends TestCase
         $this->assertFalse($this->dispatcher->hasListeners('pre.foo'));
     }
 
+    public function testAddSubscriberIgnoresOrderingConstraintsNextToAPriority()
+    {
+        $eventSubscriber = new TestEventSubscriberWithOrderingConstraints();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+
+        $this->assertSame(10, $this->dispatcher->getListenerPriority('pre.foo', [$eventSubscriber, 'preFoo']));
+        $this->assertSame(0, $this->dispatcher->getListenerPriority('post.foo', [$eventSubscriber, 'postFoo']));
+        $this->assertSame(0, $this->dispatcher->getListenerPriority('post.foo', [$eventSubscriber, 'postFooToo']));
+
+        $this->dispatcher->removeSubscriber($eventSubscriber);
+        $this->assertFalse($this->dispatcher->hasListeners('pre.foo'));
+        $this->assertFalse($this->dispatcher->hasListeners('post.foo'));
+    }
+
+    public function testAddSubscriberRejectsOrderingConstraintsWithoutPriority()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(\sprintf('The "before"/"after" keys of "%s::getSubscribedEvents()" for event "pre.foo" need a "priority" when the subscriber is added with "addSubscriber()": they only apply to subscribers registered as services.', TestEventSubscriberWithUnprioritizedOrderingConstraint::class));
+
+        $this->dispatcher->addSubscriber(new TestEventSubscriberWithUnprioritizedOrderingConstraint());
+    }
+
+    public function testAddSubscriberRejectsOrderingConstraintsWithoutPriorityInAList()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('for event "post.foo" need a "priority"');
+
+        $this->dispatcher->addSubscriber(new TestEventSubscriberWithUnprioritizedOrderingConstraintInAList());
+    }
+
     public function testAddSubscriberWithPriorities()
     {
         $eventSubscriber = new TestEventSubscriber();
@@ -705,5 +735,35 @@ class TestEventSubscriberWithNamedKeysAndMultipleListeners implements EventSubsc
             ['method' => 'preFoo2', 'priority' => 10],
             ['preFoo3', 20],
         ]];
+    }
+}
+
+class TestEventSubscriberWithOrderingConstraints implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            'pre.foo' => ['method' => 'preFoo', 'priority' => 10, 'before' => 'some.listener'],
+            'post.foo' => [
+                ['method' => 'postFoo', 'priority' => 0, 'after' => ['some.listener', 'other.listener']],
+                ['method' => 'postFooToo', 'before' => []],
+            ],
+        ];
+    }
+}
+
+class TestEventSubscriberWithUnprioritizedOrderingConstraint implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return ['pre.foo' => ['method' => 'preFoo', 'before' => 'some.listener']];
+    }
+}
+
+class TestEventSubscriberWithUnprioritizedOrderingConstraintInAList implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return ['post.foo' => [['postFoo', 5], ['method' => 'postFooToo', 'after' => 'some.listener']]];
     }
 }

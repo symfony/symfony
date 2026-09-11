@@ -576,6 +576,162 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertArrayHasKey('custom_key', $services);
         $this->assertSame('decorator2.tagged_service', (string) $services['custom_key']);
     }
+
+    public function testBeforeAndAfterTagAttributesReorderServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag');
+        $container->register('b')->addTag('my_tag');
+        $container->register('c')->addTag('my_tag', ['before' => 'a']);
+
+        $this->assertSame(['c', 'a', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testAConstraintCanInsertAServiceBetweenTwoOthers()
+    {
+        $container = new ContainerBuilder();
+        $container->register('b')->addTag('my_tag');
+        $container->register('c')->addTag('my_tag');
+        $container->register('e')->addTag('my_tag', ['after' => 'b', 'before' => 'c']);
+
+        $this->assertSame(['b', 'e', 'c'], $this->getTaggedIds($container));
+    }
+
+    public function testAServiceWithoutPriorityIsPlacedByItsConstraints()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag', ['priority' => 10]);
+        $container->register('b')->addTag('my_tag', ['priority' => 5]);
+        $container->register('c')->addTag('my_tag', ['before' => 'a']);
+
+        $this->assertSame(['c', 'a', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testAnExplicitPriorityIsOnlyReorderedAmongItsPeers()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag', ['priority' => 10]);
+        $container->register('b')->addTag('my_tag', ['priority' => 5]);
+        $container->register('c')->addTag('my_tag', ['priority' => 5, 'before' => 'b']);
+
+        $this->assertSame(['a', 'c', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testAConstraintContradictingAnExplicitPriorityIsReported()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag', ['priority' => 10]);
+        $container->register('c')->addTag('my_tag', ['priority' => -10, 'before' => 'a']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "before"/"after" constraints on tag "my_tag": the priority of "c" (-10) contradicts its "before" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.');
+
+        $this->getTaggedIds($container);
+    }
+
+    public function testSeveralTargetsAreSupported()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag');
+        $container->register('b')->addTag('my_tag');
+        $container->register('c')->addTag('my_tag', ['before' => ['a', 'b']]);
+
+        $this->assertSame(['c', 'a', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testAConstraintCanTargetAClass()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', HelloNamedService2::class)->addTag('my_tag');
+        $container->register('b')->addTag('my_tag', ['before' => HelloNamedService2::class]);
+
+        $this->assertSame(['b', 'a'], $this->getTaggedIds($container));
+    }
+
+    public function testConstraintsTargetingAnUninstalledServiceAreIgnored()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag');
+        $container->register('b')->addTag('my_tag', ['after' => 'from_a_bundle_that_is_not_installed']);
+
+        $this->assertSame(['a', 'b'], $this->getTaggedIds($container));
+    }
+
+    public function testCyclicConstraintsAreReported()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addTag('my_tag', ['before' => 'b']);
+        $container->register('b')->addTag('my_tag', ['before' => 'a']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "before"/"after" constraints on tag "my_tag": cycle detected in the "before"/"after" constraints: "a" -> "b" -> "a".');
+
+        $this->getTaggedIds($container);
+    }
+
+    public function testBeforeAndAfterAreReadFromAsTaggedItem()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', HelloNamedService2::class)->addTag('my_tag')->setAutoconfigured(true);
+        $container->register('b', OrderedAfterHelloService::class)->addTag('my_tag')->setAutoconfigured(true);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame(['b', 'a'], $this->getTaggedIds($container));
+    }
+
+    public function testSeveralTagsOfTheSameServiceKeepTheirOwnPlace()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')
+            ->addTag('my_tag', ['priority' => 100, 'key' => 'a1'])
+            ->addTag('my_tag', ['priority' => -100, 'key' => 'a2']);
+        $container->register('b')->addTag('my_tag', ['key' => 'b1']);
+        $container->register('c')->addTag('my_tag', ['key' => 'c1', 'before' => 'b']);
+
+        $refs = (new PriorityTaggedServiceTraitImplementation())->test(new TaggedIteratorArgument('my_tag', 'key'), $container);
+
+        $this->assertSame(['a1', 'c1', 'b1', 'a2'], array_keys($refs));
+    }
+
+    public function testAServiceIdOutranksTheClassOfAnotherService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', HelloNamedService2::class)->addTag('my_tag');
+        $container->register(HelloNamedService2::class, HelloNamedService::class)->addTag('my_tag');
+        $container->register('c')->addTag('my_tag', ['before' => HelloNamedService2::class]);
+
+        $this->assertSame(['a', 'c', HelloNamedService2::class], $this->getTaggedIds($container));
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testADecoratorWithABareAsTaggedItemInheritsTheDefaultPriorityOfTheDecoratedService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('other', \stdClass::class)->addTag('my_custom_tag', ['foo' => 'other']);
+        $container->register('inner.tagged_service', ServiceWithDefaultPriority::class)
+            ->setAutoconfigured(true)
+            ->addTag('my_custom_tag', ['foo' => 'decorated']);
+
+        $decorator = $container->register('decorator.tagged_service', BareAsTaggedItemDecorator::class)->setAutoconfigured(true);
+        $decorator->addTag('my_custom_tag', ['foo' => 'decorated']);
+        $decorator->addTag('container.decorator', ['id' => ServiceWithDefaultPriority::class, 'inner' => 'inner.tagged_service']);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $services = (new PriorityTaggedServiceTraitImplementation())->test(new TaggedIteratorArgument('my_custom_tag', 'foo'), $container);
+
+        // a bare attribute declares no priority, so the decorator takes the place of what it decorates
+        $this->assertSame(['decorated', 'other'], array_keys($services));
+    }
+
+    private function getTaggedIds(ContainerBuilder $container): array
+    {
+        $refs = (new PriorityTaggedServiceTraitImplementation())->test('my_tag', $container);
+
+        return array_map(strval(...), array_values($refs));
+    }
 }
 
 class PriorityTaggedServiceTraitImplementation
@@ -669,5 +825,23 @@ class MultiTagNonStaticClass
 
 #[AsTaggedItem(index: 'custom_key', priority: 1)]
 class DecoratedAsTaggedItemService
+{
+}
+
+#[AsTaggedItem(before: HelloNamedService2::class)]
+class OrderedAfterHelloService
+{
+}
+
+class ServiceWithDefaultPriority
+{
+    public static function getDefaultFooPriority(): int
+    {
+        return 42;
+    }
+}
+
+#[AsTaggedItem]
+class BareAsTaggedItemDecorator
 {
 }

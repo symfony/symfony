@@ -97,6 +97,10 @@ EventDispatcher
    to swap each one for a wrapper on the dispatcher it decorates and swap it back afterwards. It therefore no
    longer calls `dispatch()` on that dispatcher, so a custom implementation's own dispatching is bypassed
    while the profiler is watching
+ * `AsEventListener::$priority` is now `?int` and defaults to `null`, which means "no priority declared";
+   the `kernel.event_listener` tags it produces carry `null` too, and so does the `$priority` argument of
+   `AsControllerAttributeListener` and of the Workflow `As*Listener` attributes. Code that read the
+   property as an `int` should read `$attribute->priority ?? 0`
 
 Filesystem
 ----------

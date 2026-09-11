@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
@@ -103,6 +104,16 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                     $tmpContainer->addExpressionLanguageProvider($provider);
                 }
 
+                if ($configAvailable) {
+                    BaseNode::setPlaceholderResolver(static function (mixed $value, string $path) use ($tmpContainer): mixed {
+                        try {
+                            return $tmpContainer->resolveStaticValue($value);
+                        } catch (ExceptionInterface $e) {
+                            throw new RuntimeException(\sprintf('The value of the configuration option "%s" must be known when the container is compiled: %s', $path, $e->getMessage()), 0, $e);
+                        }
+                    });
+                }
+
                 $extension->load($config, $tmpContainer);
             } catch (\Exception $e) {
                 if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
@@ -110,6 +121,10 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 }
 
                 throw $e;
+            } finally {
+                if ($configAvailable) {
+                    BaseNode::setPlaceholderResolver(null);
+                }
             }
 
             if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
@@ -310,6 +325,14 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     public function compile(bool $resolveEnvPlaceholders = false): void
     {
         throw new LogicException(\sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
+    }
+
+    /**
+     * Resolves the env vars referenced by $value, ignoring the restriction that applies to extensions.
+     */
+    public function resolveStaticValue(mixed $value): mixed
+    {
+        return parent::resolveEnvPlaceholders($value, true);
     }
 
     public function resolveEnvPlaceholders(mixed $value, string|bool|null $format = null, ?array &$usedEnvs = null): mixed

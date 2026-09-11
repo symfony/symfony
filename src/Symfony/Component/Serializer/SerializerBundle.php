@@ -187,13 +187,16 @@ class SerializerBundle extends AbstractBundle
         $container->getDefinition('serializer.mapping.attribute_loader')
             ->replaceArgument(0, $config['enable_attributes'] ?? false);
 
-        $fileRecorder = static function ($extension, $path) use (&$serializerLoaders) {
-            $definition = new Definition(\in_array($extension, ['yaml', 'yml'], true) ? YamlFileLoader::class : XmlFileLoader::class, [$path]);
+        $parameterBag = $container->getParameterBag();
+        // mapping files are collected from the filesystem as literals and handed back to the container
+        $fileRecorder = static function ($extension, $path) use (&$serializerLoaders, $parameterBag) {
+            $definition = new Definition(\in_array($extension, ['yaml', 'yml'], true) ? YamlFileLoader::class : XmlFileLoader::class, [$parameterBag->escapeValue($path)]);
             $serializerLoaders[] = $definition;
         };
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
-            $configDir = is_dir($bundle['path'].'/Resources/config') ? $bundle['path'].'/Resources/config' : $bundle['path'].'/config';
+            $bundlePath = $parameterBag->unescapeValue($bundle['path']);
+            $configDir = is_dir($bundlePath.'/Resources/config') ? $bundlePath.'/Resources/config' : $bundlePath.'/config';
 
             if ($container->fileExists($file = $configDir.'/serialization.xml', false)) {
                 $fileRecorder('xml', $file);
@@ -211,7 +214,7 @@ class SerializerBundle extends AbstractBundle
             }
         }
 
-        $projectDir = $container->getParameter('kernel.project_dir');
+        $projectDir = $parameterBag->unescapeValue($container->getParameter('kernel.project_dir'));
         if ($container->fileExists($dir = $projectDir.'/config/serializer', '/^$/')) {
             $this->registerMappingFilesFromDir($dir, $fileRecorder);
         }
@@ -252,7 +255,7 @@ class SerializerBundle extends AbstractBundle
 
     private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder): void
     {
-        foreach ($config['mapping']['paths'] as $path) {
+        foreach ($container->getParameterBag()->unescapeValue($config['mapping']['paths']) as $path) {
             if (is_dir($path)) {
                 $this->registerMappingFilesFromDir($path, $fileRecorder);
                 $container->addResource(new DirectoryResource($path, '/^$/'));

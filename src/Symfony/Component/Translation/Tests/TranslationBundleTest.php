@@ -76,6 +76,26 @@ class TranslationBundleTest extends TestCase
         $this->assertContains(__DIR__.'/Fixtures/translations', $options['scanned_directories']);
     }
 
+    public function testDefaultPathContainingAPercentSign()
+    {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $projectDir = str_replace('\\', '/', sys_get_temp_dir()).'/sf_translation_my%2Fother%2Fbranch_'.substr(md5(__METHOD__), 0, 8);
+        @mkdir($projectDir.'/translations', 0o777, true);
+        file_put_contents($projectDir.'/translations/messages.en.yaml', "hello: Hello there\n");
+
+        try {
+            $options = $this->load(['default_path' => '%kernel.project_dir%/translations'], projectDir: $projectDir)
+                ->getDefinition('translator.default')->getArgument(4);
+            $files = array_map(static fn ($file) => str_replace(['%%', '\\'], ['%', '/'], $file), $options['resource_files']['en']);
+
+            $this->assertContains($projectDir.'/translations/messages.en.yaml', $files);
+        } finally {
+            @unlink($projectDir.'/translations/messages.en.yaml');
+            @rmdir($projectDir.'/translations');
+            @rmdir($projectDir);
+        }
+    }
+
     public function testAnUnknownPathIsRejected()
     {
         $this->expectException(\UnexpectedValueException::class);
@@ -188,13 +208,13 @@ class TranslationBundleTest extends TestCase
     /**
      * @param array<string, mixed> $config
      */
-    private function load(array $config, bool $debug = false, bool $merge = true, bool $profiler = false, array $enabledLocales = []): ContainerBuilder
+    private function load(array $config, bool $debug = false, bool $merge = true, bool $profiler = false, array $enabledLocales = [], ?string $projectDir = null): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'kernel.debug' => $debug,
             'kernel.build_dir' => '/build',
             'kernel.cache_dir' => '/build',
-            'kernel.project_dir' => __DIR__,
+            'kernel.project_dir' => str_replace('%', '%%', $projectDir ?? __DIR__),
             'kernel.default_locale' => 'en',
             'kernel.enabled_locales' => $enabledLocales,
             'kernel.bundles_metadata' => [],

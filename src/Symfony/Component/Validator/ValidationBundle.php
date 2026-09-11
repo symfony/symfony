@@ -234,8 +234,10 @@ class ValidationBundle extends AbstractBundle
 
     private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files): void
     {
-        $fileRecorder = static function ($extension, $path) use (&$files) {
-            $files['yaml' === $extension ? 'yml' : $extension][] = $path;
+        $parameterBag = $container->getParameterBag();
+        // mapping files are collected from the filesystem as literals and handed back to the container
+        $fileRecorder = static function ($extension, $path) use (&$files, $parameterBag) {
+            $files['yaml' === $extension ? 'yml' : $extension][] = $parameterBag->escapeValue($path);
         };
 
         if (!ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/framework-bundle', 'symfony/validator'])) {
@@ -243,7 +245,8 @@ class ValidationBundle extends AbstractBundle
         }
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
-            $configDir = is_dir($bundle['path'].'/Resources/config') ? $bundle['path'].'/Resources/config' : $bundle['path'].'/config';
+            $bundlePath = $parameterBag->unescapeValue($bundle['path']);
+            $configDir = is_dir($bundlePath.'/Resources/config') ? $bundlePath.'/Resources/config' : $bundlePath.'/config';
 
             if (
                 $container->fileExists($file = $configDir.'/validation.yaml', false)
@@ -261,12 +264,12 @@ class ValidationBundle extends AbstractBundle
             }
         }
 
-        $projectDir = $container->getParameter('kernel.project_dir');
+        $projectDir = $parameterBag->unescapeValue($container->getParameter('kernel.project_dir'));
         if ($container->fileExists($dir = $projectDir.'/config/validator', '/^$/')) {
             $this->registerMappingFilesFromDir($dir, $fileRecorder);
         }
 
-        foreach ($config['mapping']['paths'] as $path) {
+        foreach ($parameterBag->unescapeValue($config['mapping']['paths']) as $path) {
             if (is_dir($path)) {
                 $this->registerMappingFilesFromDir($path, $fileRecorder);
                 $container->addResource(new DirectoryResource($path, '/^$/'));

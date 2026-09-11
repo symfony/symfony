@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPa
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\DependencyInjection\RemoveMissingDependenciesPass;
@@ -55,6 +56,31 @@ class SerializerBundleTest extends TestCase
         $this->assertEquals(new Reference('serializer.mapping.attribute_loader'), $argument[0]);
         $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.name_converter.metadata_aware')->getArgument(1));
         $this->assertEquals(new Reference('property_info', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $container->getDefinition('serializer.normalizer.object')->getArgument(3));
+    }
+
+    public function testMappingPathsContainingAPercentSign()
+    {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $projectDir = str_replace('\\', '/', sys_get_temp_dir()).'/sf_serializer_my%2Fother%2Fbranch_'.substr(md5(__METHOD__), 0, 8);
+        @mkdir($projectDir.'/config/serializer', 0o777, true);
+        copy(__DIR__.'/Fixtures/serialization.xml', $projectDir.'/config/serializer/serialization.xml');
+
+        try {
+            $loaders = $this->load([], projectDir: $projectDir)->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
+            $files = [];
+            foreach ($loaders as $loader) {
+                if ($loader instanceof Definition) {
+                    $files[] = str_replace(['%%', '\\'], ['%', '/'], $loader->getArgument(0));
+                }
+            }
+
+            $this->assertContains($projectDir.'/config/serializer/serialization.xml', $files);
+        } finally {
+            @unlink($projectDir.'/config/serializer/serialization.xml');
+            @rmdir($projectDir.'/config/serializer');
+            @rmdir($projectDir.'/config');
+            @rmdir($projectDir);
+        }
     }
 
     public function testSerializerWithoutTranslator()
@@ -288,12 +314,12 @@ class SerializerBundleTest extends TestCase
     /**
      * @param array<string, mixed> $config
      */
-    private function load(array $config, bool $debug = false, bool $translator = true, bool $merge = true, bool $cache = true, bool $profiler = false): ContainerBuilder
+    private function load(array $config, bool $debug = false, bool $translator = true, bool $merge = true, bool $cache = true, bool $profiler = false, ?string $projectDir = null): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'kernel.debug' => $debug,
             'kernel.build_dir' => sys_get_temp_dir(),
-            'kernel.project_dir' => '/app',
+            'kernel.project_dir' => str_replace('%', '%%', $projectDir ?? '/app'),
             'kernel.bundles_metadata' => [],
             'kernel.container_class' => 'TestContainer',
         ]));

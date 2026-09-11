@@ -212,14 +212,15 @@ class AssetMapperBundle extends AbstractBundle
         $container->getDefinition('asset_mapper.public_assets_path_resolver')
             ->setArgument(0, $config['public_prefix']);
 
+        $parameterBag = $container->getParameterBag();
         $publicDirectory = $this->getPublicDirectory($container);
         $publicAssetsDirectory = rtrim($publicDirectory.'/'.ltrim($config['public_prefix'], '/'), '/');
         $container->getDefinition('asset_mapper.local_public_assets_filesystem')
-            ->setArgument(0, $publicDirectory)
+            ->setArgument(0, $parameterBag->escapeValue($publicDirectory))
         ;
 
         $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')
-            ->setArgument(0, $publicAssetsDirectory);
+            ->setArgument(0, $parameterBag->escapeValue($publicAssetsDirectory));
 
         if (!$server) {
             $container->removeDefinition('asset_mapper.dev_server_subscriber');
@@ -283,7 +284,8 @@ class AssetMapperBundle extends AbstractBundle
 
     private function getPublicDirectory(ContainerBuilder $container): string
     {
-        $projectDir = $container->getParameter('kernel.project_dir');
+        // the parameter bag returns paths in their escaped form, the filesystem needs the literal one
+        $projectDir = $container->getParameterBag()->unescapeValue($container->getParameter('kernel.project_dir'));
         $defaultPublicDir = $projectDir.'/public';
 
         $composerFilePath = $projectDir.'/composer.json';

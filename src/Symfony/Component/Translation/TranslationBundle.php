@@ -195,17 +195,19 @@ class TranslationBundle extends AbstractBundle
         $container->setParameter('translator.default_path', $config['default_path']);
 
         [$dirs, $transPaths, $nonExistingDirs] = $this->discoverTranslationDirs($config, $container);
+        // the directories were collected from the filesystem as literals, the container needs them escaped
+        $escapedTransPaths = $container->getParameterBag()->escapeValue($transPaths);
 
         if ($hasConsole) {
             $container->getDefinition('console.command.translation_xliff_update_sources')
                 ->replaceArgument(3, [...$config['paths'], $config['default_path']]);
 
             foreach (['console.command.translation_debug' => 6, 'console.command.translation_extract' => 7] as $id => $argument) {
-                $container->getDefinition($id)->replaceArgument($argument, $transPaths);
+                $container->getDefinition($id)->replaceArgument($argument, $escapedTransPaths);
             }
 
             foreach (['console.command.translation_pull' => 4, 'console.command.translation_push' => 2] as $id => $argument) {
-                $container->getDefinition($id)->replaceArgument($argument, [...$transPaths, $config['default_path']]);
+                $container->getDefinition($id)->replaceArgument($argument, [...$escapedTransPaths, $config['default_path']]);
             }
         }
 
@@ -288,8 +290,11 @@ class TranslationBundle extends AbstractBundle
             $dirs[] = $transPaths[] = \dirname($r->getFileName(), 2).'/Resources/translations';
         }
 
+        $parameterBag = $container->getParameterBag();
+
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
-            if ($container->fileExists($dir = $bundle['path'].'/Resources/translations') || $container->fileExists($dir = $bundle['path'].'/translations')) {
+            $bundlePath = $parameterBag->unescapeValue($bundle['path']);
+            if ($container->fileExists($dir = $bundlePath.'/Resources/translations') || $container->fileExists($dir = $bundlePath.'/translations')) {
                 $dirs[] = $transPaths[] = $dir;
             } else {
                 $nonExistingDirs[] = $dir;
@@ -304,7 +309,8 @@ class TranslationBundle extends AbstractBundle
             $dirs[] = $transPaths[] = $dir;
         }
 
-        $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
+        // the parameter bag returns paths in their escaped form, the filesystem needs the literal one
+        $defaultDir = $parameterBag->unescapeValue($parameterBag->resolveValue($config['default_path']));
 
         if (null === $defaultDir) {
             // allow null
@@ -336,14 +342,15 @@ class TranslationBundle extends AbstractBundle
             }
         }
 
-        $projectDir = $container->getParameter('kernel.project_dir');
+        $parameterBag = $container->getParameterBag();
+        $projectDir = $parameterBag->unescapeValue($container->getParameter('kernel.project_dir'));
         $scannedDirectories = array_merge($dirs, $nonExistingDirs);
 
         return [
-            'resource_files' => $files,
-            'scanned_directories' => $scannedDirectories,
+            'resource_files' => $parameterBag->escapeValue($files),
+            'scanned_directories' => $parameterBag->escapeValue($scannedDirectories),
             'cache_vary' => [
-                'scanned_directories' => array_map(static fn ($dir) => str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir, $scannedDirectories),
+                'scanned_directories' => $parameterBag->escapeValue(array_map(static fn ($dir) => str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir, $scannedDirectories)),
             ],
         ];
     }

@@ -100,6 +100,21 @@ class AssetMapperBundleTest extends TestCase
         $this->assertSame($this->varDir.'/web/static', $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0));
     }
 
+    public function testThePublicDirectoryIsReadFromComposerWhenTheProjectDirContainsAPercentSign()
+    {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $this->varDir = str_replace('\\', '/', sys_get_temp_dir()).'/sf_asset_mapper_my%2Fother%2Fbranch';
+        $filesystem = new Filesystem();
+        $filesystem->mkdir($this->varDir);
+        $filesystem->dumpFile($this->varDir.'/composer.json', '{"extra":{"public-dir":"web"}}');
+
+        $container = $this->createContainer(['public_prefix' => '/static/']);
+
+        $escapedVarDir = str_replace('%', '%%', $this->varDir);
+        $this->assertSame($escapedVarDir.'/web', $container->getDefinition('asset_mapper.local_public_assets_filesystem')->getArgument(0));
+        $this->assertSame($escapedVarDir.'/web/static', $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0));
+    }
+
     public function testTheBundlePublicDirectoriesAreMapped()
     {
         new Filesystem()->mkdir($this->varDir.'/public');
@@ -194,7 +209,7 @@ class AssetMapperBundleTest extends TestCase
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.debug' => $debug,
-            'kernel.project_dir' => $this->varDir,
+            'kernel.project_dir' => str_replace('%', '%%', $this->varDir),
             'kernel.bundles_metadata' => $bundles,
         ]));
         new AssetMapperBundle()->getContainerExtension()->load([$config], $container);

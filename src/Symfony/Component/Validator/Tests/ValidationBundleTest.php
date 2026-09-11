@@ -155,6 +155,27 @@ class ValidationBundleTest extends TestCase
         $this->assertSame([[[strtr($dir.'/validation.yml', '/', \DIRECTORY_SEPARATOR)]]], $yamlMappings);
     }
 
+    public function testMappingPathsContainingAPercentSign()
+    {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $projectDir = str_replace('\\', '/', sys_get_temp_dir()).'/sf_validator_my%2Fother%2Fbranch_'.substr(md5(__METHOD__), 0, 8);
+        @mkdir($projectDir.'/config/validator', 0o777, true);
+        copy(__DIR__.'/Fixtures/validation_mapping/validation.xml', $projectDir.'/config/validator/validation.xml');
+
+        try {
+            $calls = $this->load([], projectDir: $projectDir)->getDefinition('validator.builder')->getMethodCalls();
+            $xmlMappings = array_column(array_filter($calls, static fn ($call) => 'addXmlMappings' === $call[0]), 1);
+            $files = array_map(static fn ($file) => str_replace(['%%', '\\'], ['%', '/'], $file), $xmlMappings[0][0]);
+
+            $this->assertContains($projectDir.'/config/validator/validation.xml', $files);
+        } finally {
+            @unlink($projectDir.'/config/validator/validation.xml');
+            @rmdir($projectDir.'/config/validator');
+            @rmdir($projectDir.'/config');
+            @rmdir($projectDir);
+        }
+    }
+
     public function testAnUnsupportedMappingPathIsRejected()
     {
         $this->expectException(\RuntimeException::class);
@@ -205,12 +226,12 @@ class ValidationBundleTest extends TestCase
     /**
      * @param array<string, mixed> $config
      */
-    private function load(array $config, bool $debug = false, bool $merge = true, bool $cache = true, bool $profiler = false): ContainerBuilder
+    private function load(array $config, bool $debug = false, bool $merge = true, bool $cache = true, bool $profiler = false, ?string $projectDir = null): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'kernel.debug' => $debug,
             'kernel.build_dir' => sys_get_temp_dir(),
-            'kernel.project_dir' => __DIR__.'/Fixtures',
+            'kernel.project_dir' => str_replace('%', '%%', $projectDir ?? __DIR__.'/Fixtures'),
             'kernel.charset' => 'UTF-8',
             'kernel.enabled_locales' => [],
             'kernel.bundles_metadata' => [],

@@ -183,7 +183,11 @@ return static function (ContainerConfigurator $container) {
             ->tag('security.voter', ['priority' => 245])
 
         ->set('security.access.authenticated_voter', AuthenticatedVoter::class)
-            ->args([service('security.authentication.trust_resolver')])
+            ->args([
+                service('security.authentication.trust_resolver'),
+                param('security.recent_authentication_lifetime'),
+                service('clock')->nullOnInvalid(),
+            ])
             ->tag('security.voter', ['priority' => 250])
 
         ->set('security.access.role_hierarchy_voter', RoleHierarchyVoter::class)

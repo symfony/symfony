@@ -41,6 +41,11 @@ class IsGrantedContext implements AuthorizationCheckerInterface
         return $this->authorizationChecker->isGranted(AuthenticatedVoter::IS_AUTHENTICATED_FULLY);
     }
 
+    public function isAuthenticatedRecently(): bool
+    {
+        return $this->authorizationChecker->isGranted(AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY);
+    }
+
     public function isImpersonator(): bool
     {
         return $this->authorizationChecker->isGranted(AuthenticatedVoter::IS_IMPERSONATOR);

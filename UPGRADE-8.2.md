@@ -254,6 +254,7 @@ Notifier
  * Deprecate declaring `getAdminRecipients()` on a `NotifierInterface` implementation without implementing `AdminRecipientsProviderInterface`
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0. The
    boolean values it accepts are `1`/`0`, `true`/`false`, `on`/`off`, `yes`/`no` and the empty string, which reads as `false`
+ * Deprecate the `LineNotify` transport as LINE Notify was shut down, use `LineBot` instead
 
 RateLimiter
 -----------

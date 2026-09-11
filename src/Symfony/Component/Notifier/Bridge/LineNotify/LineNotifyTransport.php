@@ -22,6 +22,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Akira Kurozumi <info@a-zumi.net>
+ *
+ * @deprecated since Symfony 8.2, use the LineBot bridge instead
  */
 final class LineNotifyTransport extends AbstractTransport
 {

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\LineNotify\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransport;
@@ -24,6 +26,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Akira Kurozumi <info@a-zumi.net>
  */
+#[Group('legacy')]
+#[IgnoreDeprecations]
 final class LineNotifyTransportTest extends TransportTestCase
 {
     public static function createTransport(?HttpClientInterface $client = null): LineNotifyTransport

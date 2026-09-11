@@ -11,20 +11,34 @@
 
 namespace Symfony\Component\Notifier\Bridge\LineNotify\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Notifier\Bridge\LineNotify\LineNotifyTransportFactory;
 use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Transport\Dsn;
 
 /**
  * @author Akira Kurozumi <info@a-zumi.net>
  */
+#[Group('legacy')]
+#[IgnoreDeprecations]
 final class LineNotifyTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
+    use ExpectUserDeprecationMessageTrait;
     use IncompleteDsnTestTrait;
 
     public function createFactory(): LineNotifyTransportFactory
     {
         return new LineNotifyTransportFactory();
+    }
+
+    public function testCreateIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/line-notify-notifier 8.2: The "symfony/line-notify-notifier" package is deprecated as LINE Notify was shut down, use "symfony/line-bot-notifier" instead.');
+
+        $this->createFactory()->create(new Dsn('linenotify://token@default'));
     }
 
     public static function supportsProvider(): iterable

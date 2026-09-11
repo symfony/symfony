@@ -32,6 +32,7 @@
         "symfony/stopwatch": "^7.4|^8.0"
     },
     "conflict": {
+        "symfony/dependency-injection": "<8.2",
         "symfony/security-http": "<7.4",
         "symfony/service-contracts": "<2.5"
     },

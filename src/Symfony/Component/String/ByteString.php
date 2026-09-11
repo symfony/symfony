@@ -104,8 +104,10 @@ class ByteString extends AbstractString
     {
         $str = clone $this;
 
-        $parts = explode(' ', trim(ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $this->string))));
-        $parts[0] = 1 !== \strlen($parts[0]) && ctype_upper($parts[0]) ? $parts[0] : lcfirst($parts[0]);
+        $words = trim(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $this->string));
+        $parts = explode(' ', ucwords($words));
+        // a leading uppercase letter followed by another one is kept, as in AbstractUnicodeString::camel()
+        $parts[0] = preg_match('/^[A-Z]{2}/', $words) || (1 !== \strlen($parts[0]) && ctype_upper($parts[0])) ? $parts[0] : lcfirst($parts[0]);
         $str->string = implode('', $parts);
 
         return $str;

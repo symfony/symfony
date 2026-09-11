@@ -994,6 +994,9 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['symfonyIsAGreatFramework', 'Symfony is a great framework'],
             ['symfonyIsGREAT', '*Symfony* is GREAT!!'],
             ['SYMFONY', 'SYMFONY'],
+            ['XMLHttpRequest', 'XMLHttpRequest'],
+            ['IOError', 'IOError'],
+            ['iPhone', 'iPhone'],
         ];
     }
 
@@ -1029,6 +1032,11 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['symfonyisgreat', 'SYMFONY _ IS _ GREAT'],
             ['symfony_isgreat', 'Symfony IS GREAT!'],
             ['123_customer_with_special_name', '123-customer,with/special#name'],
+            ['xml_http_request', 'XMLHttpRequest'],
+            ['http_response', 'HTTPResponse'],
+            ['url_value', 'URLValue'],
+            ['io_error', 'IOError'],
+            ['symfony5', 'SYMFONY5'],
         ];
     }
 

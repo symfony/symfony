@@ -57,6 +57,8 @@ abstract class AbstractDoctrineExtension extends Extension
             }
         }
 
+        $parameterBag = $container->getParameterBag();
+
         foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
             if (null !== $mappingConfig && false === $mappingConfig['mapping']) {
                 continue;
@@ -68,7 +70,8 @@ abstract class AbstractDoctrineExtension extends Extension
                 'prefix' => false,
             ], (array) $mappingConfig);
 
-            $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
+            // the parameter bag returns paths in their escaped form, the filesystem needs the literal one
+            $mappingConfig['dir'] = $parameterBag->unescapeValue($parameterBag->resolveValue($mappingConfig['dir']));
             // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
             if (!isset($mappingConfig['is_bundle'])) {
                 $mappingConfig['is_bundle'] = !is_dir($mappingConfig['dir']);
@@ -186,6 +189,8 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         foreach ($this->drivers as $driverType => $driverPaths) {
+            // the paths are literals, they go back to the container in their escaped form
+            $driverPaths = $container->getParameterBag()->escapeValue($driverPaths);
             $mappingService = $this->getObjectManagerElementName($objectManager['name'].'_'.$driverType.'_metadata_driver');
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);

@@ -49,6 +49,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
@@ -2877,6 +2878,33 @@ abstract class FrameworkExtensionTestCase extends TestCase
         });
 
         $this->assertSame($expectedPrefix, $container->getDefinition('asset_mapper.asset_package')->getArgument(3));
+    }
+
+    public function testTranslatorDefaultPathContainingAPercentSign()
+    {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $projectDir = sys_get_temp_dir().'/sf_fwb_my%2Fother%2Fbranch_'.substr(md5(__METHOD__), 0, 8);
+        @mkdir($projectDir.'/translations', 0o777, true);
+        file_put_contents($projectDir.'/translations/messages.en.yaml', "hello: Hello there\n");
+
+        try {
+            $container = $this->createContainerFromClosure(static function ($container) {
+                $container->loadFromExtension('framework', [
+                    'annotations' => false,
+                    'http_method_override' => false,
+                    'handle_all_throwables' => true,
+                    'php_errors' => ['log' => true],
+                    'translator' => ['default_path' => '%kernel.project_dir%/translations'],
+                ]);
+            }, ['kernel.project_dir' => str_replace('%', '%%', $projectDir)]);
+
+            $options = $container->getDefinition('translator.default')->getArgument(4);
+            $files = array_map(static fn ($file) => str_replace('%%', '%', $file), $options['resource_files']['en']);
+
+            $this->assertContains($projectDir.'/translations/messages.en.yaml', $files);
+        } finally {
+            (new Filesystem())->remove($projectDir);
+        }
     }
 
     public function testDefaultLock()

@@ -3088,7 +3088,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
     public function testTranslatorDefaultPathContainingAPercentSign()
     {
         // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
-        $projectDir = sys_get_temp_dir().'/sf_fwb_my%2Fother%2Fbranch_'.substr(md5(__METHOD__), 0, 8);
+        $projectDir = str_replace('\\', '/', sys_get_temp_dir()).'/sf_fwb_my%2Fother%2Fbranch_'.substr(md5(__METHOD__), 0, 8);
         @mkdir($projectDir.'/translations', 0o777, true);
         file_put_contents($projectDir.'/translations/messages.en.yaml', "hello: Hello there\n");
 
@@ -3103,7 +3103,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             }, ['kernel.project_dir' => str_replace('%', '%%', $projectDir)]);
 
             $options = $container->getDefinition('translator.default')->getArgument(4);
-            $files = array_map(static fn ($file) => str_replace('%%', '%', $file), $options['resource_files']['en']);
+            $files = array_map(static fn ($file) => str_replace(['%%', '\\'], ['%', '/'], $file), $options['resource_files']['en']);
 
             $this->assertContains($projectDir.'/translations/messages.en.yaml', $files);
         } finally {

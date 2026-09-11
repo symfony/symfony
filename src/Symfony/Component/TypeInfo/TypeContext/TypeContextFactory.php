@@ -260,14 +260,9 @@ final class TypeContextFactory
             '@phpstan-template-covariant',
         ];
 
-        $tags = [];
-        foreach ($templateTags as $tagName) {
-            $tags = [...$tags, ...$docNode->getTagsByName($tagName)];
-        }
-
         $templates = [];
-        foreach ($tags as $tag) {
-            if (!$tag->value instanceof TemplateTagValueNode) {
+        foreach ($docNode->getTags() as $tag) {
+            if (!$tag->value instanceof TemplateTagValueNode || !\in_array($tag->name, $templateTags, true)) {
                 continue;
             }
 

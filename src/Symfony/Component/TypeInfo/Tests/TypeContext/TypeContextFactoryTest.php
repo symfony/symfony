@@ -22,6 +22,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithCovariantTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithImportedOnlyTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAliasImport;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithMixedTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanCovariantTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmCovariantTemplates;
@@ -171,6 +172,11 @@ class TypeContextFactoryTest extends TestCase
         yield [DummyWithCovariantTemplates::class];
         yield [DummyWithPsalmCovariantTemplates::class];
         yield [DummyWithPhpstanCovariantTemplates::class];
+    }
+
+    public function testCollectTemplatesInDeclarationOrder()
+    {
+        $this->assertSame(['T', 'U', 'V', 'W'], array_keys($this->typeContextFactory->createFromClassName(DummyWithMixedTemplates::class)->templates));
     }
 
     public function testCollectTemplatesWithParent()

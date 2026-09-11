@@ -59,6 +59,15 @@ class RegisterEntryPointPass implements CompilerPassInterface
                 }
             }
 
+            // an explicit option only, never inferred: re-authentication is not something
+            // to start by accident on a firewall that happens to have a single entry point
+            if ($container->hasDefinition($exceptionListenerId = 'security.exception_listener.'.$firewallName)
+                && \array_key_exists(9, ($exceptionListener = $container->getDefinition($exceptionListenerId))->getArguments())
+                && null !== $configuredReAuthEntryPoint = $exceptionListener->getArgument(9)
+            ) {
+                $exceptionListener->replaceArgument(9, new Reference($entryPoints[$configuredReAuthEntryPoint] ?? $fallbackEntryPoints[$configuredReAuthEntryPoint] ?? $configuredReAuthEntryPoint));
+            }
+
             if (!$entryPoints && !$fallbackEntryPoints) {
                 continue;
             }

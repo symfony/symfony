@@ -130,6 +130,28 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    public function testReAuthenticationEntryPointIsRefusedOnAStatelessFirewall()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]],
+            ],
+            'firewalls' => [
+                'api' => [
+                    'stateless' => true,
+                    'http_basic' => true,
+                    're_authentication_entry_point' => 'http_basic',
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "re_authentication_entry_point" option cannot be used on the stateless firewall "api"');
+
+        $container->compile();
+    }
+
     public function testLdapUsersOnlyIsAcceptedWithAnLdapLegInAChainProvider()
     {
         if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {

@@ -6,6 +6,7 @@
   Real value        n/a              
   Processed value   3.0              
   Used              yes              
+  Inlined           no               
  ----------------- ----------------- 
 
 %env(int:key:2:json:JSON)%
@@ -16,4 +17,5 @@
   Real value        n/a              
   Processed value   3                
   Used              yes              
+  Inlined           no               
  ----------------- ----------------- 

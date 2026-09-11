@@ -40,6 +40,7 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
         // the compiler knows which variables are referenced; the dumps below cannot be asked,
         // since the serialized one has its placeholders already resolved
         $container->setParameter('.debug.container.env_vars', array_keys($container->getEnvCounters()));
+        $container->setParameter('.debug.container.inlined_env_vars', $container->getInlinedEnvVars());
 
         $file = $container->getParameter('debug.container.dump');
         $cache = new ConfigCache($file, true);

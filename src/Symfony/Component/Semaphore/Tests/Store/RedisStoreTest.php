@@ -18,11 +18,6 @@ namespace Symfony\Component\Semaphore\Tests\Store;
  */
 class RedisStoreTest extends AbstractRedisStoreTestCase
 {
-    protected function setUp(): void
-    {
-        $this->getRedisConnection()->flushDB();
-    }
-
     public static function setUpBeforeClass(): void
     {
         try {

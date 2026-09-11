@@ -40,7 +40,7 @@ class PredisSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
             $this->assertSame(0, $rawClient->exists('my_session_prefix_my_session_prefix_test_id'));
             $this->assertEquals('test_data', $rawClient->get('my_session_prefix_test_id'));
         } finally {
-            $rawClient->flushdb();
+            $rawClient->del('my_session_prefix_test_id');
         }
     }
 }

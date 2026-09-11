@@ -20,15 +20,6 @@ use Relay\Relay;
  */
 class RelayStoreTest extends AbstractRedisStoreTestCase
 {
-    protected function setUp(): void
-    {
-        try {
-            $this->getRedisConnection()->flushDB();
-        } catch (\Relay\Exception $e) {
-            self::markTestSkipped($e->getMessage());
-        }
-    }
-
     public static function setUpBeforeClass(): void
     {
         try {

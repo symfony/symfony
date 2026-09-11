@@ -698,6 +698,22 @@ class ScreenWriterTest extends TestCase
         $this->assertSame(0, $transcript->getReadCount());
     }
 
+    public function testGrowingOverflowingContentDoesNotReadUnchangedPrefix()
+    {
+        $transcript = new CountingLineBuffer(100);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $writer = new ScreenWriter($terminal);
+
+        $writer->writeFrame(new ConcatenatedLineBuffer([$transcript, new ArrayLineBuffer(['A', 'B', 'C', 'D', 'E', 'F'])]));
+        $transcript->resetReadCount();
+        $writer->writeFrame(new ConcatenatedLineBuffer([$transcript, new ArrayLineBuffer(['A', 'B', 'C', 'D', 'E', 'F', 'G'])]));
+
+        $this->assertSame(0, $transcript->getReadCount());
+    }
+
     public static function provideShrinkingOverflowingContent(): iterable
     {
         yield 'one trailing line removed' => [['A', 'B', 'C', 'D', 'E', 'F']];

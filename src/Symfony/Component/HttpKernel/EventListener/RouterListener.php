@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
@@ -110,6 +111,21 @@ class RouterListener implements EventSubscriberInterface
                 'request_uri' => $request->getUri(),
                 'method' => $request->getMethod(),
             ]);
+
+            if (($parameters['_scheme_redirect'] ?? false) && RedirectController::class.'::urlRedirectAction' === ($parameters['_controller'] ?? null)) {
+                // the route is not served over this scheme, so redirect right away rather than
+                // letting listeners act on a request that this URL does not actually serve
+                $event->setResponse((new RedirectController())->urlRedirectAction(
+                    $request,
+                    $parameters['path'],
+                    $parameters['permanent'],
+                    $parameters['scheme'],
+                    $parameters['httpPort'],
+                    $parameters['httpsPort'],
+                ));
+
+                return;
+            }
 
             $attributes = $parameters;
             if ($mapping = $parameters['_route_mapping'] ?? false) {

@@ -92,7 +92,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
             ->with('/foo/baz', 'foo', 'https')
             ->willReturn(['redirect' => 'value'])
         ;
-        $this->assertEquals(['_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'], $matcher->match('/foo/baz'));
+        $this->assertEquals(['_scheme_redirect' => true, '_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'], $matcher->match('/foo/baz'));
     }
 
     public function testSchemeRedirectForRoot()
@@ -106,7 +106,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
             ->method('redirect')
             ->with('/', 'foo', 'https')
             ->willReturn(['redirect' => 'value']);
-        $this->assertEquals(['_route' => 'foo', 'redirect' => 'value'], $matcher->match('/'));
+        $this->assertEquals(['_scheme_redirect' => true, '_route' => 'foo', 'redirect' => 'value'], $matcher->match('/'));
     }
 
     public function testSlashRedirectWithParams()
@@ -140,7 +140,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
         $matcher = $this->getUrlMatcher($coll, new RequestContext(), true);
         $matcher->expects($this->once())->method('redirect')->with('/foo', 'foo', 'https')->willReturn([]);
-        $this->assertSame(['_route' => 'foo'], $matcher->match('/foo'));
+        $this->assertSame(['_scheme_redirect' => true, '_route' => 'foo'], $matcher->match('/foo'));
     }
 
     public function testFallbackPage()

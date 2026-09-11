@@ -189,6 +189,13 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * [BC BREAK] When a route matches the request path but declares a `scheme` the request does not use,
+   `RouterListener` now returns the redirect response itself at priority 32, instead of setting
+   `_route` and `_controller` and letting the request continue to `RedirectController`. The response
+   is unchanged, but listeners registered below priority 32, the firewall included, no longer run on
+   such a request. Previously a firewall `check_path`, `logout_path` or `switch_user` target declared
+   with `schemes: ['https']` was still acted upon when requested over plain HTTP with GET or HEAD.
+   Only scheme redirects are affected; a trailing-slash redirect still goes through the controller
  * Deprecate the `HIncludeFragmentRenderer` class, use the `EsiFragmentRenderer` or `InlineFragmentRenderer`, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
  * `Kernel::boot()` now iterates over the `$bundles` property instead of calling `getBundles()`, so that the
    bundles that have nothing to do at boot time are not instantiated

@@ -52,7 +52,7 @@ trait CompiledUrlMatcherTrait
             $this->context->setScheme(key($allowSchemes));
             try {
                 if ($ret = $this->doMatch($pathinfo)) {
-                    return $this->redirect($pathinfo, $ret['_route'], $this->context->getScheme()) + $ret;
+                    return ['_scheme_redirect' => true] + $this->redirect($pathinfo, $ret['_route'], $this->context->getScheme()) + $ret;
                 }
             } finally {
                 $this->context->setScheme($scheme);

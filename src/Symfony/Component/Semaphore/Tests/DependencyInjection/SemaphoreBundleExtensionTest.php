@@ -14,6 +14,7 @@ namespace Symfony\Component\Semaphore\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Semaphore\SemaphoreBundle;
@@ -37,6 +38,12 @@ class SemaphoreBundleExtensionTest extends TestCase
 
     public function testSemaphoreFromARootLevelDsn()
     {
+        $config = (new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()[1]->getType();
+
+        if ($config instanceof \ReflectionNamedType && 'array' === $config->getName()) {
+            $this->markTestSkipped('symfony/dependency-injection >= 8.2 is required to pass a value that is not an array to an extension.');
+        }
+
         $container = $this->createContainerFromFile('semaphore_dsn');
 
         $this->assertTrue($container->hasDefinition('semaphore.default.factory'));

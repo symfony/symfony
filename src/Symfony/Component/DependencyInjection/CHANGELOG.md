@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Pass top-level extension values that are not arrays to the extension instead of replacing them with an empty array, so that a configuration tree can accept a scalar at its root
+ * Order tagged services with the `before` and `after` tag attributes, also available as arguments of `#[AsTaggedItem]`
+ * Add `BeforeAfterSorter` to order a list according to `before`/`after` constraints
  * Name the package to install when an extension is missing, for the configuration keys declared in the `.container.extension_packages` build parameter
  * Add the `container.remove_if_missing` tag to drop a definition when a service, a class or a package it needs is not there
  * Add `ContainerBuilder::setExtensionConfig()`

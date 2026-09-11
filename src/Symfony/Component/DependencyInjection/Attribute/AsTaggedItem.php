@@ -20,12 +20,16 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class AsTaggedItem
 {
     /**
-     * @param string|null $index    The index at which the service will be found when consuming tagged iterators/locators
-     * @param int|null    $priority The priority of the service in iterators/locators; the higher the number, the earlier it will
+     * @param string|null          $index    The index at which the service will be found when consuming tagged iterators/locators
+     * @param int|null             $priority The priority of the service in iterators/locators; the higher the number, the earlier it will
+     * @param string|string[]|null $before   Service ids or classes this service must be placed before
+     * @param string|string[]|null $after    Service ids or classes this service must be placed after
      */
     public function __construct(
         public ?string $index = null,
         public ?int $priority = null,
+        public string|array|null $before = null,
+        public string|array|null $after = null,
     ) {
     }
 }

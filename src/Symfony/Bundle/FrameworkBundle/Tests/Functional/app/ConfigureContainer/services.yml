@@ -1,0 +1,7 @@
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\ConfigureContainer\Greeter: ~
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\ConfigureContainerController:
+        public: true
+        arguments:
+            - '@Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\ConfigureContainer\Greeter'

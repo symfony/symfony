@@ -13,10 +13,12 @@ namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Basic lock feature for commands.
@@ -28,6 +30,18 @@ trait LockableTrait
     private ?LockInterface $lock = null;
 
     private ?LockFactory $lockFactory = null;
+
+    /**
+     * Sets the lock factory, unless the command set one for itself already.
+     *
+     * The argument is nullable so that autowiring is a no-op for apps that
+     * declare no lock resource named "console".
+     */
+    #[Required]
+    public function setLockFactory(#[Target('console')] ?LockFactory $lockFactory = null): void
+    {
+        $this->lockFactory ??= $lockFactory;
+    }
 
     /**
      * Locks a command.

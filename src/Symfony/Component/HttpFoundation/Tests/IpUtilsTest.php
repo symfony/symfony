@@ -152,6 +152,8 @@ class IpUtilsTest extends TestCase
             ['[::FFFF:123.234.235.236]', '[::ffff:123.234.235.0]'],
             ['::123.234.235.236', '::123.234.235.0'], // deprecated IPv4-compatible IPv6 address
             ['::7bea:ebec', '::123.234.235.0'],
+            ['::1:0:1', '::'], // neither mapped nor compatible: regular IPv6 anonymization applies
+            ['0000:0000:0000:0000:0000:0001:0000:0001', '::'],
             ['fe80::1fc4:15d8:78db:2319%enp4s0', 'fe80::'], // IPv6 link-local with RFC4007 scoping
         ];
     }

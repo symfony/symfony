@@ -29,7 +29,7 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $key = new Key(__METHOD__, 1);
+        $key = new Key(uniqid(__METHOD__, true), 1);
 
         $this->assertFalse($store->exists($key));
         $store->save($key, 10);
@@ -42,8 +42,8 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $key1 = new Key(__METHOD__.'1', 1);
-        $key2 = new Key(__METHOD__.'2', 1);
+        $key1 = new Key(uniqid(__METHOD__, true), 1);
+        $key2 = new Key(uniqid(__METHOD__, true), 1);
 
         $store->save($key1, 10);
         $this->assertTrue($store->exists($key1));
@@ -66,7 +66,7 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $resource = __METHOD__;
+        $resource = uniqid(__METHOD__, true);
         $key1 = new Key($resource, 1);
         $key2 = new Key($resource, 1);
 
@@ -101,7 +101,7 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $resource = __METHOD__;
+        $resource = uniqid(__METHOD__, true);
         $key1 = new Key($resource, 2);
         $key2 = new Key($resource, 2);
         $key3 = new Key($resource, 2);
@@ -145,7 +145,7 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $resource = __METHOD__;
+        $resource = uniqid(__METHOD__, true);
         $key1 = new Key($resource, 4, 2);
         $key2 = new Key($resource, 4, 2);
         $key3 = new Key($resource, 4, 2);
@@ -188,7 +188,7 @@ abstract class AbstractStoreTestCase extends TestCase
     public function testPutOffExpiration()
     {
         $store = $this->getStore();
-        $key = new Key(__METHOD__, 4, 2);
+        $key = new Key(uniqid(__METHOD__, true), 4, 2);
         $store->save($key, 20);
 
         $store->putOffExpiration($key, 20);
@@ -212,7 +212,7 @@ abstract class AbstractStoreTestCase extends TestCase
     {
         $store = $this->getStore();
 
-        $key = new Key(__METHOD__, 1);
+        $key = new Key(uniqid(__METHOD__, true), 1);
 
         $store->save($key, 10);
         $store->save($key, 10);

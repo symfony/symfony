@@ -571,11 +571,12 @@ trait KernelTrait
     {
         $bundles = [];
         $bundlesMetadata = [];
+        $escape = static fn (string $path): string => str_replace('%', '%%', $path);
 
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = $bundle::class;
             $bundlesMetadata[$name] = [
-                'path' => $bundle->getPath(),
+                'path' => $escape($bundle->getPath()),
             ];
         }
 
@@ -590,7 +591,7 @@ trait KernelTrait
         }
 
         return [
-            'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
+            'kernel.project_dir' => $escape(realpath($this->getProjectDir()) ?: $this->getProjectDir()),
             'kernel.environment' => $this->environment,
             'kernel.runtime_environment' => '%env(default:kernel.environment:APP_RUNTIME_ENV)%',
             'kernel.runtime_mode' => '%env(query_string:default:container.runtime_mode:APP_RUNTIME_MODE)%',
@@ -598,18 +599,18 @@ trait KernelTrait
             'kernel.runtime_mode.cli' => '%env(not:default:kernel.runtime_mode.web:)%',
             'kernel.runtime_mode.worker' => '%env(int:default::key:worker:default:kernel.runtime_mode:)%',
             'kernel.debug' => $this->debug,
-            'kernel.build_dir' => realpath($dir = $this->getEffectiveBuildDir()) ?: $dir,
-            'kernel.cache_dir' => realpath($dir = ($this->getCacheDir() === $this->getBuildDir() ? $this->getEffectiveBuildDir() : $this->getCacheDir())) ?: $dir,
+            'kernel.build_dir' => $escape(realpath($dir = $this->getEffectiveBuildDir()) ?: $dir),
+            'kernel.cache_dir' => $escape(realpath($dir = ($this->getCacheDir() === $this->getBuildDir() ? $this->getEffectiveBuildDir() : $this->getCacheDir())) ?: $dir),
             'kernel.bundles' => $bundles,
             'kernel.bundles_metadata' => $bundlesMetadata,
             'kernel.container_class' => $this->getContainerClass(),
-            '.kernel.config_dir' => $this->getConfigDir(),
+            '.kernel.config_dir' => $escape($this->getConfigDir()),
             '.kernel.bundles_definition' => $this->getBundlesDefinition(),
             '.container.known_envs' => array_keys($knownEnvs),
         ] + (null !== ($dir = $this->getLogDir()) ? [
-            'kernel.logs_dir' => realpath($dir) ?: $dir,
+            'kernel.logs_dir' => $escape(realpath($dir) ?: $dir),
         ] : []) + (null !== ($dir = $this->getShareDir()) ? [
-            'kernel.share_dir' => realpath($dir) ?: $dir,
+            'kernel.share_dir' => $escape(realpath($dir) ?: $dir),
         ] : []);
     }
 

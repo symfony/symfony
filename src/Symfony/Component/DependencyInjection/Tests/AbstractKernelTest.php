@@ -136,6 +136,20 @@ class AbstractKernelTest extends TestCase
         $this->assertSame([], $container->getParameter('kernel.bundles_metadata'));
     }
 
+    public function testProjectDirContainingAPercentSign()
+    {
+        // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference
+        $this->varDir = str_replace('\\', '/', sys_get_temp_dir()).'/sf_percent_my%2Fother%2Fbranch';
+        @mkdir($this->varDir, 0o777, true);
+
+        $kernel = new PercentProjectDirKernel('percent', true, $this->varDir);
+        $kernel->boot();
+
+        $container = $kernel->getContainer();
+        $this->assertSame(realpath($this->varDir), $container->getParameter('kernel.project_dir'));
+        $this->assertSame(realpath($this->varDir).'/config', $container->getParameter('percent.interpolated'));
+    }
+
     public function testKernelIsSyntheticService()
     {
         $kernel = $this->createKernel();
@@ -625,6 +639,14 @@ class BuildHookKernel extends TestKernel
     protected function build(ContainerBuilder $container): void
     {
         $container->setParameter('build_hook_called', true);
+    }
+}
+
+class PercentProjectDirKernel extends TestKernel
+{
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->setParameter('percent.interpolated', '%kernel.project_dir%/config');
     }
 }
 

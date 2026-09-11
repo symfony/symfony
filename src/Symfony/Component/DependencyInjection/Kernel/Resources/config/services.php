@@ -90,6 +90,10 @@ return static function (ContainerConfigurator $container) {
             ->public()
         ->alias(ServicesResetterInterface::class, 'services_resetter')
 
+        // calls the methods of the services tagged "kernel.close" when the kernel shuts down
+        ->set('services_closer', ServicesResetter::class)
+            ->public()
+
         ->set('container.env_var_processor', EnvVarProcessor::class)
             ->args([
                 service('service_container'),

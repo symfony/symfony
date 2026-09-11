@@ -63,6 +63,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'json_streamer.value_transformer',
         'kernel.cache_clearer',
         'kernel.cache_warmer',
+        'kernel.close',
         'kernel.event_listener',
         'kernel.event_subscriber',
         'kernel.fragment_renderer',

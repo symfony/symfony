@@ -20,7 +20,9 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\BundleInterface;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
+use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ClosableService;
 use Symfony\Component\Filesystem\Filesystem;
 
 class AbstractKernelTest extends TestCase
@@ -209,6 +211,59 @@ class AbstractKernelTest extends TestCase
         $kernel = $this->createKernelWithBundles([$bundle]);
         $kernel->boot();
         $kernel->shutdown();
+    }
+
+    public function testShutdownClosesTaggedServices()
+    {
+        ClosableService::$closed = 0;
+        $this->writeBundlesFile([ServicesBundle::class]);
+        $kernel = new ClosingKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $kernel->getContainer()->get('closable');
+
+        $kernel->shutdown();
+
+        $this->assertSame(1, ClosableService::$closed);
+    }
+
+    public function testShutdownDoesNotInstantiateServicesToCloseThem()
+    {
+        ClosableService::$closed = 0;
+        $this->writeBundlesFile([ServicesBundle::class]);
+        $kernel = new ClosingKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $kernel->shutdown();
+
+        $this->assertSame(0, ClosableService::$closed);
+    }
+
+    public function testShutdownClearsContainerWhenClosingFails()
+    {
+        ClosableService::$closed = 0;
+        $this->writeBundlesFile([ServicesBundle::class]);
+        $kernel = new ClosingKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $kernel->getContainer()->get('failing');
+        $kernel->getContainer()->get('closable');
+
+        $closingFailed = false;
+
+        try {
+            $kernel->shutdown();
+        } catch (\RuntimeException $e) {
+            $closingFailed = true;
+            $this->assertSame('Cannot close.', $e->getMessage());
+        }
+
+        $this->assertTrue($closingFailed, 'The exception thrown while closing a service should not be swallowed.');
+
+        // one service failing to close does not prevent closing the others
+        $this->assertSame(1, ClosableService::$closed);
+        $this->assertFalse($kernel->isBooted());
+
+        $this->expectException(\LogicException::class);
+        $kernel->getContainer();
     }
 
     public function testGetBundlesAndGetBundle()
@@ -647,6 +702,19 @@ class PercentProjectDirKernel extends TestKernel
     protected function build(ContainerBuilder $container): void
     {
         $container->setParameter('percent.interpolated', '%kernel.project_dir%/config');
+    }
+}
+
+class ClosingKernel extends TestKernel
+{
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->register('failing', ClosableService::class)
+            ->setPublic(true)
+            ->addTag('kernel.close', ['method' => 'fail']);
+        $container->register('closable', ClosableService::class)
+            ->setPublic(true)
+            ->addTag('kernel.close');
     }
 }
 

@@ -109,7 +109,14 @@ abstract class AbstractKernel implements KernelInterface
             $bundle->setContainer(null);
         }
 
-        $this->container = null;
+        try {
+            // after the bundles, which may still use the services they shut down
+            if ($this->container->has('services_closer')) {
+                $this->container->get('services_closer')->reset();
+            }
+        } finally {
+            $this->container = null;
+        }
     }
 
     /**

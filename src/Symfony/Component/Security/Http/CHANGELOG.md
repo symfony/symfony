@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `ReAuthenticationRequiredException` and a re-authentication entry point to `ExceptionListener`, started when `IS_AUTHENTICATED_RECENTLY` is denied
  * Stamp the `auth_time` token attribute from the OIDC ID token claim of the same name, so `max_age` and `IS_AUTHENTICATED_RECENTLY` agree
  * Add `AuthenticationTimeListener`, which records the time of the last interactive authentication as the `auth_time` token attribute
  * Add `allowed_time_drift` option to `OidcTokenHandler` to configure time tolerance for token validation (`iat`, `nbf`, `exp` claims)

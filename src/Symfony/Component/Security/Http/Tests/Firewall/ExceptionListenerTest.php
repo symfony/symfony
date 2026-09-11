@@ -33,6 +33,10 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
+use Symfony\Component\Security\Core\Exception\ReAuthenticationRequiredException;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class ExceptionListenerTest extends TestCase
 {
@@ -222,7 +226,7 @@ class ExceptionListenerTest extends TestCase
         return new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $exception);
     }
 
-    private function createExceptionListener(?TokenStorageInterface $tokenStorage = null, ?AuthenticationTrustResolverInterface $trustResolver = null, ?HttpUtils $httpUtils = null, ?AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, ?AccessDeniedHandlerInterface $accessDeniedHandler = null)
+    private function createExceptionListener(?TokenStorageInterface $tokenStorage = null, ?AuthenticationTrustResolverInterface $trustResolver = null, ?HttpUtils $httpUtils = null, ?AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, ?AccessDeniedHandlerInterface $accessDeniedHandler = null, ?AuthenticationEntryPointInterface $reAuthenticationEntryPoint = null)
     {
         return new ExceptionListener(
             $tokenStorage ?? new TokenStorage(),
@@ -231,7 +235,85 @@ class ExceptionListenerTest extends TestCase
             'key',
             $authenticationEntryPoint,
             $errorPage,
-            $accessDeniedHandler
+            $accessDeniedHandler,
+            null,
+            false,
+            $reAuthenticationEntryPoint
         );
+    }
+
+    private function createFullFledgedTrustResolver(): AuthenticationTrustResolverInterface
+    {
+        $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
+        $trustResolver->expects($this->once())->method('isFullFledged')->willReturn(true);
+
+        return $trustResolver;
+    }
+
+    public function testReAuthenticationEntryPointStartsOnAStaleAuthentication()
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->once())
+            ->method('start')
+            ->with($this->anything(), $this->isInstanceOf(ReAuthenticationRequiredException::class))
+            ->willReturn(new Response('Confirm your password', 200));
+
+        $listener = $this->createExceptionListener(null, $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertSame('Confirm your password', $event->getResponse()->getContent());
+    }
+
+    public function testReAuthenticationEntryPointIsNotStartedForAnUnrelatedDenial()
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes(['ROLE_ADMIN']);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->never())->method('start');
+
+        $listener = $this->createExceptionListener(null, $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
+    }
+
+    public function testReAuthenticationEntryPointIsNotStartedWhenAnotherAttributeMayHaveFailed()
+    {
+        // an access_control rule is decided on all of its roles at once, so this denial
+        // does not say which attribute failed and re-authenticating may not help
+        $exception = new AccessDeniedException();
+        $exception->setAttributes(['ROLE_ADMIN', AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->never())->method('start');
+
+        $listener = $this->createExceptionListener(null, $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
+    }
+
+    public function testAnUnusableReAuthenticationEntryPointFallsBackToAccessDenied()
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->once())->method('start')->willThrowException(new NotAnEntryPointException());
+
+        $listener = $this->createExceptionListener(null, $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        // a 403 describes a stale authentication better than the 401 the entry point
+        // machinery would otherwise produce
+        $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
     }
 }

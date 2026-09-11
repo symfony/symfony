@@ -139,6 +139,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.access.denied_handler')->nullOnInvalid(),
                 service('logger')->nullOnInvalid(),
                 false, // Stateless
+                null, // Re-authentication entry point, resolved by RegisterEntryPointPass
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

@@ -65,7 +65,8 @@ final class CrowdinProvider implements ProviderInterface
     public function write(TranslatorBagInterface $translatorBag): void
     {
         $fileIds = $this->getFileIds();
-        [$languageIds, $sourceLanguageId] = $this->getLanguageIds();
+        [$languageIds, $sourceLanguageId, $targetLanguageIds] = $this->getLanguageIds();
+        $languageIds = $this->addMissingLanguages($translatorBag, $languageIds, $targetLanguageIds);
 
         $defaultLocaleCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
         foreach ($defaultLocaleCatalogue->getDomains() as $domain) {
@@ -448,7 +449,7 @@ final class CrowdinProvider implements ProviderInterface
     }
 
     /**
-     * @return array{array<string, string>, string} The language IDs indexed by locale, then the source language ID
+     * @return array{array<string, string>, string, string[]} The language IDs indexed by locale, then the source language ID, then the target language IDs as the project spells them
      *
      * @see https://support.crowdin.com/developer/api/v2/#tag/Projects/operation/api.projects.get (Crowdin API)
      * @see https://support.crowdin.com/developer/enterprise/api/v2/#tag/Projects-and-Groups/operation/api.projects.get (Crowdin Enterprise API)
@@ -472,7 +473,7 @@ final class CrowdinProvider implements ProviderInterface
         if (!isset($projectInfo['languageMapping'])) {
             $this->logger->warning('API key does not allow to access language mapping.');
 
-            return [$languageIds, $projectInfo['sourceLanguageId']];
+            return [$languageIds, $projectInfo['sourceLanguageId'], $projectInfo['targetLanguageIds']];
         }
 
         foreach ($projectInfo['languageMapping'] as $languageId => $mapping) {
@@ -484,7 +485,112 @@ final class CrowdinProvider implements ProviderInterface
             }
         }
 
-        return [$languageIds, $projectInfo['sourceLanguageId']];
+        return [$languageIds, $projectInfo['sourceLanguageId'], $projectInfo['targetLanguageIds']];
+    }
+
+    /**
+     * Adds the locales of the bag that the project does not have as target languages yet.
+     *
+     * Editing a project requires a token with a read and write "project.settings" scope. A narrower
+     * token cannot add anything: the failure is logged, and write() then skips those locales as before.
+     * A locale Crowdin does not know is left out, so that the other ones are still added.
+     *
+     * @param array<string, string> $languageIds       The language IDs indexed by locale
+     * @param string[]              $targetLanguageIds The target language IDs as the project spells them
+     *
+     * @return array<string, string> The language IDs indexed by locale, including the added ones
+     *
+     * @see https://support.crowdin.com/developer/api/v2/#tag/Projects/operation/api.projects.patch (Crowdin API)
+     * @see https://support.crowdin.com/developer/enterprise/api/v2/#tag/Projects-and-Groups/operation/api.projects.patch (Crowdin Enterprise API)
+     */
+    private function addMissingLanguages(TranslatorBagInterface $translatorBag, array $languageIds, array $targetLanguageIds): array
+    {
+        $missingLocales = [];
+
+        foreach ($translatorBag->getCatalogues() as $catalogue) {
+            $locale = $catalogue->getLocale();
+
+            if ($locale !== $this->defaultLocale && !isset($languageIds[$locale])) {
+                $missingLocales[] = $locale;
+            }
+        }
+
+        if (!$missingLocales) {
+            return $languageIds;
+        }
+
+        $supportedLanguageIds = $this->getSupportedLanguageIds();
+        $knownLanguageIds = $newLanguageIds = [];
+
+        foreach ($missingLocales as $locale) {
+            if (!$languageId = $supportedLanguageIds[$locale] ?? null) {
+                continue;
+            }
+
+            if (\in_array($languageId, $languageIds, true)) {
+                $knownLanguageIds[$locale] = $languageId;
+            } else {
+                $newLanguageIds[$locale] = $languageId;
+            }
+        }
+
+        if (!$newLanguageIds) {
+            return $languageIds + $knownLanguageIds;
+        }
+
+        $response = $this->client->request('PATCH', $this->getProjectEndpoint(), [
+            'json' => [[
+                'op' => 'replace',
+                'path' => '/targetLanguageIds',
+                'value' => [...$targetLanguageIds, ...array_values(array_unique($newLanguageIds))],
+            ]],
+        ]);
+
+        if (200 !== $statusCode = $response->getStatusCode()) {
+            $this->logger->error(\sprintf('Unable to add the "%s" locale(s) to the Crowdin project: "%s".', implode('", "', array_keys($newLanguageIds)), $response->getContent(false)));
+
+            if (500 <= $statusCode) {
+                throw new ProviderException('Unable to add the missing locales to the Crowdin project.', $response);
+            }
+
+            return $languageIds + $knownLanguageIds;
+        }
+
+        return $languageIds + $knownLanguageIds + $newLanguageIds;
+    }
+
+    /**
+     * @return array<string, string> The IDs of the languages Crowdin supports, indexed by their ID and by their locale, both written with underscores
+     *
+     * @see https://support.crowdin.com/developer/api/v2/#tag/Languages/operation/api.languages.getMany (Crowdin API)
+     * @see https://support.crowdin.com/developer/enterprise/api/v2/#tag/Languages/operation/api.languages.getMany (Crowdin Enterprise API)
+     */
+    private function getSupportedLanguageIds(): array
+    {
+        $response = $this->client->request('GET', \sprintf('%slanguages', $this->projectId ? '' : '../../'), [
+            // Crowdin supports a few hundred languages and caps a page at 500 of them
+            'query' => ['limit' => 500],
+        ]);
+
+        if (200 !== $statusCode = $response->getStatusCode()) {
+            $this->logger->error(\sprintf('Unable to list the languages Crowdin supports: "%s".', $response->getContent(false)));
+
+            if (500 <= $statusCode) {
+                throw new ProviderException('Unable to list the languages Crowdin supports.', $response);
+            }
+
+            return [];
+        }
+
+        $languageIds = [];
+
+        foreach ($response->toArray()['data'] as $language) {
+            // several languages can share a locale, so an exact ID match wins: "en_US" is the "en-US" language, not the "en" one
+            $languageIds[str_replace('-', '_', $language['data']['locale'])] ??= $language['data']['id'];
+            $languageIds[str_replace('-', '_', $language['data']['id'])] = $language['data']['id'];
+        }
+
+        return $languageIds;
     }
 
     private function getProjectEndpoint(string $endpoint = ''): string

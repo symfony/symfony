@@ -357,6 +357,9 @@ Translation
  * `TranslationBundle` provides the `translation` configuration and the services `FrameworkBundle` used to
    provide under `framework.translator`
  * `FilteringProvider::read()` now returns an empty `TranslatorBag` when none of the requested locales match the configured ones, and a bag of empty catalogues when no requested domain matches, instead of delegating to the wrapped provider
+ * `CrowdinProvider::write()` now adds the locales missing from the project before uploading, which needs an API
+   token with a read and write `project.settings` scope. With a narrower token the failure is logged and those
+   locales are skipped, as they were before
 
 Tui
 ---

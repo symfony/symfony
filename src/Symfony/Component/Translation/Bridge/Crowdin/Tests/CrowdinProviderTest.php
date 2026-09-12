@@ -1153,6 +1153,403 @@ class CrowdinProviderTest extends ProviderTestCase
         $this->assertSame(\count($responses), $httpClient->getRequestsCount());
     }
 
+    public function testWriteAddsTheLocalesMissingFromTheProject()
+    {
+        $arrayLoader = new ArrayLoader();
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_en_a'], 'en'));
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_fr_a'], 'fr_FR'));
+
+        $responses = [
+            'listFiles' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files', $url);
+
+                return new JsonMockResponse(['data' => []]);
+            },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
+
+                return new JsonMockResponse(['data' => [
+                    'sourceLanguageId' => 'en',
+                    'targetLanguageIds' => ['de'],
+                    'languageMapping' => [],
+                ]]);
+            },
+            'listLanguages' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
+
+                return self::supportedLanguagesResponse();
+            },
+            'addLanguage' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('PATCH', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
+                // the languages the project already has are kept, and "fr_FR" is spelled the way Crowdin does
+                $this->assertSame('[{"op":"replace","path":"\/targetLanguageIds","value":["de","fr"]}]', $options['body']);
+
+                return new JsonMockResponse(['data' => [
+                    'sourceLanguageId' => 'en',
+                    'targetLanguageIds' => ['de', 'fr'],
+                    'languageMapping' => [],
+                ]]);
+            },
+            'addStorage' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
+            },
+            'addFile' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files', $url);
+                $this->assertSame('{"storageId":19,"name":"messages.xlf"}', $options['body']);
+
+                return new JsonMockResponse(['data' => ['id' => 199, 'name' => 'messages.xlf']], ['http_code' => 201]);
+            },
+            'addStorage2' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 20]], ['http_code' => 201]);
+            },
+            'importTranslations' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/imports', $url);
+                // the locale is uploaded under the language that was just added
+                $this->assertSame('{"storageId":20,"languageIds":["fr"],"fileId":199}', $options['body']);
+
+                return new JsonMockResponse(['data' => ['identifier' => 'b8bfd653-2882-4b81-b74f-edae8b492b11']], ['http_code' => 202]);
+            },
+            'checkImport' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/imports/b8bfd653-2882-4b81-b74f-edae8b492b11', $url);
+
+                return new JsonMockResponse(['data' => ['status' => 'finished']]);
+            },
+        ];
+
+        $httpClient = (new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
+            'auth_bearer' => 'API_TOKEN',
+        ]);
+
+        $provider = self::createProvider($httpClient, new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
+
+        $provider->write($translatorBag);
+
+        $this->assertSame(\count($responses), $httpClient->getRequestsCount());
+    }
+
+    public function testWriteAddsTheSupportedLocalesEvenWhenAnotherOneIsUnsupported()
+    {
+        $arrayLoader = new ArrayLoader();
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_en_a'], 'en'));
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_de_a'], 'de'));
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_xx_a'], 'xx_XX'));
+
+        $responses = [
+            'listFiles' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files', $url);
+
+                return new JsonMockResponse(['data' => []]);
+            },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
+
+                return new JsonMockResponse(['data' => [
+                    'sourceLanguageId' => 'en',
+                    'targetLanguageIds' => [],
+                    'languageMapping' => [],
+                ]]);
+            },
+            'listLanguages' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
+
+                return self::supportedLanguagesResponse();
+            },
+            'addLanguage' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('PATCH', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
+                // "xx_XX" is left out instead of making the whole request fail
+                $this->assertSame('[{"op":"replace","path":"\/targetLanguageIds","value":["de"]}]', $options['body']);
+
+                return new JsonMockResponse(['data' => [
+                    'sourceLanguageId' => 'en',
+                    'targetLanguageIds' => ['de'],
+                    'languageMapping' => [],
+                ]]);
+            },
+            'addStorage' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
+            },
+            'addFile' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 199, 'name' => 'messages.xlf']], ['http_code' => 201]);
+            },
+            'addStorage2' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 20]], ['http_code' => 201]);
+            },
+            'importTranslations' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/imports', $url);
+                $this->assertSame('{"storageId":20,"languageIds":["de"],"fileId":199}', $options['body']);
+
+                return new JsonMockResponse(['data' => ['identifier' => 'b8bfd653-2882-4b81-b74f-edae8b492b11']], ['http_code' => 202]);
+            },
+            'checkImport' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/imports/b8bfd653-2882-4b81-b74f-edae8b492b11', $url);
+
+                return new JsonMockResponse(['data' => ['status' => 'finished']]);
+            },
+        ];
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
+            ->method('warning')
+            ->with('Ignored "xx_XX" locale because it is not configured or mapped in the project.');
+
+        $httpClient = (new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
+            'auth_bearer' => 'API_TOKEN',
+        ]);
+
+        $provider = self::createProvider($httpClient, new XliffFileLoader(), $logger, $this->getDefaultLocale(), 'api.crowdin.com', '1');
+
+        $provider->write($translatorBag);
+
+        $this->assertSame(\count($responses), $httpClient->getRequestsCount());
+    }
+
+    public function testWriteDoesNotPatchTheProjectWhenTheMissingLocalesResolveToOneOfItsLanguages()
+    {
+        $arrayLoader = new ArrayLoader();
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_en_a'], 'en'));
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_fr_a'], 'fr_FR'));
+
+        $responses = [
+            'listFiles' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files', $url);
+
+                return new JsonMockResponse(['data' => []]);
+            },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
+
+                return new JsonMockResponse(['data' => [
+                    'sourceLanguageId' => 'en',
+                    'targetLanguageIds' => ['fr'],
+                    'languageMapping' => [],
+                ]]);
+            },
+            'listLanguages' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
+
+                return self::supportedLanguagesResponse();
+            },
+            'addStorage' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
+            },
+            'addFile' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 199, 'name' => 'messages.xlf']], ['http_code' => 201]);
+            },
+            'addStorage2' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 20]], ['http_code' => 201]);
+            },
+            'importTranslations' => function (string $method, string $url, array $options = []): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/imports', $url);
+                // the project already has the language "fr_FR" resolves to, so it is used as is
+                $this->assertSame('{"storageId":20,"languageIds":["fr"],"fileId":199}', $options['body']);
+
+                return new JsonMockResponse(['data' => ['identifier' => 'b8bfd653-2882-4b81-b74f-edae8b492b11']], ['http_code' => 202]);
+            },
+            'checkImport' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/translations/imports/b8bfd653-2882-4b81-b74f-edae8b492b11', $url);
+
+                return new JsonMockResponse(['data' => ['status' => 'finished']]);
+            },
+        ];
+
+        $httpClient = (new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
+            'auth_bearer' => 'API_TOKEN',
+        ]);
+
+        $provider = self::createProvider($httpClient, new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
+
+        $provider->write($translatorBag);
+
+        $this->assertSame(\count($responses), $httpClient->getRequestsCount());
+    }
+
+    public function testWriteLogsWhenTheMissingLocalesCannotBeAdded()
+    {
+        $arrayLoader = new ArrayLoader();
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_en_a'], 'en'));
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_de_a'], 'de'));
+
+        $responses = [
+            'listFiles' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files', $url);
+
+                return new JsonMockResponse(['data' => []]);
+            },
+            'getProject' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
+
+                return new JsonMockResponse(['data' => [
+                    'sourceLanguageId' => 'en',
+                    'targetLanguageIds' => [],
+                    'languageMapping' => [],
+                ]]);
+            },
+            'listLanguages' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/languages?limit=500', $url);
+
+                return self::supportedLanguagesResponse();
+            },
+            'addLanguage' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('PATCH', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
+
+                // a token without a read and write "project.settings" scope cannot edit the project
+                return new JsonMockResponse(['error' => ['message' => 'Forbidden']], ['http_code' => 403]);
+            },
+            'addStorage' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/storages', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 19]], ['http_code' => 201]);
+            },
+            'addFile' => function (string $method, string $url): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/files', $url);
+
+                return new JsonMockResponse(['data' => ['id' => 199, 'name' => 'messages.xlf']], ['http_code' => 201]);
+            },
+        ];
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
+            ->method('error')
+            ->with('Unable to add the "de" locale(s) to the Crowdin project: "{"error":{"message":"Forbidden"}}".');
+        $logger->expects(self::once())
+            ->method('warning')
+            ->with('Ignored "de" locale because it is not configured or mapped in the project.');
+
+        $httpClient = (new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
+            'auth_bearer' => 'API_TOKEN',
+        ]);
+
+        $provider = self::createProvider($httpClient, new XliffFileLoader(), $logger, $this->getDefaultLocale(), 'api.crowdin.com', '1');
+
+        // the source file is still written, the locale is only skipped
+        $provider->write($translatorBag);
+
+        $this->assertSame(\count($responses), $httpClient->getRequestsCount());
+    }
+
+    public function testWriteThrowsWhenTheProjectCannotBePatched()
+    {
+        $arrayLoader = new ArrayLoader();
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_en_a'], 'en'));
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_de_a'], 'de'));
+
+        $responses = [
+            'listFiles' => static fn (): ResponseInterface => new JsonMockResponse(['data' => []]),
+            'getProject' => static fn (): ResponseInterface => new JsonMockResponse(['data' => [
+                'sourceLanguageId' => 'en',
+                'targetLanguageIds' => [],
+                'languageMapping' => [],
+            ]]),
+            'listLanguages' => static fn (): ResponseInterface => self::supportedLanguagesResponse(),
+            'addLanguage' => static fn (): ResponseInterface => new JsonMockResponse(['error' => ['message' => 'Internal Server Error']], ['http_code' => 500]),
+        ];
+
+        $httpClient = (new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
+            'auth_bearer' => 'API_TOKEN',
+        ]);
+
+        $provider = self::createProvider($httpClient, new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
+
+        $this->expectException(ProviderException::class);
+        $this->expectExceptionMessage('Unable to add the missing locales to the Crowdin project.');
+
+        $provider->write($translatorBag);
+    }
+
+    public function testWriteThrowsWhenTheSupportedLanguagesCannotBeListed()
+    {
+        $arrayLoader = new ArrayLoader();
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_en_a'], 'en'));
+        $translatorBag->addCatalogue($arrayLoader->load(['a' => 'trans_de_a'], 'de'));
+
+        $responses = [
+            'listFiles' => static fn (): ResponseInterface => new JsonMockResponse(['data' => []]),
+            'getProject' => static fn (): ResponseInterface => new JsonMockResponse(['data' => [
+                'sourceLanguageId' => 'en',
+                'targetLanguageIds' => [],
+                'languageMapping' => [],
+            ]]),
+            'listLanguages' => static fn (): ResponseInterface => new JsonMockResponse(['error' => ['message' => 'Internal Server Error']], ['http_code' => 500]),
+        ];
+
+        $httpClient = (new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
+            'auth_bearer' => 'API_TOKEN',
+        ]);
+
+        $provider = self::createProvider($httpClient, new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
+
+        $this->expectException(ProviderException::class);
+        $this->expectExceptionMessage('Unable to list the languages Crowdin supports.');
+
+        $provider->write($translatorBag);
+    }
+
     #[DataProvider('getResponsesForOneLocaleAndOneDomain')]
     public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag, string $expectedTargetLanguageId)
     {
@@ -2127,5 +2524,19 @@ class CrowdinProviderTest extends ProviderTestCase
         );
 
         $provider->delete($deletedStrings);
+    }
+
+    /**
+     * An excerpt of the list Crowdin answers on "GET /languages".
+     */
+    private static function supportedLanguagesResponse(): JsonMockResponse
+    {
+        return new JsonMockResponse(['data' => [
+            ['data' => ['id' => 'de', 'locale' => 'de-DE']],
+            ['data' => ['id' => 'en', 'locale' => 'en-US']],
+            ['data' => ['id' => 'en-US', 'locale' => 'en-US']],
+            ['data' => ['id' => 'fr', 'locale' => 'fr-FR']],
+            ['data' => ['id' => 'pt-BR', 'locale' => 'pt-BR']],
+        ]]);
     }
 }

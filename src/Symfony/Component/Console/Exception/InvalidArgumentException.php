@@ -29,4 +29,12 @@ class InvalidArgumentException extends \InvalidArgumentException implements Exce
 
         return new self($error);
     }
+
+    /**
+     * @internal
+     */
+    public static function fromInvalidType(string $name, string $value, string $type): self
+    {
+        return new self(\sprintf('The value "%s" is not valid for the "%s" argument. Expected a value of type "%s".', $value, $name, $type));
+    }
 }

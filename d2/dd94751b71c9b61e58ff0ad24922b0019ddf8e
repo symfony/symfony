@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T11:08:30Z
+
+Rebased on 8.2 and amended with two fixes.
+
+POEditor writes its language codes with a hyphen and mostly in lower case, `pt-br` where Symfony writes `pt_BR`, and the provider was sending the Symfony spelling everywhere. The two forms are now kept apart: every API call sends the spelling the project itself returns from `languages/list`, so `zh-Hans` stays as it is, a language the project does not have yet is added in lower case, and catalogues carry the Symfony spelling, so `translation:pull` writes `messages.pt_BR.xlf`. A locale that already uses POEditor spelling is passed through unchanged.
+
+This also matters for `write()`: `languages/add` is not idempotent (4050 "Language already in the project"), so comparing `pt_BR` against `pt-br` meant the language was posted again on every push and answered with 4043.
+
+`getDomains()` now reads the tags of the terms instead of their context, because `projects/export` filters on tags. The context is only ever set by `write()`, so a project filled through the POEditor interface returned an empty bag.
+
+Also corrected the error code in the language fixture: 4012 is "No data sent using POST method", 4043 is "Wrong language code".

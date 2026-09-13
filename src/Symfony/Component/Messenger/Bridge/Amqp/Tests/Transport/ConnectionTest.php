@@ -1011,6 +1011,41 @@ class ConnectionTest extends TestCase
         $connection->ack($envelope, self::DEFAULT_EXCHANGE_NAME);
     }
 
+    public function testItReconnectsWhenHeartbeatExpiresAfterGettingNoMessage()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createStub(\AMQPChannel::class),
+            $amqpQueue = $this->createStub(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $connected = true;
+
+        $amqpConnection->expects($this->once())->method('disconnect')->willReturnCallback(static function () use (&$connected) {
+            $connected = false;
+        });
+        $amqpConnection->method('connect')->willReturnCallback(static function () use (&$connected) {
+            $connected = true;
+        });
+
+        $amqpChannel->method('getConnection')->willReturn($amqpConnection);
+        $amqpChannel->method('isConnected')->willReturnCallback(static function () use (&$connected) {
+            return $connected;
+        });
+
+        $amqpQueue->method('get')->willReturn(null);
+
+        $connection = Connection::fromDsn('amqp://localhost?heartbeat=1', [], $factory);
+
+        $this->assertNull($connection->get(self::DEFAULT_EXCHANGE_NAME));
+        $this->assertNull($connection->get(self::DEFAULT_EXCHANGE_NAME));
+
+        (new \ReflectionProperty($connection, 'lastActivityTime'))->setValue($connection, time() - 3);
+
+        $connection->get(self::DEFAULT_EXCHANGE_NAME);
+    }
+
     public function testClearResetsInFlightMessagesCounter()
     {
         $factory = $this->createStub(AmqpFactory::class);

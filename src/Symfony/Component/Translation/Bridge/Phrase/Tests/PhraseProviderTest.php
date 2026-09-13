@@ -314,6 +314,37 @@ class PhraseProviderTest extends TestCase
         $this->assertSame(\count($responses), $httpClient->getRequestsCount());
     }
 
+    public function testReadWithoutDomainsNorLocales()
+    {
+        $this->getLoader()
+            ->method('load')
+            ->willReturnCallback(static fn (string $content, string $locale, string $domain) => new MessageCatalogue($locale, [$domain => ['a' => $content]]));
+
+        $responses = [
+            'init locales' => $this->getInitLocaleResponseMock(),
+            'list tags' => $this->getTagsResponseMock(),
+            'download de messages' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', 'trans_de_messages_a'),
+            'download de validators' => $this->getDownloadLocaleResponseMock('validators', '5fea6ed5c21767730918a9400e420832', 'trans_de_validators_a'),
+            'download en-GB messages' => $this->getDownloadLocaleResponseMock('messages', '13604ec993beefcdaba732812cdb828c', 'trans_en_GB_messages_a'),
+            'download en-GB validators' => $this->getDownloadLocaleResponseMock('validators', '13604ec993beefcdaba732812cdb828c', 'trans_en_GB_validators_a'),
+        ];
+
+        $provider = $this->createProvider(httpClient: $httpClient = (new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.phrase.com/api/v2/projects/1/',
+            'headers' => [
+                'Authorization' => 'token API_TOKEN',
+                'User-Agent' => 'myProject',
+            ],
+        ]), endpoint: 'api.phrase.com/api/v2');
+
+        $translatorBag = $provider->read([], []);
+
+        $this->assertSame(['de', 'en_GB'], array_map(static fn (MessageCatalogue $catalogue) => $catalogue->getLocale(), $translatorBag->getCatalogues()));
+        $this->assertSame(['a' => 'trans_de_validators_a'], $translatorBag->getCatalogue('de')->all('validators'));
+        $this->assertSame(['a' => 'trans_en_GB_messages_a'], $translatorBag->getCatalogue('en_GB')->all('messages'));
+        $this->assertSame(\count($responses), $httpClient->getRequestsCount());
+    }
+
     #[DataProvider('cacheKeyProvider')]
     public function testCacheKeyOptionsSort(array $options, string $expectedKey)
     {
@@ -1123,7 +1154,7 @@ class PhraseProviderTest extends TestCase
     {
         return function (string $method, string $url): ResponseInterface {
             $this->assertSame('GET', $method);
-            $this->assertSame('https://api.phrase.com/api/v2/projects/1/tags?per_page=100&page=1', $url);
+            $this->assertSame('https://api.phrase.com/api/v2/projects/1/tags?per_page=100&page=1&exclude_system_tags=1', $url);
 
             return new JsonMockResponse([
                 [

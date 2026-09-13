@@ -50,6 +50,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 #[AllowMockObjectsWithoutExpectations]
 class OidcLoginAuthenticatorTest extends TestCase
@@ -1147,6 +1148,70 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $this->assertSame('refresh-123', $token->getAttribute('oidc_refresh_token'));
         $this->assertSame($clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
+    }
+
+    public function testCreateTokenStampsTheAuthenticationTimeFromTheAuthTimeClaim()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $clock = new MockClock('2026-09-06 12:00:00');
+        $authTime = $clock->now()->getTimestamp() - 3600;
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'auth_time' => $authTime]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator(clock: $clock);
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        // the silent SSO case: the provider says the user authenticated an hour ago,
+        // so IS_AUTHENTICATED_RECENTLY must not treat this login as fresh
+        $this->assertSame($authTime, $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
+    }
+
+    public function testCreateTokenNeverDatesTheAuthenticationTimeInTheFuture()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $clock = new MockClock('2026-09-06 12:00:00');
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'auth_time' => $clock->now()->getTimestamp() + 86400]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator(clock: $clock);
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame($clock->now()->getTimestamp(), $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
+    }
+
+    public function testCreateTokenLeavesTheAuthenticationTimeUnsetWithoutTheClaim()
+    {
+        // the claim is only mandatory when "max_age" is requested; without it
+        // AuthenticationTimeListener falls back to stamping the login instant
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertFalse($token->hasAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
     }
 
     public function testCreateTokenReportsAMissingRefreshTokenAndExpiryAsNull()

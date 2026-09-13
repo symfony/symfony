@@ -60,6 +60,19 @@ class AuthenticationTimeListenerTest extends TestCase
         );
     }
 
+    public function testItDoesNotOverwriteATimeTheAuthenticatorAlreadyRecorded()
+    {
+        // AuthenticatorManager calls createToken() before it dispatches INTERACTIVE_LOGIN,
+        // so an authenticator that knows the real authentication time, such as an OIDC
+        // client reading the "auth_time" claim, would otherwise be overwritten here
+        $token = $this->createToken();
+        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, 1234567890);
+
+        (new AuthenticationTimeListener(new MockClock('2026-09-11 12:00:00')))->onInteractiveLogin(new InteractiveLoginEvent(new Request(), $token));
+
+        $this->assertSame(1234567890, $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
+    }
+
     public function testItSubscribesToInteractiveLogin()
     {
         $this->assertSame([SecurityEvents::INTERACTIVE_LOGIN => ['onInteractiveLogin', 256]], AuthenticationTimeListener::getSubscribedEvents());

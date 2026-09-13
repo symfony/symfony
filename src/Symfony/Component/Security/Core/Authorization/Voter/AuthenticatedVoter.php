@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\OfflineTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
@@ -18,8 +19,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 
 /**
- * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY,
- * IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED is present.
+ * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_RECENTLY,
+ * IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED, IS_AUTHENTICATED is present.
  *
  * This list is most restrictive to least restrictive checking.
  *
@@ -28,6 +29,7 @@ use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
  */
 class AuthenticatedVoter implements CacheableVoterInterface
 {
+    public const IS_AUTHENTICATED_RECENTLY = 'IS_AUTHENTICATED_RECENTLY';
     public const IS_AUTHENTICATED_FULLY = 'IS_AUTHENTICATED_FULLY';
     public const IS_AUTHENTICATED_REMEMBERED = 'IS_AUTHENTICATED_REMEMBERED';
     public const IS_AUTHENTICATED = 'IS_AUTHENTICATED';
@@ -35,8 +37,31 @@ class AuthenticatedVoter implements CacheableVoterInterface
     public const IS_REMEMBERED = 'IS_REMEMBERED';
     public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
 
+    /**
+     * Token attribute holding the Unix timestamp of the last interactive authentication.
+     */
+    public const AUTH_TIME_ATTRIBUTE = 'auth_time';
+
+    /**
+     * Most restrictive first: only the reason of the strictest attribute that failed is reported.
+     */
+    private const DENIAL_REASONS = [
+        self::IS_AUTHENTICATED_RECENTLY => 'The user is not authenticated recently enough.',
+        self::IS_AUTHENTICATED_FULLY => 'The user is not fully authenticated.',
+        self::IS_AUTHENTICATED_REMEMBERED => 'The user is neither fully authenticated nor remembered.',
+        self::IS_AUTHENTICATED => 'The user is not authenticated.',
+        self::IS_IMPERSONATOR => 'The user is not impersonating another user.',
+        self::IS_REMEMBERED => 'The user is not remembered.',
+    ];
+
+    /**
+     * @param int $recentAuthenticationLifetime Number of seconds during which an interactive
+     *                                          authentication grants IS_AUTHENTICATED_RECENTLY
+     */
     public function __construct(
         private AuthenticationTrustResolverInterface $authenticationTrustResolver,
+        private int $recentAuthenticationLifetime = 900,
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -50,7 +75,8 @@ class AuthenticatedVoter implements CacheableVoterInterface
 
         $result = VoterInterface::ACCESS_ABSTAIN;
         foreach ($attributes as $attribute) {
-            if (null === $attribute || (self::IS_AUTHENTICATED_FULLY !== $attribute
+            if (null === $attribute || (self::IS_AUTHENTICATED_RECENTLY !== $attribute
+                    && self::IS_AUTHENTICATED_FULLY !== $attribute
                     && self::IS_AUTHENTICATED_REMEMBERED !== $attribute
                     && self::IS_AUTHENTICATED !== $attribute
                     && self::IS_IMPERSONATOR !== $attribute
@@ -63,6 +89,16 @@ class AuthenticatedVoter implements CacheableVoterInterface
             }
 
             $result = VoterInterface::ACCESS_DENIED;
+
+            if (self::IS_AUTHENTICATED_RECENTLY === $attribute
+                && $this->authenticationTrustResolver->isFullFledged($token)
+                && $token->hasAttribute(self::AUTH_TIME_ATTRIBUTE)
+                && ($this->clock?->now()->getTimestamp() ?? time()) - $token->getAttribute(self::AUTH_TIME_ATTRIBUTE) <= $this->recentAuthenticationLifetime
+            ) {
+                $vote?->addReason('The user authenticated recently.');
+
+                return VoterInterface::ACCESS_GRANTED;
+            }
 
             if ((self::IS_AUTHENTICATED_FULLY === $attribute || self::IS_AUTHENTICATED_REMEMBERED === $attribute)
                 && $this->authenticationTrustResolver->isFullFledged($token)
@@ -100,7 +136,13 @@ class AuthenticatedVoter implements CacheableVoterInterface
         }
 
         if (VoterInterface::ACCESS_DENIED === $result) {
-            $vote?->addReason('The user is not appropriately authenticated.');
+            foreach (self::DENIAL_REASONS as $deniedAttribute => $reason) {
+                if (\in_array($deniedAttribute, $attributes, true)) {
+                    $vote?->addReason($reason);
+
+                    break;
+                }
+            }
         }
 
         return $result;
@@ -109,6 +151,7 @@ class AuthenticatedVoter implements CacheableVoterInterface
     public function supportsAttribute(string $attribute): bool
     {
         return \in_array($attribute, [
+            self::IS_AUTHENTICATED_RECENTLY,
             self::IS_AUTHENTICATED_FULLY,
             self::IS_AUTHENTICATED_REMEMBERED,
             self::IS_AUTHENTICATED,

@@ -58,7 +58,15 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
              * A call to MessageBusInterface::dispatch() was made from inside the main bus handling,
              * but the message does not have the stamp. So, process it like normal.
              */
-            return $stack->next()->handle($envelope, $stack);
+            $queueLengthBefore = \count($this->queue);
+            try {
+                return $stack->next()->handle($envelope, $stack);
+            } catch (\Throwable $e) {
+                // drop the messages queued by the failed dispatch, they were likely dependent on it
+                $this->queue = \array_slice($this->queue, 0, $queueLengthBefore);
+
+                throw $e;
+            }
         }
 
         // First time we get here, mark as inside a "root dispatch" call:

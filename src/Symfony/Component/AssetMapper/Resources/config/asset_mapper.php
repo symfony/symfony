@@ -101,6 +101,8 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper'),
                 service('request_stack'),
                 abstract_arg('dev server public prefix'),
+                service('assets._default_package_without_version')->nullOnInvalid(),
+                abstract_arg('asset public prefix'),
             ])
             ->tag('container.remove_if_missing', ['service' => 'assets._default_package'])
 

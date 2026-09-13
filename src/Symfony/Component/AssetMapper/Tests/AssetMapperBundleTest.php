@@ -27,6 +27,7 @@ use Symfony\Component\Config\Definition\Configuration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -86,6 +87,15 @@ class AssetMapperBundleTest extends TestCase
         $container = $this->createContainer(['server' => true], false);
 
         $this->assertTrue($container->hasDefinition('asset_mapper.dev_server_subscriber'));
+    }
+
+    public function testTheAssetPackageSkipsTheVersionOfMappedAssets()
+    {
+        $definition = $this->createContainer(['server' => false, 'public_prefix' => '/assets_path/'])->getDefinition('asset_mapper.asset_package');
+
+        $this->assertEquals(new Reference('assets._default_package_without_version', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(4));
+        // unlike the dev server prefix, this one is passed whether the server runs or not
+        $this->assertSame('/assets_path/', $definition->getArgument(5));
     }
 
     public function testThePublicDirectoryIsReadFromComposer()

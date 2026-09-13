@@ -279,6 +279,48 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--enum' => 'incorrect']), new NullOutput());
     }
 
+    public function testNumericArgumentIsConvertedOrRejected()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (#[Argument] int $count, #[Argument] float $ratio = 1.0) use (&$received): int {
+            $received = [$count, $ratio];
+
+            return Command::SUCCESS;
+        });
+
+        $command->run(new ArrayInput(['count' => '3', 'ratio' => '1.5']), new NullOutput());
+
+        self::assertSame([3, 1.5], $received);
+
+        $command->run(new ArrayInput(['count' => '007', 'ratio' => '1e3']), new NullOutput());
+
+        self::assertSame([7, 1000.0], $received);
+
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The value "abc" is not valid for the "count" argument. Expected a value of type "int".');
+
+        $command->run(new ArrayInput(['count' => 'abc']), new NullOutput());
+    }
+
+    public function testNumericOptionIsConvertedOrRejected()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (#[Option] float $ratio = 1.0) use (&$received): int {
+            $received = $ratio;
+
+            return Command::SUCCESS;
+        });
+
+        $command->run(new ArrayInput(['--ratio' => '1.5']), new NullOutput());
+
+        self::assertSame(1.5, $received);
+
+        self::expectException(InvalidOptionException::class);
+        self::expectExceptionMessage('The value "half" is not valid for the "ratio" option. Expected a value of type "float".');
+
+        $command->run(new ArrayInput(['--ratio' => 'half']), new NullOutput());
+    }
+
     public function testAskDefaultIsRejectedForArrayArgument()
     {
         $command = new Command('foo');

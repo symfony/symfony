@@ -191,7 +191,9 @@ class AssetMapperBundle extends AbstractBundle
         $server = $container->getParameterBag()->resolveValue($config['server']);
 
         $container->getDefinition('asset_mapper.asset_package')
-            ->replaceArgument(3, $server ? $config['public_prefix'] : null);
+            ->replaceArgument(3, $server ? $config['public_prefix'] : null)
+            // unlike the dev server prefix, this one is passed whether the server runs or not
+            ->replaceArgument(5, $config['public_prefix']);
 
         $paths = $config['paths'];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {

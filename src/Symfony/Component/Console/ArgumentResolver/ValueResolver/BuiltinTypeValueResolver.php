@@ -14,6 +14,8 @@ namespace Symfony\Component\Console\ArgumentResolver\ValueResolver;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
@@ -38,7 +40,13 @@ final class BuiltinTypeValueResolver implements ValueResolverInterface
                 return [];
             }
 
-            return [$input->getArgument($argument->name)];
+            $value = $input->getArgument($argument->name);
+
+            if (\is_string($value) && \in_array($argument->typeName, ['int', 'float'], true) && !is_numeric($value)) {
+                throw InvalidArgumentException::fromInvalidType($argument->name, $value, $argument->typeName);
+            }
+
+            return [$value];
         }
 
         if ($option = Option::tryFrom($member->getMember())) {
@@ -58,6 +66,10 @@ final class BuiltinTypeValueResolver implements ValueResolverInterface
 
         if (null === $value && \in_array($option->typeName, Option::ALLOWED_UNION_TYPES, true)) {
             return true;
+        }
+
+        if (\is_string($value) && \in_array($option->typeName, ['int', 'float'], true) && !is_numeric($value)) {
+            throw InvalidOptionException::fromInvalidType($option->name, $value, $option->typeName);
         }
 
         if ('array' === $option->typeName && $option->allowNull && [] === $value) {

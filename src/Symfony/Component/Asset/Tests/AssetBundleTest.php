@@ -50,6 +50,18 @@ class AssetBundleTest extends TestCase
         $this->assertTrue($container->hasDefinition('assets._default_package'));
     }
 
+    public function testTheVersionlessPackageKeepsTheBaseUrls()
+    {
+        $container = $this->load(self::PACKAGES, ['var_json_manifest_path' => 'https://cdn.example.com/manifest.json', 'env(env_manifest)' => 'https://cdn.example.com/manifest.json']);
+
+        // the asset mapper uses it for the assets it resolved itself, which already carry a content hash
+        $package = $container->getDefinition('assets._default_package_without_version');
+
+        $this->assertSame('assets.url_package', $package->getParent());
+        $this->assertSame(['http://cdn.example.com'], $package->getArgument(0));
+        $this->assertEquals(new Reference('assets.empty_version_strategy'), $package->getArgument(1));
+    }
+
     public function testNothingIsRegisteredWhenDisabled()
     {
         $container = $this->load(['enabled' => false]);

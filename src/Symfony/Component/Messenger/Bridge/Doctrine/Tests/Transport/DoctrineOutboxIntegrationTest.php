@@ -32,7 +32,7 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 #[RequiresPhpExtension('pdo_sqlite')]
 class DoctrineOutboxIntegrationTest extends TestCase
 {
-    private \Doctrine\DBAL\Connection $driverConnection;
+    private ?\Doctrine\DBAL\Connection $driverConnection = null;
     private DoctrineTransport $outbox;
     private InMemoryTransport $target;
     private MessageBus $bus;
@@ -74,7 +74,8 @@ class DoctrineOutboxIntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->driverConnection->close();
+        // setUp() can skip before the connection is opened
+        $this->driverConnection?->close();
     }
 
     public function testTheStoredMessageIsRolledBackWithTheBusinessTransaction()

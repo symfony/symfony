@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T10:18:53Z
+
+Rebased on 8.2, and changed the second locale of the new test from `fr` to `pt-BR`, expected as `pt_BR`. That also pins the dash to underscore rewrite in `exportFiles()`, which nothing covered and which is what makes Lokalise language codes usable as Symfony locales.

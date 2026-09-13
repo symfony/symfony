@@ -48,6 +48,7 @@ class Connection
         'exchange',
         'delay',
         'auto_setup',
+        'prefetch_count',
         'retry',
         'persistent',
         'frame_max',
@@ -96,6 +97,13 @@ class Connection
     private \AMQPExchange $amqpDelayExchange;
     private int $lastActivityTime = 0;
     private int $inFlightMessages = 0;
+    private int $prefetchCount = 0;
+    private int $appliedPrefetchCount = 0;
+
+    /**
+     * @var array<string, true>
+     */
+    private array $consumers = [];
 
     public function __construct(
         #[\SensitiveParameter] private array $connectionOptions,
@@ -120,6 +128,11 @@ class Connection
         ], $connectionOptions);
         $this->autoSetupExchange = $this->autoSetupDelayExchange = $connectionOptions['auto_setup'] ?? true;
         $this->amqpFactory = $amqpFactory ?? new AmqpFactory();
+
+        if (0 < $this->prefetchCount = max(0, (int) ($this->connectionOptions['prefetch_count'] ?? 0))) {
+            // a consumer that never returns cannot be stopped, so an unlimited read timeout is not an option here
+            $this->connectionOptions['read_timeout'] = (float) ($this->connectionOptions['read_timeout'] ?? 0) ?: 1.0;
+        }
     }
 
     /**
@@ -136,6 +149,11 @@ class Connection
      *   * write_timeout: Timeout in for outcome activity. Note: 0 or greater seconds. May be fractional.
      *   * connect_timeout: Connection timeout. Note: 0 or greater seconds. May be fractional.
      *   * confirm_timeout: Timeout in seconds for confirmation, if none specified transport will not wait for message confirmation. Note: 0 or greater seconds. May be fractional.
+     *   * prefetch_count: Number of messages the broker may push per queue ahead of the acknowledgments (Default: 0).
+     *     Any value greater than zero makes the transport consume messages instead of fetching them one by one, which
+     *     is faster but lets the broker decide in which order the queues are served. The value should be greater than
+     *     the fetch size the worker uses, and it is also how many messages a stopping worker leaves to be redelivered.
+     *     Consuming needs a bounded "read_timeout", which then defaults to 1 second.
      *   * queues[name]: An array of queues, keyed by the name
      *     * binding_keys: The binding keys (if any) to bind to this queue
      *     * binding_arguments: Arguments to be used while binding the queue.
@@ -490,6 +508,111 @@ class Connection
         return null;
     }
 
+    /**
+     * Fetches up to $fetchSize messages from the given queues, using a long lived consumer.
+     *
+     * Unlike get(), which asks the broker for one message at a time, this registers a consumer per
+     * queue and lets the broker push messages as they come. On an idle queue, the call returns once
+     * the connection read timeout expires.
+     *
+     * @return list<array{string, \AMQPEnvelope}> the queue name each message was consumed from
+     *
+     * @throws \AMQPException
+     */
+    public function consume(array $queueNames, int $fetchSize): array
+    {
+        if (!$this->prefetchCount) {
+            throw new LogicException('Consuming requires the "prefetch_count" option to be set on the transport.');
+        }
+
+        $this->clearWhenDisconnected();
+
+        if ($this->autoSetupExchange) {
+            $this->setupExchangeAndQueues();
+        }
+
+        $prefetchCount = max($this->prefetchCount, $fetchSize);
+
+        if ($prefetchCount !== $this->appliedPrefetchCount) {
+            $this->channel()->setPrefetchCount($this->appliedPrefetchCount = $prefetchCount);
+        }
+
+        $anyQueue = null;
+
+        foreach ($queueNames as $queueName) {
+            $anyQueue = $this->queue($queueName);
+
+            if (!isset($this->consumers[$queueName])) {
+                $anyQueue->consume(null, \AMQP_NOPARAM);
+                $this->consumers[$queueName] = true;
+            }
+        }
+
+        if (!$anyQueue) {
+            return [];
+        }
+
+        $messages = [];
+        $limit = 1;
+        $callback = function (\AMQPEnvelope $envelope, \AMQPQueue $queue) use (&$messages, &$limit): bool {
+            $messages[] = [$queue->getName(), $envelope];
+            ++$this->inFlightMessages;
+
+            return \count($messages) < $limit;
+        };
+
+        // Signals raised while the extension waits for messages are lost when it ends the wait by
+        // throwing, which is what it does on read timeout. Dispatching them here instead keeps
+        // workers stoppable, and costs nothing once the engine no longer drops them.
+        $asyncSignals = \function_exists('pcntl_async_signals') && pcntl_async_signals(false);
+
+        try {
+            // any queue of the channel reads every consumer of the connection, the extension routes
+            // each message back to the queue its consumer tag belongs to
+            $this->waitForMessages($anyQueue, $callback);
+
+            if ($messages && 1 < $limit = $fetchSize) {
+                // the rest of the batch is whatever the broker already pushed: filling it must not
+                // hold the messages at hand for as long as the read timeout
+                $amqpConnection = $anyQueue->getConnection();
+                $readTimeout = $amqpConnection->getReadTimeout();
+                $amqpConnection->setReadTimeout(0.001);
+
+                try {
+                    $this->waitForMessages($anyQueue, $callback);
+                } finally {
+                    $amqpConnection->setReadTimeout($readTimeout);
+                }
+            }
+        } finally {
+            $this->lastActivityTime = time();
+
+            if ($asyncSignals) {
+                pcntl_async_signals(true);
+                pcntl_signal_dispatch();
+            }
+        }
+
+        return $messages;
+    }
+
+    public function getPrefetchCount(): int
+    {
+        return $this->prefetchCount;
+    }
+
+    private function waitForMessages(\AMQPQueue $queue, callable $callback): void
+    {
+        try {
+            $queue->consume($callback, \AMQP_JUST_CONSUME);
+        } catch (\AMQPQueueException $e) {
+            // the extension reports the read timeout as an error, it is the normal end of a wait
+            if (!str_contains($e->getMessage(), 'Consumer timeout exceed')) {
+                throw $e;
+            }
+        }
+    }
+
     public function ack(\AMQPEnvelope $message, string $queueName): bool
     {
         try {
@@ -512,8 +635,8 @@ class Connection
 
     public function keepalive(): void
     {
-        // qos() with no limit changes nothing on the channel, it is sent for the traffic it generates
-        $this->channel()->qos(0, 0);
+        // qos() with the current limits changes nothing on the channel, it is sent for the traffic it generates
+        $this->channel()->qos(0, $this->appliedPrefetchCount);
         $this->lastActivityTime = time();
     }
 
@@ -643,6 +766,8 @@ class Connection
     {
         unset($this->amqpChannel, $this->amqpExchange, $this->amqpDelayExchange);
         $this->amqpQueues = [];
+        $this->consumers = [];
+        $this->appliedPrefetchCount = 0;
         $this->inFlightMessages = 0;
     }
 

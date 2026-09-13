@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\LogicException;
 
 #[RequiresPhpExtension('amqp')]
 #[Group('time-sensitive')]
@@ -261,6 +262,73 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
         $connection->publish('body');
+    }
+
+    public function testItConsumesWithALongLivedConsumerWhenPrefetchCountIsSet()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createStub(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createStub(\AMQPExchange::class)
+        );
+
+        $amqpChannel->method('isConnected')->willReturn(true);
+        $amqpChannel->expects($this->once())->method('setPrefetchCount')->with(7);
+        $amqpQueue->method('getName')->willReturn('messages');
+        $amqpQueue->method('getConnection')->willReturn($amqpConnection);
+
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $consumed = [];
+        $amqpQueue->expects($this->exactly(2))->method('consume')
+            ->willReturnCallback(static function (?callable $callback, int $flags) use ($amqpEnvelope, $amqpQueue, &$consumed) {
+                $consumed[] = $flags;
+
+                if (null !== $callback) {
+                    $callback($amqpEnvelope, $amqpQueue);
+                }
+            });
+
+        $connection = Connection::fromDsn('amqp://localhost?prefetch_count=7', [], $factory);
+
+        $this->assertSame(7, $connection->getPrefetchCount());
+        $this->assertSame([['messages', $amqpEnvelope]], $connection->consume(['messages'], 1));
+        $this->assertSame([\AMQP_NOPARAM, \AMQP_JUST_CONSUME], $consumed);
+    }
+
+    #[DataProvider('provideReadTimeouts')]
+    public function testConsumingBoundsTheReadTimeout(string $dsn, float|string|null $expectedReadTimeout)
+    {
+        $factory = new class($this->createStub(\AMQPConnection::class), $this->createStub(\AMQPChannel::class), $this->createStub(\AMQPQueue::class), $this->createStub(\AMQPExchange::class)) extends TestAmqpFactory {
+            public array $credentials = [];
+
+            public function createConnection(array $credentials): \AMQPConnection
+            {
+                $this->credentials = $credentials;
+
+                return parent::createConnection($credentials);
+            }
+        };
+
+        Connection::fromDsn($dsn, [], $factory)->channel();
+
+        $this->assertSame($expectedReadTimeout, $factory->credentials['read_timeout'] ?? null);
+    }
+
+    public static function provideReadTimeouts(): iterable
+    {
+        yield 'unbounded by default' => ['amqp://localhost', null];
+        yield 'bounded when consuming' => ['amqp://localhost?prefetch_count=7', 1.0];
+        yield 'kept when set' => ['amqp://localhost?prefetch_count=7&read_timeout=2.5', 2.5];
+        yield 'bounded when set to zero' => ['amqp://localhost?prefetch_count=7&read_timeout=0', 1.0];
+    }
+
+    public function testConsumingRequiresAPrefetchCount()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Consuming requires the "prefetch_count" option to be set on the transport.');
+
+        Connection::fromDsn('amqp://localhost')->consume(['messages'], 1);
     }
 
     public function testItAllowsToUseAPersistentConnection()

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Jose\Component\Core\JWK;
 use Symfony\Bundle\SecurityBundle\Controller\OidcLoginStartController;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
@@ -20,8 +21,10 @@ use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
 use Symfony\Component\Security\Http\EventListener\OidcEndSessionListener;
 use Symfony\Component\Security\Http\Firewall\OidcTokenRefreshListener;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretBasic;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 return static function (ContainerConfigurator $container) {
@@ -100,6 +103,33 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('client secret'),
+            ])
+
+        ->set('security.oauth2.client_authentication.client_secret_jwt', ClientSecretJwt::class)
+            ->abstract()
+            ->args([
+                abstract_arg('client secret'),
+                abstract_arg('signature algorithm'),
+                abstract_arg('assertion lifetime'),
+                service('clock'),
+            ])
+
+        ->set('security.oauth2.client_authentication.private_key_jwt', PrivateKeyJwt::class)
+            ->abstract()
+            ->args([
+                abstract_arg('client signing key'),
+                abstract_arg('signature algorithm'),
+                abstract_arg('assertion lifetime'),
+                service('clock'),
+            ])
+
+        // the private key of the "private_key_jwt" method, parsed from the JSON-encoded JWK
+        // the firewall configures, as the "oidc" access token handler parses its own keyset
+        ->set('security.oauth2.client_authentication.private_key_jwt.signing_key', JWK::class)
+            ->abstract()
+            ->factory([JWK::class, 'createFromJson'])
+            ->args([
+                abstract_arg('JSON-encoded JWK'),
             ])
 
         // the target of the routes declared for the "start_path" of each oidc_login

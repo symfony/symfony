@@ -7,6 +7,7 @@ CHANGELOG
  * Add `$projectId` constructor parameter to `CrowdinProvider`
  * Make `CrowdinProvider::read()` fetch every locale when passed none
  * Make `CrowdinProvider::read()` fetch every domain when passed none
+ * Make `CrowdinProvider::write()` add the locales missing from the project
 
 5.4
 ---

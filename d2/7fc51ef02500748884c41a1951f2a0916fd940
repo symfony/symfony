@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by tanguychenier at 2026-09-12T22:43:44Z
+
+A note on `Unit Tests (8.4, high-deps)`, since Carsonbot asks to look into failing checks. Two components fail there, and I could not tie either to this change.
+
+`SecurityBundle`, `FormLoginTest::testLoginThrottling`:
+
+```
+The "framework.lock" configuration is handled by the "lock" extension, which is not registered.
+```
+
+The same job fails the same way on the `7.4` branch itself (`b194cac1`), and on #66011 and #65953.
+
+`FrameworkBundle`, `RedirectableCompiledUrlMatcherTest::testSchemeRedirect`, where the match array now carries an extra `_scheme_redirect => true`. That key comes from #66025, merged into 8.2 on 11 September, and this job installs the 8.2-dev siblings.
+
+This pull request only touches the Console attributes and their exceptions, and `Unit Tests (8.2)`, `(8.3)`, `(8.4)`, `(8.5)`, `(8.6)`, `low-deps`, both Integration jobs, PHPStan, Psalm and Fabbot are green on the same commit.
+
+If you would rather I wait for those two to be sorted upstream before you look at this, just say so.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T10:40:26Z
+
+Rebased on 7.4 and reworked the check.
+
+Reverted the requoting of the `LogicException` messages: those are fabbot false positives, and the messages are unrelated to this fix.
+
+Swapped `filter_var()` for an `is_numeric()` gate that throws and then leaves the value alone, so PHP keeps coercing it exactly as it does today. `is_numeric()` is not an approximation here, it is precisely the set that separates working input from a `TypeError`:
+
+| input | today | `is_numeric` | `FILTER_VALIDATE_INT` |
+| --- | --- | --- | --- |
+| `07`, `007` | 7 | yes | reject |
+| `1e3` | 1000 | yes | reject |
+| `12.0` | 12 | yes | reject |
+| `0x1A`, `1_000`, `12abc`, `abc`, ``, `3,14` | TypeError | no | reject |
+
+Every value that throws a `TypeError` today for a non-numeric reason is rejected, and nothing that works today stops working, which is what a patch release needs. `FILTER_VALIDATE_INT` would have refused zero-padded integers, and `--month=07` or a zero-padded id is ordinary on a command line. `FILTER_FLAG_ALLOW_OCTAL` is not a way out, since it would read `010` as 8.
+
+@GromNaN this answers the question you raised about `007`: with this shape it stays valid.
+
+Tests now use `abc` for the rejected case, since `1.5` for an `int` is accepted today (it truncates with PHP’s own precision deprecation, which the gate leaves in place), plus a case pinning that `007` and `1e3` still convert. Both tests fail on 7.4 with the `TypeError` this PR removes.
+
+Two things left out on purpose, both pre-existing and neither the reported bug: an out-of-range value such as `9223372036854775808` still raises a `TypeError`, and `#[Argument, Ask]` on a `MapInput` property writes the answer straight to the typed property without passing through `resolveValue()`, so a bad interactive answer still raises one too.

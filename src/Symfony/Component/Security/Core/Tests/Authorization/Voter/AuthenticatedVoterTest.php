@@ -25,6 +25,10 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\Group;
 
 class AuthenticatedVoterTest extends TestCase
 {
@@ -165,7 +169,7 @@ class AuthenticatedVoterTest extends TestCase
         $token = $this->getToken('fully');
         $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, $clock->now()->getTimestamp());
 
-        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(), 900, $clock);
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900, $clock));
 
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
 
@@ -181,8 +185,8 @@ class AuthenticatedVoterTest extends TestCase
         $token = $this->getToken('fully');
         $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time() - 120);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, (new AuthenticatedVoter(new AuthenticationTrustResolver(), 300))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
-        $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter(new AuthenticationTrustResolver(), 60))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, (new AuthenticatedVoter(new AuthenticationTrustResolver(300)))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter(new AuthenticationTrustResolver(60)))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
     }
 
     public function testRecentlyAuthenticatedVoteReasons()
@@ -199,6 +203,68 @@ class AuthenticatedVoterTest extends TestCase
 
         $voter->vote($this->getToken('remembered'), null, ['IS_AUTHENTICATED_RECENTLY'], $remembered = new Vote());
         $this->assertSame(['The user is not authenticated recently enough.'], $remembered->reasons);
+    }
+
+    public function testACustomTrustResolverDecidesRecency()
+    {
+        // the token is stale by the default strategy, but this resolver trusts it anyway
+        $token = $this->getToken('fully');
+        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time() - 100000);
+
+        $trustResolver = new class extends AuthenticationTrustResolver {
+            public function isAuthenticatedRecently(?TokenInterface $token = null): bool
+            {
+                return true;
+            }
+        };
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, (new AuthenticatedVoter($trustResolver))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testATrustResolverWithoutTheMethodIsDeprecatedAndDenies()
+    {
+        $token = $this->getToken('fully');
+        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+
+        $legacyTrustResolver = new class implements AuthenticationTrustResolverInterface {
+            public function isAuthenticated(?TokenInterface $token = null): bool
+            {
+                return (bool) $token?->getUser();
+            }
+
+            public function isRememberMe(?TokenInterface $token = null): bool
+            {
+                return false;
+            }
+
+            public function isFullFledged(?TokenInterface $token = null): bool
+            {
+                return $this->isAuthenticated($token);
+            }
+        };
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/security-core 8.2: Not implementing "%s::isAuthenticatedRecently()" is deprecated, the method will be added to the interface in 9.0; "IS_AUTHENTICATED_RECENTLY" is denied until then.', $legacyTrustResolver::class));
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter($legacyTrustResolver))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
+    }
+
+    public function testACustomTrustResolverCannotGrantOnARememberedToken()
+    {
+        // the invariant belongs to the attribute, so the voter enforces it whatever
+        // strategy the trust resolver implements
+        $token = $this->getToken('remembered');
+        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+
+        $trustResolver = new class extends AuthenticationTrustResolver {
+            public function isAuthenticatedRecently(?TokenInterface $token = null): bool
+            {
+                return true;
+            }
+        };
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter($trustResolver))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
     }
 
     #[DataProvider('provideDenialReasons')]

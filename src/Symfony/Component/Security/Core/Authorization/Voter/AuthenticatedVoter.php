@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
-use Psr\Clock\ClockInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\OfflineTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
@@ -54,14 +53,8 @@ class AuthenticatedVoter implements CacheableVoterInterface
         self::IS_REMEMBERED => 'The user is not remembered.',
     ];
 
-    /**
-     * @param int $recentAuthenticationLifetime Number of seconds during which an interactive
-     *                                          authentication grants IS_AUTHENTICATED_RECENTLY
-     */
     public function __construct(
         private AuthenticationTrustResolverInterface $authenticationTrustResolver,
-        private int $recentAuthenticationLifetime = 900,
-        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -90,10 +83,12 @@ class AuthenticatedVoter implements CacheableVoterInterface
 
             $result = VoterInterface::ACCESS_DENIED;
 
+            // being full fledged is an invariant of the attribute, not part of the strategy:
+            // a remember-me cookie is precisely not proof that the user still holds the
+            // credentials, so no custom trust resolver gets to grant on one
             if (self::IS_AUTHENTICATED_RECENTLY === $attribute
                 && $this->authenticationTrustResolver->isFullFledged($token)
-                && $token->hasAttribute(self::AUTH_TIME_ATTRIBUTE)
-                && ($this->clock?->now()->getTimestamp() ?? time()) - $token->getAttribute(self::AUTH_TIME_ATTRIBUTE) <= $this->recentAuthenticationLifetime
+                && $this->isAuthenticatedRecently($token)
             ) {
                 $vote?->addReason('The user authenticated recently.');
 
@@ -146,6 +141,17 @@ class AuthenticatedVoter implements CacheableVoterInterface
         }
 
         return $result;
+    }
+
+    private function isAuthenticatedRecently(TokenInterface $token): bool
+    {
+        if (!method_exists($this->authenticationTrustResolver, 'isAuthenticatedRecently')) {
+            trigger_deprecation('symfony/security-core', '8.2', 'Not implementing "%s::isAuthenticatedRecently()" is deprecated, the method will be added to the interface in 9.0; "IS_AUTHENTICATED_RECENTLY" is denied until then.', \get_class($this->authenticationTrustResolver));
+
+            return false;
+        }
+
+        return $this->authenticationTrustResolver->isAuthenticatedRecently($token);
     }
 
     public function supportsAttribute(string $attribute): bool

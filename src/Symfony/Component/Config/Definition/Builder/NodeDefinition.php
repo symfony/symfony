@@ -134,6 +134,20 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
+     * Replaces the env vars referenced by this node with their value instead of passing along placeholders.
+     *
+     * Use it when the value is needed while the configuration is processed, for example to decide
+     * which services to register. The env vars are read once, so the container must be rebuilt when
+     * their value changes.
+     *
+     * @return $this
+     */
+    public function inlineEnvVars(bool $inlineEnvVars = true): static
+    {
+        return $this->attribute('inline_env_vars', $inlineEnvVars);
+    }
+
+    /**
      * Sets an attribute on the node.
      *
      * @return $this

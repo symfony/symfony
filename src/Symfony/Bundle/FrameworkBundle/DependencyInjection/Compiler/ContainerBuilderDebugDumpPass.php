@@ -35,9 +35,40 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
             return;
         }
 
+        $bag = $container->getParameterBag();
+        $envVars = array_keys($container->getEnvCounters());
+        $dump = $dumpParameters = null;
+        $readAtRuntime = null;
+
+        try {
+            $dump = new ContainerBuilder($bag);
+            $dump->setDefinitions($container->getDefinitions());
+            $dump->setAliases($container->getAliases());
+
+            if ($bag instanceof EnvPlaceholderParameterBag) {
+                $dump = DeepCloner::deepClone($dump);
+                (new ResolveEnvPlaceholdersPass(null))->process($dump);
+
+                // resolving the placeholders of a copy reports the variables the container still
+                // reads when it runs, which the bag cannot tell: it counts a variable as read when
+                // the processed configuration holds it, even when no definition does
+                $usedInParameters = [];
+                $dumpParameters = $container->resolveEnvPlaceholders($this->escapeParameters($bag->all()), null, $usedInParameters);
+                $readAtRuntime = array_unique(array_merge(array_keys(array_filter($dump->getEnvCounters())), array_keys($usedInParameters)));
+            }
+        } catch (\Throwable $e) {
+            $container->getCompiler()->log($this, $e->getMessage());
+            $dump = null;
+        }
+
         // the compiler knows which variables are referenced; the dumps below cannot be asked,
         // since the serialized one has its placeholders already resolved
-        $container->setParameter('.debug.container.env_vars', array_keys($container->getEnvCounters()));
+        $container->setParameter('.debug.container.env_vars', $envVars);
+
+        // the ones nothing reads at runtime were read while the container was compiled, so a new
+        // value only applies once it is rebuilt
+        $readAtRuntime ??= $bag instanceof EnvPlaceholderParameterBag ? array_keys($bag->getEnvPlaceholders()) : $envVars;
+        $container->setParameter('.debug.container.inlined_env_vars', array_values(array_diff($envVars, $readAtRuntime)));
 
         $file = $container->getParameter('debug.container.dump');
         $cache = new ConfigCache($file, true);
@@ -46,22 +77,15 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
         }
         $cache->write((new XmlDumper($container))->dump(), $container->getResources());
 
-        if (!str_ends_with($file, '.xml')) {
+        if (!str_ends_with($file, '.xml') || null === $dump) {
             return;
         }
 
         $file = substr_replace($file, '.ser', -4);
 
         try {
-            $bag = $container->getParameterBag();
-            $dump = new ContainerBuilder($bag);
-            $dump->setDefinitions($container->getDefinitions());
-            $dump->setAliases($container->getAliases());
-
-            if ($bag instanceof EnvPlaceholderParameterBag) {
-                $dump = DeepCloner::deepClone($dump);
-                (new ResolveEnvPlaceholdersPass(null))->process($dump);
-                $dump->__construct(new EnvPlaceholderParameterBag($container->resolveEnvPlaceholders($this->escapeParameters($bag->all()))));
+            if (null !== $dumpParameters) {
+                $dump->__construct(new EnvPlaceholderParameterBag($dumpParameters));
             }
 
             $fs = new Filesystem();

@@ -4,6 +4,11 @@ imports:
 parameters:
     env(JSON): '[1, "2.5", 3]'
     env(APP_FOO): 'foo'
+    env(FORM_ENABLED): 'true'
+
+framework:
+    form:
+        enabled: '%env(bool:FORM_ENABLED)%'
 
 services:
     _defaults: { public: true }

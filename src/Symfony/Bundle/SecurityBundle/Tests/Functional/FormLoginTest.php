@@ -54,10 +54,10 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertGreaterThanOrEqual(time() - 60, $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
         $this->assertTrue(static::getContainer()->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_RECENTLY'));
 
-        // the optional clock must actually be injected, otherwise both services
-        // silently fall back to time() and the wiring could rot unnoticed
-        $voter = static::getContainer()->get('security.access.authenticated_voter');
-        $this->assertInstanceOf(ClockInterface::class, (new \ReflectionProperty($voter, 'clock'))->getValue($voter));
+        // the optional clock must actually be injected, otherwise the strategy silently
+        // falls back to time() and the wiring could rot unnoticed
+        $trustResolver = static::getContainer()->get('security.authentication.trust_resolver');
+        $this->assertInstanceOf(ClockInterface::class, (new \ReflectionProperty($trustResolver, 'clock'))->getValue($trustResolver));
     }
 
     #[DataProvider('provideClientOptions')]

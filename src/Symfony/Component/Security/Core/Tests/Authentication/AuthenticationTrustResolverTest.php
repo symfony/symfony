@@ -12,9 +12,12 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -28,6 +31,55 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertFalse($resolver->isRememberMe(new FakeCustomToken()));
         $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
         $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
+    }
+
+    public function testIsAuthenticatedRecently()
+    {
+        $clock = new MockClock('2026-09-13 12:00:00');
+        $resolver = new AuthenticationTrustResolver(900, $clock);
+
+        $this->assertFalse($resolver->isAuthenticatedRecently(null));
+
+        // a token that never went through an interactive login carries no stamp
+        $this->assertFalse($resolver->isAuthenticatedRecently($this->getUsernamePasswordToken()));
+
+        $fresh = $this->getUsernamePasswordToken();
+        $fresh->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, $clock->now()->getTimestamp());
+        $this->assertTrue($resolver->isAuthenticatedRecently($fresh));
+
+        $clock->sleep(900);
+        $this->assertTrue($resolver->isAuthenticatedRecently($fresh));
+        $clock->sleep(1);
+        $this->assertFalse($resolver->isAuthenticatedRecently($fresh));
+    }
+
+    private function getUsernamePasswordToken(): UsernamePasswordToken
+    {
+        return new UsernamePasswordToken(new InMemoryUser('wouter', 'password', ['ROLE_USER']), 'main', ['ROLE_USER']);
+    }
+
+    public function testIsAuthenticatedRecentlyHandlesANullTokenWhateverIsFullFledgedSays()
+    {
+        // the default isFullFledged() keeps null out, but nothing guarantees an
+        // override does, and reaching hasAttribute() on null would be fatal
+        $resolver = new class extends AuthenticationTrustResolver {
+            public function isFullFledged(?TokenInterface $token = null): bool
+            {
+                return true;
+            }
+        };
+
+        $this->assertFalse($resolver->isAuthenticatedRecently(null));
+    }
+
+    public function testRememberMeIsNeverAuthenticatedRecently()
+    {
+        $resolver = new AuthenticationTrustResolver();
+
+        $token = $this->getRememberMeToken();
+        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+
+        $this->assertFalse($resolver->isAuthenticatedRecently($token));
     }
 
     public function testisFullFledged()

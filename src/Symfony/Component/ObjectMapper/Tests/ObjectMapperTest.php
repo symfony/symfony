@@ -29,6 +29,10 @@ use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\NestedEntity;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\NestedEntityResource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\ParentEntity;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\ParentEntityResource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Amount;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedFlatTarget;
@@ -92,6 +96,17 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\TargetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\User;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\UserProfile;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\HydrateObject\SourceOnly;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\AbstractTagDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\AbstractTagHolder;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\AmbiguousTagHolder;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\AmbiguousTagHolderWithPrivateProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\InterfaceTagHolder;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\Person;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\PersonDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\PropertyOnlyMetadataFactory;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\Tag as InferredTag;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\TagDtoInterface;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\TagHolder;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\A as InitializedConstructorA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\B as InitializedConstructorB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\C as InitializedConstructorC;
@@ -1358,6 +1373,74 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertInstanceOf(Dog::class, $target->pet);
         $this->assertSame('rex', $target->pet->name);
+    }
+
+    public function testNestedObjectIsMappedFromTheClassTypingTheDestinationProperty()
+    {
+        $mapped = (new ObjectMapper())->map(new ParentEntity('Laptop', new NestedEntity('Electronics')), ParentEntityResource::class);
+
+        $this->assertSame('Laptop', $mapped->name);
+        $this->assertInstanceOf(NestedEntityResource::class, $mapped->nested);
+        $this->assertSame('Electronics', $mapped->nested->name);
+    }
+
+    public function testAMetadataFactoryReportingNoClassMappingIsNotOverruled()
+    {
+        $mapper = new ObjectMapper(new PropertyOnlyMetadataFactory());
+
+        $this->expectException(\TypeError::class);
+
+        $mapper->map(new ParentEntity('Laptop', new NestedEntity('Electronics')), ParentEntityResource::class);
+    }
+
+    public function testNestedObjectIsLeftAloneWhenTheDestinationPropertyIsNotPublic()
+    {
+        $mapped = (new ObjectMapper())->map(new TagHolder(), AmbiguousTagHolderWithPrivateProperty::class);
+
+        $this->assertNull($mapped->getTag());
+    }
+
+    public function testDestinationPropertyTypeMatchingSeveralSourcesIsAmbiguous()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(\sprintf('Ambiguous mapping for "%s".', InferredTag::class));
+
+        (new ObjectMapper())->map(new TagHolder(), AmbiguousTagHolder::class);
+    }
+
+    public function testDestinationPropertyTypedWithAnAbstractClassIsRefused()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot infer a mapping target for "%s" from property "%s::$tag": class "%s" is not instantiable.', InferredTag::class, AbstractTagHolder::class, AbstractTagDto::class));
+
+        (new ObjectMapper())->map(new TagHolder(), AbstractTagHolder::class);
+    }
+
+    public function testDestinationPropertyTypedWithAnInterfaceIsRefused()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot infer a mapping target for "%s" from property "%s::$tag": class "%s" is not instantiable.', InferredTag::class, InterfaceTagHolder::class, TagDtoInterface::class));
+
+        (new ObjectMapper())->map(new TagHolder(), InterfaceTagHolder::class);
+    }
+
+    public function testNullNestedValueIsKept()
+    {
+        $mapped = (new ObjectMapper())->map(new Person(), PersonDto::class);
+
+        $this->assertSame('alice', $mapped->name);
+        $this->assertNull($mapped->friend);
+    }
+
+    public function testSelfReferencingNestedObjectIsMappedIntoTheSameTarget()
+    {
+        $person = new Person();
+        $person->friend = $person;
+
+        $mapped = (new ObjectMapper())->map($person, PersonDto::class);
+
+        $this->assertSame('alice', $mapped->name);
+        $this->assertSame($mapped, $mapped->friend);
     }
 
     public function testExplicitMappingTakesPriorityOverImplicitSameNameProperty()

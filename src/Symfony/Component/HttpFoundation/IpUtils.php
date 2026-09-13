@@ -234,9 +234,9 @@ class IpUtils
         $packedAddress = inet_pton($ip);
         if (4 === \strlen($packedAddress)) {
             $mask = rtrim(str_repeat('255.', 4 - $v4Bytes).str_repeat('0.', $v4Bytes), '.');
-        } elseif ($ip === inet_ntop($packedAddress & inet_pton('::ffff:ffff:ffff'))) {
+        } elseif (str_starts_with($packedAddress, str_repeat("\0", 10)."\xff\xff")) {
             $mask = $mappedIpV4MaskGenerator('ffff', $v4Bytes);
-        } elseif ($ip === inet_ntop($packedAddress & inet_pton('::ffff:ffff'))) {
+        } elseif (str_starts_with($packedAddress, str_repeat("\0", 12))) {
             $mask = $mappedIpV4MaskGenerator('', $v4Bytes);
         } else {
             $mask = str_repeat('ff', 16 - $v6Bytes).str_repeat('00', $v6Bytes);

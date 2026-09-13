@@ -1,0 +1,27 @@
+{
+    "class": "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\ExtendedChildType",
+    "block_prefix": "extended_child",
+    "options": {
+        "own": [
+            "child_option"
+        ],
+        "overridden": [],
+        "parent": {
+            "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\ExtendedParentType": [
+                "parent_option"
+            ]
+        },
+        "extension": {
+            "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\SharedTypeExtension": [
+                "shared_extension_option"
+            ]
+        },
+        "required": []
+    },
+    "parent_types": [
+        "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\ExtendedParentType"
+    ],
+    "type_extensions": [
+        "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\SharedTypeExtension"
+    ]
+}

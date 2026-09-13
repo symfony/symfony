@@ -156,8 +156,15 @@ class AddSessionDomainConstraintPassTest extends TestCase
             ],
         ];
 
+        $routerConfig = ['resource' => 'dummy', 'utf8' => true];
+
         $ext = new FrameworkExtension();
-        $ext->load(['framework' => ['http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true], 'csrf_protection' => false, 'router' => ['resource' => 'dummy', 'utf8' => true]]], $container);
+        $ext->load(['framework' => ['http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true], 'csrf_protection' => false, 'router' => $routerConfig]], $container);
+
+        // symfony/routing >= 8.2 owns the router, which FrameworkBundle no longer registers
+        if (class_exists($routerBundle = 'Symfony\Component\Routing\RouterBundle')) {
+            (new $routerBundle())->getContainerExtension()->load([$routerConfig], $container);
+        }
 
         $ext = new SecurityExtension();
         $ext->load($config, $container);

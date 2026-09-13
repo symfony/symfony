@@ -55,8 +55,8 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
@@ -3053,6 +3053,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals('webhook.payload_serializer.json', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
     }
 
+    public function testAssetsPackageWithoutVersionKeepsTheBaseUrls()
+    {
+        $container = $this->createContainerFromFile('assets');
+
+        $package = $container->getDefinition('assets._default_package_without_version');
+
+        $this->assertSame('assets.url_package', $package->getParent());
+        $this->assertSame(['http://cdn.example.com'], $package->getArgument(0));
+        $this->assertEquals(new Reference('assets.empty_version_strategy'), $package->getArgument(1));
+    }
+
     public function testAssetMapperWithoutAssets()
     {
         $container = $this->createContainerFromFile('asset_mapper_without_assets');
@@ -3083,6 +3094,29 @@ abstract class FrameworkExtensionTestCase extends TestCase
         });
 
         $this->assertSame($expectedPrefix, $container->getDefinition('asset_mapper.asset_package')->getArgument(3));
+    }
+
+    public function testAssetMapperAssetPackageSkipsTheVersionOfMappedAssets()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'assets' => null,
+                'asset_mapper' => [
+                    'server' => false,
+                    'public_prefix' => '/assets_path/',
+                    'paths' => ['assets/'],
+                ],
+            ]);
+        });
+
+        $definition = $container->getDefinition('asset_mapper.asset_package');
+
+        $this->assertEquals(new Reference('assets._default_package_without_version', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(4));
+        // unlike the dev server prefix, this one is passed whether the server runs or not
+        $this->assertSame('/assets_path/', $definition->getArgument(5));
     }
 
     public function testTranslatorDefaultPathContainingAPercentSign()

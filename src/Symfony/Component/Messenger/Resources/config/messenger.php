@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
+use Symfony\Component\Messenger\EventListener\DispatchOnFailureListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
 use Symfony\Component\Messenger\EventListener\ReleaseDeduplicationLockOnFailureListener;
 use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
@@ -31,9 +32,11 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
+use Symfony\Component\Messenger\Middleware\ChainMiddleware;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
+use Symfony\Component\Messenger\Middleware\DispatchOnFailureMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
@@ -130,6 +133,18 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
 
         ->set('messenger.middleware.dispatch_after_current_bus', DispatchAfterCurrentBusMiddleware::class)
+
+        ->set('messenger.middleware.chain', ChainMiddleware::class)
+            ->args([
+                service('messenger.routable_message_bus'),
+            ])
+
+        ->set('messenger.middleware.dispatch_on_failure', DispatchOnFailureMiddleware::class)
+            ->args([
+                service('messenger.routable_message_bus'),
+                service('logger')->ignoreOnInvalid(),
+            ])
+            ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.middleware.validation', ValidationMiddleware::class)
             ->args([
@@ -258,6 +273,14 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('failure transports'),
                 service('logger')->ignoreOnInvalid(),
                 abstract_arg('failure transports by name'),
+            ])
+            ->tag('kernel.event_subscriber')
+            ->tag('monolog.logger', ['channel' => 'messenger'])
+
+        ->set('messenger.failure.dispatch_on_failure_listener', DispatchOnFailureListener::class)
+            ->args([
+                service('messenger.routable_message_bus'),
+                service('logger')->ignoreOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])

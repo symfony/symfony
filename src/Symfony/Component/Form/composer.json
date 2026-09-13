@@ -24,8 +24,9 @@
         "symfony/polyfill-intl-icu": "^1.21",
         "symfony/polyfill-mbstring": "^1.0",
         "symfony/property-access": "^7.4|^8.0",
-        "symfony/property-info": "^7.4|^8.0",
+        "symfony/property-info": "^8.2",
         "symfony/service-contracts": "^2.5|^3",
+        "symfony/type-info": "^7.4.7|^8.0.7",
         "symfony/var-exporter": "^8.1"
     },
     "require-dev": {

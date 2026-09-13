@@ -59,6 +59,8 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\WithAccessors\DivergingTypes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\WithAccessors\InvalidMapping;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\WithAccessors\JustAdderAndRemover;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\WithAccessors\JustGetterOrSetter;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\WriteTypeDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\WriteTypeMagicDummy;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -810,6 +812,38 @@ class ReflectionExtractorTest extends TestCase
         $this->expectExceptionMessage('Invalid #[WithAccessors] mapping on property "prop" of class');
 
         $extractor->isReadable(InvalidMapping::class, 'prop');
+    }
+
+    #[DataProvider('provideWriteTargetTypes')]
+    public function testGetTypeFromWriteTarget(string $class, string $property, ?Type $expected, array $context = [])
+    {
+        $this->assertEquals($expected, $this->extractor->getTypeFromWriteTarget($class, $property, $context));
+    }
+
+    public static function provideWriteTargetTypes(): iterable
+    {
+        yield 'setter over the property' => [WriteTypeDummy::class, 'setterWins', Type::string()];
+        yield 'nullable setter over a non-nullable property' => [WriteTypeDummy::class, 'nullableSetter', Type::nullable(Type::string())];
+        yield 'property without a setter' => [WriteTypeDummy::class, 'propertyOnly', Type::int()];
+        yield 'set hook' => [WriteTypeDummy::class, 'hooked', Type::nullable(Type::string())];
+        yield 'getter only' => [WriteTypeDummy::class, 'getterOnly', Type::nullable(Type::string())];
+        yield 'constructor argument' => [WriteTypeDummy::class, 'constructed', Type::nullable(Type::int())];
+        yield 'constructor argument with constructor extraction enabled' => [WriteTypeDummy::class, 'constructed', Type::nullable(Type::int()), ['enable_constructor_extraction' => true]];
+        yield 'adder and remover with a public property' => [WriteTypeDummy::class, 'items', Type::array()];
+        yield 'adder and remover extraction enabled' => [WriteTypeDummy::class, 'items', null, ['enable_adder_remover_extraction' => true]];
+        yield 'setter named by the attribute' => [WriteTypeDummy::class, 'named', Type::nullable(Type::string())];
+        yield 'private(set) property' => [WriteTypeDummy::class, 'privateSet', null];
+        yield 'protected(set) property' => [WriteTypeDummy::class, 'protectedSet', null];
+        yield 'virtual property without a set hook' => [WriteTypeDummy::class, 'virtual', null];
+        yield 'readonly property' => [WriteTypeDummy::class, 'readonly', null];
+        yield 'non-public setter' => [WriteTypeDummy::class, 'privateSetter', null];
+        yield 'private property' => [WriteTypeDummy::class, 'plainPrivate', null];
+        yield 'magic __set' => [WriteTypeMagicDummy::class, 'anything', null];
+        yield 'private property behind a magic __set' => [WriteTypeMagicDummy::class, 'shadowed', null];
+        yield 'magic __call' => [WriteTypeMagicDummy::class, 'anything', null, ['enable_magic_methods_extraction' => ReflectionExtractor::ALLOW_MAGIC_CALL]];
+        yield 'private setter behind a magic __call' => [WriteTypeMagicDummy::class, 'guarded', null, ['enable_magic_methods_extraction' => ReflectionExtractor::ALLOW_MAGIC_CALL]];
+        yield 'unknown property' => [WriteTypeDummy::class, 'unknown', null];
+        yield 'unknown class' => ['Symfony\Component\PropertyInfo\Tests\Fixtures\DoesNotExist', 'foo', null];
     }
 
     public function testGetWriteInfoReadonlyProperties()

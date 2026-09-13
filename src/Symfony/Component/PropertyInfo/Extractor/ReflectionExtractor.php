@@ -283,6 +283,55 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         }
     }
 
+    /**
+     * Gets the type of the target that getWriteInfo() resolves for the same $context: the first parameter
+     * of a mutator method, or the property itself, through the parameter of its "set" hook when it has one.
+     *
+     * "enable_getter_setter_extraction" defaults to true and "enable_adder_remover_extraction" to false; an adder
+     * and remover pair yields null. A constructor is not a write target, so "enable_constructor_extraction" has no effect.
+     *
+     * @return Type|null The type, or null when there is no publicly writable target or when it declares no type
+     */
+    public function getTypeFromWriteTarget(string $class, string $property, array $context = []): ?Type
+    {
+        $context['enable_getter_setter_extraction'] ??= true;
+        $context['enable_adder_remover_extraction'] ??= false;
+        $context['enable_constructor_extraction'] = false;
+
+        $writeInfo = $this->getWriteInfo($class, $property, $context);
+
+        if (null === $writeInfo || !\in_array($writeInfo->getType(), [PropertyWriteInfo::TYPE_METHOD, PropertyWriteInfo::TYPE_PROPERTY], true) || PropertyWriteInfo::VISIBILITY_PUBLIC !== $writeInfo->getVisibility()) {
+            return null;
+        }
+
+        $refClass = new \ReflectionClass($class);
+        $name = $writeInfo->getName();
+
+        if (PropertyWriteInfo::TYPE_METHOD === $writeInfo->getType()) {
+            // the named method is missing or not callable with one argument when the write goes through __call()
+            if (!$this->isMethodAccessible($refClass, $name, 1)[0]) {
+                return null;
+            }
+
+            $target = $refClass->getMethod($name)->getParameters()[0];
+        } else {
+            // the named property is missing or not allowed when the write goes through __set()
+            if (!$refClass->hasProperty($name) || !(($target = $refClass->getProperty($name))->getModifiers() & $this->propertyReflectionFlags)) {
+                return null;
+            }
+
+            if ($writeInfo->hasHook()) {
+                $target = $target->getHook(\PropertyHookType::Set)->getParameters()[0];
+            }
+        }
+
+        try {
+            return $this->typeResolver->resolve($target);
+        } catch (UnsupportedException) {
+            return null;
+        }
+    }
+
     private function getReflectionParameterFromConstructor(string $property, \ReflectionMethod $reflectionConstructor): ?\ReflectionParameter
     {
         foreach ($reflectionConstructor->getParameters() as $reflectionParameter) {

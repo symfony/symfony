@@ -23,11 +23,12 @@ use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\Flow\FormFlowTypeInterface;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyWriteInfo;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class FormFactory implements FormFactoryInterface
 {
-    private ?ReflectionExtractor $writeInfoExtractor = null;
+    private ?ReflectionExtractor $reflectionExtractor = null;
 
     public function __construct(
         private FormRegistryInterface $registry,
@@ -149,16 +150,16 @@ class FormFactory implements FormFactoryInterface
             return $options;
         }
 
-        $writeTargetType = $this->getWriteTargetType($class, $property);
+        $writeTargetType = ($this->reflectionExtractor ??= new ReflectionExtractor())->getTypeFromWriteTarget($class, $property);
 
-        if (!$writeTargetType instanceof \ReflectionNamedType || $writeTargetType->allowsNull()) {
+        if (!$writeTargetType instanceof BuiltinType || $writeTargetType->isNullable()) {
             return $options;
         }
 
-        $emptyData = match ($writeTargetType->getName()) {
-            'string' => '',
-            'int', 'float' => '0',
-            'bool' => false,
+        $emptyData = match ($writeTargetType->getTypeIdentifier()) {
+            TypeIdentifier::STRING => '',
+            TypeIdentifier::INT, TypeIdentifier::FLOAT => '0',
+            TypeIdentifier::BOOL => false,
             default => null,
         };
 
@@ -167,49 +168,6 @@ class FormFactory implements FormFactoryInterface
         }
 
         return $options;
-    }
-
-    /**
-     * Resolves the type of the target that PropertyAccessor writes the mapped value to.
-     *
-     * Only a publicly writable mutator method or property is a write target. The type of an accessor
-     * or of a constructor argument says nothing about what the value is written through.
-     */
-    private function getWriteTargetType(string $class, string $property): ?\ReflectionType
-    {
-        $this->writeInfoExtractor ??= new ReflectionExtractor();
-
-        $writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $property, [
-            'enable_getter_setter_extraction' => true,
-            'enable_constructor_extraction' => false,
-            'enable_adder_remover_extraction' => false,
-        ]);
-
-        if (null === $writeInfo) {
-            return null;
-        }
-
-        try {
-            // PropertyWriteInfo names the target without describing it, so the target is reflected here
-            $target = match ($writeInfo->getType()) {
-                PropertyWriteInfo::TYPE_METHOD => (new \ReflectionMethod($class, $writeInfo->getName()))->getParameters()[0] ?? null,
-                PropertyWriteInfo::TYPE_PROPERTY => new \ReflectionProperty($class, $writeInfo->getName()),
-                default => null,
-            };
-        } catch (\ReflectionException) {
-            return null;
-        }
-
-        // the visibility is carried by the write info only, the target does not tell whether it can be written to
-        if (null === $target || PropertyWriteInfo::VISIBILITY_PUBLIC !== $writeInfo->getVisibility()) {
-            return null;
-        }
-
-        if ($target instanceof \ReflectionProperty) {
-            $target = $target->getHook(\PropertyHookType::Set)?->getParameters()[0] ?? $target;
-        }
-
-        return $target->getType();
     }
 
     /**

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `ReflectionExtractor::getTypeFromWriteTarget()` to get the type of the target a property is written through
  * Add `PropertyInfoBundle`, which provides the `property_info` configuration and the services previously provided by `FrameworkBundle` under `framework.property_info`
  * Allow defining accessors and mutators via a `#[WithAccessors]` attribute
  * Gather data from property hooks in ReflectionExtractor

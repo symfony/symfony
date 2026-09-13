@@ -31,6 +31,7 @@ use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\DependencyInjection\RemoveMissingDependenciesPass;
+use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
@@ -615,11 +616,16 @@ class MessengerBundle extends AbstractBundle
                     ->replaceArgument(0, $config['failure_transport']);
             }
 
+            $container->getDefinition('messenger.failed_message_repository')
+                ->replaceArgument(1, $config['failure_transport']);
+
             $failureTransportsByTransportNameServiceLocator = ServiceLocatorTagPass::register($container, $failureTransportReferencesByTransportName);
             $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
                 ->replaceArgument(0, $failureTransportsByTransportNameServiceLocator)
                 ->replaceArgument(2, $failureTransportsByName);
         } else {
+            $container->removeDefinition('messenger.failed_message_repository');
+            $container->removeAlias(FailedMessageRepository::class);
             $container->removeDefinition('messenger.failure.send_failed_message_to_failure_transport_listener');
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');

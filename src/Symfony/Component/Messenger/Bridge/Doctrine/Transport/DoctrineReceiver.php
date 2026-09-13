@@ -42,6 +42,12 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
 
     public function get(): iterable
     {
+        // Signals that reach the process while the driver waits on the database are dropped by
+        // the engine when that wait ends by throwing, which is what a lock timeout does. Holding
+        // them here and dispatching them once the call is over keeps the keepalive alarm armed,
+        // since it is rescheduled by its own handler, and keeps workers stoppable.
+        $asyncSignals = \function_exists('pcntl_async_signals') && pcntl_async_signals(false);
+
         try {
             $doctrineEnvelope = $this->connection->get();
             $this->retryingSafetyCounter = 0; // reset counter
@@ -57,6 +63,11 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
             return [];
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
+        } finally {
+            if ($asyncSignals) {
+                pcntl_async_signals(true);
+                pcntl_signal_dispatch();
+            }
         }
 
         if (null === $doctrineEnvelope) {

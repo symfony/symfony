@@ -31,12 +31,14 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
+use Symfony\Component\Messenger\Middleware\AddIdentityStampsMiddleware;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
+use Symfony\Component\Messenger\Middleware\PropagateStampsMiddleware;
 use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
@@ -54,6 +56,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\String\LazyString;
+use Symfony\Component\Uid\Uuid;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -128,6 +131,17 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.middleware.add_bus_name_stamp_middleware', AddBusNameStampMiddleware::class)
             ->abstract()
+
+        ->set('messenger.message_id_generator', \Closure::class)
+            ->factory([\Closure::class, 'fromCallable'])
+            ->args([[Uuid::class, 'v7']])
+
+        ->set('messenger.middleware.add_identity_stamps', AddIdentityStampsMiddleware::class)
+            ->args([
+                service('messenger.message_id_generator'),
+            ])
+
+        ->set('messenger.middleware.propagate_stamps', PropagateStampsMiddleware::class)
 
         ->set('messenger.middleware.dispatch_after_current_bus', DispatchAfterCurrentBusMiddleware::class)
 

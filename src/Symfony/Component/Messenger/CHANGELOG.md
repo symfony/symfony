@@ -21,6 +21,13 @@ CHANGELOG
  * Add a `transport` option to `#[AsMessageHandler]` and to the `messenger.message_handler` tag to route the handled messages to that transport and bind the handler to it
  * Add `OutboxStamp` and `OutboxSender` to store messages in an outbox transport and forward them to their target transport when the outbox is consumed
  * Add the `outbox` option to transports
+ * Add `PropagatedStampInterface` to mark stamps that are copied onto the messages dispatched while handling the message carrying them
+ * Add `PropagateStampsMiddleware` to copy the propagated stamps of the message being handled onto nested dispatches
+ * Allow handler methods to declare arguments typed with `Envelope` or with a stamp class after the message argument
+ * Add `CorrelationStamp` to tie together the messages of one flow
+ * Add `MessageIdStamp` and `CausationStamp` to identify a message and the message whose handling caused it
+ * Add `AddIdentityStampsMiddleware` to add these identity stamps to the dispatched messages
+ * Add the `messenger.identity_stamps` option to enable `AddIdentityStampsMiddleware` on every bus
 
 8.1
 ---

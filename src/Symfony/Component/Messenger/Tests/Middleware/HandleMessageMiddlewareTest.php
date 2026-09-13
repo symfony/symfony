@@ -32,6 +32,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
+use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class HandleMessageMiddlewareTest extends MiddlewareTestCase
@@ -441,6 +442,141 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $handler->expects($this->once())->method('__invoke')->with($message, 'additional named argument');
 
         $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testEnvelopeArgument()
+    {
+        $envelope = new Envelope(new DummyMessage('Hey'));
+        $received = null;
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [static function (DummyMessage $message, Envelope $envelope) use (&$received) {
+                $received = $envelope;
+            }],
+        ]));
+
+        $middleware->handle($envelope, $this->getStackMock());
+
+        $this->assertSame($envelope, $received);
+    }
+
+    public function testStampArgument()
+    {
+        $stamp = new AnEnvelopeStamp();
+        $received = null;
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [static function (DummyMessage $message, AnEnvelopeStamp $stamp) use (&$received) {
+                $received = $stamp;
+            }],
+        ]));
+
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AnEnvelopeStamp(), $stamp]), $this->getStackMock());
+
+        $this->assertSame($stamp, $received);
+    }
+
+    public function testNullableStampArgumentIsNullWhenTheStampIsMissing()
+    {
+        $received = false;
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [static function (DummyMessage $message, ?AnEnvelopeStamp $stamp) use (&$received) {
+                $received = $stamp;
+            }],
+        ]));
+
+        $middleware->handle(new Envelope(new DummyMessage('Hey')), $this->getStackMock());
+
+        $this->assertNull($received);
+    }
+
+    public function testTheDefaultValueOfAStampArgumentAppliesWhenTheStampIsMissing()
+    {
+        $received = null;
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [static function (DummyMessage $message, AnEnvelopeStamp $stamp = new AnEnvelopeStamp()) use (&$received) {
+                $received = $stamp;
+            }],
+        ]));
+
+        $middleware->handle(new Envelope(new DummyMessage('Hey')), $this->getStackMock());
+
+        $this->assertInstanceOf(AnEnvelopeStamp::class, $received);
+    }
+
+    public function testAMissingRequiredStampArgumentThrows()
+    {
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [static function (DummyMessage $message, AnEnvelopeStamp $stamp) {}],
+        ]));
+
+        try {
+            $middleware->handle(new Envelope(new DummyMessage('Hey')), $this->getStackMock(false));
+        } catch (HandlerFailedException $e) {
+            $this->assertCount(1, $e->getWrappedExceptions());
+            $this->assertInstanceOf(LogicException::class, $e->getWrappedExceptions()['Closure']);
+            $this->assertSame('Handler "Closure" requires a "Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp" stamp for argument "$stamp", but the envelope carries none.', $e->getWrappedExceptions()['Closure']->getMessage());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
+    public function testBatchHandlerStampArgument()
+    {
+        $handler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public array $stamps = [];
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null, ?AnEnvelopeStamp $stamp = null)
+            {
+                $this->stamps[] = $stamp;
+
+                return $this->handle($message, $ack);
+            }
+
+            private function shouldFlush()
+            {
+                return true;
+            }
+
+            private function process(array $jobs): void
+            {
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]));
+
+        $stamp = new AnEnvelopeStamp();
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp(static function () {}), $stamp]), new StackMiddleware());
+        $middleware->handle(new Envelope(new DummyMessage('Bob')), new StackMiddleware());
+
+        $this->assertSame([$stamp, null], $handler->stamps);
+    }
+
+    public function testHandlerArgumentsStampCombinesWithStampArguments()
+    {
+        $stamp = new AnEnvelopeStamp();
+        $received = null;
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [static function (DummyMessage $message, string $additional, AnEnvelopeStamp $stamp) use (&$received) {
+                $received = [$additional, $stamp];
+            }],
+        ]));
+
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new HandlerArgumentsStamp(['additional argument']), $stamp]), $this->getStackMock());
+
+        $this->assertSame(['additional argument', $stamp], $received);
     }
 
     public function testDispatchHandlerEvents()

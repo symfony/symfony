@@ -533,6 +533,7 @@ class TextDescriptor extends Descriptor
                         ['<info>Real value</>', $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a'],
                         ['<info>Processed value</>', $env['default_available'] || $env['runtime_available'] ? $dump($env['processed_value']) : 'n/a'],
                         ['<info>Used</>', $env['used'] ? 'yes' : 'no'],
+                        ['<info>Inlined</>', $env['inlined'] ? 'yes' : 'no'],
                     ]);
                 }
             }
@@ -557,6 +558,8 @@ class TextDescriptor extends Descriptor
         foreach ($envs as $env) {
             if (isset($rows[$env['name']])) {
                 $rows[$env['name']][3] = $rows[$env['name']][3] || $env['used'];
+                // one spelling that is still read at runtime keeps the variable dynamic
+                $rows[$env['name']][4] = $rows[$env['name']][4] && $env['inlined'];
                 continue;
             }
 
@@ -565,6 +568,7 @@ class TextDescriptor extends Descriptor
                 $env['default_available'] ? $dump($env['default_value']) : 'n/a',
                 $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a',
                 $env['used'],
+                $env['inlined'],
             ];
             // the "default" processor carries the fallback, so an unset variable is not missing
             if (!$env['default_available'] && !$env['runtime_available'] && !\in_array('default', explode(':', $env['processor']), true)) {
@@ -572,14 +576,21 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $rows = array_map(static function ($row) {
+        $hasInlined = false;
+        $rows = array_map(static function ($row) use (&$hasInlined) {
+            $hasInlined = $hasInlined || $row[4];
             $row[3] = $row[3] ? 'yes' : 'no';
+            $row[4] = $row[4] ? 'yes' : 'no';
 
             return $row;
         }, $rows);
 
-        $options['output']->table(['Name', 'Default value', 'Real value', 'Used'], $rows);
+        $options['output']->table(['Name', 'Default value', 'Real value', 'Used', 'Inlined'], $rows);
         $options['output']->comment('Note real values might be different between web and CLI.');
+
+        if ($hasInlined) {
+            $options['output']->comment('Inlined variables were read when the container was compiled, so the container must be rebuilt for a new value to apply.');
+        }
 
         if ($missing) {
             $options['output']->warning('The following variables are missing:');

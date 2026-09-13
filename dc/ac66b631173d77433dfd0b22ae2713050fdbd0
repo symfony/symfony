@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T14:56:02Z
+
+Thank you @Spomky. Rebased on 8.2 now that #65915 is in, which conflicted only on the SecurityBundle changelog, both entries kept. One fix pushed.
+
+**`JWK::find()` exists in no released `web-token/jwt-library`.** `AbstractClientAssertion::createAssertion()` read the key identifier with it. I checked the published sources: it is absent from 3.3.2, 4.0.7, 4.1.0 and 4.2.0, and present only in the unreleased `4.3.x-dev` that this repository installs, which is why nothing here caught it. The component requires `^3.3.2|^4.0`, so every user is on a version without it, and both methods died at the first token request, not only in the tests. Through a compiled container, with a released-shaped library:
+
+```
+private_key_jwt    Error: Call to undefined method Jose\Component\Core\JWK::find()
+client_secret_jwt  Error: Call to undefined method Jose\Component\Core\JWK::find()
+```
+
+`client_secret_jwt` builds a key that carries no `kid` at all and died just the same, since the call was unconditional in the shared parent. The `Unit Tests (8.4, low-deps)` leg shows the same on 4.0.7: twelve of these and `KO src/Symfony/Component/Security/Http`.
+
+It now reads `has('kid') && \is_string(get('kid'))`, which every supported version has. `testSetsTheKeyIdentifierHeaderOnlyWhenTheKeyCarriesOne` already covers both branches of it, so no test was added. The suite passes against the released shape as well as the installed one: `OK (38 tests, 80 assertions)` either way, and the `kid` still reaches the header.
+
+The rest checks out, including two things I expected to find wrong:
+
+- The key length claim is right. The check is not in `HMAC`, it is overridden in `HS256`, `HS384` and `HS512`, and it is there in 3.3.2, 4.0.7 and 4.2.0 alike. The exception class differs between versions, `InvalidArgumentException` there against `InvalidKeyException` in 4.3, which the `catch (\Throwable)` absorbs and the test does not assert on.
+- Every algorithm class the two allowlists name exists in 3.3.2, and `JWSBuilder`, `CompactSerializer` and `JWK::createFromJson` have the same signatures there.
+
+I also probed the configuration shape by shape: the secret or the key alone, the mapping, an empty mapping, two methods at once, a method next to `none`, an algorithm the method does not allow, a lifetime of zero, and an env placeholder. Each behaves, and the new array nodes do not materialise when absent, so the "exactly one method" rule still holds. A compiled container builds both methods and signs an assertion naming the client as `iss` and `sub` and the token endpoint as `aud`. Security/Http `OK (1212 tests, 2736 assertions)`, SecurityBundle `OK (645, 1793)`.
+
+One question left, which is yours to settle rather than mine. `AbstractClientAssertion` is public API, but `authenticate()` is final and `createAssertion()` is private, so a subclass can only choose the key, the algorithm and the lifetime. It cannot add the `typ` header the description expects to need once `draft-ietf-oauth-rfc7523bis` settles, nor any extra claim a provider asks for. Either make `createAssertion()` protected so the extension point is real, or mark the class `@internal` and let the two final classes be the API.
+
+I added the documentation points to the description.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-08T17:24:06Z
+
+Thanks for the fix. Let's mark AbstractClientAssertion as @internal: the API is the two final classes. We can open it up later if someone needs to change the header or the claims.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T10:18:21Z
+
+Rebased on 8.2.
+
+`testRejectsAnAlgorithmTheAssertionMethodDoesNotAllow` and `testRejectsAnAssertionLifetimeThatIsNotPositive` passed on the base branch too: without the feature, the config throws the same `InvalidConfigurationException` class for `Unrecognized option "client_secret_jwt"`. Both now assert the expected message, so all four data sets fail without the patch.

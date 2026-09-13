@@ -60,6 +60,7 @@ CHANGELOG
  * Add `framework.profiler.excluded_paths` and `framework.profiler.excluded_http_codes` to skip profiling requests matching a path or answered with a given HTTP status code
  * Add `framework.property_access.wildcard_reads` option to read every element of a collection through a `[*]` path
  * Instantiate on the console only the bundles that override the deprecated `Bundle::registerCommands()` method
+ * Add `MessengerAssertionsTrait` to `KernelTestCase`, with `assertQueuedMessageCount()`, `getQueuedMessages()`, `getMessengerTransport()` and `consumeQueuedMessages()` for in-memory Messenger transports
 
 8.1
 ---

@@ -383,6 +383,20 @@ class Route
     }
 
     /**
+     * Adds a condition, combined with the existing one using "and".
+     *
+     * @return $this
+     */
+    public function addCondition(string $condition): static
+    {
+        if ('' === $condition) {
+            return $this;
+        }
+
+        return $this->setCondition('' === $this->condition ? $condition : \sprintf('(%s) and (%s)', $this->condition, $condition));
+    }
+
+    /**
      * Compiles the route.
      *
      * @throws \LogicException If the Route cannot be compiled because the

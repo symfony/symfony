@@ -59,6 +59,7 @@
           ]
         },
         "condition": { "type": "string" },
+        "add_condition": { "type": "string" },
         "locale": { "type": "string" },
         "format": { "type": "string" },
         "utf8": { "type": "boolean" },
@@ -128,6 +129,7 @@
           ]
         },
         "condition": { "type": "string" },
+        "add_condition": { "type": "string" },
         "trailing_slash_on_root": { "type": "boolean" },
         "methods": { "oneOf": [ { "type": "string" }, { "type": "array", "items": { "type": "string" } } ] },
         "locale": { "type": "string" },

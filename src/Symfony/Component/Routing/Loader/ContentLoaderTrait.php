@@ -29,7 +29,7 @@ trait ContentLoaderTrait
      * Config keys accepted at the route or import level by {@see validate()}.
      */
     private const AVAILABLE_KEYS = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'add_condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall',
     ];
 
     /**
@@ -114,6 +114,7 @@ trait ContentLoaderTrait
         $routes->setSchemes($config['schemes'] ?? []);
         $routes->setMethods($config['methods'] ?? []);
         $routes->setCondition($config['condition'] ?? null);
+        $routes->addCondition($config['add_condition'] ?? '');
 
         if (isset($config['host'])) {
             $this->addHost($routes, $config['host']);
@@ -134,6 +135,7 @@ trait ContentLoaderTrait
         $options = $config['options'] ?? [];
         $host = $config['host'] ?? null;
         $condition = $config['condition'] ?? null;
+        $addCondition = $config['add_condition'] ?? null;
         $schemes = $config['schemes'] ?? null;
         $methods = $config['methods'] ?? null;
         $trailingSlashOnRoot = $config['trailing_slash_on_root'] ?? true;
@@ -176,6 +178,9 @@ trait ContentLoaderTrait
             }
             if (null !== $condition) {
                 $subCollection->setCondition($condition);
+            }
+            if (null !== $addCondition) {
+                $subCollection->addCondition($addCondition);
             }
             if (null !== $schemes) {
                 $subCollection->setSchemes($schemes);

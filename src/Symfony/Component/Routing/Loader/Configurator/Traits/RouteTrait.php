@@ -79,6 +79,18 @@ trait RouteTrait
     }
 
     /**
+     * Adds a condition, combined with the existing one using "and".
+     *
+     * @return $this
+     */
+    final public function addCondition(string $condition): static
+    {
+        $this->route->addCondition($condition);
+
+        return $this;
+    }
+
+    /**
      * Sets the pattern for the host.
      *
      * @return $this

@@ -21,6 +21,10 @@ CHANGELOG
  * Add a `transport` option to `#[AsMessageHandler]` and to the `messenger.message_handler` tag to route the handled messages to that transport and bind the handler to it
  * Add `OutboxStamp` and `OutboxSender` to store messages in an outbox transport and forward them to their target transport when the outbox is consumed
  * Add the `outbox` option to transports
+ * Add `retry` and `failure_transport` options to the `sync://` transport
+ * Add `$retryStrategy`, `$failureSender`, `$eventDispatcher` and `$logger` arguments to `SyncTransport`
+ * Add `$retryStrategyLocator`, `$failureSenderLocator`, `$eventDispatcher` and `$logger` arguments to `SyncTransportFactory`
+ * Add `SyncMessageFailedEvent` and `SyncMessageRetryingEvent`, dispatched by the sync transport
 
 8.1
 ---

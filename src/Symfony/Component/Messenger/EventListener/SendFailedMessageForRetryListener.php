@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageRetriedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\RuntimeException;
-use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Retry\RetryDecider;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -56,7 +56,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
         ];
 
-        $shouldRetry = $retryStrategy && $this->shouldRetry($throwable, $envelope, $retryStrategy);
+        $shouldRetry = $retryStrategy && RetryDecider::shouldRetry($throwable, $envelope, $retryStrategy);
 
         $retryCount = RedeliveryStamp::getRetryCountFromEnvelope($envelope);
         if ($shouldRetry) {
@@ -112,38 +112,6 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             // must have higher priority than SendFailedMessageToFailureTransportListener
             WorkerMessageFailedEvent::class => ['onMessageFailed', 100],
         ];
-    }
-
-    private function shouldRetry(\Throwable $e, Envelope $envelope, RetryStrategyInterface $retryStrategy): bool
-    {
-        if ($e instanceof RecoverableExceptionInterface && (!method_exists($e, 'forceRetry') || $e->forceRetry())) {
-            return true;
-        }
-
-        // if one or more nested Exceptions is an instance of RecoverableExceptionInterface we should retry
-        // if ALL nested Exceptions are an instance of UnrecoverableExceptionInterface we should not retry
-        if ($e instanceof HandlerFailedException) {
-            $shouldNotRetry = true;
-            foreach ($e->getWrappedExceptions() as $nestedException) {
-                if ($nestedException instanceof RecoverableExceptionInterface && (!method_exists($nestedException, 'forceRetry') || $nestedException->forceRetry())) {
-                    return true;
-                }
-
-                if (!$nestedException instanceof UnrecoverableExceptionInterface) {
-                    $shouldNotRetry = false;
-                    break;
-                }
-            }
-            if ($shouldNotRetry) {
-                return false;
-            }
-        }
-
-        if ($e instanceof UnrecoverableExceptionInterface) {
-            return false;
-        }
-
-        return $retryStrategy->isRetryable($envelope, $e);
     }
 
     private function getWaitingTime(Envelope $envelope, \Throwable $throwable, RetryStrategyInterface $retryStrategy): int

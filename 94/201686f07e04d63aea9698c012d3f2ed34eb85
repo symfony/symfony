@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T11:08:40Z
+
+Rebased on 8.2 and amended before merge.
+
+The locale to language id conversion was `str_replace("_", "-", $locale)`. Of the 314 languages Crowdin lists, only `es-ES`, `la-LA` and `pt-PT` use that shape, so `fr_FR`, `de_DE`, `it_IT`, `ja_JP` and most European locales produced an id that does not exist and the patch came back with `Language fr-FR not found`. `write()` now reads `GET /languages` once, only when a locale is missing, and maps a locale to an id through the `locale` field each language carries, preferring an exact id match for the three ambiguous cases.
+
+Unsupported locales are now left out of the patch instead of travelling with the others, so a single unknown locale no longer stops every other one from being added; they keep falling back to the `Ignored "%s" locale ...` warning. A locale whose language the project already has, such as `fr_FR` against `fr`, no longer triggers a patch at all.
+
+A 5xx on either request now throws like the rest of the bridge, while a 403 still only logs and skips. Added an `UPGRADE-8.2.md` note about the `project.settings` write scope, plus four tests.
+
+I left out an RFC 6902 `test` op guarding the read-modify-write window: `test` on an array compares member by member including order, nothing promises Crowdin returns `targetLanguageIds` in a stable order, and a Crowdin that does not honour it would turn every push into a 400. The window is one round trip.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-09-13T17:04:03Z
+
+Thank you for the rebase and the amend, and above all for catching the language id mapping. I had assumed `str_replace('_', '-', $locale)` was enough, and reading `GET /languages` once is clearly the right call when only 3 of the 314 languages use that shape. Leaving unsupported locales out of the patch instead of letting one of them sink the others is a real improvement too.
+
+On the current red, Psalm fails on the new `getSupportedLanguageIds()`:
+
+```
+CrowdinProvider.php:563 InvalidReturnType: declared 'array<string, string>', got 'array<array<array-key, string>|string, mixed>'
+```
+
+`$language['data']['locale']` comes out of `toArray()` as `mixed`, so Psalm allows `str_replace()` to return an array and never narrows the key to `string`. Casting before use should settle it:
+
+```php
+foreach ($response->toArray()['data'] as $language) {
+    $id = (string) $language['data']['id'];
+    $languageIds[str_replace('-', '_', (string) $language['data']['locale'])] ??= $id;
+    $languageIds[str_replace('-', '_', $id)] = $id;
+}
+```
+
+Want me to push that, or would you rather fold it into your amend?
+
+The two unit test reds look unrelated: the same `testSchemeRedirect` and `DoctrineOutboxIntegrationTest` failures show on #65989, and both were fixed on 8.2 right after this run (`6cc2cdda` and `b96ffaca`). A rebase should clear them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T19:56:44Z
+
+Thanks, and you are right on both counts. The Psalm error is mine, so I folded the casts into the amend rather than have you push a fix for it: `toArray()` hands back `mixed`, so `str_replace()` could return an array as far as Psalm knows, and the key never narrows to `string`. Taking `$id` once as a `(string)` also reads better than casting it twice.
+
+Rebased on 8.2 as well, so the `testSchemeRedirect` and `DoctrineOutboxIntegrationTest` reds should go with it. Crowdin bridge green, 42 tests.

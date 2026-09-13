@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GabeSilvaDev at 2026-09-11T16:23:47Z
+
+Addressed in 41a93431320: the mapped branch now requires the `ffff` marker in bytes 10–11 (`str_starts_with($packedAddress, str_repeat("\0", 10)."\xff\xff")`) and the compatible branch requires 12 zero bytes. `::1:0:1` and its uncompressed spelling now return `::` instead of `::1:0:0` (test cases added). Note that `::1:0:1` → `::1:0:0` was already what `6.4` produced before this PR for the canonical spelling, so this is a small behaviour change on top of the fix, in the direction of anonymizing more — description updated accordingly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T10:18:15Z
+
+Squashed the two commits and rebased on 6.4.
+
+Worth noting for readers: requiring the `ffff` marker also changes `::1:0:1` from `::1:0:0` to `::`. That address is neither IPv4-mapped nor IPv4-compatible, `checkIp()` already treats it that way, and the change anonymizes more, not less.

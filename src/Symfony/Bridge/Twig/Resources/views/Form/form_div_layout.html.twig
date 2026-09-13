@@ -468,31 +468,35 @@
 {%- endblock form_rows -%}
 
 {%- block widget_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"
-    {%- if disabled %} disabled="disabled"{% endif -%}
-    {%- if required %} required="required"{% endif -%}
+    {%- set attr = {id: id, name: full_name, disabled: disabled, required: required}|merge(attr) -%}
     {{ block('attributes') }}
 {%- endblock widget_attributes -%}
 
 {%- block widget_container_attributes -%}
-    {%- if id is not empty %}id="{{ id }}"{% endif -%}
+    {%- if id is not empty -%}
+        {%- set attr = {id: id}|merge(attr) -%}
+    {%- endif -%}
     {{ block('attributes') }}
 {%- endblock widget_container_attributes -%}
 
 {%- block button_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%}
+    {%- set attr = {id: id, name: full_name, disabled: disabled}|merge(attr) -%}
     {{ block('attributes') }}
 {%- endblock button_attributes -%}
 
 {% block attributes -%}
+    {%- set attrs = {} -%}
     {%- for attrname, attrvalue in attr -%}
-        {{- ' ' -}}
         {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ translation_domain is same as(false) or attrvalue is null ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) }}"
+            {%- set attrs = attrs|merge({(attrname): translation_domain is same as(false) or attrvalue is null ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain)}) -%}
         {%- elseif attrvalue is same as(true) -%}
-            {{- attrname }}="{{ attrname }}"
+            {%- set attrs = attrs|merge({(attrname): attrname}) -%}
         {%- elseif attrvalue is not same as(false) -%}
-            {{- attrname }}="{{ attrvalue }}"
+            {%- set attrs = attrs|merge({(attrname): attrvalue}) -%}
         {%- endif -%}
+    {%- endfor -%}
+    {%- do block_export(attrs) -%}
+    {%- for attrname, attrvalue in attrs -%}
+        {{- ' ' ~ attrname }}="{{ attrvalue }}"
     {%- endfor -%}
 {%- endblock attributes -%}

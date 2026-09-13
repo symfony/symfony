@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Exception\DeadlockException;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -395,6 +396,64 @@ class DoctrineReceiverTest extends TestCase
                 'Content-Type' => 'application/json',
             ],
         ];
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function testItDispatchesTheSignalsRaisedWhileFetching()
+    {
+        $received = false;
+        $previousHandler = pcntl_signal_get_handler(\SIGUSR1);
+        $previousAsync = pcntl_async_signals(true);
+        pcntl_signal(\SIGUSR1, static function () use (&$received) { $received = true; });
+
+        try {
+            $connection = $this->createMock(Connection::class);
+            $connection->expects($this->once())->method('get')->willReturnCallback(function () use (&$received) {
+                posix_kill(posix_getpid(), \SIGUSR1);
+
+                // the transport holds the signal back until it is done talking to the database
+                $this->assertFalse($received);
+
+                return null;
+            });
+
+            $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+
+            $this->assertSame([], $receiver->get());
+            $this->assertTrue($received);
+            $this->assertTrue(pcntl_async_signals());
+        } finally {
+            pcntl_signal(\SIGUSR1, $previousHandler);
+            pcntl_async_signals($previousAsync);
+        }
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testItRestoresSignalDispatchingWhenFetchingThrows()
+    {
+        $previousAsync = pcntl_async_signals(true);
+
+        try {
+            $connection = $this->createStub(Connection::class);
+            $connection->method('get')->willThrowException(new DeadlockException(Exception::new(new \PDOException('Deadlock', 40001)), null));
+
+            $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+
+            // the first calls are swallowed as retryable, the last one throws
+            $this->assertSame([], $receiver->get());
+            $this->assertSame([], $receiver->get());
+
+            try {
+                $receiver->get();
+                $this->fail('TransportException expected.');
+            } catch (TransportException) {
+            }
+
+            $this->assertTrue(pcntl_async_signals());
+        } finally {
+            pcntl_async_signals($previousAsync);
+        }
     }
 
     private function createSerializer(): Serializer

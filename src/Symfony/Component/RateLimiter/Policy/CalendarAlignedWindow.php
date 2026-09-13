@@ -67,11 +67,19 @@ final class CalendarAlignedWindow implements LimiterStateInterface
 
     public function calculateTimeForTokens(int $tokens, float $now): int
     {
+        return max(0, (int) ceil($this->calculateAvailabilityTime($tokens, $now) - $now));
+    }
+
+    /**
+     * The instant the tokens become available, as a Unix timestamp with microseconds.
+     */
+    public function calculateAvailabilityTime(int $tokens, float $now): float
+    {
         if (($this->maxSize - $this->hitCount) >= $tokens) {
-            return 0;
+            return $now;
         }
 
-        return max(0, (int) ceil($this->periodEnd->getTimestamp() - $now));
+        return $this->periodEnd->getTimestamp();
     }
 
     public function __serialize(): array

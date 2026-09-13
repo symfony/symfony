@@ -137,7 +137,8 @@ final class FixedWindowLimiter implements LimiterInterface
 
     private function resetAt(Window|CalendarAlignedWindow $window, float $now): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromTimestamp((int) ($now + $window->calculateTimeForTokens($this->limit, $now)));
+        // the window's end is fixed, so the reset must not drift as the clock advances inside it
+        return \DateTimeImmutable::createFromTimestamp((int) $window->calculateAvailabilityTime($this->limit, $now));
     }
 
     /**

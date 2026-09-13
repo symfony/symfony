@@ -89,13 +89,24 @@ final class Window implements LimiterStateInterface
 
     public function calculateTimeForTokens(int $tokens, float $now): int
     {
+        return (int) ceil($this->calculateAvailabilityTime($tokens, $now) - $now);
+    }
+
+    /**
+     * The instant the tokens become available, as a Unix timestamp with microseconds.
+     *
+     * Unlike the duration returned by calculateTimeForTokens(), it does not move with the clock,
+     * so it can be exposed as the moment the limit resets.
+     */
+    public function calculateAvailabilityTime(int $tokens, float $now): float
+    {
         if (($this->maxSize - $this->hitCount) >= $tokens) {
-            return 0;
+            return $now;
         }
 
         $inWindow = (int) ceil(($this->hitCount + $tokens) / $this->maxSize) - 1;
 
-        return (int) ceil($this->timer + ($this->intervalInSeconds * $inWindow) - $now);
+        return $this->timer + ($this->intervalInSeconds * $inWindow);
     }
 
     public function __serialize(): array

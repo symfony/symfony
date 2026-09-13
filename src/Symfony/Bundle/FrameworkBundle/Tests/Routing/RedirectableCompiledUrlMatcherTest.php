@@ -49,6 +49,10 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
 
         $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
+        $parameters = $matcher->match('/foo');
+        // symfony/routing >= 8.2 flags the scheme redirect for the router listener
+        unset($parameters['_scheme_redirect']);
+
         $this->assertEquals(
             [
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -60,7 +64,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
                 '_route' => 'foo',
                 '_route_mapping' => [],
             ],
-            $matcher->match('/foo')
+            $parameters
         );
     }
 

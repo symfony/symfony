@@ -41,6 +41,9 @@ Domains as tags
 Translations will be tagged in Phrase with the Symfony translation domain they belong to.
 Check the [wickedone/phrase-translation-bundle](https://github.com/wickedOne/phrase-translation-bundle) if you need help managing your tags in Phrase.
 
+Reading without a domain reads one domain per tag of the project. Tags Phrase creates on its own, such as the one every upload gets, are left out.
+Add `write[skip_upload_tags]=1` to your DSN if you do not want an upload tag created at all.
+
 Cache
 -----
 

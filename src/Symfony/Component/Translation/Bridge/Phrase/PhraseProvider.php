@@ -268,6 +268,8 @@ class PhraseProvider implements ProviderInterface
                 'query' => [
                     'per_page' => 100,
                     'page' => $page,
+                    // the tags Phrase creates on its own, one per upload and one per job, are not domains
+                    'exclude_system_tags' => '1',
                 ],
             ]);
 

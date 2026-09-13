@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `configure_container` option to `WebTestCase::createClient()` to configure the container after every kernel reboot
  * Deprecate `Command\RouterMatchCommand`, use the one from the Routing component instead
  * Deprecate `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass`, `DependencyInjection\Compiler\AssetsContextPass` and `DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass`, use the ones from the Translation, Asset and Validator components instead
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead

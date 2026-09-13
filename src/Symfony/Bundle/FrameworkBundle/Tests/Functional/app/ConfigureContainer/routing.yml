@@ -1,0 +1,3 @@
+configure_container:
+    path:     /configure_container
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\ConfigureContainerController }

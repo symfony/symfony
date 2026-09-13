@@ -454,7 +454,7 @@ class Connection
             $this->setupExchangeAndQueues();
         }
 
-        if (false !== $message = $this->queue($queueName)->get()) {
+        if ($message = $this->queue($queueName)->get()) {
             ++$this->inFlightMessages;
             $this->lastActivityTime = time();
 

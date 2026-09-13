@@ -1,0 +1,301 @@
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-09-08T13:19:20Z
+
+Congratulations @nicolas-grekas, and thank you for the effort you have put into bringing first-class transactional outbox support to Symfony Messenger. We created our own internal messaging library exactly because Symfony Messenger did not support the outbox pattern, so it is excellent to see this gap being addressed in the framework itself.
+
+I read the PR description and implementation and compared it with our internal messaging library and with Ecotone's DBAL outbox and deduplication implementations.
+
+The transparent sender decoration, preservation of the outbox transport ID for acknowledgement, separation of relay retry history from target retry history, and reuse of Messenger's existing retry/failure infrastructure are all strong parts of this implementation. I nevertheless found several areas where the correctness guarantees could be made stronger.
+
+## Comparison
+
+| Area | This Symfony implementation | Our internal messaging library | Ecotone |
+|---|---|---|---|
+| Producer API | Transparently decorates a configured target transport | Uses explicit outbox command and event buses | Uses [`DbalBackedMessageChannelBuilder`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/DbalBackedMessageChannelBuilder.php), optionally composed with a broker through [`CombinedMessageChannel`](https://github.com/ecotoneframework/ecotone/blob/6957ab73d32fcd8bf0a41ca745e6c2f5791a22b3/src/Messaging/Channel/CombinedMessageChannel.php) |
+| Transactional guarantee | Correct when the outbox is a Doctrine transport on the same connection and dispatch happens inside the business transaction; these conditions are documented but not enforced | Persists the outbox entity through the same configured ORM unit of work as the business changes | DBAL channels participate in configured handler transactions; [`DbalBatchForwardingModule`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/BatchForwarding/DbalBatchForwardingModule.php) verifies that a forwarding source is DBAL-backed |
+| Stored representation | Stores an envelope encoded for the outbox transport; the relay reconstructs the PHP message and later encodes it for the target | Resolves the message name, routing destinations, routing key, headers and final serialized payload before storage | [`DbalOutboxPublisher`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/BatchForwarding/DbalOutboxPublisher.php) relays the stored payload opaquely without reconstructing the application message |
+| Relay | A regular Messenger worker forwards one message at a time through the target sender and reuses retry/failure transports | Debezium tails committed inserts from the database transaction log and publishes the already-prepared record | Supports [`CombinedMessageChannel`](https://github.com/ecotoneframework/ecotone/blob/6957ab73d32fcd8bf0a41ca745e6c2f5791a22b3/src/Messaging/Channel/CombinedMessageChannel.php); [`DbalOutboxPublisher`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/BatchForwarding/DbalOutboxPublisher.php) claims, groups and publishes batches |
+| Logical message identity | Relies on transport message IDs, which change between the outbox and target transports | Has stable message, correlation and causation IDs independent of transport IDs | Every message has a stable `id` header, plus correlation metadata |
+| Consumer duplicate handling | `DeduplicateMiddleware` is a temporary lock and not a durable inbox | Has a durable `(consumer ID, message ID)` consumption log and lifecycle states, although its state transitions are not committed atomically with the handler's business changes | [`DeduplicationInterceptor`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/Deduplication/DeduplicationInterceptor.php) scopes records by message ID, endpoint and routing slip; insert-before-handler is atomic when an active PostgreSQL transaction uses the same connection, with a weaker fallback otherwise |
+| Topology validation | Checks that the named outbox exists and is not the target itself | The explicit outbox API and typed storage make the intended path visible | [`OutboxForwardingMessageChannel`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/OutboxForwardingMessageChannel.php) requires exactly one source/target pair, while [`DbalBatchForwardingModule`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/BatchForwarding/DbalBatchForwardingModule.php) verifies the DBAL source and prevents invalid reuse |
+| Operations | Reuses Messenger workers, retries, failure transports and Doctrine claiming | Carries rich routing/diagnostic metadata and keeps an auditable CDC source table with separate retention | Provides batching, claim recovery, partial-delivery strategies, deduplication cleanup and extensive database integration tests |
+
+## Backward-compatibility approach
+
+All suggestions below can be introduced without changing behavior for existing Messenger applications. Symfony's [backward-compatibility promise](https://symfony.com/doc/current/contributing/community/releases.html#backward-compatibility) requires minor releases to remain backward compatible; where changing established behavior would eventually be desirable, the existing behavior should remain available, trigger a targeted deprecation with a concrete replacement, and only be removed in the next major version according to Symfony's [deprecation conventions](https://symfony.com/doc/current/contributing/code/conventions.html#deprecating-code).
+
+In particular:
+
+- New capabilities should use optional interfaces/decorators rather than adding methods to existing public interfaces such as `SenderInterface`.
+- New outbox, inbox, batching, ordering and subscriber-isolation behavior should be opt-in for existing applications.
+- New readers should continue accepting old stored envelopes during rolling deployments and while backlogs drain.
+- Existing transport, routing, retry, listener and serializer defaults should not change in a minor release without a deprecation path.
+
+Because `framework.messenger.transports.<name>.outbox`, `OutboxStamp` and `OutboxSender` are being introduced by this PR and have not been released, their initial contract can still be tightened before merge without breaking existing Symfony Messenger users.
+
+## Suggested improvements
+
+### 1. Enforce the conditions that make this an outbox
+
+**What:** At present, FrameworkBundle checks that the configured outbox name exists and is not the target transport itself. It does not verify that the outbox is transactional, that it uses the same connection as the business transaction, or even that it is database-backed. Configurations such as `outbox: redis`, or a Doctrine outbox using another DBAL connection, are accepted but do not provide the advertised atomicity.
+
+There are two related ways to bypass the guarantee accidentally:
+
+- `DispatchAfterCurrentBusStamp` postpones the outbox insert until after the surrounding transaction has committed.
+- A message routed to both an outboxed sender and a direct broker sender can still leak the directly published copy if the business transaction rolls back.
+
+**What it brings:** Users could rely on `outbox` as a correctness guarantee rather than a convention whose essential preconditions live only in documentation.
+
+**Possible implementation:**
+
+- Let transports expose an outbox/transaction capability and the identity of their transactional resource, or require that information explicitly in the outbox configuration.
+- Validate that a known Doctrine outbox and `DoctrineTransactionMiddleware` use the same DBAL connection/entity manager.
+- Provide a strict `require_transaction` option that fails if an outbox capture occurs without an active transaction. Dispatching outside a transaction can remain supported when explicitly desired.
+- Detect an outboxed message carrying `DispatchAfterCurrentBusStamp` before it is deferred, either by a small guard middleware or through integration between the dispatch-after and sender-resolution middleware.
+- Validate or at least warn about routing sets that mix outboxed and non-outboxed external senders.
+
+Ecotone's [`OutboxForwardingMessageChannel`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/OutboxForwardingMessageChannel.php) and [`DbalBatchForwardingModule`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/BatchForwarding/DbalBatchForwardingModule.php) are useful references for failing early when a source is not a DBAL channel or is reused in an incompatible topology.
+
+**Backward compatibility and upgrade path:** Existing applications that do not configure the new `outbox` option would be unaffected. Because the option is new in this PR, invalid outbox configurations can be rejected before release without a BC break. If strict validation is added after release, first add an opt-in strict mode and deprecate unverifiable/non-transactional configurations with a message naming the target, outbox and mismatched resource. The upgrade is to move the outbox to the same Doctrine connection, configure the matching transaction middleware, remove `DispatchAfterCurrentBusStamp` from that dispatch, and either outbox every external route or split the routing. Enforcement can then become the default in the next major version while an explicitly named store-and-forward mode remains available for non-transactional use cases.
+
+### 2. Add a stable logical message ID
+
+**What:** `TransportMessageIdStamp` describes one transport's storage/delivery record. The PR correctly preserves the outbox ID for acknowledgement and deliberately ignores the target sender's returned ID, but that also demonstrates why a transport ID cannot identify the logical message across outbox publication, broker redelivery, retry and failure-transport replay.
+
+**What it brings:** A stable identity is the prerequisite for a transactional inbox, end-to-end tracing, safe replay, duplicate metrics and diagnosing the publish-before-ack crash window inherent in every outbox relay.
+
+**Possible implementation:**
+
+- Add an immutable, sendable `MessageIdStamp`, generated once before the first send and preserved by every transport and relay.
+- Keep it separate from `TransportMessageIdStamp`; both IDs are useful and mean different things.
+- Add first-class correlation and causation stamps. A child message should receive a new message ID, inherit the correlation ID and record the parent message ID as its causation ID.
+- Ensure retry and failure transports preserve these logical identifiers.
+
+Ecotone generates a stable message ID in [`MessageHeaders`](https://github.com/ecotoneframework/ecotone/blob/6957ab73d32fcd8bf0a41ca745e6c2f5791a22b3/src/Messaging/MessageHeaders.php). Critical context should not disappear merely because a handler dispatches the next message with a new envelope, so automatic metadata propagation would be valuable here as well.
+
+**Backward compatibility and upgrade path:** Adding the stamp classes is additive, but automatically attaching them to every existing dispatch would change serialized envelopes, signatures, cache keys and tests that compare stamps. Introduce an opt-in identity middleware/configuration first, enable it automatically only for the new outbox/inbox features, and continue accepting incoming messages without a logical ID. A later minor release could deprecate missing logical IDs only when strict inbox processing is configured, with a diagnostic naming the producer/transport. Applications then enable the identity middleware on producers, deploy consumers that accept both formats, drain old messages, and finally enable strict ID enforcement. A global default, if desired, should wait for the next major version. `TransportMessageIdStamp` must retain its current meaning and behavior.
+
+### 3. Add a transactional inbox/idempotent consumer
+
+**What:** A successful target publish followed by a relay crash before acknowledgement will produce a duplicate. This is expected and explicitly part of the outbox pattern, but Messenger currently has no durable consumer-side mechanism that atomically absorbs it. `DeduplicateMiddleware` prevents some overlapping queued work with a lock and then releases that lock after successful handling; it does not close the commit-before-ack window.
+
+Our internal messaging library has a useful persistent, consumer-scoped consumption log, but I would not copy its transaction boundaries directly: it commits `CONSUMING`, runs the handler in a separate business transaction, and records `CONSUMED` afterward. A crash between these steps can leave an inconclusive `CONSUMING` entry that requires operational reconciliation.
+
+Ecotone is closer to the desired model. Its [`DeduplicationInterceptor`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/Deduplication/DeduplicationInterceptor.php) uses a composite persistent key and, when an active PostgreSQL transaction exists, inserts it before invoking the handler so the marker and handler changes commit or roll back together. Its non-transactional/MySQL fallback inserts after the handler and therefore retains a crash window, so Symfony should make the atomic mode explicit rather than silently falling back.
+
+**What it brings:** Together, outbox and inbox provide effectively-once database effects despite at-least-once delivery. They also make replay safer and prevent one relay failure from duplicating financial or other non-idempotent state changes.
+
+**Possible implementation:**
+
+- Add a persistent inbox table with a unique key such as `(consumer_id, message_id)`, a timestamp, and optionally a payload hash.
+- Derive `consumer_id` from trusted receiver/handler configuration. Independent subscribers must have independent entries; it should not be a producer-controlled stamp.
+- Place an inbox middleware inside the same `DoctrineTransactionMiddleware` transaction as `HandleMessageMiddleware`.
+- Atomically insert the inbox key before invoking the handler. Avoid a `SELECT` followed by `INSERT`; use a unique constraint and a database-native conflict operation so concurrent consumers cannot both proceed.
+- If the key already exists with the same payload hash, skip handling and let the worker acknowledge the delivery. If the same ID is reused for different content, fail/dead-letter it rather than silently suppressing it.
+- If handling fails, roll back both the inbox marker and all business/outbox writes. Messenger should acknowledge only after the transaction commits.
+- Provide bounded cleanup with retention longer than the broker's retry/TTL period and the expected dead-letter replay horizon.
+
+The effective middleware flow could be:
+
+```text
+SendMessageMiddleware
+  -> DoctrineTransactionMiddleware
+    -> InboxMiddleware
+      -> HandleMessageMiddleware
+```
+
+The outbox relay exits through `SendMessageMiddleware`, so it would not create an inbox entry. A target handler that emits further outboxed messages would atomically commit all three parts:
+
+```text
+inbox marker + business changes + new outbox records
+```
+
+This should be described as effectively-once processing of transactional database effects, not exactly-once delivery. HTTP calls, emails and other non-transactional side effects still need natural idempotency, a downstream idempotency key, or another outgoing outbox message.
+
+Ecotone's [`DeduplicationTableManager`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/Database/DeduplicationTableManager.php) is also a useful reference for schema management, consumer scoping and cleanup.
+
+**Backward compatibility and upgrade path:** Inbox support should be opt-in per receiving transport/bus and implemented as new middleware plus a new store abstraction, without changing handler signatures or enabling database writes for existing consumers. Schema creation should be an explicit migration rather than an automatic change to existing databases. During rollout, consumers should accept messages without `MessageIdStamp` using a configurable pass-through policy and emit a diagnostic; producers are upgraded to add stable IDs before the inbox is switched to strict mode. If Symfony later wants inbox processing enabled by default, deprecate the pass-through/default-off behavior in a minor release and change it only in the next major. Existing `DeduplicateMiddleware` should remain available with its current semantics rather than being silently redefined as an inbox.
+
+### 4. Validate relay provenance instead of trusting stamps alone
+
+**What:** The new `SendMessageMiddleware` branch forwards any received envelope containing an `OutboxStamp` whose target differs from the current receiver. It does not verify that the current receiver is actually configured as the outbox for that target. Similarly, any `RedeliveryStamp` causes `OutboxSender` to bypass the outbox, even if that stamp came from another flow or from manually redispatching an old envelope.
+
+Because stamps are serialized with the message, they can be stale or crafted by a producer able to write to a queue. A mismatched `OutboxStamp` can make the application forward to another configured transport without running the intended handler; a crafted/stale `RedeliveryStamp` can bypass transactional capture.
+
+There is also a smaller extension-point hazard: sender resolution happens before `SendMessageToTransportsEvent`, but an event listener can replace the envelope and remove/change the `OutboxStamp` before `OutboxSender` receives it. The sender can then interpret a relay as a new message and put it back into the outbox.
+
+**What it brings:** This closes an unexpected routing/security boundary and makes retries robust against unrelated or stale envelope history.
+
+**Possible implementation:**
+
+- Compile a map of `outbox source -> allowed target transports` and require the trusted last `ReceivedStamp` to match that map before forwarding.
+- Treat the serialized stamp as destination data, not as sufficient authorization to forward.
+- Use target-specific trusted provenance for retry bypass, based on the actual receiver and `SentToFailureTransportStamp`, rather than the mere presence of any `RedeliveryStamp`.
+- Reassert the resolved relay metadata after `SendMessageToTransportsEvent`, or provide a dedicated internal forwarding path/event whose invariants listeners cannot accidentally remove.
+
+**Backward compatibility and upgrade path:** Tightening provenance after records have already been stored could reject legacy outbox envelopes, and changing the current `RedeliveryStamp` bypass could reroute existing retries. The safest rollout is a versioned relay stamp: new messages carry trusted source/target provenance, while the relay continues to accept the original stamp format and emits a deprecation/metric when it does so. Keep an explicit temporary `legacy_relay_targets`/allowlist so an application can remove `outbox:` from a target while old rows are still draining. Retry listeners can start adding target-specific provenance while `OutboxSender` continues accepting the old `RedeliveryStamp` path. After producers and consumers have been upgraded and the old outbox/failure queues are empty, applications remove the legacy allowlist; strict validation and removal of the broad bypass can happen in the next major. Because these stamps are new in this unreleased PR, the versioned/trusted form could instead be adopted now with no impact on existing Messenger users.
+
+### 5. Prepare the target representation before committing the producer transaction
+
+**What:** The current flow serializes an envelope for the outbox transport. The relay later deserializes it into the application message and only then asks the target sender to resolve/serialize it. The original business transaction can therefore commit before discovering a target serializer, routing or header error. Pending rows also depend on a future application version still being able to load and deserialize all message and stamp classes.
+
+The newer Symfony decode-failure machinery can preserve the encoded envelope through a configured failure flow, so this need not be silent message loss. It can nevertheless strand a message because of a failure that could have been detected before the original commit, and it couples the relay unnecessarily to application classes and schema versions.
+
+Our internal messaging library resolves the logical message name, destinations, routing key, headers and final serialized payload before persisting its outbox entity. Ecotone's [`DbalOutboxPublisher`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/BatchForwarding/DbalOutboxPublisher.php) likewise documents and implements opaque relay of the stored body and scalar headers.
+
+**What it brings:** Target serialization/routing errors abort the same transaction as the business changes, relay workers can publish old records without loading old application classes, and rolling deployments become safer.
+
+**Possible implementation:**
+
+- Introduce a target preparation abstraction that returns a transport-neutral `PreparedMessage`/encoded envelope containing the final body, scalar headers, destination and stable logical ID without publishing it.
+- Store that prepared representation in the outbox.
+- Give the relay a raw/encoded-send path so it does not have to reconstruct the application object.
+- Preserve the raw record in a quarantine/failure store when headers or routing metadata are invalid, so poison messages remain inspectable and replayable after a fix.
+
+This may need a capability interface because not every custom sender can separate preparation from publication. Unsupported senders could retain the current behavior with the weaker guarantee clearly exposed.
+
+**Backward compatibility and upgrade path:** Do not add a method to `SenderInterface`, since third-party transports implement it. Add an optional `PreparedSenderInterface`/`EncodedSenderInterface` and feature-detect it; existing senders keep the current decode-and-send relay path. Version the stored representation and make readers understand both the original envelope format and the prepared format so mixed-version deployments and existing backlogs continue working. Applications can opt into preparation per target, deploy dual-format readers first, then deploy writers of the new format. The original format can remain supported, or be deprecated only after tooling can confirm that no old rows remain and a documented serializer/upcaster path exists; removal would be next-major work.
+
+### 6. Provide a purpose-built, batch-capable relay path
+
+**What:** Reusing `messenger:consume` is pleasantly simple and gives the feature existing retry/failure behavior, but the target publication remains one call per message. Relay throughput will eventually be dominated by network round trips and database claim/delete traffic.
+
+Ecotone's DBAL implementation provides useful ideas here: configurable batch size, `FOR UPDATE SKIP LOCKED` where supported, claim markers elsewhere, grouping by target, batch-capable target channels, per-message release/delete outcomes and recovery of expired claims. See [`DbalOutboxPublisher`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/BatchForwarding/DbalOutboxPublisher.php) and [`DbalBatchForwardingModule`](https://github.com/ecotoneframework/dbal/blob/537bb73316b3b85e7a63b9e7dadbdb53e624531a/src/BatchForwarding/DbalBatchForwardingModule.php).
+
+**What it brings:** Higher throughput, safer horizontal scaling and clearer per-record recovery behavior without making the application database the long-term processing bottleneck.
+
+**Possible implementation:**
+
+- Add an optional `BatchSenderInterface` and let the relay group prepared records by target sender.
+- Claim rows in a short transaction and commit a lease before performing network I/O.
+- Publish outside the database transaction, then delete successful rows and release failed rows in another short transaction.
+- Make the claim timeout configurable specifically for outbox relays and support lease keepalive.
+- Apply adaptive idle backoff instead of aggressive empty polling.
+
+I would not copy the part of Ecotone's current implementation that keeps the database transaction open during broker publication: it can hold locks during network latency, and rolling back after some broker sends succeeded still produces duplicates. Short claim/outcome transactions plus a transactional inbox give a cleaner failure model.
+
+As a related operational detail, Doctrine transport's default redelivery timeout is one hour. A relay crash after claiming a row may therefore delay recovery for an hour unless the user knows to tune it. An outbox-specific default or prominent validation/advice would help.
+
+**Backward compatibility and upgrade path:** `BatchSenderInterface`, a dedicated relay and lease settings can all be additive and opt-in, with the existing `messenger:consume` path remaining the fallback. Do not change `Worker`, `ReceiverInterface`, `SenderInterface` or the global Doctrine transport timeout contract. Add outbox-specific batch/lease options whose defaults reproduce current behavior. Applications can enable the dedicated relay for one outbox at a time and switch back without changing message format. If a safer outbox lease becomes the future default, introduce it as an explicit option first, deprecate relying on the inherited one-hour default for outbox-configured transports, and change only the outbox default in the next major; ordinary Doctrine queues should remain untouched.
+
+### 7. Define ordering semantics
+
+**What:** The transactional outbox pattern calls out preserving the order in which a service produced messages as an important force. Doctrine currently orders available messages by `available_at`; equal timestamps and concurrent relay workers can publish later records first. There is no aggregate/partition key or sequence contract in this proposal.
+
+**What it brings:** Consumers that process successive state transitions for the same aggregate can distinguish duplicates from stale/out-of-order updates and avoid applying a newer state before an older one.
+
+**Possible implementation:**
+
+- At minimum, document explicitly that the outbox does not guarantee publication order.
+- For stronger semantics, add an optional ordering/partition key and monotonically increasing aggregate sequence.
+- Serialize relay work per ordering key while still allowing unrelated keys to publish concurrently.
+- Propagate the sequence to consumers so they can reject or defer stale/out-of-order messages.
+
+Neither our internal implementation nor Ecotone should be assumed to provide universal end-to-end ordering merely because rows have a sequence; the guarantee has to cover relay concurrency and the target broker as well.
+
+**Backward compatibility and upgrade path:** Preserve today's unordered/concurrently processed behavior by default. Ordered delivery should be a new opt-in transport/outbox mode with an optional ordering-key stamp or resolver; transports that do not support it continue unchanged. Applications migrate only the message types that need ordering, provision compatible broker partitions/queues, deploy sequence-aware consumers, and then enable ordered publication. If Symfony ever intends to strengthen the default ordering contract, announce and deprecate reliance on unordered parallelism in a minor release, provide an explicit `unordered` mode for high-throughput users, and change the default only in the next major.
+
+### 8. Consider isolated subscriber deliveries and inbox scopes
+
+**What:** In Symfony, asynchronous routing is primarily attached to the message class. Multiple handlers for that class can share one delivery and retry lifecycle unless the application manually creates separate transports and `from_transport` restrictions. If one handler succeeds and another fails, retries can repeat earlier non-transactional side effects.
+
+This is not necessarily a blocker for the outbox PR, but it becomes important once an inbox is added: the deduplication scope must represent an independently retriable subscriber, not just the message globally.
+
+**What it brings:** Each subscriber can retry, dead-letter, scale and deduplicate independently. One failing projection or notification does not rerun an unrelated successful subscriber.
+
+**Possible implementation:**
+
+- Allow handler/subscriber-level asynchronous transport configuration in addition to message-class routing.
+- Materialize one outbox delivery per independent target subscriber/channel while preserving a common correlation ID and distinct delivery identity.
+- Key inbox entries by stable logical message ID plus the configured subscriber/endpoint identity.
+- Validate the resulting topology at container compilation time.
+
+Ecotone models this through [`Asynchronous`](https://github.com/ecotoneframework/ecotone/blob/6957ab73d32fcd8bf0a41ca745e6c2f5791a22b3/src/Messaging/Attribute/Asynchronous.php), binding asynchronous execution to an endpoint/channel rather than making asynchronicity a property of the message class. Even if Symfony keeps its current routing model, first-class subscriber identity would improve inbox correctness and observability.
+
+**Backward compatibility and upgrade path:** Add handler-level asynchronous routing and subscriber identity as an opt-in attribute/configuration; do not reinterpret existing message-class routing or silently create extra deliveries. A safe migration is to declare the new subscriber queues/bindings, deploy their consumers first, switch the selected handlers/producers to isolated delivery, drain the old shared queue, and only then remove the old route. Stable logical IDs and consumer-scoped inbox keys can absorb overlap during the transition. Making isolated delivery the general default would change message counts, retry boundaries and broker topology, so that would require a minor-release deprecation of shared semantics, automated configuration diagnostics, and a next-major switch while retaining an explicit shared-delivery mode.
+
+### 9. Improve relay observability, retention and replay support
+
+**What:** Successful Doctrine rows are deleted and `OutboxSender` intentionally discards the target sender's returned envelope so that its transport ID cannot shadow the outbox ID. The acknowledgement behavior is correct, but it makes it harder to correlate the outbox row with the resulting broker record. There are also no outbox-specific lag or duplicate signals.
+
+**What it brings:** Operators can distinguish a producer problem, relay backlog, poison record, broker outage, repeated publication and consumer duplicate without reconstructing the flow from generic worker logs.
+
+**Possible implementation:**
+
+- Dispatch a relay-specific event containing the outbox transport ID, stable logical message ID, target transport and returned target transport ID.
+- Expose counters for captured, published, retried, quarantined and deduplicated messages.
+- Expose gauges for pending count, oldest pending age and oldest claimed age, partitioned by target.
+- Support optional compact dispatch history/audit storage with an explicit retention policy. Payload retention should remain optional because of storage and personal-data implications.
+- Add deliberate replay tooling that preserves the logical ID by default and offers an explicit "new logical message" mode when that is what the operator intends.
+
+**Backward compatibility and upgrade path:** Add a new relay-specific event rather than changing the payload or meaning of `MessageSentToTransportsEvent`, because existing listeners may rely on its current envelope and transport ID. New metrics, history storage and replay commands should be opt-in and must not retain payloads unless configured. Existing log messages and event signatures remain unchanged. If an existing event must eventually expose different ID semantics, add new accessors/event types first, deprecate the ambiguous accessor with a replacement named in the message, update listeners during the deprecation window, and remove it only in the next major.
+
+### 10. Add database and crash-boundary integration tests
+
+**What:** The new integration test exercises the store/forward flow, delay handling, relay retry/dead-letter/replay and target retry, but it uses in-memory transports. It does not prove the central database transaction guarantee.
+
+**What it brings:** The feature's most important contract is protected against future middleware-order, DBAL and FrameworkBundle wiring regressions.
+
+**Possible implementation:** Add real Doctrine integration tests for at least:
+
+- Business commit persists both state and outbox row.
+- Business rollback persists neither.
+- An outbox on another connection is rejected or demonstrably fails strict validation.
+- `DispatchAfterCurrentBusStamp` cannot silently move capture outside the transaction.
+- Mixed direct/outboxed routes are rejected or clearly diagnosed.
+- Two relay workers cannot concurrently claim the same row.
+- Crash after target publish but before outbox acknowledgement results in a duplicate with the same logical ID.
+- The inbox skips that duplicate after business effects have committed.
+- Handler failure rolls back both business effects and the inbox marker, allowing retry.
+- Forged or mismatched `OutboxStamp` and unrelated `RedeliveryStamp` values cannot redirect or bypass the outbox.
+- Old/undecodable payloads are quarantined with their raw representation intact.
+- Batch partial failures, expired claims and any promised ordering semantics.
+
+**Backward compatibility and upgrade path:** Tests are non-breaking. The compatibility suite should additionally pin the legacy behavior described above: third-party senders implementing only `SenderInterface` still work, messages without logical IDs follow the configured pass-through policy, old and new stored formats can be drained together, legacy relay/retry stamps remain accepted during their deprecation window, existing message-class routing is unchanged, and the normal Doctrine transport retains its current defaults. These tests should be required before any new behavior becomes the default.
+
+## Closing thought
+
+I think the sender-decorator approach is a very good fit for Messenger and a strong foundation. My main concern is that the option is named `outbox` while the framework currently cannot distinguish a genuinely transactional configuration from a store-and-forward configuration that only looks like one. Enforcing that boundary, introducing stable logical identity, and pairing the feature with an atomic consumer inbox would turn this from a useful relay mechanism into a much more complete end-to-end reliability story.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T14:22:06Z
+
+Thank you for this review, the comparison with two other implementations is genuinely useful and I agree with where you are pointing.
+
+This pull request aims at the smallest thing that is correct and useful on its own: store the message with the business transaction, forward it to the broker from a worker. Everything that is a new durable contract of its own belongs in follow-ups, so that each can be discussed and shipped separately.
+
+Two of your points landed here, since the contract is not released yet:
+
+- The relay no longer trusts the stamp to survive the dispatch. A listener on `SendMessageToTransportsEvent` could remove the `OutboxStamp` before the sender ran, turning a relay back into a new send, which stored the message in the outbox again. The middleware now reasserts the stamp it decided to relay on.
+- A Doctrine integration test proves the transactional claim rather than documenting it. It runs on SQLite, so it needs no database service: with the business transaction rolled back, neither an outbox row nor a direct publication remains, and with it committed the row is stored while the target is still empty.
+
+I also documented three of the operational points you raise: publication order is not guaranteed, the relay decodes the stored message so it needs the message classes deployed, and the Doctrine redelivery timeout of one hour is worth lowering for an outbox.
+
+On two points I see it differently:
+
+- Enforcing that the outbox is transactional cannot be done generically today. A transport is built by a factory from a DSN that is usually an environment variable and is unresolved at compile time, and third-party transports are opaque. Verifying that the outbox shares the connection of the business transaction needs transports to expose a capability, which is your point five in another form. That is worth doing, and it is a separate discussion.
+- Stamp forgery is a weak threat model here. Anyone who can write to the queue already controls the message payload and its class. The redelivery bypass is also deliberate: a message replayed by `messenger:failed:retry` went through the outbox already, and sending it back there would store it twice.
+
+The rest I read as follow-ups rather than changes to this pull request: a stable logical message identity with correlation and causation, the transactional inbox, preparing the target payload before the commit, the batch relay, ordering guarantees, and relay observability. Your point about per-subscriber delivery is being discussed in #65898, which binds a handler to its own transport.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T14:35:28Z
+
+A follow-up on your second point, about a stable identity travelling with the message.
+
+Half of it is already proposed in #65899: a stamp implementing `PropagatedStampInterface` is copied onto every message dispatched while the message carrying it is handled, at any depth and across buses. That pull request now also ships a `CorrelationStamp` built on it, so the flow identifier is part of the component rather than something each application reinvents.
+
+I checked what that gives here, with the two branches merged and a correlation stamp attached to the command that opens the flow:
+
+```
+1. stored in the outbox: 1, trace=abc-123, outbox target=orders
+2. forwarded to the target: 1, trace=abc-123, outbox stamp=stripped
+3. handled by the consumer: 1
+```
+
+The stamp is copied onto the event the command handler emits, stored in the outbox row with it, forwarded to the broker with it, and reaches the consumer. Neither branch knows about the other, and they touch disjoint files, so either can land first. The one requirement is that such a stamp is sendable, since it is serialized twice on that path.
+
+What remains of your point is therefore narrower than I wrote earlier: a per-message identifier and the causation link. Causation is not plain propagation, since a child inherits the correlation unchanged but takes the parent's message id as its cause, so it needs its own derivation step. That is the piece I would build next, on top of #65899 rather than here.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T10:18:40Z
+
+Rebased on 8.2, and answered the question in the description by adding `exclude_system_tags=true` to the tags listing.
+
+The tags `write()` sets through the `uploads` endpoint are custom tags: `system_tag` is defined as "created automatically by the system", which a value the client supplies is not. Separately, every upload creates one system upload tag of its own, because the bridge never sets `skip_upload_tags`. Listing every tag therefore turned each past upload into a domain, one per locale and domain pair, so a project pushed once with 10 locales and 20 domains would report 200 extra domains and download each of them.
+
+Also added `testReadWithoutDomainsNorLocales()`, since nothing covered both arguments being empty.
+
+Two follow-ups, neither for this PR: the bridge indexes locales by Phrase name rather than code, so a project whose locale is named `German` reads into `messages.German.xlf`; and `skip_upload_tags` is worth setting so the bridge stops leaving a system tag behind on every upload.

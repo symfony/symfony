@@ -39,6 +39,7 @@ class DebugCommand extends Command
      * @param array<string, string>                                          $senderAliases
      * @param array<string, list<string>>                                    $attributeMessages Message classes discovered via #[AsMessage] attribute mapped to their transports
      * @param array<string, string>                                          $failureTransports Failure transports mapped by source transport
+     * @param array<string, list<string>>                                    $handlerTransports Transports declared by handlers, mapped by handled message type
      */
     public function __construct(
         private array $mapping,
@@ -46,6 +47,7 @@ class DebugCommand extends Command
         private readonly array $senderAliases = [],
         private readonly array $attributeMessages = [],
         private readonly array $failureTransports = [],
+        private readonly array $handlerTransports = [],
     ) {
         parent::__construct();
     }
@@ -121,6 +123,11 @@ class DebugCommand extends Command
                     if ($handlerDescription = self::getClassDescription($handler[0])) {
                         $tableRows[] = [\sprintf('               <comment>%s</>', $handlerDescription)];
                     }
+
+                    $fromTransport = $handler[1]['from_transport'] ?? null;
+                    if (null !== $fromTransport && $this->senderAliases && !isset($this->senderAliases[$fromTransport]) && !\in_array($fromTransport, $this->senderAliases, true)) {
+                        $tableRows[] = [\sprintf('               <fg=red>transport "%s" is not configured</>', $fromTransport)];
+                    }
                 }
 
                 if (!$handlers) {
@@ -158,7 +165,7 @@ class DebugCommand extends Command
         }
 
         if ($input->mustSuggestOptionValuesFor('message')) {
-            $messages = array_keys($this->sendersMap + $this->attributeMessages);
+            $messages = array_keys($this->sendersMap + $this->attributeMessages + $this->handlerTransports);
             foreach ($this->mapping as $handlersByMessage) {
                 $messages = array_merge($messages, array_keys($handlersByMessage));
             }
@@ -243,7 +250,7 @@ class DebugCommand extends Command
         $serviceToAlias = array_flip($this->senderAliases);
         $transportNames = [];
 
-        foreach (SendersLocator::getSenderAliases($message, $this->sendersMap) as $senderAlias) {
+        foreach ([...SendersLocator::getSenderAliases($message, $this->sendersMap), ...$this->getHandlerTransportsForMessage($message)] as $senderAlias) {
             $transportName = $serviceToAlias[$senderAlias] ?? $senderAlias;
             if (!\in_array($transportName, $transportNames, true)) {
                 $transportNames[] = $transportName;
@@ -276,8 +283,8 @@ class DebugCommand extends Command
             if (!$rules) {
                 $io->writeln('    <comment>No routing rules.</>');
             } else {
-                foreach ($rules as [$rule, $fromAttribute]) {
-                    $io->writeln('    '.$this->formatRoutingRule($rule, $fromAttribute));
+                foreach ($rules as [$rule, $source]) {
+                    $io->writeln('    '.$this->formatRoutingRule($rule, $source));
                 }
             }
             if ($failureTransport = $this->getFailureTransportName($transportName)) {
@@ -288,7 +295,7 @@ class DebugCommand extends Command
     }
 
     /**
-     * @return array<string, list<array{0: string, 1: bool}>>
+     * @return array<string, list<array{0: string, 1: string|null}>>
      */
     private function getRulesByTransport(?string $messageClass): array
     {
@@ -303,7 +310,7 @@ class DebugCommand extends Command
         foreach ($this->sendersMap as $rule => $senders) {
             foreach ($senders as $sender) {
                 $transportName = $serviceToAlias[$sender] ?? $sender;
-                $rulesByTransport[$transportName][] = [$rule, false];
+                $rulesByTransport[$transportName][] = [$rule, null];
             }
         }
 
@@ -314,8 +321,17 @@ class DebugCommand extends Command
 
             foreach ($transports as $transport) {
                 $transportName = $serviceToAlias[$transport] ?? $transport;
-                if (!\in_array([$message, true], $rulesByTransport[$transportName] ?? [], true)) {
-                    $rulesByTransport[$transportName][] = [$message, true];
+                if (!\in_array([$message, 'attribute'], $rulesByTransport[$transportName] ?? [], true)) {
+                    $rulesByTransport[$transportName][] = [$message, 'attribute'];
+                }
+            }
+        }
+
+        foreach ($this->handlerTransports as $rule => $transports) {
+            foreach ($transports as $transport) {
+                $transportName = $serviceToAlias[$transport] ?? $transport;
+                if (!\in_array([$rule, 'handler'], $rulesByTransport[$transportName] ?? [], true)) {
+                    $rulesByTransport[$transportName][] = [$rule, 'handler'];
                 }
             }
         }
@@ -332,7 +348,7 @@ class DebugCommand extends Command
     /**
      * @param array<string, string> $serviceToAlias
      *
-     * @return array<string, list<array{0: string, 1: bool}>>
+     * @return array<string, list<array{0: string, 1: string|null}>>
      */
     private function getRulesByTransportForMessage(string $messageClass, array $serviceToAlias): array
     {
@@ -353,7 +369,7 @@ class DebugCommand extends Command
 
                     $seen[$senderAlias] = true;
                     $transportName = $serviceToAlias[$senderAlias] ?? $senderAlias;
-                    $rulesByTransport[$transportName][] = [$rule, false];
+                    $rulesByTransport[$transportName][] = [$rule, null];
                 }
             }
         } else {
@@ -365,8 +381,20 @@ class DebugCommand extends Command
 
                     $seen[$senderAlias] = true;
                     $transportName = $serviceToAlias[$senderAlias] ?? $senderAlias;
-                    $rulesByTransport[$transportName][] = [$rule, true];
+                    $rulesByTransport[$transportName][] = [$rule, 'attribute'];
                 }
+            }
+        }
+
+        foreach (HandlersLocator::listTypesForClass($messageClass) as $rule) {
+            foreach ($this->handlerTransports[$rule] ?? [] as $senderAlias) {
+                if (isset($seen[$senderAlias])) {
+                    continue;
+                }
+
+                $seen[$senderAlias] = true;
+                $transportName = $serviceToAlias[$senderAlias] ?? $senderAlias;
+                $rulesByTransport[$transportName][] = [$rule, 'handler'];
             }
         }
 
@@ -411,7 +439,24 @@ class DebugCommand extends Command
         return $failureTransport === $transportName ? null : $failureTransport;
     }
 
-    private function formatRoutingRule(string $rule, bool $fromAttribute): string
+    /**
+     * @return list<string>
+     */
+    private function getHandlerTransportsForMessage(string $message): array
+    {
+        $transports = [];
+        foreach (HandlersLocator::listTypesForClass($message) as $type) {
+            foreach ($this->handlerTransports[$type] ?? [] as $transport) {
+                if (!\in_array($transport, $transports, true)) {
+                    $transports[] = $transport;
+                }
+            }
+        }
+
+        return $transports;
+    }
+
+    private function formatRoutingRule(string $rule, ?string $source): string
     {
         $descriptions = [];
         if ('*' === $rule) {
@@ -422,8 +467,10 @@ class DebugCommand extends Command
             $descriptions[] = 'interface, matches implementers';
         }
 
-        if ($fromAttribute) {
+        if ('attribute' === $source) {
             $descriptions[] = 'from #[AsMessage]';
+        } elseif ('handler' === $source) {
+            $descriptions[] = 'from #[AsMessageHandler]';
         }
 
         return $rule.($descriptions ? ' ('.implode(', ', $descriptions).')' : '');

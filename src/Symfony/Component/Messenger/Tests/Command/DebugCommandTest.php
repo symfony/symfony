@@ -378,6 +378,40 @@ class DebugCommandTest extends TestCase
         $this->assertStringNotContainsString('No routing rules apply to this message.', $display);
     }
 
+    public function testOutputKeepsTheAttributeAnnotationWhenAHandlerDeclaresATransport()
+    {
+        $command = new DebugCommand(
+            ['command_bus' => [DummyMessageWithAttribute::class => [[DummyCommandHandler::class, ['from_transport' => 'audit']]]]],
+            [],
+            [
+                'first_sender' => 'messenger.transport.first_sender',
+                'second_sender' => 'messenger.transport.second_sender',
+                'audit' => 'messenger.transport.audit',
+            ],
+            [
+                DummyMessageWithAttribute::class => ['first_sender', 'second_sender'],
+            ],
+            [],
+            [
+                DummyMessageWithAttribute::class => ['audit'],
+            ],
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--message' => DummyMessageWithAttribute::class], ['decorated' => false]);
+        $display = $tester->getDisplay(true);
+
+        $this->assertSame(2, substr_count($display, DummyMessageWithAttribute::class.' (from #[AsMessage])'));
+        $this->assertSame(1, substr_count($display, DummyMessageWithAttribute::class.' (from #[AsMessageHandler])'));
+        $this->assertStringContainsString('audit', $display);
+
+        $tester->execute([], ['decorated' => false]);
+        $display = $tester->getDisplay(true);
+
+        $this->assertSame(2, substr_count($display, DummyMessageWithAttribute::class.' (from #[AsMessage])'));
+        $this->assertSame(1, substr_count($display, DummyMessageWithAttribute::class.' (from #[AsMessageHandler])'));
+    }
+
     public function testOutputDoesNotListAttributeRuleOverriddenByConfigurationUsingSameTransport()
     {
         $command = new DebugCommand(
@@ -426,6 +460,39 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('not routed', $display);
         $this->assertStringContainsString('No routing rules apply to this message.', $display);
         $this->assertStringNotContainsString('async', $display);
+    }
+
+    public function testOutputWarnsAboutHandlersBoundToAnUnknownTransport()
+    {
+        $command = new DebugCommand(
+            [
+                'command_bus' => [
+                    DummyCommand::class => [
+                        [DummyCommandHandler::class, ['from_transport' => 'ghost']],
+                        [DummyCommandHandler::class, ['from_transport' => 'async']],
+                    ],
+                ],
+            ],
+            [DummyCommand::class => ['messenger.transport.async']],
+            ['async' => 'messenger.transport.async'],
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute([], ['decorated' => false]);
+        $display = $tester->getDisplay(true);
+
+        $this->assertStringContainsString('transport "ghost" is not configured', $display);
+        $this->assertSame(1, substr_count($display, 'is not configured'));
+    }
+
+    public function testOutputDoesNotWarnAboutBoundHandlersWithoutConfiguredTransports()
+    {
+        $command = new DebugCommand(['command_bus' => [DummyCommand::class => [[DummyCommandHandler::class, ['from_transport' => 'ghost']]]]]);
+
+        $tester = new CommandTester($command);
+        $tester->execute([], ['decorated' => false]);
+
+        $this->assertStringNotContainsString('is not configured', $tester->getDisplay(true));
     }
 
     public function testExceptionOnUnknownBusArgument()

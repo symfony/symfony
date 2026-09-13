@@ -890,9 +890,11 @@ class LokaliseProviderTest extends ProviderTestCase
     public function testReadWithoutDomainsOrLocalesReadsEverything(array $domains, array $locales)
     {
         $expectedDomains = $domains ?: ['messages', 'validators'];
-        $expectedLocales = $locales ?: ['en', 'fr'];
+        // Lokalise returns language codes with a "-" separator
+        $expectedLanguages = $locales ?: ['en', 'pt-BR'];
+        $expectedLocales = array_map(static fn (string $language) => str_replace('-', '_', $language), $expectedLanguages);
 
-        $response = function (string $method, string $url, array $options = []) use ($domains, $locales, $expectedDomains, $expectedLocales): ResponseInterface {
+        $response = function (string $method, string $url, array $options = []) use ($domains, $locales, $expectedDomains, $expectedLanguages): ResponseInterface {
             $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/files/export', $url);
 
             // an empty filter is no filter at all for Lokalise
@@ -901,12 +903,14 @@ class LokaliseProviderTest extends ProviderTestCase
             $this->assertSame(array_map(static fn (string $domain) => $domain.'.xliff', $domains), $body['filter_filenames']);
 
             $files = [];
-            foreach ($expectedLocales as $locale) {
+            foreach ($expectedLanguages as $language) {
+                $locale = str_replace('-', '_', $language);
+
                 foreach ($expectedDomains as $domain) {
-                    $files[$locale][$domain.'.xliff'] = ['content' => <<<XLIFF
+                    $files[$language][$domain.'.xliff'] = ['content' => <<<XLIFF
                         <?xml version="1.0" encoding="UTF-8"?>
                         <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-                          <file source-language="en" target-language="$locale" datatype="plaintext" original="file.ext">
+                          <file source-language="en" target-language="$language" datatype="plaintext" original="file.ext">
                             <body>
                               <trans-unit id="a" resname="a">
                                 <source>a</source>

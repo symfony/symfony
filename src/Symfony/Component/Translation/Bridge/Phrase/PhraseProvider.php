@@ -177,22 +177,32 @@ class PhraseProvider implements ProviderInterface
         }
 
         $phraseCode = str_replace('_', '-', $locale);
+        $phraseLocale = $this->findLocale($phraseCode) ?? $this->createLocale($phraseCode);
 
-        if (!\array_key_exists($phraseCode, $this->phraseLocales)) {
-            $this->createLocale($phraseCode);
-        }
-
-        return $this->phraseLocales[$phraseCode]['id'];
+        return $phraseLocale['id'];
     }
 
     private function getFallbackLocale(string $locale): ?string
     {
-        $phraseLocale = str_replace('_', '-', $locale);
-
-        return $this->phraseLocales[$phraseLocale]['fallback_locale']['name'] ?? null;
+        return $this->findLocale(str_replace('_', '-', $locale))['fallback_locale']['name'] ?? null;
     }
 
-    private function createLocale(string $locale): void
+    private function findLocale(string $phraseCode): ?array
+    {
+        if (isset($this->phraseLocales[$phraseCode])) {
+            return $this->phraseLocales[$phraseCode];
+        }
+
+        foreach ($this->phraseLocales as $phraseLocale) {
+            if ($phraseCode === $phraseLocale['name']) {
+                return $phraseLocale;
+            }
+        }
+
+        return null;
+    }
+
+    private function createLocale(string $locale): array
     {
         $response = $this->httpClient->request('POST', 'locales', [
             'body' => [
@@ -213,7 +223,7 @@ class PhraseProvider implements ProviderInterface
 
         $phraseLocale = $response->toArray();
 
-        $this->phraseLocales[$phraseLocale['name']] = $phraseLocale;
+        return $this->phraseLocales[$phraseLocale['code']] = $phraseLocale;
     }
 
     private function initLocales(): void
@@ -235,7 +245,7 @@ class PhraseProvider implements ProviderInterface
             }
 
             foreach ($response->toArray() as $phraseLocale) {
-                $this->phraseLocales[$phraseLocale['name']] = $phraseLocale;
+                $this->phraseLocales[$phraseLocale['code']] = $phraseLocale;
             }
 
             $pagination = $response->getHeaders()['pagination'][0] ?? '{}';

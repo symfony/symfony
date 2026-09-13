@@ -91,7 +91,7 @@
         "symfony/asset": "<8.2",
         "symfony/asset-mapper": "<8.2",
         "symfony/console": "<8.1.2",
-        "symfony/form": "<7.4",
+        "symfony/form": "<8.2",
         "symfony/html-sanitizer": "<8.2",
         "symfony/http-client": "<8.2",
         "symfony/json-path": "<8.2",

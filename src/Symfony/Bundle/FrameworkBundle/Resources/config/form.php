@@ -15,6 +15,7 @@ use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\EnumFormTypeGuesser;
+use Symfony\Component\Form\Extension\Core\Type\BoundsType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -27,6 +28,7 @@ use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExt
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormFlowTypeSessionDataStorageExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
+use Symfony\Component\Form\Extension\Validator\Type\BoundsTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension;
@@ -126,6 +128,10 @@ return static function (ContainerConfigurator $container) {
             ->args([service('translator')->ignoreOnInvalid()])
             ->tag('form.type')
 
+        ->set('form.type.bounds', BoundsType::class)
+            ->args([service('translator')->ignoreOnInvalid()])
+            ->tag('form.type')
+
         ->set('form.type_extension.form.transformation_failure_handling', TransformationFailureExtension::class)
             ->args([service('translator')->ignoreOnInvalid()])
             ->tag('form.type_extension', ['extended-type' => FormType::class])
@@ -157,6 +163,9 @@ return static function (ContainerConfigurator $container) {
                 service('translator')->ignoreOnInvalid(),
             ])
             ->tag('form.type_extension', ['extended-type' => FormType::class])
+
+        ->set('form.type_extension.bounds.validator', BoundsTypeValidatorExtension::class)
+            ->tag('form.type_extension')
 
         ->set('form.type_extension.repeated.validator', RepeatedTypeValidatorExtension::class)
             ->tag('form.type_extension')

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T10:18:47Z
+
+Amended three nits: the new `setDefinition()` call is on one line, the comment in `getUrl()` is shorter, and the test asserts the `Reference` with `ContainerInterface::NULL_ON_INVALID_REFERENCE` instead of casting it to a string, since that flag is what matters when this reaches 8.2.

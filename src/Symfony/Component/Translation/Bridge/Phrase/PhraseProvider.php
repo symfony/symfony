@@ -89,6 +89,18 @@ class PhraseProvider implements ProviderInterface
     {
         $translatorBag = new TranslatorBag();
 
+        if (!$locales) {
+            if (!$this->phraseLocales) {
+                $this->initLocales();
+            }
+
+            // getLocale() looks locales up by name, so reading them all goes through their names too
+            $locales = str_replace('-', '_', array_keys($this->phraseLocales));
+        }
+
+        // domains are the tags write() attaches to the keys it uploads
+        $domains = $domains ?: $this->getTags();
+
         foreach ($locales as $locale) {
             $phraseLocale = $this->getLocale($locale);
 
@@ -241,6 +253,39 @@ class PhraseProvider implements ProviderInterface
             $pagination = $response->getHeaders()['pagination'][0] ?? '{}';
             $page = json_decode($pagination, true)['next_page'] ?? null;
         } while (null !== $page);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getTags(): array
+    {
+        $tags = [];
+        $page = 1;
+
+        do {
+            $response = $this->client->request('GET', 'tags', [
+                'query' => [
+                    'per_page' => 100,
+                    'page' => $page,
+                ],
+            ]);
+
+            if (200 !== $statusCode = $response->getStatusCode()) {
+                $this->logger->error(\sprintf('Unable to get tags from phrase: "%s".', $response->getContent(false)));
+
+                $this->throwProviderException($statusCode, $response, 'Unable to get tags from phrase.');
+            }
+
+            foreach ($response->toArray() as $tag) {
+                $tags[] = $tag['name'];
+            }
+
+            $pagination = $response->getHeaders()['pagination'][0] ?? '{}';
+            $page = json_decode($pagination, true)['next_page'] ?? null;
+        } while (null !== $page);
+
+        return $tags;
     }
 
     private function throwProviderException(int $statusCode, ResponseInterface $response, string $message): void

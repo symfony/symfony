@@ -20,6 +20,7 @@ use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
+use Symfony\Component\DependencyInjection\Compiler\ClosableServicePass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
@@ -61,8 +62,10 @@ class ServicesBundle extends AbstractBundle
             'kernel.event_subscriber',
             'kernel.event_listener',
             'kernel.reset',
+            'kernel.close',
         ]), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
         $container->addCompilerPass(new ResettableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
+        $container->addCompilerPass(new ClosableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
     }
 
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void

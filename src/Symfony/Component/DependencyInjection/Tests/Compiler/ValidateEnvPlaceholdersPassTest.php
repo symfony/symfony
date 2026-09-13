@@ -398,6 +398,25 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame('%env(REPORTED_DYNAMIC)%', $config['dynamic']);
     }
 
+    public function testTheEnabledNodeOfAnEnableableSectionInlinesItsEnvVar()
+    {
+        $_ENV['SECTION_ENABLED'] = 'false';
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension(new EnableableConfiguration()));
+        $container->prependExtensionConfig('env_extension', [
+            'section' => ['enabled' => '%env(bool:SECTION_ENABLED)%'],
+        ]);
+
+        try {
+            $this->doProcess($container);
+        } finally {
+            unset($_ENV['SECTION_ENABLED']);
+        }
+
+        $this->assertFalse($ext->getConfig()['section']['enabled']);
+    }
+
     private function doProcess(ContainerBuilder $container): void
     {
         (new MergeExtensionConfigurationPass())->process($container);
@@ -477,6 +496,20 @@ class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInte
                     ->requiresAtLeastOneElement()
                     ->scalarPrototype()->end()
                 ->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+}
+
+class EnableableConfiguration implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('env_extension');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->arrayNode('section')->canBeEnabled()->end()
             ->end();
 
         return $treeBuilder;

@@ -15,7 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Context\RequestStackContext;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\Asset\PathPackage;
+use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
+use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\HttpFoundation\Request;
@@ -149,6 +151,85 @@ class MapperAwareAssetPackageTest extends TestCase
         );
 
         $this->assertSame('/assets/images/foo.123456.png', $assetMapperPackage->getUrl('images/foo.png'));
+    }
+
+    public function testGetUrlSkipsTheVersionOfAssetsResolvedByTheMapper()
+    {
+        $assetMapperPackage = new MapperAwareAssetPackage(
+            new PathPackage('/', new StaticVersionStrategy('v1')),
+            $this->createAssetMapper(),
+            null,
+            null,
+            new PathPackage('/', new EmptyVersionStrategy()),
+            '/assets/',
+        );
+
+        // the content hash is the version, a second one would point at a file that does not exist
+        $this->assertSame('/assets/images/foo.123456.png', $assetMapperPackage->getUrl('images/foo.png'));
+        // assets the mapper knows nothing about keep the configured version
+        $this->assertSame('/legacy.css?v1', $assetMapperPackage->getUrl('legacy.css'));
+    }
+
+    public function testGetUrlKeepsTheBaseUrlOfAssetsResolvedByTheMapper()
+    {
+        $assetMapperPackage = new MapperAwareAssetPackage(
+            new UrlPackage(['https://cdn.example.com'], new StaticVersionStrategy('v1')),
+            $this->createAssetMapper(),
+            null,
+            null,
+            new UrlPackage(['https://cdn.example.com'], new EmptyVersionStrategy()),
+            '/assets/',
+        );
+
+        $this->assertSame('https://cdn.example.com/assets/images/foo.123456.png', $assetMapperPackage->getUrl('images/foo.png'));
+    }
+
+    public function testGetUrlSkipsTheVersionOfAPublicPathTheMapperDoesNotResolve()
+    {
+        // the import map renders the keys of its entries, which are public paths without a digest
+        $assetMapperPackage = new MapperAwareAssetPackage(
+            new PathPackage('/', new StaticVersionStrategy('v1')),
+            $this->createAssetMapper(),
+            null,
+            null,
+            new PathPackage('/', new EmptyVersionStrategy()),
+            '/assets/',
+        );
+
+        $this->assertSame('/assets/app.js', $assetMapperPackage->getUrl('assets/app.js'));
+        $this->assertSame('/legacy.css?v1', $assetMapperPackage->getUrl('legacy.css'));
+    }
+
+    public function testGetUrlSkipsTheVersionWithACustomPublicPrefix()
+    {
+        $assetMapperPackage = new MapperAwareAssetPackage(
+            new PathPackage('/', new StaticVersionStrategy('v1')),
+            $this->createAssetMapper(),
+            null,
+            null,
+            new PathPackage('/', new EmptyVersionStrategy()),
+            '/static/',
+        );
+
+        $this->assertSame('/static/app.js', $assetMapperPackage->getUrl('static/app.js'));
+        // the default prefix has nothing special about it, it is versioned like any other path
+        $this->assertSame('/assets/app.js?v1', $assetMapperPackage->getUrl('assets/app.js'));
+    }
+
+    public function testGetUrlSkipsTheVersionWithTheDevServer()
+    {
+        $requestStack = $this->createRequestStack('/index.php/blog', '/index.php');
+        $assetMapperPackage = new MapperAwareAssetPackage(
+            new PathPackage('', new StaticVersionStrategy('v1'), new RequestStackContext($requestStack)),
+            $this->createAssetMapper(),
+            $requestStack,
+            '/assets/',
+            new PathPackage('', new EmptyVersionStrategy(), new RequestStackContext($requestStack)),
+            '/assets/',
+        );
+
+        // the front controller is still added, and the version is still skipped
+        $this->assertSame('/index.php/assets/images/foo.123456.png', $assetMapperPackage->getUrl('images/foo.png'));
     }
 
     public static function getUrlTests(): iterable

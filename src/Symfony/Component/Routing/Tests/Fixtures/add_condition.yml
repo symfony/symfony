@@ -1,0 +1,15 @@
+route_with_conditions:
+    path:          /route
+    condition:     'context.getMethod() == "GET"'
+    add_condition: 'request.isSecure()'
+
+import_with_add_condition:
+    resource:      validpattern.yml
+    name_prefix:   added_
+    add_condition: 'request.isSecure()'
+
+import_with_both_conditions:
+    resource:      validpattern.yml
+    name_prefix:   replaced_
+    condition:     'context.getMethod() == "POST"'
+    add_condition: 'request.isSecure()'

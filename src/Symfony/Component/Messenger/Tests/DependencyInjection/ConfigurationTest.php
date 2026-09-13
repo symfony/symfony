@@ -88,6 +88,22 @@ class ConfigurationTest extends TestCase
         ], $config['transports']['async']['claim_check']);
     }
 
+    public function testOutboxConfiguration()
+    {
+        $config = $this->process([
+            'transports' => [
+                'orders' => [
+                    'dsn' => 'amqp://localhost/%2f/orders',
+                    'outbox' => 'outbox',
+                ],
+                'outbox' => 'doctrine://default?queue_name=outbox',
+            ],
+        ]);
+
+        $this->assertSame('outbox', $config['transports']['orders']['outbox']);
+        $this->assertNull($config['transports']['outbox']['outbox']);
+    }
+
     public function testBusMiddlewareDontMerge()
     {
         $config = new Processor()->processConfiguration($this->configuration(), [

@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Event\MessageSentToTransportsEvent;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
+use Symfony\Component\Messenger\Stamp\OutboxStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
@@ -161,6 +162,83 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = $middleware->handle($envelope, $this->getStackMock());
 
         $this->assertNull($envelope->last(SentStamp::class), 'it does not add sent stamp for received messages');
+    }
+
+    public function testItForwardsAReceivedMessageCarryingAnOutboxStamp()
+    {
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('outbox'), new OutboxStamp('orders'));
+        $target = $this->createMock(SenderInterface::class);
+        $routed = $this->createMock(SenderInterface::class);
+
+        $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['routed']], ['orders' => $target, 'routed' => $routed]);
+        $middleware = new SendMessageMiddleware($sendersLocator);
+
+        $target->expects($this->once())->method('send')->with($envelope->with(new SentStamp($target::class, 'orders')))->willReturnArgument(0);
+        $routed->expects($this->never())->method('send');
+
+        $envelope = $middleware->handle($envelope, $this->getStackMock(false));
+
+        $this->assertSame('orders', $envelope->last(SentStamp::class)?->getSenderAlias());
+    }
+
+    public function testItDispatchesTheEventsWhenForwardingFromTheOutbox()
+    {
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('outbox'), new OutboxStamp('orders'));
+        $target = $this->createMock(SenderInterface::class);
+        $target->expects($this->once())->method('send')->willReturnArgument(0);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $expectedEvents = [
+            new SendMessageToTransportsEvent($envelope, $senders = ['orders' => $target]),
+            new MessageSentToTransportsEvent($envelope->with(new SentStamp($target::class, 'orders')), $senders),
+        ];
+        $dispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function (object $event) use (&$expectedEvents) {
+                $expectedEvent = array_shift($expectedEvents);
+
+                $this->assertEquals($expectedEvent, $event);
+            });
+
+        $middleware = new SendMessageMiddleware($this->createSendersLocator([], ['orders' => $target]), $dispatcher);
+
+        $middleware->handle($envelope, $this->getStackMock(false));
+    }
+
+    public function testTheOutboxStampIsRestoredWhenAListenerRemovesIt()
+    {
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('outbox'), $outboxStamp = new OutboxStamp('orders'));
+        $target = $this->createMock(SenderInterface::class);
+        $target->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (Envelope $envelope) use ($outboxStamp) {
+                $this->assertSame([$outboxStamp], $envelope->all(OutboxStamp::class));
+
+                return true;
+            }))
+            ->willReturnArgument(0);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(SendMessageToTransportsEvent::class, static function (SendMessageToTransportsEvent $event) {
+            $event->setEnvelope($event->getEnvelope()->withoutAll(OutboxStamp::class));
+        });
+
+        $middleware = new SendMessageMiddleware($this->createSendersLocator([], ['orders' => $target]), $dispatcher);
+
+        $middleware->handle($envelope, $this->getStackMock(false));
+    }
+
+    public function testItHandlesAMessageReceivedFromTheTargetOfItsOutboxStamp()
+    {
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('orders'), new OutboxStamp('orders'));
+        $target = $this->createMock(SenderInterface::class);
+        $target->expects($this->never())->method('send');
+
+        $middleware = new SendMessageMiddleware($this->createSendersLocator([], ['orders' => $target]));
+
+        $envelope = $middleware->handle($envelope, $this->getStackMock());
+
+        $this->assertNull($envelope->last(SentStamp::class));
     }
 
     public function testItDispatchesTheEventOneTime()

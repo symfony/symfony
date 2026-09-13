@@ -18,8 +18,10 @@ use Symfony\Component\Messenger\Event\MessageSentToTransportsEvent;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
+use Symfony\Component\Messenger\Stamp\OutboxStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 
 /**
@@ -43,40 +45,49 @@ class SendMessageMiddleware implements MiddlewareInterface
             'class' => $envelope->getMessage()::class,
         ];
 
-        $sender = null;
+        $relayStamp = null;
 
-        if ($envelope->all(ReceivedStamp::class)) {
+        if (!$receivedStamp = $envelope->last(ReceivedStamp::class)) {
+            $senders = $this->sendersLocator->getSenders($envelope);
+        } elseif (($relayStamp = $envelope->last(OutboxStamp::class)) && $relayStamp->getTransportName() !== $receivedStamp->getTransportName()) {
+            $this->logger?->info('Forwarding message {class} from the outbox to {alias}', $context + ['alias' => $relayStamp->getTransportName()]);
+            $senders = $this->sendersLocator->getSenders($envelope->with(new TransportNamesStamp($relayStamp->getTransportName())));
+        } else {
             // it's a received message, do not send it back
             if (!$envelope->all(FlushBatchHandlersStamp::class)) {
                 $this->logger?->info('Received message {class}', $context);
             }
-        } else {
-            $senders = $this->sendersLocator->getSenders($envelope);
-            $senders = \is_array($senders) ? $senders : iterator_to_array($senders);
 
-            if (null !== $this->eventDispatcher && $senders) {
-                $event = new SendMessageToTransportsEvent($envelope, $senders);
-                $this->eventDispatcher->dispatch($event);
-                $envelope = $event->getEnvelope();
-            }
-
-            foreach ($senders as $alias => $sender) {
-                $this->logger?->info('Sending message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => $sender::class]);
-                $envelope = $sender->send($envelope->with(new SentStamp($sender::class, \is_string($alias) ? $alias : null)));
-            }
-
-            if (null !== $this->eventDispatcher && $senders) {
-                $this->eventDispatcher->dispatch(new MessageSentToTransportsEvent($envelope, $senders));
-            }
-
-            if (!$this->allowNoSenders && !$sender) {
-                throw new NoSenderForMessageException(\sprintf('No sender for message "%s".', $context['class']));
-            }
-        }
-
-        if (null === $sender) {
             return $stack->next()->handle($envelope, $stack);
         }
+
+        $senders = \is_array($senders) ? $senders : iterator_to_array($senders);
+
+        if (!$senders) {
+            if (!$this->allowNoSenders) {
+                throw new NoSenderForMessageException(\sprintf('No sender for message "%s".', $context['class']));
+            }
+
+            return $stack->next()->handle($envelope, $stack);
+        }
+
+        if (null !== $this->eventDispatcher) {
+            $event = new SendMessageToTransportsEvent($envelope, $senders);
+            $this->eventDispatcher->dispatch($event);
+            $envelope = $event->getEnvelope();
+
+            // the sender tells a relayed message from a new one by this stamp
+            if ($relayStamp && $relayStamp !== $envelope->last(OutboxStamp::class)) {
+                $envelope = $envelope->withoutAll(OutboxStamp::class)->with($relayStamp);
+            }
+        }
+
+        foreach ($senders as $alias => $sender) {
+            $this->logger?->info('Sending message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => $sender::class]);
+            $envelope = $sender->send($envelope->with(new SentStamp($sender::class, \is_string($alias) ? $alias : null)));
+        }
+
+        $this->eventDispatcher?->dispatch(new MessageSentToTransportsEvent($envelope, $senders));
 
         // message should only be sent and not be handled by the next middleware
         return $envelope;

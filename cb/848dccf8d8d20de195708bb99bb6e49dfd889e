@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-14T13:35:22Z
+
+on the note of https://github.com/symfony/symfony/pull/66016#discussion_r4005433041 I will submit my answer here because the thread is permanently "resolved" being the target of an outdated code:
+
+> true indeed. Thank you. But now I wonder... An entrypoint handles everything from start to login. including potentially to ask for username / email, redirection to SSO and such. Then finally may ask for a password and logs in if everything matches.
+In this case maybe it is not an entrypoint that we need but a new design of some kind. Which FormLogin and whatnot could implement.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-14T13:44:04Z
+
+@Neirda24 you were right on the second point too, and following it through made this PR considerably smaller.
+
+An entry point answers "who are you?", and its contract is to start authenticating an anonymous visitor. Re-authentication is a different question: the user is known, and the only thing being asked for is fresh proof that they still hold their credentials. Reusing `start()` for it was borrowing a mechanism whose semantics do not fit.
+
+Checking what the shipped authenticators would actually do if pointed at confirms it:
+
+ * `FormLoginAuthenticator::start()` redirects to `login_path`, which is the page a generated `SecurityController` bounces an already authenticated user away from.
+ * `HttpBasicAuthenticator::start()` returns a 401 with a fixed realm, and browsers answer that with the credentials they already cached, so nothing is re-entered.
+ * OIDC is the only one that can force it, through `prompt=login`, which is not in `MANAGED_PARAMS` and so is already settable via `authorization_params`.
+
+So the option was typed on an interface that, for two of the three, guaranteed a loop.
+
+The PR now adds a dedicated contract instead:
+
+```php
+interface ReAuthenticationEntryPointInterface
+{
+    public function startReAuthentication(Request $request, TokenInterface $token): Response;
+}
+```
+
+It takes the token rather than an exception, because knowing the user is the whole difference between this and `start()`. `re_authentication_entry_point` accepts only a service implementing it, so `form_login` can no longer be pointed at it at all, which is exactly the case that used to loop silently.
+
+That removed more than it added: the `RegisterEntryPointPass` change is gone entirely, along with its authenticator-key resolution, the validation we discussed on the other thread, and the `ReAuthenticationRequiredException` that only existed to be handed to `start()`. The pass is byte-identical to 8.2 again, and the wiring is one `new Reference()` in `SecurityExtension`. The PR went from 245 added lines to 182.
+
+Your instinct that this could be something `FormLogin` and others implement is where it should go next: an authenticator that knows how to force a fresh proof, OIDC first, can implement the interface and be selected without any configuration. Form login cannot, since the confirmation page is application surface that Symfony ships no template for, which is why a configured service stays the answer there rather than a workaround.
+
+Thanks for pushing on both points.

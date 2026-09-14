@@ -190,7 +190,11 @@ abstract class Descriptor implements DescriptorInterface
         foreach ($type->getTypeExtensions() as $extension) {
             $inheritedOptions = $optionsResolver->getDefinedOptions();
             $extension->configureOptions($optionsResolver);
-            $this->extensions[$extension::class] = array_diff($optionsResolver->getDefinedOptions(), $inheritedOptions);
+            // an extension of both a type and one of its parents defines its options at the highest level only
+            $this->extensions[$extension::class] = array_merge(
+                $this->extensions[$extension::class] ?? [],
+                array_diff($optionsResolver->getDefinedOptions(), $inheritedOptions),
+            );
         }
     }
 }

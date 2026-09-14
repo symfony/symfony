@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2026-09-14T10:04:31Z
+
+#66045 is probably needed first as it's going to exercise this PR more.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-09-14T10:20:38Z
+
+The other PR was merged in 8.2, so it does not increase the coverage in this PR (not until it is merged up)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-09-14T10:26:34Z
+
+> The other PR was merged in 8.2, so it does not increase the coverage in this PR (not until it is merged up)
+
+I messed it up, cherry-picked in 6.4 :)

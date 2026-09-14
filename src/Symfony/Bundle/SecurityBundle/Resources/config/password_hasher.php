@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\PasswordHasher\EventListener\PasswordHasherListener;
 use Symfony\Component\Form\Extension\PasswordHasher\Type\PasswordTypePasswordHasherExtension;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
@@ -40,6 +39,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('form.listener.password_hasher'),
             ])
-            ->tag('form.type_extension', ['extended-type' => PasswordType::class])
+            ->tag('form.type_extension')
     ;
 };

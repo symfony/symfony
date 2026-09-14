@@ -258,24 +258,29 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         try {
             $display = $this->runEnvVarsCommand()->getDisplay(true);
 
-            $this->assertMatchesRegularExpression('/Name\s+Default value\s+Real value\s+Used/', $display);
+            $this->assertMatchesRegularExpression('/Name\s+Default value\s+Real value\s+Used\s+Inlined/', $display);
 
             // APP_FOO has a container default and APP_BAR has nothing, but no service reads either,
             // so both are unused; APP_BAZ is in .env and read by a service, so it is used
-            $this->assertMatchesRegularExpression('/^  APP_BAR\s+n\/a\s+"bar"\s+no\s*$/m', $display);
-            $this->assertMatchesRegularExpression('/^  APP_BAZ\s+n\/a\s+"baz"\s+yes\s*$/m', $display);
-            $this->assertMatchesRegularExpression('/^  APP_FOO\s+"foo"\s+"foo"\s+no\s*$/m', $display);
-            $this->assertMatchesRegularExpression('/^  JSON\s+"\[1, "2.5", 3\]"\s+n\/a\s+yes\s*$/m', $display);
-            $this->assertMatchesRegularExpression('/^  REAL\s+n\/a\s+"value"\s+yes\s*$/m', $display);
-            $this->assertMatchesRegularExpression('/^  UNKNOWN\s+n\/a\s+n\/a\s+yes\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  APP_BAR\s+n\/a\s+"bar"\s+no\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  APP_BAZ\s+n\/a\s+"baz"\s+yes\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  APP_FOO\s+"foo"\s+"foo"\s+no\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  JSON\s+"\[1, "2.5", 3\]"\s+n\/a\s+yes\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  REAL\s+n\/a\s+"value"\s+yes\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  UNKNOWN\s+n\/a\s+n\/a\s+yes\s+no\s*$/m', $display);
 
             // variables the framework itself reads are listed, and are not reported as missing
             // because their placeholder carries a "default" fallback
-            $this->assertMatchesRegularExpression('/^  SYMFONY_TRUSTED_HOSTS\s+n\/a\s+\S+\s+yes\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  SYMFONY_TRUSTED_HOSTS\s+n\/a\s+\S+\s+yes\s+no\s*$/m', $display);
             $this->assertStringContainsString('The following variables are missing:', $display);
             $this->assertStringContainsString('* UNKNOWN', $display);
             $this->assertStringNotContainsString('* SYMFONY_TRUSTED_HOSTS', $display);
             $this->assertStringNotContainsString('* APP_RUNTIME_ENV', $display);
+
+            // "framework.form.enabled" reads FORM_ENABLED while the container is compiled,
+            // so nothing reads it at runtime anymore
+            $this->assertMatchesRegularExpression('/^  FORM_ENABLED\s+"true"\s+n\/a\s+yes\s+yes\s*$/m', $display);
+            $this->assertStringContainsString('Inlined variables were read when the container was compiled', $display);
         } finally {
             putenv('REAL');
             putenv('APP_FOO');
@@ -293,9 +298,9 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
             $display = $this->runEnvVarsCommand()->getDisplay(true);
 
             // an absent SYMFONY_DOTENV_VARS used to add a row with no name and a count of its own
-            $this->assertDoesNotMatchRegularExpression('/^\s+n\/a\s+n\/a\s+(yes|no)\s*$/m', $display);
+            $this->assertDoesNotMatchRegularExpression('/^\s+n\/a\s+n\/a\s+(yes|no)\s+(yes|no)\s*$/m', $display);
             $this->assertStringNotContainsString('* '.\PHP_EOL, $display);
-            $this->assertMatchesRegularExpression('/^  REAL\s+n\/a\s+"value"\s+yes\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  REAL\s+n\/a\s+"value"\s+yes\s+no\s*$/m', $display);
             $this->assertStringNotContainsString('APP_BAR', $display);
         } finally {
             putenv('REAL');

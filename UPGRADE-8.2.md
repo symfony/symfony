@@ -13,6 +13,14 @@ AssetMapper
 
  * Add argument `$useEsm` to `ImportMapConfigReader::createRemoteEntry()`
 
+Config
+------
+
+ * [BC BREAK] The `enabled` node of the sections declared with `canBeEnabled()` or `canBeDisabled()` reads the
+   env vars it references while the container is compiled, where the extension used to get a placeholder that
+   was always truthy. A section configured with `enabled: '%env(bool:FOO)%'` is now really disabled when `FOO`
+   is false, and compiling fails when `FOO` has no value at that point
+
 Console
 -------
 

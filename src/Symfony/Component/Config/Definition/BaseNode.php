@@ -30,6 +30,7 @@ abstract class BaseNode implements NodeInterface
 
     private static array $placeholderUniquePrefixes = [];
     private static array $placeholders = [];
+    private static ?\Closure $placeholderResolver = null;
 
     protected string $name;
     protected array $normalizationClosures = [];
@@ -89,6 +90,19 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Registers the resolver that gives the actual value of a dynamic placeholder.
+     *
+     * Nodes that declare their dynamic values must be inlined use it to replace placeholders
+     * by their actual value, before the value is normalized.
+     *
+     * @internal
+     */
+    public static function setPlaceholderResolver(?\Closure $resolver): void
+    {
+        self::$placeholderResolver = $resolver;
+    }
+
+    /**
      * Resets all current placeholders available.
      *
      * @internal
@@ -97,6 +111,7 @@ abstract class BaseNode implements NodeInterface
     {
         self::$placeholderUniquePrefixes = [];
         self::$placeholders = [];
+        self::$placeholderResolver = null;
     }
 
     public function setAttribute(string $key, mixed $value): void
@@ -378,6 +393,10 @@ abstract class BaseNode implements NodeInterface
 
     final public function normalize(mixed $value): mixed
     {
+        if (null !== self::$placeholderResolver && $this->getAttribute('inline_env_vars', false)) {
+            $value = (self::$placeholderResolver)($value, $this->getPath());
+        }
+
         $value = $this->preNormalize($value);
 
         // run custom normalization closures
@@ -532,6 +551,11 @@ abstract class BaseNode implements NodeInterface
 
     private function doValidateType(mixed $value): void
     {
+        if (null !== $this->handlingPlaceholder && $this->getAttribute('inline_env_vars', false)) {
+            // the value is inlined before it is used, so there is no dynamic value to validate
+            return;
+        }
+
         if (null !== $this->handlingPlaceholder && !$this->allowPlaceholders()) {
             $e = new InvalidTypeException(\sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));
             $e->setPath($this->getPath());

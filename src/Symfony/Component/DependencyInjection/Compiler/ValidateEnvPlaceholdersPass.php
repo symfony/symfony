@@ -74,6 +74,19 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
             $this->extensionConfig[$name] = $processor->processConfiguration($configuration, $config);
         }
 
+        // placeholders that no definition references are about to be dropped, while the configuration
+        // can still hold the ones that were inlined, so name their env var before they become unknown
+        $names = [];
+        foreach ($resolvingBag->getUnusedEnvPlaceholders() as $env => $placeholders) {
+            foreach ($placeholders as $placeholder) {
+                $names[$placeholder] = \sprintf('%%env(%s)%%', $env);
+            }
+        }
+
+        if ($names) {
+            $this->extensionConfig = $this->nameEnvPlaceholders($this->extensionConfig, $names);
+        }
+
         $resolvingBag->clearUnusedEnvPlaceholders();
     }
 
@@ -133,5 +146,22 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         $defaultType = null !== $default ? get_debug_type($default) : 'string';
 
         return [$default, $defaultType];
+    }
+
+    /**
+     * @param array<string, string> $names
+     */
+    private function nameEnvPlaceholders(mixed $value, array $names): mixed
+    {
+        if (\is_array($value)) {
+            $result = [];
+            foreach ($value as $k => $v) {
+                $result[\is_string($k) ? strtr($k, $names) : $k] = $this->nameEnvPlaceholders($v, $names);
+            }
+
+            return $result;
+        }
+
+        return \is_string($value) ? strtr($value, $names) : $value;
     }
 }

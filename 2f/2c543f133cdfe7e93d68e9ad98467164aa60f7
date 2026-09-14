@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-14T12:55:44Z
+
+Amended and rebased. Three of the changes shift the semantics, so they are worth stating rather than
+leaving in the diff.
+
+**A conditional domain now feeds every domain it can reach.** The domain argument goes through the
+same resolver as the message, and the first version read `[0]` from it, so
+`trans('k', [], $x ? 'a' : 'b')` wrote `k` to `a` and `b` never saw it. Today the domain resolves to
+nothing there and `k` lands in `messages`. Both visitors now loop over the resolved domains.
+
+**`??` is handled next to `?:`.** Once the short ternary works, `trans($title ?? 'default')` yielding
+nothing is the next thing a user runs into.
+
+**The concatenation product is capped at 256 values.** Each concatenated ternary doubles the result
+set. Twenty of them in one call produced 1048576 keys and 1.7 GB of memory; at twenty-two with a
+512 MB limit `translation:extract` died on a fatal error instead of skipping the file.
+
+`array_unique()` also moved from the ternary branch to the two entry points, because the
+concatenation product can collide on its own:
+`trans(($a ? 'ab' : 'a').($b ? '' : 'b'))` listed the same source line twice for `ab`.

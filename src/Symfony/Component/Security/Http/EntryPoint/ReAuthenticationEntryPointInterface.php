@@ -28,6 +28,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * firewall uses it for both without any extra configuration.
  *
  * @see \Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY
+ * @see \Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY
  */
 interface ReAuthenticationEntryPointInterface
 {

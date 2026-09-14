@@ -61,6 +61,7 @@ class ExpressionLanguageTest extends TestCase
             [$noToken, 'is_fully_authenticated()', false],
             [$noToken, 'is_remember_me()', false],
             [$noToken, 'is_recently_authenticated()', false],
+            [$noToken, 'is_very_recently_authenticated()', false],
 
             [$rememberMeToken, 'is_authenticated()', true],
             [$rememberMeToken, 'is_fully_authenticated()', false],
@@ -69,6 +70,7 @@ class ExpressionLanguageTest extends TestCase
             [$rememberMeToken, "is_granted('ROLE_USER')", true],
             [$rememberMeToken, 'is_recently_authenticated()', false],
             [$staleRememberMeToken, 'is_recently_authenticated()', false],
+            [$staleRememberMeToken, 'is_very_recently_authenticated()', false],
 
             [$usernamePasswordToken, 'is_authenticated()', true],
             [$usernamePasswordToken, 'is_fully_authenticated()', true],
@@ -76,9 +78,11 @@ class ExpressionLanguageTest extends TestCase
             [$usernamePasswordToken, "is_granted('ROLE_FOO')", false],
             [$usernamePasswordToken, "is_granted('ROLE_USER')", true],
             [$usernamePasswordToken, 'is_recently_authenticated()', false],
+            [$usernamePasswordToken, 'is_very_recently_authenticated()', false],
 
             [$recentlyAuthenticatedToken, 'is_recently_authenticated()', true],
             [$recentlyAuthenticatedToken, 'is_fully_authenticated()', true],
+            [$recentlyAuthenticatedToken, 'is_very_recently_authenticated()', true],
         ];
     }
 }

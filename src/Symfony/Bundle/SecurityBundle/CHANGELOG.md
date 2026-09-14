@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service used when `IS_AUTHENTICATED_RECENTLY` is denied
  * Add the `recent_authentication_lifetime` option, the number of seconds an interactive authentication keeps granting `IS_AUTHENTICATED_RECENTLY`
+ * Add the `very_recent_authentication_lifetime` option, the number of seconds an interactive authentication keeps granting `IS_AUTHENTICATED_VERY_RECENTLY`
  * Add the `security.expression_language_provider` service to evaluate the security functions outside of authorization expressions
  * Add the `debug:roles` command to inspect the role hierarchy
  * Add `allowed_time_drift` option to the OIDC token handler configuration

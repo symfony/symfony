@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `AuthenticationTrustResolver::isAuthenticatedRecently()`, the extension point `IS_AUTHENTICATED_RECENTLY` is decided on; not implementing it in a custom trust resolver is deprecated
+ * Add the `IS_AUTHENTICATED_VERY_RECENTLY` attribute, a stricter bar than `IS_AUTHENTICATED_RECENTLY` decided by `AuthenticationTrustResolver::isAuthenticatedVeryRecently()`, and the `is_very_recently_authenticated()` expression function; not implementing the method in a custom trust resolver is deprecated
  * Add the `IS_AUTHENTICATED_RECENTLY` attribute, granted while the last interactive authentication is within the configured lifetime
  * Deprecate passing more than one Security attribute to `AccessDecisionManager::decide()`, the `$allowMultipleAttributes` argument will be removed in 9.0
  * Allow a list of identifiers in the `$aud` argument of `OAuth2User`, as RFC 7662 §2.2 defines it

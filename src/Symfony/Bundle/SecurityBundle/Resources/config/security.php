@@ -128,6 +128,7 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authentication.trust_resolver', AuthenticationTrustResolver::class)
             ->args([
                 param('security.recent_authentication_lifetime'),
+                param('security.very_recent_authentication_lifetime'),
                 service('clock')->nullOnInvalid(),
             ])
 

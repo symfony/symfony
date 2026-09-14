@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `AuthenticationTimeListener`, which records the time of the last interactive authentication as the `auth_time` token attribute
  * Add `allowed_time_drift` option to `OidcTokenHandler` to configure time tolerance for token validation (`iat`, `nbf`, `exp` claims)
  * Expose the OAuth2 scopes an access token was granted as the `oauth2_scope` token attribute, read from the `scope` or `scp` claim
  * Add `OAuth2ScopeVoter` to require scopes of the access token, all the ones an `OAUTH2_SCOPE(...)` attribute lists

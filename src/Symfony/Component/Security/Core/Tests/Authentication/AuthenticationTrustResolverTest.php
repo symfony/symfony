@@ -38,7 +38,7 @@ class AuthenticationTrustResolverTest extends TestCase
     public function testIsAuthenticatedRecently()
     {
         $clock = new MockClock('2026-09-13 12:00:00');
-        $resolver = new AuthenticationTrustResolver(900, $clock);
+        $resolver = new AuthenticationTrustResolver(900, clock: $clock);
 
         $this->assertFalse($resolver->isAuthenticatedRecently(null));
 
@@ -58,7 +58,7 @@ class AuthenticationTrustResolverTest extends TestCase
     public function testTheMostRecentProofDecidesRecency()
     {
         $clock = new MockClock('2026-09-13 12:00:00');
-        $resolver = new AuthenticationTrustResolver(900, $clock);
+        $resolver = new AuthenticationTrustResolver(900, clock: $clock);
         $token = $this->getUsernamePasswordToken();
 
         $token->setAuthenticationProofs([
@@ -93,6 +93,30 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->expectUserDeprecationMessage(\sprintf('Since symfony/security-core 8.2: Not implementing "%s::getAuthenticationProofs()" is deprecated, the method will be added to "%s" in 9.0; no authentication proof is read until then.', get_debug_type($token), TokenInterface::class));
 
         $this->assertFalse((new AuthenticationTrustResolver())->isAuthenticatedRecently($token));
+    }
+
+    public function testIsAuthenticatedVeryRecently()
+    {
+        $clock = new MockClock('2026-09-13 12:00:00');
+        $resolver = new AuthenticationTrustResolver(900, 60, $clock);
+
+        $this->assertFalse($resolver->isAuthenticatedVeryRecently(null));
+        $this->assertFalse($resolver->isAuthenticatedVeryRecently($this->getUsernamePasswordToken()));
+
+        $fresh = $this->getUsernamePasswordToken();
+        $fresh->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => $clock->now()->getTimestamp()]);
+        $this->assertTrue($resolver->isAuthenticatedVeryRecently($fresh));
+
+        $clock->sleep(60);
+        $this->assertTrue($resolver->isAuthenticatedVeryRecently($fresh));
+        $clock->sleep(1);
+        $this->assertFalse($resolver->isAuthenticatedVeryRecently($fresh));
+        // the wider window still holds
+        $this->assertTrue($resolver->isAuthenticatedRecently($fresh));
+
+        $remembered = $this->getRememberMeToken();
+        $remembered->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => $clock->now()->getTimestamp()]);
+        $this->assertFalse($resolver->isAuthenticatedVeryRecently($remembered));
     }
 
     private function getUsernamePasswordToken(): UsernamePasswordToken

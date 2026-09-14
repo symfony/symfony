@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Make `OidcLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, starting an authorization request with `prompt=login` and the previous ID token as `id_token_hint`
  * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when `IS_AUTHENTICATED_RECENTLY` is denied
  * Stamp the `auth_time` token attribute from the OIDC ID token claim of the same name, so `max_age` and `IS_AUTHENTICATED_RECENTLY` agree
  * Add `AuthenticationTimeListener`, which records the time of the last interactive authentication as the `auth_time` token attribute

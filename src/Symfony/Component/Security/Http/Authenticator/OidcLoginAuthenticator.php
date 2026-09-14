@@ -31,6 +31,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\EntryPoint\ReAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Event\OidcAuthorizationRequestEvent;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
@@ -44,7 +45,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @author Mathieu Santostefano <msantostefano@proton.me>
  */
-final class OidcLoginAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
+final class OidcLoginAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface, ReAuthenticationEntryPointInterface
 {
     private const MAX_CONCURRENT_ATTEMPTS = 5;
 
@@ -143,6 +144,37 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
 
     public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
+        return $this->startAuthorizationRequest($request);
+    }
+
+    /**
+     * "prompt=login" is what OIDC Core 1.0, Section 3.1.2.1 defines for this: the provider
+     * prompts the End-User for credentials again instead of answering from the session it
+     * already holds. The previous ID token goes along as "id_token_hint" so the provider
+     * knows which End-User is being re-authenticated rather than offering a picker.
+     *
+     * "prompt" is a SHOULD in the specification. Configure "max_age" as well if the provider
+     * has to be obliged rather than asked: that one the client verifies, so a provider
+     * ignoring it fails the "auth_time" check instead of quietly returning the stale
+     * authentication that was denied in the first place.
+     */
+    public function startReAuthentication(Request $request, TokenInterface $token): Response
+    {
+        $forcedParams = ['prompt' => 'login'];
+
+        if (\is_string($idToken = $token->hasAttribute('oidc_id_token') ? $token->getAttribute('oidc_id_token') : null)) {
+            $forcedParams['id_token_hint'] = $idToken;
+        }
+
+        return $this->startAuthorizationRequest($request, $forcedParams);
+    }
+
+    /**
+     * @param array<string, string> $forcedParams Parameters applied after "authorization_params"
+     *                                            and after the event, so that neither can drop them
+     */
+    private function startAuthorizationRequest(Request $request, array $forcedParams = []): Response
+    {
         $session = $this->getSession($request);
         $prefix = $this->getSessionPrefix();
 
@@ -189,6 +221,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         }
 
         $params += $extraParams;
+
+        // applied after the event on purpose: a listener answering with "prompt=none", or
+        // simply dropping the key, would otherwise turn a re-authentication into a silent
+        // no-op and leave the user looping through the provider
+        $params = array_merge($params, $forcedParams);
 
         // each pending attempt lives under its own session key, carrying the state, so
         // that concurrent logins started from several tabs write distinct entries instead

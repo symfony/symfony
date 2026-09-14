@@ -29,8 +29,10 @@ use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -770,6 +772,93 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertNotEmpty($params['nonce']);
         $this->assertNotEmpty($params['code_challenge']);
         $this->assertSame('S256', $params['code_challenge_method']);
+    }
+
+    public function testStartReAuthenticationForcesTheProviderToPromptAgain()
+    {
+        $params = $this->startReAuthentication($this->createAuthenticator(), 'previous.id.token');
+
+        $this->assertSame('login', $params['prompt']);
+        // the provider is told which End-User to re-authenticate rather than offering a picker
+        $this->assertSame('previous.id.token', $params['id_token_hint']);
+        // and it stays an ordinary authorization request, so the callback works unchanged
+        $this->assertSame('code', $params['response_type']);
+        $this->assertNotEmpty($params['state']);
+        $this->assertNotEmpty($params['nonce']);
+        $this->assertNotEmpty($params['code_challenge']);
+    }
+
+    public function testStartReAuthenticationOverridesAConfiguredPrompt()
+    {
+        // "prompt=none" is the one that would defeat re-authentication entirely, silently
+        $params = $this->startReAuthentication($this->createAuthenticator(authorizationParams: ['prompt' => 'none']), 'previous.id.token');
+
+        $this->assertSame('login', $params['prompt']);
+    }
+
+    public function testAListenerCannotDefeatAReAuthentication()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(OidcAuthorizationRequestEvent::class, static function (OidcAuthorizationRequestEvent $event) {
+            $event->setParam('prompt', 'none');
+            $event->removeParam('id_token_hint');
+        });
+
+        $params = $this->startReAuthentication($this->createAuthenticator(eventDispatcher: $dispatcher), 'previous.id.token');
+
+        $this->assertSame('login', $params['prompt']);
+        $this->assertSame('previous.id.token', $params['id_token_hint']);
+    }
+
+    public function testAListenerStillShapesAnOrdinaryAuthorizationRequest()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(OidcAuthorizationRequestEvent::class, static function (OidcAuthorizationRequestEvent $event) {
+            $event->setParam('prompt', 'consent');
+        });
+
+        $authenticator = $this->createAuthenticator(eventDispatcher: $dispatcher);
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $params = $this->parseAuthorizationParams($authenticator->start($request));
+
+        $this->assertSame('consent', $params['prompt']);
+        $this->assertArrayNotHasKey('id_token_hint', $params);
+    }
+
+    public function testStartReAuthenticationWithoutAPreviousIdToken()
+    {
+        // the session may have been opened by another authenticator on the same firewall
+        $token = new UsernamePasswordToken(new InMemoryUser('wouter', 'password', ['ROLE_USER']), 'main', ['ROLE_USER']);
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $params = $this->parseAuthorizationParams($this->createAuthenticator()->startReAuthentication($request, $token));
+
+        $this->assertSame('login', $params['prompt']);
+        $this->assertArrayNotHasKey('id_token_hint', $params);
+    }
+
+    private function startReAuthentication(OidcLoginAuthenticator $authenticator, string $idToken): array
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('wouter', 'password', ['ROLE_USER']), 'main', ['ROLE_USER']);
+        $token->setAttribute('oidc_id_token', $idToken);
+
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        return $this->parseAuthorizationParams($authenticator->startReAuthentication($request, $token));
+    }
+
+    private function parseAuthorizationParams(Response $response): array
+    {
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+
+        $params = [];
+        parse_str(parse_url($response->getTargetUrl(), \PHP_URL_QUERY), $params);
+
+        return $params;
     }
 
     #[DataProvider('provideScopes')]

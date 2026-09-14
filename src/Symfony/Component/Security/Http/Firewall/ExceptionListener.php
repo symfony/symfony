@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -32,6 +33,7 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\EntryPoint\ReAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
@@ -58,6 +60,7 @@ class ExceptionListener
         private ?AccessDeniedHandlerInterface $accessDeniedHandler = null,
         private ?LoggerInterface $logger = null,
         private bool $stateless = false,
+        private ?ReAuthenticationEntryPointInterface $reAuthenticationEntryPoint = null,
     ) {
     }
 
@@ -140,6 +143,31 @@ class ExceptionListener
             } catch (\Exception $e) {
                 $event->setThrowable($e);
             }
+
+            return;
+        }
+
+        // Matching the whole attribute list rather than searching it is deliberate: an
+        // access_control rule is decided on all of its roles at once, so a denial of
+        // [ROLE_ADMIN, IS_AUTHENTICATED_RECENTLY] does not say which one failed, and
+        // re-authenticating would not help a user who simply lacks the role.
+        // a firewall entry point that already knows how to force a fresh proof is used
+        // without any configuration; one that only starts an ordinary login cannot be,
+        // which is exactly what implementing the interface asserts
+        $reAuthenticationEntryPoint = $this->reAuthenticationEntryPoint
+            ?? ($this->authenticationEntryPoint instanceof ReAuthenticationEntryPointInterface ? $this->authenticationEntryPoint : null);
+
+        if (null !== $token
+            && null !== $reAuthenticationEntryPoint
+            && [AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY] === $exception->getAttributes()
+        ) {
+            $this->logger?->debug('The authentication is not recent enough, starting re-authentication.', ['entry_point' => $reAuthenticationEntryPoint]);
+
+            if (!$this->stateless) {
+                $this->setTargetPath($event->getRequest());
+            }
+
+            $event->setResponse($reAuthenticationEntryPoint->startReAuthentication($event->getRequest(), $token));
 
             return;
         }

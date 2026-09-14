@@ -34,6 +34,7 @@ class KernelBrowser extends HttpKernelBrowser
     private bool $hasPerformedRequest = false;
     private bool $profiler = false;
     private bool $reboot = true;
+    private ?\Closure $containerConfigurator = null;
 
     public function __construct(KernelInterface $kernel, array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
@@ -125,6 +126,33 @@ class KernelBrowser extends HttpKernelBrowser
     }
 
     /**
+     * Registers a callable to configure the container for the lifetime of this client.
+     *
+     * It is applied right away and then again after each kernel reboot, before the
+     * container has been used to handle a request.
+     *
+     * @internal
+     */
+    public function setContainerConfigurator(\Closure $configurator): void
+    {
+        if ($this->insulated) {
+            throw new \LogicException('Cannot configure the container when requests are insulated, as closures cannot be passed to the insulated process.');
+        }
+
+        $this->containerConfigurator = $configurator;
+        $configurator($this->getContainer());
+    }
+
+    public function insulate(bool $insulated = true): void
+    {
+        if ($insulated && $this->containerConfigurator) {
+            throw new \LogicException('Cannot insulate requests when a container configurator is registered, as closures cannot be passed to the insulated process.');
+        }
+
+        parent::insulate($insulated);
+    }
+
+    /**
      * @param UserInterface        $user
      * @param array<string, mixed> $tokenAttributes
      *
@@ -174,6 +202,11 @@ class KernelBrowser extends HttpKernelBrowser
         if ($this->hasPerformedRequest && $this->reboot) {
             $this->kernel->boot();
             $this->kernel->shutdown();
+
+            if ($this->containerConfigurator) {
+                $this->kernel->boot();
+                ($this->containerConfigurator)($this->getContainer());
+            }
         } else {
             $this->hasPerformedRequest = true;
         }

@@ -39,6 +39,11 @@ abstract class WebTestCase extends KernelTestCase
     /**
      * Creates a KernelBrowser.
      *
+     * The "configure_container" option accepts a closure that receives the container
+     * returned by KernelBrowser::getContainer(). It is applied after every kernel boot,
+     * so that services replaced by the closure survive the reboots that happen between
+     * requests. All other options are passed to the createKernel method.
+     *
      * @param array $options An array of options to pass to the createKernel method
      * @param array $server  An array of server parameters
      */
@@ -46,6 +51,13 @@ abstract class WebTestCase extends KernelTestCase
     {
         if (static::$booted) {
             throw new \LogicException(\sprintf('Booting the kernel before calling "%s()" is not supported, the kernel should only be booted once.', __METHOD__));
+        }
+
+        $containerConfigurator = $options['configure_container'] ?? null;
+        unset($options['configure_container']);
+
+        if (null !== $containerConfigurator && !$containerConfigurator instanceof \Closure) {
+            throw new \InvalidArgumentException(\sprintf('The "configure_container" option must be a closure, "%s" given.', get_debug_type($containerConfigurator)));
         }
 
         if (!isset($_SERVER['APP_RUNTIME_MODE'])) {
@@ -65,6 +77,10 @@ abstract class WebTestCase extends KernelTestCase
         }
 
         $client->setServerParameters($server);
+
+        if ($containerConfigurator) {
+            $client->setContainerConfigurator($containerConfigurator);
+        }
 
         return self::getClient($client);
     }

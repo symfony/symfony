@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target>Prašome įvesti tinkamą UUID.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Apatinė riba negali būti didesnė už viršutinę ribą.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

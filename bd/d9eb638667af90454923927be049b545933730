@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2026-09-14T14:05:50Z
+
+Thanks @nicolas-grekas for your feedbacks.
+
+I've applied your suggestion, plus a new `removeParam()` method for explicit intent, so the two operations don't interfere.

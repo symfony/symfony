@@ -1,0 +1,22 @@
+
+Symfony\Component\Form\Tests\Console\Descriptor\ExtendedChildType (Block prefix: "extended_child")
+==================================================================================================
+
+ -------------- -------------------- ------------------------- 
+  Options        Parent options       Extension options        
+ -------------- -------------------- ------------------------- 
+  child_option   ExtendedParentType   SharedTypeExtension      
+                -------------------- ------------------------- 
+                 parent_option        shared_extension_option  
+ -------------- -------------------- ------------------------- 
+
+Parent types
+------------
+
+ * Symfony\Component\Form\Tests\Console\Descriptor\ExtendedParentType
+
+Type extensions
+---------------
+
+ * Symfony\Component\Form\Tests\Console\Descriptor\SharedTypeExtension
+

@@ -1,0 +1,174 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2026-04-27T21:00:03Z
+
+hello,
+
+This kind of reminds me https://github.com/symfony/symfony/pull/31101
+
+is this [internal package](https://symfony.com/doc/current/configuration/secrets.html) will then be deprecated and merged into this component as a default « local secret file vault » ?
+
+Also, kms naming feels weird imho
+Suggestions: secret/keystore/vault ?
+
+thx
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-04-27T22:22:41Z
+
+Thanks `@stof` and `@GromNaN` for the very thorough review. Latest push addresses most of it.
+
+Open: `@94noni`'s question on naming (`Kms` vs `secret`/`keystore`/`vault`) and the relationship with the existing Secrets vault. The component sits one layer below Secrets: it abstracts the master-key holder. A future iteration could plug Secrets on top of it; out of scope here. Open to suggestions on the namespace name.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2026-04-28T04:07:46Z
+
+`symfony/key-managment` ?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-04-28T16:33:24Z
+
+Yes, probably `symfony/key-management`, `symfony/keyring` or `symfony/keystore`: the main purpose is key management.
+Just to note that only encryption/decryption are provided at the moment, but signature/verification could also be included in the future.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T15:47:01Z
+
+Answering your question about the split, since that is what is blocking.
+
+The shape you offered works: component with the local backends and the commands first, then the remote bridges, then the DBAL type, the store and the blind indexes. Each part is then reviewable on its own, and the first one carries the design that matters.
+
+Two things to fix before that first part, both security relevant:
+
+- Key material is reachable through dumping. There is no `__debugInfo()`, `__serialize()` or VarDumper caster on `DataKey`, `DataKeyHandle` or `InMemoryKeyLoader`, so `var_dump()`, `print_r()`, `serialize()` and `VarCloner` all print the raw 32 byte key. One `dump()` or one exception page is enough. `sodium_memzero()` in `wipe()` and `release()` does not help there.
+- `DataKeyStore::$maxAgeSeconds` defaults to `null`, meaning never rotate, while `StoredEnvelopeEncrypter::encrypt()` draws a random 96 bit GCM IV under that shared key. There is no invocation counter either. Random IV GCM has a birthday bound, so "never rotate" is the one default we should not ship. Old keys staying readable is right, the rows should not be deleted.
+
+Smaller, for whichever part they land in:
+
+- `splitsh.json` has no entry for any of the seven packages, so none of them would ever be split or published. Editing `replace` is right for the component but does not cover this.
+- `EncryptedType` passes no AAD, so a ciphertext can be moved between rows or columns of the same type without detection.
+- `framework.key_management: true` with no `clients` returns early and wires nothing, silently.
+- `.github/workflows/windows.yml` gained `--ignore-platform-req=ext-fileinfo` for the whole repository to accommodate flysystem. That should be scoped or dropped.
+- CI is red on this PR: PHPStan 3, Psalm 1 in `KeyManagementDataCollector.php:285`, Fabbot, low-deps 4 `ServiceNotFoundException`, minimal-exts needs pdo_sqlite.
+
+For the record on scope, since it came up: the dependency declarations are clean, every import in each of the seven packages is covered by that package's `require`. Overlap with the Secrets vault is not a problem either, it is file backed and single key. The value here is the envelope framing, the store and the migration command rather than the local backends, which are a few lines of `sodium_crypto_aead_*` today.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-08-17T17:50:11Z
+
+Thanks for the rieview. Both blockers are fixed.
+
+**Dumping.** The key material is no longer a property: `DataKey`, `DataKeyHandle` and `InMemoryKeyLoader` keep it in a holder held by a `WeakMap` keyed by the object, so `var_dump()`, `print_r()`, `var_export()`, `serialize()` and `VarCloner` have nothing to print, and `__serialize()` throws. Wiping is unchanged, and one test asserts that against the five tools.
+
+**Rotation.** `max_age` now defaults to 30 days, on `DataKeyStore` and in `framework.key_management.store`. The bound is really a count, 2^32 payloads per key for random 96-bit IVs, and counting would cost a write per payload, so the age stands in for it; `null` still turns rotation off, and retired rows are never deleted.
+
+**AAD.** The others are fixed, but a DBAL type has nothing to bind: `convertToDatabaseValue()` never sees the table, the column or the row, and binding the row needs its primary key, which only the ORM has. Binding the registered name and the key id would stop a move between columns of different types but not between rows of one, so I would rather document that limit, unless you disagree.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-08-17T17:50:56Z
+
+CI failures are not related to this anymore
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-08-17T18:08:38Z
+
+The profiler panel that comes with the FrameworkBundle wiring, on the demo app.
+
+One POST encrypting a payload and reading it back under the stored regime: five operations for a
+single KMS round trip. Each row is a call site, what it asked for, the key or scope it went
+through, bytes in and out, and time.
+
+<img src="https://github.com/user-attachments/assets/df2ddbb6-7271-4a9a-bb71-46147bf36bbd" width="520" alt="Key Management panel, operations by caller">
+
+The same request by key: the master key that unwrapped the data key, and the scope that reuses it.
+
+<img src="https://github.com/user-attachments/assets/738fde89-156d-4418-89fb-1cc7d043dda9" width="520" alt="Key Management panel, operations by key">
+
+And by service: which class did the work, whether it came from a bridge or from the component,
+plus the configured clients that did nothing this request.
+
+<img src="https://github.com/user-attachments/assets/3ccf0a5e-2c77-48b4-b326-b16b04e88e5e" width="520" alt="Key Management panel, operations by service">
+
+The toolbar carries the counters, so a page talking to a KMS more than it should says so without
+opening anything.
+
+<img src="https://github.com/user-attachments/assets/0d58a9a2-b0cd-4394-87cb-fb4b4482b49f" width="240" alt="Web debug toolbar, KMS counters">
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T09:41:12Z
+
+I reviewed the five commits in depth and pushed a rework on top; the branch is rebased on current 8.2 and each commit is still green on its own. What changed, by commit:
+
+**Component**
+- `Envelope::selfContained()`/`referencing()` now validate the iv and tag lengths: both are framed without a length prefix, so a hand-built envelope with a short iv framed fine and reparsed shifted.
+- `DecrypterInterface`/`EnvelopeDecrypterInterface` no longer advertise `@throws KeyNotFoundException`: every implementation deliberately masks it as `DecryptionFailedException`, and the contract now says so.
+- `EnvelopeNormalizer::normalize()` throws the Serializer component's exception, matching the other normalizers.
+- Added a `conflict` section (`symfony/console <7.4`, `symfony/serializer <7.4`, `symfony/service-contracts <2.5`), `@experimental` on the four commands, and small cleanups (testsuite name, private-method order).
+
+**Remote bridges**
+- Vault: AAD was silently unenforced on non-derived transit keys, since Vault ignores (not rejects) `context` on those. A non-empty AAD now triggers a one-time `GET <mount>/keys/<name>` per key, and a non-derived key is refused with `UnsupportedOperationException`, as the interface contract requires. The README misstatement is corrected. This is written against Vault's documented `derived` semantics; worth one check against a live Transit engine.
+- Azure/GCP/Vault clients and both token providers: a non-JSON error body (an HTML page from a load balancer) or a 3xx escaped as http-client exceptions; every failure now surfaces as a component exception carrying the status and URL, never the body. Existing 400/404 masking is unchanged.
+- GCP: the service-account private key moved out of object properties into the component's key-material holder, so dumping the client cannot print the PEM; the JWT `iat` is backdated 10s for clock skew.
+- Token providers accept a numeric-string `expires_in`.
+- All five factories reject unknown or non-scalar DSN options: a typo like `?algorith=` used to silently keep the default algorithm.
+- AwsKms: `async-aws/core` is now an explicit requirement; half credentials in the DSN (key without secret or the reverse) are rejected. Azure rejects key ids with empty segments.
+
+**Doctrine DBAL bridge**
+- `doctrine/dbal` requirement lowered from `^4.5` (unreleased) to `^4.3`, the floor the rest of the codebase supports, using the same schema FC/BC layer as Cache, Lock and Messenger: `Schema::edit()` when available, a legacy `configureSchemaTable()` otherwise, to be removed when the minimum reaches 4.5. Verified by running the full suite against DBAL 4.4 (no `Schema::edit()`, no `Type` constructor conflict) and 4.5-dev.
+- `EncryptedType` no longer sizes the column from the mapping's `length`: `length: 180` produced `VARBINARY(180)` on MySQL while the ciphertext for a 180-char value is 227-280 bytes, so non-strict MySQL silently truncated it and destroyed the GCM tag, making the row permanently undecryptable. The column is now always the platform's unbounded blob type, the examples drop `length`, and the README documents the sizing rule plus the previously undocumented no-AAD limit (a ciphertext can be moved between rows of one scope).
+
+**FrameworkBundle**
+- The debug wiring's claim that a self-tagged client is traced was false (extension load cannot see application tags); the comment now states what happens. The four store tests gained skip guards for standalone checkouts, and the `willBeAvailable()` parent-package lists are consistent.
+
+The data key store and Doctrine ORM layers came out of review clean; the commit messages now also cover the blind indexes (commit 3) and the profiler panel (commit 5), which they shipped without mentioning.
+
+Remaining before 8.2.0, not blocking this PR: nothing. The split into five PRs can proceed from this state. Thanks for the quality of this iteration, the per-commit layering made the review tractable.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-14T06:34:48Z
+
+Rebased on current 8.2 and reworked after a second deep review pass (bugs, performance, security). The five commits keep their layering and each is green on its own.
+
+**Rebase.** 8.2 has since split the FrameworkBundle into per-component bundles, so the last commit was rewritten rather than resolved: the component now ships `KeyManagementBundle` (configuration, services, console commands, profiler wiring) and FrameworkBundle only registers it with `#[RequiredBundle(..., ignoreOnInvalid: true)]`, like every other component bundle. The configuration root is `key_management` (no `framework.key_management` alias: a new component has no compatibility reason to add to the `framework` level, and adding an alias later costs nothing while removing one would need a deprecation). The profiler decorators moved from load time into a compiler pass that runs once the data collector survived the `profiler` check, which also traces clients the application tags itself. The description and the docs PR need the same key change.
+
+**Fixed during the review, by commit:**
+
+Component
+- `LocalAead` never checked the data key length against the format: `openssl` zero-pads a short key and truncates a long one silently, so a 16-byte data key ran under a cipher labelled AES-256-GCM. Both `seal()` and `open()` now refuse a key of the wrong length.
+- Deterministic mode derived the synthetic nonce/IV with the AEAD key itself; it now uses a subkey (`generichash('nonce', key)` / `HMAC-SHA256('nonce', key)`), and the pinned vectors were regenerated. The format is unreleased, so no compatibility impact.
+- `InMemoryKms` minted all-zero data keys, so no test could detect a key-routing mistake; it now mints random ones, and a test asserts that an envelope re-pointed at another scope's key fails to decrypt.
+- An inline DSN key with a `+` lost bytes through `parse_str()`; such values are now refused with a message pointing at base64url or `%2B`.
+- `#[\SensitiveParameter]` on every `Dsn` parameter (the object carries inline keys and passwords), documented `@throws` of the stored path on `EnvelopeDecrypterInterface`.
+- `key-management:encrypt` and `decrypt` report backend failures without a stack trace; `rewrap-data-keys` rejects an unknown `--from` (it reported success on a typo) and a `--to` that cannot unwrap data keys; the encrypt help warns that an argument is visible in the process list.
+
+Remote bridges
+- Google Cloud KMS interpolated the key id into the request URL unvalidated; on decrypt it comes from the envelope bytes, so a crafted envelope sent the request (with the bearer token) to an attacker-chosen host or path. Resource names are now validated in every method; on the decrypt path a bad name is a `DecryptionFailedException`.
+- A transport error while reading a body escaped as an http-client `TimeoutException` in all four bridges and both token providers; AWS also let `UnparsableResponse` escape on a 2xx with a non-JSON body. All now surface as the component's `RuntimeException`.
+- Vault: a `data` field that is not an array was a `TypeError`. Array-valued error messages produced "Array to string conversion" in five places. Azure now validates `algorithm`/`wrap_algorithm` against the documented names instead of letting a typo surface as a masked 400, and a malformed key id in a ciphertext is a `DecryptionFailedException`. GCP: the JWT assertion lifetime is exactly 3600 s from `iat`; an EC private key is refused up front; an empty plaintext (omitted `plaintext` field with `plaintextCrc32c`) decrypts to `''`.
+
+Doctrine DBAL and ORM bridges
+- A data key row inserted inside a transaction that was rolled back (a failed `flush()`) stayed in the store's memory cache, so every payload encrypted afterwards referenced a row that no longer existed and was undecryptable for good. A key minted inside a transaction is now re-checked with one primary-key lookup on each use inside a transaction until a use outside one confirms it.
+- `EncryptedType` stringified a float parent with the `precision` ini setting and lost digits; floats are now converted losslessly and non-finite ones refused.
+- `BlindIndexListener` refuses a non-nullable target for a nullable source (was a `TypeError` inside `onFlush`) and a target that is not a mapped column (was silently unpersisted).
+- The scope is checked against its 191-byte column, and the retirement instant of a remembered key is computed once instead of re-parsing the UUID on every payload.
+
+Flysystem bridge
+- Key ids containing `\` reached Flysystem, whose normalizer turns them into `/` after the traversal check, so `..\..\secret.txt` read a file outside the key directory; they are refused.
+
+Profiler
+- The collector kept a segment per call in four lists and copied them on every call: quadratic time and linear memory per request (16000 traced calls cost 24 MiB and 169 us per call). It is now bounded by call sites and keys as its docblock says, one operation is no longer recorded twice when the stored encrypter falls back to the default client's encrypter, and a failure crossing several layers counts once.
+- `conflict` with `symfony/web-profiler-bundle <8.2`, whose absence broke every profiler page with an older WebProfilerBundle.
+- Client names are validated by the configuration (a numeric name died later in `registerAliasForArgument()`).
+
+**Left as follow-ups, not blocking:** token cache invalidation on a 401 in the Azure and GCP token providers (a revoked token is retried until `expires_in` runs out); no default request timeouts in the HTTP bridges; `store.max_age` cannot express "never rotate" (by design, worth a sentence in the docs).
+
+**Checks run:** the component suite standalone on each of the five commits (240/474/567/652/734 tests), FrameworkBundle (1131, 2 skipped) and WebProfilerBundle (184) on the tip, php-cs-fixer, codespell, the hardening-test convention, and a scoped PHPStan run on the bundle files.

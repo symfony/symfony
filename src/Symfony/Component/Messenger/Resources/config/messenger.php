@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnCustomStopExceptionListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
+use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
@@ -304,5 +305,15 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.default_bus'),
             ])
             ->tag('messenger.message_handler')
+
+        ->set('messenger.failed_message_repository', FailedMessageRepository::class)
+            ->args([
+                abstract_arg('Failure transports'),
+                abstract_arg('Default failure transport name'),
+                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
+                service('messenger.routable_message_bus'),
+            ])
+
+        ->alias(FailedMessageRepository::class, 'messenger.failed_message_repository')
     ;
 };

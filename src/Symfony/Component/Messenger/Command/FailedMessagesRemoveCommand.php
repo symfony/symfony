@@ -18,8 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
-use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -74,22 +73,20 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
         $errorIo = $io->getErrorStyle();
 
         $ids = (array) $input->getArgument('id');
-        [$classFilter, $failedAfter, $failedBefore] = $this->getFilters($input, (bool) $ids);
-        $hasFilters = null !== $classFilter || null !== $failedAfter || null !== $failedBefore;
+        $filter = $this->getFilter($input, (bool) $ids);
+        $hasFilters = !$filter->isEmpty();
 
         $failureTransportName = $input->getOption('transport');
         if (self::DEFAULT_TRANSPORT_OPTION === $failureTransportName) {
             $failureTransportName = $this->getGlobalFailureReceiverName();
         }
 
-        $receiver = $this->getReceiver($failureTransportName);
-
         $shouldForce = $input->getOption('force');
         $shouldDeleteAllMessages = $input->getOption('all');
 
         $idsCount = \count($ids);
 
-        if (!$receiver instanceof ListableReceiverInterface) {
+        if (!$this->repository->supportsListing($failureTransportName)) {
             throw new RuntimeException(\sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
         }
 
@@ -98,7 +95,10 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
         }
 
         if ($hasFilters) {
-            $ids = $this->getMessageIdsByFilter($receiver, $classFilter, $failedAfter, $failedBefore);
+            $ids = [];
+            foreach ($this->repository->all($failureTransportName, $filter) as $envelope) {
+                $ids[] = FailedMessageRepository::getMessageId($envelope);
+            }
             $idsCount = \count($ids);
 
             if (!$idsCount) {
@@ -119,23 +119,18 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
         $shouldDisplayMessages = $input->getOption('show-messages') || 1 === $idsCount;
 
         if ($shouldDeleteAllMessages) {
-            $this->removeAllMessages($receiver, $io, $errorIo, $shouldForce, $shouldDisplayMessages);
+            $this->removeAllMessages($failureTransportName, $io, $errorIo, $shouldForce, $shouldDisplayMessages);
         } else {
-            $this->removeMessagesById($ids, $receiver, $io, $errorIo, $shouldForce, $shouldDisplayMessages);
+            $this->removeMessagesById($ids, $failureTransportName, $io, $errorIo, $shouldForce, $shouldDisplayMessages);
         }
 
         return 0;
     }
 
-    private function removeMessagesById(array $ids, ListableReceiverInterface $receiver, SymfonyStyle $io, SymfonyStyle $errorIo, bool $shouldForce, bool $shouldDisplayMessages): void
+    private function removeMessagesById(array $ids, string $failureTransportName, SymfonyStyle $io, SymfonyStyle $errorIo, bool $shouldForce, bool $shouldDisplayMessages): void
     {
         foreach ($ids as $id) {
-            $this->phpSerializer?->acceptPhpIncompleteClass();
-            try {
-                $envelope = $receiver->find($id);
-            } finally {
-                $this->phpSerializer?->rejectPhpIncompleteClass();
-            }
+            $envelope = $this->repository->find($id, $failureTransportName);
 
             if (null === $envelope) {
                 $errorIo->error(\sprintf('The message with id "%s" was not found.', $id));
@@ -147,7 +142,7 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
             }
 
             if ($shouldForce || $errorIo->confirm('Do you want to permanently remove this message?', false)) {
-                $receiver->reject($envelope);
+                $this->repository->remove($envelope, $failureTransportName);
 
                 $io->success(\sprintf('Message with id %s removed.', $id));
             } else {
@@ -156,11 +151,11 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
         }
     }
 
-    private function removeAllMessages(ListableReceiverInterface $receiver, SymfonyStyle $io, SymfonyStyle $errorIo, bool $shouldForce, bool $shouldDisplayMessages): void
+    private function removeAllMessages(string $failureTransportName, SymfonyStyle $io, SymfonyStyle $errorIo, bool $shouldForce, bool $shouldDisplayMessages): void
     {
         if (!$shouldForce) {
-            if ($receiver instanceof MessageCountAwareInterface) {
-                $question = \sprintf('Do you want to permanently remove all (%d) messages?', $receiver->getMessageCount());
+            if (null !== $pending = $this->repository->count($failureTransportName)) {
+                $question = \sprintf('Do you want to permanently remove all (%d) messages?', $pending);
             } else {
                 $question = 'Do you want to permanently remove all failed messages?';
             }
@@ -171,12 +166,12 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
         }
 
         $count = 0;
-        foreach ($receiver->all() as $envelope) {
+        foreach ($this->repository->all($failureTransportName) as $envelope) {
             if ($shouldDisplayMessages) {
                 $this->displaySingleMessage($envelope, $io, $errorIo);
             }
 
-            $receiver->reject($envelope);
+            $this->repository->remove($envelope, $failureTransportName);
             ++$count;
         }
 

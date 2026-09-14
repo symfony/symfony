@@ -456,6 +456,11 @@ class MessengerPass implements CompilerPassInterface
                 $definition->replaceArgument(1, $failureTransportsLocator);
             }
         }
+
+        if ($container->hasDefinition('messenger.failed_message_repository')) {
+            $container->getDefinition('messenger.failed_message_repository')
+                ->replaceArgument(0, $failureTransportsLocator);
+        }
     }
 
     private function registerBusToCollector(ContainerBuilder $container, string $busId): void

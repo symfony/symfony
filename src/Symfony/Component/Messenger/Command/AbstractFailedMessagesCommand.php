@@ -23,14 +23,12 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Failure\FailedMessageFilter;
+use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
-use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
-use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\TraceStub;
@@ -48,27 +46,24 @@ abstract class AbstractFailedMessagesCommand extends Command
 {
     protected const DEFAULT_TRANSPORT_OPTION = 'choose';
 
+    protected FailedMessageRepository $repository;
+
     public function __construct(
-        private ?string $globalFailureReceiverName,
+        ?string $globalFailureReceiverName,
         /**
-         * @var ServiceProviderInterface<ReceiverInterface>
+         * @var ServiceProviderInterface<\Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface>
          */
         protected ServiceProviderInterface $failureTransports,
         protected ?PhpSerializer $phpSerializer = null,
     ) {
         parent::__construct();
+
+        $this->repository = new FailedMessageRepository($failureTransports, $globalFailureReceiverName, $phpSerializer);
     }
 
     protected function getGlobalFailureReceiverName(): ?string
     {
-        return $this->globalFailureReceiverName;
-    }
-
-    protected function getMessageId(Envelope $envelope): mixed
-    {
-        $stamp = $envelope->last(TransportMessageIdStamp::class);
-
-        return $stamp?->getId();
+        return $this->repository->getGlobalTransportName();
     }
 
     protected function displaySingleMessage(Envelope $envelope, SymfonyStyle $io, ?SymfonyStyle $errorIo = null): void
@@ -85,7 +80,7 @@ abstract class AbstractFailedMessagesCommand extends Command
             ['Class', $messageClass],
         ];
 
-        if (null !== $id = $this->getMessageId($envelope)) {
+        if (null !== $id = FailedMessageRepository::getMessageId($envelope)) {
             $rows[] = ['Message Id', $id];
         }
 
@@ -128,85 +123,35 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    protected function printPendingMessagesMessage(ReceiverInterface $receiver, SymfonyStyle $io): void
+    protected function printPendingMessagesMessage(?string $failureTransportName, SymfonyStyle $io): void
     {
-        if ($receiver instanceof MessageCountAwareInterface) {
-            if (1 === $receiver->getMessageCount()) {
-                $io->writeln('There is <info>1</info> message pending in the failure transport.');
-            } else {
-                $io->writeln(\sprintf('There are <info>%d</info> messages pending in the failure transport.', $receiver->getMessageCount()));
-            }
+        if (null === $count = $this->repository->count($failureTransportName)) {
+            return;
+        }
+
+        if (1 === $count) {
+            $io->writeln('There is <info>1</info> message pending in the failure transport.');
+        } else {
+            $io->writeln(\sprintf('There are <info>%d</info> messages pending in the failure transport.', $count));
         }
     }
 
     /**
      * @param bool $hasIds Whether explicit message ids were given, which the filters cannot be combined with
-     *
-     * @return array{?string, ?\DateTimeImmutable, ?\DateTimeImmutable} The class name, the earliest and the latest failure time to select
      */
-    protected function getFilters(InputInterface $input, bool $hasIds): array
+    protected function getFilter(InputInterface $input, bool $hasIds): FailedMessageFilter
     {
-        $classFilter = $input->getOption('class-filter');
-        $failedAfter = $this->getDateOption($input, 'failed-after');
-        $failedBefore = $this->getDateOption($input, 'failed-before');
+        $filter = new FailedMessageFilter(
+            $input->getOption('class-filter'),
+            $this->getDateOption($input, 'failed-after'),
+            $this->getDateOption($input, 'failed-before'),
+        );
 
-        if ($hasIds && (null !== $classFilter || null !== $failedAfter || null !== $failedBefore)) {
+        if ($hasIds && !$filter->isEmpty()) {
             throw new RuntimeException('You cannot specify message ids when using the "--class-filter", "--failed-after" or "--failed-before" options.');
         }
 
-        return [$classFilter, $failedAfter, $failedBefore];
-    }
-
-    /**
-     * @return list<mixed> The ids of the messages matching every given filter
-     */
-    protected function getMessageIdsByFilter(ListableReceiverInterface $receiver, ?string $classFilter, ?\DateTimeImmutable $failedAfter, ?\DateTimeImmutable $failedBefore): array
-    {
-        $ids = [];
-
-        $this->phpSerializer?->acceptPhpIncompleteClass();
-        try {
-            foreach ($receiver->all() as $envelope) {
-                if ($this->matchesFilter($envelope, $classFilter, $failedAfter, $failedBefore)) {
-                    $ids[] = $this->getMessageId($envelope);
-                }
-            }
-        } finally {
-            $this->phpSerializer?->rejectPhpIncompleteClass();
-        }
-
-        return $ids;
-    }
-
-    protected function matchesFilter(Envelope $envelope, ?string $classFilter, ?\DateTimeImmutable $failedAfter, ?\DateTimeImmutable $failedBefore): bool
-    {
-        if (null !== $classFilter && $classFilter !== $envelope->getMessage()::class) {
-            return false;
-        }
-
-        if (null === $failedAfter && null === $failedBefore) {
-            return true;
-        }
-
-        // messages that were never redelivered have no known failure time, so no time window can select them
-        if (null === $failedAt = $envelope->last(RedeliveryStamp::class)?->getRedeliveredAt()) {
-            return false;
-        }
-
-        return (null === $failedAfter || $failedAt >= $failedAfter) && (null === $failedBefore || $failedAt <= $failedBefore);
-    }
-
-    protected function getReceiver(?string $name = null): ReceiverInterface
-    {
-        if (null === $name ??= $this->globalFailureReceiverName) {
-            throw new InvalidArgumentException(\sprintf('No default failure transport is defined. Available transports are: "%s".', implode('", "', array_keys($this->failureTransports->getProvidedServices()))));
-        }
-
-        if (!$this->failureTransports->has($name)) {
-            throw new InvalidArgumentException(\sprintf('The "%s" failure transport was not found. Available transports are: "%s".', $name, implode('", "', array_keys($this->failureTransports->getProvidedServices()))));
-        }
-
-        return $this->failureTransports->get($name);
+        return $filter;
     }
 
     private function getDateOption(InputInterface $input, string $option): ?\DateTimeImmutable
@@ -247,7 +192,7 @@ abstract class AbstractFailedMessagesCommand extends Command
 
     protected function printWarningAvailableFailureTransports(SymfonyStyle $io, ?string $failureTransportName): void
     {
-        $failureTransports = array_keys($this->failureTransports->getProvidedServices());
+        $failureTransports = $this->repository->getTransportNames();
         $failureTransportsCount = \count($failureTransports);
         if ($failureTransportsCount > 1) {
             $io->writeln([
@@ -261,7 +206,7 @@ abstract class AbstractFailedMessagesCommand extends Command
 
     protected function interactiveChooseFailureTransport(SymfonyStyle $io): string
     {
-        $failedTransports = array_keys($this->failureTransports->getProvidedServices());
+        $failedTransports = $this->repository->getTransportNames();
         $question = new ChoiceQuestion('Select failed transport:', $failedTransports, 0);
         $question->setMultiselect(false);
 
@@ -271,7 +216,7 @@ abstract class AbstractFailedMessagesCommand extends Command
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestOptionValuesFor('transport')) {
-            $suggestions->suggestValues(array_keys($this->failureTransports->getProvidedServices()));
+            $suggestions->suggestValues($this->repository->getTransportNames());
 
             return;
         }
@@ -279,15 +224,14 @@ abstract class AbstractFailedMessagesCommand extends Command
         if ($input->mustSuggestArgumentValuesFor('id')) {
             $transport = $input->getOption('transport');
             $transport = self::DEFAULT_TRANSPORT_OPTION === $transport ? $this->getGlobalFailureReceiverName() : $transport;
-            $receiver = $this->getReceiver($transport);
 
-            if (!$receiver instanceof ListableReceiverInterface) {
+            if (!$this->repository->supportsListing($transport)) {
                 return;
             }
 
             $ids = [];
-            foreach ($receiver->all(50) as $envelope) {
-                $ids[] = $this->getMessageId($envelope);
+            foreach ($this->repository->all($transport, limit: 50) as $envelope) {
+                $ids[] = FailedMessageRepository::getMessageId($envelope);
             }
             $suggestions->suggestValues($ids);
         }

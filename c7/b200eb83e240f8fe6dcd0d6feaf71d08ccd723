@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-12T07:02:54Z
+
+Edit: the below note is addressed in #66035
+
+With the current approach, it's pretty obvious that the strategy will eventually end up asking users to re-authenticate every N minutes, which is not necessarily the best UX.
+
+There are typically other risk factors that could contribute to a "recent-enough" decision; e.g. whether the IP address changed since the last authentication, a last-activity timer, a combination of those signals, a recent WebAuthn/MFA confirmation, etc.
+
+The current time-based strategy still makes perfect sense as a simple default, but I think `AuthenticationTrustResolverInterface` could be a good extension point for richer trust decisions in the future.

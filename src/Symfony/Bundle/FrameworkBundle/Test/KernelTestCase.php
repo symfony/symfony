@@ -29,6 +29,7 @@ abstract class KernelTestCase extends TestCase
 {
     use ConsoleCommandAssertionsTrait;
     use MailerAssertionsTrait;
+    use MessengerAssertionsTrait;
     use NotificationAssertionsTrait;
 
     protected static ?string $class = null;

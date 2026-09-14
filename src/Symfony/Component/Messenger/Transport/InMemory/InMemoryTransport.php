@@ -16,6 +16,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -25,7 +27,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Gary PEGEOT <garypegeot@gmail.com>
  */
-class InMemoryTransport implements TransportInterface, ResetInterface
+class InMemoryTransport implements TransportInterface, ListableReceiverInterface, MessageCountAwareInterface, ResetInterface
 {
     /**
      * @var Envelope[]
@@ -96,6 +98,30 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         }
 
         unset($this->queue[$id = $transportMessageIdStamp->getId()], $this->availableAt[$id]);
+    }
+
+    public function getMessageCount(): int
+    {
+        return \count($this->queue);
+    }
+
+    /**
+     * Returns the queued envelopes in order, delayed ones included.
+     *
+     * @return Envelope[]
+     */
+    public function all(?int $limit = null): array
+    {
+        return array_values($this->decode(null === $limit ? $this->queue : \array_slice($this->queue, 0, $limit, true)));
+    }
+
+    public function find(mixed $id): ?Envelope
+    {
+        if (!\is_int($id) && !\is_string($id) || !isset($this->queue[$id])) {
+            return null;
+        }
+
+        return $this->decode([$this->queue[$id]])[0];
     }
 
     public function send(Envelope $envelope): Envelope

@@ -1,0 +1,18 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    messenger:
+        transports:
+            async:
+                dsn: 'in-memory://'
+                retry_strategy:
+                    delay: 10000
+            sync: 'sync://'
+        routing:
+            Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage: async
+            Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage: async
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\RecordingMessageHandler:
+        autoconfigure: true

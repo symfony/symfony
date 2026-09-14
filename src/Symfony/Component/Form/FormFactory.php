@@ -22,15 +22,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\Flow\FormFlowTypeInterface;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyWriteInfo;
+use Symfony\Component\Form\Util\EmptyDataGuesser;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class FormFactory implements FormFactoryInterface
 {
-    private ?ReflectionExtractor $writeInfoExtractor = null;
-
-    /** @var array<string, string|bool|null> */
-    private array $emptyDataGuesses = [];
+    private ?EmptyDataGuesser $emptyDataGuesser = null;
 
     public function __construct(
         private FormRegistryInterface $registry,
@@ -138,13 +135,14 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * Derives "empty_data" from the type of the mapped property when it refuses null.
-     *
-     * Since "empty_data" is view data, the guess is expressed in view space and is
-     * restricted to types that map a scalar to a single control.
      */
     private function addEmptyDataGuess(string $class, string $property, string $type, array $options): array
     {
-        if (\array_key_exists('empty_data', $options) || !($options['mapped'] ?? true) || isset($options['property_path'])) {
+        if (\array_key_exists('empty_data', $options) || !($options['mapped'] ?? true)) {
+            return $options;
+        }
+
+        if (isset($options['property_path']) && null === $property = self::resolveWriteProperty($options['property_path'])) {
             return $options;
         }
 
@@ -152,77 +150,25 @@ class FormFactory implements FormFactoryInterface
             return $options;
         }
 
-        // the guess does not depend on the form type, so a class and a property are enough to identify it
-        $key = $class.'::'.$property;
-
-        if (!\array_key_exists($key, $this->emptyDataGuesses)) {
-            $this->emptyDataGuesses[$key] = $this->guessEmptyData($class, $property);
-        }
-
-        if (null !== $emptyData = $this->emptyDataGuesses[$key]) {
+        if (null !== $emptyData = ($this->emptyDataGuesser ??= new EmptyDataGuesser())->guess($class, $property)) {
             $options['empty_data'] = $emptyData;
         }
 
         return $options;
     }
 
-    private function guessEmptyData(string $class, string $property): string|bool|null
-    {
-        $writeTargetType = $this->getWriteTargetType($class, $property);
-
-        if (!$writeTargetType instanceof \ReflectionNamedType || $writeTargetType->allowsNull()) {
-            return null;
-        }
-
-        return match ($writeTargetType->getName()) {
-            'string' => '',
-            'int', 'float' => '0',
-            'bool' => false,
-            default => null,
-        };
-    }
-
     /**
-     * Resolves the type of the target that PropertyAccessor writes the mapped value to.
+     * Tells which property a "property_path" writes to, when it writes to a property of the mapped object at all.
      *
-     * Only a publicly writable mutator method or property is a write target. The type of an accessor
-     * or of a constructor argument says nothing about what the value is written through.
+     * A property path is an arbitrary expression, so only a lone property segment names the write target.
      */
-    private function getWriteTargetType(string $class, string $property): ?\ReflectionType
+    private static function resolveWriteProperty(mixed $propertyPath): ?string
     {
-        $this->writeInfoExtractor ??= new ReflectionExtractor();
-
-        $writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $property, [
-            'enable_getter_setter_extraction' => true,
-            'enable_constructor_extraction' => false,
-            'enable_adder_remover_extraction' => false,
-        ]);
-
-        if (null === $writeInfo) {
-            return null;
+        if ($propertyPath instanceof PropertyPathInterface) {
+            return 1 === $propertyPath->getLength() && $propertyPath->isProperty(0) ? $propertyPath->getElement(0) : null;
         }
 
-        try {
-            // PropertyWriteInfo names the target without describing it, so the target is reflected here
-            $target = match ($writeInfo->getType()) {
-                PropertyWriteInfo::TYPE_METHOD => (new \ReflectionMethod($class, $writeInfo->getName()))->getParameters()[0] ?? null,
-                PropertyWriteInfo::TYPE_PROPERTY => new \ReflectionProperty($class, $writeInfo->getName()),
-                default => null,
-            };
-        } catch (\ReflectionException) {
-            return null;
-        }
-
-        // the visibility is carried by the write info only, the target does not tell whether it can be written to
-        if (null === $target || PropertyWriteInfo::VISIBILITY_PUBLIC !== $writeInfo->getVisibility()) {
-            return null;
-        }
-
-        if ($target instanceof \ReflectionProperty) {
-            $target = $target->getHook(\PropertyHookType::Set)?->getParameters()[0] ?? $target;
-        }
-
-        return $target->getType();
+        return \is_string($propertyPath) && '' !== $propertyPath && false === strpbrk($propertyPath, '.[]?\\') ? $propertyPath : null;
     }
 
     /**

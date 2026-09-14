@@ -28,6 +28,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 abstract class AbstractToken implements TokenInterface
 {
+    private const AUTH_PROOFS_ATTRIBUTE = 'auth_proofs';
+
     private ?UserInterface $user = null;
     private array $roleNames;
     private array $attributes = [];
@@ -134,6 +136,22 @@ abstract class AbstractToken implements TokenInterface
     public function setAttribute(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function getAuthenticationProofs(): array
+    {
+        return $this->attributes[self::AUTH_PROOFS_ATTRIBUTE] ?? [];
+    }
+
+    /**
+     * @param array<string, int> $proofs
+     */
+    public function setAuthenticationProofs(array $proofs): void
+    {
+        $this->attributes[self::AUTH_PROOFS_ATTRIBUTE] = $proofs;
     }
 
     public function __toString(): string

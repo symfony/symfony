@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -44,13 +46,53 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertFalse($resolver->isAuthenticatedRecently($this->getUsernamePasswordToken()));
 
         $fresh = $this->getUsernamePasswordToken();
-        $fresh->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, $clock->now()->getTimestamp());
+        $fresh->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => $clock->now()->getTimestamp()]);
         $this->assertTrue($resolver->isAuthenticatedRecently($fresh));
 
         $clock->sleep(900);
         $this->assertTrue($resolver->isAuthenticatedRecently($fresh));
         $clock->sleep(1);
         $this->assertFalse($resolver->isAuthenticatedRecently($fresh));
+    }
+
+    public function testTheMostRecentProofDecidesRecency()
+    {
+        $clock = new MockClock('2026-09-13 12:00:00');
+        $resolver = new AuthenticationTrustResolver(900, $clock);
+        $token = $this->getUsernamePasswordToken();
+
+        $token->setAuthenticationProofs([
+            AuthenticationMethod::ONE_TIME_PASSWORD => $clock->now()->getTimestamp() - 7200,
+            AuthenticationMethod::PASSWORD => $clock->now()->getTimestamp() - 60,
+        ]);
+        $this->assertTrue($resolver->isAuthenticatedRecently($token));
+
+        $token->setAuthenticationProofs([
+            AuthenticationMethod::ONE_TIME_PASSWORD => $clock->now()->getTimestamp() - 7200,
+            AuthenticationMethod::PASSWORD => $clock->now()->getTimestamp() - 901,
+        ]);
+        $this->assertFalse($resolver->isAuthenticatedRecently($token));
+    }
+
+    public function testAnEmptyProofsMapIsNotRecent()
+    {
+        $resolver = new AuthenticationTrustResolver();
+        $token = $this->getUsernamePasswordToken();
+        $token->setAuthenticationProofs([]);
+
+        $this->assertFalse($resolver->isAuthenticatedRecently($token));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testATokenWithoutTheProofsMethodsIsDeprecatedAndNeverRecent()
+    {
+        $token = $this->createStub(TokenInterface::class);
+        $token->method('getUser')->willReturn(new InMemoryUser('wouter', 'password', ['ROLE_USER']));
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/security-core 8.2: Not implementing "%s::getAuthenticationProofs()" is deprecated, the method will be added to "%s" in 9.0; no authentication proof is read until then.', get_debug_type($token), TokenInterface::class));
+
+        $this->assertFalse((new AuthenticationTrustResolver())->isAuthenticatedRecently($token));
     }
 
     private function getUsernamePasswordToken(): UsernamePasswordToken
@@ -61,7 +103,7 @@ class AuthenticationTrustResolverTest extends TestCase
     public function testIsAuthenticatedRecentlyHandlesANullTokenWhateverIsFullFledgedSays()
     {
         // the default isFullFledged() keeps null out, but nothing guarantees an
-        // override does, and reaching hasAttribute() on null would be fatal
+        // override does, and reaching getAuthenticationProofs() on null would be fatal
         $resolver = new class extends AuthenticationTrustResolver {
             public function isFullFledged(?TokenInterface $token = null): bool
             {
@@ -77,7 +119,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $resolver = new AuthenticationTrustResolver();
 
         $token = $this->getRememberMeToken();
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
 
         $this->assertFalse($resolver->isAuthenticatedRecently($token));
     }

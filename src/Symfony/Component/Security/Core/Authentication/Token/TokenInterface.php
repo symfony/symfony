@@ -21,6 +21,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @method array<string, int> getAuthenticationProofs()              Returns the authentication methods the user proved, as AuthenticationMethod values mapped to the Unix timestamp of the last proof of each; not implementing it is deprecated since Symfony 8.2
+ * @method void               setAuthenticationProofs(array $proofs) Records the authentication methods the user proved, as AuthenticationMethod values mapped to the Unix timestamp of the last proof of each; not implementing it is deprecated since Symfony 8.2
  */
 interface TokenInterface extends \Stringable
 {

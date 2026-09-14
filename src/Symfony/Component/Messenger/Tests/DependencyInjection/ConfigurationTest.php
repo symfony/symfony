@@ -35,6 +35,7 @@ class ConfigurationTest extends TestCase
             'failure_transport' => null,
             'stop_worker_on_signals' => [],
             'reject_redelivered_messages' => true,
+            'identity_stamps' => false,
             'default_bus' => null,
             'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
         ], $this->process([]));

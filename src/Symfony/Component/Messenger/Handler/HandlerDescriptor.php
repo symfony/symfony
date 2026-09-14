@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\StampInterface;
+
 /**
  * Describes a handler and the possible associated options, such as `from_transport`, `bus`, etc.
  *
@@ -21,6 +24,11 @@ final class HandlerDescriptor
     private \Closure $handler;
     private string $name;
     private ?BatchHandlerInterface $batchHandler = null;
+
+    /**
+     * @var array<string, array{class-string<Envelope|StampInterface>, bool, bool}>
+     */
+    private array $stampParameters = [];
 
     public function __construct(
         callable $handler,
@@ -44,6 +52,19 @@ final class HandlerDescriptor
             }
 
             $this->name = $handler::class.'::'.$r->name;
+        }
+
+        foreach (\array_slice($r->getParameters(), 1) as $parameter) {
+            $type = $parameter->getType();
+
+            if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+                continue;
+            }
+            $class = $type->getName();
+
+            if (Envelope::class === $class || is_subclass_of($class, StampInterface::class)) {
+                $this->stampParameters[$parameter->name] = [$class, $type->allowsNull(), $parameter->isDefaultValueAvailable()];
+            }
         }
     }
 
@@ -77,5 +98,20 @@ final class HandlerDescriptor
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    /**
+     * Returns the parameters of the handler typed with Envelope or with a stamp class, keyed by name.
+     *
+     * The first parameter, which receives the message, is never listed. Each entry holds
+     * the class, whether the parameter accepts null and whether it has a default value.
+     *
+     * @internal
+     *
+     * @return array<string, array{class-string<Envelope|StampInterface>, bool, bool}>
+     */
+    public function getStampParameters(): array
+    {
+        return $this->stampParameters;
     }
 }

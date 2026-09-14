@@ -89,7 +89,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                         $ackStamp->ack($envelope, $e);
                     }, $this->clock);
 
-                    $result = $this->callHandler($handler, $message, $ack, $envelope->last(HandlerArgumentsStamp::class));
+                    $result = $this->callHandler($handlerDescriptor, $envelope, $ack);
 
                     if (!\is_int($result) || 0 > $result) {
                         throw new LogicException(\sprintf('A handler implementing BatchHandlerInterface must return the size of the current batch as a positive integer, "%s" returned from "%s".', \is_int($result) ? $result : get_debug_type($result), get_debug_type($batchHandler)));
@@ -104,7 +104,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                         $result = $ack->getResult();
                     }
                 } else {
-                    $result = $this->callHandler($handler, $message, null, $envelope->last(HandlerArgumentsStamp::class));
+                    $result = $this->callHandler($handlerDescriptor, $envelope, null);
                 }
 
                 $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $result);
@@ -162,18 +162,28 @@ class HandleMessageMiddleware implements MiddlewareInterface
         return false;
     }
 
-    /**
-     * @param-immediately-invoked-callable $handler
-     */
-    private function callHandler(\Closure $handler, object $message, ?Acknowledger $ack, ?HandlerArgumentsStamp $handlerArgumentsStamp): mixed
+    private function callHandler(HandlerDescriptor $handlerDescriptor, Envelope $envelope, ?Acknowledger $ack): mixed
     {
-        $arguments = [$message];
+        $arguments = [$envelope->getMessage()];
         if (null !== $ack) {
             $arguments[] = $ack;
         }
-        if (null !== $handlerArgumentsStamp) {
+        if (null !== $handlerArgumentsStamp = $envelope->last(HandlerArgumentsStamp::class)) {
             $arguments = [...$arguments, ...$handlerArgumentsStamp->getAdditionalArguments()];
         }
+        foreach ($handlerDescriptor->getStampParameters() as $name => [$class, $allowsNull, $hasDefault]) {
+            if (Envelope::class === $class) {
+                $arguments[$name] = $envelope;
+            } elseif (null !== $stamp = $envelope->last($class)) {
+                $arguments[$name] = $stamp;
+            } elseif (!$hasDefault) {
+                if (!$allowsNull) {
+                    throw new LogicException(\sprintf('Handler "%s" requires a "%s" stamp for argument "$%s", but the envelope carries none.', $handlerDescriptor->getName(), $class, $name));
+                }
+                $arguments[$name] = null;
+            }
+        }
+        $handler = $handlerDescriptor->getHandler();
 
         return $handler(...$arguments);
     }

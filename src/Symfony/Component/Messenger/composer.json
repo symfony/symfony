@@ -37,6 +37,7 @@
         "symfony/serializer": "^7.4.4|^8.0.4",
         "symfony/service-contracts": "^3.7.1",
         "symfony/stopwatch": "^7.4|^8.0",
+        "symfony/uid": "^7.4|^8.0",
         "symfony/validator": "^7.4|^8.0",
         "symfony/var-dumper": "^7.4|^8.0"
     },

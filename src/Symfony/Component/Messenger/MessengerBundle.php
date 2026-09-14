@@ -40,6 +40,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -212,6 +213,10 @@ class MessengerBundle extends AbstractBundle
                     ->defaultTrue()
                     ->info('Whether redeliveries should be rejected and retried through a new message instead of being handled directly. This mostly makes sense for AMQP, which redelivers messages that were neither acknowledged nor rejected. Disabling it avoids losing a message when the retry or the failure transport is unreachable, at the risk of a redelivery loop that blocks the queue.')
                 ->end()
+                ->booleanNode('identity_stamps')
+                    ->defaultFalse()
+                    ->info('Adds a message id and a causation id to dispatched messages, and a correlation id at the start of each flow.')
+                ->end()
                 ->scalarNode('default_bus')->defaultNull()->end()
                 ->arrayNode('buses', 'bus')
                     ->defaultValue(['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]])
@@ -363,6 +368,8 @@ class MessengerBundle extends AbstractBundle
             'before' => [
                 ['id' => 'add_default_stamps_middleware'],
                 ['id' => 'add_bus_name_stamp_middleware'],
+                ...($config['identity_stamps'] ? [['id' => 'add_identity_stamps']] : []),
+                ['id' => 'propagate_stamps'],
                 ...($config['reject_redelivered_messages'] ? [['id' => 'reject_redelivered_message_middleware']] : []),
                 ['id' => 'dispatch_after_current_bus'],
                 ['id' => 'decode_failed_message_middleware'],
@@ -377,6 +384,14 @@ class MessengerBundle extends AbstractBundle
         // RemoveMissingDependenciesPass drops the middleware again when no default lock factory is registered
         if (class_exists(LockFactory::class)) {
             $defaultMiddleware['before'][] = ['id' => 'deduplicate_middleware'];
+        }
+
+        if (!$config['identity_stamps']) {
+            $container->removeDefinition('messenger.middleware.add_identity_stamps');
+            $container->removeDefinition('messenger.message_id_generator');
+        } elseif (!ContainerBuilder::willBeAvailable('symfony/uid', Uuid::class, ['symfony/messenger'])) {
+            $container->removeDefinition('messenger.message_id_generator');
+            $container->getDefinition('messenger.middleware.add_identity_stamps')->replaceArgument(0, null);
         }
 
         foreach ($config['buses'] as $busId => $bus) {

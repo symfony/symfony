@@ -46,6 +46,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyHandlerWithCustomMethods;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyHandlerWithStampArgument;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithAttribute;
@@ -430,6 +431,24 @@ class MessengerPassTest extends TestCase
             UnionTypeTwoMessage::class,
             [[TaggedDummyHandlerWithUnionTypes::class, 'handleUnionTypeMessage']]
         );
+    }
+
+    public function testTaggedMessageHandlerWithStampArgument()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container
+            ->register(DummyHandlerWithStampArgument::class, DummyHandlerWithStampArgument::class)
+            ->setAutoconfigured(true)
+        ;
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new MessengerPass())->process($container);
+
+        $handlerDescriptionMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertCount(1, $handlerDescriptionMapping);
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [DummyHandlerWithStampArgument::class], [[]]);
     }
 
     public function testTaggedBatchMessageHandlerIsRegisteredOnce()

@@ -77,6 +77,36 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
         $this->assertNotEmpty($query['code_challenge']);
     }
 
+    public function testTheAuthorizationRequestEventCanTailorTheParams()
+    {
+        $discoveryResponse = new MockResponse(json_encode([
+            'issuer' => 'https://accounts.example.com',
+            'authorization_endpoint' => 'https://accounts.example.com/authorize',
+            'token_endpoint' => 'https://accounts.example.com/token',
+            'userinfo_endpoint' => 'https://accounts.example.com/userinfo',
+            'jwks_uri' => 'https://accounts.example.com/jwks',
+        ]), ['response_headers' => ['content-type' => 'application/json']]);
+
+        // the config declares two listeners: one on the global dispatcher, which reaches the
+        // event through RegisterGlobalSecurityEventListenersPass, and one on the firewall
+        // dispatcher the authenticator dispatches on; each sets a parameter of its own
+        $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_event.yml']);
+        $client->getContainer()->set('Symfony\Contracts\HttpClient\HttpClientInterface', new MockHttpClient($discoveryResponse));
+
+        $client->request('GET', '/oidc/start');
+        $response = $client->getResponse();
+
+        $this->assertSame(302, $response->getStatusCode());
+
+        parse_str(parse_url($response->headers->get('Location'), \PHP_URL_QUERY), $query);
+
+        $this->assertSame('fr-FR', $query['ui_locales']);
+        $this->assertSame('login', $query['prompt']);
+        $this->assertSame('code', $query['response_type']);
+        $this->assertNotEmpty($query['state']);
+        $this->assertNotEmpty($query['code_challenge']);
+    }
+
     public function testTheAccessTokenIsRenewedOnTheNextRequest()
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_refresh.yml']);

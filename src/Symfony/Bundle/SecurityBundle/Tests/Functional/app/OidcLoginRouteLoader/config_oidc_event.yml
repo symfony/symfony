@@ -1,0 +1,17 @@
+imports:
+    - { resource: ./config_oidc.yml }
+
+services:
+    # a listener on the global dispatcher, as a plain #[AsEventListener] declares
+    oidc_authorization_request_listener.global:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\EventBundle\EventListener\OidcAuthorizationRequestListener
+        arguments: ['ui_locales', 'fr-FR']
+        tags:
+            - { name: kernel.event_listener }
+
+    # a listener on the firewall dispatcher, as every other security event allows
+    oidc_authorization_request_listener.firewall:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\EventBundle\EventListener\OidcAuthorizationRequestListener
+        arguments: ['prompt', 'login']
+        tags:
+            - { name: kernel.event_listener, dispatcher: security.event_dispatcher.oidc }

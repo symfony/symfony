@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container) {
                 // replaced by the firewall verifier, unless the ID token signature is not verified
                 null,
                 service('clock'),
+                abstract_arg('firewall event dispatcher'),
             ])
 
         ->set('security.authenticator.oidc_login.signature_verifier', OidcSignatureVerifier::class)

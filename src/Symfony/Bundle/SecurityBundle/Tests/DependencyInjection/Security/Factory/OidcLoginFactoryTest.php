@@ -52,6 +52,8 @@ class OidcLoginFactoryTest extends TestCase
         $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
         $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $authenticator->getArgument(3));
         $this->assertSame('my-client-id', $authenticator->getArgument(5));
+        // the authorization request event goes through the firewall dispatcher, as every other authentication event
+        $this->assertEquals(new Reference('security.event_dispatcher.main'), $authenticator->getArgument(12));
 
         // the endpoints checked against the transport of the discovery document stay wired
         // on the per-firewall child definition, which computes them from the claims source

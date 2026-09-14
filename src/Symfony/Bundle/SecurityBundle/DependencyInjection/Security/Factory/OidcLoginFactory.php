@@ -238,7 +238,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->useAttributeAsKey('name')
                 ->scalarPrototype()->end()
                 ->defaultValue([])
-                ->info('Additional parameters of the authorization request (e.g. "prompt", "display", "ui_locales", "acr_values", "login_hint").')
+                ->info('Additional parameters of the authorization request (e.g. "prompt", "display", "ui_locales", "acr_values", "login_hint"). Listen to OidcAuthorizationRequestEvent to compute them per request.')
                 ->validate()
                     ->ifTrue(static fn ($v): bool => (bool) array_intersect_key($v, array_flip(['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'max_age'])))
                     ->thenInvalid('The OIDC "authorization_params" option cannot set "response_type", "client_id", "redirect_uri", "scope", "state", "nonce", "code_challenge", "code_challenge_method" nor "max_age": the authenticator manages these; use the dedicated "scope" and "max_age" options.')
@@ -432,6 +432,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(8, $options)
             ->replaceArgument(9, $config['authorization_params'])
             ->replaceArgument(10, $signatureVerifier)
+            ->replaceArgument(12, new Reference('security.event_dispatcher.'.$firewallName))
         ;
 
         if ($config['enable_end_session']) {

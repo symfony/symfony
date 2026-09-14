@@ -28,6 +28,7 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Http\Event\OidcAuthorizationRequestEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 class RegisterGlobalSecurityEventListenersPassTest extends TestCase
@@ -76,6 +77,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             [LoginSuccessEvent::class, LoginSuccessEvent::class],
             [LogoutEvent::class, LogoutEvent::class],
             [AuthenticationTokenCreatedEvent::class, AuthenticationTokenCreatedEvent::class],
+            [OidcAuthorizationRequestEvent::class, OidcAuthorizationRequestEvent::class],
             [AuthenticationEvents::AUTHENTICATION_SUCCESS, AuthenticationEvents::AUTHENTICATION_SUCCESS],
             [SecurityEvents::INTERACTIVE_LOGIN, SecurityEvents::INTERACTIVE_LOGIN],
 

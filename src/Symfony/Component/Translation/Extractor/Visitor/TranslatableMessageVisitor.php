@@ -52,10 +52,12 @@ final class TranslatableMessageVisitor extends AbstractVisitor implements NodeVi
             return null;
         }
 
-        $domain = $this->getStringArguments($node, 2 < $firstNamedArgumentIndex ? 2 : 'domain')[0] ?? null;
+        $domains = $this->getStringArguments($node, 2 < $firstNamedArgumentIndex ? 2 : 'domain') ?: [null];
 
         foreach ($messages as $message) {
-            $this->addMessageToCatalogue($message, $domain, $node->getStartLine());
+            foreach ($domains as $domain) {
+                $this->addMessageToCatalogue($message, $domain, $node->getStartLine());
+            }
         }
 
         return null;

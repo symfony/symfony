@@ -19,6 +19,8 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 abstract class AbstractVisitor
 {
+    private const MAX_STRING_VALUES = 256;
+
     private MessageCatalogue $catalogue;
     private \SplFileInfo $file;
     private string $messagePrefix;
@@ -52,7 +54,7 @@ abstract class AbstractVisitor
             return [];
         }
 
-        return (array) $this->getStringValue($arg->value);
+        return array_values(array_unique($this->getStringValues($arg->value)));
     }
 
     protected function hasNodeNamedArguments(Node\Expr\CallLike|Node\Attribute|Node\Expr\New_ $node): bool
@@ -88,35 +90,56 @@ abstract class AbstractVisitor
 
         foreach ($args as $arg) {
             if (!$isArgumentNamePattern && $arg->name?->toString() === $argumentName) {
-                $argumentValues[] = $this->getStringValue($arg->value);
+                $argumentValues[] = $this->getStringValues($arg->value);
             } elseif ($isArgumentNamePattern && preg_match($argumentName, $arg->name?->toString() ?? '') > 0) {
-                $argumentValues[] = $this->getStringValue($arg->value);
+                $argumentValues[] = $this->getStringValues($arg->value);
             }
         }
 
-        return array_filter($argumentValues);
+        return array_values(array_unique(array_filter(array_merge(...$argumentValues))));
     }
 
-    private function getStringValue(Node $node): ?string
+    /**
+     * @return list<string> All the string values the node can resolve to
+     */
+    private function getStringValues(Node $node): array
     {
         if ($node instanceof Node\Scalar\String_) {
-            return $node->value;
+            return [$node->value];
         }
 
         if ($node instanceof Node\Expr\BinaryOp\Concat) {
-            if (null === $left = $this->getStringValue($node->left)) {
-                return null;
+            $values = [];
+            foreach ($this->getStringValues($node->left) as $left) {
+                foreach ($this->getStringValues($node->right) as $right) {
+                    if (self::MAX_STRING_VALUES <= \count($values)) {
+                        return [];
+                    }
+
+                    $values[] = $left.$right;
+                }
             }
 
-            if (null === $right = $this->getStringValue($node->right)) {
-                return null;
-            }
-
-            return $left.$right;
+            return $values;
         }
 
-        if ($node instanceof Node\Expr\Assign && $node->expr instanceof Node\Scalar\String_) {
-            return $node->expr->value;
+        if ($node instanceof Node\Expr\Ternary) {
+            // each branch is a message on its own, so keep the resolvable ones even when the other is dynamic
+            return [
+                ...$this->getStringValues($node->if ?? $node->cond),
+                ...$this->getStringValues($node->else),
+            ];
+        }
+
+        if ($node instanceof Node\Expr\BinaryOp\Coalesce) {
+            return [
+                ...$this->getStringValues($node->left),
+                ...$this->getStringValues($node->right),
+            ];
+        }
+
+        if ($node instanceof Node\Expr\Assign) {
+            return $this->getStringValues($node->expr);
         }
 
         if ($node instanceof Node\Expr\ClassConstFetch) {
@@ -124,12 +147,12 @@ abstract class AbstractVisitor
                 $reflection = new \ReflectionClass($node->class->toString());
                 $constant = $reflection->getReflectionConstant($node->name->toString());
                 if (false !== $constant && \is_string($constant->getValue())) {
-                    return $constant->getValue();
+                    return [$constant->getValue()];
                 }
             } catch (\ReflectionException) {
             }
         }
 
-        return null;
+        return [];
     }
 }

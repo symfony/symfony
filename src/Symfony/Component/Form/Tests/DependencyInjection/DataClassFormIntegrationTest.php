@@ -137,6 +137,25 @@ class DataClassFormIntegrationTest extends TestCase
         $this->assertFalse($form->get('companion')->getConfig()->getMapped());
     }
 
+    public function testTheEmptyDataOfARenamedFieldIsGuessedFromTheProperty()
+    {
+        $factory = $this->createFormFactory(static function (ContainerBuilder $container) {
+            $container->register(RenamedFieldData::class, RenamedFieldData::class)->addResourceTag('form.data_class');
+        });
+
+        $data = new RenamedFieldData();
+        $form = $factory->create(RenamedFieldData::class, $data);
+
+        $this->assertSame('', $form->get('publicName')->getConfig()->getEmptyData());
+        $this->assertInstanceOf(\Closure::class, $form->get('publicNickname')->getConfig()->getEmptyData());
+
+        $form->submit(['publicName' => '', 'publicNickname' => '']);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame('', $data->internalName);
+        $this->assertNull($data->internalNickname);
+    }
+
     public function testUndiscoveredDataClassGetsADedicatedError()
     {
         $factory = $this->createFormFactory();
@@ -228,4 +247,14 @@ class CompanionData
 {
     #[FormField]
     public ?string $name = null;
+}
+
+#[AsFormType]
+class RenamedFieldData
+{
+    #[FormField(name: 'publicName')]
+    public string $internalName = 'foo';
+
+    #[FormField(name: 'publicNickname')]
+    public ?string $internalNickname = 'bar';
 }

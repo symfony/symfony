@@ -23,6 +23,9 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Form\Tests\Fixtures\TypedProperties;
 use Symfony\Component\Form\Tests\Fixtures\WriteTargetTypedProperties;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class EmptyDataGuessingTest extends FormIntegrationTestCase
 {
@@ -98,11 +101,64 @@ class EmptyDataGuessingTest extends FormIntegrationTestCase
         $this->assertInstanceOf(\Closure::class, $form->get('name')->getConfig()->getEmptyData());
     }
 
-    public function testFieldsWithAPropertyPathAreNotGuessed()
+    public function testFieldsWithASimplePropertyPathAreGuessed()
     {
-        $form = $this->createForm(new TypedProperties(), 'name', options: ['property_path' => 'name']);
+        $data = new TypedProperties();
+        $form = $this->createForm($data, 'publicName', options: ['property_path' => 'name']);
+
+        $this->assertSame('', $form->get('publicName')->getConfig()->getEmptyData());
+
+        $form->submit(['publicName' => '']);
+
+        $this->assertSame('', $data->name);
+    }
+
+    public function testAPropertyPathInstanceIsResolved()
+    {
+        $form = $this->createForm(new TypedProperties(), 'publicName', options: ['property_path' => new PropertyPath('name')]);
+
+        $this->assertSame('', $form->get('publicName')->getConfig()->getEmptyData());
+    }
+
+    public function testFieldsWithAPropertyPathToANullablePropertyAreNotGuessed()
+    {
+        $form = $this->createForm(new TypedProperties(), 'name', options: ['property_path' => 'nickname']);
 
         $this->assertInstanceOf(\Closure::class, $form->get('name')->getConfig()->getEmptyData());
+    }
+
+    #[DataProvider('provideCompositePropertyPaths')]
+    public function testFieldsWithACompositePropertyPathAreNotGuessed(string|PropertyPathInterface $propertyPath)
+    {
+        $form = $this->factory
+            ->createBuilder(options: ['data_class' => TypedProperties::class])
+            ->add('name', null, ['property_path' => $propertyPath])
+            ->getForm();
+
+        $this->assertInstanceOf(\Closure::class, $form->get('name')->getConfig()->getEmptyData());
+    }
+
+    public static function provideCompositePropertyPaths(): iterable
+    {
+        yield 'nested' => ['name.length'];
+        yield 'indexed' => ['name[length]'];
+        yield 'index' => ['[name]'];
+        yield 'nested instance' => [new PropertyPath('name.length')];
+        yield 'index instance' => [new PropertyPath('[name]')];
+    }
+
+    public function testAnEmptyPropertyPathIsRejectedByThePropertyPathItself()
+    {
+        $this->expectException(InvalidPropertyPathException::class);
+
+        $this->createForm(new TypedProperties(), 'name', options: ['property_path' => '']);
+    }
+
+    public function testUnmappedFieldsWithAPropertyPathAreNotGuessed()
+    {
+        $form = $this->createForm(new TypedProperties(), 'publicName', options: ['mapped' => false, 'property_path' => 'name']);
+
+        $this->assertInstanceOf(\Closure::class, $form->get('publicName')->getConfig()->getEmptyData());
     }
 
     public function testExplicitlyTypedFieldsAreNotGuessed()

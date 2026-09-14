@@ -183,4 +183,20 @@ class HeaderUtilsTest extends TestCase
         $this->assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b[]=A', true));
         $this->assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b%5B%5D=A', true));
     }
-}
+
+    /**
+     * A run of whitespace before a separator must not make the parser give up: the token branch
+     * of the pattern used to match that whitespace and hand it back one character at a time.
+     */
+    public function testSplitIsNotAmbiguousAboutWhitespaceBeforeSeparators()
+    {
+        $this->assertSame([["a"], ["b"]], HeaderUtils::split("a".str_repeat(" ", 25).",b", ",="));
+        $this->assertSame([[["a"]], [["b"]]], HeaderUtils::split("a".str_repeat(" ", 25).",b", ",;="));
+        $this->assertSame([["x", "1"], ["y", "2"]], HeaderUtils::split("x=1".str_repeat(" ", 25).";y=2", ";="));
+
+        $header = str_repeat("a".str_repeat(" ", 25).",", 200);
+        $this->assertCount(200, HeaderUtils::split($header, ",="));
+
+        // whitespace inside a value is still part of it
+        $this->assertSame([["a b  c"]], HeaderUtils::split("a b  c", ",="));
+    }}

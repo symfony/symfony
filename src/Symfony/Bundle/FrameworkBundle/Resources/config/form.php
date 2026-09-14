@@ -19,8 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
 use Symfony\Component\Form\Extension\HtmlSanitizer\Type\TextTypeHtmlSanitizerExtension;
@@ -128,11 +126,11 @@ return static function (ContainerConfigurator $container) {
 
         ->set('form.type_extension.form.transformation_failure_handling', TransformationFailureExtension::class)
             ->args([service('translator')->ignoreOnInvalid()])
-            ->tag('form.type_extension', ['extended-type' => FormType::class])
+            ->tag('form.type_extension')
 
         ->set('form.type_extension.form.html_sanitizer', TextTypeHtmlSanitizerExtension::class)
             ->args([tagged_locator('html_sanitizer', 'sanitizer')])
-            ->tag('form.type_extension', ['extended-type' => TextType::class])
+            ->tag('form.type_extension')
             ->tag('container.remove_if_missing', ['service' => 'html_sanitizer'])
 
         ->set('form.type_extension.form.http_foundation', FormTypeHttpFoundationExtension::class)
@@ -156,13 +154,13 @@ return static function (ContainerConfigurator $container) {
                 service('twig.form.renderer')->ignoreOnInvalid(),
                 service('translator')->ignoreOnInvalid(),
             ])
-            ->tag('form.type_extension', ['extended-type' => FormType::class])
+            ->tag('form.type_extension')
 
         ->set('form.type_extension.repeated.validator', RepeatedTypeValidatorExtension::class)
             ->tag('form.type_extension')
 
         ->set('form.type_extension.submit.validator', SubmitTypeValidatorExtension::class)
-            ->tag('form.type_extension', ['extended-type' => SubmitType::class])
+            ->tag('form.type_extension')
 
         ->set('form.type_extension.upload.validator', UploadValidatorExtension::class)
             ->args([

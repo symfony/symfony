@@ -217,7 +217,9 @@ class TwigRendererEngine extends AbstractRendererEngine
     protected function loadResourcesFromTheme(string $cacheKey, mixed &$theme)
     {
         if (!$theme instanceof Template) {
-            $theme = $this->environment->load($theme)->unwrap();
+            // Twig 3.29 checks that the wrapper belongs to the environment passed here;
+            // the signature before it takes no argument and ignores the extra one
+            $theme = $this->environment->load($theme)->unwrap($this->environment);
         }
 
         // Store the first Template instance that we find so that

@@ -28,6 +28,7 @@ use Pheanstalk\Values\JobStats;
 use Pheanstalk\Values\TubeList;
 use Pheanstalk\Values\TubeName;
 use Pheanstalk\Values\TubeStats;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
@@ -767,6 +768,95 @@ final class ConnectionTest extends TestCase
         }
 
         $connection->keepalive($id);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function testTheKeepaliveRaisedWhileACommandIsInFlightIsSentAfterIt()
+    {
+        $id = '123456';
+
+        $tube = 'baz';
+
+        $connection = null;
+        $touched = false;
+
+        $previousHandler = pcntl_signal_get_handler(\SIGUSR1);
+        $previousAsync = pcntl_async_signals(true);
+        pcntl_signal(\SIGUSR1, static function () use (&$connection, $id) { $connection->keepalive($id); });
+
+        try {
+            $client = $this->createMock(PheanstalkInterface::class);
+            $client->expects($this->once())->method('reserveWithTimeout')->willReturnCallback(static function () {
+                posix_kill(posix_getpid(), \SIGUSR1);
+
+                return null;
+            });
+            $client->expects($this->once())->method('touch')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturnCallback(static function () use (&$touched) { $touched = true; });
+
+            $connection = new Connection(['tube_name' => $tube], $client);
+
+            $this->assertNull($connection->get());
+            $this->assertTrue($touched);
+            $this->assertTrue(pcntl_async_signals());
+        } finally {
+            pcntl_signal(\SIGUSR1, $previousHandler);
+            pcntl_async_signals($previousAsync);
+        }
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function testItDispatchesTheSignalsRaisedWhileACommandIsInFlight()
+    {
+        $received = false;
+        $previousHandler = pcntl_signal_get_handler(\SIGUSR1);
+        $previousAsync = pcntl_async_signals(true);
+        pcntl_signal(\SIGUSR1, static function () use (&$received) { $received = true; });
+
+        try {
+            $client = $this->createMock(PheanstalkInterface::class);
+            $client->expects($this->once())->method('reserveWithTimeout')->willReturnCallback(function () use (&$received) {
+                posix_kill(posix_getpid(), \SIGUSR1);
+
+                // the transport holds the signal back until the command has its response
+                $this->assertFalse($received);
+
+                return null;
+            });
+
+            $connection = new Connection(['tube_name' => 'baz'], $client);
+
+            $this->assertNull($connection->get());
+            $this->assertTrue($received);
+            $this->assertTrue(pcntl_async_signals());
+        } finally {
+            pcntl_signal(\SIGUSR1, $previousHandler);
+            pcntl_async_signals($previousAsync);
+        }
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testItRestoresSignalDispatchingWhenACommandThrows()
+    {
+        $previousAsync = pcntl_async_signals(true);
+
+        try {
+            $client = $this->createStub(PheanstalkInterface::class);
+            $client->method('reserveWithTimeout')->willThrowException(new ServerException('baz error'));
+
+            $connection = new Connection(['tube_name' => 'baz'], $client);
+
+            try {
+                $connection->get();
+                $this->fail(TransportException::class.' should have been thrown.');
+            } catch (TransportException) {
+            }
+
+            $this->assertTrue(pcntl_async_signals());
+        } finally {
+            pcntl_async_signals($previousAsync);
+        }
     }
 
     public function testSendWithRoundedDelay()

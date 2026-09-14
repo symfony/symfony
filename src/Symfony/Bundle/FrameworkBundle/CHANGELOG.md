@@ -38,6 +38,7 @@ CHANGELOG
  * Add `framework.mailer.smime_encrypter.certificates`, `on_missing_certificate` and `encrypt_for_sender` options
  * Add `framework.mailer.pgp_signer` and `framework.mailer.pgp_encrypter` options to sign and encrypt messages with PGP/MIME
  * Allow `framework.rate_limiter.*.limiters` as a map to fix the `key` of individual sub-limiters of a compound rate limiter
+ * Register `KeyManagementBundle` when `symfony/key-management` is installed
  * Add `framework.cache.default_provider` to configure `cache.app` with a DSN
  * Add `framework.messenger.reject_redelivered_messages` to allow disabling the `RejectRedeliveredMessageMiddleware`
  * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration

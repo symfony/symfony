@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * Interface for resolving the authentication status of a given token.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @method bool isAuthenticatedRecently(?TokenInterface $token = null) Resolves whether the user authenticated recently enough for a sensitive action; not implementing it is deprecated since Symfony 8.2
  */
 interface AuthenticationTrustResolverInterface
 {

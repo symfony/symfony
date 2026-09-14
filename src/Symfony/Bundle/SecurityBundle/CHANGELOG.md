@@ -40,6 +40,7 @@ CHANGELOG
  * Add the `http_client` option to the `oidc_login` authenticator, naming the HTTP client its calls to the provider are made with
  * Allow the `audience` option of the `oidc` token handler to name several identifiers as a list, as the `oauth2` one does
  * Add the `client_secret_jwt` and `private_key_jwt` client authentication methods to the `oidc_login` authenticator, which authenticate the client at the token endpoint with a JWT assertion it signs itself (RFC 7523, OIDC Core 1.0 §9)
+ * Dispatch `OidcAuthorizationRequestEvent` from the `oidc_login` authenticator through the firewall event dispatcher, so that a listener can tailor the `authorization_params` of each authorization request
 
 8.1
 ---

@@ -710,6 +710,17 @@ class ReflectionExtractorTest extends TestCase
         self::assertSame([\sprintf('The property "baz" in class "%s" can be defined with the methods "addBaz()", "removeBaz()" but the new value must be an array or an instance of \Traversable', Php71Dummy::class)], $writeMutator->getErrors());
     }
 
+    public function testDisabledAdderAndRemoverReportsAPartialAdderAndRemover()
+    {
+        $writeMutator = $this->extractor->getWriteInfo(AdderRemoverDummy::class, 'analyses', [
+            'enable_adder_remover_extraction' => false,
+        ]);
+
+        self::assertNotNull($writeMutator);
+        self::assertSame(PropertyWriteInfo::TYPE_NONE, $writeMutator->getType());
+        self::assertSame([\sprintf('The add method "addAnalyse" in class "%s" was found, but the corresponding remove method "removeAnalyse" was not found', AdderRemoverDummy::class)], $writeMutator->getErrors());
+    }
+
     public function testGetWriteMutatorPrefersTheSetterOverTheStaticMethodNamedAfterTheProperty()
     {
         $writeMutator = $this->extractor->getWriteInfo(DummyWithStaticMutator::class, 'quantity', ['enable_getter_setter_extraction' => true]);

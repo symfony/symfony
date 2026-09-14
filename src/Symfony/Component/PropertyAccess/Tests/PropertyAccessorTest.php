@@ -880,6 +880,16 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'bars', [1, 2]);
     }
 
+    public function testAdderWithoutRemoverIsReportedWhenTheValueIsNotACollection()
+    {
+        $object = new TestAdderRemoverInvalidMethods();
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessageMatches('/.*The add method "addFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidMethods" was found, but the corresponding remove method "removeFoo" was not found\./');
+
+        $this->propertyAccessor->setValue($object, 'foos', 'not a collection');
+    }
+
     public function testAdderAndRemoveNeedsTheExactParametersDefined()
     {
         $object = new TestAdderRemoverInvalidArgumentLength();

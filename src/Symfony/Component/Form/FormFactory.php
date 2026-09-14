@@ -29,6 +29,9 @@ class FormFactory implements FormFactoryInterface
 {
     private ?ReflectionExtractor $writeInfoExtractor = null;
 
+    /** @var array<string, string|bool|null> */
+    private array $emptyDataGuesses = [];
+
     public function __construct(
         private FormRegistryInterface $registry,
     ) {
@@ -149,24 +152,34 @@ class FormFactory implements FormFactoryInterface
             return $options;
         }
 
+        // the guess does not depend on the form type, so a class and a property are enough to identify it
+        $key = $class.'::'.$property;
+
+        if (!\array_key_exists($key, $this->emptyDataGuesses)) {
+            $this->emptyDataGuesses[$key] = $this->guessEmptyData($class, $property);
+        }
+
+        if (null !== $emptyData = $this->emptyDataGuesses[$key]) {
+            $options['empty_data'] = $emptyData;
+        }
+
+        return $options;
+    }
+
+    private function guessEmptyData(string $class, string $property): string|bool|null
+    {
         $writeTargetType = $this->getWriteTargetType($class, $property);
 
         if (!$writeTargetType instanceof \ReflectionNamedType || $writeTargetType->allowsNull()) {
-            return $options;
+            return null;
         }
 
-        $emptyData = match ($writeTargetType->getName()) {
+        return match ($writeTargetType->getName()) {
             'string' => '',
             'int', 'float' => '0',
             'bool' => false,
             default => null,
         };
-
-        if (null !== $emptyData) {
-            $options['empty_data'] = $emptyData;
-        }
-
-        return $options;
     }
 
     /**

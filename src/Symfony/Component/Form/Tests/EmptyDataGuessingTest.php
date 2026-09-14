@@ -227,6 +227,44 @@ class EmptyDataGuessingTest extends FormIntegrationTestCase
         $this->assertSame('', $data->heading);
     }
 
+    #[DataProvider('provideGuessedEmptyData')]
+    public function testTheGuessIsTheSameOnEveryBuild(string $property, mixed $expected)
+    {
+        $first = $this->createForm(new TypedProperties(), $property);
+        $second = $this->createForm(new TypedProperties(), $property);
+
+        $this->assertSame($expected, $first->get($property)->getConfig()->getEmptyData());
+        $this->assertSame($expected, $second->get($property)->getConfig()->getEmptyData());
+    }
+
+    #[DataProvider('provideNotGuessedEmptyData')]
+    public function testTheAbsenceOfAGuessIsTheSameOnEveryBuild(string $property)
+    {
+        $first = $this->createForm(new TypedProperties(), $property);
+        $second = $this->createForm(new TypedProperties(), $property);
+
+        $this->assertInstanceOf(\Closure::class, $first->get($property)->getConfig()->getEmptyData());
+        $this->assertInstanceOf(\Closure::class, $second->get($property)->getConfig()->getEmptyData());
+    }
+
+    public function testTheGuessOfOneClassIsNotReusedForAnother()
+    {
+        $guessed = $this->createForm(new TypedProperties(), 'name');
+        $notGuessed = $this->createForm(new WriteTargetTypedProperties(), 'name');
+
+        $this->assertSame('', $guessed->get('name')->getConfig()->getEmptyData());
+        $this->assertInstanceOf(\Closure::class, $notGuessed->get('name')->getConfig()->getEmptyData());
+    }
+
+    public function testTheAbsenceOfAGuessInOneClassIsNotReusedForAnother()
+    {
+        $notGuessed = $this->createForm(new WriteTargetTypedProperties(), 'name');
+        $guessed = $this->createForm(new TypedProperties(), 'name');
+
+        $this->assertInstanceOf(\Closure::class, $notGuessed->get('name')->getConfig()->getEmptyData());
+        $this->assertSame('', $guessed->get('name')->getConfig()->getEmptyData());
+    }
+
     protected function getTypeGuessers(): array
     {
         return [new class($this) implements FormTypeGuesserInterface {

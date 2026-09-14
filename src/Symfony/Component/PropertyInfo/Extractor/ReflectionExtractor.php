@@ -471,12 +471,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         $camelized = $this->camelize($property);
         $nonCamelized = ucfirst($property);
 
-        if (null === $adderAccessName || null === $removerAccessName) {
-            [$adderAccessName, $removerAccessName, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $camelized);
-            if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
-                $adderMethod = $reflClass->getMethod($adderAccessName);
-                $removerMethod = $reflClass->getMethod($removerAccessName);
+        $searchAdderAndRemover = null === $adderAccessName || null === $removerAccessName;
 
+        if ($searchAdderAndRemover && $allowAdderRemover) {
+            $searchAdderAndRemover = false;
+            [$adderMethod, $removerMethod, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $camelized);
+            $adderAccessName = $adderMethod?->name;
+            $removerAccessName = $removerMethod?->name;
+
+            if (null !== $adderMethod && null !== $removerMethod) {
                 $mutator = new PropertyWriteInfo(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER);
                 $mutator->setAdderInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $adderAccessName, $this->getWriteVisibilityForMethod($adderMethod), $adderMethod->isStatic()));
                 $mutator->setRemoverInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $removerAccessName, $this->getWriteVisibilityForMethod($removerMethod), $removerMethod->isStatic()));
@@ -490,13 +493,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         foreach ($this->mutatorPrefixes as $mutatorPrefix) {
             $methodName = $mutatorPrefix.$camelized;
 
-            [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, $methodName, 1);
-            if (!$accessible) {
+            [$method, $methodAccessibleErrors] = $this->getAccessibleMethod($reflClass, $methodName, 1);
+            if (null === $method) {
                 $errors[] = $methodAccessibleErrors;
                 continue;
             }
-
-            $method = $reflClass->getMethod($methodName);
 
             if (!\in_array($mutatorPrefix, $this->arrayMutatorPrefixes, true)) {
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $methodName, $this->getWriteVisibilityForMethod($method), $method->isStatic());
@@ -507,13 +508,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             foreach ($this->mutatorPrefixes as $mutatorPrefix) {
                 $methodName = $mutatorPrefix.$nonCamelized;
 
-                [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, $methodName, 1);
-                if (!$accessible) {
+                [$method, $methodAccessibleErrors] = $this->getAccessibleMethod($reflClass, $methodName, 1);
+                if (null === $method) {
                     $errors[] = $methodAccessibleErrors;
                     continue;
                 }
-
-                $method = $reflClass->getMethod($methodName);
 
                 if (!\in_array($mutatorPrefix, $this->arrayMutatorPrefixes, true)) {
                     return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $methodName, $this->getWriteVisibilityForMethod($method), $method->isStatic());
@@ -527,10 +526,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         $staticGetsetter = null;
 
         if ($allowGetterSetter) {
-            [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, $getsetter, 1);
-            if ($accessible) {
-                $method = $reflClass->getMethod($getsetter);
-
+            [$method, $methodAccessibleErrors] = $this->getAccessibleMethod($reflClass, $getsetter, 1);
+            if (null !== $method) {
                 if (!$method->isStatic()) {
                     return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetter, $this->getWriteVisibilityForMethod($method), false);
                 }
@@ -542,10 +539,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             $errors[] = $methodAccessibleErrors;
 
             if ($getsetter !== $getsetterNonCamelized) {
-                [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, $getsetterNonCamelized, 1);
-                if ($accessible) {
-                    $method = $reflClass->getMethod($getsetterNonCamelized);
-
+                [$method, $methodAccessibleErrors] = $this->getAccessibleMethod($reflClass, $getsetterNonCamelized, 1);
+                if (null !== $method) {
                     if (!$method->isStatic()) {
                         return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetterNonCamelized, $this->getWriteVisibilityForMethod($method), false);
                     }
@@ -567,8 +562,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         }
 
         if ($allowMagicSet) {
-            [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__set', 2);
-            if ($accessible) {
+            [$method, $methodAccessibleErrors] = $this->getAccessibleMethod($reflClass, '__set', 2);
+            if (null !== $method) {
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, PropertyWriteInfo::VISIBILITY_PUBLIC, false, false);
             }
 
@@ -576,12 +571,20 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         }
 
         if ($allowMagicCall) {
-            [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__call', 2);
-            if ($accessible) {
+            [$method, $methodAccessibleErrors] = $this->getAccessibleMethod($reflClass, '__call', 2);
+            if (null !== $method) {
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, 'set'.$camelized, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
             }
 
             $errors[] = $methodAccessibleErrors;
+        }
+
+        if ($searchAdderAndRemover) {
+            // the search is only needed for the errors it reports, which are read when nothing else is writable
+            [$adderMethod, $removerMethod, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $camelized);
+            $adderAccessName = $adderMethod?->name;
+            $removerAccessName = $removerMethod?->name;
+            array_unshift($errors, $adderAndRemoverErrors);
         }
 
         if (!$allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
@@ -828,7 +831,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
      * @param \ReflectionClass $reflClass The reflection class for the given object
      * @param string           $property  The camelized property name to singularize and probe
      *
-     * @return array{?string, ?string, list<string>} The adder method, the remover method, and any errors collected along the way
+     * @return array{?\ReflectionMethod, ?\ReflectionMethod, list<string>} The adder method, the remover method, and any errors collected along the way
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, string $property): array
     {
@@ -843,18 +846,18 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             $addMethod = $addPrefix.$singular;
             $removeMethod = $removePrefix.$singular;
 
-            [$addMethodFound, $addMethodAccessibleErrors] = $this->isMethodAccessible($reflClass, $addMethod, 1);
-            [$removeMethodFound, $removeMethodAccessibleErrors] = $this->isMethodAccessible($reflClass, $removeMethod, 1);
+            [$addMethodRefl, $addMethodAccessibleErrors] = $this->getAccessibleMethod($reflClass, $addMethod, 1);
+            [$removeMethodRefl, $removeMethodAccessibleErrors] = $this->getAccessibleMethod($reflClass, $removeMethod, 1);
             $errors[] = $addMethodAccessibleErrors;
             $errors[] = $removeMethodAccessibleErrors;
 
-            if ($addMethodFound && $removeMethodFound) {
-                return [$addMethod, $removeMethod, []];
+            if (null !== $addMethodRefl && null !== $removeMethodRefl) {
+                return [$addMethodRefl, $removeMethodRefl, []];
             }
 
-            if ($addMethodFound && !$removeMethodFound) {
+            if (null !== $addMethodRefl && null === $removeMethodRefl) {
                 $errors[] = [\sprintf('The add method "%s" in class "%s" was found, but the corresponding remove method "%s" was not found', $addMethod, $reflClass->getName(), $removeMethod)];
-            } elseif (!$addMethodFound && $removeMethodFound) {
+            } elseif (null === $addMethodRefl && null !== $removeMethodRefl) {
                 $errors[] = [\sprintf('The remove method "%s" in class "%s" was found, but the corresponding add method "%s" was not found', $removeMethod, $reflClass->getName(), $addMethod)];
             }
         }
@@ -863,9 +866,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
     }
 
     /**
-     * Returns whether a method is public and has the number of required parameters and errors.
+     * Returns the method when it is public and accepts the given number of parameters, and the errors found otherwise.
+     *
+     * @return array{?\ReflectionMethod, list<string>}
      */
-    private function isMethodAccessible(\ReflectionClass $class, string $methodName, int $parameters): array
+    private function getAccessibleMethod(\ReflectionClass $class, string $methodName, int $parameters): array
     {
         $errors = [];
 
@@ -877,11 +882,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             } elseif ($method->getNumberOfRequiredParameters() > $parameters || $method->getNumberOfParameters() < $parameters) {
                 $errors[] = \sprintf('The method "%s" in class "%s" requires %d arguments, but should accept only %d.', $methodName, $class->getName(), $method->getNumberOfRequiredParameters(), $parameters);
             } else {
-                return [true, $errors];
+                return [$method, $errors];
             }
         }
 
-        return [false, $errors];
+        return [null, $errors];
     }
 
     private function propertyHasHook(\ReflectionProperty $property, string $hookType): bool

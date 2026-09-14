@@ -82,6 +82,28 @@ class PhpSerializerTest extends TestCase
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
     }
 
+    public function testDecodingRejectsABodyWithCharactersOutsideTheBase64Alphabet()
+    {
+        $serializer = $this->createPhpSerializer();
+        $body = base64_encode($serializer->encode(new Envelope(new DummyMessage('Hello')))['body']);
+
+        $envelope = $serializer->decode(['body' => $body.'!']);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertStringContainsString('Could not decode the envelope body', $envelope->getMessage()->getMessage());
+    }
+
+    public function testDecodingAcceptsAWrappedBase64Body()
+    {
+        $serializer = $this->createPhpSerializer();
+        $body = base64_encode($serializer->encode(new Envelope(new DummyMessage('Hello')))['body']);
+
+        // transports may wrap the payload; base64_decode() skips whitespace in strict mode too
+        $envelope = $serializer->decode(['body' => chunk_split($body, 20, "\n")]);
+
+        $this->assertInstanceOf(DummyMessage::class, $envelope->getMessage());
+    }
+
     public function testDecodingFailsWithBadClass()
     {
         $serializer = $this->createPhpSerializer();
@@ -220,6 +242,24 @@ class PhpSerializerTest extends TestCase
                 'Honest1',
             ];
         })();
+
+        // unserialize() reads the length of a property name as an integer, so a name written with
+        // leading zeros denotes the very same property and wins by the same last-wins rule. Each of
+        // these carries an opaque "C:" payload so the in-PHP scanner runs rather than the fast path.
+        $opaqueStamp = 'a:1:{i:0;C:6:"FakeOp":2:{ok}}';
+        $nonCanonicalKeys = [
+            'private, one leading zero' => 's:045:"'."\0".'Symfony\Component\Messenger\Envelope'."\0".'message";',
+            'private, two leading zeros' => 's:0045:"'."\0".'Symfony\Component\Messenger\Envelope'."\0".'message";',
+            'protected, leading zero' => 's:010:"'."\0*\0".'message";',
+            'public, leading zero' => 's:07:"message";',
+        ];
+
+        foreach ($nonCanonicalKeys as $label => $nonCanonicalKey) {
+            yield 'non-canonical message key length ('.$label.'): returns the value PHP keeps' => [
+                $envelopePrefix.':3:{'.$stampsKey.$opaqueStamp.$messageKey.'O:6:"First1":0:{}'.$nonCanonicalKey.'O:7:"Second1":0:{}}',
+                'Second1',
+            ];
+        }
 
         yield 'trailing garbage after envelope: rejected' => [
             $envelopePrefix.':2:{'.$stampsKey.'a:0:{}'.$messageKey.'O:8:"stdClass":0:{}}garbage',

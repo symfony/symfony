@@ -46,8 +46,15 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
             return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body", or maybe you should implement your own serializer.');
         }
 
+        // Decoded strictly, as getMessageType() does, so that both read the same bytes: a lax
+        // decode silently drops characters the alphabet does not allow, leaving the type the
+        // signature is checked against to be read from a different payload than the one decoded.
         if (!str_ends_with($encodedEnvelope['body'], '}')) {
-            $encodedEnvelope['body'] = base64_decode($encodedEnvelope['body']);
+            if (false === $body = base64_decode($encodedEnvelope['body'], true)) {
+                return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode the envelope body: it is neither a serialized payload nor valid base64.');
+            }
+
+            $encodedEnvelope['body'] = $body;
         }
 
         if ('' === $serializeEnvelope = stripslashes($encodedEnvelope['body'])) {
@@ -119,19 +126,24 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
         // PHP unserialize() accepts all three property-name encodings and routes any of
         // them to Envelope::$message, so the scanner must recognize all three forms too,
         // otherwise an attacker can hide the real message behind a non-canonical key.
+        // The declared length is read as an integer, the way unserialize() reads it, rather than
+        // compared as bytes: a length written with leading zeros denotes the very same property.
         $messageKeys = [
-            's:45:"'."\0".Envelope::class."\0".'message";',
-            's:10:"'."\0*\0".'message";',
-            's:7:"message";',
+            "\0".Envelope::class."\0message",
+            "\0*\0message",
+            'message',
         ];
         $messageType = null;
 
         for ($i = 0; $i < $count; ++$i) {
             $isMessageKey = false;
-            foreach ($messageKeys as $key) {
-                if (0 === substr_compare($body, $key, $offset, \strlen($key))) {
-                    $isMessageKey = true;
-                    break;
+
+            if (preg_match('/\Gs:(\d++):"/A', $body, $m, 0, $offset)) {
+                $nameLength = (int) $m[1];
+                $nameOffset = $offset + \strlen($m[0]);
+
+                if ('";' === substr($body, $nameOffset + $nameLength, 2)) {
+                    $isMessageKey = \in_array(substr($body, $nameOffset, $nameLength), $messageKeys, true);
                 }
             }
 

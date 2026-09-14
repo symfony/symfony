@@ -67,3 +67,16 @@ EOF
 use Symfony\Component\Translation\Tests\Extractor\PhpAstExtractorTest;
 echo $view['translator']->trans('const-domain', [], PhpAstExtractorTest::OTHER_DOMAIN);
 ?>
+
+<?php echo $view['translator']->trans($amended ? 'ternary-if' : 'ternary-else'); ?>
+<?php echo $view['translator']->trans($amended ? 'ternary-other-domain-if' : 'ternary-other-domain-else', [], 'not_messages'); ?>
+<?php echo $view['translator']->trans('ternary-'.($amended ? 'concatenated-if' : 'concatenated-else')); ?>
+<?php echo $view['translator']->trans($amended ? 'nested-ternary-1' : ($cancelled ? 'nested-ternary-2' : 'nested-ternary-3')); ?>
+<?php echo $view['translator']->trans($amended ? 'ternary-with-dynamic-else' : $customTitle); ?>
+<?php echo $view['translator']->trans($customTitle ?: 'short-ternary-fallback'); ?>
+<?php echo $view['translator']->trans($amended ? 'ternary-duplicate' : 'ternary-duplicate'); ?>
+<?php echo $view['translator']->trans($customTitle ?? 'coalesce-fallback'); ?>
+<?php echo $view['translator']->trans('ternary-domain-key', [], $amended ? 'ternary_domain_a' : 'ternary_domain_b'); ?>
+<?php echo $view['translator']->trans(($amended ? 'concat-dup' : 'concat-du').($cancelled ? '' : 'p')); ?>
+<?php echo $view['translator']->trans($key = 'variable-assignation-'.'concatenated'); ?>
+<?php echo $view['translator']->trans($key = $amended ? 'variable-assignation-ternary-if' : 'variable-assignation-ternary-else', [], $domain = PhpAstExtractorTest::OTHER_DOMAIN); ?>

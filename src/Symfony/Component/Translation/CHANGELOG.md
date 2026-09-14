@@ -13,6 +13,7 @@ CHANGELOG
  * Add a locale-aware `Plural-Forms` header to the output of `PoFileDumper`
  * Re-add `PoEditorProvider`
  * Add `translation:update-xliff-sources` command to fill the `<source>` tags of XLIFF files with the default locale's translations
+ * Add support for ternary and null-coalescing expressions when extracting translation messages from PHP files
 
 8.1
 ---

@@ -106,6 +106,21 @@ final class PhpAstExtractorTest extends TestCase
                 'mix-named-arguments' => 'prefixmix-named-arguments',
                 'mix-named-arguments-locale' => 'prefixmix-named-arguments-locale',
                 'mix-named-arguments-without-domain' => 'prefixmix-named-arguments-without-domain',
+                'ternary-if' => 'prefixternary-if',
+                'ternary-else' => 'prefixternary-else',
+                'ternary-concatenated-if' => 'prefixternary-concatenated-if',
+                'ternary-concatenated-else' => 'prefixternary-concatenated-else',
+                'nested-ternary-1' => 'prefixnested-ternary-1',
+                'nested-ternary-2' => 'prefixnested-ternary-2',
+                'nested-ternary-3' => 'prefixnested-ternary-3',
+                'ternary-with-dynamic-else' => 'prefixternary-with-dynamic-else',
+                'short-ternary-fallback' => 'prefixshort-ternary-fallback',
+                'ternary-duplicate' => 'prefixternary-duplicate',
+                'coalesce-fallback' => 'prefixcoalesce-fallback',
+                'concat-dup' => 'prefixconcat-dup',
+                'concat-dupp' => 'prefixconcat-dupp',
+                'variable-assignation-concatenated' => 'prefixvariable-assignation-concatenated',
+                'concat-du' => 'prefixconcat-du',
             ],
             'not_messages' => [
                 'translatable other-domain-test-no-params-short-array' => 'prefixtranslatable other-domain-test-no-params-short-array',
@@ -142,6 +157,16 @@ final class PhpAstExtractorTest extends TestCase
                 'mix-named-arguments-without-parameters' => 'prefixmix-named-arguments-without-parameters',
                 'mix-named-arguments-disordered' => 'prefixmix-named-arguments-disordered',
                 'const-domain' => 'prefixconst-domain',
+                'ternary-other-domain-if' => 'prefixternary-other-domain-if',
+                'ternary-other-domain-else' => 'prefixternary-other-domain-else',
+                'variable-assignation-ternary-if' => 'prefixvariable-assignation-ternary-if',
+                'variable-assignation-ternary-else' => 'prefixvariable-assignation-ternary-else',
+            ],
+            'ternary_domain_a' => [
+                'ternary-domain-key' => 'prefixternary-domain-key',
+            ],
+            'ternary_domain_b' => [
+                'ternary-domain-key' => 'prefixternary-domain-key',
             ],
             'validators' => [
                 'message-in-constraint-attribute' => 'prefixmessage-in-constraint-attribute',
@@ -181,6 +206,8 @@ final class PhpAstExtractorTest extends TestCase
         $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../Fixtures/extractor-ast/translation.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
+        $this->assertEquals(['sources' => [$filename.':77']], $catalogue->getMetadata('ternary-duplicate'));
+        $this->assertEquals(['sources' => [$filename.':80']], $catalogue->getMetadata('concat-dup'));
     }
 
     public function testExtractionFromIndentedHeredocNowdoc()

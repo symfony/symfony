@@ -278,31 +278,58 @@ class Connection
      */
     private function withReconnect(callable $command, ?JobId $reservedJobId = null): mixed
     {
-        $this->busy = true;
+        return $this->holdSignals(function () use ($command, $reservedJobId) {
+            $this->busy = true;
+
+            try {
+                try {
+                    return $command();
+                } catch (ConnectionException) {
+                    $this->client->disconnect();
+
+                    $this->usingTube = false;
+                    $this->watchingTube = false;
+
+                    if (null !== $reservedJobId) {
+                        try {
+                            $this->client->reserveJob($reservedJobId);
+                        } catch (JobNotFoundException $exception) {
+                            throw new TransportException(\sprintf('Failed to reacquire the reservation for the Beanstalkd job "%s": the job no longer exists or was reserved by another consumer.', $reservedJobId->getId()), 0, $exception);
+                        }
+                    }
+
+                    return $command();
+                }
+            } catch (Exception $exception) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            } finally {
+                $this->busy = false;
+            }
+        });
+    }
+
+    /**
+     * Runs $command with asynchronous signal dispatching suspended.
+     *
+     * The keepalive alarm of messenger:consume is raised at any point of the program, and the
+     * signal handler cannot send a touch while a command awaits its response on the same socket.
+     * Holding the signals until the command is done sends the keepalive a moment later instead of
+     * skipping it, which matters most with a "timeout" option: the worker then spends nearly all
+     * of its time inside reserve-with-timeout, where every keepalive would be skipped.
+     *
+     * @param-immediately-invoked-callable $command
+     */
+    private function holdSignals(callable $command): mixed
+    {
+        $asyncSignals = \function_exists('pcntl_async_signals') && pcntl_async_signals(false);
 
         try {
-            try {
-                return $command();
-            } catch (ConnectionException) {
-                $this->client->disconnect();
-
-                $this->usingTube = false;
-                $this->watchingTube = false;
-
-                if (null !== $reservedJobId) {
-                    try {
-                        $this->client->reserveJob($reservedJobId);
-                    } catch (JobNotFoundException $exception) {
-                        throw new TransportException(\sprintf('Failed to reacquire the reservation for the Beanstalkd job "%s": the job no longer exists or was reserved by another consumer.', $reservedJobId->getId()), 0, $exception);
-                    }
-                }
-
-                return $command();
-            }
-        } catch (Exception $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+            return $command();
         } finally {
-            $this->busy = false;
+            if ($asyncSignals) {
+                pcntl_async_signals(true);
+                pcntl_signal_dispatch();
+            }
         }
     }
 }

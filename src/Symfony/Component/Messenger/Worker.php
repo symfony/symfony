@@ -390,11 +390,20 @@ class Worker
                 throw new RuntimeException(\sprintf('Receiver for "%s" does not implement "%s".', $transportName, KeepaliveReceiverInterface::class));
             }
 
-            $this->logger?->info('Sending keepalive request.', [
+            $context = [
                 'transport' => $transportName,
                 'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
-            ]);
-            $receiver->keepalive($envelope, $seconds);
+            ];
+            $this->logger?->info('Sending keepalive request.', $context);
+
+            try {
+                $receiver->keepalive($envelope, $seconds);
+            } catch (\Throwable $e) {
+                // the alarm is raised at any point of the program, so an error thrown from here
+                // surfaces wherever the worker happened to be: it stops the worker, or it is read
+                // as a failure of the message that was being handled at that moment
+                $this->logger?->warning('Keepalive request failed: {error}', $context + ['error' => $e->getMessage(), 'exception' => $e]);
+            }
         }
     }
 

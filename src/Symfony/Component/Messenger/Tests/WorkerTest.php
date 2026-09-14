@@ -33,6 +33,7 @@ use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
 use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\Handler\Acknowledger;
@@ -1388,6 +1389,142 @@ class WorkerTest extends TestCase
         $worker->keepalive(2);
 
         $this->assertCount(0, $receiver->keepaliveEnvelopes);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function testAFailingKeepaliveDoesNotStopTheWorker()
+    {
+        ClockMock::withClockMock(false);
+
+        $receiver = new ThrowingKeepaliveReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+            [new Envelope(new DummyMessage('Bob'))],
+        ]);
+        // the alarm lands while the worker polls, with the first message still held by the batch
+        $receiver->raiseAlarmOnGet = true;
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->atLeastOnce())->method('warning')->with('Keepalive request failed: {error}');
+
+        $worker = new Worker([$receiver], $this->createBatchBus(), $this->createStoppingDispatcher(2), $logger, clock: new MockClock());
+
+        $this->runWithKeepaliveOnAlarm($worker);
+
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function testAFailingKeepaliveIsNotChargedToTheMessageBeingHandled()
+    {
+        ClockMock::withClockMock(false);
+
+        $receiver = new ThrowingKeepaliveReceiver([[new Envelope(new DummyMessage('Hey'))]]);
+
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor(static function () {
+                // the alarm lands in the middle of the handler, which is what keepalive is for
+                posix_kill(posix_getpid(), \SIGALRM);
+                usleep(1000);
+            })],
+        ]))]);
+
+        $failures = [];
+        $dispatcher = $this->createStoppingDispatcher(1);
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failures) {
+            $failures[] = $event->getThrowable()->getMessage();
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
+
+        $this->runWithKeepaliveOnAlarm($worker);
+
+        $this->assertSame([], $failures);
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function testAFailingKeepaliveIsNotChargedToTheBatchBeingFlushed()
+    {
+        ClockMock::withClockMock(false);
+
+        $receiver = new ThrowingKeepaliveReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+            [new Envelope(new DummyMessage('Bob'))],
+        ]);
+
+        // the batch takes long enough for the alarm to land inside its flush
+        $worker = new Worker([$receiver], $this->createBatchBus(3), $this->createStoppingDispatcher(2), clock: new MockClock());
+
+        $this->runWithKeepaliveOnAlarm($worker, 2);
+
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
+    }
+
+    private function createBatchBus(?int $delay = null): MessageBus
+    {
+        return new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor(new DummyBatchHandler($delay))],
+        ]))]);
+    }
+
+    private function createStoppingDispatcher(int $afterRunningEvents): EventDispatcher
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($afterRunningEvents) {
+            static $i = 0;
+            if ($afterRunningEvents <= ++$i) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        return $dispatcher;
+    }
+
+    private function runWithKeepaliveOnAlarm(Worker $worker, int $alarm = 0): void
+    {
+        $previousHandler = pcntl_signal_get_handler(\SIGALRM);
+        $previousAsync = pcntl_async_signals(true);
+        pcntl_signal(\SIGALRM, static fn () => $worker->keepalive(2));
+
+        if ($alarm) {
+            pcntl_alarm($alarm);
+        }
+
+        try {
+            $worker->run();
+        } finally {
+            pcntl_alarm(0);
+            pcntl_async_signals($previousAsync);
+            pcntl_signal(\SIGALRM, $previousHandler);
+        }
+    }
+}
+
+class ThrowingKeepaliveReceiver extends DummyReceiver implements KeepaliveReceiverInterface
+{
+    public bool $raiseAlarmOnGet = false;
+
+    public function get(): iterable
+    {
+        $envelopes = parent::get();
+
+        if ($this->raiseAlarmOnGet) {
+            posix_kill(posix_getpid(), \SIGALRM);
+            usleep(1000);
+        }
+
+        return $envelopes;
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        throw new TransportException('Connection to the broker was lost.');
     }
 }
 

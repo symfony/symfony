@@ -22,6 +22,7 @@ use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\Message;
 use Composer\InstalledVersions;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
@@ -507,6 +508,33 @@ class ConnectionTest extends TestCase
         $connection->keepalive($id);
     }
 
+    public function testKeepaliveWithoutVisibilityTimeout()
+    {
+        $expectedParams = [
+            'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+            'ReceiptHandle' => $id = 'abc',
+            'VisibilityTimeout' => 5,
+        ];
+
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->once())->method('changeMessageVisibility')->with($expectedParams);
+
+        $connection = new Connection([], $client, $queueUrl);
+        $connection->keepalive($id, 5);
+    }
+
+    public function testKeepaliveWithoutVisibilityTimeoutNorInterval()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->never())->method($this->anything());
+
+        $connection = new Connection([], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Cannot keep an Amazon SQS message alive without a "visibility_timeout" option on the transport.');
+        $connection->keepalive('abc');
+    }
+
     public function testDeleteOnReject()
     {
         $expectedParams = [
@@ -561,6 +589,59 @@ class ConnectionTest extends TestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('SQS visibility_timeout (1s) cannot be smaller than the keepalive interval (2s).');
         $connection->keepalive('123', 2);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function testItDispatchesTheSignalsRaisedWhileTalkingToSqs()
+    {
+        $received = false;
+        $previousHandler = pcntl_signal_get_handler(\SIGUSR1);
+        $previousAsync = pcntl_async_signals(true);
+        pcntl_signal(\SIGUSR1, static function () use (&$received) { $received = true; });
+
+        try {
+            $responses = [$this->getMockedQueueUrlResponse(), $this->getMockedReceiveMessageResponse()];
+            $client = new MockHttpClient(function () use (&$responses, &$received) {
+                posix_kill(posix_getpid(), \SIGUSR1);
+
+                // the transport holds the signal back until it is done talking to SQS
+                $this->assertFalse($received);
+
+                return array_shift($responses);
+            });
+
+            $connection = Connection::fromDsn('sqs://default', ['access_key' => 'foo', 'secret_key' => 'bar', 'auto_setup' => false], $client);
+
+            $this->assertNotNull($connection->get());
+            $this->assertTrue($received);
+            $this->assertTrue(pcntl_async_signals());
+        } finally {
+            pcntl_signal(\SIGUSR1, $previousHandler);
+            pcntl_async_signals($previousAsync);
+        }
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testItRestoresSignalDispatchingWhenTalkingToSqsThrows()
+    {
+        $previousAsync = pcntl_async_signals(true);
+
+        try {
+            $httpClient = new MockHttpClient(new MockResponse('', ['error' => 'Connection timed out']));
+            $client = new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
+            $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+            try {
+                $connection->get();
+                $this->fail('The receive should have failed.');
+            } catch (NetworkException) {
+            }
+
+            $this->assertTrue(pcntl_async_signals());
+        } finally {
+            pcntl_async_signals($previousAsync);
+        }
     }
 
     public function testQueueAttributesAndTags()

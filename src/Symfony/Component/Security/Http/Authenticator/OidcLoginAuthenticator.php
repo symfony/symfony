@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -290,6 +291,10 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             new UserBadge($claims[$this->options['user_identifier_claim']], $this->userProvider->loadUserByIdentifier(...), $claims),
         );
         $passport->setAttribute('oidc_token_data', $tokenData);
+        // "auth_time" tells when the user actually authenticated at the provider, which a
+        // silent SSO login can place well in the past; it is only validated when "max_age"
+        // is requested, so anything non-numeric is discarded rather than trusted
+        $passport->setAttribute('oidc_auth_time', is_numeric($idTokenClaims['auth_time'] ?? null) ? (int) $idTokenClaims['auth_time'] : null);
 
         return $passport;
     }
@@ -307,6 +312,12 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             // a refresh token when it was asked for one, and "expires_in" is optional
             $token->setAttribute('oidc_refresh_token', $tokenData['refresh_token'] ?? null);
             $token->setAttribute('oidc_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? $this->clock->now()->getTimestamp() + (int) $tokenData['expires_in'] : null);
+        }
+
+        // a provider whose clock runs ahead would otherwise extend the window that
+        // IS_AUTHENTICATED_RECENTLY grants, so the claim never dates from the future
+        if (null !== $authTime = $passport->getAttribute('oidc_auth_time')) {
+            $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, min($authTime, $this->clock->now()->getTimestamp()));
         }
 
         return $token;

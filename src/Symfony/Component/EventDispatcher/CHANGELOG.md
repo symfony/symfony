@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow `getSubscribedEvents()` to name its keys: `['method' => 'onEvent', 'priority' => 10]`
+ * Add `before` and `after` to `#[AsEventListener]` to order listeners relative to each other, targeting a service id, a class, or a single listener with `Service::method`
 
 8.1
 ---

@@ -20,6 +20,7 @@ use Symfony\Component\Tui\Event\SelectEvent;
 use Symfony\Component\Tui\Event\SelectionChangeEvent;
 use Symfony\Component\Tui\Event\SelectionToggleEvent;
 use Symfony\Component\Tui\Render\RenderContext;
+use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\SelectListWidget;
@@ -406,6 +407,139 @@ class SelectListTest extends TestCase
         foreach ([60, 40, 20, 6, 4, 2, 1] as $columns) {
             foreach ($list->render(new RenderContext($columns, 24)) as $line) {
                 $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Every row fits in %d columns.', $columns));
+            }
+        }
+    }
+
+    public function testMultilineIsOffByDefault()
+    {
+        $items = [['value' => 'v', 'label' => str_repeat('a', 40)]];
+
+        $default = (new SelectListWidget($items))->render(new RenderContext(30, 10));
+        $disabled = (new SelectListWidget($items, multiline: false))->render(new RenderContext(30, 10));
+
+        $this->assertSame($default, $disabled);
+        $this->assertSame([(new Style())->withBold()->apply('→ '.str_repeat('a', 26))], $default);
+    }
+
+    public function testMultilineWrapsLongLabels()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'v', 'label' => 'alpha beta gamma delta epsilon zeta'],
+        ], multiline: true);
+
+        $lines = $list->render(new RenderContext(30, 10));
+
+        $this->assertCount(2, $lines);
+        $this->assertSame('→ alpha beta gamma delta', AnsiUtils::stripAnsiCodes($lines[0]));
+        $this->assertSame('  epsilon zeta', AnsiUtils::stripAnsiCodes($lines[1]));
+        $this->assertSame(
+            [
+                (new Style())->withBold()->apply('→ alpha beta gamma delta'),
+                (new Style())->withBold()->apply('  epsilon zeta'),
+            ],
+            $lines,
+        );
+    }
+
+    public function testMultilineRendersDescriptionOnItsOwnRow()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'a', 'label' => 'alpha', 'description' => 'the first one'],
+            ['value' => 'b', 'label' => 'beta', 'description' => 'the second one'],
+        ], multiline: true);
+
+        $lines = $list->render(new RenderContext(30, 10));
+
+        // Each item renders its label row followed by its description row.
+        $this->assertCount(4, $lines);
+        $this->assertSame('→ alpha', AnsiUtils::stripAnsiCodes($lines[0]));
+        $this->assertSame('  the first one', AnsiUtils::stripAnsiCodes($lines[1]));
+        $this->assertSame('  beta', AnsiUtils::stripAnsiCodes($lines[2]));
+        $this->assertSame('  the second one', AnsiUtils::stripAnsiCodes($lines[3]));
+    }
+
+    public function testMultilineDropsItemsPastTheSelectedOneWhenRowsRunOut()
+    {
+        $items = [];
+        for ($i = 1; $i <= 5; ++$i) {
+            $items[] = ['value' => 'v'.$i, 'label' => \sprintf('Item %d ', $i).str_repeat('x', 40)];
+        }
+        $list = new SelectListWidget($items, 5, multiline: true);
+
+        $lines = $list->render(new RenderContext(30, 4));
+
+        // Three wrapped rows for the selected item plus the scroll indicator.
+        $this->assertCount(4, $lines);
+        $this->assertStringContainsString('Item 1', AnsiUtils::stripAnsiCodes($lines[0]));
+        $this->assertStringContainsString('(1/5)', AnsiUtils::stripAnsiCodes($lines[3]));
+    }
+
+    public function testMultilineKeepsSelectedItemInsideAvailableRows()
+    {
+        $items = [];
+        for ($i = 1; $i <= 5; ++$i) {
+            $items[] = ['value' => 'v'.$i, 'label' => \sprintf('Item %d ', $i).str_repeat('word ', 17)];
+        }
+        $list = new SelectListWidget($items, 5, multiline: true);
+        $list->setSelectedIndex(2);
+
+        $lines = $list->render(new RenderContext(30, 4));
+
+        $this->assertLessThanOrEqual(4, \count($lines), 'Multiline rendering must not emit more rows than the context provides.');
+        $visible = implode("\n", array_map(AnsiUtils::stripAnsiCodes(...), $lines));
+        $this->assertStringContainsString('→ Item 3', $visible, 'The selected item must stay visible inside the available rows.');
+    }
+
+    public function testMultilineClampsSelectedItemTallerThanViewport()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'a', 'label' => str_repeat('word ', 20)],
+        ], multiline: true);
+
+        $lines = $list->render(new RenderContext(30, 3));
+
+        $this->assertLessThanOrEqual(3, \count($lines), 'A selected item taller than the viewport must be clamped to the available rows.');
+        $this->assertStringContainsString('→ word', AnsiUtils::stripAnsiCodes($lines[0]), 'The first row of the clamped selected item stays anchored at the top.');
+    }
+
+    public function testMultilineExactFitDoesNotShowScrollIndicator()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'a', 'label' => 'alpha'],
+            ['value' => 'b', 'label' => 'beta'],
+        ], multiline: true);
+
+        $lines = $list->render(new RenderContext(20, 2));
+
+        $this->assertCount(2, $lines, 'Both items fit the two available rows exactly; nothing is left to scroll.');
+        $this->assertStringContainsString('alpha', AnsiUtils::stripAnsiCodes($lines[0]));
+        $this->assertStringContainsString('beta', AnsiUtils::stripAnsiCodes($lines[1]));
+    }
+
+    public function testMultilineOneRowViewportShowsOnlyTheSelectedLabel()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'a', 'label' => 'alpha'],
+            ['value' => 'b', 'label' => 'beta'],
+        ], multiline: true);
+
+        $lines = $list->render(new RenderContext(20, 1));
+
+        $this->assertCount(1, $lines, 'A one-row viewport renders exactly one row.');
+        $this->assertStringContainsString('→ alpha', AnsiUtils::stripAnsiCodes($lines[0]), 'The selected label keeps the row; the indicator is suppressed.');
+    }
+
+    public function testMultilineRowsFitEveryWidth()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'a', 'label' => 'alpha beta gamma ★ étoile verified', 'description' => 'the first one'],
+            ['value' => 'b', 'label' => '日本語のオプション with CJK and ascii mixed', 'description' => 'the second one'],
+        ], multiline: true);
+
+        foreach ([60, 40, 20, 6, 4, 2, 1] as $columns) {
+            foreach ($list->render(new RenderContext($columns, 24)) as $line) {
+                $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Every wrapped row fits in %d columns.', $columns));
             }
         }
     }

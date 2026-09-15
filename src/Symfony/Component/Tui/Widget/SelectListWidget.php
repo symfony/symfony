@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Widget;
 
 use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Ansi\TextWrapper;
 use Symfony\Component\Tui\Event\CancelEvent;
 use Symfony\Component\Tui\Event\MultiSelectEvent;
 use Symfony\Component\Tui\Event\SelectEvent;
@@ -56,6 +57,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         private int $maxVisible = 5,
         private bool $multiselect = false,
         ?Keybindings $keybindings = null,
+        private bool $multiline = false,
     ) {
         $this->resetFilteredItems();
         if (null !== $keybindings) {
@@ -289,19 +291,28 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         $labelColumnWidth = min(30, $maxLabelWidth);
 
         // Render visible items
-        for ($i = $startIndex; $i < $endIndex; ++$i) {
-            $item = $this->getFilteredItem($i);
-            $isSelected = $i === $this->selectedIndex;
-            $description = isset($item['description']) ? $this->normalizeDescription($item['description']) : null;
-            $line = $this->renderItem($item, $isSelected, $description, $columns, $labelColumnWidth);
-            // renderItem() budgets the label against the columns left after
-            // its prefix, but the prefix itself is emitted unconditionally
-            // and is wider than the widget once the pane gets narrow enough.
-            $lines[] = AnsiUtils::truncateToWidth($line, $columns, '');
+        $indicatorRoom = true;
+        if ($this->multiline) {
+            // Wrapped items consume a variable number of rows, so the
+            // window is fitted against the physical rows of the context
+            // before anything is emitted.
+            [$lines, $startIndex, $endIndex, $indicatorRoom] = $this->renderMultilineWindow($startIndex, $endIndex, $context->getRows(), $columns);
+        } else {
+            for ($i = $startIndex; $i < $endIndex; ++$i) {
+                $item = $this->getFilteredItem($i);
+                $isSelected = $i === $this->selectedIndex;
+                $description = isset($item['description']) ? $this->normalizeDescription($item['description']) : null;
+
+                $line = $this->renderItem($item, $isSelected, $description, $columns, $labelColumnWidth);
+                // renderItem() budgets the label against the columns left after
+                // its prefix, but the prefix itself is emitted unconditionally
+                // and is wider than the widget once the pane gets narrow enough.
+                $lines[] = AnsiUtils::truncateToWidth($line, $columns, '');
+            }
         }
 
         // Add scroll indicator if needed
-        if ($startIndex > 0 || $endIndex < \count($this->filteredItemIndices)) {
+        if ($indicatorRoom && ($startIndex > 0 || $endIndex < \count($this->filteredItemIndices))) {
             $scrollText = \sprintf('  (%d/%d)', $this->selectedIndex + 1, \count($this->filteredItemIndices));
             $line = $this->applyElement('scroll-info', AnsiUtils::truncateToWidth($scrollText, $columns - 2, ''));
             $lines[] = $line;
@@ -422,6 +433,113 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         $maxColumns = $columns - $prefixWidth - 2;
 
         return $prefix.AnsiUtils::truncateToWidth($displayValue, $maxColumns, '');
+    }
+
+    /**
+     * Render the logical window as physical rows fitted to the context.
+     *
+     * Wrapped items consume a variable number of rows, so trailing items
+     * are dropped and leading items are trimmed until the selected item
+     * fits inside the budget; a selected item taller than the budget is
+     * clamped to its first rows. One row is reserved for the scroll
+     * indicator only when items actually fall outside the fitted window,
+     * so a window that fits exactly renders without an indicator.
+     *
+     * A one-row viewport has no room next to the selection, so the
+     * indicator is suppressed and its row goes to the selected label.
+     *
+     * @return array{0: list<string>, 1: int, 2: int, 3: bool} the rendered rows, the fitted [start, end) range and whether a row is left for the indicator
+     */
+    private function renderMultilineWindow(int $startIndex, int $endIndex, int $contextRows, int $columns): array
+    {
+        $rowsByIndex = [];
+        for ($i = $startIndex; $i < $endIndex; ++$i) {
+            $item = $this->getFilteredItem($i);
+            $description = isset($item['description']) ? $this->normalizeDescription($item['description']) : null;
+            $rowsByIndex[$i] = $this->renderMultilineItem($item, $i === $this->selectedIndex, $description, $columns);
+        }
+
+        $total = \count($this->filteredItemIndices);
+
+        $fit = function (int $budget) use ($rowsByIndex, $startIndex, $endIndex): array {
+            // Drop trailing items once the budget is spent.
+            $end = $endIndex;
+            $used = 0;
+            foreach ($rowsByIndex as $i => $rows) {
+                if ($i > $this->selectedIndex && $used + \count($rows) > $budget) {
+                    $end = $i;
+                    break;
+                }
+                $used += \count($rows);
+            }
+
+            // Trim leading items while they push the selection out of view.
+            $start = $startIndex;
+            while ($start < $this->selectedIndex && $used > $budget) {
+                $used -= \count($rowsByIndex[$start]);
+                ++$start;
+            }
+
+            // The selected item alone exceeds the budget: clamp it to its
+            // first rows so the arrow and the label start stay visible.
+            $clamp = max(0, $used - $budget);
+
+            return [$start, $end, $clamp];
+        };
+
+        [$start, $end, $clamp] = $fit(max(1, $contextRows));
+        $indicatorRoom = $contextRows >= 2;
+        if ($indicatorRoom && ($start > 0 || $end < $total)) {
+            // Something scrolled out, so one row goes to the indicator.
+            [$start, $end, $clamp] = $fit(max(1, $contextRows - 1));
+        }
+
+        $lines = [];
+        for ($i = $start; $i < $end; ++$i) {
+            $rows = $rowsByIndex[$i];
+            if ($i === $start && $clamp > 0) {
+                $rows = \array_slice($rows, 0, \count($rows) - $clamp);
+            }
+            // The prefix is wider than very narrow widgets, so clamp every
+            // physical row like the single-row path.
+            foreach ($rows as $row) {
+                $lines[] = AnsiUtils::truncateToWidth($row, $columns, '');
+            }
+        }
+
+        return [$lines, $start, $end, $indicatorRoom];
+    }
+
+    /**
+     * Render one item with its label wrapped across several rows when it
+     * does not fit the available columns; continuation rows and the
+     * description row align under the label start.
+     *
+     * @param array{value: string, label: string, description?: string, checked?: bool} $item
+     *
+     * @return list<string>
+     */
+    private function renderMultilineItem(array $item, bool $isSelected, ?string $description, int $columns): array
+    {
+        $checkbox = $this->multiselect ? (($item['checked'] ?? false) ? '[x] ' : '[ ] ') : '';
+        $prefix = $isSelected ? '→ '.$checkbox : '  '.$checkbox;
+        $prefixWidth = AnsiUtils::visibleWidth($prefix);
+        $width = max(1, $columns - $prefixWidth - 2);
+
+        $rows = [];
+        foreach (TextWrapper::wrapTextWithAnsi($item['label'], $width) as $i => $labelRow) {
+            $row = (0 === $i ? $prefix : str_repeat(' ', $prefixWidth)).$labelRow;
+            $rows[] = $isSelected ? $this->resolveElement('selected')->apply($row) : $row;
+        }
+
+        if (null !== $description) {
+            $desc = AnsiUtils::truncateToWidth($description, $width, '');
+            $rows[] = $isSelected
+                ? $this->resolveElement('selected')->apply(str_repeat(' ', $prefixWidth).$desc)
+                : str_repeat(' ', $prefixWidth).$this->applyElement('description', $desc);
+        }
+
+        return $rows;
     }
 
     private function resetFilteredItems(): void

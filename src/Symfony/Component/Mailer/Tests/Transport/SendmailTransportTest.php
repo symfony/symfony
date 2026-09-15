@@ -92,11 +92,6 @@ class SendmailTransportTest extends TestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Process failed with exit code 42: Sending failed');
         $sendmailTransport->send($mail, $envelope);
-
-        $streamProperty = new \ReflectionProperty(SendmailTransport::class, 'stream');
-        $stream = $streamProperty->getValue($sendmailTransport);
-
-        $this->assertNull($stream->stream);
     }
 
     public function testStreamIsClearedOnFailure()

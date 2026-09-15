@@ -125,6 +125,11 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
         return null;
     }
 
+    /**
+     * Presenting a cookie is no explicit user action, yet the INTERACTIVE_LOGIN event
+     * has been dispatched for remember-me logins since 2.0, and listeners reacting to
+     * a user coming back, such as one updating a "last login" date, rely on it.
+     */
     public function isInteractive(): bool
     {
         return true;

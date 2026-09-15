@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target state="needs-review-translation">Prosím zadejte platný UUID.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Dolní mez nesmí být větší než horní mez.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

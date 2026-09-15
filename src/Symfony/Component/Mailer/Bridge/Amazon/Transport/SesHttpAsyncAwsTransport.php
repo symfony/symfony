@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
 
 /**
@@ -29,12 +30,21 @@ use Symfony\Component\Mime\Message;
  */
 class SesHttpAsyncAwsTransport extends AbstractTransport
 {
+    private ?string $tenant = null;
+
     public function __construct(
         protected SesClient $sesClient,
         ?EventDispatcherInterface $dispatcher = null,
         ?LoggerInterface $logger = null,
     ) {
         parent::__construct($dispatcher, $logger);
+    }
+
+    public function setTenant(?string $tenant): static
+    {
+        $this->tenant = $tenant;
+
+        return $this;
     }
 
     public function __toString(): string
@@ -82,18 +92,20 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
         ];
 
         $originalMessage = $message->getOriginalMessage();
+        $tenant = $this->tenant;
         if ($originalMessage instanceof Message) {
-            if ($configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+            if ($configurationSetHeader = $originalMessage->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
                 $request['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
             }
-            if ($sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
+            if ($sourceArnHeader = $originalMessage->getHeaders()->get('X-SES-SOURCE-ARN')) {
                 $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
             }
-            if ($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+            if ($header = $originalMessage->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
                 if (preg_match('/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix', $header->getBodyAsString(), $listManagementOptions)) {
                     $request['ListManagementOptions'] = array_filter($listManagementOptions, static fn ($e) => \in_array($e, ['ContactListName', 'TopicName'], true), \ARRAY_FILTER_USE_KEY);
                 }
             }
+            $tenant = $this->getTenant($originalMessage->getHeaders());
             foreach ($originalMessage->getHeaders()->all() as $header) {
                 if ($header instanceof MetadataHeader) {
                     $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
@@ -101,7 +113,20 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             }
         }
 
+        if (null !== $tenant) {
+            $request['TenantName'] = $tenant;
+        }
+
         return new SendEmailRequest($request);
+    }
+
+    final protected function getTenant(Headers $headers): ?string
+    {
+        if ($header = $headers->get('X-SES-TENANT')) {
+            return $header->getBodyAsString();
+        }
+
+        return $this->tenant;
     }
 
     private function getRawData(SentMessage $message): string

@@ -136,6 +136,10 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport implements Remote
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
 
+        if (null !== $tenant = $this->getTenant($email->getHeaders())) {
+            $request['TenantName'] = $tenant;
+        }
+
         if ($customHeaders = $this->getCustomHeaders($email->getHeaders())) {
             if (null !== $template) {
                 $request['Content']['Template']['Headers'] = $customHeaders;
@@ -164,7 +168,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport implements Remote
     {
         $headersPrepared = [];
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'return-path', 'subject', 'reply-to', 'sender', 'content-type', 'x-ses-configuration-set', 'x-ses-source-arn', 'x-ses-list-management-options'];
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'return-path', 'subject', 'reply-to', 'sender', 'content-type', 'x-ses-configuration-set', 'x-ses-source-arn', 'x-ses-list-management-options', 'x-ses-tenant'];
         foreach ($headers->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
                 continue;

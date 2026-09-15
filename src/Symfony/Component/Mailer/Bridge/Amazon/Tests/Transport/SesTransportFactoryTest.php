@@ -15,6 +15,7 @@ use AsyncAws\Core\Configuration;
 use AsyncAws\Ses\SesClient;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiAsyncAwsTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesHttpAsyncAwsTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesSmtpTransport;
@@ -23,6 +24,8 @@ use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Mailer\Test\IncompleteDsnTestTrait;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
@@ -102,6 +105,11 @@ class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('ses+api', 'default', self::USER, self::PASSWORD, null, ['tenant' => 'my-tenant']),
+            (new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), null, $logger))->setTenant('my-tenant'),
+        ];
+
+        yield [
             new Dsn('ses+https', 'default', self::USER, self::PASSWORD),
             new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), null, $logger),
         ];
@@ -142,6 +150,11 @@ class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('ses+https', 'default', self::USER, self::PASSWORD, null, ['tenant' => 'my-tenant']),
+            (new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), null, $logger))->setTenant('my-tenant'),
+        ];
+
+        yield [
             new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD),
             new SesSmtpTransport(self::USER, self::PASSWORD, null, null, $logger),
         ];
@@ -159,6 +172,11 @@ class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield [
             new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1', 'ping_threshold' => '10']),
             (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger))->setPingThreshold(10),
+        ];
+
+        yield [
+            new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1', 'tenant' => 'my-tenant']),
+            (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger))->setTenant('my-tenant'),
         ];
 
         yield [
@@ -185,6 +203,32 @@ class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
             new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD, 465, ['region' => 'eu-west-1', 'require_tls' => '1']),
             (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger, 'default', 465))->setRequireTls(true),
         ];
+    }
+
+    public function testEmptyTenantOptionIsIgnored()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['ses+smtp', 'ses+smtps'] as $scheme) {
+            $email = new Email();
+            $transport = $factory->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD, null, ['tenant' => '']));
+            (new \ReflectionMethod(SesSmtpTransport::class, 'addSesHeaders'))->invoke($transport, $email);
+
+            $this->assertFalse($email->getHeaders()->has('X-SES-TENANT'), $scheme);
+        }
+
+        foreach (['ses', 'ses+api', 'ses+https'] as $scheme) {
+            $client = new MockHttpClient(function (string $method, string $url, array $options) use ($scheme): ResponseInterface {
+                $body = $options['body'];
+                $this->assertStringNotContainsString('TenantName', \is_string($body) ? $body : '', $scheme);
+
+                return new MockResponse('{"MessageId": "foobar"}', ['http_code' => 200]);
+            });
+
+            $email = (new Email())->subject('Hello!')->from('from@example.com')->to('to@example.com')->text('Hello There!');
+            $transport = (new SesTransportFactory(null, $client, new NullLogger()))->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD, null, ['tenant' => '']));
+            $transport->send($email);
+        }
     }
 
     public static function unsupportedSchemeProvider(): iterable

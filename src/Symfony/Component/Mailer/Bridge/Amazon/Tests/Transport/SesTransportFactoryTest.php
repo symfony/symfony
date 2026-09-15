@@ -102,6 +102,11 @@ class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('ses+api', 'default', self::USER, self::PASSWORD, null, ['tenant' => 'my-tenant']),
+            (new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), null, $logger))->setTenant('my-tenant'),
+        ];
+
+        yield [
             new Dsn('ses+https', 'default', self::USER, self::PASSWORD),
             new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), null, $logger),
         ];
@@ -142,6 +147,11 @@ class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('ses+https', 'default', self::USER, self::PASSWORD, null, ['tenant' => 'my-tenant']),
+            (new SesHttpAsyncAwsTransport(new SesClient(Configuration::create(['accessKeyId' => self::USER, 'accessKeySecret' => self::PASSWORD, 'region' => 'eu-west-1']), null, $client, $logger), null, $logger))->setTenant('my-tenant'),
+        ];
+
+        yield [
             new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD),
             new SesSmtpTransport(self::USER, self::PASSWORD, null, null, $logger),
         ];
@@ -159,6 +169,11 @@ class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield [
             new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1', 'ping_threshold' => '10']),
             (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger))->setPingThreshold(10),
+        ];
+
+        yield [
+            new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1', 'tenant' => 'my-tenant']),
+            (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger))->setTenant('my-tenant'),
         ];
 
         yield [

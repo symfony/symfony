@@ -29,12 +29,21 @@ use Symfony\Component\Mime\Message;
  */
 class SesHttpAsyncAwsTransport extends AbstractTransport
 {
+    protected ?string $tenant = null;
+
     public function __construct(
         protected SesClient $sesClient,
         ?EventDispatcherInterface $dispatcher = null,
         ?LoggerInterface $logger = null,
     ) {
         parent::__construct($dispatcher, $logger);
+    }
+
+    public function setTenant(?string $tenant): static
+    {
+        $this->tenant = $tenant;
+
+        return $this;
     }
 
     public function __toString(): string
@@ -99,6 +108,10 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
                     $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
                 }
             }
+        }
+
+        if (null !== $this->tenant) {
+            $request['TenantName'] = $this->tenant;
         }
 
         return new SendEmailRequest($request);

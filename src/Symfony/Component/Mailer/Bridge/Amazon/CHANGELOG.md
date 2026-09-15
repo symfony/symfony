@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add support for `RemoteTemplateEmail` to `SesApiAsyncAwsTransport`
+ * Add support for `X-SES-TENANT`, configurable via the `tenant` DSN option
+ * Bump `async-aws/ses` to 1.13 minimum
 
 8.1
 ---

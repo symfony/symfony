@@ -24,6 +24,10 @@ CHANGELOG
  * Add the `outbox` option to transports
  * Add `StopWorkerOnIdleListener` to stop the worker as soon as no message is available
  * Make `InMemoryTransport` implement `ListableReceiverInterface` and `MessageCountAwareInterface`
+ * Add `retry` and `failure_transport` options to the `sync://` transport
+ * Add `$retryStrategy`, `$failureSender`, `$eventDispatcher` and `$logger` arguments to `SyncTransport`
+ * Add `$retryStrategyLocator`, `$failureSenderLocator`, `$eventDispatcher` and `$logger` arguments to `SyncTransportFactory`
+ * Add `SyncMessageFailedEvent` and `SyncMessageRetryingEvent`, dispatched by the sync transport
 
 8.1
 ---

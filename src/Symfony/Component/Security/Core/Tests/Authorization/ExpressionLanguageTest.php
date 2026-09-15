@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -52,9 +53,9 @@ class ExpressionLanguageTest extends TestCase
         $rememberMeToken = new RememberMeToken($user, 'firewall-name');
         $usernamePasswordToken = new UsernamePasswordToken($user, 'firewall-name', $roles);
         $recentlyAuthenticatedToken = new UsernamePasswordToken($user, 'firewall-name', $roles);
-        $recentlyAuthenticatedToken->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+        $recentlyAuthenticatedToken->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
         $staleRememberMeToken = new RememberMeToken($user, 'firewall-name');
-        $staleRememberMeToken->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+        $staleRememberMeToken->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
 
         return [
             [$noToken, 'is_authenticated()', false],

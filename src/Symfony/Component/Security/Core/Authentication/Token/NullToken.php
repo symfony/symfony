@@ -68,6 +68,16 @@ class NullToken implements TokenInterface
         throw new \BadMethodCallException('Cannot add attribute to NullToken.');
     }
 
+    public function getAuthenticationProofs(): array
+    {
+        return [];
+    }
+
+    public function setAuthenticationProofs(array $proofs): never
+    {
+        throw new \BadMethodCallException('Cannot record authentication proofs on a NullToken.');
+    }
+
     public function __serialize(): array
     {
         return [];

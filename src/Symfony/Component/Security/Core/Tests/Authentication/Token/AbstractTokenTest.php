@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -47,6 +48,16 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
+    }
+
+    public function testAuthenticationProofs()
+    {
+        $token = new ConcreteToken();
+        $this->assertSame([], $token->getAuthenticationProofs());
+
+        $token->setAuthenticationProofs($proofs = [AuthenticationMethod::PASSWORD => 1789140200, AuthenticationMethod::ONE_TIME_PASSWORD => 1789133290]);
+        $this->assertSame($proofs, $token->getAuthenticationProofs());
+        $this->assertSame($proofs, unserialize(serialize($token))->getAuthenticationProofs());
     }
 
     public function testAttributes()

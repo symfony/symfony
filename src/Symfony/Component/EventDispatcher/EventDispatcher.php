@@ -36,9 +36,16 @@ class EventDispatcher implements EventDispatcherInterface
     private array $optimized;
     /** @var array<string, \WeakMap<object, array<string, bool>>> */
     private array $removedListeners = [];
+    private array $unsorted = [];
 
-    public function __construct()
+    /**
+     * @param array $listeners Listeners by event name, then by priority in the order they must run in,
+     *                         as built by SortedListeners
+     */
+    public function __construct(array $listeners = [])
     {
+        $this->listeners = $listeners;
+
         if (__CLASS__ === static::class) {
             $this->optimized = [];
         }
@@ -141,6 +148,7 @@ class EventDispatcher implements EventDispatcherInterface
     public function addListener(string $eventName, callable|array $listener, int $priority = 0): void
     {
         $this->listeners[$eventName][$priority][] = $listener;
+        $this->unsorted[$eventName] = true;
         unset($this->sorted[$eventName], $this->optimized[$eventName]);
     }
 
@@ -245,7 +253,10 @@ class EventDispatcher implements EventDispatcherInterface
         unset($this->removedListeners[$eventName]);
 
         do {
-            krsort($this->listeners[$eventName]);
+            if ($this->unsorted[$eventName] ?? false) {
+                krsort($this->listeners[$eventName]);
+                unset($this->unsorted[$eventName]);
+            }
             // Initializing a lazy listener can add listeners for the same event.
             // That unsets $this->sorted[$eventName], which is the signal to sort again.
             $this->sorted[$eventName] = [];
@@ -284,7 +295,10 @@ class EventDispatcher implements EventDispatcherInterface
             $this->sortListeners($eventName);
         }
 
-        krsort($this->listeners[$eventName]);
+        if ($this->unsorted[$eventName] ?? false) {
+            krsort($this->listeners[$eventName]);
+            unset($this->unsorted[$eventName]);
+        }
         $this->optimized[$eventName] = [];
 
         foreach ($this->listeners[$eventName] as &$listeners) {

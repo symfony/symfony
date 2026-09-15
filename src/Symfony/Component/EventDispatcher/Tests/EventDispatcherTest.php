@@ -32,9 +32,9 @@ class EventDispatcherTest extends TestCase
         $this->listener = new TestEventListener();
     }
 
-    protected function createEventDispatcher()
+    protected function createEventDispatcher(array $listeners = [])
     {
-        return new EventDispatcher();
+        return new EventDispatcher($listeners);
     }
 
     public function testInitialState()
@@ -42,6 +42,36 @@ class EventDispatcherTest extends TestCase
         $this->assertEquals([], $this->dispatcher->getListeners());
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
         $this->assertFalse($this->dispatcher->hasListeners(self::postFoo));
+    }
+
+    public function testTheConstructorTakesTheListenersInTheOrderTheyMustRun()
+    {
+        $called = [];
+        $high = static function () use (&$called) { $called[] = 'high'; };
+        $default = static function () use (&$called) { $called[] = 'default'; };
+
+        $dispatcher = $this->createEventDispatcher([self::preFoo => [10 => [$high], 0 => [$default]]]);
+
+        $this->assertSame([$high, $default], $dispatcher->getListeners(self::preFoo));
+        $this->assertSame(10, $dispatcher->getListenerPriority(self::preFoo, $high));
+
+        $dispatcher->dispatch(new Event(), self::preFoo);
+
+        $this->assertSame(['high', 'default'], $called);
+    }
+
+    public function testAListenerAddedAfterConstructionIsSortedIn()
+    {
+        $called = [];
+        $default = static function () use (&$called) { $called[] = 'default'; };
+        $highest = static function () use (&$called) { $called[] = 'highest'; };
+
+        $dispatcher = $this->createEventDispatcher([self::preFoo => [0 => [$default]]]);
+        $dispatcher->addListener(self::preFoo, $highest, 100);
+
+        $dispatcher->dispatch(new Event(), self::preFoo);
+
+        $this->assertSame(['highest', 'default'], $called);
     }
 
     public function testAddListener()

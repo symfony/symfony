@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\DependencyInjection\SortListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
@@ -52,6 +53,7 @@ class ServicesBundle extends AbstractBundle
     {
         if (class_exists(RegisterListenersPass::class)) {
             $container->addCompilerPass(new RegisterListenersPass(), PassConfig::TYPE_BEFORE_REMOVING);
+            $container->addCompilerPass(new SortListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
         }
         // Must run before ResolveInstanceofConditionalsPass which consumes and removes the parameter
         $container->addCompilerPass(new AddBehaviorDescribingTagsPass([

@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target>Iltimos, to'g'ri UUID kiriting.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Quyi chegara yuqori chegaradan katta bo'lmasligi kerak.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

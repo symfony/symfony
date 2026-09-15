@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target>براۓ کرم ایک درست UUID درج کریں</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">نچلی حد بالائی حد سے زیادہ نہیں ہونی چاہیے</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

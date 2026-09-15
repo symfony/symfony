@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target>Kérjük, adjon meg egy érvényes UUID-t.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Az alsó határérték nem lehet nagyobb a felső határértéknél.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

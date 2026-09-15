@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target state="needs-review-translation">Ве молиме внесете валиден UUID.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Долната граница не смее да биде поголема од горната граница.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

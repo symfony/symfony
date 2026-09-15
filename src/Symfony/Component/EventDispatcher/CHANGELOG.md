@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `$listeners` argument to `EventDispatcher::__construct()`, taking the listeners of each event in the order they must run in
+ * Add `SortedListeners` to build that argument, and `SortListenersPass` to fill it from the `addListener()` calls of a dispatcher definition
  * Allow `getSubscribedEvents()` to name its keys: `['method' => 'onEvent', 'priority' => 10]`
 
 8.1

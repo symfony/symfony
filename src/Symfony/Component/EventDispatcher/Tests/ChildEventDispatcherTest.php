@@ -15,9 +15,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ChildEventDispatcherTest extends EventDispatcherTest
 {
-    protected function createEventDispatcher()
+    protected function createEventDispatcher(array $listeners = [])
     {
-        return new ChildEventDispatcher();
+        return new ChildEventDispatcher($listeners);
     }
 }
 

@@ -62,6 +62,15 @@ DoctrineBridge
    Also note that `DoctrineDbalPingConnectionMiddleware` does not reset closed entity managers as its deprecated
    counterpart did: workers already reset them between messages
 
+EventDispatcher
+---------------
+
+ * Add argument `$listeners` to `EventDispatcher::__construct()`. It takes the listeners of each event in the
+   order they must run in, which is what `SortedListeners` builds, and the dispatcher does not sort them itself
+ * The compiled container now gives a dispatcher its listeners through that argument instead of calling
+   `addListener()` once per listener. A compiler pass that reads those calls still finds them, as long as it
+   runs before `SortListenersPass`, which is registered at `PassConfig::TYPE_AFTER_REMOVING`
+
 Filesystem
 ----------
 

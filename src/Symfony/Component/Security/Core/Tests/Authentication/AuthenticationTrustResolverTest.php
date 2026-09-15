@@ -36,7 +36,7 @@ class AuthenticationTrustResolverTest extends TestCase
     public function testIsAuthenticatedRecently()
     {
         $clock = new MockClock('2026-09-13 12:00:00');
-        $resolver = new AuthenticationTrustResolver(900, $clock);
+        $resolver = new AuthenticationTrustResolver(900, clock: $clock);
 
         $this->assertFalse($resolver->isAuthenticatedRecently(null));
 
@@ -51,6 +51,30 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isAuthenticatedRecently($fresh));
         $clock->sleep(1);
         $this->assertFalse($resolver->isAuthenticatedRecently($fresh));
+    }
+
+    public function testIsAuthenticatedVeryRecently()
+    {
+        $clock = new MockClock('2026-09-13 12:00:00');
+        $resolver = new AuthenticationTrustResolver(900, 60, $clock);
+
+        $this->assertFalse($resolver->isAuthenticatedVeryRecently(null));
+        $this->assertFalse($resolver->isAuthenticatedVeryRecently($this->getUsernamePasswordToken()));
+
+        $fresh = $this->getUsernamePasswordToken();
+        $fresh->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, $clock->now()->getTimestamp());
+        $this->assertTrue($resolver->isAuthenticatedVeryRecently($fresh));
+
+        $clock->sleep(60);
+        $this->assertTrue($resolver->isAuthenticatedVeryRecently($fresh));
+        $clock->sleep(1);
+        $this->assertFalse($resolver->isAuthenticatedVeryRecently($fresh));
+        // the wider window still holds
+        $this->assertTrue($resolver->isAuthenticatedRecently($fresh));
+
+        $remembered = $this->getRememberMeToken();
+        $remembered->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, $clock->now()->getTimestamp());
+        $this->assertFalse($resolver->isAuthenticatedVeryRecently($remembered));
     }
 
     private function getUsernamePasswordToken(): UsernamePasswordToken

@@ -5,7 +5,8 @@ CHANGELOG
 ---
 
  * Make `OidcLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, starting an authorization request with `prompt=login` and the previous ID token as `id_token_hint`
- * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when `IS_AUTHENTICATED_RECENTLY` is denied
+ * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when `IS_AUTHENTICATED_RECENTLY` or `IS_AUTHENTICATED_VERY_RECENTLY` is denied
+ * Add `IsGrantedContext::isAuthenticatedVeryRecently()`
  * Stamp the `auth_time` token attribute from the OIDC ID token claim of the same name, so `max_age` and `IS_AUTHENTICATED_RECENTLY` agree
  * Add `AuthenticationTimeListener`, which records the time of the last interactive authentication as the `auth_time` token attribute
  * Add `allowed_time_drift` option to `OidcTokenHandler` to configure time tolerance for token validation (`iat`, `nbf`, `exp` claims)

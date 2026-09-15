@@ -24,11 +24,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
 {
     /**
-     * @param int $recentAuthenticationLifetime Number of seconds during which an interactive
-     *                                          authentication counts as recent
+     * @param int $recentAuthenticationLifetime     Number of seconds during which an interactive authentication counts as recent
+     * @param int $veryRecentAuthenticationLifetime Number of seconds during which it counts as very recent
      */
     public function __construct(
         private int $recentAuthenticationLifetime = 2 * 3600,
+        private int $veryRecentAuthenticationLifetime = 5 * 60,
         private ?ClockInterface $clock = null,
     ) {
     }
@@ -58,10 +59,25 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
      */
     public function isAuthenticatedRecently(?TokenInterface $token = null): bool
     {
+        return $this->isAuthenticatedWithin($token, $this->recentAuthenticationLifetime);
+    }
+
+    /**
+     * Same signal, shorter window by default: the bar for a step that must follow a fresh
+     * proof of the credentials, such as changing the password or the e-mail address.
+     * An override is where "very recently" can mean a stronger proof rather than a shorter time.
+     */
+    public function isAuthenticatedVeryRecently(?TokenInterface $token = null): bool
+    {
+        return $this->isAuthenticatedWithin($token, $this->veryRecentAuthenticationLifetime);
+    }
+
+    private function isAuthenticatedWithin(?TokenInterface $token, int $lifetime): bool
+    {
         if (null === $token || !$this->isFullFledged($token) || !$token->hasAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE)) {
             return false;
         }
 
-        return ($this->clock?->now()->getTimestamp() ?? time()) - $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE) <= $this->recentAuthenticationLifetime;
+        return ($this->clock?->now()->getTimestamp() ?? time()) - $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE) <= $lifetime;
     }
 }

@@ -308,6 +308,9 @@ Security
  * Add argument `$targetUri` to `ImpersonateUrlGenerator::generateImpersonationPath()` and `ImpersonateUrlGenerator::generateImpersonationUrl()`
  * Deprecate passing more than one Security attribute to `AccessDecisionManager::decide()`, pass a single attribute instead.
    The `$allowMultipleAttributes` argument will be removed in 9.0
+ * Deprecate not implementing `isAuthenticatedRecently()` and `isAuthenticatedVeryRecently()` in classes implementing
+   `AuthenticationTrustResolverInterface`; both methods will be added to the interface in 9.0, and `IS_AUTHENTICATED_RECENTLY`
+   and `IS_AUTHENTICATED_VERY_RECENTLY` are denied by `AuthenticatedVoter` until they are implemented
  * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()`
  * Add argument `$parameters` to `SignatureHasher::computeSignatureHash()`, `SignatureHasher::acceptSignatureHash()` and `SignatureHasher::verifySignatureHash()`
  * Deprecate not passing the `$enforceAtJwtType` argument to `OidcTokenHandler`; pass `true` to reject

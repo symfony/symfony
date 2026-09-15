@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -36,10 +37,17 @@ class Firewall implements EventSubscriberInterface
      */
     private \SplObjectStorage $exceptionListeners;
 
+    /**
+     * @param EventDispatcherInterface|null $dispatcher Passing a dispatcher is deprecated since Symfony 8.2
+     */
     public function __construct(
         private FirewallMapInterface $map,
-        private EventDispatcherInterface $dispatcher,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
+        if (null !== $dispatcher) {
+            trigger_deprecation('symfony/security-http', '8.2', 'Passing an event dispatcher to "%s()" is deprecated, the argument will be removed in 9.0.', __METHOD__);
+        }
+
         $this->exceptionListeners = new \SplObjectStorage();
     }
 
@@ -58,7 +66,6 @@ class Firewall implements EventSubscriberInterface
 
         if (null !== $exceptionListener) {
             $this->exceptionListeners[$event->getRequest()] = $exceptionListener;
-            $exceptionListener->register($this->dispatcher);
         }
 
         // Authentication listeners are pre-sorted by SortFirewallListenersPass
@@ -86,20 +93,23 @@ class Firewall implements EventSubscriberInterface
         $this->callListeners($event, $authenticationListeners());
     }
 
+    public function onKernelException(ExceptionEvent $event): void
+    {
+        foreach ($this->exceptionListeners as $request) {
+            $this->exceptionListeners[$request]->onKernelException($event);
+        }
+    }
+
     public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
-        $request = $event->getRequest();
-
-        if (isset($this->exceptionListeners[$request])) {
-            $this->exceptionListeners[$request]->unregister($this->dispatcher);
-            unset($this->exceptionListeners[$request]);
-        }
+        unset($this->exceptionListeners[$event->getRequest()]);
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 8],
+            KernelEvents::EXCEPTION => ['onKernelException', 1],
             KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
         ];
     }

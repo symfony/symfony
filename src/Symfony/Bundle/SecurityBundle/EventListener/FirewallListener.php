@@ -25,12 +25,24 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class FirewallListener extends Firewall
 {
+    private LogoutUrlGenerator $logoutUrlGenerator;
+
+    /**
+     * @param LogoutUrlGenerator $logoutUrlGenerator Passing the removed "EventDispatcherInterface $dispatcher" as 2nd argument (pre-8.2 signature) is deprecated since Symfony 8.2
+     */
     public function __construct(
         private FirewallMapInterface $map,
-        EventDispatcherInterface $dispatcher,
-        private LogoutUrlGenerator $logoutUrlGenerator,
+        LogoutUrlGenerator|EventDispatcherInterface $logoutUrlGenerator,
     ) {
-        parent::__construct($map, $dispatcher);
+        if ($logoutUrlGenerator instanceof EventDispatcherInterface) {
+            trigger_deprecation('symfony/security-bundle', '8.2', 'Passing an event dispatcher to "%s::__construct()" is deprecated, the argument will be removed in 9.0.', self::class);
+
+            $logoutUrlGenerator = func_get_arg(2);
+        }
+
+        $this->logoutUrlGenerator = $logoutUrlGenerator;
+
+        parent::__construct($map);
     }
 
     public function configureLogoutUrlGenerator(RequestEvent $event): void
@@ -60,6 +72,7 @@ class FirewallListener extends Firewall
                 ['configureLogoutUrlGenerator', 8],
                 ['onKernelRequest', 8],
             ],
+            KernelEvents::EXCEPTION => ['onKernelException', 1],
             KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
         ];
     }

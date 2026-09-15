@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
@@ -47,7 +46,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class ContextListener extends AbstractListener
 {
     private string $sessionKey;
-    private bool $registered = false;
     private AuthenticationTrustResolverInterface $trustResolver;
     private ?\Closure $sessionTrackerEnabler;
 
@@ -82,11 +80,6 @@ class ContextListener extends AbstractListener
      */
     public function authenticate(RequestEvent $event): void
     {
-        if (!$this->registered && null !== $this->dispatcher && $event->isMainRequest()) {
-            $this->dispatcher->addListener(KernelEvents::RESPONSE, $this->onKernelResponse(...));
-            $this->registered = true;
-        }
-
         $request = $event->getRequest();
         $session = $request->hasPreviousSession() ? $request->getSession() : null;
 
@@ -165,8 +158,6 @@ class ContextListener extends AbstractListener
             return;
         }
 
-        $this->dispatcher?->removeListener(KernelEvents::RESPONSE, $this->onKernelResponse(...));
-        $this->registered = false;
         $session = $request->getSession();
         $sessionId = $session->getId();
         $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : null;

@@ -20,7 +20,6 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -264,7 +263,7 @@ class SecurityDataCollectorTest extends TestCase
             ->with($request)
             ->willReturn($firewallConfig);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new LogoutUrlGenerator()));
         $collector->collect($request, new Response());
         $collector->lateCollect();
         $collected = $collector->getFirewall();
@@ -295,14 +294,14 @@ class SecurityDataCollectorTest extends TestCase
         // Inject an instance that is not context aware
         $firewallMap = new FirewallMap(new Container(), []);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new LogoutUrlGenerator()));
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
         // Null config
         $firewallMap = new FirewallMap(new Container(), []);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new LogoutUrlGenerator()));
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
     }
@@ -341,7 +340,7 @@ class SecurityDataCollectorTest extends TestCase
             ->with($request)
             ->willReturn([[$listener], null, null]);
 
-        $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
+        $firewall = new TraceableFirewallListener($firewallMap, new LogoutUrlGenerator());
         $firewall->onKernelRequest($event);
 
         $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall);

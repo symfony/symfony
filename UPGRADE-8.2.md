@@ -320,6 +320,13 @@ Security
  * [BC BREAK] The `oauth2` access token handler now refuses an introspection response reporting an `exp` in the
    past, or an `nbf` or an `iat` in the future, and one whose `exp`, `nbf` or `iat` is not a number it can read as
    a timestamp
+ * Deprecate `ExceptionListener::register()`, `ExceptionListener::unregister()` and the `$dispatcher` argument
+   of `Firewall::__construct()`. The firewall listens to `kernel.exception` itself and calls the exception
+   listener of the firewall that matched the request, instead of adding that listener to the dispatcher on
+   every request and removing it again
+ * [BC BREAK] `ContextListener` does not register its `onKernelResponse()` method on the event dispatcher
+   anymore. An application built on the Security component alone must register it on the `kernel.response`
+   event; SecurityBundle already registers it and is not affected
 
 SecurityBundle
 --------------
@@ -336,6 +343,17 @@ SecurityBundle
    `setFirewallName()` for success handlers, to the service it decorates whenever that service relies on them,
    as `DefaultAuthenticationSuccessHandler` and `DefaultAuthenticationFailureHandler` do. Without forwarding,
    the authenticator options and the session target path are lost, and a successful login redirects to `/`
+ * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which
+   `TraceableFirewallListener` inherits: the firewall does not register listeners on the dispatcher anymore,
+   so the logout URL generator moves to that position
+
+   ```php
+   // before
+   new FirewallListener($map, $dispatcher, $logoutUrlGenerator);
+
+   // after
+   new FirewallListener($map, $logoutUrlGenerator);
+   ```
 
 Serializer
 ----------

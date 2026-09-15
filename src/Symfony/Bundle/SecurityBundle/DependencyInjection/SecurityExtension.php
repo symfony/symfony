@@ -618,9 +618,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listenerId = 'security.context_listener.'.\count($this->contextListeners);
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.context_listener'));
         $listener->replaceArgument(2, $contextKey);
+        $listener->addTag('kernel.event_listener', ['event' => KernelEvents::RESPONSE, 'method' => 'onKernelResponse']);
         if (null !== $firewallEventDispatcherId) {
             $listener->replaceArgument(4, new Reference($firewallEventDispatcherId));
-            $listener->addTag('kernel.event_listener', ['event' => KernelEvents::RESPONSE, 'method' => 'onKernelResponse']);
         }
 
         return $this->contextListeners[$contextKey] = $listenerId;

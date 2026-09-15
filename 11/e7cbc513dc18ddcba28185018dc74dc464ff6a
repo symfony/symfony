@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-09-09T13:52:36Z
+
+I think the idea is nice but I'm not sold to the current name. Does a `BoundariesType` or something similar would work better?
+
+Actually, you used `range` in your comments and it reminded me that there's already [`RangeType`](https://symfony.com/doc/current/reference/forms/types/range.html). Maybe we could improve it instead of creating a new type
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-09-09T13:57:37Z
+
+Also please note that new translation keys in .xlif files will be added in another PR targeting the oldest maintained branch (6.4 right now), not this one
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-09T13:59:59Z
+
+> Also please note that new translation keys in .xlif files will be added in another PR targeting the oldest maintained branch (6.4 right now), not this one
+
+So I remove the `src/Symfony/Component/Form/Resources/translations/*` folder from my PR?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-09-09T14:02:28Z
+
+Yes, this PR should only use plain English values in your classes. If this gets accepted, you'll be able to create a new PR for translations. This eases our work of maintenance between branches
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-09T14:43:51Z
+
+> Actually, you used `range` in your comments and it reminded me that there's already [`RangeType`](https://symfony.com/doc/current/reference/forms/types/range.html). Maybe we could improve it instead of creating a new type
+
+I actually opted for a new type of form since `RangeType` only returns a single value, I created `BetweenType`. I decided to go a different way than what you suggested.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-09-09T15:34:04Z
+
+This does not belong to RangeType. Using an option to change between 2 totally unrelated form structures (one dealing with a single numeric value, the other one dealing with an array with `from` and `to` keys with comparable types) does not make sense. It makes this form type hard to document, hard to maintain and hard to customize in rendering.
+That's a use case for a different form type. *Defining* the boundaries of a range of values is not the same than picking a value belonging to a range.
+So -1 on this PR.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-09T15:38:59Z
+
+> This does not belong to RangeType. Using an option to change between 2 totally unrelated form structures (one dealing with a single numeric value, the other one dealing with an array with `from` and `to` keys with comparable types) does not make sense. It makes this form type hard to document, hard to maintain and hard to customize in rendering.
+> That's a use case for a different form type. *Defining* the boundaries of a range of values is not the same than picking a value belonging to a range.
+> So -1 on this PR.
+
+Okay, I'm going to go back to how things were before, with a new type of form.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-09-09T15:50:44Z
+
+Oh yeah, that's right, I misremembered what RangeType is used for. Sorry for leading you in the wrong direction!
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-09T20:00:55Z
+
+Done. The PR is back to a dedicated `BetweenType` and rebased on 8.2. Translations are out of it, as suggested.
+
+The naming question is still open: `BetweenType`, or `BoundariesType` as @alexandre-daubois suggested? I have no strong preference, happy to rename.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-14T15:48:07Z
+
+Thanks @nicolas-grekas ; I’ve made the requested corrections.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-14T15:59:51Z
+
+Correction on my point about `validators.en.xlf`: please revert that file. @alexandre-daubois was right, the message units belong in a separate translation-only PR on the lowest maintained branch.
+
+`Integration (8.4)` is red because of it. The `Check Translation Status` step fires as soon as a PR touches any `Resources/translations/*.xlf`, then runs `php .github/sync-translations.php` and fails on the resulting diff, since the other 56 locales do not carry id 130. Every message-adding commit since 2024 is translation-files-only and covers all 57 locales at once, `cc652f9bb89` and `20933759187` for instance; none ever shipped alongside the code that introduced the message.
+
+The message then stays untranslated until that PR lands, which is the state `RangeType` and `UlidType` are in today.
+
+The `invalid_message` change is right: `BoundsType` of `IntegerType` now reports "Please enter an integer.", and putting the default and the two forwarded keys back fails `testABoundReportsItsOwnErrors` and `testCompareLeavesABoundThatFailedToTransformAlone`. Form (5287) and TwigBridge (2321) pass locally, php-cs-fixer and PHPStan are clean. `minimal-exts` is the usual `AmpHttpClientTest` flake.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-14T16:18:30Z
+
+Can you send the PR on 6.4 with the translations? Ideally all translated already with the proper state attribute.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-14T16:46:39Z
+
+> Can you send the PR on 6.4 with the translations? Ideally all translated already with the proper state attribute.
+
+Done : https://github.com/symfony/symfony/pull/66060

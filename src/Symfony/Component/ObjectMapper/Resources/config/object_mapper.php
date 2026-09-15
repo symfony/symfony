@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\ObjectMapper\Metadata\EnumMappingMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
+use Symfony\Component\ObjectMapper\Metadata\PropertyTypeMappingMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
@@ -31,6 +32,12 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('object_mapper.metadata_factory.enum', EnumMappingMetadataFactory::class)
+            ->decorate('object_mapper.metadata_factory')
+            ->args([
+                service('.inner'),
+            ])
+
+        ->set('object_mapper.metadata_factory.property_type', PropertyTypeMappingMetadataFactory::class)
             ->decorate('object_mapper.metadata_factory')
             ->args([
                 service('.inner'),

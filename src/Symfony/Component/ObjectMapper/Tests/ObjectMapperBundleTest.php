@@ -99,6 +99,19 @@ class ObjectMapperBundleTest extends TestCase
         $this->assertSame('Electronics', $mapped->nested->name);
     }
 
+    public function testMapNestedObjectWhenNoClassMapIsBuilt()
+    {
+        $kernel = new TestObjectMapperWithoutPropertyAccessorKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        /** @var ParentEntityResource $mapped */
+        $mapped = $kernel->getContainer()->get('test.object_mapper')->map(new ParentEntity('Laptop', new NestedEntity('Electronics')), ParentEntityResource::class);
+
+        $this->assertSame('Laptop', $mapped->name);
+        $this->assertInstanceOf(NestedEntityResource::class, $mapped->nested);
+        $this->assertSame('Electronics', $mapped->nested->name);
+    }
+
     public function testObjectMapperWorksWithoutPropertyAccessor()
     {
         $kernel = new TestObjectMapperWithoutPropertyAccessorKernel('test', true, $this->varDir);

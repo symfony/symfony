@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target>Silahkan masukkan UUID yang sah.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Batas bawah tidak boleh lebih besar dari batas atas.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

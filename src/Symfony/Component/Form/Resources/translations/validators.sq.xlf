@@ -147,6 +147,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target>Ju lutemi shkruani një UUID të vlefshëm.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Kufiri i poshtëm nuk duhet të jetë më i madh se kufiri i sipërm.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

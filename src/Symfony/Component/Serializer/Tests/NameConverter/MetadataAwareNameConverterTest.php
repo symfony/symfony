@@ -16,10 +16,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
@@ -162,5 +165,29 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['a']]));
         $this->assertEquals('buzForExport', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['b']]));
         $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class));
+    }
+
+    public function testNormalizeAndDenormalizeAfterAConverterWithoutMapping()
+    {
+        $annotations = new MetadataAwareNameConverter(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $yaml = new MetadataAwareNameConverter(new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml')));
+
+        $this->assertSame('foo', $annotations->normalize('foo', Dummy::class));
+        $this->assertSame('yaml_foo', $annotations->denormalize('yaml_foo', Dummy::class));
+
+        $this->assertSame('yaml_foo', $yaml->normalize('foo', Dummy::class));
+        $this->assertSame('foo', $yaml->denormalize('yaml_foo', Dummy::class));
+    }
+
+    public function testNormalizeAndDenormalizeAfterAConverterWithMapping()
+    {
+        $yaml = new MetadataAwareNameConverter(new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml')));
+        $annotations = new MetadataAwareNameConverter(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+
+        $this->assertSame('yaml_foo', $yaml->normalize('foo', ScalarDummy::class));
+        $this->assertSame('foo', $yaml->denormalize('yaml_foo', ScalarDummy::class));
+
+        $this->assertSame('foo', $annotations->normalize('foo', ScalarDummy::class));
+        $this->assertSame('yaml_foo', $annotations->denormalize('yaml_foo', ScalarDummy::class));
     }
 }

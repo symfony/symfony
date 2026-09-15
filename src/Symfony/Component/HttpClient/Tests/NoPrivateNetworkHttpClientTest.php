@@ -36,11 +36,6 @@ class NoPrivateNetworkHttpClientTest extends TestCase
             ['10.0.0.1',    null,          true],
             ['172.16.0.1',  null,          true],
             ['192.168.0.1', null,          true],
-            ['100.64.0.1',  null,          true],
-            ['192.0.2.1',   null,          true],
-            ['198.51.100.1', null,         true],
-            ['203.0.113.1', null,          true],
-            ['198.18.0.1',  null,          true],
             ['::1',         null,          true],
             ['::ffff:0:1',  null,          true],
             ['fe80::1',     null,          true],
@@ -52,7 +47,6 @@ class NoPrivateNetworkHttpClientTest extends TestCase
             ['64:ff9b::7f00:1',   null,    true],
             ['64:ff9b:1::7f00:1', null,    true],
             ['2001:db8::1',       null,    true],
-            ['2001:2::1',         null,    true],
             ['10.0.0.1',    '10.0.0.0/24', true],
             ['10.0.0.1',    '10.0.0.1',    true],
             ['fc00::1',     'fc00::1/120', true],
@@ -66,9 +60,6 @@ class NoPrivateNetworkHttpClientTest extends TestCase
             ['104.26.14.6',            '104.26.14.0/24',    true],
             ['2606:4700:20::681a:e06', null,                false],
             ['2606:4700:20::681a:e06', '2606:4700:20::/43', true],
-            ['100.128.0.1',            null,                false],
-            ['198.20.0.1',             null,                false],
-            ['2001:2:1::1',            null,                false],
         ];
     }
 

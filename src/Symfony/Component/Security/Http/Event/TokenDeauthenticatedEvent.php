@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -31,14 +32,16 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class TokenDeauthenticatedEvent extends Event
 {
     /**
-     * @param string|null        $reason          A human-readable, free-form sentence explaining the deauthentication
-     * @param list<class-string> $providerClasses The user providers that contributed to the deauthentication decision
+     * @param string|null                  $reason          A human-readable, free-form sentence explaining the deauthentication
+     * @param list<class-string>           $providerClasses The user providers that contributed to the deauthentication decision
+     * @param AuthenticationException|null $exception       The reason a listener of CheckRefreshedUserEvent gave to deauthenticate
      */
     public function __construct(
         private TokenInterface $originalToken,
         private Request $request,
         private ?string $reason = null,
         private array $providerClasses = [],
+        private ?AuthenticationException $exception = null,
     ) {
     }
 
@@ -71,5 +74,15 @@ final class TokenDeauthenticatedEvent extends Event
     public function getProviderClasses(): array
     {
         return $this->providerClasses;
+    }
+
+    /**
+     * Returns the reason a listener of {@see CheckRefreshedUserEvent} gave to
+     * deauthenticate the token, e.g. to tell the user why they were logged out
+     * on their next login attempt.
+     */
+    public function getException(): ?AuthenticationException
+    {
+        return $this->exception;
     }
 }

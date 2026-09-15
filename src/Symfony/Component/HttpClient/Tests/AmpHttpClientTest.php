@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -29,6 +28,36 @@ class AmpHttpClientTest extends HttpClientTestCase
     public function testResolve()
     {
         parent::testResolve();
+    }
+
+    #[Group('transient-on-windows')]
+    public function testNotATimeout()
+    {
+        parent::testNotATimeout();
+    }
+
+    #[Group('transient-on-windows')]
+    public function testTimeoutIsNotAFatalError()
+    {
+        parent::testTimeoutIsNotAFatalError();
+    }
+
+    #[Group('transient-on-windows')]
+    public function testTimeoutOnStream()
+    {
+        parent::testTimeoutOnStream();
+    }
+
+    #[Group('transient-on-windows')]
+    public function testTimeoutOnInitialize()
+    {
+        parent::testTimeoutOnInitialize();
+    }
+
+    #[Group('transient-on-windows')]
+    public function testTimeoutOnDestruct()
+    {
+        parent::testTimeoutOnDestruct();
     }
 
     protected function getHttpClient(string $testCase): HttpClientInterface

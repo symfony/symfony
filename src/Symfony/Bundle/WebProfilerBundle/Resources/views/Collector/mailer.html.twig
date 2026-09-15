@@ -353,7 +353,7 @@
                             {% set total_attachments_size_in_bytes = message.attachments|reduce((total_size, attachment) => total_size + profiler_mailer_body(attachment)|length, 0) %}
                             <p class="mailer-message-attachments-title">
                                 {{ source('@WebProfiler/Icon/attachment.svg') }}
-                                Attachments <span>({{ num_of_attachments }} file{{ num_of_attachments > 1 ? 's' }} / {{ _self.render_file_size_humanized(total_attachments_size_in_bytes) }})</span>
+                                Attachments <span>({{ num_of_attachments }} file{{ num_of_attachments > 1 ? 's' }} / {{ total_attachments_size_in_bytes|profiler_format_bytes }})</span>
                             </p>
 
                             <ul class="mailer-message-attachments-list">
@@ -371,7 +371,7 @@
                                         {% if attachment_body is null %}
                                             <em>(the file is not readable anymore)</em>
                                         {% else %}
-                                            ({{ _self.render_file_size_humanized(attachment_body|length) }})
+                                            ({{ attachment_body|length|profiler_format_bytes }})
 
                                             <a href="data:{{ attachment.contentType|default('application/octet-stream') }};base64,{{ collector.base64Encode(attachment_body) }}" download="{{ attachment.filename|default('attachment') }}">Download</a>
                                         {% endif %}
@@ -486,14 +486,4 @@
             </div>
         </div>
     {% endif %}
-{% endmacro %}
-
-{% macro render_file_size_humanized(bytes) %}
-    {%- if bytes < 1000 -%}
-        {{- bytes ~ ' bytes' -}}
-    {%- elseif bytes < 1000 ** 2 -%}
-        {{- (bytes / 1000)|number_format(2) ~ ' kB' -}}
-    {%- else -%}
-        {{- (bytes / 1000 ** 2)|number_format(2) ~ ' MB' -}}
-    {%- endif -%}
 {% endmacro %}

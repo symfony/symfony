@@ -32,6 +32,7 @@
         "symfony/stopwatch": "^7.4|^8.0"
     },
     "conflict": {
+        "symfony/http-client": "<8.2",
         "symfony/serializer": "<7.4",
         "symfony/workflow": "<7.4"
     },

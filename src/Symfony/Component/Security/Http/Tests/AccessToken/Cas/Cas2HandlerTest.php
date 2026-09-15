@@ -128,8 +128,7 @@ final class Cas2HandlerTest extends TestCase
         $requestStack->push(new Request(['ticket' => 'PGTIOU-84678-8a9d']));
 
         $cas2Handler = new Cas2Handler($requestStack, 'https://www.example.com/cas', 'invalid-one', $httpClient);
-        $username = $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
-        $this->assertEquals('lobster', $username);
+        $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
     }
 
     public function testServiceUrlIsBuiltFromCurrentRequest()

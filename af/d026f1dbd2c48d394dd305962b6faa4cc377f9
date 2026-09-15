@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2026-09-15T11:25:19Z
+
+Persistence is used as a contract in the doctrine-messenger package. We only use one iterface in a parameter type-hint. Usually we don't depend on contracts unless we provide our own implementation of said contracts. Look for example at how we use psr/log.
+
+However, we should allow the installation of v4 here.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-09-15T11:35:23Z
+
+#66084

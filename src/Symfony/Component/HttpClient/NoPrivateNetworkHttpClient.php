@@ -37,10 +37,15 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         '127.0.0.0/8',
         '10.0.0.0/8',
         '192.168.0.0/16',
+        '192.0.2.0/24',    // Documentation Ranges TEST-NET-1 (RFC 5737)
+        '198.51.100.0/24', // Documentation Ranges TEST-NET-2 (RFC 5737)
+        '203.0.113.0/24',  // Documentation Ranges TEST-NET-3 (RFC 5737)
         '172.16.0.0/12',
         '169.254.0.0/16',
+        '198.18.0.0/15',   // IPv4 Benchmarking (RFC 2544)
         '0.0.0.0/8',
         '240.0.0.0/4',
+        '100.64.0.0/10',   // Shared Address Space (RFC 6598)
         '::1/128',
         'fc00::/7',
         'fe80::/10',
@@ -49,6 +54,8 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         '::/96',
         '2002::/16',
         '2001::/32',
+        '2001:db8::/32',   // Documentation Ranges (RFC 3849)
+        '2001:2::/48',     // IPv6 Benchmarking (RFC 5180 and corrections)
         '64:ff9b::/96',
         '64:ff9b:1::/48',
     ];

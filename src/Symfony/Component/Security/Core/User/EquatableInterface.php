@@ -15,6 +15,10 @@ namespace Symfony\Component\Security\Core\User;
  * EquatableInterface used to test if two objects are equal in security
  * and re-authentication context.
  *
+ * Implementing it replaces the built-in password, roles and identifier checks.
+ *
+ * @see UserChangeAwareInterface to add checks to the built-in ones instead of replacing them
+ *
  * @author Dariusz Górecki <darek.krk@gmail.com>
  */
 interface EquatableInterface

@@ -35,8 +35,10 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Core\User\UserChangeAwareInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
@@ -361,6 +363,28 @@ class ContextListenerTest extends TestCase
         $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
     }
 
+    public function testTokenIsDeauthenticatedWhenTheUserReportsAdditionalChanges()
+    {
+        $tokenStorage = $this->refreshUserFromPreviousSession(new ChangeAwareUser('user', true), new ChangeAwareUser('user', false));
+
+        $this->assertNull($tokenStorage->getToken());
+    }
+
+    public function testTokenIsNotDeauthenticatedWhenTheUserReportsNoAdditionalChange()
+    {
+        $refreshedUser = new ChangeAwareUser('user', true);
+        $tokenStorage = $this->refreshUserFromPreviousSession(new ChangeAwareUser('user', true), $refreshedUser);
+
+        $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
+    }
+
+    public function testAdditionalChangesAreCheckedEvenWhenTheUserIsEquatable()
+    {
+        $tokenStorage = $this->refreshUserFromPreviousSession(new EquatableChangeAwareUser('user', true), new EquatableChangeAwareUser('user', false));
+
+        $this->assertNull($tokenStorage->getToken());
+    }
+
     public function testSwitchUserTokenIsNotDeauthenticated()
     {
         $impersonated = new CustomUser('user', ['ROLE_USER'], 'pass', false);
@@ -646,6 +670,26 @@ class ContextListenerTest extends TestCase
         return $deauthenticatedEvent;
     }
 
+    private function refreshUserFromPreviousSession(UserInterface $user, UserInterface $refreshedUser): TokenStorageInterface
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, 'context_key', $user->getRoles())));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider->method('supportsClass')->willReturn(true);
+        $userProvider->method('refreshUser')->willReturn($refreshedUser);
+
+        $tokenStorage = new TokenStorage();
+        $listener = new ContextListener($tokenStorage, [$userProvider], 'context_key');
+        $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        return $tokenStorage;
+    }
+
     private function handleEventWithPreviousSession($userProviders, ?UserInterface $user = null)
     {
         $tokenUser = $user ?? new InMemoryUser('foo', 'bar');
@@ -762,6 +806,43 @@ class RefreshTrackingUserProvider extends InMemoryUserProvider
         $this->refreshedIdentifiers[] = $user->getUserIdentifier();
 
         return parent::refreshUser($user);
+    }
+}
+
+class ChangeAwareUser implements UserInterface, UserChangeAwareInterface
+{
+    public function __construct(
+        private string $username,
+        private bool $enabled,
+    ) {
+    }
+
+    public function hasAdditionalChanges(UserInterface $refreshedUser): bool
+    {
+        return $refreshedUser instanceof self && $refreshedUser->enabled !== $this->enabled;
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    #[\Deprecated]
+    public function eraseCredentials(): void
+    {
+    }
+}
+
+class EquatableChangeAwareUser extends ChangeAwareUser implements EquatableInterface
+{
+    public function isEqualTo(UserInterface $user): bool
+    {
+        return true;
     }
 }
 

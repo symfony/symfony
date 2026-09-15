@@ -30,6 +30,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserChangeAwareInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
@@ -307,6 +308,10 @@ class ContextListener extends AbstractListener
 
     private static function hasUserChanged(AbstractToken $token, UserInterface $originalUser, UserInterface $refreshedUser): bool
     {
+        if ($originalUser instanceof UserChangeAwareInterface && $originalUser->hasAdditionalChanges($refreshedUser)) {
+            return true;
+        }
+
         if ($originalUser instanceof EquatableInterface) {
             return !$originalUser->isEqualTo($refreshedUser);
         }

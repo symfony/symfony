@@ -1,0 +1,8 @@
+'Symfony\Component\Serializer\Tests\Fixtures\Dummy':
+  attributes:
+    foo:
+      serialized_name: 'yaml_foo'
+'Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy':
+  attributes:
+    foo:
+      serialized_name: 'yaml_foo'

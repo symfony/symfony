@@ -17,10 +17,13 @@ use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
@@ -187,6 +190,30 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Found SerializedName and SerializedPath attributes on property "foo" of class "Symfony\Component\Serializer\Tests\NameConverter\NestedPathAndName".');
         $nameConverter->normalize('foo', NestedPathAndName::class);
+    }
+
+    public function testNormalizeAndDenormalizeAfterAConverterWithoutMapping()
+    {
+        $attributes = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()));
+        $yaml = new MetadataAwareNameConverter(new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml')));
+
+        $this->assertSame('foo', $attributes->normalize('foo', Dummy::class));
+        $this->assertSame('yaml_foo', $attributes->denormalize('yaml_foo', Dummy::class));
+
+        $this->assertSame('yaml_foo', $yaml->normalize('foo', Dummy::class));
+        $this->assertSame('foo', $yaml->denormalize('yaml_foo', Dummy::class));
+    }
+
+    public function testNormalizeAndDenormalizeAfterAConverterWithMapping()
+    {
+        $yaml = new MetadataAwareNameConverter(new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml')));
+        $attributes = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->assertSame('yaml_foo', $yaml->normalize('foo', ScalarDummy::class));
+        $this->assertSame('foo', $yaml->denormalize('yaml_foo', ScalarDummy::class));
+
+        $this->assertSame('foo', $attributes->normalize('foo', ScalarDummy::class));
+        $this->assertSame('yaml_foo', $attributes->denormalize('yaml_foo', ScalarDummy::class));
     }
 }
 

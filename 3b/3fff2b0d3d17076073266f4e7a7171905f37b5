@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-09-15T12:09:23Z
+
+> async-aws builds the request when the client method is called, and sends it when its result is resolved or freed
+
+This is not accurate. It sends the request immediately, but does not wait for its response to return.
+The behavior in async-aws is actually the behavior implemented in symfony/http-client. The async-aws client sends the request and wraps the Response in its Result object without waiting for the response to settle until the Result needs to be resolved.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T12:17:38Z
+
+With `symfony/http-client`, `request()` only schedules: nothing reaches the wire until a response is awaited. Measured against a local listener, same result with `CurlHttpClient` and `NativeHttpClient`:
+
+```
+client: request() returned           +0.523s
+client: slept 0.7s, nothing awaited  +1.227s
+client: getStatusCode() = 200        +1.230s
+server: accepted at                  +1.228s
+server: read 189 bytes at            +1.228s
+```
+
+`CurlResponse::__construct()` calls `curl_multi_add_handle()` and stops there. The connect, the send and the receive all happen inside `CurlResponse::perform()`, which is what `Result::resolve()` reaches, and what `Core\Response::__destruct()` reaches for a result nothing read.
+
+Your point holds in one direction though: whatever is already scheduled does flow as soon as anything else is awaited on the same client. With two scheduled requests, awaiting the first puts both on the wire at once. It does not change this PR, because what must not be interrupted is the userland PHP that `perform()` runs, and that only happens while a response is being awaited.
+
+I reworded the description to say "schedules" and to name `perform()` as the transfer, since "sends" was glossing over the two steps.
+
+---------------------------------------------------------------------------
+
+by dciprian-petrisor at 2026-09-15T12:18:16Z
+
+@nicolas-grekas  beat me to it!

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Core\Result;
 use AsyncAws\Core\Sts\StsClient;
+use AsyncAws\Core\Waiter;
 use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
@@ -506,6 +508,9 @@ class Connection
      * request is over sends the keepalive a moment later instead. Nesting is free: the inner call
      * finds the signals already held and leaves them to the outer one.
      *
+     * async-aws sends the request when its result is resolved or freed, not when the client method
+     * returns, so a result that $command does not read is resolved here, while the signals are held.
+     *
      * @param-immediately-invoked-callable $command
      */
     private function holdSignals(callable $command): mixed
@@ -513,7 +518,13 @@ class Connection
         $asyncSignals = \function_exists('pcntl_async_signals') && pcntl_async_signals(false);
 
         try {
-            return $command();
+            $result = $command();
+
+            if ($result instanceof Result || $result instanceof Waiter) {
+                $result->resolve();
+            }
+
+            return $result;
         } finally {
             if ($asyncSignals) {
                 pcntl_async_signals(true);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\AsyncDecoratorTrait;
 use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -62,6 +63,18 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         }
 
         HttpClientTestCase::testTimeoutOnDestruct();
+    }
+
+    #[Group('transient-on-windows')]
+    public function testTimeoutIsNotAFatalError()
+    {
+        parent::testTimeoutIsNotAFatalError();
+    }
+
+    #[Group('transient-on-windows')]
+    public function testTimeoutWithActiveConcurrentStream()
+    {
+        parent::testTimeoutWithActiveConcurrentStream();
     }
 
     public function testRetry404()

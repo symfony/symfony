@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Form\Extension\Core\Type\BoundsType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
@@ -491,6 +492,37 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
         /following-sibling::input[@type="hidden"][@id="name__token"][@value="foo&bar"]
     ]
     [count(.//input[@type="hidden"])=1]
+'
+        );
+    }
+
+    public function testBoundsRow()
+    {
+        if (!class_exists(BoundsType::class)) {
+            $this->markTestSkipped('Requires symfony/form 8.2+.');
+        }
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\BoundsType');
+        $form->addError(new FormError('[trans]Error![/trans]'));
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        // The errors of the form are not rendered by intention!
+        // In practice, ranges cannot have errors as all errors
+        // on them are mapped to the lower bound.
+        // (see BoundsTypeValidatorExtension)
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [
+        ./label[@for="name_from"]
+        /following-sibling::input[@id="name_from"]
+    ]
+/following-sibling::div
+    [
+        ./label[@for="name_to"]
+        /following-sibling::input[@id="name_to"]
+    ]
 '
         );
     }

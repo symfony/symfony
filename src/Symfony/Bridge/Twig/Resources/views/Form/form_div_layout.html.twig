@@ -349,6 +349,14 @@
 
 {# Rows #}
 
+{%- block bounds_row -%}
+    {#
+    No need to render the errors here, as all errors are mapped
+    to the first child (see BoundsTypeValidatorExtension).
+    #}
+    {{- block('form_rows') -}}
+{%- endblock bounds_row -%}
+
 {%- block repeated_row -%}
     {#
     No need to render the errors here, as all errors are mapped

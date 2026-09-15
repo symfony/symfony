@@ -60,9 +60,7 @@ final class GoogleChatTransportTest extends TransportTestCase
 
         $transport = self::createTransport($client);
 
-        $sentMessage = $transport->send(new ChatMessage('testMessage'));
-
-        $this->assertSame('spaces/My-Space/messages/abcdefg.hijklmno', $sentMessage->getMessageId());
+        $transport->send(new ChatMessage('testMessage'));
     }
 
     public function testSendWithErrorResponseThrowsTransportException()
@@ -74,9 +72,7 @@ final class GoogleChatTransportTest extends TransportTestCase
 
         $transport = self::createTransport($client);
 
-        $sentMessage = $transport->send(new ChatMessage('testMessage'));
-
-        $this->assertSame('spaces/My-Space/messages/abcdefg.hijklmno', $sentMessage->getMessageId());
+        $transport->send(new ChatMessage('testMessage'));
     }
 
     public function testSendWithOptions()
@@ -151,8 +147,6 @@ final class GoogleChatTransportTest extends TransportTestCase
 
         $transport = self::createTransport($client);
 
-        $sentMessage = $transport->send(new ChatMessage('testMessage'));
-
-        $this->assertSame('spaces/My-Space/messages/abcdefg.hijklmno', $sentMessage->getMessageId());
+        $transport->send(new ChatMessage('testMessage'));
     }
 }

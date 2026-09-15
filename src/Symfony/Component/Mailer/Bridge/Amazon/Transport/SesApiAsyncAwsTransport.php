@@ -136,6 +136,10 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport implements Remote
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
 
+        if (null !== $this->tenant) {
+            $request['TenantName'] = $this->tenant;
+        }
+
         if ($customHeaders = $this->getCustomHeaders($email->getHeaders())) {
             if (null !== $template) {
                 $request['Content']['Template']['Headers'] = $customHeaders;

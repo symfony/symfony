@@ -50,4 +50,27 @@ class SesSmtpTransportTest extends TestCase
         $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default', 2587);
         $this->assertTrue($transport->isTlsRequired());
     }
+
+    public function testTenantHeader()
+    {
+        $email = new Email();
+
+        $transport = (new SesSmtpTransport('user', 'pass'))->setTenant('my-tenant');
+        $method = new \ReflectionMethod(SesSmtpTransport::class, 'addSesHeaders');
+        $method->invoke($transport, $email);
+
+        $this->assertTrue($email->getHeaders()->has('X-SES-TENANT'));
+        $this->assertSame('X-SES-TENANT: my-tenant', $email->getHeaders()->get('X-SES-TENANT')->toString());
+    }
+
+    public function testNoTenantHeaderWhenNotConfigured()
+    {
+        $email = new Email();
+
+        $transport = new SesSmtpTransport('user', 'pass');
+        $method = new \ReflectionMethod(SesSmtpTransport::class, 'addSesHeaders');
+        $method->invoke($transport, $email);
+
+        $this->assertFalse($email->getHeaders()->has('X-SES-TENANT'));
+    }
 }

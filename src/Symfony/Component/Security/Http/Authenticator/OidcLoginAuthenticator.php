@@ -384,7 +384,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             $token->setAuthenticationProofs(array_fill_keys($methods, min($authTime, $now)));
         } elseif ([AuthenticationMethod::UNSPECIFIED] !== $methods) {
             // without "auth_time" the login instant is all that is known about when, which is
-            // what AuthenticationTimeListener would record; the methods are still worth keeping
+            // what AuthenticationProofsListener would record; the methods are still worth keeping
             $token->setAuthenticationProofs(array_fill_keys($methods, $now));
         }
 

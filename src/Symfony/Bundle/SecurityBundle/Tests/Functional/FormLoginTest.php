@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 
 class FormLoginTest extends AbstractWebTestCase
 {
@@ -49,8 +50,8 @@ class FormLoginTest extends AbstractWebTestCase
 
         $token = static::getContainer()->get('security.token_storage')->getToken();
 
-        $this->assertNotEmpty($token->getAuthenticationProofs());
-        $this->assertGreaterThanOrEqual(time() - 60, max($token->getAuthenticationProofs()));
+        $this->assertArrayHasKey(AuthenticationMethod::PASSWORD, $token->getAuthenticationProofs());
+        $this->assertGreaterThanOrEqual(time() - 60, $token->getAuthenticationProofs()[AuthenticationMethod::PASSWORD]);
         $this->assertTrue(static::getContainer()->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_RECENTLY'));
 
         // the optional clock must actually be injected, otherwise the strategy silently

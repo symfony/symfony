@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target state="needs-review-translation">Syötä kelvollinen UUID.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Alaraja ei saa olla suurempi kuin yläraja.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

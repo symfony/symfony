@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target>Palun sisesta korrektne UUID.</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">Alumine piir ei tohi olla suurem kui ülemine piir.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

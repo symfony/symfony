@@ -62,8 +62,12 @@ class FailoverTransportTest extends TestCase
         $t = new FailoverTransport([$t1, $t2]);
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('All transports failed.');
-        $t->send(new RawMessage(''));
-        $this->assertTransports($t, 0, [$t1, $t2]);
+
+        try {
+            $t->send(new RawMessage(''));
+        } finally {
+            $this->assertTransports($t, 0, [$t1, $t2]);
+        }
     }
 
     public function testSendOneDead()

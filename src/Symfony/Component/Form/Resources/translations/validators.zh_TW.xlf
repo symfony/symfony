@@ -138,6 +138,10 @@
                 <source>Please enter a valid UUID.</source>
                 <target>請輸入有效的 UUID。</target>
             </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target state="needs-review-translation">下限不得大於上限。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

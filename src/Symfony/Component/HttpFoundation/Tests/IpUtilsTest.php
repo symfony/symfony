@@ -265,6 +265,10 @@ class IpUtilsTest extends TestCase
             // public
             ['104.26.14.6',             false],
             ['2606:4700:20::681a:e06',  false],
+            // just past the boundary of the ranges above, which pins their prefix lengths
+            ['100.128.0.1',             false],
+            ['198.20.0.1',              false],
+            ['2001:2:1::1',             false],
         ];
     }
 

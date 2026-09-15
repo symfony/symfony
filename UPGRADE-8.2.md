@@ -276,11 +276,11 @@ RateLimiter
 Scheduler
 ---------
 
- * Deprecate `Schedule::with()`. It returns a schedule that keeps only the event dispatcher, so a lock or a
-   state set on the original schedule is silently dropped, and the resulting schedule then runs unlocked.
+ * Deprecate `Schedule::with()`. It returns an empty schedule, so a lock or a state set on the original
+   schedule is silently dropped, and the resulting schedule then runs unlocked.
 
-   To derive a schedule from another one, clone it. The clone shares the dispatcher, the lock and the state,
-   and its list of messages is independent, so adding to one does not affect the other:
+   To derive a schedule from another one, clone it. The clone keeps the lock and the state, and its list of
+   messages and its listeners are independent, so adding to one does not affect the other:
 
    ```php
    $new = clone $schedule;
@@ -294,7 +294,18 @@ Scheduler
    $new = $schedule->with($message);
 
    // after
-   $new = (new Schedule($dispatcher))->add($message);
+   $new = (new Schedule())->add($message);
+   ```
+ * Deprecate passing an event dispatcher to `Schedule::__construct()`. `before()`, `after()` and `onFailure()`
+   register their listeners on the schedule itself, so a listener now runs for the messages of its own schedule
+   only, where it used to run for the messages of every schedule sharing that dispatcher:
+
+   ```php
+   // before
+   $schedule = (new Schedule($this->dispatcher))->before($listener);
+
+   // after
+   $schedule = (new Schedule())->before($listener);
    ```
 
 Security

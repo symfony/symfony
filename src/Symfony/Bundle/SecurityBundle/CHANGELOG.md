@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which now takes the logout URL generator there
  * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service used when `IS_AUTHENTICATED_RECENTLY` is denied
  * Add the `recent_authentication_lifetime` option, the number of seconds an interactive authentication keeps granting `IS_AUTHENTICATED_RECENTLY`
  * Add the `security.expression_language_provider` service to evaluate the security functions outside of authorization expressions

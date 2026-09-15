@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T07:05:47Z
+
+Both answers, thanks for asking.
+
+The `DispatchAfterCurrentBusMiddleware` change is split out: #66032 proposes it on 6.4 on its own, with a test that fails on the current code because the event queued by the failed nested dispatch reaches its handler anyway. This branch keeps the change until that one is merged up, since the synchronous retries need it. The description says so now.
+
+No docs pull request yet, for this one or for the rest of the series. The public API is still moving under review, so I am waiting for these to be merged before writing them; the points each one has to carry are listed at the end of its description in the meantime.

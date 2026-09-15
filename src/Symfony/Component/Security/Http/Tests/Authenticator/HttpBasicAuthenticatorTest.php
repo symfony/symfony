@@ -14,10 +14,12 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\AuthenticationMethodBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
@@ -45,6 +47,7 @@ class HttpBasicAuthenticatorTest extends TestCase
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals('ThePassword', $passport->getBadge(PasswordCredentials::class)->getPassword());
+        $this->assertSame([AuthenticationMethod::PASSWORD], $passport->getBadge(AuthenticationMethodBadge::class)->methods);
 
         $this->assertTrue($user->isEqualTo($passport->getUser()));
     }

@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
-use Symfony\Component\Security\Http\EventListener\AuthenticationTimeListener;
+use Symfony\Component\Security\Http\EventListener\AuthenticationProofsListener;
 use Symfony\Component\Security\Http\EventListener\CheckCredentialsListener;
 use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
@@ -95,7 +95,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('user checker'),
             ])
 
-        ->set('security.listener.authentication_time', AuthenticationTimeListener::class)
+        ->set('security.listener.authentication_proofs', AuthenticationProofsListener::class)
             ->abstract()
             ->args([
                 service('clock')->nullOnInvalid(),

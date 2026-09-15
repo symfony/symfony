@@ -37,11 +37,6 @@ class AuthenticatedVoter implements CacheableVoterInterface
     public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
 
     /**
-     * Token attribute holding the Unix timestamp of the last interactive authentication.
-     */
-    public const AUTH_TIME_ATTRIBUTE = 'auth_time';
-
-    /**
      * Most restrictive first: only the reason of the strictest attribute that failed is reported.
      */
     private const DENIAL_REASONS = [

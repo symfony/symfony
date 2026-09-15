@@ -14,11 +14,13 @@ namespace Symfony\Component\Security\Http\Authenticator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\AuthenticationMethodBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
@@ -67,7 +69,7 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
         $password = $request->headers->get('PHP_AUTH_PW', '');
 
         $userBadge = new UserBadge($username, $this->userProvider->loadUserByIdentifier(...));
-        $passport = new Passport($userBadge, new PasswordCredentials($password));
+        $passport = new Passport($userBadge, new PasswordCredentials($password), [new AuthenticationMethodBadge(AuthenticationMethod::PASSWORD)]);
 
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
             $passport->addBadge(new PasswordUpgradeBadge($password, $this->userProvider));

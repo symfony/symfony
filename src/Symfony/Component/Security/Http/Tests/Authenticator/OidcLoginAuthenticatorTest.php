@@ -32,8 +32,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\AttributesBasedUserProviderInterface;
@@ -1348,7 +1348,70 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         // the silent SSO case: the provider says the user authenticated an hour ago,
         // so IS_AUTHENTICATED_RECENTLY must not treat this login as fresh
-        $this->assertSame($authTime, $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
+        $this->assertSame([AuthenticationMethod::UNSPECIFIED => $authTime], $token->getAuthenticationProofs());
+    }
+
+    public function testCreateTokenRecordsTheMethodsOfTheAmrClaim()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $clock = new MockClock('2026-09-06 12:00:00');
+        $authTime = $clock->now()->getTimestamp() - 60;
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'auth_time' => $authTime, 'amr' => ['pwd', 'otp']]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator(clock: $clock);
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame([AuthenticationMethod::PASSWORD => $authTime, AuthenticationMethod::ONE_TIME_PASSWORD => $authTime], $token->getAuthenticationProofs());
+    }
+
+    public function testCreateTokenKeepsOnlyTheStringEntriesOfTheAmrClaim()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $clock = new MockClock('2026-09-06 12:00:00');
+        $authTime = $clock->now()->getTimestamp() - 60;
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'auth_time' => $authTime, 'amr' => ['pwd', 42]]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator(clock: $clock);
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame([AuthenticationMethod::PASSWORD => $authTime], $token->getAuthenticationProofs());
+    }
+
+    public function testCreateTokenFallsBackToAnUnspecifiedMethodWhenTheAmrClaimIsNotAList()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $clock = new MockClock('2026-09-06 12:00:00');
+        $authTime = $clock->now()->getTimestamp() - 60;
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'auth_time' => $authTime, 'amr' => 'pwd']),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator(clock: $clock);
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame([AuthenticationMethod::UNSPECIFIED => $authTime], $token->getAuthenticationProofs());
     }
 
     public function testCreateTokenNeverDatesTheAuthenticationTimeInTheFuture()
@@ -1368,13 +1431,13 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $token = $authenticator->createToken($passport, 'main');
 
-        $this->assertSame($clock->now()->getTimestamp(), $token->getAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
+        $this->assertSame([AuthenticationMethod::UNSPECIFIED => $clock->now()->getTimestamp()], $token->getAuthenticationProofs());
     }
 
     public function testCreateTokenLeavesTheAuthenticationTimeUnsetWithoutTheClaim()
     {
         // the claim is only mandatory when "max_age" is requested; without it
-        // AuthenticationTimeListener falls back to stamping the login instant
+        // AuthenticationProofsListener falls back to recording the login instant
         $nonce = bin2hex(random_bytes(16));
         $state = bin2hex(random_bytes(16));
 
@@ -1389,7 +1452,29 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $token = $authenticator->createToken($passport, 'main');
 
-        $this->assertFalse($token->hasAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE));
+        $this->assertSame([], $token->getAuthenticationProofs());
+    }
+
+    public function testCreateTokenRecordsTheMethodsOfTheAmrClaimAtTheLoginInstantWithoutTheAuthTimeClaim()
+    {
+        // without "auth_time", the login instant is all that is known about when, which is
+        // what AuthenticationProofsListener would record anyway; the methods are still worth keeping
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $clock = new MockClock('2026-09-06 12:00:00');
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'amr' => ['pwd', 'otp']]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator(clock: $clock);
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame([AuthenticationMethod::PASSWORD => $clock->now()->getTimestamp(), AuthenticationMethod::ONE_TIME_PASSWORD => $clock->now()->getTimestamp()], $token->getAuthenticationProofs());
     }
 
     public function testCreateTokenReportsAMissingRefreshTokenAndExpiryAsNull()

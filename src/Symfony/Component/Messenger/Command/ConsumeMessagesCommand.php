@@ -29,7 +29,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\ScopedEventDispatcher;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
@@ -39,6 +38,8 @@ use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -54,7 +55,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
     public function __construct(
         private RoutableMessageBus $routableBus,
         private ContainerInterface $receiverLocator,
-        private EventDispatcherInterface $eventDispatcher,
+        private EventDispatcherInterface&ListenerIntrospectionInterface $eventDispatcher,
         private ?LoggerInterface $logger = null,
         private array $receiverNames = [],
         private ?ResetServicesListener $resetServicesListener = null,

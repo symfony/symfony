@@ -23,9 +23,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 
 /**
  * @author Timo Bakx <timobakx@gmail.com>
@@ -174,7 +174,7 @@ final class DebugFirewallCommand extends Command
             return;
         }
 
-        /** @var EventDispatcherInterface $dispatcher */
+        /** @var ListenerIntrospectionInterface $dispatcher */
         $dispatcher = $this->eventDispatchers->get($dispatcherId);
 
         foreach ($dispatcher->getListeners() as $event => $listeners) {

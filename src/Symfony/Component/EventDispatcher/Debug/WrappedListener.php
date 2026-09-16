@@ -12,9 +12,10 @@
 namespace Symfony\Component\EventDispatcher\Debug;
 
 use Psr\EventDispatcher\StoppableEventInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -35,7 +36,7 @@ final class WrappedListener
         callable|array $listener,
         ?string $name,
         private Stopwatch $stopwatch,
-        private ?EventDispatcherInterface $dispatcher = null,
+        private ?ListenerIntrospectionInterface $dispatcher = null,
         private ?int $priority = null,
     ) {
         $this->listener = $listener;

@@ -36,6 +36,7 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -118,6 +119,7 @@ class ServicesBundle extends AbstractBundle
             $container->removeDefinition('event_dispatcher');
             $container->removeAlias(EventDispatcherInterface::class);
             $container->removeAlias(ContractsEventDispatcherInterface::class);
+            $container->removeAlias(ListenerIntrospectionInterface::class);
             $container->removeAlias(PsrEventDispatcherInterface::class);
         }
 

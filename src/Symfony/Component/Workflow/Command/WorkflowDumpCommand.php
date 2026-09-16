@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Debug\ListenerExtractor;
 use Symfony\Component\Workflow\Debug\TraceableWorkflow;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
@@ -29,6 +28,7 @@ use Symfony\Component\Workflow\Dumper\PlantUmlDumper;
 use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\StateMachine;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -49,7 +49,7 @@ class WorkflowDumpCommand extends Command
 
     public function __construct(
         private ServiceProviderInterface $workflows,
-        ?EventDispatcherInterface $dispatcher = null,
+        ?ListenerIntrospectionInterface $dispatcher = null,
     ) {
         parent::__construct();
         $this->listenerExtractor = $dispatcher ? new ListenerExtractor($dispatcher) : null;

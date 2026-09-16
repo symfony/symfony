@@ -24,7 +24,7 @@
         "symfony/dependency-injection": "^8.2",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/error-handler": "^7.4|^8.0",
-        "symfony/event-dispatcher": "^8.1",
+        "symfony/event-dispatcher": "^8.2",
         "symfony/filesystem": "^7.4|^8.0",
         "symfony/finder": "^7.4|^8.0",
         "symfony/http-foundation": "^7.4|^8.0",

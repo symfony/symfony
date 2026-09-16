@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by kbond at 2026-09-16T15:25:14Z
+
+Done - the listener catches `AuthenticationException` now, with a test throwing `CustomUserMessageAuthenticationException` to pin it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-16T15:28:40Z
+
+Do you think we should turn your on in the default recipe?
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-09-16T15:38:39Z
+
+> Do you think we should turn your on in the default recipe?
+
+I was going to propose that, yeah.

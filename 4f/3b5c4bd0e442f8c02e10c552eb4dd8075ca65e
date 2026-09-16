@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-16T14:07:00Z
+
+PR updated: instead of adding the introspection methods to the existing interface in contracts, this adds `ListenerIntrospectionInterface` to them.

@@ -46,6 +46,7 @@ use Symfony\Component\Security\Http\Tests\Fixtures\LazyDoctrinePersistenceUser;
 use Symfony\Component\Security\Http\Tests\Fixtures\LazyVarExporterUser;
 use Symfony\Component\Security\Http\Tests\Fixtures\NullUserToken;
 use Symfony\Component\VarExporter\LazyObjectInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class ContextListenerTest extends TestCase
@@ -253,6 +254,20 @@ class ContextListenerTest extends TestCase
                 && 'onKernelResponse' === (new \ReflectionFunction($l))->name));
 
         $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
+    }
+
+    public function testDispatcherMustBeAbleToRegisterListeners()
+    {
+        $dispatcher = new class implements ContractsEventDispatcherInterface {
+            public function dispatch(object $event, ?string $eventName = null): object
+            {
+                return $event;
+            }
+        };
+
+        $this->expectException(\TypeError::class);
+
+        new ContextListener(new TokenStorage(), [], 'key123', null, $dispatcher);
     }
 
     public function testOnKernelResponseListenerRemovesItself()

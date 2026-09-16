@@ -25,6 +25,7 @@ use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 use Symfony\Component\Security\Http\FirewallMapInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 class FirewallTest extends TestCase
 {
@@ -55,6 +56,20 @@ class FirewallTest extends TestCase
 
         $firewall = new Firewall($map, $dispatcher);
         $firewall->onKernelRequest($event);
+    }
+
+    public function testDispatcherMustBeAbleToRegisterListeners()
+    {
+        $dispatcher = new class implements ContractsEventDispatcherInterface {
+            public function dispatch(object $event, ?string $eventName = null): object
+            {
+                return $event;
+            }
+        };
+
+        $this->expectException(\TypeError::class);
+
+        new Firewall($this->createMock(FirewallMapInterface::class), $dispatcher);
     }
 
     public function testOnKernelRequestStopsWhenThereIsAResponse()

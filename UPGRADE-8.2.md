@@ -65,13 +65,29 @@ DoctrineBridge
 EventDispatcher
 ---------------
 
- * The `event_dispatcher` service is a `CompiledEventDispatcher` in production, where it used to be an
-   `EventDispatcher`. Both implement `EventDispatcherInterface`, which is what to type against; the compiled
-   one holds the identifier and the method of each listener instead of a closure per listener, and fetches a
-   listener from a service locator when it is about to run
+ * The `event_dispatcher` service is a `CompiledEventDispatcher`, where it used to be an `EventDispatcher`
+   (in debug, it is the one the `TraceableEventDispatcher` decorates) Both implement `EventDispatcherInterface`,
+   which is what to type against; the compiled one holds the identifier and the method of each listener instead
+   of a closure per listener, and fetches a listener from a service locator when it is about to run
  * `CompileListenersPass` moves the `addListener()` calls of a dispatcher definition into that map. It is
    registered at `PassConfig::TYPE_AFTER_REMOVING`, so a compiler pass reading those calls still finds them
-   as long as it runs before that
+   as long as it runs before that. When the definition is a decorator, the calls are compiled into the
+   dispatcher it decorates, so a decorator no longer receives them at runtime
+ * Deprecate calling `addListener()`, `addSubscriber()`, `removeListener()` and `removeSubscriber()` on a
+   `CompiledEventDispatcher`, which is what the `event_dispatcher` service is. Declare the listener in the
+   container, or add it to a `ScopedEventDispatcher` wrapping the shared one and dispatch through that:
+
+   ```php
+   $dispatcher = new ScopedEventDispatcher($container->get('event_dispatcher'));
+   $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(10));
+
+   (new Worker($receivers, $bus, $dispatcher))->run();
+   ```
+
+   The listeners of the wrapped dispatcher run as they would have, so only the code that dispatches through the
+   scoped one sees the added ones. A test that adds a listener to the `event_dispatcher` service to watch an
+   event is the most likely place to meet this deprecation; register a listener service in the test container
+   instead, and give it what the test needs to observe
  * `TraceableEventDispatcher` calls the listeners of an event itself, wrapping them as it goes, where it used
    to swap each one for a wrapper on the dispatcher it decorates and swap it back afterwards. It therefore no
    longer calls `dispatch()` on that dispatcher, so a custom implementation's own dispatching is bypassed

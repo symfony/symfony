@@ -12,11 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 class CsrfFormLoginTest extends AbstractWebTestCase
 {
@@ -121,23 +116,5 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     {
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'config.yml']];
         yield [['test_case' => 'CsrfFormLogin', 'root_config' => 'routes_as_path.yml']];
-    }
-
-    private function callInRequestContext(KernelBrowser $client, callable $callable): void
-    {
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $wrappedCallable = static function (RequestEvent $event) use (&$callable) {
-            $callable();
-            $event->setResponse(new Response(''));
-            $event->stopPropagation();
-        };
-
-        $eventDispatcher->addListener(KernelEvents::REQUEST, $wrappedCallable);
-        try {
-            $client->request('GET', '/not-existent');
-        } finally {
-            $eventDispatcher->removeListener(KernelEvents::REQUEST, $wrappedCallable);
-        }
     }
 }

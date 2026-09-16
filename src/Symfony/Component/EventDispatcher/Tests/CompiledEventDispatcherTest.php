@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\EventDispatcher\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\CompiledEventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\ScopedEventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class CompiledEventDispatcherTest extends TestCase
@@ -74,6 +77,8 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertSame([], $fetched);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testAddingAListenerKeepsTheCompiledOnes()
     {
         $called = [];
@@ -85,6 +90,8 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertSame(['compiled', 'added'], $called);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testRemovingACompiledListener()
     {
         $called = [];
@@ -101,6 +108,8 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertSame(['bar'], $called);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testSubscribersRunNextToTheCompiledListeners()
     {
         $called = [];
@@ -131,6 +140,45 @@ class CompiledEventDispatcherTest extends TestCase
         $dispatcher->dispatch(new Event(), self::preFoo);
 
         $this->assertSame(['compiled'], $called);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testMutatingTheDispatcherIsDeprecated()
+    {
+        $called = [];
+        $dispatcher = $this->createDispatcher([], $called);
+        $listener = static function () {};
+        $subscriber = new class implements EventSubscriberInterface {
+            public static function getSubscribedEvents(): array
+            {
+                return [];
+            }
+        };
+
+        foreach ([
+            'addListener' => [self::preFoo, $listener],
+            'addSubscriber' => [$subscriber],
+            'removeListener' => [self::preFoo, $listener],
+            'removeSubscriber' => [$subscriber],
+        ] as $method => $arguments) {
+            $deprecations = [];
+            set_error_handler(static function (int $type, string $message) use (&$deprecations) {
+                $deprecations[] = $message;
+
+                return true;
+            }, \E_USER_DEPRECATED);
+
+            try {
+                $dispatcher->$method(...$arguments);
+            } finally {
+                restore_error_handler();
+            }
+
+            $this->assertCount(1, $deprecations);
+            $this->assertStringStartsWith(\sprintf('Since symfony/event-dispatcher 8.2: Calling "%s::%s()" is deprecated, ', CompiledEventDispatcher::class, $method), $deprecations[0]);
+            $this->assertStringEndsWith(\sprintf('a "%s" wrapping this one instead.', ScopedEventDispatcher::class), $deprecations[0]);
+        }
     }
 
     private function createDispatcher(array $listeners, array &$called, array &$fetched = []): CompiledEventDispatcher

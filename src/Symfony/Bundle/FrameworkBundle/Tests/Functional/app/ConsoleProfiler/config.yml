@@ -11,3 +11,9 @@ services:
     public_profiler:
         alias: profiler
         public: true
+
+    stop_command_listener:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\app\ConsoleProfiler\StopCommandListener
+        public: true
+        tags:
+            - { name: kernel.event_listener, event: console.command }

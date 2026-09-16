@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -93,7 +92,7 @@ class ConsoleProfilerTest extends AbstractWebTestCase
 
     private function stopCommandWith(callable $listener): void
     {
-        static::getContainer()->get('event_dispatcher')->addListener(ConsoleEvents::COMMAND, $listener);
+        static::getContainer()->get('stop_command_listener')->listener = $listener;
     }
 
     private function loadProfile(): Profile

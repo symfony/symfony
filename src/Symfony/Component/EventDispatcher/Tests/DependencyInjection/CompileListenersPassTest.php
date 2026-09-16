@@ -96,6 +96,42 @@ class CompileListenersPassTest extends TestCase
         $this->assertCount(1, $definition->getMethodCalls());
     }
 
+    public function testTheListenersOfADecoratedDispatcherAreCompiledIntoTheDecoratedOne()
+    {
+        $container = new ContainerBuilder();
+        $inner = $container->register('event_dispatcher.inner', EventDispatcher::class);
+        $definition = $container->register('event_dispatcher', DecoratingDispatcher::class)
+            ->addTag('event_dispatcher.dispatcher')
+            ->addArgument(new Reference('event_dispatcher.inner'));
+        $definition->innerServiceId = 'event_dispatcher.inner';
+        $definition->addMethodCall('addListener', ['foo', $this->listener('foo')]);
+
+        (new CompileListenersPass())->process($container);
+
+        $this->assertSame(DecoratingDispatcher::class, $definition->getClass());
+        $this->assertSame([], $definition->getMethodCalls());
+        $this->assertSame(CompiledEventDispatcher::class, $inner->getClass());
+        $this->assertSame(['foo' => [0 => [['foo', 'onEvent']]]], $inner->getArguments()[0]);
+    }
+
+    public function testADecoratedDispatcherThatIsCalledIsLeftAlone()
+    {
+        $container = new ContainerBuilder();
+        $inner = $container->register('event_dispatcher.inner', EventDispatcher::class)
+            ->addMethodCall('setSomething', ['value']);
+        $definition = $container->register('event_dispatcher', DecoratingDispatcher::class)
+            ->addTag('event_dispatcher.dispatcher');
+        $definition->innerServiceId = 'event_dispatcher.inner';
+        $definition->addMethodCall('addListener', ['foo', $this->listener('foo')]);
+
+        $pass = new CompileListenersPass();
+        $pass->process($container);
+
+        $this->assertSame(EventDispatcher::class, $inner->getClass());
+        $this->assertCount(1, $definition->getMethodCalls());
+        $this->assertSame([$pass::class.': Not compiling the listeners of "event_dispatcher": "setSomething()" is called on "event_dispatcher.inner".'], $container->getCompiler()->getLog());
+    }
+
     public function testADispatcherThatAlreadyHasArgumentsIsLeftAlone()
     {
         $container = new ContainerBuilder();

@@ -1381,6 +1381,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($iterator->needsIndexes());
     }
 
+    public function testCachePoolClearerIsRegisteredInDebugWithoutTheProfiler()
+    {
+        $container = $this->createContainerFromFile('default_config', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
+
+        $this->assertFalse($container->hasDefinition('data_collector.cache'));
+        $this->assertTrue($container->hasDefinition('cache_pool_clearer.cache_warmer'));
+    }
+
+    public function testCachePoolClearerIsNotRegisteredWithoutDebug()
+    {
+        $container = $this->createContainerFromFile('default_config', ['kernel.debug' => false, 'kernel.container_class' => __CLASS__]);
+
+        $this->assertFalse($container->hasDefinition('cache_pool_clearer.cache_warmer'));
+    }
+
     public function testSessionCookieSecureAuto()
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');

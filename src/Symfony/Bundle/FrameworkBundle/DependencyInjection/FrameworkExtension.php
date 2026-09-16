@@ -79,6 +79,8 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  */
 class FrameworkExtension extends Extension
 {
+    private const MAPPING_FILE_PATTERN = '/\.(xml|ya?ml)$/';
+
     private array $configsEnabled = [];
 
     /**
@@ -140,6 +142,12 @@ class FrameworkExtension extends Extension
                 $container->removeDefinition('console.messenger.application');
                 $container->removeDefinition('console.messenger.execute_command_handler');
             }
+        }
+
+        if ($container->getParameter('kernel.debug')) {
+            // clears the pools that cache metadata read from mapping files, so that editing one of
+            // these files is enough to refresh them
+            $loader->load('cache_debug.php');
         }
 
         $configuration = $this->getConfiguration($configs, $container);
@@ -455,7 +463,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('profiling.php');
         $loader->load('collectors.php');
-        $loader->load('cache_debug.php');
 
         if ($this->isInitializedConfigEnabled('form')) {
             $loader->load('form_debug.php');
@@ -614,7 +621,7 @@ class FrameworkExtension extends Extension
      */
     private function registerMappingFilesFromDir(string $dir, callable $fileRecorder): void
     {
-        foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
+        foreach (Finder::create()->followLinks()->files()->in($dir)->name(self::MAPPING_FILE_PATTERN)->sortByName() as $file) {
             $fileRecorder($file->getExtension(), $file->getRealPath());
         }
     }
@@ -622,14 +629,14 @@ class FrameworkExtension extends Extension
     /**
      * @param-immediately-invoked-callable $fileRecorder
      */
-    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder): void
+    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder, bool $trackContents): void
     {
         foreach ($container->getParameterBag()->unescapeValue($config['mapping']['paths']) as $path) {
             if (is_dir($path)) {
                 $this->registerMappingFilesFromDir($path, $fileRecorder);
-                $container->addResource(new DirectoryResource($path, '/^$/'));
-            } elseif ($container->fileExists($path, false)) {
-                if (!preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
+                $container->addResource(new DirectoryResource($path, $trackContents ? self::MAPPING_FILE_PATTERN : '/^$/'));
+            } elseif ($container->fileExists($path, $trackContents)) {
+                if (!preg_match(self::MAPPING_FILE_PATTERN, $path, $matches)) {
                     throw new \RuntimeException(\sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
                 }
                 $fileRecorder($matches[1], $path);

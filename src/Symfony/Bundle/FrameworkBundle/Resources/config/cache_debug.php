@@ -12,19 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Cache\CacheWarmer\CachePoolClearerCacheWarmer;
-use Symfony\Component\Cache\DataCollector\CacheDataCollector;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        // DataCollector (public to prevent inlining, made private in CacheCollectorPass)
-        ->set('data_collector.cache', CacheDataCollector::class)
-            ->public()
-            ->tag('data_collector', [
-                'template' => '@WebProfiler/Collector/cache.html.twig',
-                'id' => 'cache',
-                'priority' => 275,
-            ])
-
         // CacheWarmer used in dev to clear cache pool
         ->set('cache_pool_clearer.cache_warmer', CachePoolClearerCacheWarmer::class)
             ->args([

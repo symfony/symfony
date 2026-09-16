@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
@@ -131,6 +132,50 @@ class SerializerBundleTest extends TestCase
     {
         $container = $this->load(['enable_attributes' => true], debug: false);
         $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+    }
+
+    public function testSerializerCacheUsedWithMappingFilesOnly()
+    {
+        $container = $this->load(['enable_attributes' => false, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]], debug: true);
+
+        $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+    }
+
+    public function testSerializerCacheUsesTheClearablePoolInDebug()
+    {
+        $container = $this->load(['enable_attributes' => false, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]], debug: true);
+
+        $cache = $container->getDefinition('serializer.mapping.cache_class_metadata_factory')->getArgument(1);
+        $this->assertEquals(new Reference('cache.serializer'), $cache);
+    }
+
+    public function testSerializerMappingFilesAreTrackedWhenCacheIsUsed()
+    {
+        $container = $this->load(['enable_attributes' => false, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]], debug: true);
+
+        $this->assertContains(__DIR__.'/Fixtures/serialization.yml', $this->trackedFiles($container));
+    }
+
+    public function testSerializerMappingFilesAreNotTrackedWhenCacheIsNotUsed()
+    {
+        $container = $this->load(['enable_attributes' => true, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]], debug: true);
+
+        $this->assertNotContains(__DIR__.'/Fixtures/serialization.yml', $this->trackedFiles($container));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function trackedFiles(ContainerBuilder $container): array
+    {
+        $files = [];
+        foreach ($container->getResources() as $resource) {
+            if ($resource instanceof FileResource) {
+                $files[] = $resource->getResource();
+            }
+        }
+
+        return $files;
     }
 
     public function testSerializerCacheNotActivatedWithAttributes()

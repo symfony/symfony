@@ -1,0 +1,140 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T17:36:38Z
+
+I surveyed 110 real `UserCheckerInterface` implementations from public repositories to settle the two open questions.
+
+You are right that both halves must run, and my "preAuth only" suggestion was wrong: 15 of the 110 (14%) have an empty `checkPreAuth` and put everything in `checkPostAuth` (DOMjudge, Bolt, repman, Sylius's email verification checker, among others). Consulting only `checkPreAuth` would give those applications nothing.
+
+On the cost, it is much smaller than feared. 90 of the 110 `checkPreAuth` bodies are empty or a pure flag check on the user object, and `refreshUser()` already queries the database every request for that same user, so for the vast majority the marginal cost is a method call. Only one checker in the corpus runs its own query.
+
+The genuinely problematic pattern is rare and specific: two checkers do `setLastLoginDate(new \DateTime())` plus a `flush()` in `checkPostAuth`, one resets a failed-login counter, one dispatches application events. That is a handful out of 110, and roughly 6% of applications configure a custom checker at all (~1.4k `user_checker` keys in a `security.yaml` against ~22k firewall configs, order of magnitude only).
+
+So let's land it unguarded. A writing checker is already out of contract: the interface says "implement to throw `AccountStatusException`", and a `flush()` in there already misfires on every remember-me re-authentication and on switch-user. A firewall option would be paid for by everyone to protect a fraction of a percent from a write that belongs in `LoginSuccessEvent` anyway.
+
+Two things to add to the PR:
+
+* a sentence on `UserCheckerInterface` saying implementations must be cheap and free of side effects, since they now run on every request of a stateful firewall;
+* a line in the UPGRADE note pointing at `LoginSuccessEvent` for anyone recording a login timestamp from `checkPostAuth`.
+
+I can share the corpus and the classification if you want to check any of it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T17:50:43Z
+
+Correction to my previous comment. I cited Sylius as an example of the only-`checkPostAuth` group, and looking at what its checkers actually do changes the conclusion.
+
+`EmailVerificationUserChecker` and `VerificationAwareEnabledUserChecker` are both tagged `security.user_checker.shop`, and both call `ChannelContextInterface::getChannel()`, which throws `ChannelNotFoundException extends \RuntimeException` when no channel resolves. Today they run only inside a login attempt on the shop firewall, where a channel is guaranteed. Under this PR they would run on every request of that stateful firewall, and a `\RuntimeException` is neither an `AccountStatusException` nor an `AuthenticationException`, so it escapes `ContextListener::authenticate()` and gives a 500 instead of a deauthentication.
+
+That is a different risk class from the side effects I measured, and my classifier missed it because a service call that can throw looks pure. The checker is not doing anything out of contract here: it is simply only safe in the context it was written to be called from. So I withdraw "land it unguarded". A `flush()` in a checker can fairly be called out of contract, "I assumed a channel was resolvable because I only ever ran at login" cannot.
+
+It stays rare, 4 of the 110 depend on ambient request context, but Sylius is by far the most deployed package in the corpus and its shop firewall is exactly the stateful case this PR targets.
+
+So it needs the opt-in after all. Cheapest shape is a firewall option, off by default, so that an application or a package like Sylius audits its checkers once and turns it on. The rest of my previous comment stands: when enabled, both halves must run, and the per-request cost of a normal checker is nil.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T17:59:20Z
+
+Thinking about the opt-in some more, I believe the Sylius case argues for a different shape than a firewall option.
+
+A flag exists to protect existing code from a new call site. And it has the wrong granularity here: it is per firewall, but the safety property is per checker, and a firewall's checker is a `ChainUserChecker` of tagged services from packages the application does not control. Sylius's shop firewall chains one safe checker and two unsafe ones, so an application cannot opt in to the first without the other two. The flag puts the audit burden on the application author, who cannot see inside Sylius, instead of on the package author who wrote the checker.
+
+An event has neither problem. It has no existing subscribers, so it needs no flag: writing the listener is the opt-in, and whoever writes it knows it runs on every request. Something like this, dispatched from `ContextListener::refreshUser()` on the firewall dispatcher it already holds, after the built-in comparison, with the verdict pre-seeded:
+
+```php
+final class CheckRefreshedUserEvent extends Event
+{
+    // token, originalUser, refreshedUser, bool $userChanged seeded by the built-in checks
+    public function markUserAsChanged(?AuthenticationException $reason = null): void;
+    public function setUserChanged(bool $changed): void;
+}
+```
+
+#66052 becomes a five-line listener on `getRefreshedUser()->isEnabled()`. Running a user checker on refresh becomes a three-line listener with a try/catch, at whatever granularity the application or the package chooses, so the framework does not have to decide the pre/post question or the impersonation one: the listener sees the token. The comparison-shaped cases from the original issue get both users and the token, which `hasAdditionalChanges()` never had.
+
+It is also the only shape with a path to a single way: a listener doing `setUserChanged(!$user->isEqualTo($refreshed))` reproduces `EquatableInterface` exactly, replace semantics included, so the interface becomes deprecable in a follow-up.
+
+Most of this PR carries over: the deauthentication plumbing, the reason on `TokenDeauthenticatedEvent`, and the tests. What changes is the trigger, an event instead of an unconditional call into the checker chain.
+
+What we lose is zero-code reuse of existing checkers. After the Sylius finding, that is the feature I would least want to keep.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-09-15T18:06:48Z
+
+Agreed - the per-checker vs per-firewall granularity settles it, and an event means no flag, no deprecation and no UPGRADE entry at all. Rewriting the PR around it.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-09-15T18:21:27Z
+
+I rewrote the PR to use an event.
+
+A few notes on the shape, all easy to flip.
+
+I collapsed `markUserAsChanged()` and `setUserChanged()` into `setUserChanged(bool $changed, ?AuthenticationException $exception = null)` - two methods where only one takes a bool invites passing the wrong one, and the bool-less name reads like it cannot un-mark.
+
+The exception is typed `AuthenticationException` rather than `AccountStatusException`, so a listener is not forced to describe every reason as an account status. It reaches `TokenDeauthenticatedEvent::getException()`, which is new here too.
+
+One limitation: `createContextListener()` memoizes per context key and injects the first firewall's dispatcher, so for firewalls sharing a context a listener registered on the second one's dispatcher never fires. That is the quirk you pointed at early on, unchanged by this PR - happy to fix it here rather than document it if you'd prefer.
+
+Separately: would you take a first-party listener that runs a user checker on refresh, as a follow-up? I know zero-code reuse is the piece you would least want to keep, but as a listener the application picks which checker it points at instead of inheriting the chain, which is the part that made it unsafe. Fine to drop the idea if you'd rather leave it to userland.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T18:40:35Z
+
+Looks good, this is the shape I had in mind. On your three questions:
+
+The collapsed `setUserChanged(bool, ?AuthenticationException)` is better than my two methods, and `AuthenticationException` is the right type. Keep both.
+
+Shared contexts: document, do not fix here. `onKernelResponse()` guards on `_security_firewall_run === $this->sessionKey`, which is the context key, so per-firewall instances would both pass that guard on a shared context and write the session twice per response. A real fix changes that protocol to a firewall id, which is a separate PR, and `TokenDeauthenticatedEvent` has lived with the quirk since it was added. One sentence in the event docblock, "dispatched on the dispatcher of the first firewall using the context", is enough.
+
+First-party listener running a user checker: I would rather not. It is the three-line listener your PR body already shows, so the docs can carry it as the example with the try/catch visible, and shipping it under Symfony's name re-raises the pre/post question and invites pointing it at `security.user_checker.<firewall>`, the chain that made this unsafe. A package like Sylius can write three lines against its safe checker.
+
+Two things in the diff:
+
+* `setUserChanged(true)` without an exception erases the reason an earlier listener gave: `$this->exception = $changed ? $exception : null`. A listener that merely confirms "changed" should not wipe a previous `DisabledException`. `$changed ? ($exception ?? $this->exception) : null`, plus a test.
+* nothing pins the `SwitchUserToken` path the body relies on: `refreshUser()` recurses into the original token, so the event fires twice, impersonator first. One test asserting both tokens are seen would lock that in.
+
+Optional: `the user has changed: Account is disabled.` reads oddly for a status rule. When a listener gives an exception, its message alone is the better log line.
+
+Docs and the `EquatableInterface` deprecation can follow once this is in.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-09-15T21:07:37Z
+
+Pushed. `setUserChanged(true)` without an exception now keeps the one an earlier listener gave, with a test, and another pins the `SwitchUserToken` path firing twice with the impersonator first.
+
+Took the optional one as well: the reason is the exception's message alone, falling back to `getMessageKey()` since the idiomatic call is `new DisabledException()` with no message.
+
+I also added the event to `EVENT_BUBBLING_EVENTS`, since `TokenDeauthenticatedEvent` is already there and a bare `#[AsEventListener]` would otherwise compile fine and never fire. That leaves the shared-context quirk affecting only listeners deliberately scoped with `dispatcher:`, so I skipped the docblock sentence rather than write one that misleads for the common case - say the word and I'll add it.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-09-15T21:10:16Z
+
+> EquatableInterface deprecation can follow once this is in.
+
+Out of scope here, but I'm not totally convinced we should deprecate it. Your original objection was two user-side interfaces forever, and this PR adds none - one interface on the entity and one hook on the dispatcher feel like different layers rather than two ways to do one thing.
+
+The deprecation also asks everyone with an `isEqualTo()` to rewrite it as a listener doing the identical thing for no behaviour change, with no clean place to trigger it: `ContextListener` would fire it at runtime on every request, unsilenceable short of that rewrite, and `InMemoryUser` and `LdapUser` implement it in-tree. It needs the built-in comparison to become a default listener first anyway, which is its own refactor.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-09-15T21:13:59Z
+
+> First-party listener running a user checker: I would rather not.
+
+Follow-up material, but for the record: I think the long-term goal is the user checker running on every request. Someone who writes a checker throwing `DisabledException` almost certainly means the account is unusable now, not from the next login - today's behaviour, where the session survives until logout, is the surprising one.
+
+An opt-in first-party listener seems like the way there without the Sylius problem: the application turns it on once its chain is safe, and Symfony answers the pre/post question once instead of every app answering it differently in its own three lines. Fine to leave it to the docs for now and revisit once the event has some mileage.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-16T07:55:11Z
+
+Rebased on the current 8.2 tip and added the `EquatableInterface` docblock pointer to `CheckRefreshedUserEvent` in your commit, so nothing is left on your side. Security Core, Security Http and SecurityBundle suites are green locally.

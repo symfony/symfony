@@ -64,7 +64,7 @@ class FirewallTest extends TestCase
 
         $this->expectException(\TypeError::class);
 
-        new Firewall($this->createMock(FirewallMapInterface::class), $dispatcher);
+        new Firewall($this->createStub(FirewallMapInterface::class), $dispatcher);
     }
 
     public function testOnKernelRequestStopsWhenThereIsAResponse()

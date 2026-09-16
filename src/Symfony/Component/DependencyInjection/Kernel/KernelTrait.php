@@ -235,7 +235,10 @@ trait KernelTrait
                 restore_error_handler();
 
                 @file_put_contents($buildDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));
-                @file_put_contents($buildDir.'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
+            }
+
+            if (null !== $container) {
+                @file_put_contents($buildDir.'/'.$class.'Compiler.log', implode("\n", $container->getCompiler()->getLog()));
             }
         }
 

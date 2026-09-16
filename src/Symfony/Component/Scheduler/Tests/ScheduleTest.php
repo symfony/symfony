@@ -14,7 +14,11 @@ namespace Symfony\Component\Scheduler\Tests;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Scheduler\Event\FailureEvent;
+use Symfony\Component\Scheduler\Event\PostRunEvent;
+use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
@@ -46,6 +50,39 @@ class ScheduleTest extends TestCase
         $this->assertSame($state, $new->getState());
         $this->assertCount(1, $schedule->getRecurringMessages());
         $this->assertCount(2, $new->getRecurringMessages());
+    }
+
+    public function testTheListenersAreKeptOnTheScheduleItself()
+    {
+        $schedule = (new Schedule())
+            ->before(static fn () => null)
+            ->after(static fn () => null)
+            ->onFailure(static fn () => null);
+
+        $this->assertSame(
+            [PreRunEvent::class, PostRunEvent::class, FailureEvent::class],
+            array_keys($schedule->getEventDispatcher()->getListeners())
+        );
+    }
+
+    public function testCloneDetachesTheListeners()
+    {
+        $schedule = (new Schedule())->before(static fn () => null);
+
+        $new = clone $schedule;
+        $new->after(static fn () => null);
+
+        $this->assertSame([PreRunEvent::class], array_keys($schedule->getEventDispatcher()->getListeners()));
+        $this->assertSame([PreRunEvent::class, PostRunEvent::class], array_keys($new->getEventDispatcher()->getListeners()));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testPassingAnEventDispatcherIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/scheduler 8.2: Passing an event dispatcher to "Symfony\\Component\\Scheduler\\Schedule::__construct()" is deprecated, the argument will be removed in 9.0.');
+
+        new Schedule(new EventDispatcher());
     }
 
     #[Group('legacy')]

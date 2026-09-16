@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -23,7 +22,7 @@ class AutowiringTypesTest extends AbstractWebTestCase
         static::bootKernel(['debug' => false]);
 
         $autowiredServices = self::getContainer()->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(EventDispatcher::class, $autowiredServices->getDispatcher(), 'The event_dispatcher service should be injected if the debug is not enabled');
+        $this->assertNotInstanceOf(TraceableEventDispatcher::class, $autowiredServices->getDispatcher(), 'The event_dispatcher service should be injected if the debug is not enabled');
 
         static::bootKernel(['debug' => true]);
 

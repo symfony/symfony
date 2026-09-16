@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T17:32:05Z
+
+Note that this might improve perf a bit since adding a listener at runtime is an expensive operation.

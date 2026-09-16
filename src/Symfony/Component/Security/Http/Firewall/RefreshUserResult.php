@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Outcome of a user-refresh attempt performed by {@see ContextListener::refreshUser()}.
@@ -27,6 +28,7 @@ final class RefreshUserResult
         public readonly ?TokenInterface $token,
         public readonly ?string $deauthenticationReason = null,
         public readonly array $providerClasses = [],
+        public readonly ?AuthenticationException $exception = null,
     ) {
     }
 }

@@ -33,6 +33,7 @@ use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterfac
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 
@@ -135,7 +136,7 @@ class ContextListener extends AbstractListener
             if (!$token) {
                 $this->logger?->debug('Token was deauthenticated after trying to refresh it.');
 
-                $this->dispatcher?->dispatch(new TokenDeauthenticatedEvent($originalToken, $request, $refreshResult->deauthenticationReason, $refreshResult->providerClasses));
+                $this->dispatcher?->dispatch(new TokenDeauthenticatedEvent($originalToken, $request, $refreshResult->deauthenticationReason, $refreshResult->providerClasses, $refreshResult->exception));
             }
         } elseif (null !== $token) {
             $this->logger?->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);
@@ -222,6 +223,7 @@ class ContextListener extends AbstractListener
         $userClass = $user::class;
         $userChangedBy = [];
         $userNotFoundBy = [];
+        $userChangedBecause = null;
 
         foreach ($this->userProviders as $provider) {
             if (!$provider instanceof UserProviderInterface) {
@@ -236,7 +238,17 @@ class ContextListener extends AbstractListener
                 $refreshedUser = $provider->refreshUser($user);
 
                 // tokens can be deauthenticated if the user has been changed.
-                if ($token instanceof AbstractToken && self::hasUserChanged($token, $user, $refreshedUser)) {
+                $userChanged = $token instanceof AbstractToken && self::hasUserChanged($token, $user, $refreshedUser);
+
+                if (null !== $this->dispatcher) {
+                    $event = new CheckRefreshedUserEvent($token, $user, $refreshedUser, $userChanged);
+                    $this->dispatcher->dispatch($event);
+
+                    $userChanged = $event->isUserChanged();
+                    $userChangedBecause ??= $event->getException();
+                }
+
+                if ($userChanged) {
                     $userChangedBy[] = $provider::class;
 
                     $this->logger?->debug('Cannot refresh token because user has changed.', ['username' => $refreshedUser->getUserIdentifier(), 'provider' => $provider::class]);
@@ -268,7 +280,9 @@ class ContextListener extends AbstractListener
         }
 
         if ($userChangedBy) {
-            return new RefreshUserResult(null, 'the user has changed', $userChangedBy);
+            $reason = $userChangedBecause ? ($userChangedBecause->getMessage() ?: $userChangedBecause->getMessageKey()) : 'the user has changed';
+
+            return new RefreshUserResult(null, $reason, $userChangedBy, $userChangedBecause);
         }
 
         if ($userNotFoundBy) {

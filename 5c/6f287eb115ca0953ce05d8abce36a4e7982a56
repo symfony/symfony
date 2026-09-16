@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-15T06:18:27Z
+
+Hi @nicolas-grekas,
+
+Do you think possible to use one the `IsGranted` argument to pass a max age value the voter will be able to understand?
+This way the configuration value could be overridden.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T06:20:52Z
+
+I don't think this belongs to an is_granted() call: the max-age is an app-wide policy to me, not per controller/etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T06:29:16Z
+
+> I don't think this belongs to an is_granted() call: the max-age is an app-wide policy to me, not per controller/etc.
+
+also because "recently" is meant in a broader way than just time here - eg very recently could mean "hardware-key presented less than 5 minutes ago" - something that belongs to a central policy, not to any local is_granted call.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-15T06:32:05Z
+
+OK thanks.

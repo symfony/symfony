@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Messenger\Serializer\Normalizer\SchedulerTriggerNormalizer;
 use Symfony\Component\Scheduler\Trigger\CallbackTrigger;
 use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger;
+use Symfony\Component\Scheduler\Trigger\SerializedTrigger;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class SchedulerTriggerNormalizerTest extends TestCase
@@ -73,6 +74,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
     public function testDenormalize()
     {
         $trigger = $this->normalizer->denormalize('every 5 seconds', TriggerInterface::class);
+        self::assertInstanceOf(SerializedTrigger::class, $trigger);
         self::assertSame('every 5 seconds', (string) $trigger);
     }
 }

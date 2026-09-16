@@ -9,6 +9,9 @@ CHANGELOG
  * Add a "Next Run In" column to `debug:scheduler` showing the time until the next run
  * Add `env` option to `#[AsCronTask]` and `#[AsPeriodicTask]` to restrict a task to one or more environments
  * Deprecate `Schedule::with()`, use `add()` on a new `Schedule` instead
+ * Add `$useMessengerRouting` constructor argument to `SchedulerTransport` and `SchedulerTransportFactory`
+ * Add `SerializedTrigger`, the trigger a `MessageContext` carries once its message has crossed a transport
+ * Dispatch the scheduled message instead of its `RedispatchMessage` wrapper in `PreRunEvent`, `PostRunEvent` and `FailureEvent`
 
 8.1
 ---

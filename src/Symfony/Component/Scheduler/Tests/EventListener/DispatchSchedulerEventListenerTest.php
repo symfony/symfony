@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -19,6 +20,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Scheduler\Event\FailureEvent;
@@ -65,6 +67,39 @@ class DispatchSchedulerEventListenerTest extends TestCase
         $this->assertSame('result', $secondListener->postRunEvent->getResult());
         $this->assertInstanceOf(FailureEvent::class, $secondListener->failureEvent);
         $this->assertEquals(new \Exception('failed'), $secondListener->failureEvent->getError());
+    }
+
+    #[DataProvider('redispatchedMessageProvider')]
+    public function testRedispatchedMessagesAreUnwrappedForListeners(\Closure $wrap)
+    {
+        $trigger = $this->createStub(TriggerInterface::class);
+        $message = (object) ['id' => 'default'];
+
+        $scheduleProviderLocator = new Container();
+        $scheduleProviderLocator->set('default', new SomeScheduleProvider([RecurringMessage::trigger($trigger, $message)]));
+
+        $stamp = new ScheduledStamp(new MessageContext('default', 'default', $trigger, new \DateTimeImmutable()));
+        $envelope = new Envelope($wrap($message, $stamp), [$stamp]);
+
+        $listener = new DispatchSchedulerEventListener($scheduleProviderLocator, $eventDispatcher = new EventDispatcher());
+        $secondListener = new TestEventListener();
+
+        $eventDispatcher->addListener(PreRunEvent::class, [$secondListener, 'preRun']);
+        $eventDispatcher->addListener(PostRunEvent::class, [$secondListener, 'postRun']);
+        $eventDispatcher->addListener(FailureEvent::class, [$secondListener, 'onFailure']);
+        $listener->onMessageReceived(new WorkerMessageReceivedEvent($envelope, 'default'));
+        $listener->onMessageHandled(new WorkerMessageHandledEvent($envelope->with(new HandledStamp('result', 'handlerName')), 'default'));
+        $listener->onMessageFailed(new WorkerMessageFailedEvent($envelope, 'default', new \Exception('failed')));
+
+        $this->assertSame($message, $secondListener->preRunEvent->getMessage());
+        $this->assertSame($message, $secondListener->postRunEvent->getMessage());
+        $this->assertSame($message, $secondListener->failureEvent->getMessage());
+    }
+
+    public static function redispatchedMessageProvider(): iterable
+    {
+        yield 'wrapped envelope' => [static fn (object $message, ScheduledStamp $stamp) => new RedispatchMessage(new Envelope($message, [$stamp]))];
+        yield 'wrapped message' => [static fn (object $message) => new RedispatchMessage($message, 'async')];
     }
 
     public function testTheListenersOfAScheduleRunForItsOwnMessagesOnly()

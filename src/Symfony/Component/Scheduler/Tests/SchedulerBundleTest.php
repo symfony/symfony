@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
@@ -84,6 +85,33 @@ class SchedulerBundleTest extends TestCase
 
         $this->assertFalse($container->hasDefinition('scheduler.messenger_transport_factory'));
         $this->assertFalse($container->hasDefinition('serializer.normalizer.scheduler_trigger'));
+    }
+
+    public function testUseMessengerRoutingNotSetKeepsTheParameterNull()
+    {
+        // no deprecation is expected here: it is only triggered lazily by SchedulerTransport,
+        // when a scheduled message is actually redispatched, not on every container build
+        $container = new ContainerBuilder();
+        new SchedulerBundle()->getContainerExtension()->load([['enabled' => true]], $container);
+
+        $this->assertNull($container->getParameter('.scheduler.use_messenger_routing'));
+    }
+
+    public function testUseMessengerRoutingRejectsEnvVar()
+    {
+        // env placeholders are only recognized as such once resolved against a real container
+        // compilation (MergeExtensionConfigurationPass registers them), not through a bare
+        // Extension::load() call, so this goes through $container->compile() instead
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag());
+        $container->registerExtension(new SchedulerBundle()->getContainerExtension());
+        $container->loadFromExtension('scheduler', [
+            'use_messenger_routing' => '%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%',
+        ]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "framework.scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%"). Set a static boolean instead.');
+
+        $container->compile();
     }
 }
 

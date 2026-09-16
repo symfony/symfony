@@ -207,6 +207,7 @@ FrameworkBundle
  * Deprecate `CacheWarmer\RouterCacheWarmer`, `Controller\RedirectController`,
    `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader` and
    `Routing\RedirectableCompiledUrlMatcher`, use their counterparts from the Routing component instead
+ * Deprecate not setting the `framework.scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
 
 HttpClient
 ----------
@@ -343,6 +344,11 @@ Scheduler
    // after
    $schedule = (new Schedule())->before($listener);
    ```
+ * `PreRunEvent`, `PostRunEvent` and `FailureEvent` now carry the scheduled message itself when that message is
+   redispatched, instead of the `RedispatchMessage` wrapping it
+ * `MessageContext::$trigger` is a `SerializedTrigger` once its message has crossed a transport. Triggers can hold
+   closures or any other non-serializable state, so only their description travels, and `getNextRunDate()` throws
+   on the receiving side
 
 Security
 --------

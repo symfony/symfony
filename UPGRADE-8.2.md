@@ -72,6 +72,10 @@ EventDispatcher
  * `CompileListenersPass` moves the `addListener()` calls of a dispatcher definition into that map. It is
    registered at `PassConfig::TYPE_AFTER_REMOVING`, so a compiler pass reading those calls still finds them
    as long as it runs before that
+ * `TraceableEventDispatcher` calls the listeners of an event itself, wrapping them as it goes, where it used
+   to swap each one for a wrapper on the dispatcher it decorates and swap it back afterwards. It therefore no
+   longer calls `dispatch()` on that dispatcher, so a custom implementation's own dispatching is bypassed
+   while the profiler is watching
 
 Filesystem
 ----------

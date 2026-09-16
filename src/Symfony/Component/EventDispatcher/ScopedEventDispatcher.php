@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
+
 /**
  * Adds listeners to those of another dispatcher, without mutating it.
  *
@@ -28,7 +31,7 @@ final class ScopedEventDispatcher extends EventDispatcher
     private array $merged = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private ContractsEventDispatcherInterface&ListenerIntrospectionInterface $dispatcher,
     ) {
         parent::__construct();
     }

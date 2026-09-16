@@ -32,6 +32,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -55,6 +56,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(EventDispatcherInterface::class, 'event_dispatcher')
             ->deprecate('symfony/dependency-injection', '8.2', 'The "%alias_id%" alias is deprecated, use "'.ContractsEventDispatcherInterface::class.'" instead.')
         ->alias(ContractsEventDispatcherInterface::class, 'event_dispatcher')
+        ->alias(ListenerIntrospectionInterface::class, 'event_dispatcher')
         ->alias(PsrEventDispatcherInterface::class, 'event_dispatcher')
 
         ->set('filesystem', Filesystem::class)

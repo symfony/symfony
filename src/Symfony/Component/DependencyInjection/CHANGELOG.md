@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add an autowiring alias for `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`
  * Deprecate the `Symfony\Component\EventDispatcher\EventDispatcherInterface` autowiring alias, type the one from the EventDispatcher contracts instead
  * Pass top-level extension values that are not arrays to the extension instead of replacing them with an empty array, so that a configuration tree can accept a scalar at its root
  * Name the package to install when an extension is missing, for the configuration keys declared in the `.container.extension_packages` build parameter

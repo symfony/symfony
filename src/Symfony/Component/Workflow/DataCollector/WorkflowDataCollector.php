@@ -12,7 +12,6 @@
 namespace Symfony\Component\Workflow\DataCollector;
 
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -25,6 +24,7 @@ use Symfony\Component\Workflow\Dumper\MermaidDumper;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\WorkflowInterface;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -35,7 +35,7 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
 
     public function __construct(
         private readonly iterable $workflows,
-        EventDispatcherInterface $eventDispatcher,
+        ListenerIntrospectionInterface $eventDispatcher,
         ?FileLinkFormatter $fileLinkFormatter = null,
     ) {
         $this->listenerExtractor = new ListenerExtractor($eventDispatcher, $fileLinkFormatter);

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `CompiledEventDispatcher`, which dispatches to listeners a container described at compile time, and `CompileListenersPass`, which describes them
  * Add `ScopedEventDispatcher`, to give listeners the lifetime of a scope without mutating the dispatcher they run next to
+ * Add `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`, which `EventDispatcherInterface` extends, to type what reads the listeners of a dispatcher without registering any
  * Deprecate calling `addListener()`, `addSubscriber()`, `removeListener()` and `removeSubscriber()` on a `CompiledEventDispatcher`, declare the listener in the container or add it to a `ScopedEventDispatcher` instead
  * Allow `getSubscribedEvents()` to name its keys: `['method' => 'onEvent', 'priority' => 10]`
 

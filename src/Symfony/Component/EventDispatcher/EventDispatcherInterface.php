@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
@@ -20,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEvent
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface EventDispatcherInterface extends ContractsEventDispatcherInterface
+interface EventDispatcherInterface extends ContractsEventDispatcherInterface, ListenerIntrospectionInterface
 {
     /**
      * Adds an event listener that listens on the specified events.
@@ -44,23 +45,4 @@ interface EventDispatcherInterface extends ContractsEventDispatcherInterface
     public function removeListener(string $eventName, callable $listener): void;
 
     public function removeSubscriber(EventSubscriberInterface $subscriber): void;
-
-    /**
-     * Gets the listeners of a specific event or all listeners sorted by descending priority.
-     *
-     * @return ($eventName is null ? array<string, list<callable>> : list<callable>)
-     */
-    public function getListeners(?string $eventName = null): array;
-
-    /**
-     * Gets the listener priority for a specific event.
-     *
-     * Returns null if the event or the listener does not exist.
-     */
-    public function getListenerPriority(string $eventName, callable $listener): ?int;
-
-    /**
-     * Checks whether an event has any registered listeners.
-     */
-    public function hasListeners(?string $eventName = null): bool;
 }

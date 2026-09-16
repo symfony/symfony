@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\ScopedEventDispatcher;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageSkipEvent;
@@ -33,6 +32,8 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -47,13 +48,13 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
     private bool $forceExit = false;
     private bool $redispatchFailed = false;
     private ?Worker $worker = null;
-    private EventDispatcherInterface $scopedDispatcher;
+    private ScopedEventDispatcher $scopedDispatcher;
 
     public function __construct(
         ?string $globalReceiverName,
         ServiceProviderInterface $failureTransports,
         private MessageBusInterface $messageBus,
-        private EventDispatcherInterface $eventDispatcher,
+        private EventDispatcherInterface&ListenerIntrospectionInterface $eventDispatcher,
         private ?LoggerInterface $logger = null,
         ?PhpSerializer $phpSerializer = null,
         private ?array $signals = null,

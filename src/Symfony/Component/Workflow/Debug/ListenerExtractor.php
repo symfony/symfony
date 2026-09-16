@@ -12,11 +12,11 @@
 namespace Symfony\Component\Workflow\Debug;
 
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\EventListener\GuardExpression;
 use Symfony\Component\Workflow\EventListener\GuardListener;
 use Symfony\Component\Workflow\Transition;
+use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 
 /**
  * @internal
@@ -26,7 +26,7 @@ use Symfony\Component\Workflow\Transition;
 final class ListenerExtractor
 {
     public function __construct(
-        private readonly ?EventDispatcherInterface $dispatcher = null,
+        private readonly ?ListenerIntrospectionInterface $dispatcher = null,
         private readonly ?FileLinkFormatter $fileLinkFormatter = null,
     ) {
     }

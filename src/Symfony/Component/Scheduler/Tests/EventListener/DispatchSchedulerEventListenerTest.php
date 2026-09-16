@@ -28,6 +28,8 @@ use Symfony\Component\Scheduler\EventListener\DispatchSchedulerEventListener;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Messenger\ScheduledStamp;
 use Symfony\Component\Scheduler\RecurringMessage;
+use Symfony\Component\Scheduler\Schedule;
+use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Component\Scheduler\Tests\Fixtures\SomeScheduleProvider;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
@@ -63,6 +65,42 @@ class DispatchSchedulerEventListenerTest extends TestCase
         $this->assertSame('result', $secondListener->postRunEvent->getResult());
         $this->assertInstanceOf(FailureEvent::class, $secondListener->failureEvent);
         $this->assertEquals(new \Exception('failed'), $secondListener->failureEvent->getError());
+    }
+
+    public function testTheListenersOfAScheduleRunForItsOwnMessagesOnly()
+    {
+        $trigger = $this->createStub(TriggerInterface::class);
+        $called = [];
+
+        $createProvider = static function (string $name) use ($trigger, &$called) {
+            $schedule = (new Schedule())
+                ->add(RecurringMessage::trigger($trigger, (object) ['id' => $name]))
+                ->before(static function () use ($name, &$called) { $called[] = $name; });
+
+            return new class($schedule) implements ScheduleProviderInterface {
+                public function __construct(private readonly Schedule $schedule)
+                {
+                }
+
+                public function getSchedule(): Schedule
+                {
+                    return $this->schedule;
+                }
+            };
+        };
+
+        $scheduleProviderLocator = new Container();
+        $scheduleProviderLocator->set('first', $createProvider('first'));
+        $scheduleProviderLocator->set('second', $createProvider('second'));
+
+        $listener = new DispatchSchedulerEventListener($scheduleProviderLocator, new EventDispatcher());
+
+        $context = new MessageContext('first', 'first', $trigger, new \DateTimeImmutable());
+        $envelope = (new Envelope(new \stdClass()))->with(new ScheduledStamp($context));
+
+        $listener->onMessageReceived(new WorkerMessageReceivedEvent($envelope, 'default'));
+
+        $this->assertSame(['first'], $called);
     }
 
     public function testCanceledMessageIsRejected()

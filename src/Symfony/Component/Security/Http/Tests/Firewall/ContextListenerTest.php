@@ -17,7 +17,6 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +25,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
@@ -48,7 +46,6 @@ use Symfony\Component\Security\Http\Tests\Fixtures\LazyDoctrinePersistenceUser;
 use Symfony\Component\Security\Http\Tests\Fixtures\LazyVarExporterUser;
 use Symfony\Component\Security\Http\Tests\Fixtures\NullUserToken;
 use Symfony\Component\VarExporter\LazyObjectInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class ContextListenerTest extends TestCase
@@ -240,58 +237,6 @@ class ContextListenerTest extends TestCase
             [serialize(null)],
             [null],
         ];
-    }
-
-    public function testHandleAddsKernelResponseListener()
-    {
-        $tokenStorage = new TokenStorage();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $listener = new ContextListener($tokenStorage, [], 'key123', null, $dispatcher);
-
-        $dispatcher->expects($this->once())
-            ->method('addListener')
-            ->with(KernelEvents::RESPONSE, $this->callback(static fn ($l) => $l instanceof \Closure
-                && $listener === (new \ReflectionFunction($l))->getClosureThis()
-                && 'onKernelResponse' === (new \ReflectionFunction($l))->name));
-
-        $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
-    }
-
-    public function testDispatcherMustBeAbleToRegisterListeners()
-    {
-        $dispatcher = new class implements ContractsEventDispatcherInterface {
-            public function dispatch(object $event, ?string $eventName = null): object
-            {
-                return $event;
-            }
-        };
-
-        $this->expectException(\TypeError::class);
-
-        new ContextListener(new TokenStorage(), [], 'key123', null, $dispatcher);
-    }
-
-    public function testOnKernelResponseListenerRemovesItself()
-    {
-        $session = new Session(new MockArraySessionStorage('SESSIONNAME'));
-        $tokenStorage = new TokenStorage();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $listener = new ContextListener($tokenStorage, [], 'key123', null, $dispatcher);
-
-        $request = new Request();
-        $request->attributes->set('_security_firewall_run', '_security_key123');
-        $request->setSession($session);
-
-        $event = new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, new Response());
-
-        $dispatcher->expects($this->once())
-            ->method('removeListener')
-            ->with(KernelEvents::RESPONSE, $this->callback(static fn ($l) => $l instanceof \Closure
-                && $listener === (new \ReflectionFunction($l))->getClosureThis()
-                && 'onKernelResponse' === (new \ReflectionFunction($l))->name));
-
-        $listener->onKernelResponse($event);
     }
 
     public function testHandleRemovesTokenIfNoPreviousSessionWasFound()
@@ -643,14 +588,11 @@ class ContextListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, new Response()));
     }
 
-    public function testOnKernelResponseRemoveListener()
+    public function testTheKernelResponseListenerIsNotRegisteredOnTheDispatcher()
     {
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']));
 
         $request = new Request();
-        $request->attributes->set('_security_firewall_run', '_security_session');
-
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 
@@ -658,13 +600,15 @@ class ContextListenerTest extends TestCase
         $httpKernel = $this->createStub(HttpKernelInterface::class);
 
         $listener = new ContextListener($tokenStorage, [], 'session', null, $dispatcher, null, $tokenStorage->getToken(...));
-        $this->assertSame([], $dispatcher->getListeners());
 
         $listener->authenticate(new RequestEvent($httpKernel, $request, HttpKernelInterface::MAIN_REQUEST));
-        $this->assertNotEmpty($dispatcher->getListeners());
+        $this->assertSame([], $dispatcher->getListeners());
+
+        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('test1', 'pass1'), 'phpunit', ['ROLE_USER']));
 
         $listener->onKernelResponse(new ResponseEvent($httpKernel, $request, HttpKernelInterface::MAIN_REQUEST, new Response()));
         $this->assertSame([], $dispatcher->getListeners());
+        $this->assertNotNull($session->get('_security_session'));
     }
 
     #[TestWith([true])]

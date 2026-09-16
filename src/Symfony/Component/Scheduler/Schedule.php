@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Scheduler;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class Schedule implements ScheduleProviderInterface
 {
@@ -27,10 +28,23 @@ final class Schedule implements ScheduleProviderInterface
     private ?CacheInterface $state = null;
     private bool $shouldRestart = false;
     private bool $onlyLastMissed = false;
+    private ?EventDispatcher $listeners = null;
 
-    public function __construct(
-        private readonly ?EventDispatcherInterface $dispatcher = null,
-    ) {
+    /**
+     * @param EventDispatcherInterface|null $dispatcher Passing a dispatcher is deprecated since Symfony 8.2
+     */
+    public function __construct(?EventDispatcherInterface $dispatcher = null)
+    {
+        if (null !== $dispatcher) {
+            trigger_deprecation('symfony/scheduler', '8.2', 'Passing an event dispatcher to "%s()" is deprecated, the argument will be removed in 9.0.', __METHOD__);
+        }
+    }
+
+    public function __clone()
+    {
+        if (null !== $this->listeners) {
+            $this->listeners = clone $this->listeners;
+        }
     }
 
     /**
@@ -40,7 +54,7 @@ final class Schedule implements ScheduleProviderInterface
     {
         trigger_deprecation('symfony/scheduler', '8.2', 'The "%s()" method is deprecated and will be removed in 9.0, clone the schedule or use "add()" on a new "%s" instead.', __METHOD__, self::class);
 
-        return static::doAdd(new self($this->dispatcher), $message, ...$messages);
+        return static::doAdd(new self(), $message, ...$messages);
     }
 
     /**
@@ -162,35 +176,33 @@ final class Schedule implements ScheduleProviderInterface
 
     public function before(callable $listener, int $priority = 0): static
     {
-        if (!$this->dispatcher) {
-            throw new LogicException(\sprintf('To register a listener with "%s()", you need to set an event dispatcher on the Schedule.', __METHOD__));
-        }
-
-        $this->dispatcher->addListener(PreRunEvent::class, $listener, $priority);
+        ($this->listeners ??= new EventDispatcher())->addListener(PreRunEvent::class, $listener, $priority);
 
         return $this;
     }
 
     public function after(callable $listener, int $priority = 0): static
     {
-        if (!$this->dispatcher) {
-            throw new LogicException(\sprintf('To register a listener with "%s()", you need to set an event dispatcher on the Schedule.', __METHOD__));
-        }
-
-        $this->dispatcher->addListener(PostRunEvent::class, $listener, $priority);
+        ($this->listeners ??= new EventDispatcher())->addListener(PostRunEvent::class, $listener, $priority);
 
         return $this;
     }
 
     public function onFailure(callable $listener, int $priority = 0): static
     {
-        if (!$this->dispatcher) {
-            throw new LogicException(\sprintf('To register a listener with "%s()", you need to set an event dispatcher on the Schedule.', __METHOD__));
-        }
-
-        $this->dispatcher->addListener(FailureEvent::class, $listener, $priority);
+        ($this->listeners ??= new EventDispatcher())->addListener(FailureEvent::class, $listener, $priority);
 
         return $this;
+    }
+
+    /**
+     * Returns the dispatcher holding the listeners registered on this schedule, if any.
+     *
+     * @internal
+     */
+    public function getEventDispatcher(): ?EventDispatcherInterface
+    {
+        return $this->listeners;
     }
 
     public function shouldRestart(): bool

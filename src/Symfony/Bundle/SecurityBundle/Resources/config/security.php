@@ -223,7 +223,6 @@ return static function (ContainerConfigurator $container) {
         ->set('security.firewall', FirewallListener::class)
             ->args([
                 service('security.firewall.map'),
-                service('event_dispatcher'),
                 service('security.logout_url_generator'),
             ])
             ->tag('kernel.event_subscriber')

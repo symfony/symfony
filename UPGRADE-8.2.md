@@ -287,11 +287,11 @@ RateLimiter
 Scheduler
 ---------
 
- * Deprecate `Schedule::with()`. It returns a schedule that keeps only the event dispatcher, so a lock or a
-   state set on the original schedule is silently dropped, and the resulting schedule then runs unlocked.
+ * Deprecate `Schedule::with()`. It returns an empty schedule, so a lock or a state set on the original
+   schedule is silently dropped, and the resulting schedule then runs unlocked.
 
-   To derive a schedule from another one, clone it. The clone shares the dispatcher, the lock and the state,
-   and its list of messages is independent, so adding to one does not affect the other:
+   To derive a schedule from another one, clone it. The clone keeps the lock and the state, and its list of
+   messages and its listeners are independent, so adding to one does not affect the other:
 
    ```php
    $new = clone $schedule;
@@ -305,7 +305,18 @@ Scheduler
    $new = $schedule->with($message);
 
    // after
-   $new = (new Schedule($dispatcher))->add($message);
+   $new = (new Schedule())->add($message);
+   ```
+ * Deprecate passing an event dispatcher to `Schedule::__construct()`. `before()`, `after()` and `onFailure()`
+   register their listeners on the schedule itself, so a listener now runs for the messages of its own schedule
+   only, where it used to run for the messages of every schedule sharing that dispatcher:
+
+   ```php
+   // before
+   $schedule = (new Schedule($this->dispatcher))->before($listener);
+
+   // after
+   $schedule = (new Schedule())->before($listener);
    ```
 
 Security
@@ -337,6 +348,13 @@ Security
  * [BC BREAK] The `oauth2` access token handler now refuses an introspection response reporting an `exp` in the
    past, or an `nbf` or an `iat` in the future, and one whose `exp`, `nbf` or `iat` is not a number it can read as
    a timestamp
+ * Deprecate `ExceptionListener::register()`, `ExceptionListener::unregister()` and the `$dispatcher` argument
+   of `Firewall::__construct()`. The firewall listens to `kernel.exception` itself and calls the exception
+   listener of the firewall that matched the request, instead of adding that listener to the dispatcher on
+   every request and removing it again
+ * [BC BREAK] `ContextListener` does not register its `onKernelResponse()` method on the event dispatcher
+   anymore. An application built on the Security component alone must register it on the `kernel.response`
+   event; SecurityBundle already registers it and is not affected
 
 SecurityBundle
 --------------
@@ -353,6 +371,17 @@ SecurityBundle
    `setFirewallName()` for success handlers, to the service it decorates whenever that service relies on them,
    as `DefaultAuthenticationSuccessHandler` and `DefaultAuthenticationFailureHandler` do. Without forwarding,
    the authenticator options and the session target path are lost, and a successful login redirects to `/`
+ * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which
+   `TraceableFirewallListener` inherits: the firewall does not register listeners on the dispatcher anymore,
+   so the logout URL generator moves to that position
+
+   ```php
+   // before
+   new FirewallListener($map, $dispatcher, $logoutUrlGenerator);
+
+   // after
+   new FirewallListener($map, $logoutUrlGenerator);
+   ```
 
 Serializer
 ----------

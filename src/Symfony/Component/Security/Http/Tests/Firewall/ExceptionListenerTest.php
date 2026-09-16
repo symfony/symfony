@@ -12,6 +12,8 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +24,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -156,15 +159,32 @@ class ExceptionListenerTest extends TestCase
         $this->assertEquals(403, $event->getThrowable()->getStatusCode());
     }
 
-    public function testUnregister()
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testRegisterIsDeprecated()
     {
         $listener = $this->createExceptionListener();
         $dispatcher = new EventDispatcher();
 
+        $this->expectUserDeprecationMessage('Since symfony/security-http 8.2: The "Symfony\\Component\\Security\\Http\\Firewall\\ExceptionListener::register()" method is deprecated and will be removed in 9.0, register "onKernelException()" on the "kernel.exception" event instead.');
+
         $listener->register($dispatcher);
+
         $this->assertNotEmpty($dispatcher->getListeners());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testUnregisterIsDeprecated()
+    {
+        $listener = $this->createExceptionListener();
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, $listener->onKernelException(...), 1);
+
+        $this->expectUserDeprecationMessage('Since symfony/security-http 8.2: The "Symfony\\Component\\Security\\Http\\Firewall\\ExceptionListener::unregister()" method is deprecated and will be removed in 9.0, register "onKernelException()" on the "kernel.exception" event instead.');
 
         $listener->unregister($dispatcher);
+
         $this->assertSame([], $dispatcher->getListeners());
     }
 

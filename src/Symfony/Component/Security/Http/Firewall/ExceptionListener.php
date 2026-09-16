@@ -66,17 +66,25 @@ class ExceptionListener
 
     /**
      * Registers a onKernelException listener to take care of security exceptions.
+     *
+     * @deprecated since Symfony 8.2, register "onKernelException()" on the "kernel.exception" event instead
      */
     public function register(EventDispatcherInterface $dispatcher): void
     {
+        trigger_deprecation('symfony/security-http', '8.2', 'The "%s()" method is deprecated and will be removed in 9.0, register "onKernelException()" on the "kernel.exception" event instead.', __METHOD__);
+
         $dispatcher->addListener(KernelEvents::EXCEPTION, $this->onKernelException(...), 1);
     }
 
     /**
      * Unregisters the dispatcher.
+     *
+     * @deprecated since Symfony 8.2, register "onKernelException()" on the "kernel.exception" event instead
      */
     public function unregister(EventDispatcherInterface $dispatcher): void
     {
+        trigger_deprecation('symfony/security-http', '8.2', 'The "%s()" method is deprecated and will be removed in 9.0, register "onKernelException()" on the "kernel.exception" event instead.', __METHOD__);
+
         $dispatcher->removeListener(KernelEvents::EXCEPTION, $this->onKernelException(...));
     }
 

@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-09-16T06:08:48Z
+
+The failing Unit Tests (8.1) job fails on ProcessTest::testPreparedCommand in the SIGCHLD step. This PR only touches the Yaml component, so that failure is unrelated to it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-16T07:40:10Z
+
+Thanks @lazerg, nice catch and a clean diagnosis. I rebased on 6.4 and added a test to each commit, because the fix does more than the line numbers.
+
+The offset you now pass correctly also feeds `isCurrentLineLastLineInDocument()`, which `parseBlockScalar()` uses to decide whether to keep a block scalar's final newline. With the inflated offset the nested parser believed it had reached the end of the document, so this lost its trailing newline:
+
+```yaml
+- foo:
+    bar: |
+      text
+- second
+```
+
+`bar` was `"text"` and is now `"text\n"`. I ran 48 combinations of chomping style and nesting shape: 16 change, all 16 from disagreeing with PyYAML to agreeing with it, and none regress. Each commit now carries a test for that shape, and both fail on 6.4 without the matching fix. I also updated the commit messages and the description to cover it, since it is a parsed-value change going into a patch release.
+
+On the failing job: the red one is `Unit Tests (8.4, high-deps)`, failing on `AmpHttpClientTest::testPauseDuringBody` with `Failed asserting that 0.9999351501464844 is equal to 1 or is greater than 1`. That is a timing assertion in HttpClient, unrelated here.
+
+One note for anyone reading #66081 later: the `skippedLineNumbers` theory in the issue is not the cause. Nothing ever appends to `skippedLineNumbers` or `locallySkippedLineNumbers`, so `getRealCurrentLineNb()` reduces to `currentLineNb + offset`. The read-order diagnosis in this PR is the right one.

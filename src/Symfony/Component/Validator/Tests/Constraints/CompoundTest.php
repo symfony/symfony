@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\Compound;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Sequentially;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class CompoundTest extends TestCase
 {
@@ -57,6 +58,17 @@ class CompoundTest extends TestCase
             $this->assertSame(['inner'], $nestedConstraint->groups);
         }
     }
+
+    public function testGroupsAreNotPropagatedToValidNestedInSequentially()
+    {
+        $compound = new CompoundWithSequentiallyAndValid(groups: ['my-group']);
+
+        $sequentially = $compound->constraints[0];
+        $this->assertInstanceOf(Sequentially::class, $sequentially);
+        $this->assertSame(['my-group'], $sequentially->groups);
+        $this->assertSame(['my-group'], $sequentially->constraints[0]->groups);
+        $this->assertNull($sequentially->constraints[1]->groups);
+    }
 }
 
 class EmptyCompound extends Compound
@@ -89,6 +101,19 @@ class CompoundWithExplicitlyGroupedSequentially extends Compound
                 new NotBlank(),
                 new Length(min: 3),
             ], groups: ['inner']),
+        ];
+    }
+}
+
+class CompoundWithSequentiallyAndValid extends Compound
+{
+    protected function getConstraints(array $options): array
+    {
+        return [
+            new Sequentially([
+                new NotBlank(),
+                new Valid(traverse: false),
+            ]),
         ];
     }
 }

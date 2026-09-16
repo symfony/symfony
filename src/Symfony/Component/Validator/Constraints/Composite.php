@@ -46,6 +46,9 @@ abstract class Composite extends Constraint
      *     of the groups of the composite constraint. If not, a
      *     {@link ConstraintDefinitionException} is thrown.
      *
+     * A Valid constraint nested in Sequentially without explicit groups keeps
+     * forwarding the effective cascaded groups instead of inheriting groups.
+     *
      * All this is done in the constructor, because constraints can then be
      * cached. When constraints are loaded from the cache, no more group
      * checks need to be done.
@@ -78,7 +81,13 @@ abstract class Composite extends Constraint
                 }
 
                 if ($constraint instanceof Valid) {
-                    throw new ConstraintDefinitionException(\sprintf('The constraint Valid cannot be nested inside constraint "%s". You can only declare the Valid constraint directly on a field or method.', get_debug_type($this)));
+                    if (!$this instanceof Sequentially) {
+                        throw new ConstraintDefinitionException(\sprintf('The constraint Valid cannot be nested inside constraint "%s". You can only declare the Valid constraint directly on a field or method or within the Sequentially constraint.', get_debug_type($this)));
+                    }
+
+                    if (null !== $constraint->groups) {
+                        throw new ConstraintDefinitionException(\sprintf('The constraint Valid cannot define groups when nested inside constraint "%s". Set the groups on the Sequentially constraint instead.', get_debug_type($this)));
+                    }
                 }
             }
 
@@ -86,6 +95,10 @@ abstract class Composite extends Constraint
                 $mergedGroups = [];
 
                 foreach ($nestedConstraints as $constraint) {
+                    if ($this->isImplicitlyGroupedValid($constraint)) {
+                        continue;
+                    }
+
                     foreach ($constraint->groups as $group) {
                         $mergedGroups[$group] = true;
                     }
@@ -99,6 +112,10 @@ abstract class Composite extends Constraint
             }
 
             foreach ($nestedConstraints as $constraint) {
+                if ($this->isImplicitlyGroupedValid($constraint)) {
+                    continue;
+                }
+
                 if (isset(((array) $constraint)['groups'])) {
                     $excessGroups = array_diff($constraint->groups, $this->groups);
 
@@ -161,5 +178,14 @@ abstract class Composite extends Constraint
      */
     protected function initializeNestedConstraints(): void
     {
+    }
+
+    /**
+     * An ungrouped Valid constraint forwards the effective cascaded groups and
+     * must therefore not inherit the composite's groups.
+     */
+    private function isImplicitlyGroupedValid(Constraint $constraint): bool
+    {
+        return $constraint instanceof Valid && null === $constraint->groups;
     }
 }

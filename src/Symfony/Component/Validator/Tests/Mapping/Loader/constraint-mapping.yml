@@ -43,6 +43,11 @@ Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
             - NotNull: ~
             - Range:
                 min: 3
+      # Sequentially with conditional cascading
+      - Sequentially:
+          constraints:
+            - Type: object
+            - Valid: ~
       # Value with child constraints
       - Collection:
           fields:

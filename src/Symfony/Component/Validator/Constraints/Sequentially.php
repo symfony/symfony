@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 /**
  * Use this constraint to sequentially validate nested constraints.
  * Validation for the nested constraints collection will stop at first violation.
+ * A nested Valid constraint can be used to cascade validation only after the
+ * preceding constraints pass. Its groups must be configured on Sequentially.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */

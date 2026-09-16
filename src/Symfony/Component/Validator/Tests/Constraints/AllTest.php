@@ -33,6 +33,8 @@ class AllTest extends TestCase
     public function testRejectValidConstraint()
     {
         $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The constraint Valid cannot be nested inside constraint "Symfony\Component\Validator\Constraints\All". You can only declare the Valid constraint directly on a field or method or within the Sequentially constraint.');
+
         new All([
             new Valid(),
         ]);

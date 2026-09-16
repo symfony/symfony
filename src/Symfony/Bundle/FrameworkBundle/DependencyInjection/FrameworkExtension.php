@@ -206,6 +206,8 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  */
 class FrameworkExtension extends Extension
 {
+    private const MAPPING_FILE_PATTERN = '/\.(xml|ya?ml)$/';
+
     private array $configsEnabled = [];
 
     /**
@@ -264,6 +266,12 @@ class FrameworkExtension extends Extension
 
         // Load Cache configuration first as it is used by other components
         $loader->load('cache.php');
+
+        if ($container->getParameter('kernel.debug')) {
+            // clears the pools that cache metadata read from mapping files, so that editing one of
+            // these files is enough to refresh them
+            $loader->load('cache_debug.php');
+        }
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -863,7 +871,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('profiling.php');
         $loader->load('collectors.php');
-        $loader->load('cache_debug.php');
 
         if ($this->isInitializedConfigEnabled('form')) {
             $loader->load('form_debug.php');
@@ -1767,24 +1774,24 @@ class FrameworkExtension extends Extension
             $this->registerMappingFilesFromDir($dir, $fileRecorder);
         }
 
-        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
+        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder, false);
     }
 
     private function registerMappingFilesFromDir(string $dir, callable $fileRecorder): void
     {
-        foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
+        foreach (Finder::create()->followLinks()->files()->in($dir)->name(self::MAPPING_FILE_PATTERN)->sortByName() as $file) {
             $fileRecorder($file->getExtension(), $file->getRealPath());
         }
     }
 
-    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder): void
+    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder, bool $trackContents): void
     {
         foreach ($container->getParameterBag()->unescapeValue($config['mapping']['paths']) as $path) {
             if (is_dir($path)) {
                 $this->registerMappingFilesFromDir($path, $fileRecorder);
-                $container->addResource(new DirectoryResource($path, '/^$/'));
-            } elseif ($container->fileExists($path, false)) {
-                if (!preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
+                $container->addResource(new DirectoryResource($path, $trackContents ? self::MAPPING_FILE_PATTERN : '/^$/'));
+            } elseif ($container->fileExists($path, $trackContents)) {
+                if (!preg_match(self::MAPPING_FILE_PATTERN, $path, $matches)) {
                     throw new \RuntimeException(\sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
                 }
                 $fileRecorder($matches[1], $path);
@@ -1958,16 +1965,29 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.normalizer.mime_message');
         }
 
-        if ($container->getParameter('kernel.debug')) {
-            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
-        }
-
         if (!$this->readConfigEnabled('translator', $container, $config)) {
             $container->removeDefinition('serializer.normalizer.translatable');
         }
 
+        $attributesEnabled = isset($config['enable_attributes']) && $config['enable_attributes'];
+
+        // attribute metadata is read from the classes at runtime, so it cannot be cached in debug
+        // mode; metadata read from mapping files can be, because the container is rebuilt when one
+        // of these files changes, which clears the pool the metadata is stored in
+        $cacheMetadata = !$attributesEnabled || !$container->getParameter('kernel.debug');
+        $mappingDirPattern = $cacheMetadata ? self::MAPPING_FILE_PATTERN : '/^$/';
+
+        if (!$cacheMetadata) {
+            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
+        } elseif ($container->getParameter('kernel.debug')) {
+            // the PHP file behind "serializer.mapping.cache.symfony" is written by an optional cache
+            // warmer, which does not run when the container is rebuilt while handling a request
+            $container->getDefinition('serializer.mapping.cache_class_metadata_factory')
+                ->replaceArgument(1, new Reference('cache.serializer'));
+        }
+
         $serializerLoaders = [];
-        if (isset($config['enable_attributes']) && $config['enable_attributes']) {
+        if ($attributesEnabled) {
             $annotationLoader = new Definition(
                 AttributeLoader::class,
                 interface_exists(CacheableSupportsMethodInterface::class) ? [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)] : [],
@@ -1987,28 +2007,28 @@ class FrameworkExtension extends Extension
             $bundlePath = $parameterBag->unescapeValue($bundle['path']);
             $configDir = is_dir($bundlePath.'/Resources/config') ? $bundlePath.'/Resources/config' : $bundlePath.'/config';
 
-            if ($container->fileExists($file = $configDir.'/serialization.xml', false)) {
+            if ($container->fileExists($file = $configDir.'/serialization.xml', $cacheMetadata)) {
                 $fileRecorder('xml', $file);
             }
 
             if (
-                $container->fileExists($file = $configDir.'/serialization.yaml', false)
-                || $container->fileExists($file = $configDir.'/serialization.yml', false)
+                $container->fileExists($file = $configDir.'/serialization.yaml', $cacheMetadata)
+                || $container->fileExists($file = $configDir.'/serialization.yml', $cacheMetadata)
             ) {
                 $fileRecorder('yml', $file);
             }
 
-            if ($container->fileExists($dir = $configDir.'/serialization', '/^$/')) {
+            if ($container->fileExists($dir = $configDir.'/serialization', $mappingDirPattern)) {
                 $this->registerMappingFilesFromDir($dir, $fileRecorder);
             }
         }
 
         $projectDir = $parameterBag->unescapeValue($container->getParameter('kernel.project_dir'));
-        if ($container->fileExists($dir = $projectDir.'/config/serializer', '/^$/')) {
+        if ($container->fileExists($dir = $projectDir.'/config/serializer', $mappingDirPattern)) {
             $this->registerMappingFilesFromDir($dir, $fileRecorder);
         }
 
-        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
+        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder, $cacheMetadata);
 
         $chainLoader->replaceArgument(0, $serializerLoaders);
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);

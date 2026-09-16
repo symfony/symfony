@@ -42,6 +42,11 @@ DependencyInjection
  * Bundles that declare no constructor and inherit `boot()`, `shutdown()` and `setContainer()` from
    `AbstractBundle` are now instantiated on demand instead of on every boot. The `$bundles` property of
    the kernel holds only the bundles that have been instantiated, call `getBundles()` to get them all
+ * Deprecate the `Symfony\Component\EventDispatcher\EventDispatcherInterface` autowiring alias, type
+   `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` instead. Autowiring hands out the event
+   dispatcher of the application, which must not be mutated at runtime, so the type to ask for is the one
+   that only dispatches. A service that needs to read the listeners of the dispatcher, a debug tool for
+   instance, can still be given the `event_dispatcher` service explicitly
 
 DoctrineBridge
 --------------

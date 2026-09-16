@@ -278,6 +278,23 @@ class ExceptionListenerTest extends TestCase
         $this->assertSame('Confirm your password', $event->getResponse()->getContent());
     }
 
+    public function testReAuthenticationEntryPointStartsWhenAVeryRecentAuthenticationIsRequired()
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->once())
+            ->method('startReAuthentication')
+            ->willReturn(new Response('Confirm your password', 200));
+
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertSame('Confirm your password', $event->getResponse()->getContent());
+    }
+
     public function testTheFirewallEntryPointIsUsedWhenItCanReAuthenticate()
     {
         $exception = new AccessDeniedException();

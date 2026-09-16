@@ -152,6 +152,23 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('app.confirm_password', (string) $container->getDefinition('security.exception_listener.main')->getArgument(9));
     }
 
+    public function testTheAuthenticationLifetimesArePassedToTheTrustResolver()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'recent_authentication_lifetime' => 600,
+            'very_recent_authentication_lifetime' => 60,
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['form_login' => true]],
+        ]);
+        $container->compile();
+
+        $this->assertSame(600, $container->getParameter('security.recent_authentication_lifetime'));
+        $this->assertSame(60, $container->getParameter('security.very_recent_authentication_lifetime'));
+        $this->assertSame('%security.recent_authentication_lifetime%', $container->getDefinition('security.authentication.trust_resolver')->getArgument(0));
+        $this->assertSame('%security.very_recent_authentication_lifetime%', $container->getDefinition('security.authentication.trust_resolver')->getArgument(1));
+    }
+
     public function testReAuthenticationEntryPointIsRefusedOnAStatelessFirewall()
     {
         $container = $this->getRawContainer();

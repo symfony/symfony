@@ -7,7 +7,8 @@ CHANGELOG
  * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, to add application-specific reasons to deauthenticate the token
  * Add argument `$exception` to `TokenDeauthenticatedEvent::__construct()` and `TokenDeauthenticatedEvent::getException()`
  * Make `OidcLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, starting an authorization request with `prompt=login` and the previous ID token as `id_token_hint`
- * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when `IS_AUTHENTICATED_RECENTLY` is denied
+ * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when `IS_AUTHENTICATED_RECENTLY` or `IS_AUTHENTICATED_VERY_RECENTLY` is denied
+ * Add `IsGrantedContext::isAuthenticatedVeryRecently()`
  * Record the OIDC `amr` and `auth_time` claims as the authentication proofs of the token, so `max_age` and `IS_AUTHENTICATED_RECENTLY` agree
  * Add `AuthenticationTimeListener`, which records the last interactive authentication as an authentication proof of the token and carries the proofs over when a re-authentication of the same user replaces the token
  * Add `allowed_time_drift` option to `OidcTokenHandler` to configure time tolerance for token validation (`iat`, `nbf`, `exp` claims)

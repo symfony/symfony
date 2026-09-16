@@ -159,7 +159,7 @@ class ExceptionListener
 
         if (null !== $token
             && null !== $reAuthenticationEntryPoint
-            && [AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY] === $exception->getAttributes()
+            && \in_array($exception->getAttributes(), [[AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY], [AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]], true)
         ) {
             $this->logger?->debug('The authentication is not recent enough, starting re-authentication.', ['entry_point' => $reAuthenticationEntryPoint]);
 

@@ -51,6 +51,7 @@ use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
@@ -1423,6 +1424,58 @@ class SecurityExtensionTest extends TestCase
         $listenersIteratorArgument = $container->getDefinition('security.firewall.map.context.main')->getArgument(0);
         $firewallListeners = array_map('strval', $listenersIteratorArgument->getValues());
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
+    }
+
+    public function testUserCheckerOnRefreshRegistersAListenerForTheUserCheckerOfTheFirewall()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('app.user_checker', InMemoryUserChecker::class);
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'main' => ['user_checker' => 'app.user_checker', 'user_checker_on_refresh' => true],
+            ],
+        ]);
+
+        $container->compile();
+
+        $listener = $container->getDefinition('security.listener.user_checker_on_refresh.main');
+
+        $this->assertSame('security.user_checker.main', (string) $listener->getArgument(0));
+        $this->assertSame('app.user_checker', (string) $container->getAlias('security.user_checker.main'));
+        $this->assertSame(
+            [['dispatcher' => 'security.event_dispatcher.main', 'event' => CheckRefreshedUserEvent::class]],
+            $listener->getTag('kernel.event_listener'),
+        );
+    }
+
+    public function testNoUserCheckerOnRefreshListenerByDefault()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.listener.user_checker_on_refresh.main'));
+    }
+
+    public function testUserCheckerOnRefreshRequiresAStatefulFirewall()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'main' => ['stateless' => true, 'user_checker_on_refresh' => true],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "user_checker_on_refresh" option of the "main" firewall requires a stateful firewall');
+
+        $container->compile();
     }
 
     public function testOidcLoginRegistersTheTokenRefreshListenerAfterTheContextListener()

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `RefreshedUserCheckerListener`, running a user checker on `CheckRefreshedUserEvent` so an account disabled during a session is rejected on the next request
  * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, to add application-specific reasons to deauthenticate the token
  * Add argument `$exception` to `TokenDeauthenticatedEvent::__construct()` and `TokenDeauthenticatedEvent::getException()`
  * Handle security exceptions from a `kernel.exception` listener of the firewall, and deprecate `ExceptionListener::register()`, `ExceptionListener::unregister()` and the `$dispatcher` argument of `Firewall::__construct()`

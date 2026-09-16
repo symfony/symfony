@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session
  * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which now takes the logout URL generator there
  * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service used when `IS_AUTHENTICATED_RECENTLY` is denied
  * Add the `recent_authentication_lifetime` option, the number of seconds an interactive authentication keeps granting `IS_AUTHENTICATED_RECENTLY`

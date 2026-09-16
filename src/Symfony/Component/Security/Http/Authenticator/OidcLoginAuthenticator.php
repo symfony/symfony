@@ -185,7 +185,10 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         $redirectUri = $this->httpUtils->generateUri($request, $this->options['check_path']);
 
         $state = bin2hex(random_bytes(32));
-        $nonce = bin2hex(random_bytes(32));
+        // 256 bits of entropy, base64url-encoded to 43 characters instead of the 64 a hex
+        // encoding would take: the nonce travels to the provider and back inside the ID
+        // token, and longer values are known not to be accepted by every provider
+        $nonce = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
 
         $params = [
             'response_type' => 'code',
@@ -498,9 +501,8 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             throw new AuthenticationException(\sprintf('The "%s" claim is missing or invalid in the OIDC response.', $userIdentifierClaim));
         }
 
-        if (!\is_string($idTokenClaims['sub'] ?? null) || '' === $idTokenClaims['sub']) {
-            throw new AuthenticationException('The "sub" claim is missing or invalid in the ID token.');
-        }
+        // the ID token "sub" is validated by OidcIdToken::validateClaims(), before the
+        // UserInfo request this compares its answer to
         if ('userinfo' === $this->options['user_data_source']
             && (!\is_string($claims['sub'] ?? null) || !hash_equals($idTokenClaims['sub'], $claims['sub']))
         ) {

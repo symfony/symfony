@@ -64,23 +64,47 @@ final class CompiledEventDispatcher implements EventDispatcherInterface
         return $event;
     }
 
+    /**
+     * @deprecated since Symfony 8.2, declare the listener in the container or add it to a ScopedEventDispatcher instead
+     */
     public function addListener(string $eventName, callable $listener, int $priority = 0): void
     {
+        trigger_deprecation('symfony/event-dispatcher', '8.2', 'Calling "%s()" is deprecated, declare the listener in the container or add it to a "%s" wrapping this one instead.', __METHOD__, ScopedEventDispatcher::class);
+        // throw new \BadMethodCallException('Compiled event dispatchers must not be modified.');
+
         ($this->dispatcher ?? $this->thaw())->addListener($eventName, $listener, $priority);
     }
 
+    /**
+     * @deprecated since Symfony 8.2, declare the subscriber in the container or add it to a ScopedEventDispatcher instead
+     */
     public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
+        trigger_deprecation('symfony/event-dispatcher', '8.2', 'Calling "%s()" is deprecated, declare the subscriber in the container or add it to a "%s" wrapping this one instead.', __METHOD__, ScopedEventDispatcher::class);
+        // throw new \BadMethodCallException('Compiled event dispatchers must not be modified.');
+
         ($this->dispatcher ?? $this->thaw())->addSubscriber($subscriber);
     }
 
+    /**
+     * @deprecated since Symfony 8.2, add the listener to a ScopedEventDispatcher instead
+     */
     public function removeListener(string $eventName, callable $listener): void
     {
+        trigger_deprecation('symfony/event-dispatcher', '8.2', 'Calling "%s()" is deprecated, add the listener to a "%s" wrapping this one instead.', __METHOD__, ScopedEventDispatcher::class);
+        // throw new \BadMethodCallException('Compiled event dispatchers must not be modified.');
+
         ($this->dispatcher ?? $this->thaw())->removeListener($eventName, $listener);
     }
 
+    /**
+     * @deprecated since Symfony 8.2, add the subscriber to a ScopedEventDispatcher instead
+     */
     public function removeSubscriber(EventSubscriberInterface $subscriber): void
     {
+        trigger_deprecation('symfony/event-dispatcher', '8.2', 'Calling "%s()" is deprecated, add the subscriber to a "%s" wrapping this one instead.', __METHOD__, ScopedEventDispatcher::class);
+        // throw new \BadMethodCallException('Compiled event dispatchers must not be modified.');
+
         ($this->dispatcher ?? $this->thaw())->removeSubscriber($subscriber);
     }
 

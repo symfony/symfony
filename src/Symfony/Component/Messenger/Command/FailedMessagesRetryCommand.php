@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\ScopedEventDispatcher;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageSkipEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
@@ -46,6 +47,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
     private bool $forceExit = false;
     private bool $redispatchFailed = false;
     private ?Worker $worker = null;
+    private EventDispatcherInterface $scopedDispatcher;
 
     public function __construct(
         ?string $globalReceiverName,
@@ -124,7 +126,8 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
         $ids = $input->getArgument('id');
         $filter = $this->getFilter($input, (bool) $ids);
 
-        $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $this->scopedDispatcher = new ScopedEventDispatcher($this->eventDispatcher);
+        $this->scopedDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
@@ -292,18 +295,18 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
             }
 
             if ('skip' === $choice) {
-                $this->eventDispatcher->dispatch(new WorkerMessageSkipEvent($envelope, $envelope->last(SentToFailureTransportStamp::class)->getOriginalReceiverName()));
+                $this->scopedDispatcher->dispatch(new WorkerMessageSkipEvent($envelope, $envelope->last(SentToFailureTransportStamp::class)->getOriginalReceiverName()));
             }
 
             $messageReceivedEvent->shouldHandle(false);
             $receiver->reject($envelope);
         };
-        $this->eventDispatcher->addListener(WorkerMessageReceivedEvent::class, $listener);
+        $this->scopedDispatcher->addListener(WorkerMessageReceivedEvent::class, $listener);
 
         $this->worker = new Worker(
             [$failureTransportName => $receiver],
             $this->messageBus,
-            $this->eventDispatcher,
+            $this->scopedDispatcher,
             $this->logger
         );
 
@@ -311,7 +314,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
             $this->worker->run();
         } finally {
             $this->worker = null;
-            $this->eventDispatcher->removeListener(WorkerMessageReceivedEvent::class, $listener);
+            $this->scopedDispatcher->removeListener(WorkerMessageReceivedEvent::class, $listener);
         }
 
         return $count;

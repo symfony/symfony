@@ -17,12 +17,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -159,18 +155,9 @@ class SecurityTest extends AbstractWebTestCase
         $client->loginUser(new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']), 'main');
 
         // put a csrf token in the storage
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $setCsrfToken = static function (RequestEvent $event) {
+        $this->callInRequestContext($client, static function () {
             static::getContainer()->get('security.csrf.token_storage')->setToken('logout', 'bar');
-            $event->setResponse(new Response(''));
-        };
-        $eventDispatcher->addListener(KernelEvents::REQUEST, $setCsrfToken);
-        try {
-            $client->request('GET', '/not-existent');
-        } finally {
-            $eventDispatcher->removeListener(KernelEvents::REQUEST, $setCsrfToken);
-        }
+        });
 
         static::getContainer()->get(LogoutController::class)->checkCsrf = true;
         $client->request('GET', '/main/force-logout', ['_csrf_token' => 'bar']);

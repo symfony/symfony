@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\ScopedEventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -75,8 +75,7 @@ trait MessengerAssertionsTrait
         $container = static::getContainer();
         $receiver = self::createRetryAwareReceiver(self::getMessengerTransport($transport));
         $bus = $container->get('messenger.routable_message_bus');
-        /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = $container->get('event_dispatcher');
+        $dispatcher = new ScopedEventDispatcher($container->get('event_dispatcher'));
 
         $handled = 0;
         $failures = [];
@@ -101,15 +100,7 @@ trait MessengerAssertionsTrait
         $dispatcher->addListener(WorkerMessageHandledEvent::class, $countHandled);
         $dispatcher->addListener(WorkerMessageFailedEvent::class, $recordFailure);
 
-        try {
-            (new Worker([$transport => $receiver], $bus, $dispatcher))->run(['sleep' => 0]);
-        } finally {
-            foreach ($subscribers as $subscriber) {
-                $dispatcher->removeSubscriber($subscriber);
-            }
-            $dispatcher->removeListener(WorkerMessageHandledEvent::class, $countHandled);
-            $dispatcher->removeListener(WorkerMessageFailedEvent::class, $recordFailure);
-        }
+        (new Worker([$transport => $receiver], $bus, $dispatcher))->run(['sleep' => 0]);
 
         if ($failures) {
             throw $failures[0];

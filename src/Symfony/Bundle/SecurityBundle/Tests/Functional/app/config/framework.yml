@@ -18,3 +18,9 @@ framework:
 
 services:
     logger: { class: Psr\Log\NullLogger }
+
+    request_context_runner:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\app\RequestContextRunner
+        public: true
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }

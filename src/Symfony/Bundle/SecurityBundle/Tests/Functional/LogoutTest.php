@@ -13,10 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 class LogoutTest extends AbstractWebTestCase
 {
@@ -149,23 +146,5 @@ class LogoutTest extends AbstractWebTestCase
         $client->followRedirects(false);
 
         return $client;
-    }
-
-    private function callInRequestContext(KernelBrowser $client, callable $callable): void
-    {
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $wrappedCallable = static function (RequestEvent $event) use (&$callable) {
-            $callable();
-            $event->setResponse(new Response(''));
-            $event->stopPropagation();
-        };
-
-        $eventDispatcher->addListener(KernelEvents::REQUEST, $wrappedCallable);
-        try {
-            $client->request('GET', '/not-existent');
-        } finally {
-            $eventDispatcher->removeListener(KernelEvents::REQUEST, $wrappedCallable);
-        }
     }
 }

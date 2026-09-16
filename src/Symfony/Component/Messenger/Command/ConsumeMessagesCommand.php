@@ -30,6 +30,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\ScopedEventDispatcher;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
@@ -340,7 +341,17 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             );
         }
 
-        $this->worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters, new Clock(), $messageExecutionStrategy);
+        $eventDispatcher = $this->eventDispatcher;
+
+        if ($subscribers) {
+            $eventDispatcher = new ScopedEventDispatcher($eventDispatcher);
+
+            foreach ($subscribers as $subscriber) {
+                $eventDispatcher->addSubscriber($subscriber);
+            }
+        }
+
+        $this->worker = new Worker($receivers, $bus, $eventDispatcher, $this->logger, $rateLimiters, new Clock(), $messageExecutionStrategy);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
             'time_limit' => null !== $timeLimit ? (int) $timeLimit : null,
@@ -354,19 +365,11 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $options['bus_name'] = $busName;
         }
 
-        foreach ($subscribers as $subscriber) {
-            $this->eventDispatcher->addSubscriber($subscriber);
-        }
-
         try {
             $this->worker->run($options);
         } finally {
             $this->worker = null;
             $messageExecutionStrategy?->shutdown();
-
-            foreach ($subscribers as $subscriber) {
-                $this->eventDispatcher->removeSubscriber($subscriber);
-            }
         }
 
         return 0;

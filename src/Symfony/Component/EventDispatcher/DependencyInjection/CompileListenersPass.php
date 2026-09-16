@@ -32,11 +32,32 @@ class CompileListenersPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('event_dispatcher.dispatcher') as $id => $tags) {
             $definition = $container->getDefinition($id);
 
-            if ($definition->isAbstract() || $definition->getArguments()) {
+            if ($definition->isAbstract()) {
                 continue;
             }
 
-            $class = $definition->getClass();
+            // a decorator took the id over: the listeners belong to the dispatcher it decorates
+            $dispatcher = $definition;
+
+            while (null !== $innerId = $dispatcher->innerServiceId) {
+                if (!$container->hasDefinition($innerId)) {
+                    continue 2;
+                }
+
+                $dispatcher = $container->getDefinition($innerId);
+
+                if ($calls = $dispatcher->getMethodCalls()) {
+                    $container->log($this, \sprintf('Not compiling the listeners of "%s": "%s()" is called on "%s".', $id, $calls[0][0], $innerId));
+
+                    continue 2;
+                }
+            }
+
+            if ($dispatcher->getArguments()) {
+                continue;
+            }
+
+            $class = $dispatcher->getClass();
 
             if (EventDispatcher::class !== ($class ? $container->getParameterBag()->resolveValue($class) : null)) {
                 continue;
@@ -74,9 +95,9 @@ class CompileListenersPass implements CompilerPassInterface
             }
             unset($byPriority);
 
-            $definition->setClass(CompiledEventDispatcher::class);
+            $dispatcher->setClass(CompiledEventDispatcher::class);
+            $dispatcher->setArguments([$listeners, new ServiceLocatorArgument($references)]);
             $definition->setMethodCalls([]);
-            $definition->setArguments([$listeners, new ServiceLocatorArgument($references)]);
         }
     }
 }

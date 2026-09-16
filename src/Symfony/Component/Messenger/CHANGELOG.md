@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * `messenger:consume` and `messenger:failed:retry` add the listeners of a run to a `ScopedEventDispatcher` instead of to the event dispatcher of the application
  * Add `FailedMessageRepository` and `FailedMessageFilter` to list, inspect, remove and redispatch failed messages outside the console
  * Add `MessengerBundle`, which provides the `messenger` configuration and the services previously provided by `FrameworkBundle` under `framework.messenger`
  * Add claim check support with `ClaimCheckSerializer` and PSR-6 cache pools

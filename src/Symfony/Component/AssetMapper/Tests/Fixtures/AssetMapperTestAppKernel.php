@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests\Fixtures;
 
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Component\AssetMapper\Event\PreAssetsCompileEvent;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -58,5 +59,8 @@ class AssetMapperTestAppKernel extends Kernel
     protected function build(ContainerBuilder $container): void
     {
         $container->register('logger', NullLogger::class);
+        $container->register('pre_assets_compile_listener', PreAssetsCompileListener::class)
+            ->setPublic(true)
+            ->addTag('kernel.event_listener', ['event' => PreAssetsCompileEvent::class]);
     }
 }

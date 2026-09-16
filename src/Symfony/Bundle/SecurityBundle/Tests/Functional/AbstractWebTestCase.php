@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\app\AppKernel;
 use Symfony\Component\Filesystem\Filesystem;
@@ -18,6 +19,15 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 abstract class AbstractWebTestCase extends BaseWebTestCase
 {
+    /**
+     * Runs a callable inside a request context, for the request-scoped services it needs.
+     */
+    protected function callInRequestContext(KernelBrowser $client, callable $callable): void
+    {
+        static::getContainer()->get('request_context_runner')->callable = $callable;
+        $client->request('GET', '/not-existent');
+    }
+
     public static function assertRedirect($response, $location)
     {
         self::assertTrue($response->isRedirect(), "Response is not a redirect, got:\n".(($p = strpos($response, '-->')) ? substr($response, 0, $p + 3) : $response));

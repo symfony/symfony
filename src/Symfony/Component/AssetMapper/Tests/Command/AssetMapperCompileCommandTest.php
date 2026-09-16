@@ -18,7 +18,6 @@ use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -143,14 +142,12 @@ class AssetMapperCompileCommandTest extends TestCase
         $this->kernel->boot();
         $application = new Application($this->kernel);
         $container = $this->kernel->getContainer();
-        $dispatcher = $container->get('event_dispatcher');
-        \assert($dispatcher instanceof EventDispatcherInterface);
 
         $listenerCalled = false;
-        $dispatcher->addListener(PreAssetsCompileEvent::class, function (PreAssetsCompileEvent $event) use (&$listenerCalled) {
+        $container->get('pre_assets_compile_listener')->listener = function (PreAssetsCompileEvent $event) use (&$listenerCalled) {
             $listenerCalled = true;
             $this->assertInstanceOf(OutputInterface::class, $event->getOutput());
-        });
+        };
 
         $command = $application->find('asset-map:compile');
         $tester = new CommandTester($command);

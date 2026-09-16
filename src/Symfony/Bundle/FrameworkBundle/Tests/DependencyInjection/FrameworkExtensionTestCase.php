@@ -33,6 +33,8 @@ use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -1932,13 +1934,61 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testSerializerCacheUsedWithoutAnnotationsAndMappingFiles()
     {
-        $container = $this->createContainerFromFile('serializer_mapping_without_annotations', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
-        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+        $container = $this->createContainerFromFile('serializer_mapping_attributes_disabled', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
+        $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+    }
+
+    public function testSerializerCacheUsesTheClearablePoolInDebug()
+    {
+        $container = $this->createContainerFromFile('serializer_mapping_attributes_disabled', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
+
+        $cache = $container->getDefinition('serializer.mapping.cache_class_metadata_factory')->getArgument(1);
+        $this->assertEquals(new Reference('cache.serializer'), $cache);
+    }
+
+    public function testSerializerMappingFilesAreTrackedWhenCacheIsUsed()
+    {
+        $container = $this->createContainerFromFile('serializer_mapping_attributes_disabled', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__, 'kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle']]]);
+        $configDir = strtr(__DIR__.'/Fixtures/TestBundle/Resources/config', '\\', '/');
+
+        $files = [];
+        $directories = [];
+        foreach ($container->getResources() as $resource) {
+            if ($resource instanceof FileResource) {
+                $files[] = strtr($resource->getResource(), '\\', '/');
+            } elseif ($resource instanceof DirectoryResource) {
+                $directories[strtr($resource->getResource(), '\\', '/')] = $resource->getPattern();
+            }
+        }
+
+        $this->assertContains($configDir.'/serialization.yml', $files);
+        $this->assertContains($configDir.'/serialization.xml', $files);
+        $this->assertContains($configDir.'/serializer_mapping/serialization.yml', $files);
+        $this->assertSame('/\\.(xml|ya?ml)$/', $directories[$configDir.'/serializer_mapping/files']);
+    }
+
+    public function testSerializerMappingFilesAreNotTrackedWhenCacheIsNotUsed()
+    {
+        $container = $this->createContainerFromFile('serializer_mapping', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__, 'kernel.bundles_metadata' => ['TestBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle']]]);
+        $configDir = strtr(__DIR__.'/Fixtures/TestBundle/Resources/config', '\\', '/');
+
+        $files = [];
+        $directories = [];
+        foreach ($container->getResources() as $resource) {
+            if ($resource instanceof FileResource) {
+                $files[] = strtr($resource->getResource(), '\\', '/');
+            } elseif ($resource instanceof DirectoryResource) {
+                $directories[strtr($resource->getResource(), '\\', '/')] = $resource->getPattern();
+            }
+        }
+        $this->assertNotContains($configDir.'/serialization.yml', $files);
+        $this->assertNotContains($configDir.'/serializer_mapping/serialization.yml', $files);
+        $this->assertSame('/^$/', $directories[$configDir.'/serializer_mapping/files']);
     }
 
     public function testSerializerCacheUsedWithoutAnnotationsAndMappingFilesNoDebug()
     {
-        $container = $this->createContainerFromFile('serializer_mapping_without_annotations', ['kernel.debug' => false, 'kernel.container_class' => __CLASS__]);
+        $container = $this->createContainerFromFile('serializer_mapping_attributes_disabled', ['kernel.debug' => false, 'kernel.container_class' => __CLASS__]);
         $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
     }
 
@@ -2227,6 +2277,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('cache.taggable', $iterator->getTag());
         $this->assertSame('pool', $iterator->getIndexAttribute());
         $this->assertTrue($iterator->needsIndexes());
+    }
+
+    public function testCachePoolClearerIsRegisteredInDebugWithoutTheProfiler()
+    {
+        $container = $this->createContainerFromFile('serializer_mapping_without_annotations', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
+
+        $this->assertFalse($container->hasDefinition('data_collector.cache'));
+        $this->assertTrue($container->hasDefinition('cache_pool_clearer.cache_warmer'));
+    }
+
+    public function testCachePoolClearerIsNotRegisteredWithoutDebug()
+    {
+        $container = $this->createContainerFromFile('serializer_mapping_without_annotations', ['kernel.debug' => false, 'kernel.container_class' => __CLASS__]);
+
+        $this->assertFalse($container->hasDefinition('cache_pool_clearer.cache_warmer'));
     }
 
     public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()

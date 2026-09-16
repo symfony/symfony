@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-04T13:45:39Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "8.2 for features / 6.4, 7.4, 8.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T15:38:41Z
+
+Coming back to this with a smaller shape to propose.
+
+The outcome is already reachable today for provider-declared tasks. This routes to `async` on 8.2 with the option off:
+
+```php
+RecurringMessage::every(1, new RedispatchMessage(new MyTask()))
+```
+
+So the real gap is only the attribute-declared ones, where there is nowhere to wrap by hand. And that gap is one line. `AddScheduleMessengerPass` tests `if ($tagAttributes['transports'] ?? null)`, so `transports: []` is falsy and does nothing at all today. If `transports: []` meant "use the senders configured in `framework.messenger.routing`", you would get:
+
+```php
+#[AsCronTask('0 * * * *', transports: [])]
+```
+
+per task, opt-in, additive, no config key, no deprecation, and no default to flip in 9.0.
+
+Three things about the current shape push me that way rather than just asking for fixes:
+
+The option does not do what its name says. `#[AsSchedule]` provider messages are not wrapped: with the option set to `true` the provider still yields the raw message. Only attribute-declared tasks are affected, while the name, the `info()` and both CHANGELOG entries describe the general case.
+
+An env var silently inverts it. `use_messenger_routing: '%env(bool:X)%'` with `X=0` passes validation, and the pass then reads the unresolved placeholder as truthy, so the message is wrapped and sent to `async`. That needs to throw.
+
+And it silently no-ops on older Messenger. FrameworkBundle allows `symfony/messenger: ^7.4.10|^8.0.10`, but the empty `transportNames` semantics only exist in 8.2. Running the 8.2 pass against the 7.4 handler, the option set to `true` gives `sync calls: ["ran-sync"], async holds: 0`. low-deps installs 7.4.10.
+
+Two smaller ones either way: `scheduler.use_messenger_routing` lands in the compiled container as a public parameter and wants a leading dot, and `RedispatchMessage::__toString()` renders `@App\Task via ` with a dangling "via", which this PR makes the common case and which shows up in `scheduler:debug`.
+
+Also, the first commit here is the pre-rebase copy of #65143, which merged on 2026-08-06.
+
+If you would rather keep the config option, none of the above is fatal, but the `transports: []` route gets the same result with none of the surface. What do you think?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-08-18T09:12:42Z
+
+> ```
+> RecurringMessage::every(1, new RedispatchMessage(new MyTask()))
+> ```
+
+⬆️ dI don't want to write this. I want to write ⬇️
+
+```
+RecurringMessage::every(1, new MyTask())
+```
+
+The first syntax is really now obvious, and it's unexpected it does not use the default routing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T16:11:03Z
+
+@lyrixx agreed on the destination. `RecurringMessage::every(1, new MyTask())` goes through the bus, and everywhere else in Symfony that means routing applies. The scheduler being the one exception is the wart, and your "unexpected" is the argument: the current behavior should not stay the default.
+
+That changes what this option is, though. Not a permanent preference, but a migration flag toward routing-by-default in 9.0, on the usual pattern: option defaults to the legacy behavior, deprecation when unset, default flips in 9.0, option removed later. I'm in favor of taking it in that shape. What it needs to get there:
+
+1. Cover every scheduled task, attribute-declared and `#[AsSchedule]` provider messages alike. Right now provider messages are not wrapped: with the option enabled the provider still yields the raw message, while the name, the `info()` and both CHANGELOG entries describe the general case.
+2. Fix the env-var trap: the value is consumed at compile time, so `use_messenger_routing: '%env(bool:...)%'` is truthy whatever the variable holds. Either reject env placeholders with a clear message or resolve them.
+3. Wire the deprecation for not setting the option, so 8.x apps are told the default will flip and can pick a side.
+
+Who pays on the flip: apps that route a class async in messenger *and* schedule it expecting inline execution in the scheduler worker. They get the whole 8.x window plus explicit `transports` as the escape hatch, which deserves an UPGRADE note.
+
+If the provider half is more than you want to sign up for here, the minimal fallback stays available: `transports: []` on the attributes meaning "use messenger routing" (one line in `AddScheduleMessengerPass`) and the default stays put. But since your goal is the new default, the flag is the shape that gets you there.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-08-25T09:35:19Z
+
+I made some changes. Is it better?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-27T10:24:35Z
+
+Thanks for the rework, I verified it end to end: provider and attribute tasks both follow `framework.messenger.routing` when the option is on, the env placeholder throws, and the parameter is gone from the compiled container.
+
+One thing to state clearly, in the description and in the option's `info()`: when the option is on and a scheduled message class has a route (a `'*'` catch-all counts, since attribute tasks are `ServiceCallMessage` / `RunCommandMessage`), the task is sent to that transport. A consumer must run for it, or the task is queued and never executes, with nothing logged beyond "Sending message". Retries, the failure transport and serialization of the message arguments apply from then on. `transports: 'sync'` on the attribute, or a `sync` route for the class, keeps a task inline.
+
+Since new apps should start with the option on, please also open a symfony/recipes PR that sets `use_messenger_routing: true` in the framework recipe for 8.2.
+
+Remaining findings:
+
+- `symfony/scheduler` still allows `symfony/messenger: ^7.4|^8.0`. Below 8.2, `RedispatchMessageHandler` sets an empty `TransportNamesStamp` and `SendersLocator` yields no sender, so the option is a silent no-op there. Bump to `^8.2` (and the FrameworkBundle conflict rule).
+- The `AddScheduleMessengerPass` change is redundant now: `SchedulerTransport` wraps every message the generator yields, attribute tasks included. Its only visible effect is `debug:scheduler` showing `RedispatchMessage (@my.service)` for attribute tasks while provider tasks keep their class name. Please drop the pass change, its tests and the parameter read there.
+- The Scheduler CHANGELOG describes that pass change and names a parameter that no longer exists in that form. It should list the new `$useMessengerRouting` constructor argument of `SchedulerTransport` and `SchedulerTransportFactory` instead.
+- Optional: the deprecation fires for every app that has the scheduler installed, even with no task. Passing the tri-state down and triggering it once in `SchedulerTransport`, when an unwrapped message is actually yielded, would only warn apps that are affected.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-09-09T12:27:11Z
+
+Thanks for the thorough review! Addressed everything in 3f3a8bad26a:
+
+- Dropped the `AddScheduleMessengerPass` change, its tests and the parameter read there — `SchedulerTransport` already covers everything, so it was indeed redundant.
+- Fixed the Scheduler CHANGELOG entry to describe the actual `$useMessengerRouting` constructor argument on `SchedulerTransport`/`SchedulerTransportFactory`.
+- Bumped `symfony/scheduler`'s `symfony/messenger` requirement to `^8.2` and widened the `symfony/framework-bundle` conflict rule to `<8.2` accordingly.
+- Moved the deprecation into `SchedulerTransport::get()`, firing lazily only when an actual unwrapped message is yielded, so an idle install (scheduler present, nothing due) stays quiet.
+- Reworded the option's `info()` and the PR description with the exact behavior you described: routed message class → sent to that transport, needs a running consumer or it queues forever, retries/failure transport/serialization apply from there, `sync://` (or `transports: 'sync'`) to keep a task inline.
+
+Also opened symfony/recipes#1573 to set `use_messenger_routing: true` in the scheduler recipe for 8.2.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-09-16T15:39:58Z
+
+Rebased, again 🥵
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-16T16:27:21Z
+
+Thanks for the rework, that shape is right. I verified it end to end, with a real worker over a real bus, and amended the branch rather than sending you another round.
+
+Two consequences of wrapping were not visible from the diff, and the option turns both into the default path:
+
+- The scheduler events carried the `RedispatchMessage`, not the scheduled message, so a listener matching on the task class stopped matching as soon as the option was on. This happened even when nothing was routed. `DispatchSchedulerEventListener` now unwraps.
+- `ScheduledStamp` carries the trigger, so a task triggered by a `CallbackTrigger` died at send time with `Serialization of 'Closure' is not allowed` and never ran. `MessageContext::__serialize()` now stores the trigger description and restores a `SerializedTrigger`, the same degradation the `TriggerInterface` normalizer already did for the Symfony serializer. Old payloads still decode.
+
+Both were reachable before this PR by writing `RedispatchMessage` by hand, so they are fixed here rather than in a separate PR.
+
+The rest is mechanical: the messenger constraint moved into `conflict` too, since `require-dev` only pins our own CI and `SchedulerBundle` can be registered without FrameworkBundle; the `info()` text is two sentences, with the long version in the description where `config:dump-reference` does not have to print it; the changelog entries are one line each; import order.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-16T16:46:16Z
+
+Correction to my previous comment: the trigger degradation moved from `MessageContext` to `ScheduledStamp`, and it is now a `__serialize()` with no `__unserialize()` at all.
+
+The version I described added `MessageContext::__unserialize()`, which assigned `$data['name']` and `$data['id']` into `string`-typed properties. PHP's own unserialize rejects an object there with a `TypeError`, but an assignment inside `__unserialize()` runs in coercive mode, so a `Stringable` in the payload fires `__toString()`: a new trampoline into a gadget chain. `UnserializeToStringTrampolineRule` did not catch it, because its guard check is method-wide and the unrelated `is_string($data['trigger'])` in the same method counted as the guard. All 13 checks were green on that commit.
+
+`ScheduledStamp::__serialize()` returns the rebuilt context under the same `messageContext` key and defines no `__unserialize()`, so PHP restores the property natively, with its strict type check intact, and payloads written before 8.2 decode unchanged. No string-typed property is ever assigned from a payload.

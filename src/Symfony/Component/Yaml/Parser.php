@@ -210,12 +210,14 @@ class Parser
                             || self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#', $this->trimTag($values['value']), $matches)
                         )
                     ) {
+                        $currentLineNumber = $this->getRealCurrentLineNb();
+
                         $block = $values['value'];
                         if ($this->isNextLineIndented() || isset($matches['value']) && '>-' === $matches['value']) {
                             $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + \strlen($values['leadspaces']) + 1);
                         }
 
-                        $data[] = $this->parseBlock($this->getRealCurrentLineNb(), $block, $flags);
+                        $data[] = $this->parseBlock($currentLineNumber, $block, $flags);
                     } else {
                         $data[] = $this->parseValue($values['value'], $flags, $context);
                     }
@@ -284,12 +286,14 @@ class Parser
 
                         $data += $refValue; // array union
                     } else {
+                        $currentLineNumber = $this->getRealCurrentLineNb();
+
                         if (isset($values['value']) && '' !== $values['value']) {
                             $value = $values['value'];
                         } else {
                             $value = $this->getNextEmbedBlock();
                         }
-                        $parsed = $this->parseBlock($this->getRealCurrentLineNb() + 1, $value, $flags);
+                        $parsed = $this->parseBlock($currentLineNumber + 1, $value, $flags);
 
                         if (Yaml::PARSE_OBJECT_FOR_MAP & $flags && $parsed instanceof \stdClass) {
                             $parsed = (array) $parsed;

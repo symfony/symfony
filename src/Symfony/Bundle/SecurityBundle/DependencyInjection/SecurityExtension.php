@@ -63,6 +63,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
 
 /**
  * SecurityExtension.
@@ -558,6 +559,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ->setDefinition('security.listener.user_checker.'.$id, new ChildDefinition('security.listener.user_checker'))
             ->replaceArgument(0, new Reference('security.user_checker.'.$id))
             ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+
+        if ($firewall['user_checker_on_refresh']) {
+            if ($firewall['stateless']) {
+                throw new InvalidConfigurationException(\sprintf('The "user_checker_on_refresh" option of the "%s" firewall requires a stateful firewall, as a stateless one never refreshes the user from a session.', $id));
+            }
+
+            $container
+                ->setDefinition('security.listener.user_checker_on_refresh.'.$id, new ChildDefinition('security.listener.user_checker_on_refresh'))
+                ->replaceArgument(0, new Reference('security.user_checker.'.$id))
+                ->addTag('kernel.event_listener', ['dispatcher' => $firewallEventDispatcherId, 'event' => CheckRefreshedUserEvent::class]);
+        }
 
         $listeners[] = new Reference('security.firewall.authenticator.'.$id);
 

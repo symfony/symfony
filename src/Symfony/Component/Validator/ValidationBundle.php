@@ -32,6 +32,8 @@ use Symfony\Component\Validator\DependencyInjection\AddValidatorSecurityExpressi
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Validator\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
+use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
+use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 
 /**
  * Provides the services that validate objects against their constraints.
@@ -39,6 +41,8 @@ use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 #[RequiredBundle(ServicesBundle::class)]
 class ValidationBundle extends AbstractBundle
 {
+    private const MAPPING_FILE_PATTERN = '/\.(xml|ya?ml)$/';
+
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
@@ -167,7 +171,8 @@ class ValidationBundle extends AbstractBundle
         $container->setParameter('.validator.translation_domain', $config['translation_domain']);
 
         $files = ['xml' => [], 'yml' => []];
-        $this->registerValidatorMapping($container, $config, $files);
+        $mappedClasses = [];
+        $this->registerValidatorMapping($container, $config, $files, $mappedClasses);
 
         if ($files['xml']) {
             $validatorBuilder->addMethodCall('addXmlMappings', [$files['xml']]);
@@ -175,6 +180,10 @@ class ValidationBundle extends AbstractBundle
 
         if ($files['yml']) {
             $validatorBuilder->addMethodCall('addYamlMappings', [$files['yml']]);
+        }
+
+        if ($mappedClasses) {
+            $validatorBuilder->addMethodCall('addMappedClasses', [$mappedClasses]);
         }
 
         $container->findDefinition('validator.email')->replaceArgument(0, $config['email_validation_mode']);
@@ -232,12 +241,20 @@ class ValidationBundle extends AbstractBundle
         }
     }
 
-    private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files): void
+    private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files, array &$mappedClasses): void
     {
         $parameterBag = $container->getParameterBag();
-        // mapping files are collected from the filesystem as literals and handed back to the container
-        $fileRecorder = static function ($extension, $path) use (&$files, $parameterBag) {
-            $files['yaml' === $extension ? 'yml' : $extension][] = $parameterBag->escapeValue($path);
+        // mapping files are collected from the filesystem as literals and handed back to the container,
+        // together with the classes they map, so that the chain can skip them for the other classes
+        $fileRecorder = static function ($extension, $path) use (&$files, &$mappedClasses, $parameterBag) {
+            $isYaml = 'yaml' === $extension || 'yml' === $extension;
+            $files[$isYaml ? 'yml' : $extension][] = $escapedPath = $parameterBag->escapeValue($path);
+
+            try {
+                $mappedClasses[$escapedPath] = array_flip(($isYaml ? new YamlFileLoader($path) : new XmlFileLoader($path))->getMappedClasses());
+            } catch (\Exception) {
+                // a file that cannot be read now is read for every class, which reports the error when it is loaded
+            }
         };
 
         if (!ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/framework-bundle', 'symfony/validator'])) {
@@ -249,32 +266,32 @@ class ValidationBundle extends AbstractBundle
             $configDir = is_dir($bundlePath.'/Resources/config') ? $bundlePath.'/Resources/config' : $bundlePath.'/config';
 
             if (
-                $container->fileExists($file = $configDir.'/validation.yaml', false)
-                || $container->fileExists($file = $configDir.'/validation.yml', false)
+                $container->fileExists($file = $configDir.'/validation.yaml')
+                || $container->fileExists($file = $configDir.'/validation.yml')
             ) {
                 $fileRecorder('yml', $file);
             }
 
-            if ($container->fileExists($file = $configDir.'/validation.xml', false)) {
+            if ($container->fileExists($file = $configDir.'/validation.xml')) {
                 $fileRecorder('xml', $file);
             }
 
-            if ($container->fileExists($dir = $configDir.'/validation', '/^$/')) {
+            if ($container->fileExists($dir = $configDir.'/validation', self::MAPPING_FILE_PATTERN)) {
                 $this->registerMappingFilesFromDir($dir, $fileRecorder);
             }
         }
 
         $projectDir = $parameterBag->unescapeValue($container->getParameter('kernel.project_dir'));
-        if ($container->fileExists($dir = $projectDir.'/config/validator', '/^$/')) {
+        if ($container->fileExists($dir = $projectDir.'/config/validator', self::MAPPING_FILE_PATTERN)) {
             $this->registerMappingFilesFromDir($dir, $fileRecorder);
         }
 
         foreach ($parameterBag->unescapeValue($config['mapping']['paths']) as $path) {
             if (is_dir($path)) {
                 $this->registerMappingFilesFromDir($path, $fileRecorder);
-                $container->addResource(new DirectoryResource($path, '/^$/'));
-            } elseif ($container->fileExists($path, false)) {
-                if (!preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
+                $container->addResource(new DirectoryResource($path, self::MAPPING_FILE_PATTERN));
+            } elseif ($container->fileExists($path)) {
+                if (!preg_match(self::MAPPING_FILE_PATTERN, $path, $matches)) {
                     throw new \RuntimeException(\sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
                 }
                 $fileRecorder($matches[1], $path);
@@ -289,7 +306,7 @@ class ValidationBundle extends AbstractBundle
      */
     private function registerMappingFilesFromDir(string $dir, callable $fileRecorder): void
     {
-        foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
+        foreach (Finder::create()->followLinks()->files()->in($dir)->name(self::MAPPING_FILE_PATTERN)->sortByName() as $file) {
             $fileRecorder($file->getExtension(), $file->getRealPath());
         }
     }

@@ -154,7 +154,7 @@ return static function (ContainerConfigurator $container) {
 
         // Loader
         ->set('serializer.mapping.chain_loader', LoaderChain::class)
-            ->args([[]])
+            ->args([[], []])
 
         ->set('serializer.mapping.attribute_loader', AttributeLoader::class)
             ->args([true, []])

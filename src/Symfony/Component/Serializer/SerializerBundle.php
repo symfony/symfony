@@ -157,7 +157,6 @@ class SerializerBundle extends AbstractBundle
         // mode; metadata read from mapping files can be, because the container is rebuilt when one
         // of these files changes, which clears the pool the metadata is stored in
         $cacheMetadata = !$attributesEnabled || !$container->getParameter('kernel.debug');
-        $mappingDirPattern = $cacheMetadata ? self::MAPPING_FILE_PATTERN : '/^$/';
 
         if (!$cacheMetadata) {
             $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
@@ -203,40 +202,50 @@ class SerializerBundle extends AbstractBundle
             ->replaceArgument(0, $config['enable_attributes'] ?? false);
 
         $parameterBag = $container->getParameterBag();
-        // mapping files are collected from the filesystem as literals and handed back to the container
-        $fileRecorder = static function ($extension, $path) use (&$serializerLoaders, $parameterBag) {
-            $definition = new Definition(\in_array($extension, ['yaml', 'yml'], true) ? YamlFileLoader::class : XmlFileLoader::class, [$parameterBag->escapeValue($path)]);
-            $serializerLoaders[] = $definition;
+        $mappedClasses = [];
+        // mapping files are collected from the filesystem as literals and handed back to the container,
+        // together with the classes they map, so that the chain can skip them for the other classes
+        $fileRecorder = static function ($extension, $path) use (&$serializerLoaders, &$mappedClasses, $parameterBag) {
+            $class = \in_array($extension, ['yaml', 'yml'], true) ? YamlFileLoader::class : XmlFileLoader::class;
+
+            try {
+                $mappedClasses[\count($serializerLoaders)] = array_flip((new $class($path))->getMappedClasses());
+            } catch (\Exception) {
+                // a file that cannot be read now is read for every class, which reports the error when it is loaded
+            }
+
+            $serializerLoaders[] = new Definition($class, [$parameterBag->escapeValue($path)]);
         };
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
             $bundlePath = $parameterBag->unescapeValue($bundle['path']);
             $configDir = is_dir($bundlePath.'/Resources/config') ? $bundlePath.'/Resources/config' : $bundlePath.'/config';
 
-            if ($container->fileExists($file = $configDir.'/serialization.xml', $cacheMetadata)) {
+            if ($container->fileExists($file = $configDir.'/serialization.xml')) {
                 $fileRecorder('xml', $file);
             }
 
             if (
-                $container->fileExists($file = $configDir.'/serialization.yaml', $cacheMetadata)
-                || $container->fileExists($file = $configDir.'/serialization.yml', $cacheMetadata)
+                $container->fileExists($file = $configDir.'/serialization.yaml')
+                || $container->fileExists($file = $configDir.'/serialization.yml')
             ) {
                 $fileRecorder('yml', $file);
             }
 
-            if ($container->fileExists($dir = $configDir.'/serialization', $mappingDirPattern)) {
+            if ($container->fileExists($dir = $configDir.'/serialization', self::MAPPING_FILE_PATTERN)) {
                 $this->registerMappingFilesFromDir($dir, $fileRecorder);
             }
         }
 
         $projectDir = $parameterBag->unescapeValue($container->getParameter('kernel.project_dir'));
-        if ($container->fileExists($dir = $projectDir.'/config/serializer', $mappingDirPattern)) {
+        if ($container->fileExists($dir = $projectDir.'/config/serializer', self::MAPPING_FILE_PATTERN)) {
             $this->registerMappingFilesFromDir($dir, $fileRecorder);
         }
 
-        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder, $cacheMetadata);
+        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
 
         $chainLoader->replaceArgument(0, $serializerLoaders);
+        $chainLoader->replaceArgument(1, $mappedClasses);
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
         if ($config['name_converter'] ?? false) {
@@ -268,13 +277,13 @@ class SerializerBundle extends AbstractBundle
         });
     }
 
-    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder, bool $trackContents): void
+    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder): void
     {
         foreach ($container->getParameterBag()->unescapeValue($config['mapping']['paths']) as $path) {
             if (is_dir($path)) {
                 $this->registerMappingFilesFromDir($path, $fileRecorder);
-                $container->addResource(new DirectoryResource($path, $trackContents ? self::MAPPING_FILE_PATTERN : '/^$/'));
-            } elseif ($container->fileExists($path, $trackContents)) {
+                $container->addResource(new DirectoryResource($path, self::MAPPING_FILE_PATTERN));
+            } elseif ($container->fileExists($path)) {
                 if (!preg_match(self::MAPPING_FILE_PATTERN, $path, $matches)) {
                     throw new \RuntimeException(\sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
                 }

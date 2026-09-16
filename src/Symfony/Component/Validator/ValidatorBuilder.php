@@ -45,6 +45,7 @@ class ValidatorBuilder
     private array $yamlMappings = [];
     private array $methodMappings = [];
     private array $attributeMappings = [];
+    private array $mappedClasses = [];
     private bool $enableAttributeMapping = false;
     private ?MetadataFactoryInterface $metadataFactory = null;
     private ConstraintValidatorFactoryInterface $validatorFactory;
@@ -176,6 +177,26 @@ class ValidatorBuilder
      *
      * @return $this
      */
+    /**
+     * Declares which classes are mapped by the given mapping files.
+     *
+     * Files missing from this list are read for every class.
+     *
+     * @param array<string, array<class-string, mixed>> $classesByFile The classes mapped by each file, given as keys
+     *
+     * @throws ValidatorException When the ValidatorBuilder is already initialized with a custom metadata factory
+     */
+    public function addMappedClasses(array $classesByFile): static
+    {
+        if (null !== $this->metadataFactory) {
+            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+        }
+
+        $this->mappedClasses = array_merge($this->mappedClasses, $classesByFile);
+
+        return $this;
+    }
+
     public function addMethodMapping(string $methodName): static
     {
         if (null !== $this->metadataFactory) {
@@ -356,25 +377,7 @@ class ValidatorBuilder
      */
     public function getLoaders(): array
     {
-        $loaders = [];
-
-        foreach ($this->xmlMappings as $xmlMapping) {
-            $loaders[] = new XmlFileLoader($xmlMapping);
-        }
-
-        foreach ($this->yamlMappings as $yamlMappings) {
-            $loaders[] = new YamlFileLoader($yamlMappings);
-        }
-
-        foreach ($this->methodMappings as $methodName) {
-            $loaders[] = new StaticMethodLoader($methodName);
-        }
-
-        if ($this->enableAttributeMapping || $this->attributeMappings) {
-            $loaders[] = new AttributeLoader($this->enableAttributeMapping, $this->attributeMappings);
-        }
-
-        return array_merge($loaders, $this->loaders);
+        return $this->createLoaders()[0];
     }
 
     /**
@@ -385,11 +388,11 @@ class ValidatorBuilder
         $metadataFactory = $this->metadataFactory;
 
         if (!$metadataFactory) {
-            $loaders = $this->getLoaders();
+            [$loaders, $mappedClasses] = $this->createLoaders();
             $loader = null;
 
-            if (\count($loaders) > 1) {
-                $loader = new LoaderChain($loaders);
+            if (\count($loaders) > 1 || $mappedClasses) {
+                $loader = new LoaderChain($loaders, $mappedClasses);
             } elseif (1 === \count($loaders)) {
                 $loader = $loaders[0];
             }
@@ -414,5 +417,40 @@ class ValidatorBuilder
         $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
 
         return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers, $this->groupProviderLocator, $this->propertyMetadataExistenceCheck);
+    }
+
+    /**
+     * @return array{0: LoaderInterface[], 1: array<int, array<class-string, mixed>>}
+     */
+    private function createLoaders(): array
+    {
+        $loaders = [];
+        $mappedClasses = [];
+
+        foreach ($this->xmlMappings as $xmlMapping) {
+            if (isset($this->mappedClasses[$xmlMapping])) {
+                $mappedClasses[\count($loaders)] = $this->mappedClasses[$xmlMapping];
+            }
+
+            $loaders[] = new XmlFileLoader($xmlMapping);
+        }
+
+        foreach ($this->yamlMappings as $yamlMapping) {
+            if (isset($this->mappedClasses[$yamlMapping])) {
+                $mappedClasses[\count($loaders)] = $this->mappedClasses[$yamlMapping];
+            }
+
+            $loaders[] = new YamlFileLoader($yamlMapping);
+        }
+
+        foreach ($this->methodMappings as $methodName) {
+            $loaders[] = new StaticMethodLoader($methodName);
+        }
+
+        if ($this->enableAttributeMapping || $this->attributeMappings) {
+            $loaders[] = new AttributeLoader($this->enableAttributeMapping, $this->attributeMappings);
+        }
+
+        return [array_merge($loaders, $this->loaders), $mappedClasses];
     }
 }

@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
@@ -34,6 +35,8 @@ use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\SerializerBundle;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 
 class SerializerBundleTest extends TestCase
 {
@@ -156,11 +159,26 @@ class SerializerBundleTest extends TestCase
         $this->assertContains(strtr(__DIR__.'/Fixtures/serialization.yml', '\\', '/'), $this->trackedFiles($container));
     }
 
-    public function testSerializerMappingFilesAreNotTrackedWhenCacheIsNotUsed()
+    public function testSerializerMappingFilesAreTrackedWhenCacheIsNotUsed()
     {
         $container = $this->load(['enable_attributes' => true, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]], debug: true);
 
-        $this->assertNotContains(strtr(__DIR__.'/Fixtures/serialization.yml', '\\', '/'), $this->trackedFiles($container));
+        $this->assertContains(strtr(__DIR__.'/Fixtures/serialization.yml', '\\', '/'), $this->trackedFiles($container));
+    }
+
+    public function testMappingFilesDeclareTheClassesTheyMap()
+    {
+        $container = $this->load(['enable_attributes' => true, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]]);
+
+        $loaders = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
+        $mappedClasses = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(1);
+
+        $this->assertEquals(new Reference('serializer.mapping.attribute_loader'), $loaders[0]);
+        $this->assertArrayNotHasKey(0, $mappedClasses, 'the attribute loader is used for every class');
+        $this->assertSame(YamlFileLoader::class, $loaders[1]->getClass());
+        $this->assertArrayHasKey(GroupDummy::class, $mappedClasses[1]);
+        $this->assertArrayHasKey(ContextDummy::class, $mappedClasses[1]);
+        $this->assertArrayNotHasKey(\stdClass::class, $mappedClasses[1]);
     }
 
     /**

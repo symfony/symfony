@@ -153,14 +153,14 @@ class SerializerBundleTest extends TestCase
     {
         $container = $this->load(['enable_attributes' => false, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]], debug: true);
 
-        $this->assertContains(__DIR__.'/Fixtures/serialization.yml', $this->trackedFiles($container));
+        $this->assertContains(strtr(__DIR__.'/Fixtures/serialization.yml', '\\', '/'), $this->trackedFiles($container));
     }
 
     public function testSerializerMappingFilesAreNotTrackedWhenCacheIsNotUsed()
     {
         $container = $this->load(['enable_attributes' => true, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]], debug: true);
 
-        $this->assertNotContains(__DIR__.'/Fixtures/serialization.yml', $this->trackedFiles($container));
+        $this->assertNotContains(strtr(__DIR__.'/Fixtures/serialization.yml', '\\', '/'), $this->trackedFiles($container));
     }
 
     /**
@@ -171,7 +171,7 @@ class SerializerBundleTest extends TestCase
         $files = [];
         foreach ($container->getResources() as $resource) {
             if ($resource instanceof FileResource) {
-                $files[] = $resource->getResource();
+                $files[] = strtr($resource->getResource(), '\\', '/');
             }
         }
 

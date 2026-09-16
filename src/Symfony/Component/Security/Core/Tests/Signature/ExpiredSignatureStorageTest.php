@@ -47,7 +47,7 @@ class ExpiredSignatureStorageTest extends TestCase
         $item->expects($this->once())->method('expiresAfter')->with(600);
 
         $cache = $this->createMock(CacheItemPoolInterface::class);
-        $cache->method('getItem')->with(rawurlencode('hash+more'))->willReturn($item);
+        $cache->expects($this->once())->method('getItem')->with(rawurlencode('hash+more'))->willReturn($item);
         $cache->expects($this->once())->method('save')->with($item);
 
         $storage = new ExpiredSignatureStorage($cache, 600);

@@ -10,7 +10,8 @@ CHANGELOG
  * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when `IS_AUTHENTICATED_RECENTLY` or `IS_AUTHENTICATED_VERY_RECENTLY` is denied
  * Add `IsGrantedContext::isAuthenticatedVeryRecently()`
  * Record the OIDC `amr` and `auth_time` claims as the authentication proofs of the token, so `max_age` and `IS_AUTHENTICATED_RECENTLY` agree
- * Add `AuthenticationTimeListener`, which records the last interactive authentication as an authentication proof of the token and carries the proofs over when a re-authentication of the same user replaces the token
+ * Add `AuthenticationProofsListener`, which records an interactive authentication as an authentication proof of the token, under the methods its `AuthenticationMethodBadge` states, and carries the proofs over when a re-authentication of the same user replaces the token
+ * Add `AuthenticationMethodBadge`, for an authenticator to state which authentication methods it verified; `form_login`, `json_login` and `http_basic` state `AuthenticationMethod::PASSWORD`
  * Add `allowed_time_drift` option to `OidcTokenHandler` to configure time tolerance for token validation (`iat`, `nbf`, `exp` claims)
  * Expose the OAuth2 scopes an access token was granted as the `oauth2_scope` token attribute, read from the `scope` or `scp` claim
  * Add `OAuth2ScopeVoter` to require scopes of the access token, all the ones an `OAUTH2_SCOPE(...)` attribute lists

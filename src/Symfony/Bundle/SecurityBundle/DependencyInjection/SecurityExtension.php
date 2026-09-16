@@ -392,7 +392,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $firewallEventDispatcherId = 'security.event_dispatcher.'.$id;
 
         $container
-            ->setDefinition('security.listener.authentication_time.'.$id, new ChildDefinition('security.listener.authentication_time'))
+            ->setDefinition('security.listener.authentication_proofs.'.$id, new ChildDefinition('security.listener.authentication_proofs'))
             ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
         // Provider id (must be configured explicitly per firewall/authenticator if more than one provider is set)

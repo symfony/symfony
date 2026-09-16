@@ -1437,7 +1437,7 @@ class OidcLoginAuthenticatorTest extends TestCase
     public function testCreateTokenLeavesTheAuthenticationTimeUnsetWithoutTheClaim()
     {
         // the claim is only mandatory when "max_age" is requested; without it
-        // AuthenticationTimeListener falls back to recording the login instant
+        // AuthenticationProofsListener falls back to recording the login instant
         $nonce = bin2hex(random_bytes(16));
         $state = bin2hex(random_bytes(16));
 
@@ -1458,7 +1458,7 @@ class OidcLoginAuthenticatorTest extends TestCase
     public function testCreateTokenRecordsTheMethodsOfTheAmrClaimAtTheLoginInstantWithoutTheAuthTimeClaim()
     {
         // without "auth_time", the login instant is all that is known about when, which is
-        // what AuthenticationTimeListener would record anyway; the methods are still worth keeping
+        // what AuthenticationProofsListener would record anyway; the methods are still worth keeping
         $nonce = bin2hex(random_bytes(16));
         $state = bin2hex(random_bytes(16));
         $clock = new MockClock('2026-09-06 12:00:00');

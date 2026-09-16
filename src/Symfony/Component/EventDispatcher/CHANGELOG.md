@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `CompiledEventDispatcher`, which dispatches to listeners a container described at compile time, and `CompileListenersPass`, which describes them
  * Allow `getSubscribedEvents()` to name its keys: `['method' => 'onEvent', 'priority' => 10]`
 
 8.1

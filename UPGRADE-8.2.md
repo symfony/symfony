@@ -62,6 +62,17 @@ DoctrineBridge
    Also note that `DoctrineDbalPingConnectionMiddleware` does not reset closed entity managers as its deprecated
    counterpart did: workers already reset them between messages
 
+EventDispatcher
+---------------
+
+ * The `event_dispatcher` service is a `CompiledEventDispatcher` in production, where it used to be an
+   `EventDispatcher`. Both implement `EventDispatcherInterface`, which is what to type against; the compiled
+   one holds the identifier and the method of each listener instead of a closure per listener, and fetches a
+   listener from a service locator when it is about to run
+ * `CompileListenersPass` moves the `addListener()` calls of a dispatcher definition into that map. It is
+   registered at `PassConfig::TYPE_AFTER_REMOVING`, so a compiler pass reading those calls still finds them
+   as long as it runs before that
+
 Filesystem
 ----------
 

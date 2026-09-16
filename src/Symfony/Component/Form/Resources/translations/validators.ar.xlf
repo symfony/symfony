@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>
-                <target state="needs-review-translation">يجب ألا يكون الحد الأدنى أكبر من الحد الأعلى.</target>
+                <target>يجب ألا يكون الحد الأدنى أكبر من الحد الأعلى.</target>
             </trans-unit>
         </body>
     </file>

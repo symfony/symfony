@@ -24,6 +24,9 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Sequentially;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
@@ -119,6 +122,7 @@ class YamlFileLoaderTest extends TestCase
         $expected->addPropertyConstraint('firstName', new NotNull());
         $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
         $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
+        $expected->addPropertyConstraint('firstName', new Sequentially([new Type('object'), new Valid()]));
         $expected->addPropertyConstraint('firstName', new Collection(fields: [
             'foo' => [new NotNull(), new Range(min: 3)],
             'bar' => [new Range(min: 5)],

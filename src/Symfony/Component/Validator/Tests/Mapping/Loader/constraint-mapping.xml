@@ -83,6 +83,14 @@
         </option>
       </constraint>
 
+      <!-- Sequentially with conditional cascading -->
+      <constraint name="Sequentially">
+        <option name="constraints">
+          <constraint name="Type">object</constraint>
+          <constraint name="Valid" />
+        </option>
+      </constraint>
+
       <!-- Value with child constraints -->
       <constraint name="Collection">
         <option name="fields">

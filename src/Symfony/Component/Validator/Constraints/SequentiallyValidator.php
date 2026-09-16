@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -33,7 +34,10 @@ class SequentiallyValidator extends ConstraintValidator
         $originalCount = $validator->getViolations()->count();
 
         foreach ($constraint->constraints as $c) {
-            if ($originalCount !== $validator->validate($value, $c)->getViolations()->count()) {
+            $cascadedGroups = $c instanceof Valid && $context instanceof ExecutionContext ? $context->getCascadedGroups() : null;
+            $violations = null === $cascadedGroups ? $validator->validate($value, $c) : $validator->validate($value, $c, $cascadedGroups);
+
+            if ($originalCount !== $violations->getViolations()->count()) {
                 break;
             }
         }

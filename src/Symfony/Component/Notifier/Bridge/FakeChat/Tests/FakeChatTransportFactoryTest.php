@@ -20,6 +20,7 @@ use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
 {
@@ -55,6 +56,20 @@ final class FakeChatTransportFactoryTest extends TransportFactoryTestCase
         $transport = $factory->create(new Dsn('fakechat+logger://default'));
 
         $this->assertSame('fakechat+logger://default', (string) $transport);
+    }
+
+    public function testTheEventDispatcherOfTheContractsIsAccepted()
+    {
+        $dispatcher = new class implements EventDispatcherInterface {
+            public function dispatch(object $event, ?string $eventName = null): object
+            {
+                return $event;
+            }
+        };
+        $factory = new FakeChatTransportFactory($this->createStub(MailerInterface::class), $this->createStub(LoggerInterface::class), $dispatcher);
+
+        $this->assertSame('fakechat+logger://default', (string) $factory->create(new Dsn('fakechat+logger://default')));
+        $this->assertSame('fakechat+email://default?to=recipient@email.net&from=sender@email.net', (string) $factory->create(new Dsn('fakechat+email://default?to=recipient@email.net&from=sender@email.net')));
     }
 
     public function createFactory(): FakeChatTransportFactory

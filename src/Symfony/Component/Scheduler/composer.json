@@ -32,11 +32,12 @@
         "symfony/dependency-injection": "^8.1",
         "symfony/event-dispatcher": "^7.4|^8.0",
         "symfony/lock": "^7.4|^8.0",
-        "symfony/messenger": "^7.4|^8.0",
+        "symfony/messenger": "^8.2",
         "symfony/serializer": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<8.1"
+        "symfony/dependency-injection": "<8.1",
+        "symfony/messenger": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Scheduler\\": "" },

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Scheduler\Messenger\Serializer\Normalizer;
 
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Scheduler\Trigger\SerializedTrigger;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -40,21 +41,7 @@ final class SchedulerTriggerNormalizer implements DenormalizerInterface, Normali
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): TriggerInterface
     {
-        return new class($data) implements TriggerInterface {
-            public function __construct(private readonly string $description)
-            {
-            }
-
-            public function __toString(): string
-            {
-                return $this->description;
-            }
-
-            public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
-            {
-                throw new \LogicException('Not possible to get next run date from a deserialized trigger.');
-            }
-        };
+        return new SerializedTrigger($data);
     }
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool

@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
@@ -23,6 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\DependencyInjection\RemoveMissingDependenciesPass;
+use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\ValidationBundle;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -153,6 +155,33 @@ class ValidationBundleTest extends TestCase
         // the finder reports the paths with the separator of the platform
         $this->assertSame([[[strtr($dir.'/validation.xml', '/', \DIRECTORY_SEPARATOR)]]], $xmlMappings);
         $this->assertSame([[[strtr($dir.'/validation.yml', '/', \DIRECTORY_SEPARATOR)]]], $yamlMappings);
+    }
+
+    public function testMappingFilesDeclareTheClassesTheyMap()
+    {
+        $file = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
+        $calls = $this->load(['mapping' => ['paths' => [$file]]])->getDefinition('validator.builder')->getMethodCalls();
+
+        $mappedClasses = array_column(array_filter($calls, static fn ($call) => 'addMappedClasses' === $call[0]), 1)[0][0];
+
+        $this->assertSame([$file], array_keys($mappedClasses));
+        $this->assertArrayHasKey(Entity::class, $mappedClasses[$file]);
+        $this->assertArrayNotHasKey(\stdClass::class, $mappedClasses[$file]);
+    }
+
+    public function testMappingFilesAreTracked()
+    {
+        $file = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
+        $container = $this->load(['mapping' => ['paths' => [$file]]]);
+
+        $tracked = [];
+        foreach ($container->getResources() as $resource) {
+            if ($resource instanceof FileResource) {
+                $tracked[] = strtr($resource->getResource(), '\\', '/');
+            }
+        }
+
+        $this->assertContains(strtr($file, '\\', '/'), $tracked);
     }
 
     public function testMappingPathsContainingAPercentSign()

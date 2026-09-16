@@ -17,6 +17,8 @@ CHANGELOG
  * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`
  * Stop narrowing the `File` constraint's `mimeTypes` option with mime types auto-derived from the matched extension when `extensions` is configured
  * Add support for reading objects properties with `Unique` constraint `fields` option
+ * Add an optional `$mappedClasses` argument to `Mapping\Loader\LoaderChain::__construct()`, to declare which classes each loader maps
+ * Add `ValidatorBuilder::addMappedClasses()`, to declare which classes each mapping file maps
 
 8.1
 ---

@@ -6,6 +6,8 @@ CHANGELOG
 
  * Add `AuthenticationTrustResolver::isAuthenticatedRecently()`, the extension point `IS_AUTHENTICATED_RECENTLY` is decided on; not implementing it in a custom trust resolver is deprecated
  * Add the `IS_AUTHENTICATED_RECENTLY` attribute, granted while the last interactive authentication is within the configured lifetime
+ * Add `TokenInterface::getAuthenticationProofs()` and `setAuthenticationProofs()`, the authentication methods the user proved mapped to the time of the last proof of each, implemented by `AbstractToken`; not implementing them in a custom token is deprecated
+ * Add `AuthenticationMethod`, the RFC 8176 names of the methods a token can hold a proof of, which key that map
  * Deprecate passing more than one Security attribute to `AccessDecisionManager::decide()`, the `$allowMultipleAttributes` argument will be removed in 9.0
  * Allow a list of identifiers in the `$aud` argument of `OAuth2User`, as RFC 7662 §2.2 defines it
  * Allow using wildcards as placeholders in the keys of the `RoleHierarchy` map

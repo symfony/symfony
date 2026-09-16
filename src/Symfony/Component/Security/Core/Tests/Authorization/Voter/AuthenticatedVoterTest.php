@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
@@ -128,7 +129,7 @@ class AuthenticatedVoterTest extends TestCase
     public function testRecentlyAuthenticatedIsGrantedWithinTheLifetime()
     {
         $token = $this->getToken('fully');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time() - 60);
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time() - 60]);
 
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900));
 
@@ -138,7 +139,7 @@ class AuthenticatedVoterTest extends TestCase
     public function testRecentlyAuthenticatedIsDeniedOnceTheLifetimeElapsed()
     {
         $token = $this->getToken('fully');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time() - 901);
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time() - 901]);
 
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900));
 
@@ -156,7 +157,7 @@ class AuthenticatedVoterTest extends TestCase
     public function testRecentlyAuthenticatedIsDeniedForARememberedToken()
     {
         $token = $this->getToken('remembered');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
 
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900));
 
@@ -167,7 +168,7 @@ class AuthenticatedVoterTest extends TestCase
     {
         $clock = new MockClock('2026-09-11 12:00:00');
         $token = $this->getToken('fully');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, $clock->now()->getTimestamp());
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => $clock->now()->getTimestamp()]);
 
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900, $clock));
 
@@ -183,7 +184,7 @@ class AuthenticatedVoterTest extends TestCase
     public function testRecentlyAuthenticatedLifetimeIsConfigurable()
     {
         $token = $this->getToken('fully');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time() - 120);
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time() - 120]);
 
         $this->assertSame(VoterInterface::ACCESS_GRANTED, (new AuthenticatedVoter(new AuthenticationTrustResolver(300)))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
         $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter(new AuthenticationTrustResolver(60)))->vote($token, null, ['IS_AUTHENTICATED_RECENTLY']));
@@ -194,7 +195,7 @@ class AuthenticatedVoterTest extends TestCase
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900));
 
         $token = $this->getToken('fully');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
         $voter->vote($token, null, ['IS_AUTHENTICATED_RECENTLY'], $granted = new Vote());
         $this->assertSame(['The user authenticated recently.'], $granted->reasons);
 
@@ -209,7 +210,7 @@ class AuthenticatedVoterTest extends TestCase
     {
         // the token is stale by the default strategy, but this resolver trusts it anyway
         $token = $this->getToken('fully');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time() - 100000);
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time() - 100000]);
 
         $trustResolver = new class extends AuthenticationTrustResolver {
             public function isAuthenticatedRecently(?TokenInterface $token = null): bool
@@ -226,7 +227,7 @@ class AuthenticatedVoterTest extends TestCase
     public function testATrustResolverWithoutTheMethodIsDeprecatedAndDenies()
     {
         $token = $this->getToken('fully');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
 
         $legacyTrustResolver = new class implements AuthenticationTrustResolverInterface {
             public function isAuthenticated(?TokenInterface $token = null): bool
@@ -255,7 +256,7 @@ class AuthenticatedVoterTest extends TestCase
         // the invariant belongs to the attribute, so the voter enforces it whatever
         // strategy the trust resolver implements
         $token = $this->getToken('remembered');
-        $token->setAttribute(AuthenticatedVoter::AUTH_TIME_ATTRIBUTE, time());
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
 
         $trustResolver = new class extends AuthenticationTrustResolver {
             public function isAuthenticatedRecently(?TokenInterface $token = null): bool

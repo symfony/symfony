@@ -18,6 +18,7 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -67,6 +68,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => time() + 3600,
             'iat' => time(),
@@ -82,6 +84,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => ['other-client', 'my-client-id'],
             'azp' => 'my-client-id',
             'exp' => time() + 3600,
@@ -99,6 +102,7 @@ class OidcIdTokenTest extends TestCase
         // checked, so a missing "azp" claim must not reject the token
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => ['other-client', 'my-client-id'],
             'exp' => time() + 3600,
             'iat' => time(),
@@ -113,6 +117,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'azp' => 'another-client',
             'exp' => time() + 3600,
@@ -129,6 +134,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => time() + 3600,
             'iat' => time(),
@@ -143,6 +149,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://evil.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => time() + 3600,
             'iat' => time(),
@@ -150,6 +157,41 @@ class OidcIdTokenTest extends TestCase
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid ID token');
+
+        $this->createIdToken()->validateClaims($claims, 'https://provider.example.com', 'my-client-id');
+    }
+
+    public function testValidateClaimsMissingSub()
+    {
+        $claims = [
+            'iss' => 'https://provider.example.com',
+            'aud' => 'my-client-id',
+            'exp' => time() + 3600,
+            'iat' => time(),
+        ];
+
+        $this->expectException(AuthenticationException::class);
+        // "sub" is REQUIRED by OIDC Core 1.0, Section 2, and the whole login is about it
+        $this->expectExceptionMessage('The following claims are mandatory: sub.');
+
+        $this->createIdToken()->validateClaims($claims, 'https://provider.example.com', 'my-client-id');
+    }
+
+    #[TestWith([''])]
+    #[TestWith([42])]
+    #[TestWith([null])]
+    public function testValidateClaimsRejectsAnEmptyOrNonStringSub(mixed $sub)
+    {
+        $claims = [
+            'iss' => 'https://provider.example.com',
+            'sub' => $sub,
+            'aud' => 'my-client-id',
+            'exp' => time() + 3600,
+            'iat' => time(),
+        ];
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('the "sub" claim must be a non-empty string');
 
         $this->createIdToken()->validateClaims($claims, 'https://provider.example.com', 'my-client-id');
     }
@@ -172,6 +214,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'wrong-client-id',
             'exp' => time() + 3600,
             'iat' => time(),
@@ -187,6 +230,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => time() - 3600,
             'iat' => time(),
@@ -202,6 +246,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'iat' => time(),
         ];
@@ -216,6 +261,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => time() + 3600,
         ];
@@ -231,6 +277,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => 1750003600,
             'iat' => 1749999999,
@@ -253,6 +300,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => 1750003600,
             'iat' => 1750000001,
@@ -268,6 +316,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => time() + 3600,
             'iat' => time(),
@@ -284,6 +333,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => time() + 3600,
             'iat' => time(),
@@ -299,6 +349,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => 1750000000,
             'iat' => 1749990000,
@@ -324,6 +375,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => 1750003600,
             'iat' => 1750000000,
@@ -344,6 +396,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => 1750003600,
             'iat' => 1750000000,
@@ -360,6 +413,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => 1750003600,
             'iat' => 1750000000,
@@ -375,6 +429,7 @@ class OidcIdTokenTest extends TestCase
     {
         $claims = [
             'iss' => 'https://provider.example.com',
+            'sub' => 'user-42',
             'aud' => 'my-client-id',
             'exp' => 1750003600,
             'iat' => 1750000000,

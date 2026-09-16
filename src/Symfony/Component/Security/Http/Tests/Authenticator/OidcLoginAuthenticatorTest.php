@@ -944,6 +944,64 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertSame($params['redirect_uri'], $attempt['redirect_uri']);
     }
 
+    public function testStartSendsANonceShortEnoughForEveryProvider()
+    {
+        $authenticator = $this->createAuthenticator();
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $params = [];
+        parse_str(parse_url($authenticator->start($request)->getTargetUrl(), \PHP_URL_QUERY), $params);
+
+        // 256 bits of entropy in the 43 characters base64url takes for them; providers are
+        // known to reject longer nonces, 43 being the longest the OpenID Foundation
+        // conformance suite itself generates
+        $this->assertSame(43, \strlen($params['nonce']));
+        $this->assertMatchesRegularExpression('/^[A-Za-z0-9\-_]{43}$/', $params['nonce']);
+    }
+
+    public function testAuthenticateDoesNotCallUserInfoWhenTheIdTokenHasNoSub()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $claims = $this->buildIdTokenClaims();
+        unset($claims['sub']);
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdTokenFromClaims(array_merge($claims, ['nonce' => $nonce])),
+        ]);
+        // an ID token without "sub" is invalid per OIDC Core 1.0, Section 2, so the access
+        // token it came with must not be put to any use, the UserInfo request included
+        $this->oidcClient->expects($this->never())->method('fetchUserInfo');
+
+        $authenticator = $this->createAuthenticator();
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The following claims are mandatory: sub.');
+
+        $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+    }
+
+    public function testAuthenticateDoesNotCallUserInfoWhenTheIdTokenSubIsEmpty()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'sub' => '']),
+        ]);
+        $this->oidcClient->expects($this->never())->method('fetchUserInfo');
+
+        $authenticator = $this->createAuthenticator();
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('the "sub" claim must be a non-empty string');
+
+        $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+    }
+
     public function testStartWithoutPkce()
     {
         $authenticator = $this->createAuthenticator(['pkce_enabled' => false]);
@@ -1753,8 +1811,16 @@ class OidcLoginAuthenticatorTest extends TestCase
 
     private function buildIdToken(array $extraClaims = []): string
     {
+        return $this->buildIdTokenFromClaims($this->buildIdTokenClaims($extraClaims));
+    }
+
+    /**
+     * The claims as given, for the tests that need one of the defaults to be absent.
+     */
+    private function buildIdTokenFromClaims(array $claims): string
+    {
         $header = rtrim(strtr(base64_encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT'])), '+/', '-_'), '=');
-        $payload = rtrim(strtr(base64_encode(json_encode($this->buildIdTokenClaims($extraClaims))), '+/', '-_'), '=');
+        $payload = rtrim(strtr(base64_encode(json_encode($claims)), '+/', '-_'), '=');
         $signature = rtrim(strtr(base64_encode('fake-signature'), '+/', '-_'), '=');
 
         return $header.'.'.$payload.'.'.$signature;

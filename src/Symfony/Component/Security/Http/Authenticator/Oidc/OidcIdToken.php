@@ -98,9 +98,17 @@ final class OidcIdToken
                 new IssuedAtChecker(clock: $this->clock, allowedTimeDrift: $this->allowedTimeDrift),
                 new NotBeforeChecker(clock: $this->clock, allowedTimeDrift: $this->allowedTimeDrift),
                 new ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: $this->allowedTimeDrift),
-            ]))->check($claims, ['iss', 'aud', 'exp', 'iat']);
+            ]))->check($claims, ['iss', 'aud', 'exp', 'iat', 'sub']);
         } catch (InvalidClaimException|MissingMandatoryClaimException $e) {
             throw new AuthenticationException(\sprintf('Invalid ID token: "%s"', $e->getMessage()), previous: $e);
+        }
+
+        // "sub" is REQUIRED by OIDC Core 1.0, Section 2 and is the identity the whole login
+        // is about; the ClaimCheckerManager above only proves it is there, and it is checked
+        // here rather than by the caller so that a token missing it is rejected before its
+        // access token is put to any use, the UserInfo request included
+        if (!\is_string($claims['sub']) || '' === $claims['sub']) {
+            throw new AuthenticationException('Invalid ID token: the "sub" claim must be a non-empty string.');
         }
 
         // "azp" is only checked when present: OIDC Core 1.0, Section 3.1.3.7 items 3 to 5

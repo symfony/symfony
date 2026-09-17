@@ -97,6 +97,15 @@ jobs:
           composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
           composer require --no-progress --ansi --no-plugins phpstan/phpstan:@stable phpstan/phpstan-deprecation-rules:@stable phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
 
+      # Use a warm PHPStan result cache when possible to speedup analysis
+      - name: "Restore PHPStan result cache"
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ".github/sa-tools/phpstan-cache"
+          key: "result-cache-v1-${{ env.php-version }}-${{ github.run_id }}"
+          restore-keys: |
+            result-cache-v1-${{ env.php-version }}-
+
       - name: PHPStan on target branch
         run: ./vendor/bin/phpstan analyse --error-format=json --no-progress --autoload-file='.github/sa-tools/rules/bootstrap.php' > .github/sa-tools/phpstan-base.json || true
 
@@ -124,6 +133,14 @@ jobs:
         run: |
           ./vendor/bin/phpstan analyse --error-format=json --no-progress --autoload-file='.github/sa-tools/rules/bootstrap.php' > .github/sa-tools/phpstan-pr.json || true
           php .github/sa-tools/phpstan-diff.php .github/sa-tools/phpstan-base.json .github/sa-tools/phpstan-pr.json
+
+      # Persist the PHPStan cache for re-use on the next run
+      - name: "Save result cache"
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !cancelled() }}
+        with:
+          path: ".github/sa-tools/phpstan-cache"
+          key: "result-cache-v1-${{ env.php-version }}-${{ github.run_id }}"
 
   hardening-tests:
     name: Hardening tests

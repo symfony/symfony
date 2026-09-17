@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 
@@ -41,7 +42,7 @@ class KernelTest extends TestCase
 
     public function testBuildContainerWritesCachedirTag()
     {
-        $kernel = new CachedirTagKernel($this->projectDir);
+        $kernel = new TestKernel($this->projectDir);
         $kernel->boot();
 
         foreach ([$kernel->getCacheDir(), $kernel->getBuildDir()] as $dir) {
@@ -50,9 +51,37 @@ class KernelTest extends TestCase
             $this->assertStringStartsWith('Signature: 8a477f597d28d172789f06886806bc55', file_get_contents($cachedirTag));
         }
     }
+
+    public function testBuildContainerWritesCompilerLogWithoutDebug()
+    {
+        $kernel = new TestKernel($this->projectDir);
+        $kernel->boot();
+
+        $this->assertFalse($kernel->isDebug());
+
+        $container = $kernel->getContainer();
+        $compilerLog = $container->getParameter('kernel.build_dir').'/'.$container->getParameter('kernel.container_class').'Compiler.log';
+
+        $this->assertFileExists($compilerLog);
+        $this->assertStringContainsString('Removed service "unused_service"; reason: unused.', file_get_contents($compilerLog));
+    }
+
+    public function testBuildContainerDoesNotWriteCompilerLogWhenBuildingFails()
+    {
+        $kernel = new BrokenKernel($this->projectDir);
+
+        try {
+            $kernel->boot();
+            $this->fail('Booting the kernel should have failed.');
+        } catch (\LogicException $e) {
+            $this->assertSame('Broken build.', $e->getMessage());
+        }
+
+        $this->assertEmpty(glob($kernel->getBuildDir().'/*Compiler.log'));
+    }
 }
 
-class CachedirTagKernel extends AbstractKernel
+class TestKernel extends AbstractKernel
 {
     use KernelTrait;
 
@@ -69,5 +98,18 @@ class CachedirTagKernel extends AbstractKernel
     public function getBuildDir(): string
     {
         return $this->projectDir.'/var/build';
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->register('unused_service', \stdClass::class);
+    }
+}
+
+class BrokenKernel extends TestKernel
+{
+    protected function build(ContainerBuilder $container): void
+    {
+        throw new \LogicException('Broken build.');
     }
 }

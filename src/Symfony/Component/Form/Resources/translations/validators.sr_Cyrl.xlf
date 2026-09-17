@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>
-                <target state="needs-review-translation">Доња граница не сме бити већа од горње границе.</target>
+                <target>Доња граница не сме бити већа од горње границе.</target>
             </trans-unit>
         </body>
     </file>

@@ -1446,4 +1446,22 @@ class FormFlowTest extends TestCase
         self::assertSame('step2', $flow->getCursor()->getCurrentStep());
         self::assertTrue($flow->has('step2'));
     }
+
+    public function testFirstStepSkippedHidesPreviousButton()
+    {
+        $flow = $this->factory->create(FirstStepSkippedType::class, []);
+        $cursor = $flow->getCursor();
+
+        self::assertSame('step2', $cursor->getCurrentStep());
+        self::assertTrue($cursor->isFirstStep());
+        self::assertFalse($cursor->canMoveBack());
+        self::assertSame('step2', $cursor->getFirstStep());
+        self::assertFalse($flow->get('navigator')->has('previous'), 'the previous button must not be offered when every previous step is skipped');
+        self::assertTrue($flow->get('navigator')->has('next'));
+
+        $view = $flow->createView();
+
+        self::assertTrue($view->vars['steps']['step1']['is_skipped']);
+        self::assertTrue($view->vars['steps']['step2']['is_current_step']);
+    }
 }

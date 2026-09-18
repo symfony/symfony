@@ -241,7 +241,7 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
         $step = $this->getStep($currentStep);
         $this->add($step->getName(), $step->getType(), $step->getOptions());
 
-        $cursor = new FormFlowCursor($config->getSteps(), $currentStep);
+        $cursor = new FormFlowCursor($config->getSteps(), $currentStep, $this->getData());
         $this->pruneActionButtons($this, $cursor);
 
         return new FormFlow($config, $cursor);

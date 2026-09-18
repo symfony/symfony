@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add `HttpClientBundle` to provide the HTTP client services and the `http_client` configuration
+ * Add `RecorderHttpClient` to record HTTP exchanges into a HAR file and replay them, redacting credentials by default and replaying repeated exchanges in the order they were recorded
+ * Add an optional `MatcherInterface` argument to `HarFileResponseFactory`; pass `new DefaultMatcher(new DefaultRedactor())` to replay a file produced by `RecorderHttpClient`
  * Add the `extra.cache_policy` option to `CachingHttpClient` to tag cached responses and force their lifetime
  * Allow passing a stream or a closure to `HttpOptions::buffer()`
  * Add `QUERY` to the list of cacheable HTTP methods in `CachingHttpClient`

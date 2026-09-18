@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by iz-ahmad at 2026-09-10T08:34:43Z
+
+I see the CI is red on `Unit Tests (8.4, high-deps)` and `Unit Tests (8.4, low-deps)`, but not from this change. `ObjectMapper` passes cleanly in both jobs. The failures are pre-existing on `8.2`: `WebProfilerBundle`, `SecurityBundle`, `Validator`, `Translation`, and an `HttpClient`/`symfony/config` version mismatch (`NodeBuilder::appendFromCallback()` undefined).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T11:24:03Z
+
+Thank you for your patience on this one, and for the diagnosis. The gap you found is real: a class that declares `#[Map(source: ...)]` describes how it is built, and that declaration went unused for a nested object unless the target class was already in a class map. Your fixtures pinned the case down and your `getPropertyTypeMetadata()` had the resolution rule right.
+
+I reworked where it runs. In the branch as it stood, the resolution lived in `ObjectMapper::getSourceValue()`, which has three consequences:
+
+1. It goes around `ObjectMapperMetadataFactoryInterface`, the component's extension point and the mapper's first constructor argument. A custom factory that answers "no mapping for this class" was overruled: I ran one that hides a single mapping and delegates the rest, and the branch mapped the value anyway. The decorators, `EnumMappingMetadataFactory` and `ReverseClassObjectMapperMetadataFactory`, never saw the inferred mapping either.
+2. `getSourceValue()` also runs for a destination property the mapper will never write, such as a non-public one with no property accessor. On 8.2 nothing happens there; with the resolution inside, it could throw. Two cases that map cleanly today started failing: an ambiguous inference on a private property raised `Ambiguous mapping`, and an abstract one on a protected property raised `Cannot instantiate abstract class`.
+3. `class_exists()` is true for abstract classes, so an abstract destination property type reached `newLazyGhost()` and threw a raw `\Error`, outside the component's exception hierarchy. An interface-typed property was silently skipped instead.
+
+It also helped that your `getPropertyTypeMetadata()` was nearly the `if (!$property)` branch of `ReverseClassObjectMapperMetadataFactory::create()`: the logic already belonged in the metadata layer.
+
+So the resolution now lives in a new `PropertyTypeMappingMetadataFactory`, a metadata factory decorator composed like the existing two. The mapper only passes the destination to the factory, through the `$context` argument the interface already carried, and only when it can actually write that property, so case 2 cannot come back. A non-instantiable destination type is refused with a `MappingException` naming the property. The factory sits in the default chain the no-argument `ObjectMapper` constructor builds and is registered in `Resources/config/object_mapper.php`, so your case needs no configuration.
+
+On the fixtures: `Tests/Fixtures/Bundle` already had the same pair, and `ObjectMapperBundleTest::testMapNestedObjectWhoseClassDeclaresNoMapping` already covered the container version of the scenario, so the standalone test now reuses them and is the exact counterpart of that one. The new fixture directory holds only what nothing covered: the abstract, interface, ambiguous, non-public and self-referencing cases.
+
+I checked that turning this on by default changes no case that works today. Everything it newly handles fails with a `TypeError` on 8.2. The one exception is a class with a constructor parameter typed wider than the same-named property, which now receives the mapped object instead of the raw one, and that already matches how `filterMetadataByPropertyType()` treats the same shape.
+
+One trade-off worth knowing: `new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $propertyAccessor)`, the usual way to add a property accessor, no longer gets the inference, because passing a factory means that factory decides. Compose `PropertyTypeMappingMetadataFactory` around it to keep both.
+
+The branch is squashed into one commit with your authorship, rebased on 8.2, and the component and FrameworkBundle suites are green. I also rewrote the description as documentation for the eventual docs pull request.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-13T11:52:34Z
+
+/cc @soyuka WDYT?
+
+---------------------------------------------------------------------------
+
+by iz-ahmad at 2026-09-13T22:15:11Z
+
+@nicolas-grekas, grateful for your review and reworks over this. thanks. And after your updates, this now makes more sense.

@@ -39,6 +39,7 @@ class AssetMapperTestAppKernel extends Kernel
             $assetMapper = [
                 'paths' => ['dir1', 'dir2', 'non_ascii', 'assets'],
                 'public_prefix' => 'assets',
+                'metadata_dir' => '%kernel.project_dir%/public/assets',
             ];
 
             if ('reachable_entries' === $this->getEnvironment()) {

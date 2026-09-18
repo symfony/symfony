@@ -39,6 +39,7 @@ class ImportMapTestAppKernel extends Kernel
                 'assets' => null,
                 'asset_mapper' => [
                     'paths' => ['assets'],
+                    'metadata_dir' => '%kernel.project_dir%/public/assets',
                 ],
                 'test' => true,
             ]);

@@ -1063,7 +1063,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
     /**
      * @see https://github.com/symfony/symfony/issues/54478
      */
-
     public function testPropertyInfoConfigurationIsForwardedToPropertyInfoBundle()
     {
         $container = $this->createContainerFromFile('legacy_property_info');
@@ -1851,6 +1850,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'asset_mapper' => [
                     'server' => $server,
                     'public_prefix' => '/assets_path/',
+                    'metadata_dir' => '%kernel.share_dir%/assets',
                     'paths' => ['assets/'],
                 ],
             ]);
@@ -1877,6 +1877,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'assets' => null,
                 'asset_mapper' => [
                     'paths' => ['assets/'],
+                    'metadata_dir' => '%kernel.share_dir%/assets',
                     'importmap_entries' => 'reachable',
                     'importmap_polyfill' => 'my-polyfill',
                 ],
@@ -1887,6 +1888,26 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('reachable', $definition->getArgument(4));
         // the polyfill name is configured on the renderer only, and handed over at render time
         $this->assertSame('my-polyfill', $container->getDefinition('asset_mapper.importmap.renderer')->getArgument(3));
+    }
+
+    public function testAssetMapperMetadataDirIsConfigurable()
+    {
+        $container = $this->createContainerFromFile('asset_mapper_metadata_dir');
+
+        $this->assertSame(
+            $container->getParameter('kernel.project_dir').'/var/assets',
+            $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0),
+        );
+    }
+
+    public function testAssetMapperMetadataDirFallsBackToThePublicAssetsDirectory()
+    {
+        $container = $this->createContainerFromFile('asset_mapper_default_metadata_dir');
+
+        $this->assertStringEndsWith(
+            '/assets',
+            $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0),
+        );
     }
 
     public function testJsonStreamerConfigurationIsForwardedToJsonStreamerBundle()

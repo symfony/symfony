@@ -210,4 +210,18 @@ class HeaderBagTest extends TestCase
 
         $this->assertCount(\count($headers), $headerBag);
     }
+
+    public function testNumericKeysAreExposedAsStrings()
+    {
+        $bag = new HeaderBag(['123' => 'foo', 'bar' => 'baz']);
+
+        $this->assertSame(['123', 'bar'], $bag->keys());
+
+        $keys = [];
+        foreach ($bag as $key => $value) {
+            $keys[] = $key;
+        }
+
+        $this->assertSame(['123', 'bar'], $keys);
+    }
 }

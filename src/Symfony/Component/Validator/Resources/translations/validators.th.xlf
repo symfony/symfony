@@ -578,6 +578,74 @@
                 <source>This value is not a valid ULID.</source>
                 <target state="needs-review-translation">ค่านี้ไม่ใช่ ULID ที่ถูกต้อง</target>
             </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target state="needs-review-translation">ไฟล์นี้ไม่ใช่ไฟล์เสียงที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target state="needs-review-translation">ไฟล์เสียงนี้สั้นเกินไป ({{ duration }} วินาที) ระยะเวลาขั้นต่ำที่คาดไว้คือ {{ min_duration }} วินาที.</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target state="needs-review-translation">ไฟล์เสียงนี้ยาวเกินไป ({{ duration }} วินาที) ระยะเวลาสูงสุดที่อนุญาตคือ {{ max_duration }} วินาที.</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target state="needs-review-translation">ไม่สามารถตรวจพบระยะเวลาของไฟล์เสียงได้</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target state="needs-review-translation">บิตเรตของไฟล์เสียงต่ำเกินไป ({{ bitrate }} bps) บิตเรตขั้นต่ำที่คาดไว้คือ {{ min_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target state="needs-review-translation">บิตเรตของไฟล์เสียงสูงเกินไป ({{ bitrate }} bps) บิตเรตสูงสุดที่อนุญาตคือ {{ max_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target state="needs-review-translation">ไม่สามารถตรวจพบบิตเรตของไฟล์เสียงได้</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target state="needs-review-translation">ไม่รองรับอัตราสุ่มตัวอย่างของเสียง ({{ sample_rate }} Hz).</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target state="needs-review-translation">ไม่สามารถตรวจพบอัตราสุ่มตัวอย่างของไฟล์เสียงได้</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target state="needs-review-translation">ไฟล์เสียงนี้มีช่องสัญญาณน้อยเกินไป ({{ channels }}) จำนวนขั้นต่ำที่คาดไว้คือ {{ min_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target state="needs-review-translation">ไฟล์เสียงนี้มีช่องสัญญาณมากเกินไป ({{ channels }}) จำนวนสูงสุดที่คาดไว้คือ {{ max_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target state="needs-review-translation">ไม่สามารถตรวจพบจำนวนช่องสัญญาณเสียงได้</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target state="needs-review-translation">ไฟล์เสียงเสียหาย.</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">ไฟล์เสียงนี้มีสตรีมหลายสตรีม อนุญาตเฉพาะสตรีมเดียวเท่านั้น</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target state="needs-review-translation">ไม่รองรับตัวแปลงสัญญาณเสียง "{{ codec }}".</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target state="needs-review-translation">ไม่รองรับคอนเทนเนอร์เสียง "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target state="needs-review-translation">ไฟล์นี้ไม่มีสตรีมเสียง</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

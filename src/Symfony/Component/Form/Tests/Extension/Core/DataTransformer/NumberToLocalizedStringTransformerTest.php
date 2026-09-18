@@ -262,9 +262,6 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals($to, $transformer->reverseTransform($from));
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/issues/7609
-     */
     public function testReverseTransformWithGroupingAndFixedSpaces()
     {
         // Since we test against other locales, we need the full implementation
@@ -521,9 +518,6 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('foo');
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/issues/3161
-     */
     #[DataProvider('nanRepresentationProvider')]
     public function testReverseTransformDisallowsNaN($nan)
     {
@@ -537,7 +531,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     {
         return [
             ['nan'],
-            ['NaN'], // see https://github.com/symfony/symfony/issues/3161
+            ['NaN'],
             ['NAN'],
         ];
     }

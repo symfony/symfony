@@ -44,9 +44,6 @@ class TextTypeTest extends BaseTypeTestCase
         ];
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/issues/1986
-     */
     #[DataProvider('provideZeros')]
     public function testSetDataThroughParamsWithZero($data, $dataAsString)
     {

@@ -70,9 +70,6 @@ class YamlFileLoaderTest extends TestCase
         ];
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/pull/12158
-     */
     public function testDoNotModifyStateIfExceptionIsThrown()
     {
         $loader = new YamlFileLoader(__DIR__.'/nonvalid-mapping.yml');

@@ -40,6 +40,14 @@ class ObjectMapperBundle extends AbstractBundle
     {
         $configurator->import('Resources/config/object_mapper.php');
 
+        // attribute metadata is read from the classes at runtime, so it cannot be invalidated in debug mode
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('object_mapper.metadata.cache_warmer');
+            $container->removeDefinition('object_mapper.metadata.cache_class_metadata_factory');
+            $container->removeDefinition('object_mapper.metadata.cache_property_name_collection_factory');
+            $container->removeDefinition('object_mapper.metadata.cache_property_metadata_factory');
+        }
+
         $container->registerForAutoconfiguration(TransformCallableInterface::class)
             ->addTag('object_mapper.transform_callable');
         $container->registerForAutoconfiguration(ConditionCallableInterface::class)

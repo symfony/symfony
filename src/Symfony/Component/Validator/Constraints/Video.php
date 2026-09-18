@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Validator\Exception\LogicException;
-
 /**
  * @author Kev <https://github.com/symfonyaml>
  * @author Nicolas Grekas <p@tchwork.com>
@@ -39,15 +35,15 @@ class Video extends File
     public const UNSUPPORTED_VIDEO_CODEC_ERROR = 'a9f2f6f7-2b5a-4f3c-b746-d3e2e9d1b2a1';
     public const UNSUPPORTED_VIDEO_CONTAINER_ERROR = 'b7c9d2a4-5e1f-4aa0-8f9d-1c3e2b4a6d7e';
 
-    // Include the mapping from the base class
-
     protected const ERROR_NAMES = [
+        // Include the mapping from the base class
         self::NOT_FOUND_ERROR => 'NOT_FOUND_ERROR',
         self::NOT_READABLE_ERROR => 'NOT_READABLE_ERROR',
         self::EMPTY_ERROR => 'EMPTY_ERROR',
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
         self::INVALID_MIME_TYPE_ERROR => 'INVALID_MIME_TYPE_ERROR',
         self::FILENAME_TOO_LONG => 'FILENAME_TOO_LONG',
+        // Mapping for Video validation errors
         self::SIZE_NOT_DETECTED_ERROR => 'SIZE_NOT_DETECTED_ERROR',
         self::TOO_WIDE_ERROR => 'TOO_WIDE_ERROR',
         self::TOO_NARROW_ERROR => 'TOO_NARROW_ERROR',
@@ -186,16 +182,6 @@ class Video extends File
         ?string $filenameCountUnit = null,
         ?string $filenameCharsetMessage = null,
     ) {
-        static $hasFfprobe;
-        if (!$hasFfprobe) {
-            if (!class_exists(Process::class)) {
-                throw new LogicException('The Process component is required to use the Video constraint. Try running "composer require symfony/process".');
-            }
-            if (!$hasFfprobe ??= (new ExecutableFinder())->find('ffprobe')) {
-                throw new LogicException('The ffprobe binary is required to use the Video constraint.');
-            }
-        }
-
         parent::__construct(
             null,
             $maxSize,

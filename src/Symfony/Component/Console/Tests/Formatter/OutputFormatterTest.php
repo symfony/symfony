@@ -406,6 +406,15 @@ class OutputFormatterTest extends TestCase
         $this->assertSame("foobarbazne\nw\nline", $formatter->formatAndWrap("foobar<error>baznew\nline</error>", 11));
         $this->assertSame('👩‍🌾', $formatter->formatAndWrap('👩‍🌾', 1));
     }
+
+    public function testFormatKeepsMultiByteContentUnchanged()
+    {
+        $formatter = new OutputFormatter();
+
+        $this->assertSame("e\u{0301}x", $formatter->format("e<info>\u{0301}x</info>"));
+        $this->assertSame("a\u{0301} e\u{0301}", $formatter->format("a\u{0301} <info>e\u{0301}</info>"));
+        $this->assertSame('não é válido 日本語 😀', $formatter->format('não <info>é válido</info> 日本語 <comment>😀</comment>'));
+    }
 }
 
 class TableCell

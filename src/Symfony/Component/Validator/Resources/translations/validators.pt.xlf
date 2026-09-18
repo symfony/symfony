@@ -578,6 +578,74 @@
                 <source>This value is not a valid ULID.</source>
                 <target state="needs-review-translation">Este valor não é um ULID válido.</target>
             </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target state="needs-review-translation">Este ficheiro não é um ficheiro de áudio válido.</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target state="needs-review-translation">O áudio é demasiado curto ({{ duration }} segundos). A duração mínima esperada é {{ min_duration }} segundos.</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target state="needs-review-translation">O áudio é demasiado longo ({{ duration }} segundos). A duração máxima permitida é {{ max_duration }} segundos.</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target state="needs-review-translation">Não foi possível detetar a duração do áudio.</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target state="needs-review-translation">A taxa de bits do áudio é demasiado baixa ({{ bitrate }} bps). A taxa de bits mínima esperada é {{ min_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target state="needs-review-translation">A taxa de bits do áudio é demasiado alta ({{ bitrate }} bps). A taxa de bits máxima permitida é {{ max_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target state="needs-review-translation">Não foi possível detetar a taxa de bits do áudio.</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target state="needs-review-translation">Taxa de amostragem de áudio ({{ sample_rate }} Hz) não suportada.</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target state="needs-review-translation">Não foi possível detetar a taxa de amostragem do áudio.</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target state="needs-review-translation">O áudio tem poucos canais ({{ channels }}). A quantidade mínima esperada é {{ min_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target state="needs-review-translation">O áudio tem demasiados canais ({{ channels }}). A quantidade máxima esperada é {{ max_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target state="needs-review-translation">Não foi possível detetar o número de canais de áudio.</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target state="needs-review-translation">O ficheiro de áudio está corrompido.</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">O áudio contém múltiplos fluxos. Apenas é permitido um fluxo.</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target state="needs-review-translation">Codec de áudio "{{ codec }}" não suportado.</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target state="needs-review-translation">Contentor de áudio "{{ container }}" não suportado.</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target state="needs-review-translation">O ficheiro não contém nenhum fluxo de áudio.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

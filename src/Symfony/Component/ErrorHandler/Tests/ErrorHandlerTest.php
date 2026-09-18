@@ -588,7 +588,7 @@ class ErrorHandlerTest extends TestCase
     {
         try {
             $calls = 0;
-            $logger = $this->createMock(LoggerInterface::class);
+            $logger = $this->createStub(LoggerInterface::class);
             $logger
                 ->method('log')
                 ->willReturnCallback(static function () use (&$calls) {

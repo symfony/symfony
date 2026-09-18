@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\RefreshableInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
 use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
@@ -86,6 +87,76 @@ abstract class AdapterTestCase extends CachePoolTest
                 return $this->value;
             }
         }));
+    }
+
+    public function testRefresh()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool();
+
+        if (!$cache instanceof RefreshableInterface) {
+            $this->markTestSkipped('Not a refreshable cache pool.');
+        }
+
+        $cache->clear();
+
+        $calls = 0;
+        $callback = static function () use (&$calls) {
+            return ++$calls;
+        };
+
+        $this->assertSame(1, $cache->get('refresh', $callback));
+        $this->assertSame(1, $cache->get('refresh', $callback));
+
+        $cache->enableRefresh();
+
+        // checking for existence must not consume the one refresh the key gets
+        $this->assertFalse($cache->hasItem('refresh'));
+        $this->assertFalse($cache->hasItem('refresh'));
+
+        $this->assertSame(2, $cache->get('refresh', $callback));
+
+        // the refreshed value is served for the rest of the cycle
+        $this->assertSame(2, $cache->get('refresh', $callback));
+        $this->assertTrue($cache->hasItem('refresh'));
+
+        // keys are refreshed independently of each other
+        $this->assertSame(3, $cache->get('refresh-other', $callback));
+
+        $cache->enableRefresh(false);
+        $this->assertSame(2, $cache->get('refresh', $callback));
+        $this->assertTrue($cache->hasItem('refresh'));
+    }
+
+    public function testRefreshItems()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool();
+
+        if (!$cache instanceof RefreshableInterface) {
+            $this->markTestSkipped('Not a refreshable cache pool.');
+        }
+
+        $cache->clear();
+        $cache->save($cache->getItem('refresh-items')->set('cached'));
+
+        $this->assertTrue($cache->getItem('refresh-items')->isHit());
+
+        $cache->enableRefresh();
+
+        $items = iterator_to_array($cache->getItems(['refresh-items', 'refresh-items-missing']));
+        $this->assertSame(['refresh-items', 'refresh-items-missing'], array_keys($items));
+        $this->assertFalse($items['refresh-items']->isHit());
+        $this->assertFalse($items['refresh-items-missing']->isHit());
+
+        // the key was refreshed already, so the stale value is served again
+        $this->assertTrue($cache->getItem('refresh-items')->isHit());
     }
 
     public function testRecursiveGet()

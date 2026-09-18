@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Component\Cache\RefreshableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\AbstractAdapterTrait;
 use Symfony\Component\Cache\Traits\ContractsTrait;
@@ -25,7 +26,7 @@ use Symfony\Contracts\Cache\NamespacedPoolInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, LoggerAwareInterface, ResettableInterface
+abstract class AbstractAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, LoggerAwareInterface, RefreshableInterface, ResettableInterface
 {
     use AbstractAdapterTrait;
     use ContractsTrait;

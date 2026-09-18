@@ -17,7 +17,9 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\RefreshableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\RefreshableTrait;
 use Symfony\Component\VarExporter\DeepCloner;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\NamespacedPoolInterface;
@@ -29,9 +31,10 @@ use Symfony\Contracts\Cache\NamespacedPoolInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, LoggerAwareInterface, ResettableInterface
+class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, LoggerAwareInterface, RefreshableInterface, ResettableInterface
 {
     use LoggerAwareTrait;
+    use RefreshableTrait;
 
     private array $values = [];
     private array $tags = [];
@@ -106,6 +109,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     public function hasItem(mixed $key): bool
     {
+        if ($this->refreshing && \is_string($key) && !isset($this->refreshed[$key]) && !$this->isTagVersion($key)) {
+            return false;
+        }
+
         if (\is_string($key) && isset($this->expiries[$key]) && $this->expiries[$key] > $this->getCurrentTime()) {
             if ($this->maxItems) {
                 // Move the item last in the storage
@@ -123,6 +130,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     public function getItem(mixed $key): CacheItem
     {
+        if ($this->refreshing && \is_string($key) && !$this->isTagVersion($key) && $this->shouldRefresh($key)) {
+            return (self::$createCacheItem)($key, null, false, null, null);
+        }
+
         if (!$isHit = $this->hasItem($key)) {
             $value = null;
 
@@ -328,6 +339,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
     public function reset(): void
     {
         $this->clear();
+        $this->enableRefresh(false);
     }
 
     public function __clone()
@@ -340,6 +352,14 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
     private function generateItems(array $keys, float $now, \Closure $f): \Generator
     {
         foreach ($keys as $i => $key) {
+            if ($this->refreshing && !$this->isTagVersion($key) && $this->shouldRefresh($key)) {
+                unset($keys[$i]);
+
+                yield $key => $f($key, null, false, null);
+
+                continue;
+            }
+
             if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] > $now || !$this->deleteItem($key))) {
                 $value = null;
 

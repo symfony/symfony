@@ -25,7 +25,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterface
+class Psr16Cache implements CacheInterface, PruneableInterface, RefreshableInterface, ResettableInterface
 {
     use ProxyTrait;
 
@@ -128,6 +128,11 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
         } catch (Psr6CacheException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    public function enableRefresh(bool $enable = true): void
+    {
+        $this->pool instanceof RefreshableInterface && $this->pool->enableRefresh($enable);
     }
 
     public function clear(): bool

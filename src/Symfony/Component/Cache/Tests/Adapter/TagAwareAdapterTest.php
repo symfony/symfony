@@ -22,6 +22,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[Group('time-sensitive')]
 class TagAwareAdapterTest extends AdapterTestCase
@@ -36,6 +37,82 @@ class TagAwareAdapterTest extends AdapterTestCase
     public static function tearDownAfterClass(): void
     {
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
+    }
+
+    public function testRefreshKeepsTagVersionsIntact()
+    {
+        $cache = new TagAwareAdapter(new ArrayAdapter());
+        $tag = static function (string $value) {
+            return static function (ItemInterface $item) use ($value) {
+                $item->tag('shared');
+
+                return $value;
+            };
+        };
+
+        $cache->get('one', $tag('one'));
+        $cache->get('two', $tag('two'));
+
+        $cache->enableRefresh();
+
+        $this->assertSame('one/refreshed', $cache->get('one', $tag('one/refreshed')));
+
+        $cache->enableRefresh(false);
+
+        // refreshing an item must not rotate the version of the tags it carries
+        $this->assertSame('two', $cache->get('two', $tag('two/recomputed')));
+        $this->assertSame('one/refreshed', $cache->get('one', $tag('one/recomputed')));
+
+        $cache->invalidateTags(['shared']);
+
+        $this->assertSame('two/invalidated', $cache->get('two', $tag('two/invalidated')));
+    }
+
+    public function testRefreshingTheInnerPoolKeepsTagVersionsIntact()
+    {
+        $inner = new ArrayAdapter();
+        $cache = new TagAwareAdapter($inner);
+        $tag = static function (string $value) {
+            return static function (ItemInterface $item) use ($value) {
+                $item->tag('shared');
+
+                return $value;
+            };
+        };
+
+        $cache->get('one', $tag('one'));
+        $cache->get('two', $tag('two'));
+
+        // the tag versions live in the very pool being refreshed
+        $inner->enableRefresh();
+
+        $this->assertSame('one/refreshed', $cache->get('one', $tag('one/refreshed')));
+
+        $inner->enableRefresh(false);
+
+        $this->assertSame('two', $cache->get('two', $tag('RECOMPUTED')));
+    }
+
+    public function testRefreshingADedicatedTagsPoolKeepsTagVersionsIntact()
+    {
+        $tags = new ArrayAdapter();
+        $cache = new TagAwareAdapter(new ArrayAdapter(), $tags);
+        $tag = static function (string $value) {
+            return static function (ItemInterface $item) use ($value) {
+                $item->tag('shared');
+
+                return $value;
+            };
+        };
+
+        $cache->get('one', $tag('one'));
+        $cache->get('two', $tag('two'));
+
+        $tags->enableRefresh();
+        $cache->get('three', $tag('three')); // a miss, so this one really commits
+        $tags->enableRefresh(false);
+
+        $this->assertSame('two', $cache->get('two', $tag('RECOMPUTED')));
     }
 
     public function testPrune()

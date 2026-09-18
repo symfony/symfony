@@ -12,6 +12,7 @@ CHANGELOG
  * Support the `mongodb:` and `mongodb+srv:` DSN in `AbstractAdapter::createConnection()`
  * Implement `PruneableInterface` on `RedisTagAwareAdapter` to garbage-collect its tag Sets
  * Add `PdoTagAwareAdapter`
+ * Add `RefreshableInterface` to put a pool in refresh mode
 
 8.0
 ---

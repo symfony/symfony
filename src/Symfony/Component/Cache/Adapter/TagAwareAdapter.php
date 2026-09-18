@@ -18,8 +18,10 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\BadMethodCallException;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\RefreshableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
+use Symfony\Component\Cache\Traits\RefreshableTrait;
 use Symfony\Contracts\Cache\NamespacedPoolInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -35,10 +37,13 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Sergey Belyshkin <sbelyshkin@gmail.com>
  */
-class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, NamespacedPoolInterface, PruneableInterface, ResettableInterface, LoggerAwareInterface
+class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, NamespacedPoolInterface, PruneableInterface, RefreshableInterface, ResettableInterface, LoggerAwareInterface
 {
     use ContractsTrait;
     use LoggerAwareTrait;
+    // handled here instead of being delegated to the inner pool: refreshing the pool that
+    // holds the tag versions would make commits rotate them all and invalidate every item
+    use RefreshableTrait;
 
     public const TAGS_PREFIX = "\1tags\1";
 
@@ -131,6 +136,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
 
     public function hasItem(mixed $key): bool
     {
+        if ($this->refreshing && \is_string($key) && !isset($this->refreshed[$key])) {
+            return false;
+        }
+
         return $this->getItem($key)->isHit();
     }
 
@@ -144,11 +153,16 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     public function getItems(array $keys = []): iterable
     {
         $tagKeys = [];
+        $refreshing = [];
         $commit = false;
 
         foreach ($keys as $key) {
             if ('' !== $key && \is_string($key)) {
                 $commit = $commit || isset($this->deferred[$key]);
+
+                if ($this->refreshing && $this->shouldRefresh($key)) {
+                    $refreshing[$key] = true;
+                }
             }
         }
 
@@ -167,11 +181,16 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $bufferedItems = $itemTags = [];
 
         foreach ($items as $key => $item) {
+            $bufferedItems[$key] = $item;
+
+            // leaving the item out of $itemTags is what makes self::$setCacheItemTags blank it
+            if ($refreshing && isset($refreshing[$key])) {
+                continue;
+            }
+
             if (null !== $tags = $item->getMetadata()[CacheItem::METADATA_TAGS] ?? null) {
                 $itemTags[$key] = $tags;
             }
-
-            $bufferedItems[$key] = $item;
 
             if (null === $tags) {
                 $key = "\0tags\0".$key;
@@ -316,6 +335,8 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         } finally {
             $this->knownTagVersions = [];
             $this->deferred = [];
+            $this->enableRefresh(false);
+
             $this->pool instanceof ResettableInterface && $this->pool->reset();
             $this->tags instanceof ResettableInterface && $this->tags->reset();
         }

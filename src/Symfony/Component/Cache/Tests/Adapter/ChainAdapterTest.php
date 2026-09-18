@@ -44,6 +44,28 @@ class ChainAdapterTest extends AdapterTestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
+    public function testRefreshAppliesToEveryLink()
+    {
+        $chain = new ChainAdapter([$first = new ArrayAdapter(), new ExternalAdapter(), $last = new ArrayAdapter()]);
+        $calls = 0;
+        $callback = static function () use (&$calls) {
+            return ++$calls;
+        };
+
+        $this->assertSame(1, $chain->get('refresh-chain', $callback));
+
+        $chain->enableRefresh();
+
+        // a link still holding the old value would shadow the refresh
+        $this->assertSame(2, $chain->get('refresh-chain', $callback));
+
+        $chain->enableRefresh(false);
+
+        $this->assertSame(2, $chain->get('refresh-chain', $callback));
+        $this->assertSame(2, $first->getItem('refresh-chain')->get());
+        $this->assertSame(2, $last->getItem('refresh-chain')->get());
+    }
+
     public function testEmptyAdaptersException()
     {
         $this->expectException(InvalidArgumentException::class);

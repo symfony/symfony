@@ -13,13 +13,14 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\RefreshableInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
  */
-class NullAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, TagAwareAdapterInterface
+class NullAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, RefreshableInterface, TagAwareAdapterInterface
 {
     private static \Closure $createCacheItem;
 
@@ -62,6 +63,11 @@ class NullAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInt
     public function hasItem(mixed $key): bool
     {
         return false;
+    }
+
+    public function enableRefresh(bool $enable = true): void
+    {
+        // everything is always a miss already
     }
 
     public function clear(string $prefix = ''): bool

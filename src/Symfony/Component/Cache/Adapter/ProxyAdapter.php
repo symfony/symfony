@@ -15,19 +15,25 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\RefreshableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Component\Cache\Traits\ProxyTrait;
+use Symfony\Component\Cache\Traits\RefreshableTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheInterface, PruneableInterface, ResettableInterface
+class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheInterface, PruneableInterface, RefreshableInterface, ResettableInterface
 {
     use ContractsTrait;
-    use ProxyTrait;
+    use ProxyTrait {
+        reset as private proxyReset;
+    }
+    // handled here instead of being delegated, so that wrapping a foreign pool is enough
+    use RefreshableTrait;
 
     private string $namespace = '';
     private int $namespaceLen;
@@ -95,7 +101,13 @@ class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheIn
             return $this->doGet($this, $key, $callback, $beta, $metadata);
         }
 
-        return $this->pool->get($this->getId($key), function ($innerItem, bool &$save) use ($key, $callback) {
+        $id = $this->getId($key);
+
+        if ($this->refreshing && $this->shouldRefresh($id)) {
+            $beta = \INF;
+        }
+
+        return $this->pool->get($id, function ($innerItem, bool &$save) use ($key, $callback) {
             $item = (self::$createCacheItem)($key, $innerItem, $this->poolHash);
             $item->set($value = $callback($item, $save));
             (self::$setInnerItem)($innerItem, $item);
@@ -106,25 +118,45 @@ class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheIn
 
     public function getItem(mixed $key): CacheItem
     {
-        $item = $this->pool->getItem($this->getId($key));
+        $id = $this->getId($key);
 
-        return (self::$createCacheItem)($key, $item, $this->poolHash);
+        if ($this->refreshing && $this->shouldRefresh($id)) {
+            return (self::$createCacheItem)($key, null, $this->poolHash);
+        }
+
+        return (self::$createCacheItem)($key, $this->pool->getItem($id), $this->poolHash);
     }
 
     public function getItems(array $keys = []): iterable
     {
-        if ($this->namespaceLen) {
+        $refreshing = [];
+
+        if ($this->refreshing || $this->namespaceLen) {
             foreach ($keys as $i => $key) {
-                $keys[$i] = $this->getId($key);
+                $id = $this->getId($key);
+
+                if ($this->refreshing && $this->shouldRefresh($id)) {
+                    $refreshing[$key] = true;
+                }
+
+                if ($this->namespaceLen) {
+                    $keys[$i] = $id;
+                }
             }
         }
 
-        return $this->generateItems($this->pool->getItems($keys));
+        return $this->generateItems($this->pool->getItems($keys), $refreshing);
     }
 
     public function hasItem(mixed $key): bool
     {
-        return $this->pool->hasItem($this->getId($key));
+        $id = $this->getId($key);
+
+        if ($this->refreshing && !isset($this->refreshed[$id])) {
+            return false;
+        }
+
+        return $this->pool->hasItem($id);
     }
 
     public function clear(string $prefix = ''): bool
@@ -160,6 +192,12 @@ class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheIn
     public function saveDeferred(CacheItemInterface $item): bool
     {
         return $this->doSave($item, __FUNCTION__);
+    }
+
+    public function reset(): void
+    {
+        $this->enableRefresh(false);
+        $this->proxyReset();
     }
 
     public function commit(): bool
@@ -207,7 +245,7 @@ class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheIn
         return $this->pool->$method($innerItem);
     }
 
-    private function generateItems(iterable $items): \Generator
+    private function generateItems(iterable $items, array $refreshing): \Generator
     {
         $f = self::$createCacheItem;
 
@@ -216,7 +254,7 @@ class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheIn
                 $key = substr($key, $this->namespaceLen);
             }
 
-            yield $key => $f($key, $item, $this->poolHash);
+            yield $key => $f($key, isset($refreshing[$key]) ? null : $item, $this->poolHash);
         }
     }
 

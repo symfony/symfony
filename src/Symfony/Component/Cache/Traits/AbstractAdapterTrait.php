@@ -24,6 +24,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 trait AbstractAdapterTrait
 {
     use LoggerAwareTrait;
+    use RefreshableTrait;
 
     /**
      * needs to be set by class, signature is function(string <key>, mixed <value>, bool <isHit>).
@@ -92,6 +93,10 @@ trait AbstractAdapterTrait
 
         if (isset($this->deferred[$key])) {
             $this->commit();
+        }
+
+        if ($this->refreshing && !isset($this->refreshed[$id]) && !$this->isTagVersion($key)) {
+            return false;
         }
 
         try {
@@ -192,6 +197,10 @@ trait AbstractAdapterTrait
             $this->commit();
         }
 
+        if ($this->refreshing && !$this->isTagVersion($key) && $this->shouldRefresh($id)) {
+            return (self::$createCacheItem)($key, null, false);
+        }
+
         $isHit = false;
         $value = null;
 
@@ -222,8 +231,21 @@ trait AbstractAdapterTrait
             $this->commit();
         }
 
+        $idsToFetch = $ids;
+
+        if ($this->refreshing) {
+            $idsToFetch = [];
+            $keys = array_values($keys);
+
+            foreach ($ids as $i => $id) {
+                if ($this->isTagVersion($keys[$i]) || !$this->shouldRefresh($id)) {
+                    $idsToFetch[] = $id;
+                }
+            }
+        }
+
         try {
-            $items = $this->doFetch($ids);
+            $items = $this->doFetch($idsToFetch);
         } catch (\Exception $e) {
             CacheItem::log($this->logger, 'Failed to fetch items: '.$e->getMessage(), ['keys' => $keys, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
             $items = [];
@@ -290,6 +312,7 @@ trait AbstractAdapterTrait
         }
         $this->namespaceVersion = '';
         $this->ids = [];
+        $this->enableRefresh(false);
     }
 
     public function __serialize(): array

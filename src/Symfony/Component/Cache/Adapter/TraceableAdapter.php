@@ -15,6 +15,7 @@ use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\BadMethodCallException;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\RefreshableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\NamespacedPoolInterface;
@@ -27,7 +28,7 @@ use Symfony\Contracts\Service\ResetInterface;
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TraceableAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, PruneableInterface, ResettableInterface
+class TraceableAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, PruneableInterface, RefreshableInterface, ResettableInterface
 {
     private string $namespace = '';
     private array $calls = [];
@@ -171,6 +172,11 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, NamespacedPo
         };
 
         return $f();
+    }
+
+    public function enableRefresh(bool $enable = true): void
+    {
+        $this->pool instanceof RefreshableInterface && $this->pool->enableRefresh($enable);
     }
 
     public function clear(string $prefix = ''): bool

@@ -17,6 +17,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\BadMethodCallException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\RefreshableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -31,7 +32,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, PruneableInterface, ResettableInterface
+class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInterface, PruneableInterface, RefreshableInterface, ResettableInterface
 {
     use ContractsTrait;
 
@@ -195,6 +196,18 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
         }
 
         return false;
+    }
+
+    /**
+     * Every adapter is refreshed: one still holding the old value would shadow the others.
+     */
+    public function enableRefresh(bool $enable = true): void
+    {
+        foreach ($this->adapters as $adapter) {
+            if ($adapter instanceof RefreshableInterface) {
+                $adapter->enableRefresh($enable);
+            }
+        }
     }
 
     public function clear(string $prefix = ''): bool

@@ -175,4 +175,18 @@ class AttributeBagTest extends TestCase
     {
         $this->assertCount(\count($this->array), $this->bag);
     }
+
+    public function testNumericKeysAreExposedAsStrings()
+    {
+        $bag = new AttributeBag();
+        $bag->set('123', 'foo');
+        $bag->set('bar', 'baz');
+
+        $keys = [];
+        foreach ($bag as $key => $value) {
+            $keys[] = $key;
+        }
+
+        $this->assertSame(['123', 'bar'], $keys);
+    }
 }

@@ -24,7 +24,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     protected const LOWER = '-abcdefghijklmnopqrstuvwxyz';
 
     /**
-     * @var array<string, list<string|null>>
+     * @var array<list<string|null>>
      */
     protected array $headers = [];
     protected array $cacheControl = [];
@@ -63,7 +63,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      *
      * @param string|null $key The name of the headers to return or null to get them all
      *
-     * @return ($key is null ? array<string, list<string|null>> : list<string|null>)
+     * @return ($key is null ? array<list<string|null>> : list<string|null>)
      */
     public function all(?string $key = null): array
     {
@@ -81,7 +81,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     public function keys(): array
     {
-        return array_keys($this->all());
+        return array_map(strval(...), array_keys($this->all()));
     }
 
     /**
@@ -243,7 +243,14 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     public function getIterator(): \ArrayIterator
     {
-        return new \ArrayIterator($this->headers);
+        return new
+            /** @extends \ArrayIterator<string, list<string|null>> */
+            class($this->headers) extends \ArrayIterator {
+                public function key(): string
+                {
+                    return (string) parent::key();
+                }
+            };
     }
 
     /**

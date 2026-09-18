@@ -104,7 +104,14 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
      */
     public function getIterator(): \ArrayIterator
     {
-        return new \ArrayIterator($this->attributes);
+        return new
+            /** @extends \ArrayIterator<string, mixed> */
+            class($this->attributes) extends \ArrayIterator {
+                public function key(): string
+                {
+                    return (string) parent::key();
+                }
+            };
     }
 
     /**

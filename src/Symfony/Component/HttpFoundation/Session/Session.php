@@ -106,7 +106,14 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
      */
     public function getIterator(): \ArrayIterator
     {
-        return new \ArrayIterator($this->getAttributeBag()->all());
+        return new
+            /** @extends \ArrayIterator<string, mixed> */
+            class($this->getAttributeBag()->all()) extends \ArrayIterator {
+                public function key(): string
+                {
+                    return (string) parent::key();
+                }
+            };
     }
 
     /**

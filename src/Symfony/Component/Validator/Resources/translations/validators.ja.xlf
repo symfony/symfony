@@ -578,6 +578,74 @@
                 <source>This value is not a valid ULID.</source>
                 <target state="needs-review-translation">有効なULIDではありません。</target>
             </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target state="needs-review-translation">選択されたファイルは有効な音声ファイルではありません。</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target state="needs-review-translation">音声が短すぎます（{{ duration }} 秒）。許可されている最小の再生時間は {{ min_duration }} 秒です。</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target state="needs-review-translation">音声が長すぎます（{{ duration }} 秒）。許可されている最大の再生時間は {{ max_duration }} 秒です。</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target state="needs-review-translation">音声の再生時間を検出できませんでした。</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target state="needs-review-translation">音声のビットレートが低すぎます（{{ bitrate }} bps）。許可されている最小のビットレートは {{ min_bitrate }} bps です。</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target state="needs-review-translation">音声のビットレートが高すぎます（{{ bitrate }} bps）。許可されている最大のビットレートは {{ max_bitrate }} bps です。</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target state="needs-review-translation">音声のビットレートを検出できませんでした。</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target state="needs-review-translation">サポートされていない音声のサンプルレート（{{ sample_rate }} Hz）です。</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target state="needs-review-translation">音声のサンプルレートを検出できませんでした。</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target state="needs-review-translation">この音声のチャンネル数が少なすぎます（{{ channels }}）。許可されている最小チャンネル数は {{ min_channels }} です。</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target state="needs-review-translation">この音声のチャンネル数が多すぎます（{{ channels }}）。許可されている最大チャンネル数は {{ max_channels }} です。</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target state="needs-review-translation">音声のチャンネル数を検出できませんでした。</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target state="needs-review-translation">音声ファイルが破損しています。</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">この音声には複数のストリームが含まれています。許可されるのは1つのストリームのみです。</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target state="needs-review-translation">サポートされていない音声コーデック「{{ codec }}」です。</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target state="needs-review-translation">サポートされていない音声コンテナ「{{ container }}」です。</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target state="needs-review-translation">このファイルには音声ストリームが含まれていません。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

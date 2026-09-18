@@ -578,6 +578,74 @@
                 <source>This value is not a valid ULID.</source>
                 <target state="needs-review-translation">Bu qiymat haqiqiy ULID emas.</target>
             </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target state="needs-review-translation">Ushbu fayl yaroqli audio fayl emas.</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target state="needs-review-translation">Audio juda qisqa ({{ duration }} sekund). Kutilgan minimal davomiylik {{ min_duration }} sekund.</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target state="needs-review-translation">Audio juda uzun ({{ duration }} sekund). Ruxsat etilgan maksimal davomiylik {{ max_duration }} sekund.</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target state="needs-review-translation">Audioning davomiyligini aniqlab bo‘lmadi.</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target state="needs-review-translation">Audio bitreyti juda past ({{ bitrate }} bps). Kutilayotgan minimal bitreyt {{ min_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target state="needs-review-translation">Audio bitreyti juda yuqori ({{ bitrate }} bps). Ruxsat etilgan maksimal bitreyt {{ max_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target state="needs-review-translation">Audioning bitreytini aniqlab bo‘lmadi.</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target state="needs-review-translation">Qo‘llab-quvvatlanmaydigan audio namuna olish chastotasi ({{ sample_rate }} Hz).</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target state="needs-review-translation">Audioning namuna olish chastotasini aniqlab bo‘lmadi.</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target state="needs-review-translation">Audioda kanallar soni juda kam ({{ channels }}). Kutilgan minimal miqdor {{ min_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target state="needs-review-translation">Audioda juda ko‘p kanal bor ({{ channels }}). Kutilayotgan maksimal miqdor {{ max_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target state="needs-review-translation">Audio kanallari sonini aniqlab bo‘lmadi.</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target state="needs-review-translation">Audio fayli buzilgan.</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">Audioda bir nechta oqim mavjud. Faqat bitta oqimga ruxsat beriladi.</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target state="needs-review-translation">Qo‘llab-quvvatlanmaydigan audio kodek "{{ codec }}".</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target state="needs-review-translation">Qo'llab-quvvatlanmaydigan audio konteyner "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target state="needs-review-translation">Faylda audio oqim mavjud emas.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

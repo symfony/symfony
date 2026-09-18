@@ -578,6 +578,74 @@
                 <source>This value is not a valid ULID.</source>
                 <target>Nilai ini bukan ULID yang valid.</target>
             </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target state="needs-review-translation">Berkas ini bukan berkas audio yang valid.</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target state="needs-review-translation">Audio terlalu pendek ({{ duration }} detik). Durasi minimum yang diharapkan adalah {{ min_duration }} detik.</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target state="needs-review-translation">Audio terlalu panjang ({{ duration }} detik). Durasi maksimum yang diizinkan adalah {{ max_duration }} detik.</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target state="needs-review-translation">Durasi audio tidak dapat dideteksi.</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target state="needs-review-translation">Bitrate audio terlalu rendah ({{ bitrate }} bps). Bitrate minimum yang diharapkan adalah {{ min_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target state="needs-review-translation">Bitrate audio terlalu tinggi ({{ bitrate }} bps). Bitrate maksimum yang diizinkan adalah {{ max_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target state="needs-review-translation">Bitrate audio tidak dapat dideteksi.</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target state="needs-review-translation">Laju sampel audio tidak didukung ({{ sample_rate }} Hz).</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target state="needs-review-translation">Laju sampel audio tidak dapat dideteksi.</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target state="needs-review-translation">Audio memiliki terlalu sedikit kanal ({{ channels }}). Jumlah minimum yang diharapkan adalah {{ min_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target state="needs-review-translation">Audio memiliki terlalu banyak kanal ({{ channels }}). Jumlah maksimum yang diharapkan adalah {{ max_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target state="needs-review-translation">Jumlah kanal audio tidak dapat dideteksi.</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target state="needs-review-translation">Berkas audio rusak.</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">Audio berisi beberapa aliran. Hanya satu aliran yang diizinkan.</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target state="needs-review-translation">Kodek audio tidak didukung "{{ codec }}".</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target state="needs-review-translation">Kontainer audio tidak didukung "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target state="needs-review-translation">Berkas tidak berisi aliran audio.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

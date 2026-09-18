@@ -111,7 +111,7 @@ class FormFlowType extends AbstractFlowType
      *
      * @return array<string, array<string, mixed>>
      */
-    private function buildStepsVars(array $steps, FormFlowCursor $cursor, mixed $viewData, int $level = 0): array
+    private function buildStepsVars(array $steps, FormFlowCursor $cursor, mixed $viewData, int $level = 0, bool $parentSkipped = false): array
     {
         $tree = [];
         $index = 0;
@@ -119,12 +119,13 @@ class FormFlowType extends AbstractFlowType
         $currentStep = $cursor->getCurrentStep();
 
         foreach ($steps as $name => $step) {
+            // a skipped step takes its whole subtree with it
+            $isSkipped = $parentSkipped || $step->isSkipped($viewData);
+
             $children = [];
             if ($childSteps = $step->getSteps()) {
-                $children = $this->buildStepsVars($childSteps, $cursor, $viewData, $level + 1);
+                $children = $this->buildStepsVars($childSteps, $cursor, $viewData, $level + 1, $isSkipped);
             }
-
-            $isSkipped = $step->isSkipped($viewData);
 
             $tree[$name] = [
                 'name' => $name,

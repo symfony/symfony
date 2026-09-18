@@ -327,6 +327,25 @@ class StepNodeTest extends TestCase
         $this->assertFalse($roots[0]->getChildren()[1]->isGroupOrSkipped(null));
     }
 
+    public function testChildSkipCannotCancelSkippedParent()
+    {
+        $stepB = new StepFlowBuilder('stepB')
+            ->setSkip(static fn () => true)
+            ->addStep(new StepFlowBuilder('stepB1')->setSkip(static fn () => false))
+            ->addStep(
+                new StepFlowBuilder('stepB2')
+                    ->setSkip(static fn () => false)
+                    ->addStep('stepB21')
+            );
+        $roots = StepFlowNode::fromConfig(['stepB' => $stepB->getStepConfig()]);
+
+        $this->assertTrue($roots[0]->isGroupOrSkipped(null));
+        $this->assertTrue($roots[0]->getChildren()[0]->isGroupOrSkipped(null));
+        $stepB2 = $roots[0]->getChildren()[1];
+        $this->assertTrue($stepB2->isGroupOrSkipped(null));
+        $this->assertTrue($stepB2->getChildren()[0]->isGroupOrSkipped(null));
+    }
+
     public function testGroupWithSkipOnChildrenAreSkipped()
     {
         $stepA = new StepFlowBuilder('stepA')

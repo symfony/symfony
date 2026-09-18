@@ -614,6 +614,44 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    public function testHandleFatalErrorUsesBacktraceProvidedByPhp()
+    {
+        try {
+            $logger = $this->createMock(LoggerInterface::class);
+            $handler = ErrorHandler::register();
+
+            $trace = [
+                ['file' => 'foo.php', 'line' => 12, 'function' => 'require'],
+                ['file' => 'bar.php', 'line' => 34, 'function' => 'doSomething', 'args' => []],
+            ];
+
+            $error = [
+                'type' => \E_ERROR,
+                'message' => 'foo',
+                'file' => 'bar',
+                'line' => 123,
+                'trace' => $trace,
+            ];
+
+            $logger
+                ->expects($this->once())
+                ->method('log')
+                ->willReturnCallback(function ($level, $message, $context) use ($trace) {
+                    $this->assertInstanceOf(FatalError::class, $context['exception']);
+                    $this->assertSame($trace, $context['exception']->getTrace());
+                })
+            ;
+
+            $handler->setDefaultLogger($logger, \E_ERROR);
+            $handler->setExceptionHandler(null);
+
+            $handler->handleFatalError($error);
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+    }
+
     public function testHandleErrorException()
     {
         $exception = new \Error("Class 'IReallyReallyDoNotExistAnywhereInTheRepositoryISwear' not found");

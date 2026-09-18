@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `DebugClassLoaderIssueTriggerResolver` to classify `DebugClassLoader` deprecations with PHPUnit 13.1+
+ * Add the `#[UseRecord]` attribute, the `SYMFONY_HTTP_RECORDER` env var and the `http-recorder-directory` parameter of `SymfonyExtension` to replay and record HTTP calls made through `RecorderHttpClient` in tests
 
 8.1
 ---

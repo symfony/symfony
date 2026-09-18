@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T10:26:20Z
+
+Thanks @a-muzyka! The reasoning in the description is right: `<` and `>` are ASCII and every byte of a multibyte sequence is >= 0x80, so a tag offset can never land inside one.
+
+I checked base vs this branch over a matrix of ~9000 cases (ascii, accented latin, CJK, emoji, ZWJ emoji, combining marks, malformed UTF-8, x 14 tag shapes, x widths 0-40) and the output is byte-identical everywhere except one thing, which is in your favour: base was dropping a combining mark placed right after a tag. `format("e<info>\u{0301}x</info>tail")` gave `extail`, now `éxtail`. I added that to the description, it deserves to be visible.
+
+I also pushed a test for it, since a perf fix with no behavioural guard invites the next optimization to put the conversion back. Inline assertions rather than a data provider on purpose: a docblock `@dataProvider` on 6.4 breaks when this merges up to PHPUnit 13.
+
+Checked the ASCII path separately since this removes the fast path from 5e84b90b999 - 742 KB with 20000 tags, median 0.158s before and 0.150s after, so nothing lost there.

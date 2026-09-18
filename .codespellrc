@@ -1,4 +1,4 @@
 [codespell]
 # "smove" is the name of a Redis command
-# "hastable" is Doctrine's Schema::hasTable() method
-ignore-words-list = smove,hastable
+# "hastable" is Doctrine's Schema::hasTable() method, "caf" comes from the "café" test fixtures
+ignore-words-list = smove,hastable,caf

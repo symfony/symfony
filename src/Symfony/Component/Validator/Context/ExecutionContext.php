@@ -73,6 +73,13 @@ class ExecutionContext implements ExecutionContextInterface
     private ?Constraint $constraint = null;
 
     /**
+     * The groups that nested objects are validated against.
+     *
+     * @var string[]|null
+     */
+    private ?array $cascadedGroups = null;
+
+    /**
      * Stores which objects have been validated in which group.
      *
      * @var bool[][]
@@ -129,6 +136,14 @@ class ExecutionContext implements ExecutionContextInterface
     public function setConstraint(Constraint $constraint): void
     {
         $this->constraint = $constraint;
+    }
+
+    /**
+     * @param string[]|null $cascadedGroups
+     */
+    public function setCascadedGroups(?array $cascadedGroups): void
+    {
+        $this->cascadedGroups = $cascadedGroups;
     }
 
     public function addViolation(string|\Stringable $message, array $parameters = []): void
@@ -205,6 +220,14 @@ class ExecutionContext implements ExecutionContextInterface
     public function getConstraint(): ?Constraint
     {
         return $this->constraint;
+    }
+
+    /**
+     * @return string[]|null
+     */
+    public function getCascadedGroups(): ?array
+    {
+        return $this->cascadedGroups;
     }
 
     public function getClassName(): ?string

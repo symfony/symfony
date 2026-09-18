@@ -52,6 +52,8 @@ trait PriorityTaggedServiceTrait
 
         $parameterBag = $container->getParameterBag();
         $services = [];
+        $constrained = false;
+        $classById = [];
 
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $attributes) {
             if (\in_array($serviceId, $exclude, true)) {
@@ -60,10 +62,12 @@ trait PriorityTaggedServiceTrait
 
             $defaultPriority = $defaultAttributePriority = null;
             $defaultIndex = $defaultAttributeIndex = null;
+            $attributeConstraints = [];
             $indexes = [];
             $definition = $container->getDefinition($serviceId);
             $class = $definition->getClass();
             $class = $container->getParameterBag()->resolveValue($class) ?: null;
+            $classById[$serviceId] = $class;
             $reflector = null !== $class ? $container->getReflectionClass($class) : null;
             $phpAttributes = $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes') ? $reflector?->getAttributes(AsTaggedItem::class) : [];
 
@@ -71,12 +75,16 @@ trait PriorityTaggedServiceTrait
                 $attribute = $attribute->newInstance();
                 $phpAttributes[$i] = [
                     'priority' => $attribute->priority,
+                    'before' => $attribute->before,
+                    'after' => $attribute->after,
                     $indexAttribute ?? '' => $attribute->index,
                 ];
                 if (null === $defaultAttributePriority) {
                     $defaultAttributePriority = $attribute->priority ?? 0;
                     $defaultAttributeIndex = $attribute->index;
                 }
+                $attributeConstraints['before'] ??= $attribute->before;
+                $attributeConstraints['after'] ??= $attribute->after;
             }
             if (1 >= \count($phpAttributes)) {
                 $phpAttributes = [];
@@ -113,8 +121,18 @@ trait PriorityTaggedServiceTrait
                 }
                 $priority ??= $defaultPriority ??= 0;
 
+                $entryConstraints = [];
+                foreach (['before', 'after'] as $direction) {
+                    $targets = \array_key_exists($direction, $attribute) ? $attribute[$direction] : ($attributeConstraints[$direction] ?? null);
+
+                    if ($targets = (array) ($targets ?? [])) {
+                        $entryConstraints[$direction] = $targets;
+                        $constrained = true;
+                    }
+                }
+
                 if (null === $indexAttribute && !$defaultIndexMethod && !$needsIndexes) {
-                    $services[] = [$priority, $i, null, $serviceId, null];
+                    $services[] = [$priority, $i, null, $serviceId, null, $entryConstraints];
                     continue 2;
                 }
 
@@ -140,11 +158,15 @@ trait PriorityTaggedServiceTrait
                 }
                 $indexes[$index] = true;
 
-                $services[] = [$priority, $i, $index, $serviceId, $class];
+                $services[] = [$priority, $i, $index, $serviceId, $class, $entryConstraints];
             }
         }
 
         uasort($services, static fn ($a, $b) => $b[0] <=> $a[0] ?: $a[1] <=> $b[1]);
+
+        if ($constrained) {
+            $services = PriorityTaggedServiceUtil::applyConstraints($services, $classById, $tagName);
+        }
 
         $refs = [];
         foreach ($services as [, , $index, $serviceId, $class]) {
@@ -170,6 +192,59 @@ trait PriorityTaggedServiceTrait
  */
 class PriorityTaggedServiceUtil
 {
+    /**
+     * @param array<array{0: int, 1: int, 2: string|null, 3: string, 4: string|null, 5: array}> $services
+     * @param array<string, string|null>                                                        $classById
+     *
+     * @return list<array{0: int, 1: int, 2: string|null, 3: string, 4: string|null, 5: array}>
+     */
+    public static function applyConstraints(array $services, array $classById, string $tagName): array
+    {
+        $keys = [];
+        $entries = [];
+        $aliases = [];
+        $keysById = [];
+        $constraints = [];
+
+        // each tag gets its own key so that the other tags of a service keep the place the priority sort gave them
+        foreach ($services as $service) {
+            $serviceId = $service[3];
+
+            for ($n = 0, $key = $serviceId; isset($entries[$key]); ++$n) {
+                $key = $serviceId.'#'.$n;
+            }
+
+            $entries[$key] = $service;
+            $keys[] = $key;
+            $keysById[$serviceId][] = $key;
+
+            if ($service[5]) {
+                $constraints[$key] = $service[5];
+            }
+
+            if (null !== $class = $classById[$serviceId] ?? null) {
+                $aliases[$class][] = $key;
+            }
+        }
+
+        // a service id always designates its own tags, whatever class it happens to share a name with
+        $aliases = $keysById + $aliases;
+
+        try {
+            $keys = BeforeAfterSorter::sort($keys, $constraints, $aliases);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(\sprintf('Invalid "before"/"after" constraints on tag "%s": ', $tagName).lcfirst($e->getMessage()), previous: $e);
+        }
+
+        $sorted = [];
+
+        foreach ($keys as $key) {
+            $sorted[] = $entries[$key];
+        }
+
+        return $sorted;
+    }
+
     public static function getDefault(string $serviceId, \ReflectionClass $r, string $defaultMethod, string $tagName, ?string $indexAttribute): string|int|null
     {
         if ($r->isInterface() || !$r->hasMethod($defaultMethod)) {

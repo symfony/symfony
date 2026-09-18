@@ -9,6 +9,7 @@ CHANGELOG
  * Add `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`, which `EventDispatcherInterface` extends, to type what reads the listeners of a dispatcher without registering any
  * Deprecate calling `addListener()`, `addSubscriber()`, `removeListener()` and `removeSubscriber()` on a `CompiledEventDispatcher`, declare the listener in the container or add it to a `ScopedEventDispatcher` instead
  * Allow `getSubscribedEvents()` to name its keys: `['method' => 'onEvent', 'priority' => 10]`
+ * Add `before` and `after` to `#[AsEventListener]` to order listeners relative to each other, targeting a service id, a class, or a single listener with `Service::method`
 
 8.1
 ---

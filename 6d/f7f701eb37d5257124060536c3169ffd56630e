@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-16T08:59:37Z
+
+Does this need a flag? What about just doing it all the time?
+
+---------------------------------------------------------------------------
+
+by ineersa at 2026-09-16T17:06:29Z
+
+> Does this need a flag? What about just doing it all the time?
+
+Current rendering slightly changes default select list widget output, so I made it separate.
+
+But in theory nothing stops from wrapping labels/descriptions to support multiline.
+
+So for label/description layout would be something like this
+```
+
+  → Development   Local development server
+                                is long
+
+   Production       Public production server
+   is long
+
+   Normal             Normal
+```
+
+For label only pickers we can keep full line length and wrap it to multiple lines.
+
+I will try to rework render to be compatible with old view and remove option.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T10:03:10Z
+
+Thanks @ineersa, I pushed a few changes on top of yours.
+
+The widget doesn't expand vertically by default anymore: that was adding blank rows under every existing list, and `ContainerWidget::isVerticallyExpanded()` propagates it to the whole subtree, so wrapping the list in a panel flipped that too. `expandVertically(true)` opts in, and there's now a test on each side of it.
+
+I also renamed `testNonExpandedSelectListOverflowKeepsSelectedArrowVisible` and made it expand: it was asserting that the heading and footer survive an 8-row terminal, which no widget guarantees - a tall `TextWidget` scrolls the heading off in the same layout.
+
+One thing I left alone: PageDown now advances half a page for plain one-row items, where it used to advance `maxVisible`. Your rule never skips an unseen item, which is the property that matters here, and fixing the step properly means anchoring the window to the selection instead of centring it. Worth a follow-up I think, WDYT?
+
+Can you give this a try on your side and confirm it still does what you need?
+
+---------------------------------------------------------------------------
+
+by ineersa at 2026-09-18T17:39:09Z
+
+Thanks @nicolas-grekas !
+
+<img width="3823" height="971" alt="image" src="https://github.com/user-attachments/assets/b5987d9b-dfd6-47bc-99e1-26328000fd20" />
+Tested and it works as intended.
+I was still trying to test older version.
+
+> The widget doesn't expand vertically by default anymore: that was adding blank rows under every existing list, and ContainerWidget::isVerticallyExpanded() propagates it to the whole subtree, so wrapping the list in a panel flipped that too. expandVertically(true) opts in, and there's now a test on each side of it.
+
+In theory it was not that bad idea, on practice changed behavior and I got a lot of regressions in agent today during testing.
+
+> One thing I left alone: PageDown now advances half a page for plain one-row items, where it used to advance maxVisible. Your rule never skips an unseen item, which is the property that matters here, and fixing the step properly means anchoring the window to the selection instead of centring it. Worth a follow-up I think, WDYT?
+
+Agree this changes PageDown behavior, but should be done separately to not add more complexity to PR.
+Keeping unseen items from being skipped works for now.
+For the follow-up, yes we will need explicit anchor/scroll position.

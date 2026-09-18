@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2026-08-25T14:03:33Z
+
+> Wouldn't that cause problems, such as with relative paths or front-end frameworks that use these files?
+
+This is why I introduce a public setting. Rare or specific cases will still be possible :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-27T10:00:09Z
+
+Putting this in the cache-dir or build-dir means cache:clear removes assets. That's broken DX I fear.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-08-27T10:24:18Z
+
+> Putting this in the cache-dir or build-dir means cache:clear removes assets. That's broken DX I fear.
+
+Should it be in `%kernel.project_dir%/assets/build` dir then?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2026-09-15T14:21:38Z
+
+> Putting this in the cache-dir or build-dir means cache:clear removes assets. That's broken DX I fear.
+
+Absolutely! I had the false impression build-dir would be read-only once .. built. But not indeed.
+
+Would that be ok for you to have a
+
+```
+%kernel.project_dir%/var/assets/build/
+```
+
+directory? (with or without env ?)
+
+@GromNaN @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-16T19:34:12Z
+
+`%kernel.share_dir%/assets` ? my concern is that ppl might be use to configure `var/cache/` as the shared fs on their host and adding something in `var/` directly means not shared in those setup / something deploy script to patch.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2026-09-17T20:12:11Z
+
+> %kernel.share_dir%/assets ?
+
+Used as default, docs and config updated, all thing rebased on the new AssetMapperBundle
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T13:35:46Z
+
+My `%kernel.share_dir%/assets` suggestion was wrong: `Kernel::getShareDir()` returns `getCacheDir()` unless `APP_SHARE_DIR` is set, so `cache:clear` wipes it just like the build dir. I probed all four layouts:
+
+| `metadata_dir` | after `cache:clear` |
+| --- | --- |
+| `%kernel.share_dir%/assets`, default layout | gone |
+| `%kernel.share_dir%/assets`, separate `var/build` | gone |
+| `APP_SHARE_DIR=var/share` | survives |
+| unset (public assets dir, today's default) | survives |
+
+And it fails silently: the manifest is absent, `getPublicPath()` still resolves, the import map is just rebuilt from source on every request. `cache:clear` renames both the cache dir and the build dir aside and replaces the build dir with the warmup copy, so only what a warmer regenerates survives. `%kernel.build_dir%` has the same problem, which is what you had spotted for the original name.
+
+So there is no good default to promise for 9.0 right now, and picking one freezes it into the deprecation message. I dropped the deprecation and kept the option: the feature is useful on its own, people who care can set it today, and we can deprecate later once we have somewhere sensible to point at (a directory `cache:clear` never manages, or `share_dir` plus a warmer that recompiles).
+
+What I changed on top of your branch:
+
+- removed the deprecation, the UPGRADE entry and the `symfony/deprecation-contracts` requirement (it was the only `trigger_deprecation()` in the component)
+- the two legacy tests are now plain tests, and dropped the `IgnoreDeprecations` import they orphaned
+- added `cannotBeEmpty()`: `metadata_dir: ''` used to be accepted and gave a CWD-relative path
+- `abstract_arg('public assets directory')` -> `'metadata directory'`, since it is not the public dir any more
+- fixtures use `%kernel.project_dir%/var/assets` instead of `share_dir`, so we are not advertising the location that does not survive
+- reverted the `BundlePaths` config change, which only existed to silence the deprecation
+- squashed, rebased, retitled to `[AssetMapper]`
+
+@GromNaN your approval predates the rebase, worth a fresh look.

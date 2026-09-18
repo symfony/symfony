@@ -8,3 +8,7 @@
 # doctrine/collections, doctrine/dbal and the sebastian/* packages that ship
 # with PHPUnit.
 %^Function spl_object_hash\(\) is deprecated%
+
+# PHP 8.6 deprecates "is" as a class name. guzzlehttp/promises declares an "Is"
+# class that HttplugClient reaches through the Guzzle promise API.
+%^Using "is" as a class name is deprecated%

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-17T10:12:25Z
+
+I closed this in #62568 because this is pure strict-mode induced shenanigans.
+
+---------------------------------------------------------------------------
+
+by gjuric at 2026-09-17T11:02:15Z
+
+It has real word consequences as well, especially with the tooling that is in use today.
+
+We don't control what comes as a query parameter, but we can control what the code tells us about itself.
+
+In this case the code is not correct. What is the point of a docblock if we can't rely on it?
+
+I think that people who don't care about correctness can ignore the error or lower their static analysis level, not the other way around.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T07:17:51Z
+
+One doesn't control what is put in a query, but controls which keys are read from it. Do we really expect numbers as parameter keys? I need to understand which kind of code will reach that int case in practice.
+
+---------------------------------------------------------------------------
+
+by gjuric at 2026-09-18T08:54:31Z
+
+OK, fair point. That said, with some legacy systems you sometimes have to jump through hoops that don't necessarily make much sense.
+
+In this particular case, I need to read all of the query parameters and execute some logic based on them. That logic relies on the contract described in the docblock being accurate.
+
+I understand the reasoning behind wanting to control which keys are read, but I don't quite see the benefit of having the calling code receive something different from what the docblock says it will receive.
+
+Wouldn't it be preferable for the contract defined in the docblock to accurately reflect the actual behavior? Otherwise, I'm not sure what purpose that contract serves.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T11:53:49Z
+
+Thanks for pushing back. I went the other way: instead of widening the docblocks to `array-key` and pushing `int|string` into your loop, `keys()` and the iterator now return the strings they always claimed, so `get($key)` works with no cast under strict_types. The annotations that describe what you pass in no longer constrain the key type, since the bag genuinely doesn't care.
+
+all() still hands back the raw array, so numeric keys stay ints there; its annotation just doesn't claim otherwise any more. #66151 does the same for HeaderBag and the session bags.

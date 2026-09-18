@@ -28,6 +28,7 @@ use Symfony\Component\Tui\Terminal\VirtualTerminal;
 use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\ContainerWidget;
 use Symfony\Component\Tui\Widget\InputWidget;
+use Symfony\Component\Tui\Widget\SelectListWidget;
 use Symfony\Component\Tui\Widget\TextWidget;
 
 class TuiTest extends TestCase
@@ -633,5 +634,79 @@ class TuiTest extends TestCase
 
         $this->assertSame('z', $received);
         $tui->stop();
+    }
+
+    public function testExpandedSelectListOverflowKeepsSelectedArrowVisible()
+    {
+        $terminal = new VirtualTerminal(40, 8);
+        $tui = new Tui(terminal: $terminal);
+        $tui->add(new TextWidget('heading1'));
+        $tui->add((new SelectListWidget([
+            ['value' => 'a', 'label' => str_repeat('word ', 50)],
+            ['value' => 'b', 'label' => 'another option'],
+        ], maxVisible: 5))->expandVertically(true));
+        $tui->add(new TextWidget('footer1'));
+
+        try {
+            $tui->start();
+            $tui->processRender();
+
+            $screen = new ScreenBuffer(40, 8);
+            $screen->write($terminal->getOutput());
+            $visible = array_map(rtrim(...), explode("\n", $screen->getScreen()));
+
+            $this->assertTrue(
+                (bool) array_filter($visible, static fn (string $line): bool => str_contains($line, '→')),
+                'The selected arrow must remain visible on the rendered screen.',
+            );
+            $this->assertTrue(
+                (bool) array_filter($visible, static fn (string $line): bool => str_contains($line, 'heading1')),
+                'The heading must remain visible on the rendered screen.',
+            );
+            $this->assertTrue(
+                (bool) array_filter($visible, static fn (string $line): bool => str_contains($line, 'footer1')),
+                'The footer must remain visible on the rendered screen.',
+            );
+        } finally {
+            $tui->stop();
+        }
+    }
+
+    public function testExpandedSelectListContainerKeepsSelectedArrowVisible()
+    {
+        $terminal = new VirtualTerminal(40, 8);
+        $tui = new Tui(terminal: $terminal);
+        $tui->add(new TextWidget('heading1'));
+        $wrap = (new ContainerWidget())->expandVertically(true);
+        $wrap->add(new SelectListWidget([
+            ['value' => 'a', 'label' => str_repeat('word ', 50)],
+            ['value' => 'b', 'label' => 'another option'],
+        ], maxVisible: 5));
+        $tui->add($wrap);
+        $tui->add(new TextWidget('footer1'));
+
+        try {
+            $tui->start();
+            $tui->processRender();
+
+            $screen = new ScreenBuffer(40, 8);
+            $screen->write($terminal->getOutput());
+            $visible = array_map(rtrim(...), explode("\n", $screen->getScreen()));
+
+            $this->assertTrue(
+                (bool) array_filter($visible, static fn (string $line): bool => str_contains($line, '→')),
+                'An expanding container around the list keeps the selected arrow visible.',
+            );
+            $this->assertTrue(
+                (bool) array_filter($visible, static fn (string $line): bool => str_contains($line, 'heading1')),
+                'An expanding container around the list keeps the heading visible.',
+            );
+            $this->assertTrue(
+                (bool) array_filter($visible, static fn (string $line): bool => str_contains($line, 'footer1')),
+                'An expanding container around the list keeps the footer visible.',
+            );
+        } finally {
+            $tui->stop();
+        }
     }
 }

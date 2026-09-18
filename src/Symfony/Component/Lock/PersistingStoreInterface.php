@@ -16,6 +16,11 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
 
 /**
+ * Keeps the state of locks, each of them owned by the Key that acquired it.
+ *
+ * Only the owning key can extend or release a lock. Sharing a lock with another
+ * process requires serializing its key and passing it to that process.
+ *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
 interface PersistingStoreInterface
@@ -31,7 +36,9 @@ interface PersistingStoreInterface
     public function save(Key $key);
 
     /**
-     * Removes a resource from the storage.
+     * Removes the resource from the storage if the given key owns it.
+     *
+     * Does nothing when the lock is owned by another key.
      *
      * @return void
      *
@@ -40,7 +47,7 @@ interface PersistingStoreInterface
     public function delete(Key $key);
 
     /**
-     * Returns whether or not the resource exists in the storage.
+     * Returns whether or not the given key owns the lock on the resource.
      */
     public function exists(Key $key): bool;
 

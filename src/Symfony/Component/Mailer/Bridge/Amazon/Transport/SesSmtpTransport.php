@@ -25,6 +25,8 @@ use Symfony\Component\Mime\RawMessage;
  */
 class SesSmtpTransport extends EsmtpTransport
 {
+    private ?string $tenant = null;
+
     /**
      * @param string|null $region Amazon SES region (default `eu-west-1`)
      * @param string      $host   SMTP host; `'default'` resolves to `email-smtp.<region>.amazonaws.com`
@@ -47,6 +49,13 @@ class SesSmtpTransport extends EsmtpTransport
 
         $this->setUsername($username);
         $this->setPassword($password);
+    }
+
+    public function setTenant(?string $tenant): static
+    {
+        $this->tenant = $tenant;
+
+        return $this;
     }
 
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
@@ -73,6 +82,10 @@ class SesSmtpTransport extends EsmtpTransport
 
         if ($metadata) {
             $headers->addTextHeader('X-SES-MESSAGE-TAGS', implode(', ', $metadata));
+        }
+
+        if (null !== $this->tenant && !$headers->has('X-SES-TENANT')) {
+            $headers->addTextHeader('X-SES-TENANT', $this->tenant);
         }
     }
 }

@@ -29,6 +29,7 @@ final class SesTransportFactory extends AbstractTransportFactory
         $scheme = $dsn->getScheme();
         $region = $dsn->getOption('region');
         $port = $dsn->getPort() ?? 465;
+        $tenant = $dsn->getOption('tenant') ?: null;
 
         if ('ses+smtp' === $scheme || 'ses+smtps' === $scheme) {
             $transport = new SesSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $region, $this->dispatcher, $this->logger, $dsn->getHost(), $port);
@@ -39,6 +40,10 @@ final class SesTransportFactory extends AbstractTransportFactory
 
             if (null !== $pingThreshold = $dsn->getOption('ping_threshold')) {
                 $transport->setPingThreshold((int) $pingThreshold);
+            }
+
+            if (null !== $tenant) {
+                $transport->setTenant($tenant);
             }
 
             return $transport;
@@ -61,7 +66,13 @@ final class SesTransportFactory extends AbstractTransportFactory
                     null === $dsn->getOption('session_token') ? [] : ['sessionToken' => $dsn->getOption('session_token')]
                 );
 
-                return new $class(new SesClient(Configuration::create($options), null, $this->client, $this->logger), $this->dispatcher, $this->logger);
+                $transport = new $class(new SesClient(Configuration::create($options), null, $this->client, $this->logger), $this->dispatcher, $this->logger);
+
+                if (null !== $tenant) {
+                    $transport->setTenant($tenant);
+                }
+
+                return $transport;
         }
 
         throw new UnsupportedSchemeException($dsn, 'ses', $this->getSupportedSchemes());

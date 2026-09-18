@@ -7,13 +7,13 @@ Configuration example:
 
 ```env
 # SMTP
-MAILER_DSN=ses+smtp://USERNAME:PASSWORD@default:PORT?region=REGION&session_token=SESSION_TOKEN
+MAILER_DSN=ses+smtp://USERNAME:PASSWORD@default:PORT?region=REGION&session_token=SESSION_TOKEN&tenant=TENANT
 
 # HTTP
-MAILER_DSN=ses+https://ACCESS_KEY:SECRET_KEY@default?region=REGION&session_token=SESSION_TOKEN
+MAILER_DSN=ses+https://ACCESS_KEY:SECRET_KEY@default?region=REGION&session_token=SESSION_TOKEN&tenant=TENANT
 
 # API
-MAILER_DSN=ses+api://ACCESS_KEY:SECRET_KEY@default?region=REGION&session_token=SESSION_TOKEN
+MAILER_DSN=ses+api://ACCESS_KEY:SECRET_KEY@default?region=REGION&session_token=SESSION_TOKEN&tenant=TENANT
 ```
 
 where:
@@ -22,6 +22,13 @@ where:
  - `REGION` is Amazon SES selected region (optional, default `eu-west-1`)
  - `SESSION_TOKEN` is your Amazon SES session token (optional)
  - `PORT` is the port you want to communicate to SES with (optional, default `465`)
+ - `TENANT` is the Amazon SES tenant name to send on behalf of, for
+   [tenant management](https://docs.aws.amazon.com/ses/latest/dg/tenant-sending.html)
+   (optional). It can be overridden per message with an `X-SES-TENANT` header,
+   which takes precedence over the DSN option. Every tenant must have a default
+   configuration set associated with it in the AWS console, which is used
+   automatically when no `X-SES-CONFIGURATION-SET` header is set on the message;
+   set that header to use a different configuration set for a specific send.
 
 For the `ses+smtp` / `ses+smtps` schemes, the `PORT` value selects the TLS mode:
 

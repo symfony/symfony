@@ -578,6 +578,74 @@
                 <source>This value is not a valid ULID.</source>
                 <target>See väärtus ei ole korrektne ULID.</target>
             </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target state="needs-review-translation">See fail ei ole kehtiv helifail.</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target state="needs-review-translation">Heli on liiga lühike ({{ duration }} sekundit). Oodatav minimaalne kestus on {{ min_duration }} sekundit.</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target state="needs-review-translation">Heli on liiga pikk ({{ duration }} sekundit). Lubatud maksimaalne kestus on {{ max_duration }} sekundit.</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target state="needs-review-translation">Heli kestust ei õnnestunud tuvastada.</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target state="needs-review-translation">Heli bitikiirus on liiga madal ({{ bitrate }} bps). Oodatav minimaalne bitikiirus on {{ min_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target state="needs-review-translation">Heli bitikiirus on liiga suur ({{ bitrate }} bps). Lubatud maksimaalne bitikiirus on {{ max_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target state="needs-review-translation">Heli bitikiirust ei õnnestunud tuvastada.</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target state="needs-review-translation">Toetamata heli diskreetimissagedus ({{ sample_rate }} Hz).</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target state="needs-review-translation">Heli diskreetimissagedust ei õnnestunud tuvastada.</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target state="needs-review-translation">Helil on liiga vähe kanaleid ({{ channels }}). Oodatav miinimum on {{ min_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target state="needs-review-translation">Helil on liiga palju kanaleid ({{ channels }}). Eeldatav maksimaalne kogus on {{ max_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target state="needs-review-translation">Helikanalite arvu ei õnnestunud tuvastada.</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target state="needs-review-translation">Helifail on rikutud.</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">Heli sisaldab mitu voogu. Lubatud on ainult üks voog.</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target state="needs-review-translation">Toetamata helikoodek „{{ codec }}“.</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target state="needs-review-translation">Toetamata helikonteiner "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target state="needs-review-translation">Fail ei sisalda ühtegi helivoogu.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

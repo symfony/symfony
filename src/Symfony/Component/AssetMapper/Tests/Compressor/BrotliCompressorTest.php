@@ -30,6 +30,10 @@ class BrotliCompressorTest extends TestCase
             $this->markTestSkipped($reason);
         }
 
+        if (\PHP_VERSION_ID >= 80600 && \extension_loaded('brotli') && version_compare(phpversion('brotli'), '0.21.0', '<=')) {
+            $this->markTestSkipped('ext-brotli up to 0.21.0 reports a failure when closing a compressing stream.');
+        }
+
         $this->filesystem = new Filesystem();
         if (!file_exists(self::WRITABLE_ROOT)) {
             $this->filesystem->mkdir(self::WRITABLE_ROOT);

@@ -499,6 +499,7 @@ class ErrorHandler
     public function handleException(\Throwable $exception): void
     {
         $handlerException = null;
+        $loggerFailed = false;
 
         if (!$exception instanceof FatalError) {
             self::$exitCode = 255;
@@ -526,6 +527,7 @@ class ErrorHandler
             try {
                 $this->loggers[$type][0]->log($this->loggers[$type][1], $message, ['exception' => $exception]);
             } catch (\Throwable $handlerException) {
+                $loggerFailed = true;
             }
         }
 
@@ -553,7 +555,8 @@ class ErrorHandler
         }
 
         $loggedErrors = $this->loggedErrors;
-        if ($exception === $handlerException) {
+        if ($exception === $handlerException || $loggerFailed) {
+            // the logger for that type is what threw, so calling it again would recurse forever
             $this->loggedErrors &= ~$type;
         }
 

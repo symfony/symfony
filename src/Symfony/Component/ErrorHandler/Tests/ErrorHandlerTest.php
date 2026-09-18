@@ -584,6 +584,36 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    public function testHandleExceptionStopsWhenTheLoggerThrows()
+    {
+        try {
+            $calls = 0;
+            $logger = $this->createMock(LoggerInterface::class);
+            $logger
+                ->method('log')
+                ->willReturnCallback(static function () use (&$calls) {
+                    throw new \RuntimeException('logger is down '.++$calls);
+                })
+            ;
+
+            $handler = ErrorHandler::register();
+            $handler->setDefaultLogger($logger, \E_ALL);
+            $handler->setExceptionHandler(null);
+
+            try {
+                $handler->handleException(new \RuntimeException('boom'));
+                $this->fail('The exception should have been given back to the native handler.');
+            } catch (\RuntimeException $e) {
+                $this->assertSame('logger is down 1', $e->getMessage());
+            }
+
+            $this->assertSame(1, $calls, 'The failing logger must not be called again.');
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+    }
+
     public function testHandleErrorException()
     {
         $exception = new \Error("Class 'IReallyReallyDoNotExistAnywhereInTheRepositoryISwear' not found");

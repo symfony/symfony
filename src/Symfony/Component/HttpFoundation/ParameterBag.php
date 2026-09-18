@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
 class ParameterBag implements \IteratorAggregate, \Countable
 {
     /**
-     * @param array<string, mixed> $parameters
+     * @param array<mixed> $parameters
      */
     public function __construct(
         protected array $parameters = [],
@@ -34,11 +34,9 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameters.
      *
-     * @template TKey of string|null
+     * @param string|null $key The name of the parameter to return or null to get them all
      *
-     * @param TKey $key The name of the parameter to return or null to get them all
-     *
-     * @return (TKey is null ? array<string, mixed> : array<mixed>)
+     * @return array<mixed>
      *
      * @throws BadRequestException if the value is not an array
      */
@@ -62,13 +60,13 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function keys(): array
     {
-        return array_keys($this->parameters);
+        return array_map(strval(...), array_keys($this->parameters));
     }
 
     /**
      * Replaces the current parameters by a new set.
      *
-     * @param array<string, mixed> $parameters
+     * @param array<mixed> $parameters
      */
     public function replace(array $parameters = []): void
     {
@@ -78,7 +76,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Adds parameters.
      *
-     * @param array<string, mixed> $parameters
+     * @param array<mixed> $parameters
      */
     public function add(array $parameters = []): void
     {
@@ -278,7 +276,14 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function getIterator(): \ArrayIterator
     {
-        return new \ArrayIterator($this->parameters);
+        return new
+            /** @extends \ArrayIterator<string, mixed> */
+            class($this->parameters) extends \ArrayIterator {
+                public function key(): string
+                {
+                    return (string) parent::key();
+                }
+            };
     }
 
     /**

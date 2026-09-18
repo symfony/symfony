@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by DjLeChuck at 2026-09-15T12:13:02Z
+
+Fixes #66087
+
+---------------------------------------------------------------------------
+
+by DjLeChuck at 2026-09-17T09:23:57Z
+
+Thanks for the review @nicolas-grekas!
+
+All your remarks are processed. However, concerning the `X-SES-CONFIGURATION-SET` header, he is not mandatory when using `X-SES-TENANT` because by default a tenant is linked to a configuration set, so not defining it will use the default one. I have add a note in the README.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T07:08:19Z
+
+Thanks @DjLeChuck!
+
+I amended two things: `?tenant=` (empty) configured an empty tenant, so `X-SES-TENANT:` and `"TenantName": ""` were sent - now `?: null` like `region` just below. And I dropped the changelog line about the dependency bump, we don't list those (eg 481c007, 603834301).
+
+Note the factory's `testCreate` can't catch the empty case, it compares transports with `assertEquals` where `'' == null`, hence the separate test.

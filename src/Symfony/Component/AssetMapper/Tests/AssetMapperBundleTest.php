@@ -145,6 +145,35 @@ class AssetMapperBundleTest extends TestCase
         $this->assertFalse($container->hasDefinition('cache.asset_mapper'));
     }
 
+    #[TestWith(['%kernel.share_dir%/assets', '/shared/assets'])]
+    #[TestWith(['%kernel.project_dir%/metadata', '/metadata'])]
+    public function testTheMetadataDirectoryIsConfigurable(string $metadataDir, string $expectedSuffix)
+    {
+        $container = $this->createContainer(['paths' => ['assets/'], 'metadata_dir' => $metadataDir]);
+
+        $this->assertSame(
+            $this->varDir.$expectedSuffix,
+            $container->getParameterBag()->resolveValue($container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0)),
+        );
+        $this->assertSame($this->varDir.'/public', $container->getDefinition('asset_mapper.local_public_assets_filesystem')->getArgument(0));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testTheMetadataDirectoryFallsBackToThePublicAssetsDirectory(bool $bundleAssets)
+    {
+        if ($bundleAssets) {
+            new Filesystem()->mkdir($this->varDir.'/public');
+        }
+
+        $container = $this->createContainer(
+            ['paths' => $bundleAssets ? [] : ['assets/'], 'public_prefix' => '/static/'],
+            bundles: $bundleAssets ? ['AcmeBundle' => ['path' => $this->varDir]] : [],
+        );
+
+        $this->assertSame($this->varDir.'/public/static', $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0));
+    }
+
     public function testDefaultConfig()
     {
         $config = new Processor()->processConfiguration($this->getConfiguration(), [[]]);
@@ -156,6 +185,7 @@ class AssetMapperBundleTest extends TestCase
             'exclude_dotfiles' => true,
             'server' => '%kernel.debug%',
             'public_prefix' => '/assets/',
+            'metadata_dir' => null,
             'missing_import_mode' => 'warn',
             'extensions' => [],
             'importmap_path' => '%kernel.project_dir%/importmap.php',
@@ -220,6 +250,7 @@ class AssetMapperBundleTest extends TestCase
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.debug' => $debug,
             'kernel.project_dir' => str_replace('%', '%%', $this->varDir),
+            'kernel.share_dir' => str_replace('%', '%%', $this->varDir).'/shared',
             'kernel.bundles_metadata' => $bundles,
         ]));
         new AssetMapperBundle()->getContainerExtension()->load([$config], $container);

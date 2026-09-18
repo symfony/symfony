@@ -98,6 +98,12 @@ class AssetMapperBundle extends AbstractBundle
                     ->info('The public path where the assets will be written to (and served from when "server" is true).')
                     ->defaultValue('/assets/')
                 ->end()
+                ->scalarNode('metadata_dir')
+                    ->info('The directory where "asset-map:compile" writes manifest.json, importmap.json and entrypoint.*.json. These files are read by PHP only, so they do not need to be exposed to the browser.')
+                    ->example('%kernel.project_dir%/var/assets')
+                    ->defaultNull()
+                    ->cannotBeEmpty()
+                ->end()
                 ->enumNode('missing_import_mode')
                     ->values(['strict', 'warn', 'ignore'])
                     ->info('Behavior if an asset cannot be found when imported from JavaScript or CSS files - e.g. "import \'./non-existent.js\'". "strict" means an exception is thrown, "warn" means a warning is logged, "ignore" means the import is left as-is.')
@@ -221,8 +227,10 @@ class AssetMapperBundle extends AbstractBundle
             ->setArgument(0, $parameterBag->escapeValue($publicDirectory))
         ;
 
+        $metadataDir = $config['metadata_dir'] ?? $parameterBag->escapeValue($publicAssetsDirectory);
+
         $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')
-            ->setArgument(0, $parameterBag->escapeValue($publicAssetsDirectory));
+            ->setArgument(0, $metadataDir);
 
         if (!$server) {
             $container->removeDefinition('asset_mapper.dev_server_subscriber');

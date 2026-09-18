@@ -90,7 +90,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('asset_mapper.compiled_asset_mapper_config_reader', CompiledAssetMapperConfigReader::class)
             ->args([
-                abstract_arg('public assets directory'),
+                abstract_arg('metadata directory'),
                 param('kernel.debug'),
             ])
 

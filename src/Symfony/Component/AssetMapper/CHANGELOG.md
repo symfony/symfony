@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `asset_mapper.metadata_dir` option to choose where `asset-map:compile` writes its metadata
  * Add `AssetMapperBundle`, which provides the `asset_mapper` configuration and the services previously provided by `FrameworkBundle` under `framework.asset_mapper`
  * Add an `$entries` argument to `ImportMapGenerator` to restrict the import map to the entries reachable from the rendered entrypoints
  * Defined stable alphabetical order of importmap entries

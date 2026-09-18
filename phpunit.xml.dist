@@ -47,7 +47,7 @@
         </exclude>
     </groups>
 
-    <source ignoreSuppressionOfDeprecations="true">
+    <source ignoreSuppressionOfDeprecations="true" ignoreIndirectDeprecations="true">
         <deprecationTrigger ignoreUndefinedTriggers="true">
             <function>trigger_deprecation</function>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>

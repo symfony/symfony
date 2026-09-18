@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Extractor;
 
 use Symfony\Component\PropertyInfo\Attribute\WithAccessors;
+use Symfony\Component\PropertyInfo\Attribute\WithCollectionAccessors;
 use Symfony\Component\PropertyInfo\Exception\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
@@ -603,6 +604,25 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $methodName, $this->getWriteVisibilityForMethod($method), true);
         }
 
+        if ($allowAdderRemover && $reflClass->hasProperty($property)) {
+            $propertyType = $reflClass->getProperty($property)->getType();
+            $propertyType = $propertyType instanceof \ReflectionNamedType ? $propertyType->getName() : null;
+
+            if ($propertyType && (class_exists($propertyType) || interface_exists($propertyType))) {
+                $typeAccessors = $this->getCollectionAccessors($propertyType);
+                $adderName = $typeAccessors?->adder ?? 'add';
+                $removerName = $typeAccessors?->remover ?? 'removeElement';
+
+                if (method_exists($propertyType, $adderName) && method_exists($propertyType, $removerName)) {
+                    $mutator = new PropertyWriteInfo(PropertyWriteInfo::TYPE_COLLECTION_ADDER_AND_REMOVER);
+                    $mutator->setAdderInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $adderName, PropertyWriteInfo::VISIBILITY_PUBLIC));
+                    $mutator->setRemoverInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $removerName, PropertyWriteInfo::VISIBILITY_PUBLIC));
+
+                    return $mutator;
+                }
+            }
+        }
+
         $noneProperty = new PropertyWriteInfo();
         $noneProperty->setErrors(array_merge([], ...$errors));
 
@@ -1099,6 +1119,18 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         }
 
         return $this->accessorsAttributes[$propertyHash] = $accessorsAttribute;
+    }
+
+    private function getCollectionAccessors(string $class): ?WithCollectionAccessors
+    {
+        $refClass = new \ReflectionClass($class);
+
+        /** @var \ReflectionAttribute<WithCollectionAccessors> $refAttribute */
+        if (null === $refAttribute = $refClass->getAttributes(WithCollectionAccessors::class)[0] ?? null) {
+            return null;
+        }
+
+        return $refAttribute->newInstance();
     }
 
     /**

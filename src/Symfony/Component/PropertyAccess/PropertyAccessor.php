@@ -599,6 +599,8 @@ class PropertyAccessor implements PropertyAccessorInterface
                     $object->{$mutator->getName()} = $value;
                 } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
                     $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
+                } elseif (PropertyWriteInfo::TYPE_COLLECTION_ADDER_AND_REMOVER === $type) {
+                    $this->writeCollectionValue($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
                 }
             } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
                 $object->$property = $value;
@@ -655,6 +657,39 @@ class PropertyAccessor implements PropertyAccessorInterface
         foreach ($collection as $item) {
             if (!$previousValue || !\in_array($item, $previousValue, true)) {
                 $zval[self::VALUE]->$addMethodName($item);
+            }
+        }
+    }
+
+    /**
+     * Adjusts a collection-valued property via the collection's own add()/removeElement() methods.
+     */
+    private function writeCollectionValue(array $zval, string $property, iterable $collection, PropertyWriteInfo $addMethod, PropertyWriteInfo $removeMethod): void
+    {
+        $previousValue = $this->readProperty($zval, $property)[self::VALUE];
+
+        if (!$previousValue instanceof \Traversable) {
+            throw new NoSuchPropertyException(\sprintf('Cannot write collection property "%s" in class "%s": the current value is not an existing collection.', $property, $zval[self::VALUE]::class));
+        }
+
+        $addMethodName = $addMethod->getName();
+        $removeMethodName = $removeMethod->getName();
+
+        if (\is_object($collection)) {
+            $collection = iterator_to_array($collection);
+        }
+
+        $previousAsArray = iterator_to_array($previousValue);
+
+        foreach ($previousAsArray as $item) {
+            if (!\in_array($item, $collection, true)) {
+                $previousValue->$removeMethodName($item);
+            }
+        }
+
+        foreach ($collection as $item) {
+            if (!\in_array($item, $previousAsArray, true)) {
+                $previousValue->$addMethodName($item);
             }
         }
     }

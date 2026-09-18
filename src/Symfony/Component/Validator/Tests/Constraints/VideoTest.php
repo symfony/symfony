@@ -12,20 +12,12 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Validator\Constraints\Video;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class VideoTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        if (!(new ExecutableFinder())->find('ffprobe')) {
-            self::markTestSkipped('The ffprobe binary is required to run this test.');
-        }
-    }
-
     public function testAttributes()
     {
         $metadata = new ClassMetadata(VideoDummy::class);

@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -47,8 +49,18 @@ class VideoValidator extends FileValidator
             return;
         }
 
+        static $ffprobe;
+        if (!$ffprobe) {
+            if (!class_exists(Process::class)) {
+                throw new LogicException('The Process component is required to use the Video constraint. Try running "composer require symfony/process".');
+            }
+            if (!$ffprobe ??= (new ExecutableFinder())->find('ffprobe')) {
+                throw new LogicException('The ffprobe binary is required to use the Video constraint.');
+            }
+        }
+
         $process = new Process([
-            'ffprobe',
+            $ffprobe,
             '-v', 'error',
             '-select_streams', 'v',
             '-show_entries', 'stream=index,codec_type,codec_name,width,height',

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T14:36:06Z
+
+Thanks @janedbal. Verified on a local 8.5.10 build: `error_get_last()` gains `trace` with `fatal_error_backtraces=1`, loses it with `=0`, and 8.4 never has it.
+
+I added a phpt on top. The unit test supplies the `trace` key itself, so it pins the plumbing but would pass unchanged if PHP had named the key something else; the phpt triggers a real fatal error with `--INI-- fatal_error_backtraces=1` and reads whatever PHP puts there, so it is the one that pins the name. It skips below 8.5.
+
+For the record on the `backtrace` key you kept precedence for: it is dead. Nothing in Symfony sets it and stock PHP never has. It comes from 445de5e828c, an HHVM fix from 2015 where `handleError()` took a sixth `array $backtrace` argument; that parameter is long gone. Keeping it first is harmless since PHP only ever emits `trace`, and I will remove it on 8.2 separately rather than change a public method's behaviour on a patch branch.
+
+One thing I hit while revert-verifying, unrelated to your change: when the logger throws, `handleException()` recurses without bound, because `$this->loggedErrors &= ~$type` only applies when `$exception === $handlerException`. Any assertion failure in these tests then reports as an OOM rather than a diff. Separate fix coming.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T14:50:03Z
+
+Follow-up: I dropped the dead `backtrace` branch in the same commit, so the line now reads `$error['trace'] ?? null`. `handleFatalError()` is `@internal` and nothing in the repository sets that key, so there is nothing to keep it for. Updated the description accordingly.
+
+The recursion I mentioned is #66159.

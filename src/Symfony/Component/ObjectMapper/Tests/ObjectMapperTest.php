@@ -120,6 +120,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\IsNotNullCondition\IsNotNullSo
 use Symfony\Component\ObjectMapper\Tests\Fixtures\IsNotNullCondition\IsNotNullSourceMapping;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\IsNotNullCondition\IsNotNullTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\IsNotNullCondition\IsNotNullTargetMapping;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\LazyConstructorTarget\Source as LazyConstructorSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\LazyConstructorTarget\Target as LazyConstructorTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\LazyFoo;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MagicGet\MagicGetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MagicGet\MagicGetUserView;
@@ -731,6 +733,15 @@ final class ObjectMapperTest extends TestCase
         $d = $mapper->map($lazyObj, MyProxy::class);
         $this->assertSame('test', $d->name);
         $this->assertTrue($initialized);
+    }
+
+    public function testMapLazySourceToAConstructorTargetReadsNullValues()
+    {
+        $lazy = new \ReflectionClass(LazyConstructorSource::class)->newLazyGhost(static function (LazyConstructorSource $source): void {
+            $source->name = null;
+        });
+
+        $this->assertNull(new ObjectMapper()->map($lazy, LazyConstructorTarget::class)->name);
     }
 
     public function testDecorateObjectMapper()

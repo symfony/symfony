@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T15:35:26Z
+
+Thank you @soyuka, I pushed a fix and some perf on top of your commits.
+
+`(array) $source` was computed before the lazy source got initialized, so a lazy source mapped to a constructor target lost its null values.
+
+For the perf, on a 20-property DTO with two nested objects: 2.9x vs 8.2 with a shared mapper instead of 2.0x, and 1.8x instead of 1.4x on the first `map()` of a pair with a warmed cache.
+
+One for a follow up: only class-level `#[Map]` pairs get warmed, so a property-level-only mapping with an explicit target never hits the cache. Warming more is free at runtime, the file is included once per process.

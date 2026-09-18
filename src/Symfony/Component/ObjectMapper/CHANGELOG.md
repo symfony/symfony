@@ -7,6 +7,7 @@ CHANGELOG
  * Add `ObjectMapperBundle`
  * Add automatic conversion between `BackedEnum` and scalar types (both ways)
  * Add a `MappingAwareTransformCallableInterface` to pass the `Map` attribute being applied to transformers
+ * Add `PropertyTypeMappingMetadataFactory` to map a nested object to the class typing the property it is written into
 
 8.1
 ---

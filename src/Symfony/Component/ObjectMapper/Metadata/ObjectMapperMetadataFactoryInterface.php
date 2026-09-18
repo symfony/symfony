@@ -19,6 +19,12 @@ namespace Symfony\Component\ObjectMapper\Metadata;
 interface ObjectMapperMetadataFactoryInterface
 {
     /**
+     * The context describes the mapping being computed. The object mapper fills these keys:
+     *
+     *  * "source" and "target": the classes being mapped, when $property is given
+     *  * "target" and "target_property": the class and the property a nested $object is written
+     *    into, set only when the mapper can write that property
+     *
      * @param array<string, mixed> $context
      *
      * @return list<Mapping>

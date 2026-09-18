@@ -1,7 +1,7 @@
 --TEST--
 Test using the fatal error backtrace collected by PHP
 --SKIPIF--
-<?php if (\PHP_VERSION_ID < 80500) die('Skipped: PHP >= 8.5 required.'); ?>
+<?php if (\PHP_VERSION_ID < 80500) echo 'Skipped: PHP >= 8.5 required.'; ?>
 --INI--
 display_errors=0
 fatal_error_backtraces=1

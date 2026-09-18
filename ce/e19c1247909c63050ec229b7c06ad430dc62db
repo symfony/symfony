@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T15:30:00Z
+
+Added a 17th message, id 165, `The file does not contain any audio stream.`
+
+#66143 now reports an empty ffprobe stream list with its own `NO_AUDIO_STREAM_ERROR` instead of borrowing `CORRUPTED_AUDIO_ERROR`: a valid video file with no audio track was being called corrupted.
+
+Translated into all 56 locales like the rest, reusing each catalogue's own wording for "audio" and "stream" from ids 149 and 163, and marked `needs-review-translation` since I am not a native speaker of any of them.

@@ -156,9 +156,6 @@ class XmlFileLoaderTest extends TestCase
         $loader->loadClassMetadata($metadata);
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/pull/12158
-     */
     public function testDoNotModifyStateIfExceptionIsThrown()
     {
         $loader = new XmlFileLoader(__DIR__.'/withdoctype.xml');

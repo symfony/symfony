@@ -1721,9 +1721,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new Reference('translator'), $definition->getArgument('$translator'));
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/issues/54478
-     */
     public function testBackedEnumNormalizerRegistered()
     {
         $container = $this->createContainerFromFile('full');

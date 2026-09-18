@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T14:11:28Z
+
+Thanks @Valmonzo, nice work: the mutation coverage is genuinely good, and using `null !==` throughout means the `0` boundaries behave, which `Video` gets wrong in places.
+
+I split the 57 translation catalogues out into #66156 on 6.4. Catalogues are maintained on the lowest branch and merged up, so assigning ids 149-164 on 8.2 would collide with the next translation commit on 6.4 or 7.4, which are all still at 148. Same shape as `Video`, whose messages landed separately in 59b201d1b85. This PR is now the code only, and the Integration translation gate no longer fires on it.
+
+I also fixed the description: it said no file outside the CHANGELOG and the English catalogue was modified (57 were), and promised the ffmpeg commands "below" when they were missing. Worth adding them back if you have them, since they are the provenance record for five committed binaries. I checked what I could: all five carry `Lavf63.1.101`/`Lavc63.1.101` encoder tags and the wav decodes to `mean_volume: -91.0 dB`, so they are generated silence with no licence concern.
+
+Things I left for you rather than changing myself:
+
+- `AudioValidator` maps an empty `streams` array to `CORRUPTED_AUDIO_ERROR`, so a perfectly valid video file with no audio track is reported as "The audio file is corrupted." Unreachable with the default `mimeTypes: 'audio/*'`, but reachable for anyone accepting video containers to constrain their audio track. `Video` has a dedicated message for its analogous case.
+- `DURATION_NOT_DETECTED_ERROR`, `BITRATE_NOT_DETECTED_ERROR`, `SAMPLE_RATE_NOT_DETECTED_ERROR` and `CHANNELS_NOT_DETECTED_ERROR`, with their four messages, have no test. The `format`/`stream` fallbacks are good design and that is precisely why they are hard to reach; worth saying so rather than leaving four untested constants.
+- `allowedSampleRates` is documented `positive-int[]` but the validator does `array_map('intval', ...)` and `testAllowedSampleRate` passes `['44100', 48000]`. Pick one. Related: `'not-a-number'` becomes `0`, matches nothing, and a valid 44.1 kHz file is then rejected with a message that gives no hint the constraint is misconfigured.
+- The six `ConstraintDefinitionException` checks live in the validator, so a broken definition like `minDuration: -1` is reported for a real file and silently accepted for `null` or `''`. The constructor is the right place.
+- `$containers[0]` reports `"mov"` for an m4a, because ffprobe's `format_name` is `mov,mp4,m4a,3gp,3g2,mj2`. The intersection test is right, only the reported name is off.
+- `$process->run()` has no timeout, so a pathological file on slow storage blocks the request thread.
+
+The last three, plus the constructor guard, are all shared with `Video`, so they want one pass across both constraints rather than a change here.
+
+@Kocal your `ERROR_NAMES` comment thread was left undecided, could you close it out either way?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T14:34:49Z
+
+Follow-up on the `0` bounds, after a second look: a minimum of `0` and a maximum of `0` are not the same kind of value.
+
+A minimum of `0` is a harmless no-op ("at least 0 channels" is always true), so it should be accepted. A maximum of `0` cannot be satisfied by any file, so it is exactly as invalid as the negative value that already threw. I pushed that: `maxDuration`, `maxBitrate` and `maxChannels` now reject `0` with a `ConstraintDefinitionException`, while the three minimums keep accepting it.
+
+This also makes the runtime agree with what the docblocks already promised: the three maximums were documented `positive-int`, which excludes `0`. The minimums disagreed among themselves, `minDuration` being `int<0, max>` while `minBitrate` and `minChannels` said `positive-int` yet accepted `0` at runtime; both are now `int<0, max>`.
+
+Four tests added, three of which fail without the change.
+
+For the record, `VideoValidator` has the opposite bug here and I left it alone: it tests `minWidth`/`maxWidth`/`minHeight`/`maxHeight` for truthiness, so `maxWidth: 0` is silently ignored rather than rejected. Making it throw turns silence into an exception, which is not a change for a maintenance branch, so it stays a known wart there. #66157 fixes the genuine `Video` bug instead: the codec and container whitelists never ran at all.

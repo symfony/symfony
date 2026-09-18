@@ -92,6 +92,29 @@ class HttpClientBundle extends AbstractBundle
                 ->integerNode('max_host_connections')
                     ->info('The maximum number of connections to a single host.')
                 ->end()
+                ->arrayNode('recorder')
+                    ->info('Record HTTP exchanges into HAR files and replay them (see RecorderHttpClient).')
+                    ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('matcher')
+                            ->info('Service id of a MatcherInterface deciding which recorded entry matches a request.')
+                            ->defaultNull()
+                        ->end()
+                        ->scalarNode('redactor')
+                            ->info('Service id of a RedactorInterface; when set, the "redact" lists are ignored.')
+                            ->defaultNull()
+                        ->end()
+                        ->arrayNode('redact')
+                            ->info('Names masked in recorded files, added to the built-in lists.')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->arrayNode('headers')->scalarPrototype()->end()->end()
+                                ->arrayNode('query')->info('Query-string and form field names.')->scalarPrototype()->end()->end()
+                                ->arrayNode('body')->info('JSON and form field names.')->scalarPrototype()->end()->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
                 ->arrayNode('default_options')
                     ->children()
                         ->arrayNode('vars', 'var')
@@ -356,6 +379,25 @@ class HttpClientBundle extends AbstractBundle
                     ->replaceArgument(0, new Reference($name));
 
                 $container->registerAliasForArgument('httplug.'.$name, HttpAsyncClient::class, $name);
+            }
+        }
+
+        if ($config['recorder']['enabled']) {
+            $configurator->import('Resources/config/http_client_recorder.php');
+
+            $container->getDefinition('http_client.recorder')
+                ->replaceArgument(5, $container->getDefinition('http_client.transport')->getArgument(0));
+
+            $recorder = $config['recorder'];
+            $container->getDefinition('http_client.recorder.redactor')
+                ->setArguments([$recorder['redact']['headers'], $recorder['redact']['query'], $recorder['redact']['body']]);
+
+            if ($recorder['redactor']) {
+                $container->setAlias('http_client.recorder.redactor', $recorder['redactor']);
+            }
+
+            if ($recorder['matcher']) {
+                $container->setAlias('http_client.recorder.matcher', $recorder['matcher']);
             }
         }
     }

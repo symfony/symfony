@@ -51,6 +51,20 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['foo'], $bag->keys());
     }
 
+    public function testNumericKeysAreExposedAsStrings()
+    {
+        $bag = new ParameterBag(['foo' => 'bar', '123' => 'baz']);
+
+        $this->assertSame(['foo', '123'], $bag->keys());
+
+        $keys = [];
+        foreach ($bag as $key => $value) {
+            $keys[] = $key;
+        }
+
+        $this->assertSame(['foo', '123'], $keys);
+    }
+
     public function testAdd()
     {
         $bag = new ParameterBag(['foo' => 'bar']);

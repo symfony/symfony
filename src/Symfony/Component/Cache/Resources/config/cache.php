@@ -27,6 +27,7 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\CachePoolRefresher;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Messenger\EarlyExpirationHandler;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
@@ -273,6 +274,12 @@ return static function (ContainerConfigurator $container) {
                 service('reverse_container'),
             ])
             ->tag('messenger.message_handler')
+
+        ->set('cache.refresher', CachePoolRefresher::class)
+            ->args([
+                [], // replaced by CachePoolRefresherPass
+            ])
+            ->alias(CachePoolRefresher::class, 'cache.refresher')
 
         ->set('cache.default_clearer', Psr6CacheClearer::class)
             ->args([

@@ -13,6 +13,8 @@ CHANGELOG
  * Implement `PruneableInterface` on `RedisTagAwareAdapter` to garbage-collect its tag Sets
  * Add `PdoTagAwareAdapter`
  * Add `RefreshableInterface` to put a pool in refresh mode
+ * Add `CachePoolRefresher` and the `cache.refresher` service to put every refreshable pool in refresh mode at once, with `CachePoolRefresher::runWithRefresh()` to scope it to a callback
+ * Add a `refreshable` option to cache pools
 
 8.0
 ---

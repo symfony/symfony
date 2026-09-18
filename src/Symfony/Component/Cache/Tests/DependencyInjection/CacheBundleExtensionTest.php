@@ -41,6 +41,22 @@ class CacheBundleExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('cache.global_clearer'));
     }
 
+    public function testTheAppPoolIsRefreshableButTheSystemOneIsNot()
+    {
+        $container = $this->createContainerFromFile('cache');
+
+        $this->assertTrue($container->getDefinition('cache.app')->getTag('cache.pool')[0]['refreshable']);
+        $this->assertFalse($container->getDefinition('cache.system')->getTag('cache.pool')[0]['refreshable']);
+    }
+
+    public function testAnAdditionalPoolIsNotRefreshableUnlessItSaysSo()
+    {
+        $container = $this->createContainerFromFile('refreshable_pools');
+
+        $this->assertTrue($container->getDefinition('cache.opted_in')->getTag('cache.pool')[0]['refreshable']);
+        $this->assertFalse($container->getDefinition('cache.silent')->getTag('cache.pool')[0]['refreshable']);
+    }
+
     /**
      * The pools of the sections that use them are declared by the bundles owning those sections.
      */

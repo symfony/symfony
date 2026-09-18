@@ -20,6 +20,7 @@ use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
+use Symfony\Component\Cache\DependencyInjection\CachePoolRefresherPass;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Application;
@@ -57,6 +58,8 @@ class CacheBundle extends AbstractBundle
         $container->addCompilerPass(new CachePoolPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
         $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new CachePoolPrunerPass(), PassConfig::TYPE_AFTER_REMOVING);
+        // before removing, so that the service is still addressable by its own id when a public alias points at it
+        $container->addCompilerPass(new CachePoolRefresherPass(), PassConfig::TYPE_BEFORE_REMOVING);
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -146,6 +149,10 @@ class CacheBundle extends AbstractBundle
                                 ->prototype('scalar')->end()
                             ->end()
                             ->scalarNode('tags')->defaultNull()->end()
+                            ->booleanNode('refreshable')
+                                ->info('Allow the pool to be put in "refresh mode", where reads report a miss so that values are rebuilt in place. Always on for "cache.app".')
+                                ->defaultFalse()
+                            ->end()
                             ->booleanNode('public')->defaultFalse()->end()
                             ->scalarNode('default_lifetime')
                                 ->info('Default lifetime of the pool.')
@@ -204,6 +211,8 @@ class CacheBundle extends AbstractBundle
                 'provider' => 'app' === $name ? $config['default_provider'] ?? null : null,
                 'public' => true,
                 'tags' => false,
+                // the system cache holds metadata warmed at build time, rebuilding it per request is pointless
+                'refreshable' => 'app' === $name,
             ];
         }
         $nativeTagAwareAdapters = [['cache.adapter.redis_tag_aware'], ['cache.adapter.valkey_tag_aware'], ['cache.adapter.pdo_tag_aware'], ['cache.adapter.mongodb_tag_aware']];

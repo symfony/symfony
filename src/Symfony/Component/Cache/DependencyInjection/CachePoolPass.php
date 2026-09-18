@@ -51,6 +51,7 @@ class CachePoolPass implements CompilerPassInterface
             'early_expiration_message_bus',
             'reset',
             'pruneable',
+            'refreshable',
         ];
         foreach ($container->findTaggedServiceIds('cache.pool') as $id => $tags) {
             $adapter = $pool = $container->getDefinition($id);

@@ -37,6 +37,9 @@ jobs:
           - php: '8.4'
           - php: '8.5'
           - php: '8.6'
+            # ext-brotli and ext-zstd report a failure when closing a compressing stream,
+            # which PHP 8.6 propagates to copy(), so AssetMapper cannot use their wrappers
+            extensions: amqp,apcu,igbinary,intl,mbstring,memcached,redis,relay
       fail-fast: false
 
     runs-on: ubuntu-24.04

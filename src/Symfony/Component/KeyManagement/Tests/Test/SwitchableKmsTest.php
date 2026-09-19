@@ -26,12 +26,14 @@ class SwitchableKmsTest extends TestCase
         $this->assertSame(16, \strlen($kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key)));
 
         $this->assertSame(['encrypt' => 1, 'decrypt' => 1, 'generateDataKey' => 1, 'unwrapDataKey' => 1], $kms->calls);
+        $this->assertSame(['app', 'app'], $kms->keyIds);
         $this->assertSame([true], $kms->deterministic);
     }
 
     public function testEveryCallThrowsWhileDown()
     {
-        $kms = new SwitchableKms(new InMemoryKms(), 'gone fishing');
+        $failure = new \DomainException('gone fishing');
+        $kms = new SwitchableKms(new InMemoryKms(), $failure);
         $ciphertext = $kms->encrypt('app', 'secret');
         $kms->down = true;
 
@@ -44,12 +46,26 @@ class SwitchableKmsTest extends TestCase
             try {
                 $call();
                 $this->fail('A client that is down must throw.');
-            } catch (\RuntimeException $e) {
-                $this->assertSame('gone fishing', $e->getMessage());
+            } catch (\DomainException $e) {
+                $this->assertSame($failure, $e, 'the very exception given is what a test can then expect.');
             }
         }
 
         $this->assertSame(['encrypt' => 2, 'decrypt' => 1, 'generateDataKey' => 1, 'unwrapDataKey' => 1], $kms->calls, 'a call is counted whether it went through or not.');
+    }
+
+    public function testTheDefaultFailureIsAPlainRuntimeException()
+    {
+        $kms = new SwitchableKms(new InMemoryKms());
+        $kms->down = true;
+
+        try {
+            $kms->encrypt('app', 'secret');
+            $this->fail('A client that is down must throw.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame(\RuntimeException::class, $e::class, 'what an SDK throws when its backend is unreachable, and the component does not classify.');
+            $this->assertSame('The backend is down.', $e->getMessage());
+        }
     }
 
     public function testAClientComesBackUp()

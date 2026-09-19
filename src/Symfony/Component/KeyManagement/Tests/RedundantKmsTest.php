@@ -48,9 +48,9 @@ class RedundantKmsTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->aws = new SwitchableKms(new InMemoryKms(), 'aws is down.');
-        $this->azure = new SwitchableKms(new InMemoryKms(), 'azure is down.');
-        $this->gcp = new SwitchableKms(new InMemoryKms(), 'gcp is down.');
+        $this->aws = new SwitchableKms(new InMemoryKms(), new \RuntimeException('aws is down.'));
+        $this->azure = new SwitchableKms(new InMemoryKms(), new \RuntimeException('azure is down.'));
+        $this->gcp = new SwitchableKms(new InMemoryKms(), new \RuntimeException('gcp is down.'));
     }
 
     public function testACiphertextRoundTrips()
@@ -97,7 +97,7 @@ class RedundantKmsTest extends TestCase
     public function testACiphertextIsReadWithoutTheMemberThatWroteItFirst()
     {
         $ciphertext = $this->kms()->encrypt('app', 'secret');
-        $survivor = new RedundantKms(self::locator(['azure' => $this->azure]), 'azure', []);
+        $survivor = new RedundantKms(self::locator(['azure' => $this->azure]), ['azure' => null]);
 
         $this->assertSame('secret', $survivor->decrypt($ciphertext));
     }
@@ -107,7 +107,7 @@ class RedundantKmsTest extends TestCase
         $ciphertext = $this->kms()->encrypt('app', 'secret');
 
         foreach (['aws' => $this->aws, 'azure' => $this->azure, 'gcp' => $this->gcp] as $name => $member) {
-            $alone = new RedundantKms(self::locator([$name => $member]), $name, []);
+            $alone = new RedundantKms(self::locator([$name => $member]), [$name => null]);
             $this->assertSame('secret', $alone->decrypt($ciphertext), $name);
         }
     }
@@ -129,7 +129,7 @@ class RedundantKmsTest extends TestCase
     public function testACiphertextNoRegisteredMemberWroteIsReportedLoudly()
     {
         $ciphertext = $this->kms()->encrypt('app', 'secret');
-        $stranger = new RedundantKms(self::locator(['vault' => new InMemoryKms()]), 'vault', []);
+        $stranger = new RedundantKms(self::locator(['vault' => new InMemoryKms()]), ['vault' => null]);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('None of the KMS clients that wrapped the ciphertext ("aws", "azure", "gcp") is registered');
@@ -181,7 +181,7 @@ class RedundantKmsTest extends TestCase
         $this->assertSame(['encrypt' => 1], $this->azure->calls, 'the others wrap its plaintext.');
 
         foreach (['aws' => $this->aws, 'azure' => $this->azure, 'gcp' => $this->gcp] as $name => $member) {
-            $alone = new RedundantKms(self::locator([$name => $member]), $name, []);
+            $alone = new RedundantKms(self::locator([$name => $member]), [$name => null]);
             $this->assertSame($plaintext, $alone->unwrapDataKey($dataKey->wrapped, 'aad')->use(static fn (string $key): string => $key), $name);
         }
     }
@@ -204,7 +204,7 @@ class RedundantKmsTest extends TestCase
     public function testTheMintedDataKeyIsConsumed()
     {
         $minting = self::minting(random_bytes(32));
-        $kms = new RedundantKms(self::locator(['aws' => $minting, 'azure' => $this->azure]), 'aws', ['azure' => 'backup']);
+        $kms = new RedundantKms(self::locator(['aws' => $minting, 'azure' => $this->azure]), ['aws' => null, 'azure' => 'backup']);
 
         $dataKey = $kms->generateDataKey('app');
 
@@ -220,37 +220,56 @@ class RedundantKmsTest extends TestCase
     public function testTheDataKeyDoesNotReachStackTraces()
     {
         $known = random_bytes(32);
-        $kms = new RedundantKms(self::locator(['aws' => self::minting($known), 'azure' => new UnreachableKms()]), 'aws', ['azure' => 'backup']);
+        $kms = new RedundantKms(self::locator(['aws' => self::minting($known), 'azure' => new UnreachableKms()]), ['aws' => null, 'azure' => 'backup']);
 
         $trace = self::traceOf(static fn () => $kms->generateDataKey('app'));
 
         self::assertRedacted($known, $trace);
     }
 
-    public function testAMemberThatCannotDecryptIsRefusedToEncrypt()
+    /**
+     * A member that could wrap but not read back would be a wrapping nothing reads, so a member
+     * is a full KMS client or no member at all, and this is settled before anything is written.
+     */
+    public function testAMemberThatCannotReadBackIsRefused()
     {
-        $kms = new RedundantKms(self::locator(['aws' => $this->aws, 'azure' => new EncryptOnlyKms()]), 'aws', ['azure' => 'backup']);
+        $kms = new RedundantKms(self::locator(['aws' => $this->aws, 'azure' => new EncryptOnlyKms()]), ['aws' => null, 'azure' => 'backup']);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The KMS client "azure" does not implement "Symfony\Component\KeyManagement\DataKeyGeneratorInterface"');
-        $kms->generateDataKey('app');
+        $this->expectExceptionMessage('The KMS client "azure" cannot be a member of a redundant client');
+        $kms->encrypt('app', 'secret');
     }
 
     public function testAnUnregisteredMemberIsReportedWhenAskedToWrap()
     {
-        $kms = new RedundantKms(self::locator(['aws' => $this->aws]), 'aws', ['azure' => 'backup']);
+        $kms = new RedundantKms(self::locator(['aws' => $this->aws]), ['aws' => null, 'azure' => 'backup']);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('No KMS client named "azure" is registered on the redundant client.');
         $kms->encrypt('app', 'secret');
     }
 
-    public function testTheFirstMemberCannotBeARecipientAsWell()
+    public function testAtLeastOneMemberIsRequired()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The KMS client "aws" is the one every call names a master key on');
+        $this->expectExceptionMessage('A redundant KMS client needs at least one member.');
 
-        new RedundantKms(self::locator(['aws' => $this->aws]), 'aws', ['aws' => 'backup']);
+        new RedundantKms(self::locator(['aws' => $this->aws]), []);
+    }
+
+    /**
+     * A member given no master key wraps under the one each call names, which is what lets two
+     * providers sharing a key name run with no configuration beyond their names.
+     */
+    public function testAMemberWithoutAMasterKeyUsesTheOneEachCallNames()
+    {
+        $kms = new RedundantKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), ['aws' => null, 'azure' => null]);
+
+        $ciphertext = $kms->encrypt('app', 'secret');
+        $survivor = new RedundantKms(self::locator(['azure' => $this->azure]), ['azure' => null]);
+
+        $this->assertSame('secret', $survivor->decrypt($ciphertext));
+        $this->assertSame('app', $this->azure->keyIds[0]);
     }
 
     public function testAMemberNameHasToFitInTheCiphertext()
@@ -258,12 +277,12 @@ class RedundantKmsTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('is 256 bytes long');
 
-        new RedundantKms(self::locator(['aws' => $this->aws]), 'aws', [str_repeat('a', 256) => 'backup']);
+        new RedundantKms(self::locator(['aws' => $this->aws]), [str_repeat('a', 256) => 'backup']);
     }
 
     public function testAMasterKeyIdHasToFitInTheCiphertext()
     {
-        $kms = new RedundantKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), 'aws', ['azure' => str_repeat('k', 0x10000)]);
+        $kms = new RedundantKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), ['aws' => null, 'azure' => str_repeat('k', 0x10000)]);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The master key id of the KMS client "azure" is too long');
@@ -295,8 +314,8 @@ class RedundantKmsTest extends TestCase
     {
         $aws = new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32)]));
         $azure = new OpenSslKms(new InMemoryKeyLoader(['backup' => random_bytes(32)]));
-        $encrypter = new EnvelopeEncrypter(new RedundantKms(self::locator(['aws' => $aws, 'azure' => $azure]), 'aws', ['azure' => 'backup']));
-        $survivor = new EnvelopeEncrypter(new RedundantKms(self::locator(['azure' => $azure]), 'azure', []));
+        $encrypter = new EnvelopeEncrypter(new RedundantKms(self::locator(['aws' => $aws, 'azure' => $azure]), ['aws' => null, 'azure' => 'backup']));
+        $survivor = new EnvelopeEncrypter(new RedundantKms(self::locator(['azure' => $azure]), ['azure' => null]));
 
         $envelope = $encrypter->encrypt('app', 'a payload of any size', 'aad');
 
@@ -338,7 +357,7 @@ class RedundantKmsTest extends TestCase
         $gcp = new OpenSslKms(new InMemoryKeyLoader(['backup' => random_bytes(32)]));
 
         // the service the store and the command know as "redundant", reconfigured between the two phases
-        $redundant = new class(new RedundantKms(self::locator(['aws' => $aws, 'azure' => $azure]), 'aws', ['azure' => 'backup'])) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
+        $redundant = new class(new RedundantKms(self::locator(['aws' => $aws, 'azure' => $azure]), ['aws' => null, 'azure' => 'backup'])) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
             public function __construct(public RedundantKms $members)
             {
             }
@@ -368,19 +387,19 @@ class RedundantKmsTest extends TestCase
         $envelope = $encrypter->encrypt('user.email', 'survives the loss of aws');
         $store->forget();
 
-        $redundant->members = new RedundantKms(self::locator(['azure' => $azure, 'gcp' => $gcp]), 'azure', ['gcp' => 'backup']);
+        $redundant->members = new RedundantKms(self::locator(['azure' => $azure, 'gcp' => $gcp]), ['azure' => null, 'gcp' => 'backup']);
         $tester = new CommandTester(new RewrapDataKeysCommand($store, self::locator(['redundant' => $redundant])));
         $tester->execute(['--from' => 'redundant', '--to' => 'redundant', '--key-id' => 'backup']);
         $tester->assertCommandIsSuccessful();
         $store->forget();
 
-        $redundant->members = new RedundantKms(self::locator(['gcp' => $gcp]), 'gcp', []);
+        $redundant->members = new RedundantKms(self::locator(['gcp' => $gcp]), ['gcp' => null]);
         $this->assertSame('survives the loss of aws', $encrypter->decrypt($envelope));
     }
 
     private function kms(): RedundantKms
     {
-        return new RedundantKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure, 'gcp' => $this->gcp]), 'aws', ['azure' => 'backup', 'gcp' => 'projects/p/keys/backup']);
+        return new RedundantKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure, 'gcp' => $this->gcp]), ['aws' => null, 'azure' => 'backup', 'gcp' => 'projects/p/keys/backup']);
     }
 
     /**

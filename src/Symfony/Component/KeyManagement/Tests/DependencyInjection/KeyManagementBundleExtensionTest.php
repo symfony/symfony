@@ -493,11 +493,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('app', $container->getDefinition('key_management.store')->getArgument(2));
     }
 
-    /**
-     * An application that configured redundancy meant every path to go through it, and a store
-     * wrapping with one member only would quietly be the exception.
-     */
-    public function testStoreWrapsWithTheRedundantClientWhenRedundancyIsConfigured()
+    public function testStoreWrapsWithARedundantClientLikeAnyOther()
     {
         if (!class_exists(DataKeyStore::class)) {
             $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
@@ -509,37 +505,15 @@ class KeyManagementBundleExtensionTest extends TestCase
                 'clients' => [
                     'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
                     'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'azure' => 'backup']],
                 ],
-                'default_client' => 'aws',
-                'redundancy' => ['azure' => 'backup'],
+                'default_client' => 'main',
                 'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key'],
             ]);
         });
 
-        $this->assertSame('redundant', $container->getDefinition('key_management.store')->getArgument(2));
-        $this->assertSame('key_management.envelope_encrypter.redundant', (string) $container->getDefinition('key_management.stored_envelope_encrypter')->getArgument(1), 'the fallback reads the self-contained envelopes the redundant client wrote.');
-    }
-
-    public function testStoreNamingTheRedundantClientIsAccepted()
-    {
-        if (!class_exists(DataKeyStore::class)) {
-            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
-        }
-
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->register('app.dbal', \stdClass::class);
-            $container->loadFromExtension('key_management', [
-                'clients' => [
-                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
-                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
-                ],
-                'default_client' => 'aws',
-                'redundancy' => ['azure' => 'backup'],
-                'store' => ['connection' => 'app.dbal', 'client' => 'redundant', 'key_id' => 'alias/app-key'],
-            ]);
-        });
-
-        $this->assertSame('redundant', $container->getDefinition('key_management.store')->getArgument(2));
+        $this->assertSame('main', $container->getDefinition('key_management.store')->getArgument(2));
+        $this->assertSame('key_management.envelope_encrypter.main', (string) $container->getDefinition('key_management.stored_envelope_encrypter')->getArgument(1), 'the fallback reads the self-contained envelopes the redundant client wrote.');
     }
 
     public function testStoreWithoutAClientNorADefaultOneIsRefused()
@@ -683,96 +657,69 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key_management.envelope_encrypter.vault', (string) $container->getAlias(EnvelopeEncrypterInterface::class.' $vaultEnvelopeEncrypter'));
     }
 
-    public function testRedundancyRegistersAClientMadeOfTheOthersAndMakesItTheDefault()
+    public function testAClientDeclaredByItsMembersIsARedundantOne()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('key_management', [
                 'clients' => [
                     'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
                     'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'azure' => 'backup']],
                 ],
-                'default_client' => 'aws',
-                'redundancy' => ['azure' => 'backup'],
+                'default_client' => 'main',
             ]);
         });
 
-        $definition = $container->getDefinition('key_management.redundant');
+        $definition = $container->getDefinition('key_management.main');
         $this->assertSame(RedundantKms::class, $definition->getClass());
         $this->assertInstanceOf(ServiceLocatorArgument::class, $definition->getArgument(0));
         $this->assertSame('key_management.client', $definition->getArgument(0)->getTaggedIteratorArgument()->getTag(), 'the members are the tagged clients, so one an application registers itself can be a member.');
         $this->assertSame('key', $definition->getArgument(0)->getTaggedIteratorArgument()->getIndexAttribute());
-        $this->assertSame('aws', $definition->getArgument(1));
-        $this->assertSame(['azure' => 'backup'], $definition->getArgument(2));
-        $this->assertSame([['key' => 'redundant']], $definition->getTag('key_management.client'), 'the redundant client is a client like any other for the commands and the profiler.');
+        $this->assertSame(['aws' => null, 'azure' => 'backup'], $definition->getArgument(1));
+        $this->assertSame([['key' => 'main']], $definition->getTag('key_management.client'), 'a redundant client is a client like any other for the commands and the profiler.');
 
-        $this->assertSame('key_management.redundant', (string) $container->getDefinition('key_management.envelope_encrypter.redundant')->getArgument(0));
+        $this->assertSame('key_management.main', (string) $container->getDefinition('key_management.envelope_encrypter.main')->getArgument(0));
+        $this->assertSame('key_management.main', (string) $container->getAlias(EncrypterInterface::class), 'and it is the default when named so, like any other.');
+        $this->assertSame('key_management.envelope_encrypter.main', (string) $container->getAlias(EnvelopeEncrypterInterface::class));
 
-        foreach ([EncrypterInterface::class, DecrypterInterface::class, DataKeyGeneratorInterface::class] as $type) {
-            $this->assertSame('key_management.redundant', (string) $container->getAlias($type), $type);
-            $this->assertTrue($container->hasAlias('.'.$type.' $redundant'), $type);
+        foreach ([EncrypterInterface::class, DecrypterInterface::class, DataKeyGeneratorInterface::class, EnvelopeEncrypterInterface::class, EnvelopeDecrypterInterface::class] as $type) {
+            $this->assertTrue($container->hasAlias('.'.$type.' $main'), $type);
             $this->assertTrue($container->hasAlias('.'.$type.' $aws'), 'each member stays reachable on its own.');
-        }
-        foreach ([EnvelopeEncrypterInterface::class, EnvelopeDecrypterInterface::class] as $type) {
-            $this->assertSame('key_management.envelope_encrypter.redundant', (string) $container->getAlias($type), $type);
-            $this->assertTrue($container->hasAlias('.'.$type.' $redundant'), $type);
         }
     }
 
-    public function testRedundancyNeedsADefaultClient()
+    public function testAMemberMustBeARegisteredClient()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Configuring "key_management.redundancy" requires a default client to wrap with first');
+        $this->expectExceptionMessage('The member "gcp" of the redundant KMS client "main" is not registered in "key_management.clients".');
 
         $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('key_management', [
                 'clients' => [
                     'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
-                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'gcp' => 'backup']],
                 ],
-                'redundancy' => ['azure' => 'backup'],
             ]);
         });
     }
 
-    public function testARecipientMustBeARegisteredClient()
+    /**
+     * Two redundant clients naming each other would read in circles, and one listing the other
+     * gains nothing over listing its members, so nesting is refused rather than cycle-checked.
+     */
+    public function testAMemberCannotBeARedundantClientItself()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The KMS client "gcp" listed in "key_management.redundancy" is not registered');
-
-        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('key_management', [
-                'clients' => ['aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U='],
-                'redundancy' => ['gcp' => 'backup'],
-            ]);
-        });
-    }
-
-    public function testTheDefaultClientCannotBeARecipient()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The default KMS client "aws" is the one "key_management.redundancy" wraps with first');
-
-        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('key_management', [
-                'clients' => ['aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U='],
-                'redundancy' => ['aws' => 'backup'],
-            ]);
-        });
-    }
-
-    public function testAClientCannotBeNamedAfterTheRedundantOne()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('A KMS client cannot be named "redundant" while "key_management.redundancy" is configured');
+        $this->expectExceptionMessage('The member "inner" of the redundant KMS client "outer" is a redundant client itself');
 
         $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('key_management', [
                 'clients' => [
-                    'redundant' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
-                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'inner' => ['members' => ['aws' => null]],
+                    'outer' => ['members' => ['inner' => null]],
                 ],
-                'default_client' => 'redundant',
-                'redundancy' => ['azure' => 'backup'],
+                'default_client' => 'outer',
             ]);
         });
     }

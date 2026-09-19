@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
@@ -54,11 +55,6 @@ class KeyManagementBundle extends AbstractBundle
      */
     private const string STORE_TARGET = 'stored';
 
-    /**
-     * Name of the client wrapping under every member of "redundancy", both as an argument and as a target.
-     */
-    private const string REDUNDANT = 'redundant';
-
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
@@ -89,7 +85,7 @@ class KeyManagementBundle extends AbstractBundle
                     ->defaultNull()
                 ->end()
                 ->arrayNode('clients', 'client')
-                    ->info('Map of client name to DSN; "service://<id>" takes the client the application registered under that service id instead of building one from a DSN.')
+                    ->info('Map of client name to DSN, or to the members of a redundant client; "service://<id>" takes the client the application registered under that service id instead of building one from a DSN.')
                     ->beforeNormalization()
                         ->ifString()
                         ->then(static fn (string $dsn): array => ['default' => $dsn])
@@ -98,29 +94,44 @@ class KeyManagementBundle extends AbstractBundle
                     ->useAttributeAsKey('name')
                     ->validate()
                         ->always(static function (array $clients): array {
-                            foreach ($clients as $name => $dsn) {
+                            foreach ($clients as $name => $client) {
                                 if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $name)) {
                                     throw new InvalidArgumentException(\sprintf('The KMS client name "%s" is invalid: it must start with a letter or an underscore and contain only letters, digits, underscores, dots and dashes.', $name));
+                                }
+                                if (\array_key_exists($name, $client['members'])) {
+                                    throw new InvalidArgumentException(\sprintf('The redundant KMS client "%s" cannot be a member of itself.', $name));
                                 }
                             }
 
                             return $clients;
                         })
                     ->end()
-                    ->scalarPrototype()
-                        ->cannotBeEmpty()
-                        ->validate()
-                            ->ifTrue(static fn ($dsn): bool => !\is_string($dsn))
-                            ->thenInvalid('The DSN of a KMS client must be a string, got %s.')
+                    ->arrayPrototype()
+                        ->beforeNormalization()
+                            ->ifTrue(static fn ($client): bool => !\is_array($client))
+                            ->then(static fn ($dsn): array => ['dsn' => $dsn])
                         ->end()
-                    ->end()
-                ->end()
-                ->arrayNode('redundancy', 'recipient')
-                    ->info('Map of client name to master key: everything the default client encrypts is also wrapped under each of these, and read back through whichever answers, so that losing one provider loses nothing. The client the application gets is then named "redundant". Each wrapping is a full path to the data.')
-                    ->normalizeKeys(false)
-                    ->useAttributeAsKey('name')
-                    ->scalarPrototype()
-                        ->cannotBeEmpty()
+                        ->validate()
+                            ->ifTrue(static fn (array $client): bool => isset($client['dsn']) === (bool) $client['members'])
+                            ->thenInvalid('A KMS client is either a DSN or the members of a redundant client, not both nor neither.')
+                        ->end()
+                        ->children()
+                            ->scalarNode('dsn')
+                                ->cannotBeEmpty()
+                                ->validate()
+                                    ->ifTrue(static fn ($dsn): bool => !\is_string($dsn))
+                                    ->thenInvalid('The DSN of a KMS client must be a string, got %s.')
+                                ->end()
+                            ->end()
+                            ->arrayNode('members', 'member')
+                                ->info('Map of member name to the master key it wraps under, null for the key id given to each call. Everything the redundant client encrypts is wrapped by each member and read back through the first one that answers, the first member minting the data keys, so that losing one provider loses nothing. Each member is a full path to the data.')
+                                ->normalizeKeys(false)
+                                ->useAttributeAsKey('name')
+                                ->scalarPrototype()
+                                    ->defaultNull()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
                 ->arrayNode('store')
@@ -132,7 +143,7 @@ class KeyManagementBundle extends AbstractBundle
                             ->cannotBeEmpty()
                         ->end()
                         ->scalarNode('client')
-                            ->info('Name of the client wrapping the data keys this store creates (must match an entry of "clients", or "redundant"); defaults to the client the application gets.')
+                            ->info('Name of the client wrapping the data keys this store creates (must match an entry of "clients"); defaults to the default client.')
                             ->defaultNull()
                             ->cannotBeEmpty()
                         ->end()
@@ -198,13 +209,15 @@ class KeyManagementBundle extends AbstractBundle
             throw new LogicException(\sprintf('Default KMS client "%s" is not registered in "key_management.clients".', $defaultName));
         }
 
-        foreach ($clients as $name => $dsn) {
+        foreach ($clients as $name => $client) {
             $serviceId = 'key_management.'.$name;
 
             $definition = $container->register($serviceId, EncrypterInterface::class)
                 ->addTag('key_management.client', ['key' => $name]);
 
-            if (str_starts_with($dsn, self::SERVICE_SCHEME)) {
+            if ($client['members']) {
+                $this->configureRedundantClient($definition, $name, $client['members'], $clients);
+            } elseif (str_starts_with($dsn = $client['dsn'], self::SERVICE_SCHEME)) {
                 if ('' === $referencedId = substr($dsn, \strlen(self::SERVICE_SCHEME))) {
                     throw new InvalidArgumentException(\sprintf('The DSN of the KMS client "%s" must name a service id after "%s".', $name, self::SERVICE_SCHEME));
                 }
@@ -228,13 +241,6 @@ class KeyManagementBundle extends AbstractBundle
             }
         }
 
-        $clientNames = array_keys($clients);
-        if ($config['redundancy']) {
-            $this->registerRedundancy($config['redundancy'], $clientNames, $defaultName, $container);
-            $defaultName = self::REDUNDANT;
-            $clientNames[] = self::REDUNDANT;
-        }
-
         if (null !== $defaultName) {
             $container->setAlias(EncrypterInterface::class, 'key_management.'.$defaultName);
             $container->setAlias(DecrypterInterface::class, 'key_management.'.$defaultName);
@@ -244,58 +250,37 @@ class KeyManagementBundle extends AbstractBundle
         }
 
         if (isset($config['store']['key_id'])) {
-            $this->registerStore($config['store'], $clientNames, $defaultName, $container);
+            $this->registerStore($config['store'], array_keys($clients), $defaultName, $container);
         }
     }
 
     /**
-     * The redundant client is a client like any other: tagged, so the console commands and the
-     * profiler see it, and given an envelope encrypter and the argument aliases of its name. What
-     * sets it apart is that it becomes the default, since an application that configured
-     * redundancy meant every path to go through it, the store included.
+     * A redundant client is a client like any other, tagged and aliased under its name; what it is
+     * made of is the tagged clients, so a client contributed by a bundle can be a member. The
+     * members named in the configuration are still checked against it, where a typo is reported
+     * against a name, and a member cannot be redundant itself: two of them naming each other would
+     * read in circles.
      *
-     * @param array<string, string> $recipients
-     * @param list<string>          $clientNames
+     * @param array<string, string|null>  $members
+     * @param array<string, array<mixed>> $clients
      */
-    private function registerRedundancy(array $recipients, array $clientNames, ?string $defaultName, ContainerBuilder $container): void
+    private function configureRedundantClient(Definition $definition, string $name, array $members, array $clients): void
     {
-        if (null === $defaultName) {
-            throw new LogicException('Configuring "key_management.redundancy" requires a default client to wrap with first: set "key_management.default_client".');
-        }
-
-        if (\in_array(self::REDUNDANT, $clientNames, true)) {
-            throw new LogicException(\sprintf('A KMS client cannot be named "%1$s" while "key_management.redundancy" is configured: that name is the one the redundant client registers under. Rename the "%1$s" client.', self::REDUNDANT));
-        }
-
-        foreach (array_keys($recipients) as $name) {
-            if (!\in_array($name, $clientNames, true)) {
-                throw new LogicException(\sprintf('The KMS client "%s" listed in "key_management.redundancy" is not registered in "key_management.clients".', $name));
+        foreach (array_keys($members) as $member) {
+            if (!isset($clients[$member])) {
+                throw new LogicException(\sprintf('The member "%s" of the redundant KMS client "%s" is not registered in "key_management.clients".', $member, $name));
             }
 
-            if ($name === $defaultName) {
-                throw new LogicException(\sprintf('The default KMS client "%s" is the one "key_management.redundancy" wraps with first, so it cannot be listed as a recipient as well.', $name));
+            if ($clients[$member]['members']) {
+                throw new LogicException(\sprintf('The member "%s" of the redundant KMS client "%s" is a redundant client itself, which is not supported: list its members instead.', $member, $name));
             }
         }
 
-        $serviceId = 'key_management.'.self::REDUNDANT;
-        $container->register($serviceId, RedundantKms::class)
+        $definition->setClass(RedundantKms::class)
             ->setArguments([
                 new ServiceLocatorArgument(new TaggedIteratorArgument('key_management.client', 'key', true)),
-                $defaultName,
-                $recipients,
-            ])
-            ->addTag('key_management.client', ['key' => self::REDUNDANT]);
-
-        $envelopeId = 'key_management.envelope_encrypter.'.self::REDUNDANT;
-        $container->register($envelopeId, EnvelopeEncrypter::class)
-            ->setArguments([new Reference($serviceId)]);
-
-        foreach ([EncrypterInterface::class, DecrypterInterface::class, DataKeyGeneratorInterface::class] as $type) {
-            $container->registerAliasForArgument($serviceId, $type, self::REDUNDANT.'.kms', self::REDUNDANT);
-        }
-        foreach ([EnvelopeEncrypterInterface::class, EnvelopeDecrypterInterface::class] as $type) {
-            $container->registerAliasForArgument($envelopeId, $type, self::REDUNDANT.'.envelope_encrypter', self::REDUNDANT);
-        }
+                $members,
+            ]);
     }
 
     /**

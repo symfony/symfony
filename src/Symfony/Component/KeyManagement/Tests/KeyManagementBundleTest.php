@@ -109,7 +109,7 @@ class KeyManagementBundleTest extends TestCase
      * loop: the profiler sees the redundant client and each of its members.
      */
     #[RequiresPhpExtension('sodium')]
-    public function testARedundantClientIsWhatTheApplicationGetsAndEachMemberIsTraced()
+    public function testARedundantClientIsADefaultLikeAnyOtherAndEachMemberIsTraced()
     {
         $kernel = new TestKeyManagementKernel('redundant', true, $this->varDir);
         $kernel->boot();
@@ -117,7 +117,7 @@ class KeyManagementBundleTest extends TestCase
 
         $kms = $container->get('test.kms');
         $this->assertInstanceOf(TraceableKms::class, $kms);
-        $this->assertSame($container->get('test.redundant_kms'), $kms, 'configuring redundancy makes the redundant client the one the application gets.');
+        $this->assertSame($container->get('test.redundant_kms'), $kms);
         $this->assertSame('secret', $kms->decrypt($kms->encrypt('app', 'secret')));
 
         $envelopeEncrypter = $container->get('test.envelope_encrypter');
@@ -228,9 +228,9 @@ class TestKeyManagementKernel extends AbstractKernel
                 'clients' => [
                     'primary' => 'sodium://?keys[app]='.Base64UrlSafe::encode(random_bytes(32)),
                     'secondary' => 'sodium://?keys[backup]='.Base64UrlSafe::encode(random_bytes(32)),
+                    'redundant' => ['members' => ['primary' => null, 'secondary' => 'backup']],
                 ],
-                'default_client' => 'primary',
-                'redundancy' => ['secondary' => 'backup'],
+                'default_client' => 'redundant',
             ];
             $services
                 ->alias('test.kms', EncrypterInterface::class)->public()

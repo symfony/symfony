@@ -27,11 +27,11 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * complete on its own. An outage of one provider is then invisible on the read path, and the
  * loss of one for good is recovered by adding another member and rewrapping what the store holds.
  *
- * The first member is the one the key id given to each call names a master key on, and the one it
- * generates data keys with; the others wrap under a master key of their own, fixed once in the
- * configuration. Each member is a full path to the plaintext, so the list is worth keeping to
- * providers one would otherwise lose sleep over losing, and each of them deserves the protection
- * the first one gets.
+ * The members are listed with the master key each of them wraps under, or null for the key id
+ * given to each call; the first member is the one that mints data keys and the first one asked to
+ * read. Each member is a full KMS client, required to read back what it wraps, and a full path to
+ * the plaintext: the list is worth keeping to providers one would otherwise lose sleep over
+ * losing, and each of them deserves the protection the first one gets.
  *
  * Writing goes through every member, and a member that cannot wrap fails the whole call: a
  * ciphertext missing one wrapping is a ciphertext less redundant than the configuration claims,
@@ -40,9 +40,11 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  *
  * The blob is laid out as `[0x01][count]` followed, for each wrapping, by the member's name, the
  * master key it used and its own blob, each prefixed with its length on one, two and four bytes.
- * The name is what lets a wrapping find its member back; a member dropped from the configuration
- * leaves wrappings that are passed over, and one added later is found in the ciphertexts written
- * from then on.
+ * The name is what lets a wrapping find its member back, as the client column of a data key store
+ * does, and it is persisted with the same consequence: a member renamed or dropped leaves
+ * wrappings that are passed over, the other members keep reading, and `key-management:rewrap-data-keys`
+ * writes stored keys under the current names. A member added later is found in the ciphertexts
+ * written from then on.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -53,36 +55,29 @@ final class RedundantKms implements DataKeyGeneratorInterface, DecrypterInterfac
     private const int VERSION = 1;
 
     /**
-     * @param ContainerInterface    $clients    KMS clients, indexed by name
-     * @param string                $client     Name of the member the key id given to each call names a master key on; it generates the data keys and is asked first to read
-     * @param array<string, string> $recipients Master key, indexed by member name, that every ciphertext is also wrapped under
+     * @param ContainerInterface         $clients KMS clients, indexed by name
+     * @param array<string, string|null> $members Master key each member wraps under, indexed by member name, null for the key id given to each call; the first member mints the data keys and is asked first to read
      */
     public function __construct(
         private readonly ContainerInterface $clients,
-        private readonly string $client,
-        private readonly array $recipients,
+        private readonly array $members,
     ) {
-        if (isset($recipients[$client])) {
-            throw new InvalidArgumentException(\sprintf('The KMS client "%s" is the one every call names a master key on, so it cannot be listed among the recipients as well.', $client));
+        if (!$members) {
+            throw new InvalidArgumentException('A redundant KMS client needs at least one member.');
         }
 
-        foreach ([$client, ...array_keys($recipients)] as $name) {
+        foreach (array_keys($members) as $name) {
             if ('' === $name || 0xFF < \strlen($name)) {
                 throw new InvalidArgumentException(\sprintf('A KMS client name is between 1 and 255 bytes long to be recorded in a ciphertext, "%s" is %d bytes long.', $name, \strlen($name)));
             }
         }
     }
 
-    /**
-     * Each member is required to decrypt as well as to encrypt, at the time it is asked to encrypt:
-     * a member that could only wrap would be a wrapping nothing reads back, which is not the
-     * redundancy the configuration claims.
-     */
     public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
     {
-        $wrappings = [$this->client => $this->member($this->client, EncrypterInterface::class, DecrypterInterface::class)->encrypt($keyId, $plaintext, $aad, $deterministic)];
-        foreach ($this->recipients as $name => $recipientKeyId) {
-            $wrappings[$name] = $this->member($name, EncrypterInterface::class, DecrypterInterface::class)->encrypt($recipientKeyId, $plaintext, $aad, $deterministic);
+        $wrappings = [];
+        foreach ($this->members as $name => $memberKeyId) {
+            $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad, $deterministic);
         }
 
         return new Ciphertext(self::frame($wrappings), $keyId);
@@ -90,24 +85,27 @@ final class RedundantKms implements DataKeyGeneratorInterface, DecrypterInterfac
 
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
     {
-        return $this->readThroughAny(self::parse($ciphertext), static fn (DecrypterInterface $member, Ciphertext $wrapped): string => $member->decrypt($wrapped, $aad), DecrypterInterface::class);
+        return $this->readThroughAny(self::parse($ciphertext), static fn (DecrypterInterface $member, Ciphertext $wrapped): string => $member->decrypt($wrapped, $aad));
     }
 
     /**
      * The data key is minted by the first member and wrapped by the others while its plaintext is
-     * still around, inside the closure {@see DataKey::use()} hands it to; each of them is required
-     * to unwrap as well, for the reason {@see encrypt()} gives. The DataKey returned takes a buffer
-     * of its own, for the reason {@see DataKeyHandle} gives: the minted DataKey wipes what it held
-     * once the closure returns, and a shared buffer would leave one of the two sides unwiped.
+     * still around, inside the closure {@see DataKey::use()} hands it to. The DataKey returned
+     * takes a buffer of its own, for the reason {@see DataKeyHandle} gives: the minted DataKey
+     * wipes what it held once the closure returns, and a shared buffer would leave one of the two
+     * sides unwiped.
      */
     public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
     {
-        $dataKey = $this->member($this->client, DataKeyGeneratorInterface::class)->generateDataKey($keyId, $length, $aad);
+        $first = array_key_first($this->members);
+        $dataKey = $this->member($first)->generateDataKey($this->members[$first] ?? $keyId, $length, $aad);
 
-        return $dataKey->use(function (#[\SensitiveParameter] string $plaintext) use ($dataKey, $keyId, $aad): DataKey {
-            $wrappings = [$this->client => $dataKey->wrapped];
-            foreach ($this->recipients as $name => $recipientKeyId) {
-                $wrappings[$name] = $this->member($name, EncrypterInterface::class, DataKeyGeneratorInterface::class)->encrypt($recipientKeyId, $plaintext, $aad);
+        return $dataKey->use(function (#[\SensitiveParameter] string $plaintext) use ($dataKey, $first, $keyId, $aad): DataKey {
+            $wrappings = [$first => $dataKey->wrapped];
+            foreach ($this->members as $name => $memberKeyId) {
+                if ($name !== $first) {
+                    $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad);
+                }
             }
 
             if ('' !== $plaintext) {
@@ -120,27 +118,24 @@ final class RedundantKms implements DataKeyGeneratorInterface, DecrypterInterfac
 
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
-        return $this->readThroughAny(self::parse($wrapped), static fn (DataKeyGeneratorInterface $member, Ciphertext $wrapping): DataKey => $member->unwrapDataKey($wrapping, $aad), DataKeyGeneratorInterface::class);
+        return $this->readThroughAny(self::parse($wrapped), static fn (DataKeyGeneratorInterface $member, Ciphertext $wrapping): DataKey => $member->unwrapDataKey($wrapping, $aad));
     }
 
     /**
-     * Asks the first member, then the recipients in their configured order, then whoever else
-     * left a wrapping in the ciphertext. A member that is not registered anymore cannot be asked
-     * and is passed over; one that fails is passed over too, and its failure is the one reported
-     * when none of them answers.
+     * Asks the members in their configured order, then whoever else left a wrapping in the
+     * ciphertext. A member that is not registered anymore cannot be asked and is passed over; one
+     * that fails is passed over too, and its failure is the one reported when none of them answers.
      *
      * @template T
-     * @template M of DecrypterInterface|DataKeyGeneratorInterface
      *
-     * @param array<string, Ciphertext>  $wrappings
-     * @param \Closure(M, Ciphertext): T $read
-     * @param class-string<M>            $type
+     * @param array<string, Ciphertext>                                                                $wrappings
+     * @param \Closure(DataKeyGeneratorInterface&DecrypterInterface&EncrypterInterface, Ciphertext): T $read
      *
      * @return T
      */
-    private function readThroughAny(array $wrappings, \Closure $read, string $type): mixed
+    private function readThroughAny(array $wrappings, \Closure $read): mixed
     {
-        $rank = array_flip([$this->client, ...array_keys($this->recipients)]);
+        $rank = array_flip(array_keys($this->members));
         uksort($wrappings, static fn (string $a, string $b): int => ($rank[$a] ?? \PHP_INT_MAX) <=> ($rank[$b] ?? \PHP_INT_MAX));
 
         $failure = null;
@@ -152,7 +147,7 @@ final class RedundantKms implements DataKeyGeneratorInterface, DecrypterInterfac
             }
 
             try {
-                return $read($this->member($name, $type), $wrapping);
+                return $read($this->member($name), $wrapping);
             } catch (\RuntimeException $e) {
                 $failure ??= $e;
             }
@@ -162,24 +157,19 @@ final class RedundantKms implements DataKeyGeneratorInterface, DecrypterInterfac
     }
 
     /**
-     * @template M of object
-     *
-     * @param class-string<M> $type
-     * @param class-string    ...$types
-     *
-     * @return M
+     * A member is a full KMS client: one that could wrap but not read back would be a wrapping
+     * nothing reads, which is not the redundancy the configuration claims. This is checked here,
+     * on every resolution, since the container hands the members out lazily.
      */
-    private function member(string $name, string $type, string ...$types): object
+    private function member(string $name): DataKeyGeneratorInterface&DecrypterInterface&EncrypterInterface
     {
         if (!$this->clients->has($name)) {
             throw new LogicException(\sprintf('No KMS client named "%s" is registered on the redundant client.', $name));
         }
 
         $member = $this->clients->get($name);
-        foreach ([$type, ...$types] as $required) {
-            if (!$member instanceof $required) {
-                throw new LogicException(\sprintf('The KMS client "%s" does not implement "%s", which the redundant client needs from each of its members.', $name, $required));
-            }
+        if (!$member instanceof DataKeyGeneratorInterface || !$member instanceof DecrypterInterface || !$member instanceof EncrypterInterface) {
+            throw new LogicException(\sprintf('The KMS client "%s" cannot be a member of a redundant client: a member encrypts, decrypts and generates data keys, so that it reads back everything it wraps.', $name));
         }
 
         return $member;

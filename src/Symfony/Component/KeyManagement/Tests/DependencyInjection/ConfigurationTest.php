@@ -25,30 +25,14 @@ class ConfigurationTest extends TestCase
             'enabled' => true,
             'default_client' => null,
             'clients' => [],
-            'redundancy' => [],
         ], $this->process([]));
-    }
-
-    public function testTheRedundancyMapsAClientNameToAMasterKey()
-    {
-        $config = $this->process(['redundancy' => ['azure' => 'https://vault.azure.net/keys/app', 'Vault' => 'app']]);
-
-        $this->assertSame(['azure' => 'https://vault.azure.net/keys/app', 'Vault' => 'app'], $config['redundancy']);
-    }
-
-    public function testARecipientNeedsAMasterKey()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('key_management.redundancy.azure');
-
-        $this->process(['redundancy' => ['azure' => '']]);
     }
 
     public function testADsnAtTheRootIsTheDefaultClient()
     {
         $config = $this->process('sodium://?keys[app]=AAAA');
 
-        $this->assertSame(['default' => 'sodium://?keys[app]=AAAA'], $config['clients']);
+        $this->assertSame(['default' => ['dsn' => 'sodium://?keys[app]=AAAA', 'members' => []]], $config['clients']);
         $this->assertTrue($config['enabled']);
     }
 
@@ -56,8 +40,49 @@ class ConfigurationTest extends TestCase
     {
         $config = $this->process(['clients' => 'sodium://?keys[app]=AAAA', 'enabled' => false]);
 
-        $this->assertSame(['default' => 'sodium://?keys[app]=AAAA'], $config['clients']);
+        $this->assertSame(['default' => ['dsn' => 'sodium://?keys[app]=AAAA', 'members' => []]], $config['clients']);
         $this->assertFalse($config['enabled']);
+    }
+
+    /**
+     * A redundant client is declared where the others are, by its members instead of a DSN: a
+     * map of member name to the master key it wraps under, null standing for the key id each call
+     * names.
+     */
+    public function testAClientCanBeTheMembersOfARedundantOne()
+    {
+        $config = $this->process(['clients' => [
+            'aws' => 'aws-kms://default',
+            'azure' => 'azure-keyvault://default',
+            'main' => ['members' => ['aws' => null, 'azure' => 'https://vault.azure.net/keys/app']],
+        ]]);
+
+        $this->assertSame(['members' => ['aws' => null, 'azure' => 'https://vault.azure.net/keys/app']], $config['clients']['main']);
+        $this->assertSame(['dsn' => 'aws-kms://default', 'members' => []], $config['clients']['aws']);
+    }
+
+    public function testAClientIsADsnOrMembersNotBoth()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A KMS client is either a DSN or the members of a redundant client, not both nor neither.');
+
+        $this->process(['clients' => ['main' => ['dsn' => 'aws-kms://default', 'members' => ['aws' => null]]]]);
+    }
+
+    public function testAClientIsADsnOrMembersNotNeither()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A KMS client is either a DSN or the members of a redundant client, not both nor neither.');
+
+        $this->process(['clients' => ['main' => ['members' => []]]]);
+    }
+
+    public function testARedundantClientCannotBeItsOwnMember()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The redundant KMS client "main" cannot be a member of itself.');
+
+        $this->process(['clients' => ['main' => ['members' => ['main' => null, 'aws' => null]]]]);
     }
 
     public function testClientNamesAreKeptAsTheyAre()
@@ -82,7 +107,7 @@ class ConfigurationTest extends TestCase
     public function testADsnMustBeAString()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "key_management.clients.app": The DSN of a KMS client must be a string, got 5.');
+        $this->expectExceptionMessage('Invalid configuration for path "key_management.clients.app.dsn": The DSN of a KMS client must be a string, got 5.');
 
         $this->process(['clients' => ['app' => 5]]);
     }

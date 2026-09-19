@@ -240,11 +240,12 @@ final class RedundantKms implements DataKeyGeneratorInterface, DecrypterInterfac
             throw new DecryptionFailedException();
         }
 
-        $fieldLength = match ($lengthBytes) {
-            1 => \ord($blob[$offset]),
-            2 => unpack('n', $blob, $offset)[1],
-            4 => unpack('N', $blob, $offset)[1],
-        };
+        $fieldLength = (int) unpack(match ($lengthBytes) {
+            1 => 'C',
+            2 => 'n',
+            4 => 'N',
+            default => throw new LogicException(\sprintf('A length is prefixed on 1, 2 or 4 bytes, not %d.', $lengthBytes)),
+        }, $blob, $offset)[1];
         $offset += $lengthBytes;
 
         if ($offset + $fieldLength > $length) {

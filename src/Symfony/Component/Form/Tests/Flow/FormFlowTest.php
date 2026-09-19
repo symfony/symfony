@@ -445,6 +445,86 @@ class FormFlowTest extends TestCase
         self::assertNull($data->role);
     }
 
+    public function testResetActionWithoutInitialData()
+    {
+        $data = new UserSignUp();
+        $data->firstName = 'John';
+        $data->lastName = 'Doe';
+        $data->worker = true;
+        $data->company = 'Acme';
+        $data->currentStep = 'account';
+
+        $dataStorage = new InMemoryDataStorage('user_sign_up');
+        $dataStorage->save($data);
+
+        $flow = $this->factory->create(UserSignUpType::class, null, [
+            'data_storage' => $dataStorage,
+        ]);
+
+        self::assertSame('account', $flow->getCursor()->getCurrentStep());
+
+        $flow->submit([
+            'account' => [],
+            'navigator' => [
+                'reset' => '',
+            ],
+        ]);
+
+        $flow = $flow->getStepForm();
+        /** @var UserSignUp $data */
+        $data = $flow->getData();
+
+        self::assertSame('personal', $flow->getCursor()->getCurrentStep());
+        self::assertTrue($flow->has('personal'), 'reset action should restart the flow from empty data');
+        self::assertNull($data->firstName);
+        self::assertNull($data->company);
+        self::assertSame('personal', $data->currentStep);
+        self::assertNull($dataStorage->load());
+    }
+
+    public function testFinishActionWithoutInitialData()
+    {
+        $data = new UserSignUp();
+        $data->firstName = 'John';
+        $data->lastName = 'Doe';
+        $data->worker = true;
+        $data->company = 'Acme';
+        $data->role = 'ROLE_DEVELOPER';
+        $data->currentStep = 'account';
+
+        $dataStorage = new InMemoryDataStorage('user_sign_up');
+        $dataStorage->save($data);
+
+        $flow = $this->factory->create(UserSignUpType::class, null, [
+            'data_storage' => $dataStorage,
+        ]);
+
+        $flow->submit([
+            'account' => [
+                'email' => 'john@acme.com',
+                'password' => 'eBvU2vBLfSXqf36',
+            ],
+            'navigator' => [
+                'finish' => '',
+            ],
+        ]);
+
+        self::assertTrue($flow->isFinished());
+        self::assertSame('personal', $flow->getCursor()->getCurrentStep());
+
+        /** @var UserSignUp $data */
+        $data = $flow->getData();
+        self::assertSame('John', $data->firstName, 'the finished data must stay available');
+        self::assertSame('john@acme.com', $data->email);
+
+        $nextFlow = $flow->getStepForm();
+
+        self::assertNotSame($flow, $nextFlow);
+        self::assertSame('personal', $nextFlow->getCursor()->getCurrentStep());
+        self::assertNotSame($data, $nextFlow->getData());
+        self::assertNull($nextFlow->getData()->firstName);
+    }
+
     public function testResetManually()
     {
         $data = new UserSignUp();

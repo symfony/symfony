@@ -30,6 +30,7 @@ class FormFlow extends Form implements FormFlowInterface
 {
     private ?ButtonFlowInterface $clickedFlowButton = null;
     private bool $finished = false;
+    private bool $reset = false;
 
     public function __construct(
         private readonly FormFlowConfigInterface $config,
@@ -75,6 +76,7 @@ class FormFlow extends Form implements FormFlowInterface
     {
         $this->config->getDataStorage()->clear();
         $this->cursor = $this->cursor->withCurrentStep($this->config->getInitialStep());
+        $this->reset = true;
     }
 
     public function movePrevious(?string $step = null): void
@@ -99,7 +101,10 @@ class FormFlow extends Form implements FormFlowInterface
 
     public function newStepForm(): static
     {
-        return $this->config->getFormFactory()->createNamed($this->config->getName(), $this->config->getType()->getInnerType()::class, $this->getData(), $this->config->getInitialOptions());
+        // after a reset, restart from the initial data only; without any, the builder creates empty data
+        $data = $this->reset ? null : $this->getData();
+
+        return $this->config->getFormFactory()->createNamed($this->config->getName(), $this->config->getType()->getInnerType()::class, $data, $this->config->getInitialOptions());
     }
 
     public function getStepForm(): static

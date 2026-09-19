@@ -135,8 +135,8 @@ class StepFlowNode
             return true;
         }
 
-        if ($this->skip) {
-            return ($this->skip)($data);
+        if ($this->skip && ($this->skip)($data)) {
+            return true;
         }
 
         // Check ancestors: if a parent is skipped via skip func, children are too

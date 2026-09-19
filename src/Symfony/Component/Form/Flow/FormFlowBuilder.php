@@ -111,7 +111,9 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
             return $defaultStep;
         }
 
-        return (string) $this->stepAccessor->getStep($this->initialOptions['data'], $defaultStep);
+        $initialStep = (string) $this->stepAccessor->getStep($this->initialOptions['data'], $defaultStep);
+
+        return $this->hasStep($initialStep) ? $initialStep : $defaultStep;
     }
 
     public function getInitialOptions(): array
@@ -210,11 +212,7 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
 
         $currentStep = $this->resolveCurrentStep();
 
-        if (!isset($this->steps[$currentStep])) {
-            throw new InvalidArgumentException(\sprintf('Step form "%s" is not defined.', $currentStep));
-        }
-
-        $step = $this->steps[$currentStep];
+        $step = $this->getStep($currentStep);
         $this->add($step->getName(), $step->getType(), $step->getOptions());
 
         $cursor = new FormFlowCursor(array_keys($this->steps), $currentStep);
@@ -251,7 +249,8 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
     {
         $data = $this->getData();
 
-        if (!$currentStep = $this->getStepAccessor()->getStep($data)) {
+        // fall back to the first step when no step is stored yet or when the stored one no longer exists
+        if (!($currentStep = $this->getStepAccessor()->getStep($data)) || !$this->hasStep($currentStep)) {
             $currentStep = key($this->steps);
             $this->getStepAccessor()->setStep($data, $currentStep);
             $this->setData($data);

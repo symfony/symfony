@@ -800,6 +800,44 @@ class FormFlowTest extends TestCase
         self::assertSame('', $emptyData->currentStep, 'The empty_data instance must not be mutated');
     }
 
+    public function testUnknownStoredStepFallsBackToFirstStep()
+    {
+        $data = new UserSignUp();
+        $data->firstName = 'John';
+        $data->worker = true;
+        $data->currentStep = 'removed_step';
+
+        $dataStorage = new InMemoryDataStorage('user_sign_up');
+        $dataStorage->save($data);
+
+        $flow = $this->factory->create(UserSignUpType::class, new UserSignUp(), [
+            'data_storage' => $dataStorage,
+        ]);
+
+        /** @var UserSignUp $data */
+        $data = $flow->getData();
+
+        self::assertSame('personal', $flow->getCursor()->getCurrentStep());
+        self::assertTrue($flow->has('personal'));
+        self::assertSame('personal', $data->currentStep, 'the stored step must be corrected');
+        self::assertSame('John', $data->firstName, 'the stored data must be preserved');
+    }
+
+    public function testUnknownInitialStepFallsBackToFirstStep()
+    {
+        $flow = $this->factory->create(UserSignUpType::class, ['currentStep' => 'removed_step'], [
+            'data_class' => null,
+            'step_property_path' => '[currentStep]',
+        ]);
+
+        self::assertSame('personal', $flow->getCursor()->getCurrentStep());
+        self::assertSame('personal', $flow->getConfig()->getInitialStep());
+
+        $flow->reset();
+
+        self::assertSame('personal', $flow->getCursor()->getCurrentStep());
+    }
+
     public function testFormFlowWithArrayData()
     {
         $flow = $this->factory->create(UserSignUpType::class, [], [

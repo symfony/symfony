@@ -43,6 +43,7 @@ use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 use Symfony\Component\KeyManagement\KeyManagementBundle;
+use Symfony\Component\KeyManagement\RedundantKms;
 use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -475,6 +476,67 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertFalse($container->hasAlias(DataKeyStoreInterface::class));
     }
 
+    public function testStoreWrapsWithTheDefaultClientWhenToldNoOther()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key'],
+            ]);
+        });
+
+        $this->assertSame('app', $container->getDefinition('key_management.store')->getArgument(2));
+    }
+
+    public function testStoreWrapsWithARedundantClientLikeAnyOther()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'azure' => 'backup']],
+                ],
+                'default_client' => 'main',
+                'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key'],
+            ]);
+        });
+
+        $this->assertSame('main', $container->getDefinition('key_management.store')->getArgument(2));
+        $this->assertSame('key_management.envelope_encrypter.main', (string) $container->getDefinition('key_management.stored_envelope_encrypter')->getArgument(1), 'the fallback reads the self-contained envelopes the redundant client wrote.');
+    }
+
+    public function testStoreWithoutAClientNorADefaultOneIsRefused()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "key_management.store" needs a client to wrap its data keys with');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                ],
+                'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key'],
+            ]);
+        });
+    }
+
     public function testStoreRejectsAClientThatIsNotRegistered()
     {
         $this->expectException(LogicException::class);
@@ -593,6 +655,73 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key_management.vault', (string) $container->getAlias(EncrypterInterface::class.' $vaultKms'));
         $this->assertSame('key_management.vault', (string) $container->getAlias(DataKeyGeneratorInterface::class.' $vaultKms'));
         $this->assertSame('key_management.envelope_encrypter.vault', (string) $container->getAlias(EnvelopeEncrypterInterface::class.' $vaultEnvelopeEncrypter'));
+    }
+
+    public function testAClientDeclaredByItsMembersIsARedundantOne()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'azure' => 'backup']],
+                ],
+                'default_client' => 'main',
+            ]);
+        });
+
+        $definition = $container->getDefinition('key_management.main');
+        $this->assertSame(RedundantKms::class, $definition->getClass());
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $definition->getArgument(0));
+        $this->assertSame('key_management.client', $definition->getArgument(0)->getTaggedIteratorArgument()->getTag(), 'the members are the tagged clients, so one an application registers itself can be a member.');
+        $this->assertSame('key', $definition->getArgument(0)->getTaggedIteratorArgument()->getIndexAttribute());
+        $this->assertSame(['aws' => null, 'azure' => 'backup'], $definition->getArgument(1));
+        $this->assertSame([['key' => 'main']], $definition->getTag('key_management.client'), 'a redundant client is a client like any other for the commands and the profiler.');
+
+        $this->assertSame('key_management.main', (string) $container->getDefinition('key_management.envelope_encrypter.main')->getArgument(0));
+        $this->assertSame('key_management.main', (string) $container->getAlias(EncrypterInterface::class), 'and it is the default when named so, like any other.');
+        $this->assertSame('key_management.envelope_encrypter.main', (string) $container->getAlias(EnvelopeEncrypterInterface::class));
+
+        foreach ([EncrypterInterface::class, DecrypterInterface::class, DataKeyGeneratorInterface::class, EnvelopeEncrypterInterface::class, EnvelopeDecrypterInterface::class] as $type) {
+            $this->assertTrue($container->hasAlias('.'.$type.' $main'), $type);
+            $this->assertTrue($container->hasAlias('.'.$type.' $aws'), 'each member stays reachable on its own.');
+        }
+    }
+
+    public function testAMemberMustBeARegisteredClient()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The member "gcp" of the redundant KMS client "main" is not registered in "key_management.clients".');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'gcp' => 'backup']],
+                ],
+            ]);
+        });
+    }
+
+    /**
+     * Two redundant clients naming each other would read in circles, and one listing the other
+     * gains nothing over listing its members, so nesting is refused rather than cycle-checked.
+     */
+    public function testAMemberCannotBeARedundantClientItself()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The member "inner" of the redundant KMS client "outer" is a redundant client itself');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'inner' => ['members' => ['aws' => null]],
+                    'outer' => ['members' => ['inner' => null]],
+                ],
+                'default_client' => 'outer',
+            ]);
+        });
     }
 
     /**

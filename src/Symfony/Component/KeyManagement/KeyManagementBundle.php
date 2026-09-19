@@ -54,6 +54,11 @@ class KeyManagementBundle extends AbstractBundle
      */
     private const string STORE_TARGET = 'stored';
 
+    /**
+     * Name of the client wrapping under every member of "redundancy", both as an argument and as a target.
+     */
+    private const string REDUNDANT = 'redundant';
+
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
@@ -110,6 +115,14 @@ class KeyManagementBundle extends AbstractBundle
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('redundancy', 'recipient')
+                    ->info('Map of client name to master key: everything the default client encrypts is also wrapped under each of these, and read back through whichever answers, so that losing one provider loses nothing. The client the application gets is then named "redundant". Each wrapping is a full path to the data.')
+                    ->normalizeKeys(false)
+                    ->useAttributeAsKey('name')
+                    ->scalarPrototype()
+                        ->cannotBeEmpty()
+                    ->end()
+                ->end()
                 ->arrayNode('store')
                     ->info('Data key store: payloads then refer to a stored data key instead of carrying it, so the KMS is reached once per key and per process, and that key can be rewrapped under another provider without rewriting a payload.')
                     ->children()
@@ -119,8 +132,8 @@ class KeyManagementBundle extends AbstractBundle
                             ->cannotBeEmpty()
                         ->end()
                         ->scalarNode('client')
-                            ->info('Name of the client wrapping the data keys this store creates (must match an entry of "clients").')
-                            ->isRequired()
+                            ->info('Name of the client wrapping the data keys this store creates (must match an entry of "clients", or "redundant"); defaults to the client the application gets.')
+                            ->defaultNull()
                             ->cannotBeEmpty()
                         ->end()
                         ->scalarNode('key_id')
@@ -215,6 +228,13 @@ class KeyManagementBundle extends AbstractBundle
             }
         }
 
+        $clientNames = array_keys($clients);
+        if ($config['redundancy']) {
+            $this->registerRedundancy($config['redundancy'], $clientNames, $defaultName, $container);
+            $defaultName = self::REDUNDANT;
+            $clientNames[] = self::REDUNDANT;
+        }
+
         if (null !== $defaultName) {
             $container->setAlias(EncrypterInterface::class, 'key_management.'.$defaultName);
             $container->setAlias(DecrypterInterface::class, 'key_management.'.$defaultName);
@@ -223,8 +243,58 @@ class KeyManagementBundle extends AbstractBundle
             $container->setAlias(EnvelopeDecrypterInterface::class, 'key_management.envelope_encrypter.'.$defaultName);
         }
 
-        if (isset($config['store']['client'])) {
-            $this->registerStore($config['store'], array_keys($clients), $defaultName, $container);
+        if (isset($config['store']['key_id'])) {
+            $this->registerStore($config['store'], $clientNames, $defaultName, $container);
+        }
+    }
+
+    /**
+     * The redundant client is a client like any other: tagged, so the console commands and the
+     * profiler see it, and given an envelope encrypter and the argument aliases of its name. What
+     * sets it apart is that it becomes the default, since an application that configured
+     * redundancy meant every path to go through it, the store included.
+     *
+     * @param array<string, string> $recipients
+     * @param list<string>          $clientNames
+     */
+    private function registerRedundancy(array $recipients, array $clientNames, ?string $defaultName, ContainerBuilder $container): void
+    {
+        if (null === $defaultName) {
+            throw new LogicException('Configuring "key_management.redundancy" requires a default client to wrap with first: set "key_management.default_client".');
+        }
+
+        if (\in_array(self::REDUNDANT, $clientNames, true)) {
+            throw new LogicException(\sprintf('A KMS client cannot be named "%1$s" while "key_management.redundancy" is configured: that name is the one the redundant client registers under. Rename the "%1$s" client.', self::REDUNDANT));
+        }
+
+        foreach (array_keys($recipients) as $name) {
+            if (!\in_array($name, $clientNames, true)) {
+                throw new LogicException(\sprintf('The KMS client "%s" listed in "key_management.redundancy" is not registered in "key_management.clients".', $name));
+            }
+
+            if ($name === $defaultName) {
+                throw new LogicException(\sprintf('The default KMS client "%s" is the one "key_management.redundancy" wraps with first, so it cannot be listed as a recipient as well.', $name));
+            }
+        }
+
+        $serviceId = 'key_management.'.self::REDUNDANT;
+        $container->register($serviceId, RedundantKms::class)
+            ->setArguments([
+                new ServiceLocatorArgument(new TaggedIteratorArgument('key_management.client', 'key', true)),
+                $defaultName,
+                $recipients,
+            ])
+            ->addTag('key_management.client', ['key' => self::REDUNDANT]);
+
+        $envelopeId = 'key_management.envelope_encrypter.'.self::REDUNDANT;
+        $container->register($envelopeId, EnvelopeEncrypter::class)
+            ->setArguments([new Reference($serviceId)]);
+
+        foreach ([EncrypterInterface::class, DecrypterInterface::class, DataKeyGeneratorInterface::class] as $type) {
+            $container->registerAliasForArgument($serviceId, $type, self::REDUNDANT.'.kms', self::REDUNDANT);
+        }
+        foreach ([EnvelopeEncrypterInterface::class, EnvelopeDecrypterInterface::class] as $type) {
+            $container->registerAliasForArgument($envelopeId, $type, self::REDUNDANT.'.envelope_encrypter', self::REDUNDANT);
         }
     }
 
@@ -251,15 +321,16 @@ class KeyManagementBundle extends AbstractBundle
             throw new LogicException(\sprintf('A KMS client cannot be named "%1$s" while a data key store is configured: the store registers the autowiring aliases of that name, which would leave the client of the same name unreachable. Rename the "%1$s" client.', self::STORE_TARGET));
         }
 
-        if (!\in_array($config['client'], $clientNames, true)) {
-            throw new LogicException(\sprintf('The KMS client "%s" set on "key_management.store" is not registered in "key_management.clients".', $config['client']));
+        $client = $config['client'] ?? $defaultName ?? throw new LogicException('The "key_management.store" needs a client to wrap its data keys with: set "key_management.store.client", or "key_management.default_client" to have it inferred.');
+        if (!\in_array($client, $clientNames, true)) {
+            throw new LogicException(\sprintf('The KMS client "%s" set on "key_management.store" is not registered in "key_management.clients".', $client));
         }
 
         $container->register('key_management.store', DataKeyStore::class)
             ->setArguments([
                 new Reference($config['connection']),
                 new ServiceLocatorArgument(new TaggedIteratorArgument('key_management.client', 'key', true)),
-                $config['client'],
+                $client,
                 $config['key_id'],
                 $config['table'],
                 32,

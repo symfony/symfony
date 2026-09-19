@@ -25,7 +25,23 @@ class ConfigurationTest extends TestCase
             'enabled' => true,
             'default_client' => null,
             'clients' => [],
+            'redundancy' => [],
         ], $this->process([]));
+    }
+
+    public function testTheRedundancyMapsAClientNameToAMasterKey()
+    {
+        $config = $this->process(['redundancy' => ['azure' => 'https://vault.azure.net/keys/app', 'Vault' => 'app']]);
+
+        $this->assertSame(['azure' => 'https://vault.azure.net/keys/app', 'Vault' => 'app'], $config['redundancy']);
+    }
+
+    public function testARecipientNeedsAMasterKey()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('key_management.redundancy.azure');
+
+        $this->process(['redundancy' => ['azure' => '']]);
     }
 
     public function testADsnAtTheRootIsTheDefaultClient()
@@ -92,12 +108,23 @@ class ConfigurationTest extends TestCase
         ], $config['store']);
     }
 
-    public function testTheStoreNeedsAClientAndAKeyId()
+    public function testTheStoreNeedsAKeyId()
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The child config "key_id" under "key_management.store" must be configured');
 
         $this->process(['store' => ['client' => 'app']]);
+    }
+
+    /**
+     * The client is inferred from the default one when the container is built, where the
+     * redundant client, if any, is known.
+     */
+    public function testTheStoreClientIsOptional()
+    {
+        $config = $this->process(['store' => ['key_id' => 'alias/app-key']]);
+
+        $this->assertNull($config['store']['client']);
     }
 
     public function testANegativeMaxAgeIsRefused()

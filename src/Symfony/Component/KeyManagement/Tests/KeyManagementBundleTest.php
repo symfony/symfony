@@ -103,6 +103,35 @@ class KeyManagementBundleTest extends TestCase
         $this->assertSame(['encrypt' => 1], $services['default']['operations']);
     }
 
+    /**
+     * The whole container is compiled and booted here, which is what proves that a client made of
+     * the tagged clients, and tagged itself, is neither a circular reference nor traced into a
+     * loop: the profiler sees the redundant client and each of its members.
+     */
+    #[RequiresPhpExtension('sodium')]
+    public function testARedundantClientIsWhatTheApplicationGetsAndEachMemberIsTraced()
+    {
+        $kernel = new TestKeyManagementKernel('redundant', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $kms = $container->get('test.kms');
+        $this->assertInstanceOf(TraceableKms::class, $kms);
+        $this->assertSame($container->get('test.redundant_kms'), $kms, 'configuring redundancy makes the redundant client the one the application gets.');
+        $this->assertSame('secret', $kms->decrypt($kms->encrypt('app', 'secret')));
+
+        $envelopeEncrypter = $container->get('test.envelope_encrypter');
+        $this->assertSame('secret', $envelopeEncrypter->decrypt($envelopeEncrypter->encrypt('app', 'secret')));
+
+        $collector = $container->get('test.data_collector');
+        $collector->lateCollect();
+        $services = $collector->getServices()[KeyManagementDataCollector::LAYER_KMS];
+
+        $this->assertSame(['encrypt' => 1, 'decrypt' => 1, 'generate_data_key' => 1, 'unwrap_data_key' => 1], $services['redundant']['operations']);
+        $this->assertSame(['encrypt' => 1, 'decrypt' => 1, 'generate_data_key' => 1, 'unwrap_data_key' => 1], $services['primary']['operations'], 'the first member is asked to read and answers.');
+        $this->assertSame(['encrypt' => 2], $services['secondary']['operations'], 'the second member wraps everything and is never asked to read while the first one answers.');
+    }
+
     public function testTheDataCollectorGoesWithTheProfiler()
     {
         $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => true]));
@@ -193,6 +222,22 @@ class TestKeyManagementKernel extends AbstractKernel
             ->alias('test.kms', 'key_management.default')->public()
             ->alias('test.envelope_encrypter', 'key_management.envelope_encrypter.default')->public()
         ;
+
+        if ('redundant' === $this->environment) {
+            $config = [
+                'clients' => [
+                    'primary' => 'sodium://?keys[app]='.Base64UrlSafe::encode(random_bytes(32)),
+                    'secondary' => 'sodium://?keys[backup]='.Base64UrlSafe::encode(random_bytes(32)),
+                ],
+                'default_client' => 'primary',
+                'redundancy' => ['secondary' => 'backup'],
+            ];
+            $services
+                ->alias('test.kms', EncrypterInterface::class)->public()
+                ->alias('test.redundant_kms', 'key_management.redundant')->public()
+                ->alias('test.envelope_encrypter', EnvelopeEncrypterInterface::class)->public()
+            ;
+        }
 
         if ($this->isDebug()) {
             // the data collector is kept only when a profiler collects it

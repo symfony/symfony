@@ -179,6 +179,13 @@ class Terminal
 
     private static function initDimensions(): void
     {
+        if (class_exists(\Io\Terminal\Terminal::class) && false !== $size = \Io\Terminal\Terminal::open()->getSize()) {
+            self::$width = $size->cols;
+            self::$height = $size->rows;
+
+            return;
+        }
+
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $ansicon = getenv('ANSICON');
             if (false !== $ansicon && preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim($ansicon), $matches)) {

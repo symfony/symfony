@@ -433,6 +433,13 @@ class QuestionHelper extends Helper
      */
     private function getHiddenResponse(OutputInterface $output, $inputStream, bool $trimmable = true): string
     {
+        if (class_exists(\Io\Terminal\Terminal::class) && $this->isInteractiveInput($inputStream)) {
+            $value = \Io\Terminal\Terminal::fromStream($inputStream)->readSecret();
+            $output->writeln('');
+
+            return $trimmable ? trim($value) : $value;
+        }
+
         if ('\\' === \DIRECTORY_SEPARATOR && $this->isInteractiveInput($inputStream)) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
 

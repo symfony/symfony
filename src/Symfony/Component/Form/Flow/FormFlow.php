@@ -192,14 +192,15 @@ class FormFlow extends Form implements FormFlowInterface
             throw new RuntimeException(\sprintf('Cannot move back to step "%s" because it is ahead of the current step "%s".', $step, $currentStep));
         }
 
-        while ($targetIndex < $currentIndex) {
-            $this->movePrevious();
-            $currentIndex = $this->cursor->getStepIndex();
-        }
+        $data = $this->getData();
 
-        if ($targetIndex > $currentIndex) {
+        if ($this->config->getStep($step)->isSkipped($data)) {
             throw new RuntimeException(\sprintf('Cannot move back to step "%s" because it is a skipped step.', $step));
         }
+
+        $this->cursor = $this->cursor->withCurrentStep($step);
+        $this->config->getStepAccessor()->setStep($data, $step);
+        $this->config->getDataStorage()->save($data);
     }
 
     private function move(\Closure $direction): bool

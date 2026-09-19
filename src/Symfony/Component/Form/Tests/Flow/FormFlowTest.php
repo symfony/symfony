@@ -620,12 +620,53 @@ class FormFlowTest extends TestCase
         $data = new UserSignUp();
         $data->worker = false;
         $data->currentStep = 'account';
-        $flow = $this->factory->create(UserSignUpType::class, $data);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Cannot move back to step "professional" because it is a skipped step.');
+        $dataStorage = new InMemoryDataStorage('user_sign_up');
+        $dataStorage->save($data);
 
-        $flow->movePrevious('professional');
+        $flow = $this->factory->create(UserSignUpType::class, new UserSignUp(), [
+            'data_storage' => $dataStorage,
+        ]);
+
+        try {
+            $flow->movePrevious('professional');
+            self::fail('A RuntimeException should have been thrown.');
+        } catch (RuntimeException $e) {
+            self::assertSame('Cannot move back to step "professional" because it is a skipped step.', $e->getMessage());
+        }
+
+        self::assertSame('account', $flow->getCursor()->getCurrentStep(), 'the cursor must not move when the target is skipped');
+        self::assertSame('account', $dataStorage->load()->currentStep, 'the storage must not change when the target is skipped');
+    }
+
+    public function testMovePreviousToStepSavesOnce()
+    {
+        $dataStorage = new class('user_sign_up') extends InMemoryDataStorage {
+            public array $savedSteps = [];
+
+            public function save(object|array $data): void
+            {
+                $this->savedSteps[] = $data->currentStep;
+
+                parent::save($data);
+            }
+        };
+
+        $data = new UserSignUp();
+        $data->worker = true;
+        $data->currentStep = 'account';
+        $dataStorage->save($data);
+        $dataStorage->savedSteps = [];
+
+        $flow = $this->factory->create(UserSignUpType::class, new UserSignUp(), [
+            'data_storage' => $dataStorage,
+        ]);
+
+        $flow->movePrevious('personal');
+
+        self::assertSame('personal', $flow->getCursor()->getCurrentStep());
+        self::assertSame(['personal'], $dataStorage->savedSteps, 'only the target step must be persisted');
+        self::assertSame('personal', $flow->newStepForm()->getCursor()->getCurrentStep());
     }
 
     public function testInvalidStepForm()

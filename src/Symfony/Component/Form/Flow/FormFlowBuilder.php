@@ -268,7 +268,12 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
     private function resolveFirstStep(?array $steps = null): string
     {
         foreach ($steps ?? $this->steps as $step) {
-            if (!$step->isGroup() && !$step->isSkipped($this->getData())) {
+            if ($step->isSkipped($this->getData())) {
+                // a skipped step takes its whole subtree with it
+                continue;
+            }
+
+            if (!$step->isGroup()) {
                 return $step->getName();
             }
 

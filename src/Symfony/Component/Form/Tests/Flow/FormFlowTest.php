@@ -30,6 +30,7 @@ use Symfony\Component\Form\Tests\Fixtures\Flow\FirstStepSkippedType;
 use Symfony\Component\Form\Tests\Fixtures\Flow\GroupingStepsFlowType;
 use Symfony\Component\Form\Tests\Fixtures\Flow\LastStepSkippedType;
 use Symfony\Component\Form\Tests\Fixtures\Flow\NestedStepsFlowType;
+use Symfony\Component\Form\Tests\Fixtures\Flow\SkippedParentStepsFlowType;
 use Symfony\Component\Form\Tests\Fixtures\Flow\UserSignUpType;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
@@ -1436,6 +1437,72 @@ class FormFlowTest extends TestCase
         $this->expectExceptionMessage('Cannot determine previous step.');
 
         $flow->movePrevious();
+    }
+
+    public function testSkippedParentSkipsItsWholeSubtree()
+    {
+        $flow = $this->factory->create(SkippedParentStepsFlowType::class, []);
+
+        self::assertSame('intro', $flow->getCursor()->getCurrentStep());
+
+        $flow->submit(['intro' => 'value', 'navigator' => ['next' => '']]);
+        $flow = $flow->getStepForm();
+
+        // p, p1, p2 (skip => false), g and g1 are all skipped
+        self::assertSame('q', $flow->getCursor()->getCurrentStep());
+        self::assertTrue($flow->has('q'));
+        self::assertTrue($flow->getCursor()->isLastStep());
+
+        // and moving back from q goes to intro
+        $flow->submit(['q' => 'value', 'navigator' => ['previous' => '']]);
+        $flow = $flow->getStepForm();
+
+        self::assertSame('intro', $flow->getCursor()->getCurrentStep());
+    }
+
+    public function testSkippedParentIsNotResolvedAsInitialStep()
+    {
+        $flow = $this->factory->create(SkippedParentStepsFlowType::class, ['skipIntro' => true]);
+
+        self::assertSame('q', $flow->getCursor()->getCurrentStep());
+        self::assertTrue($flow->has('q'));
+        self::assertTrue($flow->getCursor()->isFirstStep());
+        self::assertFalse($flow->get('navigator')->has('previous'));
+    }
+
+    public function testSkippedParentViewVars()
+    {
+        $view = $this->factory->create(SkippedParentStepsFlowType::class, [])->createView();
+        $steps = $view->vars['steps'];
+
+        self::assertSame(['intro', 'q'], array_keys($view->vars['visible_steps']));
+
+        self::assertTrue($steps['p']['is_skipped']);
+        self::assertSame(-1, $steps['p']['position']);
+        self::assertTrue($steps['p']['children']['p1']['is_skipped']);
+        self::assertSame(-1, $steps['p']['children']['p1']['position']);
+        self::assertTrue($steps['p']['children']['p2']['is_skipped'], 'a child skip closure cannot cancel the skipped parent');
+        self::assertTrue($steps['p']['children']['p2']['can_be_skipped']);
+        self::assertSame([], $steps['p']['visible_children']);
+
+        self::assertTrue($steps['g']['is_skipped']);
+        self::assertTrue($steps['g']['children']['g1']['is_skipped']);
+        self::assertSame([], $steps['g']['visible_children']);
+
+        self::assertFalse($steps['q']['is_skipped']);
+        self::assertSame(2, $steps['q']['position']);
+    }
+
+    public function testNestedStepsViewVarsWithSkippedParent()
+    {
+        $view = $this->factory->create(NestedStepsFlowType::class, ['stepB' => 1, 'currentStep' => 'stepB2'])->createView();
+        $stepB1 = $view->vars['steps']['stepB']['children']['stepB1'];
+
+        self::assertTrue($stepB1['is_skipped']);
+        self::assertTrue($stepB1['children']['stepB11']['is_skipped']);
+        self::assertTrue($stepB1['children']['stepB12']['is_skipped']);
+        self::assertSame([], $stepB1['visible_children']);
+        self::assertSame(['stepB2'], array_keys($view->vars['steps']['stepB']['visible_children']));
     }
 
     public function testFirstStepSkippedResolvesToSecondStep()

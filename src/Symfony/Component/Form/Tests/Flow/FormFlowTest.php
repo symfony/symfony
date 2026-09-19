@@ -23,6 +23,7 @@ use Symfony\Component\Form\Flow\Type\NextFlowType;
 use Symfony\Component\Form\Flow\Type\PreviousFlowType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Fixtures\Flow\Data\UserSignUp;
 use Symfony\Component\Form\Tests\Fixtures\Flow\Extension\UserSignUpTypeExtension;
@@ -720,6 +721,83 @@ class FormFlowTest extends TestCase
 
         self::assertSame('professional', $flow->getCursor()->getCurrentStep(), 'The current step should be the one set in the initial data');
         self::assertSame('professional', $data->currentStep);
+    }
+
+    public function testCreateWithoutInitialData()
+    {
+        $flow = $this->factory->create(UserSignUpType::class);
+
+        /** @var UserSignUp $data */
+        $data = $flow->getData();
+
+        self::assertInstanceOf(UserSignUp::class, $data);
+        self::assertSame('personal', $data->currentStep);
+        self::assertSame('personal', $flow->getCursor()->getCurrentStep());
+        self::assertTrue($flow->has('personal'));
+        self::assertArrayNotHasKey('data', $flow->getConfig()->getInitialOptions());
+
+        $flow->submit([
+            'personal' => [
+                'firstName' => 'John',
+                'lastName' => 'Doe',
+                'worker' => '1',
+            ],
+            'navigator' => [
+                'next' => '',
+            ],
+        ]);
+
+        self::assertTrue($flow->isValid());
+
+        $flow = $flow->getStepForm();
+
+        self::assertSame('professional', $flow->getCursor()->getCurrentStep());
+        self::assertSame($data, $flow->getData());
+        self::assertSame('John', $data->firstName);
+    }
+
+    public function testCreateWithoutInitialDataAndWithoutDataClass()
+    {
+        $flow = $this->factory->create(LastStepSkippedType::class);
+
+        self::assertSame(['currentStep' => 'step1'], $flow->getData());
+        self::assertSame('step1', $flow->getCursor()->getCurrentStep());
+        self::assertTrue($flow->has('step1'));
+    }
+
+    public function testCreateWithoutInitialDataUsesEmptyDataClosure()
+    {
+        $flow = $this->factory->create(UserSignUpType::class, null, [
+            'empty_data' => static function (FormInterface $form) {
+                $data = new UserSignUp();
+                $data->worker = true;
+
+                return $data;
+            },
+        ]);
+
+        /** @var UserSignUp $data */
+        $data = $flow->getData();
+
+        self::assertInstanceOf(FormFlowInterface::class, $flow);
+        self::assertTrue($data->worker);
+        self::assertSame('personal', $data->currentStep);
+    }
+
+    public function testCreateWithoutInitialDataClonesEmptyDataObject()
+    {
+        $emptyData = new UserSignUp();
+        $emptyData->worker = true;
+
+        $flow = $this->factory->create(UserSignUpType::class, null, ['empty_data' => $emptyData]);
+
+        /** @var UserSignUp $data */
+        $data = $flow->getData();
+
+        self::assertNotSame($emptyData, $data);
+        self::assertTrue($data->worker);
+        self::assertSame('personal', $data->currentStep);
+        self::assertSame('', $emptyData->currentStep, 'The empty_data instance must not be mutated');
     }
 
     public function testFormFlowWithArrayData()

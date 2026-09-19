@@ -204,6 +204,10 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
 
         uasort($this->steps, static fn (StepFlowBuilderConfigInterface $a, StepFlowBuilderConfigInterface $b) => $b->getPriority() <=> $a->getPriority());
 
+        if (null === $this->getData()) {
+            $this->setData($this->createEmptyData());
+        }
+
         $currentStep = $this->resolveCurrentStep();
 
         if (!isset($this->steps[$currentStep])) {
@@ -217,6 +221,30 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
         $this->pruneActionButtons($this, $cursor);
 
         return new FormFlow($this->getFormConfig(), $cursor);
+    }
+
+    /**
+     * Creates the data of the flow when none was passed.
+     *
+     * A regular form creates its data lazily from the "empty_data" option on
+     * submission, but a flow needs it before that to resolve the current step.
+     */
+    private function createEmptyData(): object|array
+    {
+        $emptyData = $this->getEmptyData();
+
+        if ($emptyData instanceof \Closure) {
+            // The closure expects the form it creates the data for, use a provisional flow built from the same config
+            $emptyData = $emptyData(new FormFlow($this->getFormConfig(), new FormFlowCursor(array_keys($this->steps), (string) key($this->steps))), null);
+        } elseif (\is_object($emptyData)) {
+            $emptyData = clone $emptyData;
+        }
+
+        if (\is_object($emptyData) || \is_array($emptyData)) {
+            return $emptyData;
+        }
+
+        return null !== ($dataClass = $this->getDataClass()) ? new $dataClass() : [];
     }
 
     private function resolveCurrentStep(): string

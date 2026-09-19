@@ -26,6 +26,10 @@
         </ignoreFiles>
     </projectFiles>
 
+    <stubs>
+        <file name=".github/sa-tools/stubs/phpunit-13.php" />
+    </stubs>
+
     <issueHandlers>
         <MissingImmutableAnnotation>
             <errorLevel type="suppress">

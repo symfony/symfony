@@ -51,6 +51,14 @@ class IsGrantedContext implements AuthorizationCheckerInterface
         return $this->authorizationChecker->isGranted(AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY);
     }
 
+    /**
+     * @param string ...$classes The authentication context classes the provider may name, e.g. "phr", any one of which grants
+     */
+    public function isAuthenticatedInContext(string ...$classes): bool
+    {
+        return $this->authorizationChecker->isGranted(AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.implode(' ', $classes));
+    }
+
     public function isImpersonator(): bool
     {
         return $this->authorizationChecker->isGranted(AuthenticatedVoter::IS_IMPERSONATOR);

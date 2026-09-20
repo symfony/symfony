@@ -119,6 +119,56 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertFalse($resolver->isAuthenticatedVeryRecently($remembered));
     }
 
+    public function testIsAuthenticatedInContextComparesTheClassTheProviderAsserted()
+    {
+        $resolver = new AuthenticationTrustResolver();
+
+        $token = $this->getUsernamePasswordToken();
+        $token->setAttribute('oidc_acr', 'phrh');
+
+        $this->assertTrue($resolver->isAuthenticatedInContext($token, ['phr', 'phrh']));
+        // an exact match, as no ordering exists between classes
+        $this->assertFalse($resolver->isAuthenticatedInContext($token, ['phr']));
+        $this->assertFalse($resolver->isAuthenticatedInContext($token, ['2']));
+    }
+
+    public function testIsAuthenticatedInContextIsFalseWithoutAClass()
+    {
+        $resolver = new AuthenticationTrustResolver();
+
+        // the authenticator records the attribute whatever the provider said, and a token
+        // that never went through one does not hold it at all
+        $this->assertFalse($resolver->isAuthenticatedInContext($this->getUsernamePasswordToken(), ['phr']));
+
+        $token = $this->getUsernamePasswordToken();
+        $token->setAttribute('oidc_acr', null);
+        $this->assertFalse($resolver->isAuthenticatedInContext($token, ['phr']));
+
+        $this->assertFalse($resolver->isAuthenticatedInContext(null, ['phr']));
+    }
+
+    public function testRememberMeIsNeverAuthenticatedInAContext()
+    {
+        $resolver = new AuthenticationTrustResolver();
+
+        $token = $this->getRememberMeToken();
+        $token->setAttribute('oidc_acr', 'phr');
+
+        $this->assertFalse($resolver->isAuthenticatedInContext($token, ['phr']));
+    }
+
+    public function testIsAuthenticatedInContextHandlesANullTokenWhateverIsFullFledgedSays()
+    {
+        $resolver = new class extends AuthenticationTrustResolver {
+            public function isFullFledged(?TokenInterface $token = null): bool
+            {
+                return true;
+            }
+        };
+
+        $this->assertFalse($resolver->isAuthenticatedInContext(null, ['phr']));
+    }
+
     private function getUsernamePasswordToken(): UsernamePasswordToken
     {
         return new UsernamePasswordToken(new InMemoryUser('wouter', 'password', ['ROLE_USER']), 'main', ['ROLE_USER']);

@@ -52,6 +52,8 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 
             new ExpressionFunction('is_very_recently_authenticated', $this->compiler('is_very_recently_authenticated', static fn () => '$token && $auth_checker->isGranted("IS_AUTHENTICATED_VERY_RECENTLY")'), fn (array $variables) => $this->token($variables, 'is_very_recently_authenticated') && $this->authChecker($variables, 'is_very_recently_authenticated')->isGranted('IS_AUTHENTICATED_VERY_RECENTLY')),
 
+            new ExpressionFunction('is_authenticated_in_context', $this->compiler('is_authenticated_in_context', static fn (...$classes) => \sprintf('$token && $auth_checker->isGranted("IS_AUTHENTICATED_IN_CONTEXT:".implode(" ", [%s]))', implode(', ', $classes))), fn (array $variables, ...$classes) => $this->token($variables, 'is_authenticated_in_context') && $this->authChecker($variables, 'is_authenticated_in_context')->isGranted('IS_AUTHENTICATED_IN_CONTEXT:'.implode(' ', $classes))),
+
             new ExpressionFunction('is_granted', $this->compiler('is_granted', static fn ($attributes, $object = 'null') => \sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object)), fn (array $variables, $attributes, $object = null) => $this->authChecker($variables, 'is_granted')->isGranted($attributes, $object)),
 
             new ExpressionFunction('is_remember_me', $this->compiler('is_remember_me', static fn () => '$token && $auth_checker->isGranted("IS_REMEMBERED")'), fn (array $variables) => $this->token($variables, 'is_remember_me') && $this->authChecker($variables, 'is_remember_me')->isGranted('IS_REMEMBERED')),

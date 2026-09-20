@@ -29,6 +29,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @see \Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY
  * @see \Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY
+ * @see \Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT
+ * @see \Symfony\Component\Security\Http\SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE
  */
 interface ReAuthenticationEntryPointInterface
 {

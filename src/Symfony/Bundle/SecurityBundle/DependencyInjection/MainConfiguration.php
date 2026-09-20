@@ -242,7 +242,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->info(\sprintf('An enabled authenticator name or a service id that implements "%s".', AuthenticationEntryPointInterface::class))
             ->end()
             ->scalarNode('re_authentication_entry_point')
-                ->info(\sprintf('Service id implementing "%s", asking an already authenticated user to prove possession of their credentials again when IS_AUTHENTICATED_RECENTLY or IS_AUTHENTICATED_VERY_RECENTLY is denied. Defaults to the firewall entry point when that one implements it.', ReAuthenticationEntryPointInterface::class))
+                ->info(\sprintf('Service id implementing "%s", asking an already authenticated user to prove possession of their credentials again when IS_AUTHENTICATED_RECENTLY or IS_AUTHENTICATED_VERY_RECENTLY is denied, or to authenticate in the context class IS_AUTHENTICATED_IN_CONTEXT: names when that one is denied. Defaults to the firewall entry point when that one implements it.', ReAuthenticationEntryPointInterface::class))
             ->end()
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()

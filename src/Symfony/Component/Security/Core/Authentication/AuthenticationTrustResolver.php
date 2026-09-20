@@ -73,6 +73,36 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
         return $this->isAuthenticatedWithin($token, $this->veryRecentAuthenticationLifetime);
     }
 
+    /**
+     * The default compares the class the provider asserted, the "oidc_acr" attribute the OIDC
+     * authenticator records, with the ones the attribute requires, and no two classes dominate
+     * each other: "phr" is not "2" with something extra, the registry of RFC 6711 is flat, and
+     * OpenID Connect dropped the "Comparison" of SAML 2.0, so an exact match is all that can
+     * be asserted (OpenID Connect Core 1.0, Section 5.5.1.1).
+     *
+     * An application whose providers name the same context differently, or that states the class
+     * somewhere else than the "acr" claim, overrides this method: the vocabularies are mapped onto
+     * the one the routes use in that single place, rather than every provider's class being named
+     * on every route.
+     *
+     * An override does not have to repeat the isFullFledged() check that AuthenticatedVoter
+     * already enforces; it is kept here because this method is also callable on its own.
+     *
+     * @param non-empty-list<string> $contextClasses The classes any one of which is required
+     *
+     * @see AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT
+     */
+    public function isAuthenticatedInContext(?TokenInterface $token, array $contextClasses): bool
+    {
+        if (null === $token || !$this->isFullFledged($token)) {
+            return false;
+        }
+
+        $class = $token->hasAttribute('oidc_acr') ? $token->getAttribute('oidc_acr') : null;
+
+        return \is_string($class) && \in_array($class, $contextClasses, true);
+    }
+
     private function isAuthenticatedWithin(?TokenInterface $token, int $lifetime): bool
     {
         if (null === $token || !$this->isFullFledged($token)) {

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `IS_AUTHENTICATED_IN_CONTEXT:` attribute prefix, requiring any one of the named authentication context classes, space-delimited, decided by `AuthenticationTrustResolver::isAuthenticatedInContext()`, and the `is_authenticated_in_context()` expression function; not implementing the method in a custom trust resolver is deprecated
  * Add `AuthenticationTrustResolver::isAuthenticatedRecently()`, the extension point `IS_AUTHENTICATED_RECENTLY` is decided on; not implementing it in a custom trust resolver is deprecated
  * Add the `IS_AUTHENTICATED_VERY_RECENTLY` attribute, a stricter bar than `IS_AUTHENTICATED_RECENTLY` decided by `AuthenticationTrustResolver::isAuthenticatedVeryRecently()`, and the `is_very_recently_authenticated()` expression function; not implementing the method in a custom trust resolver is deprecated
  * Add the `IS_AUTHENTICATED_RECENTLY` attribute, granted while the last interactive authentication is within the configured lifetime

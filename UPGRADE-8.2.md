@@ -364,9 +364,10 @@ Security
  * Deprecate not implementing `getAuthenticationProofs()` and `setAuthenticationProofs()` in classes implementing
    `TokenInterface`; both methods will be added to the interface in 9.0, and until they are implemented no
    authentication proof is recorded on such a token, so it never satisfies `IS_AUTHENTICATED_RECENTLY`
- * Deprecate not implementing `isAuthenticatedRecently()` and `isAuthenticatedVeryRecently()` in classes implementing
-   `AuthenticationTrustResolverInterface`; both methods will be added to the interface in 9.0, and `IS_AUTHENTICATED_RECENTLY`
-   and `IS_AUTHENTICATED_VERY_RECENTLY` are denied by `AuthenticatedVoter` until they are implemented
+ * Deprecate not implementing `isAuthenticatedRecently()`, `isAuthenticatedVeryRecently()` and `isAuthenticatedInContext()`
+   in classes implementing `AuthenticationTrustResolverInterface`; the three methods will be added to the interface in 9.0,
+   and `IS_AUTHENTICATED_RECENTLY`, `IS_AUTHENTICATED_VERY_RECENTLY` and `IS_AUTHENTICATED_IN_CONTEXT:` are denied by
+   `AuthenticatedVoter` until they are implemented
  * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()`
  * Add argument `$parameters` to `SignatureHasher::computeSignatureHash()`, `SignatureHasher::acceptSignatureHash()` and `SignatureHasher::verifySignatureHash()`
  * Deprecate not passing the `$enforceAtJwtType` argument to `OidcTokenHandler`; pass `true` to reject

@@ -172,6 +172,54 @@ class AuthenticationProofsListenerTest extends TestCase
         $this->assertSame([], $token->getAuthenticationProofs());
     }
 
+    public function testTheContextClassOfThePreviousTokenOfTheSameUserIsCarriedOver()
+    {
+        // the same passkey proves "hwk" and is asserted as "phr": keeping the proof across
+        // a password re-check while dropping the class would leave the session in neither
+        $previousToken = $this->createToken();
+        $previousToken->setAttribute('oidc_acr', 'phr');
+        $token = $this->createToken();
+
+        (new AuthenticationProofsListener(new MockClock('@200')))->onLoginSuccess($this->createLoginSuccessEvent($token, $previousToken));
+
+        $this->assertSame('phr', $token->getAttribute('oidc_acr'));
+    }
+
+    public function testTheContextClassOfTheNewAuthenticationWins()
+    {
+        $previousToken = $this->createToken();
+        $previousToken->setAttribute('oidc_acr', 'phr');
+        $token = $this->createToken();
+        $token->setAttribute('oidc_acr', '2');
+
+        (new AuthenticationProofsListener(new MockClock('@200')))->onLoginSuccess($this->createLoginSuccessEvent($token, $previousToken));
+
+        $this->assertSame('2', $token->getAttribute('oidc_acr'));
+    }
+
+    public function testTheContextClassOfAnotherUserIsNotCarriedOver()
+    {
+        $previousToken = $this->createToken('someone-else');
+        $previousToken->setAttribute('oidc_acr', 'phr');
+        $token = $this->createToken();
+
+        (new AuthenticationProofsListener(new MockClock('@200')))->onLoginSuccess($this->createLoginSuccessEvent($token, $previousToken));
+
+        $this->assertFalse($token->hasAttribute('oidc_acr'));
+    }
+
+    public function testAPreviousTokenStatingNoContextClassLeavesTheNewOneWithout()
+    {
+        // the OIDC authenticator records the attribute even when the provider named no class
+        $previousToken = $this->createToken();
+        $previousToken->setAttribute('oidc_acr', null);
+        $token = $this->createToken();
+
+        (new AuthenticationProofsListener(new MockClock('@200')))->onLoginSuccess($this->createLoginSuccessEvent($token, $previousToken));
+
+        $this->assertFalse($token->hasAttribute('oidc_acr'));
+    }
+
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testATokenWithoutTheProofsMethodsIsDeprecatedAndLeftAlone()

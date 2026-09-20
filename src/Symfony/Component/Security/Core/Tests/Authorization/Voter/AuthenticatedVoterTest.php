@@ -78,6 +78,9 @@ class AuthenticatedVoterTest extends TestCase
         yield [AuthenticatedVoter::IS_REMEMBERED, true];
         yield [AuthenticatedVoter::PUBLIC_ACCESS, true];
         yield [AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, true];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY, true];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr', true];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'urn:okta:loa:2fa:any', true];
 
         yield ['', false];
         yield ['foo', false];
@@ -125,6 +128,168 @@ class AuthenticatedVoterTest extends TestCase
         yield [AuthenticatedVoter::IS_REMEMBERED];
         yield [AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY];
         yield [AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY];
+        yield [AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr'];
+    }
+
+    public function testInContextIsGrantedToAnyOfSeveralClasses()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $token = $this->getToken('fully');
+        // a provider naming the strongest class it can assert, a hardware key here, is accepted
+        // by a route that also takes the weaker one, without a round trip to ask for it
+        $token->setAttribute('oidc_acr', 'phrh');
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phr phrh']));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phr 2']));
+    }
+
+    public function testInContextIgnoresExtraSpacesBetweenClasses()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $token = $this->getToken('fully');
+        $token->setAttribute('oidc_acr', 'phrh');
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT: phr  phrh ']));
+    }
+
+    public function testInContextIsGrantedToTheExactClassOnly()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $token = $this->getToken('fully');
+        $token->setAttribute('oidc_acr', 'phr');
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phr']));
+        // no ordering is assumed between classes: "phrh" is not "phr" and the other way round
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phrh']));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:1']));
+    }
+
+    public function testInContextIsGrantedToAClassNamedByAUri()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $token = $this->getToken('fully');
+        $token->setAttribute('oidc_acr', 'urn:okta:loa:2fa:any');
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:urn:okta:loa:2fa:any']));
+    }
+
+    public function testInContextIsDeniedToATokenWithoutAClass()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->getToken('fully'), null, ['IS_AUTHENTICATED_IN_CONTEXT:phr']));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->getToken('none'), null, ['IS_AUTHENTICATED_IN_CONTEXT:phr']));
+    }
+
+    public function testInContextIsDeniedForARememberedToken()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $token = $this->getToken('remembered');
+        $token->setAttribute('oidc_acr', 'phr');
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phr']));
+    }
+
+    public function testInContextVoteReasons()
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $token = $this->getToken('fully');
+        $token->setAttribute('oidc_acr', 'phr');
+        $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phr'], $granted = new Vote());
+        $this->assertSame(['The user authenticated in the "phr" context.'], $granted->reasons);
+
+        $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phrh'], $denied = new Vote());
+        $this->assertSame(['The user did not authenticate in the "phrh" context.'], $denied->reasons);
+
+        $voter->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phrh 2'], $deniedSeveral = new Vote());
+        $this->assertSame(['The user did not authenticate in the "phrh" or "2" context.'], $deniedSeveral->reasons);
+    }
+
+    #[DataProvider('provideAttributesWithoutAClassName')]
+    public function testInContextRequiresAClassName(string $attribute)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "IS_AUTHENTICATED_IN_CONTEXT:" attribute must be followed by the name of at least one authentication context class.');
+
+        $voter->vote($this->getToken('fully'), null, [$attribute]);
+    }
+
+    public static function provideAttributesWithoutAClassName(): iterable
+    {
+        yield 'nothing at all' => ['IS_AUTHENTICATED_IN_CONTEXT:'];
+        yield 'spaces only' => ['IS_AUTHENTICATED_IN_CONTEXT:   '];
+    }
+
+    public function testACustomTrustResolverMapsTheClassesOfSeveralProvidersOntoTheOnesTheRoutesName()
+    {
+        // the vocabularies of two providers are mapped in that one place, so a route keeps
+        // naming the classes the application chose and no route is edited when a third arrives
+        $trustResolver = new class extends AuthenticationTrustResolver {
+            public function isAuthenticatedInContext(?TokenInterface $token, array $contextClasses): bool
+            {
+                return parent::isAuthenticatedInContext($token, $contextClasses)
+                    || (\in_array('phr', $contextClasses, true) && 'urn:okta:loa:2fa:any' === $token?->getAttribute('oidc_acr'));
+            }
+        };
+
+        $token = $this->getToken('fully');
+        $token->setAttribute('oidc_acr', 'urn:okta:loa:2fa:any');
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, (new AuthenticatedVoter($trustResolver))->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phr']));
+    }
+
+    public function testACustomTrustResolverCannotGrantAContextClassOnARememberedToken()
+    {
+        // the invariant belongs to the attribute: a cookie proves nothing about the class
+        // the session was opened in, whatever strategy the trust resolver implements
+        $trustResolver = new class extends AuthenticationTrustResolver {
+            public function isAuthenticatedInContext(?TokenInterface $token, array $contextClasses): bool
+            {
+                return true;
+            }
+        };
+
+        $token = $this->getToken('remembered');
+        $token->setAttribute('oidc_acr', 'phr');
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter($trustResolver))->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phr']));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testATrustResolverWithoutTheContextMethodIsDeprecatedAndDenies()
+    {
+        $token = $this->getToken('fully');
+        $token->setAttribute('oidc_acr', 'phr');
+
+        $legacyTrustResolver = new class implements AuthenticationTrustResolverInterface {
+            public function isAuthenticated(?TokenInterface $token = null): bool
+            {
+                return (bool) $token?->getUser();
+            }
+
+            public function isRememberMe(?TokenInterface $token = null): bool
+            {
+                return false;
+            }
+
+            public function isFullFledged(?TokenInterface $token = null): bool
+            {
+                return $this->isAuthenticated($token);
+            }
+        };
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/security-core 8.2: Not implementing "%s::isAuthenticatedInContext()" is deprecated, the method will be added to the interface in 9.0; "IS_AUTHENTICATED_IN_CONTEXT:phr" is denied until then.', get_debug_type($legacyTrustResolver)));
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter($legacyTrustResolver))->vote($token, null, ['IS_AUTHENTICATED_IN_CONTEXT:phr']));
     }
 
     public function testRecentlyAuthenticatedIsGrantedWithinTheLifetime()
@@ -381,6 +546,7 @@ class AuthenticatedVoterTest extends TestCase
         yield 'recently beats fully' => ['remembered', ['IS_AUTHENTICATED_FULLY', 'IS_AUTHENTICATED_RECENTLY'], ['The user is not authenticated recently enough.']];
         yield 'very recently beats recently' => ['fully', ['IS_AUTHENTICATED_RECENTLY', 'IS_AUTHENTICATED_VERY_RECENTLY'], ['The user did not authenticate very recently.']];
         yield 'unrelated attributes are ignored' => ['remembered', ['ROLE_ADMIN', 'IS_AUTHENTICATED_FULLY'], ['The user is not fully authenticated.']];
+        yield 'a context class beats recency' => ['fully', ['IS_AUTHENTICATED_RECENTLY', 'IS_AUTHENTICATED_IN_CONTEXT:phr'], ['The user did not authenticate in the "phr" context.']];
     }
 
     protected function getToken($authenticated)

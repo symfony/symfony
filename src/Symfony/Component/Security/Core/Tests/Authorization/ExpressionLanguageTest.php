@@ -56,6 +56,10 @@ class ExpressionLanguageTest extends TestCase
         $recentlyAuthenticatedToken->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
         $staleRememberMeToken = new RememberMeToken($user, 'firewall-name');
         $staleRememberMeToken->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
+        $phishingResistantToken = new UsernamePasswordToken($user, 'firewall-name', $roles);
+        $phishingResistantToken->setAttribute('oidc_acr', 'phr');
+        $rememberedPhishingResistantToken = new RememberMeToken($user, 'firewall-name');
+        $rememberedPhishingResistantToken->setAttribute('oidc_acr', 'phr');
 
         return [
             [$noToken, 'is_authenticated()', false],
@@ -63,6 +67,7 @@ class ExpressionLanguageTest extends TestCase
             [$noToken, 'is_remember_me()', false],
             [$noToken, 'is_recently_authenticated()', false],
             [$noToken, 'is_very_recently_authenticated()', false],
+            [$noToken, "is_authenticated_in_context('phr')", false],
 
             [$rememberMeToken, 'is_authenticated()', true],
             [$rememberMeToken, 'is_fully_authenticated()', false],
@@ -84,6 +89,12 @@ class ExpressionLanguageTest extends TestCase
             [$recentlyAuthenticatedToken, 'is_recently_authenticated()', true],
             [$recentlyAuthenticatedToken, 'is_fully_authenticated()', true],
             [$recentlyAuthenticatedToken, 'is_very_recently_authenticated()', true],
+            [$recentlyAuthenticatedToken, "is_authenticated_in_context('phr')", false],
+
+            [$phishingResistantToken, "is_authenticated_in_context('phr')", true],
+            [$phishingResistantToken, "is_authenticated_in_context('phrh')", false],
+            [$phishingResistantToken, "is_authenticated_in_context('phrh', 'phr')", true],
+            [$rememberedPhishingResistantToken, "is_authenticated_in_context('phr')", false],
         ];
     }
 }

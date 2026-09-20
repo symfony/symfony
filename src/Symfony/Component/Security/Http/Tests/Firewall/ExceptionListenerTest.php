@@ -372,6 +372,44 @@ class ExceptionListenerTest extends TestCase
         $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
     }
 
+    public function testReAuthenticationIsStartedWhenAContextClassIsDenied()
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr phrh']);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->once())
+            ->method('startReAuthentication')
+            ->willReturnCallback(function (Request $request, TokenInterface $token): Response {
+                // the classes that would do travel as the denied attribute, which is what an
+                // entry point turns into the question it asks its provider
+                $this->assertSame(AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr phrh', $request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+
+                return new Response('Use your passkey', 200);
+            });
+
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertSame('Use your passkey', $event->getResponse()->getContent());
+    }
+
+    public function testReAuthenticationEntryPointIsNotStartedWhenARoleMayHaveFailedNextToTheContextClass()
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes(['ROLE_ADMIN', AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr']);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->never())->method('startReAuthentication');
+
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
+    }
+
     public function testReAuthenticationEntryPointIsNotStartedForAnUnrelatedDenial()
     {
         $exception = new AccessDeniedException();

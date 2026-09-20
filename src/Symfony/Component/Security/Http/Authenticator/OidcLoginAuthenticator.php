@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -157,6 +158,17 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
      * has to be obliged rather than asked: that one the client verifies, so a provider
      * ignoring it fails the "auth_time" check instead of quietly returning the stale
      * authentication that was denied in the first place.
+     *
+     * When what was denied is an authentication context class, the classes that would do go
+     * along as "acr_values", the same section, itself a space-delimited list in order of
+     * preference: the provider then asks for a factor that proves one of them, a passkey for
+     * "phr", and names the class it achieved in the "acr" claim of the new ID token. The
+     * parameter is a request the provider may not honour, so the class is checked again on the
+     * route after the round trip rather than assumed from it; a provider that cannot assert it
+     * fails the request with "unmet_authentication_requirements" and the user lands back on a
+     * 403 rather than in a loop. The classes are a default rather than a forced parameter, so
+     * an application whose provider names its own reshapes them from a listener on
+     * OidcAuthorizationRequestEvent, which reads the denied attribute off the same request.
      */
     public function startReAuthentication(Request $request, TokenInterface $token): Response
     {
@@ -166,14 +178,19 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             $forcedParams['id_token_hint'] = $idToken;
         }
 
-        return $this->startAuthorizationRequest($request, $forcedParams);
+        $contextClasses = AuthenticatedVoter::getRequiredContextClasses($request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+
+        return $this->startAuthorizationRequest($request, $forcedParams, $contextClasses ? ['acr_values' => implode(' ', $contextClasses)] : []);
     }
 
     /**
-     * @param array<string, string> $forcedParams Parameters applied after "authorization_params"
-     *                                            and after the event, so that neither can drop them
+     * @param array<string, string> $forcedParams  Parameters applied after "authorization_params"
+     *                                             and after the event, so that neither can drop them
+     * @param array<string, string> $defaultParams Parameters applied before the event and over
+     *                                             "authorization_params", so that a listener still
+     *                                             has the last word on them
      */
-    private function startAuthorizationRequest(Request $request, array $forcedParams = []): Response
+    private function startAuthorizationRequest(Request $request, array $forcedParams = [], array $defaultParams = []): Response
     {
         $session = $this->getSession($request);
         $prefix = $this->getSessionPrefix();
@@ -211,7 +228,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             $params['max_age'] = (string) $this->options['max_age'];
         }
 
-        $extraParams = $this->authorizationParams;
+        $extraParams = array_merge($this->authorizationParams, $defaultParams);
 
         if (null !== $this->eventDispatcher) {
             $event = new OidcAuthorizationRequestEvent($request, $this->options['firewall_name'], $extraParams);

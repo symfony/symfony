@@ -34,6 +34,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\AttributesBasedUserProviderInterface;
@@ -840,13 +841,60 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertArrayNotHasKey('id_token_hint', $params);
     }
 
-    private function startReAuthentication(OidcLoginAuthenticator $authenticator, string $idToken): array
+    public function testStartReAuthenticationAsksForTheDeniedContextClasses()
+    {
+        $params = $this->startReAuthentication($this->createAuthenticator(), 'previous.id.token', AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr phrh');
+
+        // "acr_values" is a space-delimited list in order of preference, which is the order
+        // the attribute wrote the classes in (OIDC Core 1.0, Section 3.1.2.1)
+        $this->assertSame('phr phrh', $params['acr_values']);
+        $this->assertSame('login', $params['prompt']);
+    }
+
+    public function testStartReAuthenticationAsksForNoContextClassOnAStaleAuthentication()
+    {
+        $params = $this->startReAuthentication($this->createAuthenticator(), 'previous.id.token', AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY);
+
+        $this->assertArrayNotHasKey('acr_values', $params);
+    }
+
+    public function testTheDeniedContextClassesOverrideTheConfiguredOnes()
+    {
+        // what the route was denied on is more specific than what the firewall asks for by default
+        $params = $this->startReAuthentication($this->createAuthenticator(authorizationParams: ['acr_values' => '1']), 'previous.id.token', AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr');
+
+        $this->assertSame('phr', $params['acr_values']);
+    }
+
+    public function testAListenerReshapesTheRequestedContextClasses()
+    {
+        // the classes of a provider with a vocabulary of its own are mapped here, the denied
+        // attribute being on the request the listener receives
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(OidcAuthorizationRequestEvent::class, static function (OidcAuthorizationRequestEvent $event) {
+            if (AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr' === $event->getRequest()->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE)) {
+                $event->setParam('acr_values', 'urn:okta:loa:2fa:any');
+            }
+        });
+
+        $params = $this->startReAuthentication($this->createAuthenticator(eventDispatcher: $dispatcher), 'previous.id.token', AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT.'phr');
+
+        $this->assertSame('urn:okta:loa:2fa:any', $params['acr_values']);
+        // and the parameters the re-authentication itself rests on are still out of reach
+        $this->assertSame('login', $params['prompt']);
+    }
+
+    private function startReAuthentication(OidcLoginAuthenticator $authenticator, string $idToken, ?string $deniedAttribute = null): array
     {
         $token = new UsernamePasswordToken(new InMemoryUser('wouter', 'password', ['ROLE_USER']), 'main', ['ROLE_USER']);
         $token->setAttribute('oidc_id_token', $idToken);
 
         $request = Request::create('/protected');
         $request->setSession(new Session(new MockArraySessionStorage()));
+
+        if (null !== $deniedAttribute) {
+            $request->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $deniedAttribute);
+        }
 
         return $this->parseAuthorizationParams($authenticator->startReAuthentication($request, $token));
     }

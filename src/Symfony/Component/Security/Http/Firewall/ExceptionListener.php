@@ -165,17 +165,22 @@ class ExceptionListener
         $reAuthenticationEntryPoint = $this->reAuthenticationEntryPoint
             ?? ($this->authenticationEntryPoint instanceof ReAuthenticationEntryPointInterface ? $this->authenticationEntryPoint : null);
 
+        $attributes = $exception->getAttributes();
+        // a context class the user did not authenticate in is asked for the same way a fresh
+        // proof is: the entry point names the classes to the provider, which knows what proves them
+        $contextClasses = 1 === \count($attributes) ? AuthenticatedVoter::getRequiredContextClasses($attributes[0]) : null;
+
         if (null !== $token
             && null !== $reAuthenticationEntryPoint
-            && \in_array($exception->getAttributes(), [[AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY], [AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]], true)
+            && (null !== $contextClasses || \in_array($attributes, [[AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY], [AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]], true))
         ) {
-            $this->logger?->debug('The authentication is not recent enough, starting re-authentication.', ['entry_point' => $reAuthenticationEntryPoint]);
+            $this->logger?->debug(null !== $contextClasses ? 'The authentication is not in a required context, starting re-authentication.' : 'The authentication is not recent enough, starting re-authentication.', ['entry_point' => $reAuthenticationEntryPoint]);
 
             if (!$this->stateless) {
                 $this->setTargetPath($event->getRequest());
             }
 
-            $event->getRequest()->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $exception->getAttributes()[0]);
+            $event->getRequest()->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $attributes[0]);
 
             $event->setResponse($reAuthenticationEntryPoint->startReAuthentication($event->getRequest(), $token));
 

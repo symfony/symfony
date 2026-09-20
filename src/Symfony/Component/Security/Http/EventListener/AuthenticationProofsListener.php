@@ -41,7 +41,14 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  * password re-check hours later for a policy to be able to require both. They are
  * carried over as long as the user is the same, the newer entry winning.
  *
+ * The authentication context class the provider asserted is carried over the same way,
+ * and for the same reason: a session that keeps the "hwk" proof of a passkey across a
+ * password re-check, but loses the "phr" class asserted by the very same passkey, would
+ * silently hold no class at all while still proving a hardware key. What the new
+ * authentication asserts wins; only a token that got no class of its own inherits one.
+ *
  * @see AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY
+ * @see AuthenticatedVoter::IS_AUTHENTICATED_IN_CONTEXT
  */
 final class AuthenticationProofsListener implements EventSubscriberInterface
 {
@@ -81,11 +88,15 @@ final class AuthenticationProofsListener implements EventSubscriberInterface
 
         $previousToken = $event->getPreviousToken();
 
-        if (null === $previousToken
-            || !method_exists($previousToken, 'getAuthenticationProofs')
-            || $previousToken->getUserIdentifier() !== $token->getUserIdentifier()
-            || !$previousProofs = $previousToken->getAuthenticationProofs()
-        ) {
+        if (null === $previousToken || $previousToken->getUserIdentifier() !== $token->getUserIdentifier()) {
+            return;
+        }
+
+        if (null === self::getContextClass($token) && null !== $contextClass = self::getContextClass($previousToken)) {
+            $token->setAttribute('oidc_acr', $contextClass);
+        }
+
+        if (!method_exists($previousToken, 'getAuthenticationProofs') || !$previousProofs = $previousToken->getAuthenticationProofs()) {
             return;
         }
 
@@ -97,5 +108,12 @@ final class AuthenticationProofsListener implements EventSubscriberInterface
         // high priority so that a listener stopping propagation cannot leave the token
         // without the record IS_AUTHENTICATED_RECENTLY is decided on
         return [LoginSuccessEvent::class => ['onLoginSuccess', 256]];
+    }
+
+    private static function getContextClass(TokenInterface $token): ?string
+    {
+        $contextClass = $token->hasAttribute('oidc_acr') ? $token->getAttribute('oidc_acr') : null;
+
+        return \is_string($contextClass) && '' !== $contextClass ? $contextClass : null;
     }
 }

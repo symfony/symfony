@@ -26,12 +26,31 @@ class InMemoryKmsTest extends TestCase
         $this->assertSame('hello', $kms->decrypt($ciphertext));
     }
 
-    public function testCiphertextEmbedsKeyIdAndAadInPrefix()
+    public function testCiphertextEmbedsTheInstanceTheKeyIdAndTheAadInPrefix()
     {
-        $kms = new InMemoryKms();
+        $kms = new InMemoryKms('vault');
 
-        $this->assertSame('encrypted/app//hello', $kms->encrypt('app', 'hello')->blob);
-        $this->assertSame('encrypted/app/'.bin2hex('tenant=acme').'/hello', $kms->encrypt('app', 'hello', 'tenant=acme')->blob);
+        $this->assertSame('encrypted/vault/app//hello', $kms->encrypt('app', 'hello')->blob);
+        $this->assertSame('encrypted/vault/app/'.bin2hex('tenant=acme').'/hello', $kms->encrypt('app', 'hello', 'tenant=acme')->blob);
+    }
+
+    /**
+     * Two instances are two providers, each with key material of its own: what one wrote, the
+     * other cannot read. Without this, a test routing a ciphertext to the wrong client would pass.
+     */
+    public function testAnotherInstanceCannotDecrypt()
+    {
+        $ciphertext = new InMemoryKms()->encrypt('app', 'hello');
+
+        $this->expectException(DecryptionFailedException::class);
+        new InMemoryKms()->decrypt($ciphertext);
+    }
+
+    public function testTheNameIsRandomUnlessGiven()
+    {
+        $this->assertNotSame(new InMemoryKms()->name, new InMemoryKms()->name);
+        $this->assertSame('vault', new InMemoryKms('vault')->name);
+        $this->assertSame('hello', new InMemoryKms('vault')->decrypt(new InMemoryKms('vault')->encrypt('app', 'hello')), 'two instances given the same name stand for the same provider.');
     }
 
     public function testAadRoundTrip()

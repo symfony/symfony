@@ -21,8 +21,8 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 /**
  * No-crypto, in-memory implementation of {@see EncrypterInterface} /
  * {@see DecrypterInterface} for tests. The `$blob` of returned ciphertexts
- * is the plaintext prefixed with a marker that embeds the key id and the
- * AAD (`encrypted/<keyId>/<hex(aad)>/<plaintext>`) so that:
+ * is the plaintext prefixed with a marker that embeds the instance, the key
+ * id and the AAD (`encrypted/<name>/<keyId>/<hex(aad)>/<plaintext>`) so that:
  *
  *   - tests cannot accidentally compare a plaintext to a ciphertext;
  *   - decrypting something that was never produced by encrypt() fails with
@@ -30,11 +30,15 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
  *     plaintext back into decrypt();
  *   - decrypting under a different key id or with a different AAD than was
  *     used at encryption time fails the prefix check, catching key-routing
- *     and AAD-binding bugs in tests.
+ *     and AAD-binding bugs in tests;
+ *   - decrypting through another instance fails the prefix check too, the way
+ *     one provider fails on what another one wrote, catching client-routing
+ *     bugs in tests: a real KMS has key material of its own, and this one
+ *     has its name instead, random unless given.
  *
  * The `$deterministic` flag is accepted for interface compliance but has no
  * observable effect: this fixture is no-crypto and the produced blob is
- * already a pure function of `(keyId, aad, plaintext)`.
+ * already a pure function of `(name, keyId, aad, plaintext)`.
  *
  * MUST NOT be used outside test fixtures.
  *
@@ -48,18 +52,28 @@ final class InMemoryKms implements DecrypterInterface, EncrypterInterface, DataK
 
     public int $calls = 0;
 
+    public readonly string $name;
+
+    /**
+     * @param string|null $name What tells this instance's ciphertexts from another's; random when not given
+     */
+    public function __construct(?string $name = null)
+    {
+        $this->name = $name ?? bin2hex(random_bytes(8));
+    }
+
     public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
     {
         ++$this->calls;
 
-        return new Ciphertext(self::CIPHERTEXT_PREFIX.$keyId.'/'.bin2hex($aad).'/'.$plaintext, $keyId);
+        return new Ciphertext(self::CIPHERTEXT_PREFIX.$this->name.'/'.$keyId.'/'.bin2hex($aad).'/'.$plaintext, $keyId);
     }
 
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
     {
         ++$this->calls;
 
-        $expected = self::CIPHERTEXT_PREFIX.$ciphertext->keyId.'/'.bin2hex($aad).'/';
+        $expected = self::CIPHERTEXT_PREFIX.$this->name.'/'.$ciphertext->keyId.'/'.bin2hex($aad).'/';
         if (!str_starts_with($ciphertext->blob, $expected)) {
             throw new DecryptionFailedException();
         }

@@ -194,7 +194,7 @@ class EnvelopeEncrypterTest extends TestCase
     public function testADataKeyOfTheWrongLengthIsRefusedAtDecryptTime()
     {
         $envelope = $this->encrypter->encrypt('app-key', 'hello');
-        $decrypter = new EnvelopeEncrypter(new WrongLengthDataKeyKms(16));
+        $decrypter = new EnvelopeEncrypter(new WrongLengthDataKeyKms(16, $this->kms));
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The data key must be 32 bytes long for "aes-256-gcm", 16 given.');

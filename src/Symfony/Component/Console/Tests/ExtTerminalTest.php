@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Tests;
 
-use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -89,8 +88,7 @@ class ExtTerminalTest extends TestCase
         };
         $descriptors = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w'], 3 => ['pipe', 'r'], 4 => ['pipe', 'r']];
         $descriptors[$ttyFd] = ['pty'];
-        $autoload = \dirname((new \ReflectionClass(ClassLoader::class))->getFileName(), 2).'/autoload.php';
-        $process = @proc_open([\PHP_BINARY, __DIR__.'/Fixtures/terminal_extension.php', $autoload, $scenario], $descriptors, $pipes);
+        $process = @proc_open([\PHP_BINARY, __DIR__.'/Fixtures/terminal_extension.php', $scenario], $descriptors, $pipes);
         if (!\is_resource($process)) {
             $this->markTestSkipped('Cannot allocate a pseudo terminal.');
         }

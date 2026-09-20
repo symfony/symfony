@@ -1,0 +1,26 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    workflows:
+        article:
+            type: workflow
+            supports: [Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\WorkflowDefinition\Article]
+            initial_marking: [draft]
+            places: [draft, published]
+            transitions:
+                publish:
+                    from: draft
+                    to: published
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\WorkflowDefinition\:
+        resource: '../../Bundle/TestBundle/WorkflowDefinition/'
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\WorkflowDefinition\WorkflowController:
+        public: true
+        tags: [controller.service_arguments]

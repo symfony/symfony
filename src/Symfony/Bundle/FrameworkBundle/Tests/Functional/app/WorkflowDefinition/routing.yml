@@ -1,0 +1,3 @@
+workflow_definition:
+    path: /workflow-definition
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\WorkflowDefinition\WorkflowController

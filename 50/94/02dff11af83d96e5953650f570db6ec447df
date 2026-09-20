@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-20T14:40:55Z
+
+Thanks @Spomky, that was quick. Pushed two small things on top: the constructors now sit below the class constants, and the docblocks on the new test cases are gone, we don't usually carry those.
+
+I looked at extending this to the AWS bridge, since async-aws takes an `HttpClientInterface` as the third constructor argument, and decided against it: when it gets none it wraps its own client in a `RetryableHttpClient` with an `AwsRetryStrategy` (AWS status codes, 3 retries, backoff and jitter). Handing it the application's plain client would replace that, so throttled KMS calls would silently stop being retried. Leaving AWS out is the right call, and the docblock already points people at wiring `AwsKms` manually.

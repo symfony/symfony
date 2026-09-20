@@ -464,6 +464,36 @@ class FormFlowCursorTest extends TestCase
         $this->assertSame('c1', (new FormFlowCursor($steps, 'b'))->getLastStep());
     }
 
+    public function testBackwardNavigationIsSkipAwareWhenDataIsGiven()
+    {
+        $steps = [
+            'personal' => new StepFlowBuilder('personal')->setSkip(static fn (array $data) => $data['skipPersonal'])->getStepConfig(),
+            'professional' => new StepFlowBuilder('professional')->getStepConfig(),
+            'account' => new StepFlowBuilder('account')->getStepConfig(),
+        ];
+
+        $cursor = new FormFlowCursor($steps, 'professional', ['skipPersonal' => true]);
+
+        $this->assertFalse($cursor->canMoveBack());
+        $this->assertTrue($cursor->isFirstStep());
+        $this->assertSame('professional', $cursor->getFirstStep());
+        $this->assertSame('personal', $cursor->getPreviousStep(), 'getPreviousStep() stays structural');
+        $this->assertTrue($cursor->withCurrentStep('account')->canMoveBack());
+
+        $cursor = new FormFlowCursor($steps, 'professional', ['skipPersonal' => false]);
+
+        $this->assertTrue($cursor->canMoveBack());
+        $this->assertFalse($cursor->isFirstStep());
+        $this->assertSame('personal', $cursor->getFirstStep());
+
+        // without data, only groups are taken into account
+        $cursor = new FormFlowCursor($steps, 'professional');
+
+        $this->assertTrue($cursor->canMoveBack());
+        $this->assertFalse($cursor->isFirstStep());
+        $this->assertSame('personal', $cursor->getFirstStep());
+    }
+
     /**
      * Creates steps: a(group) -> [a1, a2], b, c(group) -> [c1].
      *

@@ -241,7 +241,7 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
         $step = $this->getStep($currentStep);
         $this->add($step->getName(), $step->getType(), $step->getOptions());
 
-        $cursor = new FormFlowCursor($config->getSteps(), $currentStep);
+        $cursor = new FormFlowCursor($config->getSteps(), $currentStep, $this->getData());
         $this->pruneActionButtons($this, $cursor);
 
         return new FormFlow($config, $cursor);
@@ -268,7 +268,12 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
     private function resolveFirstStep(?array $steps = null): string
     {
         foreach ($steps ?? $this->steps as $step) {
-            if (!$step->isGroup() && !$step->isSkipped($this->getData())) {
+            if ($step->isSkipped($this->getData())) {
+                // a skipped step takes its whole subtree with it
+                continue;
+            }
+
+            if (!$step->isGroup()) {
                 return $step->getName();
             }
 

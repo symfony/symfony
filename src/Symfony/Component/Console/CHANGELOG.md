@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Add support for `ext-terminal` to determine terminal dimensions and read hidden input natively when available
+ * Add support for the `prateekbhujel/php-terminal` extension 1.0 or later to determine terminal dimensions and read hidden input natively when available
  * Add `LockableTrait::setLockFactory()`, autowired with the lock factory of the resource named `console` when the app declares one
  * Allow `#[AsCommand]` to list `InputOption`s to add after the ones the parameters of the command declare
  * Register a class-level `#[AsCommand]` without `__invoke()` as the command grouping its method-level ones

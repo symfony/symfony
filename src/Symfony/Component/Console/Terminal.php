@@ -179,7 +179,7 @@ class Terminal
 
     private static function initDimensions(): void
     {
-        if (class_exists(\Io\Terminal\Terminal::class) && false !== $size = \Io\Terminal\Terminal::open()->getSize()) {
+        if (\extension_loaded('terminal') && version_compare(phpversion('terminal'), '1.0.0', '>=') && false !== $size = \Io\Terminal\Terminal::create()->getSize()) {
             self::$width = $size->cols;
             self::$height = $size->rows;
 

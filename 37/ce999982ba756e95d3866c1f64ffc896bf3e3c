@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-20T14:19:31Z
+
+Thanks @tomsommer. I added a functional test in SecurityBundle and pushed.
+
+The wiring test alone could not catch a breakage: `createContainerFromFile()` clears the optimization passes, so `ResolveInvalidReferencesPass` never runs there and the assertion holds whether or not the provider exists. With `ignoreOnInvalid()` the call is simply dropped, so if the service is ever renamed the functions disappear from controller expressions and nothing goes red. The new test boots both bundles and evaluates `current_user()` through `controller.expression_language` itself, which fails with `The function "current_user" does not exist` without your one-line change.
+
+Also shortened the changelog entry, the details belong in the docs.

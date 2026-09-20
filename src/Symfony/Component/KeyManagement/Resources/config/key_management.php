@@ -51,6 +51,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.remove_if_missing', ['class' => TransitKmsFactory::class, 'package' => 'symfony/hashicorp-vault-key-management', 'parent_packages' => ['symfony/key-management']])
 
         ->set('key_management.factory.aws_kms', AwsKmsFactory::class)
+            ->args([service('http_client')->nullOnInvalid()])
             ->tag('key_management.factory')
             ->tag('container.remove_if_missing', ['class' => AwsKmsFactory::class, 'package' => 'symfony/aws-key-management', 'parent_packages' => ['symfony/key-management']])
 

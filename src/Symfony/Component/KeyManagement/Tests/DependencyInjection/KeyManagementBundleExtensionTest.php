@@ -96,6 +96,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield 'hashicorp vault' => ['key_management.factory.hashicorp_vault_transit'];
         yield 'azure' => ['key_management.factory.azure_key_vault'];
         yield 'google cloud' => ['key_management.factory.google_cloud_kms'];
+        yield 'aws' => ['key_management.factory.aws_kms'];
     }
 
     /**

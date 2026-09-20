@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Add support for `ext-terminal` to determine terminal dimensions and read hidden input natively when available
+ * Add support for the `prateekbhujel/php-terminal` extension 1.0 or later to determine terminal dimensions and read hidden input natively when available
  * Add `CommandInvocation` and the `%command.invocation%` help placeholder to include the Symfony CLI launcher, or `php` when the script is not executable
  * Add `CompletionSuggestions::suggestPaths()`, `suggestDirectories()` and `getPathSuggestion()` to let the shell complete file system paths, as `InputFile` arguments and options now do
  * Pass the `CompletionSuggestions` to the `suggestedValues` closures of arguments and options

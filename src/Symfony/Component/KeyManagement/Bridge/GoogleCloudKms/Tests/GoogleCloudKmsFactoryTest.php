@@ -12,6 +12,8 @@
 namespace Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKms;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
 use Symfony\Component\KeyManagement\Dsn;
@@ -92,5 +94,25 @@ class GoogleCloudKmsFactoryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         (new GoogleCloudKmsFactory())->create(Dsn::fromString('gcp-kms://default?credentials=/nope/missing.json'));
+    }
+
+    public function testTheGivenHttpClientIsScopedToTheDsn()
+    {
+        $key = 'projects/my-proj/locations/global/keyRings/app/cryptoKeys/master';
+        $urls = [];
+        $client = new MockHttpClient(static function (string $method, string $url) use (&$urls, $key): MockResponse {
+            $urls[] = $url;
+
+            return str_contains($url, 'oauth2.googleapis.com')
+                ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
+                : new MockResponse(json_encode(['name' => $key.'/cryptoKeyVersions/1', 'ciphertext' => 'CipherFromGcp']));
+        });
+
+        $kms = (new GoogleCloudKmsFactory($client))->create(Dsn::fromString('gcp-kms://kms.local:8443/v2/?credentials='.urlencode($this->credentialsPath)));
+        $kms->encrypt($key, 'hello');
+
+        $this->assertCount(2, $urls);
+        $this->assertSame('https://oauth2.googleapis.com/token', $urls[0]);
+        $this->assertSame('https://kms.local:8443/v2/'.$key.':encrypt', $urls[1]);
     }
 }

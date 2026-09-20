@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -71,6 +72,30 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield ['console.command.key_management_encrypt'];
         yield ['console.command.key_management_decrypt'];
         yield ['console.command.key_management_generate_data_key'];
+    }
+
+    #[DataProvider('provideHttpFactoryIds')]
+    public function testAnHttpFactoryGetsTheApplicationHttpClient(string $serviceId)
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', []);
+        });
+
+        if (!$container->hasDefinition($serviceId)) {
+            $this->markTestSkipped(\sprintf('"%s" is not installed.', $serviceId));
+        }
+
+        $client = $container->getDefinition($serviceId)->getArgument(0);
+        $this->assertInstanceOf(Reference::class, $client);
+        $this->assertSame('http_client', (string) $client);
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $client->getInvalidBehavior());
+    }
+
+    public static function provideHttpFactoryIds(): iterable
+    {
+        yield 'hashicorp vault' => ['key_management.factory.hashicorp_vault_transit'];
+        yield 'azure' => ['key_management.factory.azure_key_vault'];
+        yield 'google cloud' => ['key_management.factory.google_cloud_kms'];
     }
 
     /**

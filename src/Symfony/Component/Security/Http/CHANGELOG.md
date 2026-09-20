@@ -12,6 +12,8 @@ CHANGELOG
  * Make `OidcLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, starting an authorization request with `prompt=login` and the previous ID token as `id_token_hint`
  * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when `IS_AUTHENTICATED_RECENTLY` or `IS_AUTHENTICATED_VERY_RECENTLY` is denied
  * Add `IsGrantedContext::isAuthenticatedVeryRecently()`
+ * Record the OIDC `acr` claim as the `oidc_acr` token attribute, the authentication context class the provider asserts
+ * Add `SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE`, holding the denied attribute while a `ReAuthenticationEntryPointInterface` starts a re-authentication
  * Record the OIDC `amr` and `auth_time` claims as the authentication proofs of the token, so `max_age` and `IS_AUTHENTICATED_RECENTLY` agree
  * Add `AuthenticationProofsListener`, which records an interactive authentication as an authentication proof of the token, under the methods its `AuthenticationMethodBadge` states, and carries the proofs over when a re-authentication of the same user replaces the token
  * Add `AuthenticationMethodBadge`, for an authenticator to state which authentication methods it verified; `form_login`, `json_login` and `http_basic` state `AuthenticationMethod::PASSWORD`

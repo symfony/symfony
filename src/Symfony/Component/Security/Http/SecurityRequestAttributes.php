@@ -28,4 +28,12 @@ final class SecurityRequestAttributes
      * @see Authenticator\Debug\UnsupportedReasons
      */
     public const UNSUPPORTED_REASONS = '_security.unsupported_reasons';
+
+    /**
+     * Holds the denied security attribute while a ReAuthenticationEntryPointInterface starts a re-authentication,
+     * so that an entry point asking the same question in several ways knows which one was asked here.
+     *
+     * @see EntryPoint\ReAuthenticationEntryPointInterface
+     */
+    public const RE_AUTHENTICATION_ATTRIBUTE = '_security.re_authentication_attribute';
 }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-20T13:48:08Z
+
+Thanks for splitting it. I added one clause to your `createEmptyData()` merge-up note: `resolveFirstStep()` looks like the obvious way to get the first non-group step on 8.2, but it evaluates the skip conditions against data that does not exist yet, so a closure typed `array $data` (like the one in `SkippedParentStepsFlowType`) throws the very `TypeError` commit 1 removes. The lookup has to walk past groups only.

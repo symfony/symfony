@@ -46,7 +46,7 @@ jobs:
 
       - name: Install released ext-terminal
         if: matrix.terminal != 'candidate'
-        run: pie install "prateekbhujel/php-terminal:$TERMINAL_VERSION"
+        run: sudo "$(command -v pie)" install "prateekbhujel/php-terminal:$TERMINAL_VERSION" --with-php-config="$(command -v php-config)"
 
       # Test the exact proposed contract until 1.0.0 can be installed through PIE.
       - name: Checkout ext-terminal candidate

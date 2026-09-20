@@ -43,7 +43,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('key_management.factory')
             ->tag('container.remove_if_missing', ['class' => FlysystemKmsFactory::class, 'package' => 'symfony/flysystem-key-management', 'parent_packages' => ['symfony/key-management']])
 
+        // the factories talking HTTP scope the application's client to the DSN's base URI, so a
+        // timeout, a retry policy or the profiler configured on it reach the KMS
         ->set('key_management.factory.hashicorp_vault_transit', TransitKmsFactory::class)
+            ->args([service('http_client')->nullOnInvalid()])
             ->tag('key_management.factory')
             ->tag('container.remove_if_missing', ['class' => TransitKmsFactory::class, 'package' => 'symfony/hashicorp-vault-key-management', 'parent_packages' => ['symfony/key-management']])
 
@@ -52,10 +55,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.remove_if_missing', ['class' => AwsKmsFactory::class, 'package' => 'symfony/aws-key-management', 'parent_packages' => ['symfony/key-management']])
 
         ->set('key_management.factory.azure_key_vault', AzureKeyVaultFactory::class)
+            ->args([service('http_client')->nullOnInvalid()])
             ->tag('key_management.factory')
             ->tag('container.remove_if_missing', ['class' => AzureKeyVaultFactory::class, 'package' => 'symfony/azure-keyvault-key-management', 'parent_packages' => ['symfony/key-management']])
 
         ->set('key_management.factory.google_cloud_kms', GoogleCloudKmsFactory::class)
+            ->args([service('http_client')->nullOnInvalid()])
             ->tag('key_management.factory')
             ->tag('container.remove_if_missing', ['class' => GoogleCloudKmsFactory::class, 'package' => 'symfony/google-cloud-key-management', 'parent_packages' => ['symfony/key-management']])
 

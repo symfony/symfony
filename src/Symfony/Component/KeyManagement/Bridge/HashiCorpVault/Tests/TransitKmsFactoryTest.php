@@ -12,6 +12,8 @@
 namespace Symfony\Component\KeyManagement\Bridge\HashiCorpVault\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKms;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKmsFactory;
 use Symfony\Component\KeyManagement\Dsn;
@@ -83,5 +85,20 @@ class TransitKmsFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Vault token');
         (new TransitKmsFactory())->create(Dsn::fromString('hashicorp-vault-transit://vault.example.com'));
+    }
+
+    public function testTheGivenHttpClientIsScopedToTheDsn()
+    {
+        $urls = [];
+        $client = new MockHttpClient(static function (string $method, string $url) use (&$urls): MockResponse {
+            $urls[] = $url;
+
+            return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:abc']]));
+        });
+
+        $kms = (new TransitKmsFactory($client))->create(Dsn::fromString('hashicorp-vault-transit://s.token@vault.local:8200/v1/'));
+        $kms->encrypt('app', 'hello');
+
+        $this->assertSame(['https://vault.local:8200/v1/transit/encrypt/app'], $urls);
     }
 }

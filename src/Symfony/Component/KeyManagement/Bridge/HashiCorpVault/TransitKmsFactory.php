@@ -18,6 +18,7 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
 use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Builds a {@see TransitKms} from a DSN of the form:
@@ -29,8 +30,9 @@ use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
  * (the password component is ignored). The `scheme` option defaults to
  * `https`; pass `http` to talk to a local Vault dev instance.
  *
- * Users that need a custom HttpClient (retry, certificates, ...) wire
- * {@see TransitKms} manually.
+ * The HTTP client given to the factory is what the DSN's base URI is applied
+ * to, so that its timeout, retry policy or certificates reach Vault; without
+ * one, a client is built for the base URI alone.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -39,6 +41,14 @@ use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 final class TransitKmsFactory implements KmsFactoryInterface
 {
     private const string SCHEME = 'hashicorp-vault-transit';
+
+    /**
+     * @param HttpClientInterface|null $client The client the DSN's base URI is applied to, so that a timeout, a retry policy or the profiler set on the application's client reach the KMS; a client of its own is built when none is given
+     */
+    public function __construct(
+        private readonly ?HttpClientInterface $client = null,
+    ) {
+    }
 
     public function supports(#[\SensitiveParameter] Dsn $dsn): bool
     {
@@ -70,7 +80,7 @@ final class TransitKmsFactory implements KmsFactoryInterface
         $baseUri = $scheme.'://'.$dsn->host.$port.$path;
 
         return new TransitKms(
-            HttpClient::createForBaseUri($baseUri),
+            $this->scopedClient($baseUri),
             $dsn->user,
             $dsn->getOption('mount', 'transit'),
             $dsn->getOption('namespace'),
@@ -90,5 +100,10 @@ final class TransitKmsFactory implements KmsFactoryInterface
                 throw new InvalidArgumentException(\sprintf('The "%s" option of the "%s://" DSN must be a scalar value.', $option, $dsn->scheme));
             }
         }
+    }
+
+    private function scopedClient(string $baseUri): HttpClientInterface
+    {
+        return $this->client?->withOptions(['base_uri' => $baseUri]) ?? HttpClient::createForBaseUri($baseUri);
     }
 }

@@ -12,6 +12,8 @@
 namespace Symfony\Component\KeyManagement\Bridge\AzureKeyVault\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVault;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVaultFactory;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\ClientCredentialsTokenProvider;
@@ -146,5 +148,24 @@ class AzureKeyVaultFactoryTest extends TestCase
         $audienceProperty = (new \ReflectionClass(ClientCredentialsTokenProvider::class))->getProperty('audience');
 
         return $audienceProperty->getValue($tokens);
+    }
+
+    public function testTheGivenHttpClientIsScopedToTheDsn()
+    {
+        $urls = [];
+        $client = new MockHttpClient(static function (string $method, string $url) use (&$urls): MockResponse {
+            $urls[] = $url;
+
+            return str_contains($url, '/oauth2/')
+                ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
+                : new MockResponse(json_encode(['kid' => 'https://my-vault.vault.azure.net/keys/app/v1', 'value' => 'CipherFromAzure']));
+        });
+
+        $kms = (new AzureKeyVaultFactory($client))->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t'));
+        $kms->encrypt('app', 'hello');
+
+        $this->assertCount(2, $urls);
+        $this->assertStringStartsWith('https://login.microsoftonline.com/t/oauth2/', $urls[0]);
+        $this->assertStringStartsWith('https://my-vault.vault.azure.net/keys/app/encrypt', $urls[1]);
     }
 }

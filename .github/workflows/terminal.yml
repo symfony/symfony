@@ -25,11 +25,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terminal: ['0.8.0', '0.9.0', 'candidate']
+        terminal: ['0.8.0', '0.9.0', '1.0.0']
     env:
       COMPOSER_ROOT_VERSION: 8.2.x-dev
       SYMFONY_REQUIRE: '>=8.2'
-      TERMINAL_VERSION: ${{ matrix.terminal == 'candidate' && '1.0.0' || matrix.terminal }}
+      TERMINAL_VERSION: ${{ matrix.terminal }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -45,30 +45,9 @@ jobs:
           ini-values: memory_limit=-1, zend.assertions=1
 
       - name: Install released ext-terminal
-        if: matrix.terminal != 'candidate'
         run: |
           sudo env "COMPOSER_HOME=$RUNNER_TEMP/terminal-pie-composer" "XDG_CONFIG_HOME=$RUNNER_TEMP/terminal-pie-config" \
             "$(command -v pie)" install "prateekbhujel/php-terminal:$TERMINAL_VERSION" --with-php-config="$(command -v php-config)"
-
-      # Test the exact proposed contract until 1.0.0 can be installed through PIE.
-      - name: Checkout ext-terminal candidate
-        if: matrix.terminal == 'candidate'
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: prateekbhujel/php-terminal
-          ref: d716bd264807e6671ef5e89b8b822103716f5e44
-          path: .terminal-extension
-          persist-credentials: false
-
-      - name: Build ext-terminal candidate
-        if: matrix.terminal == 'candidate'
-        working-directory: .terminal-extension
-        run: |
-          phpize
-          ./configure
-          make -j2
-          sudo make install
-          echo 'extension=terminal.so' | sudo tee "$(php -r 'echo PHP_CONFIG_FILE_SCAN_DIR;')/30-terminal.ini"
 
       - name: Verify ext-terminal version
         run: |

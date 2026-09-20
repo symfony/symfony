@@ -40,7 +40,7 @@
         "symfony/dom-crawler": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",
         "symfony/form": "^7.4|^8.0",
-        "symfony/framework-bundle": "^8.1",
+        "symfony/framework-bundle": "^8.2",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/ldap": "^7.4|^8.0",
         "symfony/lock": "^7.4|^8.0",
@@ -57,7 +57,7 @@
         "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {
-        "symfony/framework-bundle": "<8.1"
+        "symfony/framework-bundle": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },

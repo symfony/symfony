@@ -1611,6 +1611,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
     }
 
+    public function testControllerExpressionLanguageRegistersTheSecurityProvider()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertEquals(
+            [['registerProvider', [new Reference('security.expression_language_provider', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]]],
+            $container->getDefinition('controller.expression_language')->getMethodCalls(),
+        );
+    }
+
     /**
      * @param array{profiler?: bool|array<string, mixed>, test?: bool} $extraConfig
      */

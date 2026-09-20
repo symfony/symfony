@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add opt-in browser-compatible cookie handling to `CookieJar`, including host-only and Max-Age semantics, RFC path and domain matching, cookie name prefix enforcement, duplicate-name request cookies, and request and response limits
+ * Add `Cookie::fromStringBrowserCompatible()`, `Cookie::getMaxAge()`, `Cookie::isHostOnly()`, `CookieJar::createBrowserCompatible()`, `CookieJar::getCookieHeader()`, and `CookieJar::clearSessionCookies()`
+
 8.0
 ---
 

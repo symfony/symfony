@@ -45,6 +45,22 @@ class ExpressionLanguageProviderTest extends AbstractWebTestCase
         $expressionLanguage->evaluate('current_user()');
     }
 
+    public function testTheSecurityFunctionsAreAvailableInControllerExpressions()
+    {
+        $container = $this->bootTestKernel();
+
+        $user = new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']);
+        $container->get('test.request_stack')->push(new Request());
+        $container->get('test.security.token_storage')->setToken(new UsernamePasswordToken($user, 'main', ['ROLE_FOO']));
+
+        $expressionLanguage = $container->get('test.controller.expression_language');
+        $variables = ['request' => $container->get('test.request_stack')->getCurrentRequest(), 'args' => [], 'this' => null];
+
+        $this->assertSame($user, $expressionLanguage->evaluate('current_user()', $variables));
+        $this->assertSame('chalasr', $expressionLanguage->evaluate('current_user().getUserIdentifier()', $variables));
+        $this->assertTrue($expressionLanguage->evaluate('is_granted("ROLE_FOO")', $variables));
+    }
+
     private function createExpressionLanguage(ContainerInterface $container): ExpressionLanguage
     {
         $expressionLanguage = new ExpressionLanguage();

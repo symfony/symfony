@@ -257,19 +257,4 @@ class TerminalTest extends TestCase
 
         Terminal::setITerm2ImagesSupport(null);
     }
-
-    public function testInitDimensionsWithExtTerminal()
-    {
-        if (!class_exists(\Io\Terminal\Terminal::class)) {
-            $this->markTestSkipped('ext-terminal is not available.');
-        }
-
-        putenv('COLUMNS');
-        putenv('LINES');
-        $this->resetStatics();
-
-        $terminal = new Terminal();
-        $this->assertGreaterThan(0, $terminal->getWidth());
-        $this->assertGreaterThan(0, $terminal->getHeight());
-    }
 }

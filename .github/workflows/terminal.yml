@@ -1,0 +1,86 @@
+name: Console with ext-terminal
+
+on:
+  pull_request:
+    paths:
+      - 'src/Symfony/Component/Console/**'
+      - '.github/workflows/terminal.yml'
+  push:
+    branches: ['*.*']
+    paths:
+      - 'src/Symfony/Component/Console/**'
+      - '.github/workflows/terminal.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  console:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        terminal: ['0.8.0', '0.9.0', 'candidate']
+    env:
+      COMPOSER_ROOT_VERSION: 8.2.x-dev
+      SYMFONY_REQUIRE: '>=8.2'
+      TERMINAL_VERSION: ${{ matrix.terminal == 'candidate' && '1.0.0' || matrix.terminal }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: flex, pie
+          extensions: intl, mbstring
+          ini-values: memory_limit=-1, zend.assertions=1
+
+      - name: Install released ext-terminal
+        if: matrix.terminal != 'candidate'
+        run: pie install "prateekbhujel/php-terminal:$TERMINAL_VERSION"
+
+      # Test the exact proposed contract until 1.0.0 can be installed through PIE.
+      - name: Checkout ext-terminal candidate
+        if: matrix.terminal == 'candidate'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: prateekbhujel/php-terminal
+          ref: d716bd264807e6671ef5e89b8b822103716f5e44
+          path: .terminal-extension
+          persist-credentials: false
+
+      - name: Build ext-terminal candidate
+        if: matrix.terminal == 'candidate'
+        working-directory: .terminal-extension
+        run: |
+          phpize
+          ./configure
+          make -j2
+          sudo make install
+          echo 'extension=terminal.so' | sudo tee "$(php -r 'echo PHP_CONFIG_FILE_SCAN_DIR;')/30-terminal.ini"
+
+      - name: Verify ext-terminal version
+        run: |
+          php -r 'exit(extension_loaded("terminal") && phpversion("terminal") === getenv("TERMINAL_VERSION") ? 0 : 1);'
+
+      - name: Install test dependencies
+        run: |
+          git config --global user.email ""
+          git config --global user.name "Symfony"
+          mkdir -p "$(composer config home)"
+          cp .github/composer-config.json "$(composer config home)/config.json"
+          php .github/build-packages.php HEAD^ 8.2 src/Symfony/Bridge/PhpUnit
+          composer update --no-interaction --no-progress
+          ./phpunit install
+
+      - name: Run Console tests including native PTY coverage
+        run: ./phpunit src/Symfony/Component/Console --exclude-group tty --exclude-group transient --fail-on-warning

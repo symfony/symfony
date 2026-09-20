@@ -24,9 +24,14 @@ final class WrongLengthDataKeyKms implements DataKeyGeneratorInterface
 {
     private readonly InMemoryKms $kms;
 
-    public function __construct(private readonly int $length)
-    {
-        $this->kms = new InMemoryKms();
+    /**
+     * @param InMemoryKms|null $kms The backend whose wrappings are read, so that an envelope written through it is what this one hands back at the wrong length
+     */
+    public function __construct(
+        private readonly int $length,
+        ?InMemoryKms $kms = null,
+    ) {
+        $this->kms = $kms ?? new InMemoryKms();
     }
 
     public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey

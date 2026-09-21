@@ -172,14 +172,12 @@ class MermaidDumper implements DumperInterface
     }
 
     /**
-     * Replace double quotes with the mermaid escape syntax and
-     * ensure all other characters are properly escaped.
+     * Wraps the label in quotes and writes the characters that would end it as Mermaid entities.
      */
     private function escape(string $label): string
     {
-        $label = str_replace('"', '#quot;', $label);
-
-        return \sprintf('"%s"', $label);
+        // "#" goes first so that the entity written for the quote is not escaped again
+        return \sprintf('"%s"', str_replace(['#', '"'], ['#35;', '#quot;'], $label));
     }
 
     public function validateDirection(string $direction): void

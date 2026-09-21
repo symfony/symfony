@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-21T15:43:03Z
+
+Retargeted to 7.4, where `MermaidDumper` first appears: the file is byte-identical on 7.4 and 8.1, so the patch applies unchanged.
+
+I also extended the escaping to `#`, `<` and `>`. Mermaid renders labels as HTML by default, so `ROLE_<B>` was coming out as markup rather than as the role name, which is the thing this PR is fixing. `#` goes first so the entities inserted after it are not escaped again.
+
+Merge-up to 8.2: #66194 touches the same dumper and its test, so whichever lands second carries the resolution.

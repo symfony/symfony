@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-21T14:56:12Z
+
+Changelog line reworded to lead with the response mode, since that's what one greps for.
+
+One thing for the description: the route declared for the `check_path` has to allow POST. `RouterListener` runs at priority 32 and the firewall at 8, so a GET-only callback route answers the posted response with a 405 before any authenticator sees it, and nothing shows up in the security profiler. Worth a line here and in the docs, `SameSite` isn't the only requirement this mode adds.

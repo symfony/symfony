@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-21T05:22:12Z
+
+Thanks @nicolas-grekas, reading the `acr` claim belongs here, and you are right that the class
+names do not belong on routes. Once this is merged I will update #66181 to only open up `ExceptionListener`.
+One nit that came after my approval: `getAttribute()` throws when the key is absent, so the example needs `hasAttribute()` first.

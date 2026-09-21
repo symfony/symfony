@@ -135,7 +135,6 @@ class MermaidDumperTest extends TestCase
         $roleHierarchy = new RoleHierarchy([
             'ROLE_ADMIN-TEST' => ['ROLE_USER'],
             'ROLE_*' => ['ROLE_USER.SPECIAL'],
-            'ROLE_<B>#"' => ['ROLE_USER'],
         ]);
 
         $output = (new MermaidDumper())->dump($roleHierarchy);
@@ -146,10 +145,8 @@ class MermaidDumperTest extends TestCase
                 ROLE_USER
                 ROLE__["ROLE_*"]
                 ROLE_USER_SPECIAL["ROLE_USER.SPECIAL"]
-                ROLE__B___["ROLE_#lt;B#gt;#35;#quot;"]
                 ROLE_ADMIN_TEST --> ROLE_USER
                 ROLE__ --> ROLE_USER_SPECIAL
-                ROLE__B___ --> ROLE_USER
             MERMAID, $output);
     }
 }

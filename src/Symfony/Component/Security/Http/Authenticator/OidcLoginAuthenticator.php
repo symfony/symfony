@@ -258,12 +258,28 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         $session = $this->getSession($request);
         $prefix = $this->getSessionPrefix();
 
+        // "form_post" has the provider post the response to the "check_path", the default
+        // "query" mode puts it in the redirect; a provider on another site makes that POST
+        // a cross-site one, which carries no "SameSite=Lax" cookie, hence no session
+        if ($request->isMethod('POST')) {
+            $state = $request->request->getString('state');
+            $code = $request->request->getString('code');
+            $iss = $request->request->getString('iss');
+            $error = $request->request->getString('error');
+            $errorDescription = $request->request->getString('error_description');
+        } else {
+            $state = $request->query->getString('state');
+            $code = $request->query->getString('code');
+            $iss = $request->query->getString('iss');
+            $error = $request->query->getString('error');
+            $errorDescription = $request->query->getString('error_description');
+        }
+
         // the "state" is validated first: an unauthenticated request would otherwise get an
         // attacker-supplied "error_description" stored in the session, through the exception
         // the failure handler keeps there (the provider echoes "state" back on errors too,
         // as RFC 6749, Section 4.1.2.1 requires)
-        $state = $request->query->get('state');
-        if (!\is_string($state) || '' === $state) {
+        if ('' === $state) {
             throw new AuthenticationException('Invalid OIDC state parameter.');
         }
 
@@ -293,11 +309,10 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         $codeVerifier = \is_array($attempt) ? $attempt['code_verifier'] ?? null : null;
         $redirectUri = \is_array($attempt) ? $attempt['redirect_uri'] ?? null : null;
 
-        $this->checkIssuerParameter($request);
-        $this->checkForProviderError($request);
+        $this->checkIssuerParameter($iss);
+        $this->checkForProviderError($error, $errorDescription);
 
-        $code = $request->query->get('code');
-        if (null === $code) {
+        if ('' === $code) {
             throw new AuthenticationException('Missing authorization code in OIDC callback.');
         }
 
@@ -424,11 +439,10 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         return true;
     }
 
-    private function checkForProviderError(Request $request): void
+    private function checkForProviderError(string $error, string $errorDescription): void
     {
-        $error = $request->query->get('error');
-        if (null !== $error) {
-            $description = $request->query->get('error_description', $error);
+        if ('' !== $error) {
+            $description = '' !== $errorDescription ? $errorDescription : $error;
 
             // only the matched attempt was consumed: a provider error for one tab
             // must not cancel the logins pending in the others
@@ -444,12 +458,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
      * It is checked before the "error" parameter, which RFC 9207, Section 2 requires
      * it to accompany too.
      */
-    private function checkIssuerParameter(Request $request): void
+    private function checkIssuerParameter(string $iss): void
     {
         $configuration = $this->discovery->getConfiguration();
-        $iss = $request->query->get('iss');
 
-        if (null === $iss) {
+        if ('' === $iss) {
             // a provider announcing support for the parameter sends it on every
             // authorization response, so a callback without it did not come from it
             if (true === ($configuration['authorization_response_iss_parameter_supported'] ?? null)) {
@@ -460,7 +473,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         }
 
         $expectedIssuer = $configuration['issuer'] ?? null;
-        if (!\is_string($iss) || '' === $iss || !\is_string($expectedIssuer) || !hash_equals($expectedIssuer, $iss)) {
+        if (!\is_string($expectedIssuer) || !hash_equals($expectedIssuer, $iss)) {
             throw new AuthenticationException('The OIDC callback "iss" parameter does not match the expected issuer.');
         }
     }

@@ -16,3 +16,12 @@ use Symfony\Component\Serializer\CacheWarmer\SerializerCacheWarmer as BaseSerial
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer', BaseSerializerCacheWarmer::class);
 
 class_alias(BaseSerializerCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Serializer\CacheWarmer\SerializerCacheWarmer instead
+     */
+    class SerializerCacheWarmer
+    {
+    }
+}

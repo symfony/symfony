@@ -16,3 +16,12 @@ use Symfony\Component\Cache\Command\CachePoolPruneCommand as BaseCachePoolPruneC
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand', BaseCachePoolPruneCommand::class);
 
 class_alias(BaseCachePoolPruneCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Cache\Command\CachePoolPruneCommand instead
+     */
+    class CachePoolPruneCommand
+    {
+    }
+}

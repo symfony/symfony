@@ -1430,6 +1430,44 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertSame([AuthenticationMethod::PASSWORD => $authTime, AuthenticationMethod::ONE_TIME_PASSWORD => $authTime], $token->getAuthenticationProofs());
     }
 
+    public function testCreateTokenRecordsTheAcrClaim()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'acr' => 'phr']),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame('phr', $token->getAttribute('oidc_acr'));
+    }
+
+    public function testCreateTokenReportsAnUnusableAcrClaimAsNull()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'acr' => ['phr']]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertNull($token->getAttribute('oidc_acr'));
+    }
+
     public function testCreateTokenKeepsOnlyTheStringEntriesOfTheAmrClaim()
     {
         $nonce = bin2hex(random_bytes(16));

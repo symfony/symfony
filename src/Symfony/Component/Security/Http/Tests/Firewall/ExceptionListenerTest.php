@@ -42,6 +42,7 @@ use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointI
 use Symfony\Component\Security\Http\EntryPoint\ReAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class ExceptionListenerTest extends TestCase
 {
@@ -315,6 +316,27 @@ class ExceptionListenerTest extends TestCase
         $this->assertSame('Confirm your password', $event->getResponse()->getContent());
     }
 
+    public function testTheDeniedAttributeIsNamedOnTheRequestStartingTheReAuthentication()
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->once())
+            ->method('startReAuthentication')
+            ->willReturnCallback(function (Request $request): Response {
+                $this->assertSame(AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY, $request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+
+                return new Response('Confirm your password', 200);
+            });
+
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertSame('Confirm your password', $event->getResponse()->getContent());
+    }
+
     public function testTheFirewallEntryPointIsUsedWhenItCanReAuthenticate()
     {
         $exception = new AccessDeniedException();
@@ -363,6 +385,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
+        $this->assertFalse($event->getRequest()->attributes->has(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
     }
 
     public function testReAuthenticationEntryPointIsNotStartedWhenAnotherAttributeMayHaveFailed()

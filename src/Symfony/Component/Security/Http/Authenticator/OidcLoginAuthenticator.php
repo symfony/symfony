@@ -358,6 +358,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         // which is what lets a trust resolver require one of them and not just any login
         $amr = $idTokenClaims['amr'] ?? null;
         $passport->setAttribute('oidc_amr', \is_array($amr) ? array_values(array_filter($amr, \is_string(...))) : []);
+        // "acr" names the authentication context class the provider asserts, in the vocabulary it
+        // shares with this application, and is the claim answering the "acr_values" an authorization
+        // request asks for; it is compared as-is, so anything but a non-empty string is no class
+        $acr = $idTokenClaims['acr'] ?? null;
+        $passport->setAttribute('oidc_acr', \is_string($acr) && '' !== $acr ? $acr : null);
 
         return $passport;
     }
@@ -376,6 +381,8 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             $token->setAttribute('oidc_refresh_token', $tokenData['refresh_token'] ?? null);
             $token->setAttribute('oidc_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? $this->clock->now()->getTimestamp() + (int) $tokenData['expires_in'] : null);
         }
+
+        $token->setAttribute('oidc_acr', $passport->getAttribute('oidc_acr'));
 
         $methods = $passport->getAttribute('oidc_amr');
         $methods = \is_array($methods) && $methods ? $methods : [AuthenticationMethod::UNSPECIFIED];

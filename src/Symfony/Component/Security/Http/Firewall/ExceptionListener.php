@@ -175,6 +175,8 @@ class ExceptionListener
                 $this->setTargetPath($event->getRequest());
             }
 
+            $event->getRequest()->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $exception->getAttributes()[0]);
+
             $event->setResponse($reAuthenticationEntryPoint->startReAuthentication($event->getRequest(), $token));
 
             return;

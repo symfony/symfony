@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-21T15:43:01Z
+
+Retargeted to 6.4: the same `$now->modify('+%d milliseconds')` is on 6.4, 7.4, 8.1 and 8.2, so the fix belongs on the oldest branch that carries it.
+
+Two things had to change for that branch. `DelayStamp::delayUntil()` only reads the mockable clock from 8.1; on 6.4 and 7.4 it calls `time()`, so with a mocked clock the stamp came out with a negative delay and the test could not fail for the right reason. It now passes the delay in milliseconds directly, which exercises the same path and is clock-independent on every branch. The data provider is inlined as three calls too, since 6.4 runs PHPUnit 9.6 and cannot read `#[DataProvider]`.
+
+Verified with the fix reverted: `Message must not be available one second before 2026-03-29T12:00:00+02:00`. Messenger is green at 777 tests.

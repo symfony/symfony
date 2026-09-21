@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\InMemory;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -26,6 +27,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class InMemoryTransportTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     private InMemoryTransport $transport;
 
     private InMemoryTransport $serializeTransport;
@@ -101,6 +104,35 @@ class InMemoryTransportTest extends TestCase
 
         $clock->sleep(0.5);
         $this->assertSame([$envelope], $transport->get());
+    }
+
+    public function testQueueWithDelayAcrossDstTransition()
+    {
+        // spring forward, fall back, and a day without a transition
+        $this->assertDelayIsHonored('2026-03-28 12:00:00', '2026-03-29 12:00:00');
+        $this->assertDelayIsHonored('2026-10-24 12:00:00', '2026-10-25 12:00:00');
+        $this->assertDelayIsHonored('2026-06-01 12:00:00', '2026-06-02 12:00:00');
+    }
+
+    private function assertDelayIsHonored(string $now, string $target): void
+    {
+        $tz = new \DateTimeZone('Europe/Prague');
+        $now = new \DateTimeImmutable($now, $tz);
+        $target = new \DateTimeImmutable($target, $tz);
+
+        // the delay is given in milliseconds rather than through DelayStamp::delayUntil(),
+        // which reads the real clock on this branch
+        $delay = ($target->getTimestamp() - $now->getTimestamp()) * 1000;
+
+        $clock = self::mockTime($now);
+        $transport = new InMemoryTransport(clock: $clock);
+        $envelope = $transport->send((new Envelope(new \stdClass()))->with(new DelayStamp($delay)));
+
+        $clock->sleep($delay / 1000 - 1);
+        $this->assertSame([], $transport->get(), \sprintf('Message must not be available one second before %s.', $target->format('c')));
+
+        $clock->sleep(2);
+        $this->assertSame([$envelope], $transport->get(), \sprintf('Message must be available one second after %s.', $target->format('c')));
     }
 
     public function testQueueWithSerialization()

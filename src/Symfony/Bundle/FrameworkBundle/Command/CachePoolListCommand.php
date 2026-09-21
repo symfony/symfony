@@ -16,3 +16,12 @@ use Symfony\Component\Cache\Command\CachePoolListCommand as BaseCachePoolListCom
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand', BaseCachePoolListCommand::class);
 
 class_alias(BaseCachePoolListCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Cache\Command\CachePoolListCommand instead
+     */
+    class CachePoolListCommand
+    {
+    }
+}

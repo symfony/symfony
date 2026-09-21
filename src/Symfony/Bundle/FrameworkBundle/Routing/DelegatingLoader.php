@@ -16,3 +16,12 @@ use Symfony\Component\Routing\Loader\DelegatingLoader as BaseDelegatingLoader;
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader', BaseDelegatingLoader::class);
 
 class_alias(BaseDelegatingLoader::class, 'Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Routing\Loader\DelegatingLoader instead
+     */
+    class DelegatingLoader
+    {
+    }
+}

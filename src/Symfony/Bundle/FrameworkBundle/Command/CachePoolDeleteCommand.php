@@ -16,3 +16,12 @@ use Symfony\Component\Cache\Command\CachePoolDeleteCommand as BaseCachePoolDelet
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand', BaseCachePoolDeleteCommand::class);
 
 class_alias(BaseCachePoolDeleteCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Cache\Command\CachePoolDeleteCommand instead
+     */
+    class CachePoolDeleteCommand
+    {
+    }
+}

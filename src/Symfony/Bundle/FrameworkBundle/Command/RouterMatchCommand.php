@@ -16,3 +16,12 @@ use Symfony\Component\Routing\Command\RouterMatchCommand as BaseRouterMatchComma
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand', BaseRouterMatchCommand::class);
 
 class_alias(BaseRouterMatchCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Routing\Command\RouterMatchCommand instead
+     */
+    class RouterMatchCommand
+    {
+    }
+}

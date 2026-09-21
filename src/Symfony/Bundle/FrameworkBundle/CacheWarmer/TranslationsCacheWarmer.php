@@ -16,3 +16,12 @@ use Symfony\Component\Translation\CacheWarmer\TranslationsCacheWarmer as BaseTra
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer', BaseTranslationsCacheWarmer::class);
 
 class_alias(BaseTranslationsCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Translation\CacheWarmer\TranslationsCacheWarmer instead
+     */
+    class TranslationsCacheWarmer
+    {
+    }
+}

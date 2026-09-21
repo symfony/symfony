@@ -16,3 +16,12 @@ use Symfony\Component\Translation\DependencyInjection\TranslationLintCommandPass
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationLintCommandPass', BaseTranslationLintCommandPass::class);
 
 class_alias(BaseTranslationLintCommandPass::class, 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationLintCommandPass');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Translation\DependencyInjection\TranslationLintCommandPass instead
+     */
+    class TranslationLintCommandPass
+    {
+    }
+}

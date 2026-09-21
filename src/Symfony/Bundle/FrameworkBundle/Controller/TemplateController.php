@@ -16,3 +16,12 @@ use Symfony\Bundle\TwigBundle\Controller\TemplateController as BaseTemplateContr
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController', BaseTemplateController::class);
 
 class_alias(BaseTemplateController::class, 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Bundle\TwigBundle\Controller\TemplateController instead
+     */
+    class TemplateController
+    {
+    }
+}

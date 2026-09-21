@@ -16,3 +16,12 @@ use Symfony\Component\Cache\CacheWarmer\CachePoolClearerCacheWarmer as BaseCache
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\CachePoolClearerCacheWarmer', BaseCachePoolClearerCacheWarmer::class);
 
 class_alias(BaseCachePoolClearerCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\CachePoolClearerCacheWarmer');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Cache\CacheWarmer\CachePoolClearerCacheWarmer instead
+     */
+    class CachePoolClearerCacheWarmer
+    {
+    }
+}

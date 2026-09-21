@@ -16,3 +16,12 @@ use Symfony\Component\Validator\DependencyInjection\AddValidatorSecurityExpressi
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass', BaseAddValidatorSecurityExpressionLanguageProviderPass::class);
 
 class_alias(BaseAddValidatorSecurityExpressionLanguageProviderPass::class, 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Validator\DependencyInjection\AddValidatorSecurityExpressionLanguageProviderPass instead
+     */
+    class AddValidatorSecurityExpressionLanguageProviderPass
+    {
+    }
+}

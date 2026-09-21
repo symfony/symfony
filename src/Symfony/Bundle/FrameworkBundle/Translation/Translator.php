@@ -16,3 +16,12 @@ use Symfony\Component\Translation\DependencyInjection\Translator as BaseTranslat
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Translation\Translator', BaseTranslator::class);
 
 class_alias(BaseTranslator::class, 'Symfony\Bundle\FrameworkBundle\Translation\Translator');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Translation\DependencyInjection\Translator instead
+     */
+    class Translator
+    {
+    }
+}

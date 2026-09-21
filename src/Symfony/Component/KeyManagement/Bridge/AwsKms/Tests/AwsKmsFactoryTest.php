@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\AwsKms\Tests;
 
+use AsyncAws\Core\AbstractApi;
 use AsyncAws\Kms\KmsClient;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKms;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory;
 use Symfony\Component\KeyManagement\Dsn;
@@ -119,6 +121,17 @@ class AwsKmsFactoryTest extends TestCase
     {
         $this->expectException(UnsupportedSchemeException::class);
         (new AwsKmsFactory())->create(Dsn::fromString('hashicorp-vault-transit://t@vault.local/v1/'));
+    }
+
+    public function testTheGivenHttpClientIsHandedToTheAwsClient()
+    {
+        $client = new MockHttpClient();
+
+        $kms = (new AwsKmsFactory($client))->create(Dsn::fromString('aws-kms://default?region=eu-west-1'));
+
+        $httpClient = (new \ReflectionClass(AbstractApi::class))->getProperty('httpClient');
+
+        $this->assertSame($client, $httpClient->getValue(self::getKmsClient($kms)));
     }
 
     private static function getKmsClient(AwsKms $kms): KmsClient

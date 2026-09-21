@@ -215,4 +215,16 @@ class MermaidDumperTest extends TestCase
             .'transition1-->place2',
         ];
     }
+
+    public function testLabelCannotEndItsOwnNode()
+    {
+        $definition = new Definition(
+            ['start', 'a#quot;]-->EVIL[x'],
+            [new Transition('go', 'start', 'a#quot;]-->EVIL[x')]
+        );
+
+        $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_STATEMACHINE);
+
+        $this->assertStringContainsString('place1(("a#35;quot;]-->EVIL[x"))', $dumper->dump($definition));
+    }
 }

@@ -121,6 +121,12 @@ interface HttpClientInterface
 
     /**
      * Returns a new instance of the client with new default options.
+     *
+     * As for request(), implementations are not required to support all options described above,
+     * and they MUST throw a TransportExceptionInterface when an unsupported option is passed, so
+     * that a caller can tell an option a client ignores from one it does not know.
+     *
+     * @throws TransportExceptionInterface When an unsupported option is passed
      */
     public function withOptions(array $options): static;
 }

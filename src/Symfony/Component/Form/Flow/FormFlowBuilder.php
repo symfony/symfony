@@ -111,7 +111,9 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
             return $defaultStep;
         }
 
-        return (string) $this->stepAccessor->getStep($this->initialOptions['data'], $defaultStep);
+        $initialStep = (string) $this->stepAccessor->getStep($this->initialOptions['data'], $defaultStep);
+
+        return $this->hasStep($initialStep) ? $initialStep : $defaultStep;
     }
 
     public function getInitialOptions(): array
@@ -204,13 +206,13 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
 
         uasort($this->steps, static fn (StepFlowBuilderConfigInterface $a, StepFlowBuilderConfigInterface $b) => $b->getPriority() <=> $a->getPriority());
 
-        $currentStep = $this->resolveCurrentStep();
-
-        if (!isset($this->steps[$currentStep])) {
-            throw new InvalidArgumentException(\sprintf('Step form "%s" is not defined.', $currentStep));
+        if (null === $this->getData()) {
+            $this->setData($this->createEmptyData());
         }
 
-        $step = $this->steps[$currentStep];
+        $currentStep = $this->resolveCurrentStep();
+
+        $step = $this->getStep($currentStep);
         $this->add($step->getName(), $step->getType(), $step->getOptions());
 
         $cursor = new FormFlowCursor(array_keys($this->steps), $currentStep);
@@ -219,11 +221,36 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
         return new FormFlow($this->getFormConfig(), $cursor);
     }
 
+    /**
+     * Creates the data of the flow when none was passed.
+     *
+     * A regular form creates its data lazily from the "empty_data" option on
+     * submission, but a flow needs it before that to resolve the current step.
+     */
+    private function createEmptyData(): object|array
+    {
+        $emptyData = $this->getEmptyData();
+
+        if ($emptyData instanceof \Closure) {
+            // The closure expects the form it creates the data for, use a provisional flow built from the same config
+            $emptyData = $emptyData(new FormFlow($this->getFormConfig(), new FormFlowCursor(array_keys($this->steps), (string) key($this->steps))), null);
+        } elseif (\is_object($emptyData)) {
+            $emptyData = clone $emptyData;
+        }
+
+        if (\is_object($emptyData) || \is_array($emptyData)) {
+            return $emptyData;
+        }
+
+        return null !== ($dataClass = $this->getDataClass()) ? new $dataClass() : [];
+    }
+
     private function resolveCurrentStep(): string
     {
         $data = $this->getData();
 
-        if (!$currentStep = $this->getStepAccessor()->getStep($data)) {
+        // fall back to the first step when no step is stored yet or when the stored one no longer exists
+        if (!($currentStep = $this->getStepAccessor()->getStep($data)) || !$this->hasStep($currentStep)) {
             $currentStep = key($this->steps);
             $this->getStepAccessor()->setStep($data, $currentStep);
             $this->setData($data);

@@ -109,6 +109,10 @@ class MessengerBundle extends AbstractBundle
                         ->arrayNode('symfony_serializer')
                             ->addDefaultsIfNotSet()
                             ->children()
+                                ->scalarNode('service')
+                                    ->info('Service id of the Symfony serializer behind the messenger.transport.symfony_serializer service, e.g. "serializer.api" for the named serializer "api".')
+                                    ->defaultNull()
+                                ->end()
                                 ->scalarNode('format')->defaultValue('json')->info('Serialization format for the messenger.transport.symfony_serializer service (which is not the serializer used by default).')->end()
                                 ->arrayNode('context')
                                     ->normalizeKeys(false)
@@ -431,6 +435,7 @@ class MessengerBundle extends AbstractBundle
             $container->removeAlias(SerializerInterface::class);
         } else {
             $container->getDefinition('messenger.transport.symfony_serializer')
+                ->replaceArgument(0, new Reference($config['serializer']['symfony_serializer']['service'] ?? 'serializer'))
                 ->replaceArgument(1, $config['serializer']['symfony_serializer']['format'])
                 ->replaceArgument(2, $config['serializer']['symfony_serializer']['context']);
             $container->setAlias('messenger.default_serializer', $config['serializer']['default_serializer']);

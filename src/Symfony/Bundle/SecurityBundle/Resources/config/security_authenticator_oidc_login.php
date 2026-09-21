@@ -12,12 +12,14 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Jose\Component\Core\JWK;
+use Symfony\Bundle\SecurityBundle\Controller\OidcLoginBackChannelLogoutController;
 use Symfony\Bundle\SecurityBundle\Controller\OidcLoginStartController;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcTokenRefresher;
 use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
+use Symfony\Component\Security\Http\EventListener\OidcBackChannelLogoutListener;
 use Symfony\Component\Security\Http\EventListener\OidcEndSessionListener;
 use Symfony\Component\Security\Http\Firewall\OidcTokenRefreshListener;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretBasic;
@@ -25,7 +27,10 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
+use Symfony\Component\Security\Http\Oidc\OidcBackChannelLogout;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\Oidc\OidcEndedSessions;
+use Symfony\Component\Security\Http\Oidc\OidcLogoutToken;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -139,6 +144,46 @@ return static function (ContainerConfigurator $container) {
             ->public()
             ->args([
                 service_locator([]),
+            ])
+
+        // the target of the routes declared for the "backchannel_logout.path" of each
+        // oidc_login firewall; public, as the routes reference it by id as their controller
+        ->set('security.authenticator.oidc_login.backchannel_logout_controller', OidcLoginBackChannelLogoutController::class)
+            ->public()
+            ->args([
+                service_locator([]),
+            ])
+
+        ->set('security.authenticator.oidc_login.backchannel_logout', OidcBackChannelLogout::class)
+            ->abstract()
+            ->args([
+                abstract_arg('signature verifier'),
+                abstract_arg('logout token'),
+                abstract_arg('OIDC discovery'),
+                abstract_arg('client ID'),
+                abstract_arg('ended sessions'),
+                service('logger')->nullOnInvalid(),
+            ])
+            ->tag('monolog.logger', ['channel' => 'security'])
+
+        ->set('security.authenticator.oidc_login.logout_token', OidcLogoutToken::class)
+            ->abstract()
+            ->args([
+                service('clock'),
+                abstract_arg('allowed time drift'),
+            ])
+
+        ->set('security.authenticator.oidc_login.ended_sessions', OidcEndedSessions::class)
+            ->abstract()
+            ->args([
+                abstract_arg('cache pool'),
+                abstract_arg('firewall name'),
+            ])
+
+        ->set('security.authenticator.oidc_login.backchannel_logout_listener', OidcBackChannelLogoutListener::class)
+            ->abstract()
+            ->args([
+                abstract_arg('ended sessions'),
             ])
 
         ->set('security.authenticator.oidc_login.token_refresher', OidcTokenRefresher::class)

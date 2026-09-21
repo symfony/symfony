@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `backchannel_logout` option of the `oidc_login` firewall, which declares a route where the provider posts its logout tokens (OpenID Connect Back-Channel Logout 1.0) and refuses the logins the sessions they name opened
  * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session
  * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which now takes the logout URL generator there
  * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service used when `IS_AUTHENTICATED_RECENTLY` is denied

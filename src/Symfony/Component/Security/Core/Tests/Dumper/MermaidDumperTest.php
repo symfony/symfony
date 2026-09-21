@@ -128,4 +128,24 @@ class MermaidDumperTest extends TestCase
         $this->assertStringContainsString('ROLE_USER_SPECIAL', $output);
         $this->assertStringContainsString('ROLE_ADMIN_TEST --> ROLE_USER_SPECIAL', $output);
     }
+
+    public function testEscapedRoleNamesKeepTheirOriginalNameAsLabel()
+    {
+        $roleHierarchy = new RoleHierarchy([
+            'ROLE_*' => ['ROLE_USER'],
+            'ROLE_BLOG_*' => ['ROLE_BLOG_READER'],
+        ]);
+
+        $output = (new MermaidDumper())->dump($roleHierarchy);
+
+        $this->assertSame(<<<'MERMAID'
+            graph TB
+                ROLE__["ROLE_*"]
+                ROLE_USER
+                ROLE_BLOG__["ROLE_BLOG_*"]
+                ROLE_BLOG_READER
+                ROLE__ --> ROLE_USER
+                ROLE_BLOG__ --> ROLE_BLOG_READER
+            MERMAID, $output);
+    }
 }

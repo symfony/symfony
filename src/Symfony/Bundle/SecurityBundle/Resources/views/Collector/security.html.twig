@@ -80,6 +80,50 @@
         #collector-content .authenticators .badge.badge-not_resolved {
             background-color: var(--yellow-500);
         }
+
+        #collector-content .roles-diagram {
+            position: relative;
+        }
+        #collector-content .roles-diagram .sf-mermaid {
+            margin: 0;
+        }
+        #collector-content .roles-diagram .btn-zoom {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+        #roles-diagram-dialog {
+            background: var(--page-background);
+            border: 1px solid var(--table-border-color);
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            box-sizing: border-box;
+            height: calc(100vh - 40px);
+            max-height: none;
+            max-width: none;
+            overflow: hidden;
+            padding: 0;
+            width: calc(100vw - 40px);
+        }
+        #roles-diagram-dialog::backdrop {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        #roles-diagram-dialog .dialog-content {
+            box-sizing: border-box;
+            display: flex;
+            height: 100%;
+            overflow: auto;
+            padding: 20px;
+        }
+        #roles-diagram-dialog .dialog-content svg {
+            flex-shrink: 0;
+            margin: auto;
+        }
+        #roles-diagram-dialog .btn-close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
     </style>
 {% endblock %}
 
@@ -333,11 +377,40 @@
                                             tertiaryColor: isDarkMode ? 'lightSalmon' : 'lightSalmon',
                                         }
                                     });
+                                    // Mermaid cannot compute the size of the diagram while its tab is hidden,
+                                    // so the diagram is rendered only when the tab is displayed
                                     document.addEventListener('DOMContentLoaded', () => {
                                         const mEl = document.querySelector('.sf-mermaid');
-                                        mermaid.run({
-                                            nodes: [mEl],
+                                        const tab = mEl.closest('.tab');
+                                        const observer = new MutationObserver(() => {
+                                            if (!tab.classList.contains('block') || mEl.dataset.processed) {
+                                                return;
+                                            }
+                                            mermaid.run({
+                                                nodes: [mEl],
+                                            });
                                         });
+                                        observer.observe(tab, { attributeFilter: ['class'] });
+
+                                        const dialog = document.getElementById('roles-diagram-dialog');
+                                        document.querySelector('.roles-diagram .btn-zoom').addEventListener('click', () => {
+                                            const diagram = mEl.querySelector('svg');
+                                            if (!diagram) {
+                                                return;
+                                            }
+
+                                            // the inline diagram is scaled down to fit the panel; the dialog shows it at its natural size
+                                            const fullSizeDiagram = diagram.cloneNode(true);
+                                            const [, , width, height] = diagram.getAttribute('viewBox').split(' ');
+                                            fullSizeDiagram.style.maxWidth = 'none';
+                                            fullSizeDiagram.setAttribute('width', width);
+                                            fullSizeDiagram.setAttribute('height', height);
+
+                                            dialog.querySelector('.dialog-content').replaceChildren(fullSizeDiagram);
+                                            dialog.showModal();
+                                        });
+                                        dialog.querySelector('.btn-close').addEventListener('click', () => dialog.close());
+                                        dialog.addEventListener('click', (e) => e.target === dialog && dialog.close());
                                     });
                                 </script>
                                 <tr>
@@ -347,9 +420,21 @@
                                 <tr>
                                     <th>Available Roles</th>
                                     <td>
-                                        <pre class="sf-mermaid">
-                                            {{ collector.rolesDiagram|raw }}
-                                        </pre>
+                                        <div class="roles-diagram">
+                                            <button type="button" class="btn btn-sm btn-zoom" title="View the diagram in full size">
+                                                {{ source('@WebProfiler/Icon/search.svg') }}
+                                            </button>
+                                            <pre class="sf-mermaid">
+                                                {{ collector.rolesDiagram|raw }}
+                                            </pre>
+                                        </div>
+
+                                        <dialog id="roles-diagram-dialog" aria-label="Role hierarchy diagram">
+                                            <button type="button" class="btn btn-sm btn-close" title="Close">
+                                                {{ source('@WebProfiler/Icon/close.svg') }}
+                                            </button>
+                                            <div class="dialog-content"></div>
+                                        </dialog>
                                     </td>
                                 </tr>
                                 {% endif %}

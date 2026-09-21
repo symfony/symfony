@@ -795,6 +795,57 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() does not load request.xml when no request formats are defined');
     }
 
+    public function testRequestAndResponseSerializersDefaultToTheSerializerService()
+    {
+        $container = $this->createContainerFromFile('default_config', [], true, false);
+        $container->register('serializer');
+        $container->compile();
+
+        $this->assertEquals(new Reference('serializer'), $container->getDefinition('argument_resolver.request_payload')->getArgument(0));
+        $this->assertEquals(new Reference('serializer', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
+    }
+
+    public function testRequestAndResponseSerializers()
+    {
+        $container = $this->createContainerFromFile('request_response_serializer', [], true, false);
+        $container->register('serializer');
+        $container->compile();
+
+        $this->assertEquals(new Reference('serializer.request'), $container->getDefinition('argument_resolver.request_payload')->getArgument(0));
+        $this->assertEquals(new Reference('serializer.response'), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
+    }
+
+    public function testEmptySerializerIdsAreNotIgnored()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'request' => ['serializer' => ''],
+                'response' => ['serializer' => ''],
+            ]);
+        }, [], false);
+        $container->register('serializer');
+        $container->compile();
+
+        $this->assertEquals(new Reference(''), $container->getDefinition('argument_resolver.request_payload')->getArgument(0));
+        $this->assertEquals(new Reference(''), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
+    }
+
+    public function testRequestSerializerWithoutTheSerializerService()
+    {
+        $container = $this->createContainerFromFile('request_serializer_without_serializer', [], true, false);
+        $container->register('app.serializer');
+        $container->compile();
+
+        $resolver = $container->getDefinition('argument_resolver.request_payload');
+        $this->assertFalse($container->has('serializer'));
+        $this->assertFalse($resolver->hasErrors());
+        $this->assertTrue($resolver->hasTag('kernel.event_subscriber'));
+        $this->assertEquals(new Reference('app.serializer'), $resolver->getArgument(0));
+    }
+
     public function testFormDataClassAttributeAutoconfiguration()
     {
         $container = $this->createContainerFromFile('full', [], true, false);

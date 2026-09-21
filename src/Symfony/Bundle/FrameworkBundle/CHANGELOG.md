@@ -68,6 +68,7 @@ CHANGELOG
  * Instantiate on the console only the bundles that override the deprecated `Bundle::registerCommands()` method
  * Add `MessengerAssertionsTrait` to `KernelTestCase`, with `assertQueuedMessageCount()`, `getQueuedMessages()`, `getMessengerTransport()` and `consumeQueuedMessages()` for in-memory Messenger transports
  * Don't use the secrets vault as an env var loader when its directory is in the project but does not exist at build time
+ * Add the `framework.request.serializer` and `framework.response.serializer` options
 
 8.1
 ---

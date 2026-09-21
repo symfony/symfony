@@ -29,3 +29,7 @@ serialize_controller_result:
 serialize_controller_result_with_format:
     path: /serialize-controller-result.{_format}
     controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAttributeController
+
+map_request_payload_and_serialize_controller_result:
+    path: /map-request-payload-and-serialize-controller-result
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadAndSerializeAttributesController

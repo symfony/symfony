@@ -311,6 +311,10 @@ class ConfigurationTest extends TestCase
             'request' => [
                 'enabled' => false,
                 'formats' => [],
+                'serializer' => null,
+            ],
+            'response' => [
+                'serializer' => null,
             ],
             'php_errors' => [
                 'log' => true,

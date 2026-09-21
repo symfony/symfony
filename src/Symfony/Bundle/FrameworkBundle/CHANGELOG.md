@@ -67,6 +67,7 @@ CHANGELOG
  * Add `framework.property_access.wildcard_reads` option to read every element of a collection through a `[*]` path
  * Instantiate on the console only the bundles that override the deprecated `Bundle::registerCommands()` method
  * Add `MessengerAssertionsTrait` to `KernelTestCase`, with `assertQueuedMessageCount()`, `getQueuedMessages()`, `getMessengerTransport()` and `consumeQueuedMessages()` for in-memory Messenger transports
+ * Add the `framework.request.serializer` and `framework.response.serializer` options to choose the serializer service, e.g. a named one, behind `#[MapRequestPayload]`, `#[MapQueryString]` and `#[Serialize]`
 
 8.1
 ---

@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-20T20:07:49Z
+
+Good point, this is now async-aws/aws#2139: the wrapper moves out of the `isset()` branch so it applies to a given client too, with the error factory and the logger of the client it belongs to, which is what I could not reach from here.
+
+I dropped the retry part of this PR, so it is back to just the `$client` argument on `AwsKmsFactory`. SES, SQS, SNS and DynamoDb need no change then, they get the policy back through async-aws.
+
+You were right about the options not matching, by the way. The five scalar arguments were the constructor defaults, but I passed `ChainAwsErrorFactory` instead of the client's own, and I dropped the logger entirely, so retries were silent.

@@ -481,6 +481,60 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertSame('test@example.com', $userProvider->claims['email']);
     }
 
+    public function testAuthenticateReadsAResponsePostedByTheProvider()
+    {
+        // OAuth 2.0 Form Post Response Mode: the provider answers with a page that submits
+        // the authorization response to the "check_path", so the parameters arrive in the
+        // body of a POST instead of the query string
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->expects($this->once())
+            ->method('exchangeCode')
+            ->willReturn(['access_token' => 'access-123', 'id_token' => $this->buildIdToken(['nonce' => $nonce])]);
+        $this->oidcClient->expects($this->once())
+            ->method('fetchUserInfo')
+            ->willReturn(['sub' => 'user-42']);
+
+        $passport = $this->createAuthenticator()->authenticate($this->createPostedCallbackRequest($state, $nonce, ['iss' => 'https://provider.example.com']));
+
+        $this->assertSame('user-42', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+    }
+
+    public function testAuthenticateReadsNothingFromTheQueryStringOfAPostedResponse()
+    {
+        // the response is the one the provider posted: a query string added to the action
+        // of the form is not another half of it
+        $state = bin2hex(random_bytes(16));
+
+        $request = $this->createPostedCallbackRequest($state, bin2hex(random_bytes(16)));
+        $request->query->set('state', $state);
+        $request->query->set('iss', 'https://attacker.example.com');
+        $request->request->remove('state');
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Invalid OIDC state');
+
+        $this->createAuthenticator()->authenticate($request);
+    }
+
+    public function testAuthenticateReportsAnErrorPostedByTheProvider()
+    {
+        // an error response travels in the response mode that was asked for too
+        // (OIDC Core 1.0, Section 3.1.2.6)
+        $state = bin2hex(random_bytes(16));
+
+        $request = $this->createPostedCallbackRequest($state, bin2hex(random_bytes(16)));
+        $request->request->remove('code');
+        $request->request->set('error', 'access_denied');
+        $request->request->set('error_description', 'User denied access');
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('OIDC provider returned an error: "User denied access"');
+
+        $this->createAuthenticator()->authenticate($request);
+    }
+
     public function testAuthenticateWithInvalidState()
     {
         $authenticator = $this->createAuthenticator();
@@ -1841,6 +1895,25 @@ class OidcLoginAuthenticatorTest extends TestCase
         $session->set($prefix.'attempt.'.$state, [
             'nonce' => $nonce,
             'code_verifier' => $codeVerifier ?? bin2hex(random_bytes(32)),
+            'redirect_uri' => 'http://localhost/oidc/callback',
+        ]);
+
+        return $request;
+    }
+
+    /**
+     * The same callback, posted by the self-submitting page of the "form_post" response
+     * mode instead of being followed as a redirect.
+     */
+    private function createPostedCallbackRequest(string $state, string $nonce, array $extraParameters = []): Request
+    {
+        $request = Request::create('/oidc/callback', 'POST', ['code' => 'auth-code', 'state' => $state] + $extraParameters);
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $session->set('_security.oidc_login.main.attempt.'.$state, [
+            'nonce' => $nonce,
+            'code_verifier' => bin2hex(random_bytes(32)),
             'redirect_uri' => 'http://localhost/oidc/callback',
         ]);
 

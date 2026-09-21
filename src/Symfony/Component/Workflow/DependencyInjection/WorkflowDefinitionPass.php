@@ -25,6 +25,7 @@ use Symfony\Component\Workflow\DependencyInjection\Configuration\WorkflowConfig;
 use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 use Symfony\Component\Workflow\WeightedPlace;
 use Symfony\Component\Workflow\WorkflowEvents;
+use Symfony\Component\Workflow\WorkflowType;
 
 /**
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
@@ -182,7 +183,7 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
                 throw new LogicException(\sprintf('Transition "%s" on enum "%s" must declare at least one "from" place.', $transition->name, $enumName));
             }
 
-            $transitions[] = $this->normalizeTransition($transition, $from, $enum, $placeNames);
+            $transitions[] = $this->normalizeTransition($transition, $from, $enum, $placeNames, $attribute->type);
         }
 
         foreach ($enum->getCases() as $case) {
@@ -192,7 +193,7 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
                     throw new LogicException(\sprintf('Transition "%s" on case "%s::%s" must not declare "from"; the case is the inferred source place.', $transition->name, $enumName, $case->getName()));
                 }
 
-                $transitions[] = $this->normalizeTransition($transition, $case->getValue(), $enum, $placeNames);
+                $transitions[] = $this->normalizeTransition($transition, $case->getValue(), $enum, $placeNames, $attribute->type);
             }
         }
 
@@ -241,7 +242,7 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
      * @param \UnitEnum|WeightedPlace|list<\UnitEnum|WeightedPlace> $from
      * @param array<string, true>                                   $places
      */
-    private function normalizeTransition(Transition $transition, \UnitEnum|WeightedPlace|array $from, \ReflectionEnum $enum, array $places): TransitionConfig
+    private function normalizeTransition(Transition $transition, \UnitEnum|WeightedPlace|array $from, \ReflectionEnum $enum, array $places, WorkflowType $type): TransitionConfig
     {
         if ('' === $transition->name) {
             throw new LogicException(\sprintf('Transition name cannot be empty on workflow definition enum "%s".', $enum->getName()));
@@ -250,10 +251,21 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
             throw new LogicException(\sprintf('Guard expression for transition "%s" cannot be empty on workflow definition enum "%s".', $transition->name, $enum->getName()));
         }
 
+        $from = $this->normalizeArcs($from, $enum, $places, $transition->name, 'from');
+        $to = $this->normalizeArcs($transition->to, $enum, $places, $transition->name, 'to');
+
+        if (WorkflowType::StateMachine === $type) {
+            foreach (['from' => $from, 'to' => $to] as $direction => $arcs) {
+                if (1 < \count($arcs)) {
+                    throw new LogicException(\sprintf('State machine transition "%s" on enum "%s" cannot have more than one "%s" place; use repeated #[Transition] attributes to define separate transitions.', $transition->name, $enum->getName(), $direction));
+                }
+            }
+        }
+
         return new TransitionConfig(
             $transition->name,
-            $this->normalizeArcs($from, $enum, $places, $transition->name, 'from'),
-            $this->normalizeArcs($transition->to, $enum, $places, $transition->name, 'to'),
+            $from,
+            $to,
             $transition->guard,
             $transition->metadata,
         );

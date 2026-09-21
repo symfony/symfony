@@ -110,7 +110,7 @@ final class WorkflowDefinitionPassTest extends TestCase
         $this->assertTrue(DefinitionValidator::$called);
     }
 
-    public function testRegistersAStateMachineFromAUnitEnum()
+    public function testRegistersAStateMachineFromAUnitEnumWithRepeatedTransitionAttributes()
     {
         $container = $this->createContainer([PostStateDefinition::class]);
         $container->compile();
@@ -330,7 +330,7 @@ final class WorkflowDefinitionPassTest extends TestCase
 
     public static function provideExpandedTransitionServiceIds(): iterable
     {
-        yield 'state machine Cartesian product' => [PostStateDefinition::class, 'post', '.state_machine.post.transition.1'];
+        yield 'state machine repeated attribute' => [PostStateDefinition::class, 'post', '.state_machine.post.transition.1'];
         yield 'workflow transition list' => [ArticleWorkflowDefinition::class, 'article', '.workflow.article.transition.2'];
     }
 
@@ -493,6 +493,8 @@ final class WorkflowDefinitionPassTest extends TestCase
         yield 'missing validator' => [MissingValidatorDefinition::class, 'The validation class "Missing\\DefinitionValidator"'];
         yield 'validator with required constructor argument' => [RequiredConstructorValidatorDefinition::class, 'must have a constructor without required arguments'];
         yield 'place attribute on ordinary enum constant' => [PlaceAttributeOnConstantDefinition::class, 'must be an enum case'];
+        yield 'multiple state machine sources' => [MultipleSourceStateMachineDefinition::class, 'State machine transition "go" on enum "Symfony\\Component\\Workflow\\Tests\\DependencyInjection\\MultipleSourceStateMachineDefinition" cannot have more than one "from" place; use repeated #[Transition] attributes to define separate transitions.'];
+        yield 'multiple state machine destinations' => [MultipleDestinationStateMachineDefinition::class, 'State machine transition "go" on enum "Symfony\\Component\\Workflow\\Tests\\DependencyInjection\\MultipleDestinationStateMachineDefinition" cannot have more than one "to" place; use repeated #[Transition] attributes to define separate transitions.'];
     }
 
     /**
@@ -572,7 +574,8 @@ enum ArticleWorkflowDefinition: string
 }
 
 #[AsWorkflowDefinition(name: 'post', supports: [\stdClass::class], initialMarking: self::Draft)]
-#[Transition(name: 'publish', from: [self::Draft, self::Reviewed], to: self::Published)]
+#[Transition(name: 'publish', from: self::Draft, to: self::Published)]
+#[Transition(name: 'publish', from: self::Reviewed, to: self::Published)]
 enum PostStateDefinition
 {
     #[Transition(name: 'review', to: self::Reviewed)]
@@ -906,6 +909,24 @@ enum PlaceAttributeOnConstantDefinition
 
     #[Place]
     public const INVALID = 'invalid';
+}
+
+#[AsWorkflowDefinition(name: 'multiple_source', supports: [\stdClass::class])]
+#[Transition(name: 'go', from: [self::A, self::B], to: self::C)]
+enum MultipleSourceStateMachineDefinition
+{
+    case A;
+    case B;
+    case C;
+}
+
+#[AsWorkflowDefinition(name: 'multiple_destination', supports: [\stdClass::class])]
+enum MultipleDestinationStateMachineDefinition
+{
+    #[Transition(name: 'go', to: [self::B, self::C])]
+    case A;
+    case B;
+    case C;
 }
 
 interface SupportedSubjectInterface

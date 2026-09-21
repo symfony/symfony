@@ -90,7 +90,8 @@ class MermaidDumper
             return $id;
         }
 
-        return \sprintf('%s["%s"]', $id, str_replace('"', '#quot;', $role));
+        // "#" goes first so that the entity inserted after it is not escaped again
+        return \sprintf('%s["%s"]', $id, str_replace(['#', '"'], ['#35;', '#quot;'], $role));
     }
 
     /**

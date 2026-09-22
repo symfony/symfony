@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by wimwinterberg at 2026-09-22T14:40:07Z
+
+The failing **Fabbot / Checks** run is a `codespell` false positive, unrelated to this change: it flags the pre-existing `Schema::hasTable()` calls in `Connection.php` (line 350) and `ConnectionTest.php` (lines 701, 727) as a typo for `hashtable`, which is not a real method and would break the code if applied.
+
+This is a known issue that's already fixed on newer branches via `.codespellrc` (`ignore-words-list = smove,hastable`), present on `7.4`, `8.1` and `8.2` — but that file was never backported to `6.4`, so any PR touching a file with `hasTable()` on this branch hits it. All substantive checks (Unit Tests on PHP 8.1–8.6, PHPStan, Psalm, Hardening tests, Verify Packages) pass; only this lint false positive is red.
+
+Happy to add `.codespellrc` to `6.4` in this PR (or a separate tiny PR) if that's preferred — let me know.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-22T18:33:00Z
+
+Thanks @wimwinterberg, your analysis made this easy to check.
+
+Rounding the delay up isn't enough though: the column drops the fractional part of `$now` too, so `floor(now + ceil(delay))` can still land before `now + delay` - on the retry case from your description, 25% of the retries still fired within 500ms. I rounded the resulting instant up instead, and reworked the test to assert that property.

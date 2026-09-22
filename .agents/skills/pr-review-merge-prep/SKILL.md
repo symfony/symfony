@@ -61,7 +61,9 @@ description: Principles for rigorously reviewing a pull request and making it me
 
 ## House rules
 
-- Write code comments sparingly, only where they add value the code cannot express. Never reference issues or pull requests in code or tests.
+- Write code comments sparingly, only where they add value the code cannot express. A test method or a test helper carries no docblock and no comment narrating it: its name and its assertions say what it checks. The comment that stays in a test is the one saying why a fixture looks wrong on purpose. Never reference issues or pull requests in code or tests.
+- A prose docblock opens with one line that summarizes, then a blank line, then the details. Before reshaping a comment into that form, ask whether it should exist at all.
+- Do not wrap prose at a column. A line ends where a sentence, a paragraph, a list item or a code sample ends, and a sentence stays on one line unless it runs very long, in which case it breaks where a clause ends: a line break has to mean something, and a column count is not a meaning. The same holds for a `@param` description.
 - Use TDD for every fix: failing test first, implementation second, full suite of the touched component last.
 - No em-dashes, no `Co-Authored-By` trailers, no credit to AI tools anywhere: code, commit messages, PR titles and bodies, review comments, issue comments.
 - Keep a factual tone in everything published: findings and evidence, no self-promotion, no filler.

@@ -144,9 +144,11 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
     }
 
     /**
-     * Vault only honours the `context` parameter on keys created with `derived=true`;
-     * on any other key it silently ignores it, so an AAD mismatch would decrypt fine.
-     * The key configuration is read once per key name and cached for the process.
+     * Checks that a key honours the `context` parameter before AAD is relied on.
+     *
+     * Vault only honours it on keys created with `derived=true`; on any other key it silently
+     * ignores it, so an AAD mismatch would decrypt fine. The key configuration is read once per
+     * key name and cached for the process.
      */
     private function assertAadIsEnforceable(string $keyId, bool $treatClientErrorAsDecryptionFailure): void
     {
@@ -220,9 +222,11 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
     }
 
     /**
-     * Encodes each path segment individually so that nested mount points
-     * (`transit/v2`, `kms/transit`, ...) keep their `/` separators while any
-     * special characters inside a segment are properly percent-encoded.
+     * Encodes each path segment individually.
+     *
+     * Nested mount points (`transit/v2`, `kms/transit`, ...) keep their `/`
+     * separators while any special characters inside a segment are properly
+     * percent-encoded.
      */
     private static function encodePath(string $path): string
     {

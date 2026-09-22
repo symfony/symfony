@@ -76,10 +76,6 @@ class KeyManagementBundleTest extends TestCase
         $this->assertInstanceOf(KeyManagementDataCollector::class, $container->get('test.data_collector'));
     }
 
-    /**
-     * A self-contained envelope read through the stored encrypter goes through the fallback, which
-     * is the default client's envelope encrypter: what the profiler must report is one read.
-     */
     #[RequiresPhpExtension('sodium')]
     public function testAStoredEncrypterReadingASelfContainedEnvelopeIsRecordedOnce()
     {
@@ -103,12 +99,6 @@ class KeyManagementBundleTest extends TestCase
         $this->assertSame(['encrypt' => 1], $services['default']['operations']);
     }
 
-    /**
-     * A composite client, itself tagged, is neither a circular reference nor a tracing loop.
-     *
-     * The whole container is compiled and booted here, which is what proves it: the profiler sees
-     * the composite client and each of its members.
-     */
     #[RequiresPhpExtension('sodium')]
     public function testACompositeClientIsADefaultLikeAnyOtherAndEachMemberIsTraced()
     {
@@ -155,11 +145,6 @@ class KeyManagementBundleTest extends TestCase
         $this->assertContains(KeyManagementPass::class, $this->buildPasses());
     }
 
-    /**
-     * The pass is what makes the storages of league/flysystem-bundle answer to the host of a
-     * "...+fly://" DSN; without it registered, every such DSN names a service the factory has no
-     * way of seeing.
-     */
     public function testTheFlysystemStoragesPassIsRegisteredWhenTheBridgeIsInstalled()
     {
         if (!class_exists(RegisterFlysystemStoragesPass::class)) {
@@ -169,11 +154,6 @@ class KeyManagementBundleTest extends TestCase
         $this->assertContains(RegisterFlysystemStoragesPass::class, $this->buildPasses());
     }
 
-    /**
-     * The pass is what hands the listener the blind indexes of the application; without it
-     * registered, the listener keeps the empty locator the extension gave it and every entity
-     * carrying a "#[BlindIndexed]" property fails on a flush.
-     */
     public function testTheBlindIndexesPassIsRegisteredWhenTheBridgeIsInstalled()
     {
         if (!class_exists(RegisterBlindIndexesPass::class)) {

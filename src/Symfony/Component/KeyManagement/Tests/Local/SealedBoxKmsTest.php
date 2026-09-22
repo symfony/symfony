@@ -49,7 +49,6 @@ class SealedBoxKmsTest extends TestCase
 
         $ciphertext = $writer->encrypt('app', 'committed-secret');
 
-        // Reader (with full keypair) decrypts what the writer (public-only) produced.
         $this->assertSame('committed-secret', $reader->decrypt($ciphertext));
     }
 
@@ -60,7 +59,6 @@ class SealedBoxKmsTest extends TestCase
 
         $ciphertext = $reader->encrypt('app', 'hello');
 
-        // Writer-only deployment cannot decrypt.
         $this->expectException(DecryptionFailedException::class);
         $writer->decrypt($ciphertext);
     }
@@ -146,8 +144,6 @@ class SealedBoxKmsTest extends TestCase
 
     public function testDataKeyGenerationOnEncryptOnlyDeploymentWorks()
     {
-        // The classic envelope-encryption write-only pattern: anyone with the
-        // public key can wrap a fresh DEK; only the keypair holder can unwrap.
         $writer = new SealedBoxKms(new InMemoryKeyLoader(['app' => $this->publicKey]));
 
         $dataKey = $writer->generateDataKey('app', 32);

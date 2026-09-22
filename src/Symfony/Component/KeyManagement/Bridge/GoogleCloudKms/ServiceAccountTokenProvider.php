@@ -21,9 +21,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * Acquires Google Cloud OAuth2 tokens using the `service_account` credentials
- * flow: a JWT is signed with the service account's RSA private key (RS256)
- * and exchanged at the Google token endpoint for an access token.
+ * Acquires Google Cloud OAuth2 tokens using the `service_account` credentials flow.
+ *
+ * A JWT is signed with the service account's RSA private key (RS256) and
+ * exchanged at the Google token endpoint for an access token.
  *
  * The token is cached in memory until 60s before its advertised expiration to
  * give long-running operations a safety margin against clock skew.
@@ -46,8 +47,10 @@ final class ServiceAccountTokenProvider implements TokenProviderInterface
     private const int EXPIRY_SAFETY_MARGIN_SECONDS = 60;
 
     /**
-     * How far in the past the JWT `iat` claim is set, so a local clock slightly
-     * ahead of Google's does not make the assertion "issued in the future".
+     * How far in the past the JWT `iat` claim is set.
+     *
+     * A local clock slightly ahead of Google's then does not make the assertion
+     * "issued in the future".
      */
     private const int IAT_CLOCK_SKEW_SECONDS = 10;
 

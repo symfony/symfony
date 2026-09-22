@@ -20,8 +20,7 @@ use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 
 /**
- * Doctrine DBAL Type that decorates another Type with column-level
- * envelope encryption.
+ * Doctrine DBAL Type that decorates another Type with column-level envelope encryption.
  *
  * The value first goes through the parent Type's `convertToDatabaseValue()`
  * (so any normalization, JSON encoding, datetime formatting, ... applies as

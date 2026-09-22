@@ -35,11 +35,11 @@ trait CommandTrait
     }
 
     /**
-     * Resolves the stream carrying the payload when it is not given as an argument: the stream the
-     * input exposes when it has one (this is what the console testers feed), STDIN otherwise.
+     * Resolves the stream carrying the payload when it is not given as an argument.
      *
-     * Returns null when STDIN is an interactive terminal, where reading would silently block until
-     * the user happens to type an end-of-file.
+     * It is the stream the input exposes when it has one, which is what the console testers feed,
+     * and STDIN otherwise. Null is returned when STDIN is an interactive terminal, where reading
+     * would silently block until the user happens to type an end-of-file.
      *
      * @return resource|null
      */
@@ -53,6 +53,8 @@ trait CommandTrait
     }
 
     /**
+     * Resolves the client to run with, reporting to `$errorIo` when it cannot.
+     *
      * Diagnostics go to `$errorIo` so that they never end up in the payload stream, where a
      * downstream command reading STDIN would happily encrypt the error block.
      *

@@ -46,12 +46,6 @@ class ConfigurationTest extends TestCase
         $this->assertFalse($config['enabled']);
     }
 
-    /**
-     * A composite client is declared where the others are, by its members instead of a DSN.
-     *
-     * The members are a map of member name to the master key it wraps under, null standing for the
-     * key id each call names.
-     */
     public function testAClientCanBeTheMembersOfACompositeOne()
     {
         $config = $this->process(['clients' => [
@@ -88,13 +82,6 @@ class ConfigurationTest extends TestCase
         $this->process(['clients' => ['main' => ['members' => ['main' => null, 'aws' => null]]]]);
     }
 
-    /**
-     * The schema and the array shape say a client is a DSN string or the map of its members.
-     *
-     * The JSON schema is what an IDE validates the YAML files against, and the array shape is what
-     * the config builder is documented with: both say what the normalization accepts, and nothing
-     * else.
-     */
     public function testAClientIsDocumentedAsADsnOrItsMembers()
     {
         $tree = new Configuration(new KeyManagementBundle(), null, 'key_management')->getConfigTreeBuilder()->buildTree();
@@ -114,10 +101,6 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['my-kms', 'Vault'], array_keys($config['clients']));
     }
 
-    /**
-     * A client name becomes a service id and an argument name, so a list of DSNs, whose names are
-     * their positions, is refused where it is written rather than when the container is built.
-     */
     public function testAClientNameMustBeAName()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -163,11 +146,6 @@ class ConfigurationTest extends TestCase
         $this->process(['store' => ['client' => 'app']]);
     }
 
-    /**
-     * The store client is inferred from the default one when the container is built.
-     *
-     * That is where the composite client, if any, is known.
-     */
     public function testTheStoreClientIsOptional()
     {
         $config = $this->process(['store' => ['key_id' => 'alias/app-key']]);

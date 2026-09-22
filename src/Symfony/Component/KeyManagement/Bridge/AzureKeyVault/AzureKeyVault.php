@@ -207,9 +207,11 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
     }
 
     /**
-     * Builds the decrypt/unwrap body, auto-detecting the algorithm from the
-     * AEAD blob prefix when present so that ciphertexts written under a
-     * previous configuration can still be decoded after a config rotation.
+     * Builds the decrypt/unwrap body.
+     *
+     * The algorithm is auto-detected from the AEAD blob prefix when present, so
+     * that ciphertexts written under a previous configuration can still be
+     * decoded after a config rotation.
      *
      * @return array<string, mixed>
      */

@@ -155,8 +155,9 @@ final class RewrapDataKeysCommand
     }
 
     /**
-     * Unwrapping through {@see DataKeyGeneratorInterface::unwrapDataKey()} rather than a bare
-     * `decrypt()` keeps the plaintext inside a {@see DataKey}, which wipes it once re-wrapped.
+     * Unwraps through {@see DataKeyGeneratorInterface::unwrapDataKey()}, not a bare `decrypt()`.
+     *
+     * That keeps the plaintext inside a {@see DataKey}, which wipes it once re-wrapped.
      */
     private function rewrap(StoredDataKey $row, EncrypterInterface $target, string $keyId): Ciphertext
     {

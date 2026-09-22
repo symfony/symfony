@@ -185,10 +185,6 @@ class RewrapDataKeysCommandTest extends TestCase
         $this->assertSame('aws', iterator_to_array($this->store->all(), false)[0]->client);
     }
 
-    /**
-     * The store reads a data key back through the client that wraps it, so a target that can only
-     * encrypt would leave every rewrapped row unreadable.
-     */
     public function testATargetThatCannotUnwrapDataKeysIsRejected()
     {
         $this->store->current('user.email');
@@ -205,10 +201,6 @@ class RewrapDataKeysCommandTest extends TestCase
         $this->assertSame('aws', iterator_to_array($this->store->all(), false)[0]->client);
     }
 
-    /**
-     * Each key passes through the process in plaintext for as long as it takes to re-wrap it, in a
-     * closure whose argument the trace of a failing target would otherwise carry.
-     */
     public function testTheDataKeyDoesNotReachStackTraces()
     {
         $dataKey = $this->store->current('user.email')->use(static fn (string $key): string => $key);
@@ -223,10 +215,6 @@ class RewrapDataKeysCommandTest extends TestCase
         self::assertRedacted($dataKey, $trace);
     }
 
-    /**
-     * The reason the options are declared on the parameters rather than on a mapped input object:
-     * only a parameter can carry suggestions that come from the injected clients.
-     */
     public function testCompletionSuggestsTheRegisteredClients()
     {
         $tester = new CommandCompletionTester(new Command(null, new RewrapDataKeysCommand($this->store, $this->locator())));
@@ -235,10 +223,6 @@ class RewrapDataKeysCommandTest extends TestCase
         $this->assertSame(['aws', 'azure'], $tester->complete(['--from', '']));
     }
 
-    /**
-     * A store backed by a database lists its rows on the same connection the rewrapping writes to,
-     * and some drivers refuse a statement while a result set is still open.
-     */
     public function testNothingIsWrittenWhileTheListingIsStillOpen()
     {
         $this->store->current('user.email');

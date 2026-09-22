@@ -75,9 +75,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame(['encrypt' => 1], $this->gcp->calls);
     }
 
-    /**
-     * What the redundancy is for: a member that no longer answers is invisible on the read path.
-     */
     public function testACiphertextIsReadThroughTheNextMemberWhenTheFirstIsDown()
     {
         $kms = $this->kms();
@@ -91,12 +88,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame(['encrypt' => 1, 'decrypt' => 1], $this->gcp->calls);
     }
 
-    /**
-     * A provider lost for good is a member replaced in the configuration.
-     *
-     * What it wrapped is passed over, the newcomer has nothing to read yet, and the other wrappings
-     * still read.
-     */
     public function testACiphertextIsReadWithoutTheMemberThatWroteItFirst()
     {
         $ciphertext = $this->kms()->encrypt('app', 'secret');
@@ -115,11 +106,6 @@ class CompositeKmsTest extends TestCase
         }
     }
 
-    /**
-     * The logger is the only place a member passed over shows.
-     *
-     * It is a provider in trouble that the caller never hears of, since another one answered.
-     */
     public function testAMemberPassedOverIsLogged()
     {
         $logger = new class extends AbstractLogger {
@@ -163,12 +149,6 @@ class CompositeKmsTest extends TestCase
         $stranger->decrypt($ciphertext);
     }
 
-    /**
-     * A member that cannot wrap fails the whole write.
-     *
-     * A ciphertext missing one wrapping is less redundant than the configuration claims, so no
-     * ciphertext comes out at all.
-     */
     public function testAMemberThatCannotWrapFailsTheWrite()
     {
         $kms = $this->kms();
@@ -226,12 +206,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame($plaintext, $kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key));
     }
 
-    /**
-     * The minted key is consumed on the way.
-     *
-     * It gives its plaintext up to the composite one rather than sharing it, so there is one key
-     * left to wipe.
-     */
     public function testTheMintedDataKeyIsConsumed()
     {
         $minting = self::minting(random_bytes(32));
@@ -244,12 +218,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame(32, \strlen($dataKey->use(static fn (string $key): string => $key)));
     }
 
-    /**
-     * The trace of a failing recipient does not carry the plaintext it was wrapping.
-     *
-     * The plaintext passes through each recipient in a closure, whose argument the trace would
-     * otherwise show.
-     */
     public function testTheDataKeyDoesNotReachStackTraces()
     {
         $known = random_bytes(32);
@@ -260,11 +228,6 @@ class CompositeKmsTest extends TestCase
         self::assertRedacted($known, $trace);
     }
 
-    /**
-     * A member is a full KMS client or no member at all, settled before anything is written.
-     *
-     * One that could wrap but not read back would be a wrapping nothing reads.
-     */
     public function testAMemberThatCannotReadBackIsRefused()
     {
         $kms = new CompositeKms(self::locator(['aws' => $this->aws, 'azure' => new EncryptOnlyKms()]), ['aws' => null, 'azure' => 'backup']);
@@ -291,21 +254,11 @@ class CompositeKmsTest extends TestCase
         new CompositeKms(self::locator(['aws' => $this->aws]), []);
     }
 
-    /**
-     * A composite of one is a degraded mode, not a misconfiguration.
-     *
-     * This is what losing a provider for good looks like, end to end: it is dropped from the
-     * members, one is left, and that one keeps reading everything the pair wrapped and keeps
-     * writing, until a replacement joins and reads what was written meanwhile. Refusing a single
-     * member would leave an application whose two-member pair lost one with nothing to run on,
-     * since a plain client does not read a frame either.
-     */
     public function testAProviderLostForGoodLeavesTheSurvivorWorkingAlone()
     {
         $pair = new CompositeKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), ['aws' => null, 'azure' => null]);
         $written = $pair->encrypt('app', 'written while both were alive');
 
-        // "aws" is gone for good, so it leaves the members rather than failing every write
         $degraded = new CompositeKms(self::locator(['azure' => $this->azure]), ['azure' => null]);
         $meanwhile = $degraded->encrypt('app', 'written while degraded');
 
@@ -318,11 +271,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame('written while degraded', $restored->decrypt($meanwhile));
     }
 
-    /**
-     * The survivor stays wrapped in a composite.
-     *
-     * A member on its own is handed a frame it knows nothing about.
-     */
     public function testAPlainMemberDoesNotReadAFrame()
     {
         $ciphertext = $this->kms()->encrypt('app', 'secret');
@@ -331,12 +279,6 @@ class CompositeKmsTest extends TestCase
         $this->aws->decrypt($ciphertext);
     }
 
-    /**
-     * A member given no master key wraps under the one each call names.
-     *
-     * This is what lets two providers sharing a key name run with no configuration beyond their
-     * names.
-     */
     public function testAMemberWithoutAMasterKeyUsesTheOneEachCallNames()
     {
         $kms = new CompositeKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), ['aws' => null, 'azure' => null]);
@@ -365,12 +307,6 @@ class CompositeKmsTest extends TestCase
         $kms->encrypt('app', 'secret');
     }
 
-    /**
-     * A blob that is not a frame is handed to the members as it is.
-     *
-     * What they make of it is what comes back: an unreadable ciphertext, reported by the first
-     * member.
-     */
     #[DataProvider('provideMalformedBlobs')]
     public function testABlobThatDoesNotParseIsAnUnreadableCiphertext(string $blob)
     {
@@ -404,12 +340,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame('a payload of any size', $survivor->decrypt(Envelope::fromBytes((string) $envelope), 'aad'));
     }
 
-    /**
-     * An envelope the application could not read back through every member is never produced.
-     *
-     * The envelope is what the application persists, so the write fails as a whole and nothing
-     * comes out.
-     */
     #[RequiresPhpExtension('openssl')]
     public function testNoEnvelopeIsWrittenWhileAMemberIsDown()
     {
@@ -427,14 +357,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame([], $this->gcp->calls, 'the members after the one that failed are not asked either.');
     }
 
-    /**
-     * The recovery the README describes, through the rewrap command.
-     *
-     * A member gone for good is replaced in the list, and the data keys a store holds are wrapped
-     * under the new list by the rewrap command, from the composite client to itself. The lost
-     * member's wrapping is passed over on the way, and what comes out reads through the newcomer
-     * alone.
-     */
     #[RequiresPhpExtension('openssl')]
     public function testAStoreIsRewrappedUnderNewMembersThroughTheCommand()
     {
@@ -442,7 +364,6 @@ class CompositeKmsTest extends TestCase
         $azure = new OpenSslKms(new InMemoryKeyLoader(['backup' => random_bytes(32)]));
         $gcp = new OpenSslKms(new InMemoryKeyLoader(['backup' => random_bytes(32)]));
 
-        // the service the store and the command know as "redundant", reconfigured between the two phases
         $redundant = new class(new CompositeKms(self::locator(['aws' => $aws, 'azure' => $azure]), ['aws' => null, 'azure' => 'backup'])) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
             public function __construct(public CompositeKms $members)
             {
@@ -483,12 +404,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame('survives the loss of aws', $encrypter->decrypt($envelope));
     }
 
-    /**
-     * What an application wrote before switching to a composite client stays readable.
-     *
-     * It was written by one member alone, so an unframed ciphertext is handed to each member in
-     * turn.
-     */
     public function testACiphertextAMemberWroteOnItsOwnIsRead()
     {
         $ciphertext = $this->azure->encrypt('backup', 'written before the switch', 'aad');
@@ -503,14 +418,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame([], $this->gcp->calls);
     }
 
-    /**
-     * A wrapping is read back by the operation that wrote it.
-     *
-     * On Azure Key Vault, wrapping a key and encrypting a payload are two operations with their own
-     * permissions and algorithms, so a wrapping written by encrypt() cannot be read by
-     * unwrapDataKey(). Only the minter's wrapping came out of generateDataKey(); the others must
-     * be read by decrypt().
-     */
     public function testAWrappingIsReadBackByTheOperationThatWroteIt()
     {
         $aws = new SwitchableKms(self::twoOperations(new InMemoryKms('aws')));
@@ -541,12 +448,6 @@ class CompositeKmsTest extends TestCase
         $this->assertSame($dataKey->wrapped, $kms->unwrapDataKey($dataKey->wrapped)->wrapped);
     }
 
-    /**
-     * A client whose two operations are told apart, the way Azure Key Vault tells them apart.
-     *
-     * A blob is read back by the operation that produced it, "encrypt" or "wrapKey", and by no
-     * other.
-     */
     private static function twoOperations(InMemoryKms $inner): DataKeyGeneratorInterface&DecrypterInterface&EncrypterInterface
     {
         return new class($inner) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
@@ -590,12 +491,6 @@ class CompositeKmsTest extends TestCase
         return new CompositeKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure, 'gcp' => $this->gcp]), ['aws' => null, 'azure' => 'backup', 'gcp' => 'projects/p/keys/backup']);
     }
 
-    /**
-     * A member minting `$known` as its data key, and keeping the DataKey it handed out.
-     *
-     * A test then knows the plaintext that goes through the composite client and what became of
-     * it.
-     */
     private static function minting(#[\SensitiveParameter] string $known): DataKeyGeneratorInterface&DecrypterInterface&EncrypterInterface
     {
         return new class($known) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
@@ -642,12 +537,6 @@ class CompositeKmsTest extends TestCase
         return new ServiceLocator($factories);
     }
 
-    /**
-     * A member is passed over whatever its backend throws.
-     *
-     * A backend is down whatever its SDK throws, and the exception classes an SDK picks are its
-     * own, so any of them is passed over rather than the RuntimeException family alone.
-     */
     public function testAMemberIsPassedOverWhateverItThrows()
     {
         foreach ([new \DomainException('down.'), new \Exception('down.'), new \InvalidArgumentException('down.')] as $failure) {
@@ -660,11 +549,6 @@ class CompositeKmsTest extends TestCase
         }
     }
 
-    /**
-     * The member count is bounded by the one byte of the blob that records it.
-     *
-     * A longer list would write ciphertexts no member could ever read back.
-     */
     public function testTheNumberOfMembersHasToFitInTheCiphertext()
     {
         $members = [];

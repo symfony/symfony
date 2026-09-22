@@ -58,8 +58,10 @@ final class StoredEnvelopeEncrypter implements EnvelopeEncrypterInterface, Envel
     }
 
     /**
-     * The AAD binds the payload only, not the stored data key: that key is shared by the whole
-     * scope, so binding it to the AAD of one payload would make it unusable for the next.
+     * The AAD binds the payload only, not the stored data key.
+     *
+     * That key is shared by the whole scope, so binding it to the AAD of one payload would make it
+     * unusable for the next.
      */
     public function encrypt(string $key, #[\SensitiveParameter] string $plaintext, string $aad = ''): Envelope
     {

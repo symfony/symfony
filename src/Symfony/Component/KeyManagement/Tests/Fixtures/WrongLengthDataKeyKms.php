@@ -17,8 +17,10 @@ use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 
 /**
- * Backend that ignores the data key length it is asked for and hands out keys of its own length,
- * both when generating and when unwrapping, the way a misconfigured or buggy backend would.
+ * Backend that ignores the data key length it is asked for.
+ *
+ * It hands out keys of its own length, both when generating and when unwrapping, the way a
+ * misconfigured or buggy backend would.
  */
 final class WrongLengthDataKeyKms implements DataKeyGeneratorInterface
 {

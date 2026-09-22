@@ -14,8 +14,9 @@ namespace Symfony\Component\KeyManagement\Bridge\AzureKeyVault;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
 
 /**
- * Returns a bearer token usable against the Azure Key Vault REST API
- * (audience `https://vault.azure.net`).
+ * Returns a bearer token usable against the Azure Key Vault REST API.
+ *
+ * The audience is `https://vault.azure.net`.
  *
  * Implementations are expected to cache the token until it expires and to
  * refresh it transparently. {@see ClientCredentialsTokenProvider} ships the

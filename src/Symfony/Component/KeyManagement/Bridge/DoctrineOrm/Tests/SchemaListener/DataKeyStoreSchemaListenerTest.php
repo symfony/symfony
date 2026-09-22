@@ -23,8 +23,9 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
 
 /**
- * The store is final, so these run against a real one on an in-memory database, which exercises
- * its configureSchema() rather than a mock of it.
+ * These run against a real store on an in-memory database.
+ *
+ * The store is final, so its configureSchema() is exercised rather than a mock of it.
  */
 #[RequiresPhpExtension('pdo_sqlite')]
 class DataKeyStoreSchemaListenerTest extends TestCase
@@ -55,9 +56,6 @@ class DataKeyStoreSchemaListenerTest extends TestCase
         $this->assertFalse($event->getSchema()->hasTable('key_management_data_keys'));
     }
 
-    /**
-     * Anything else sharing the iterator is not this listener's business.
-     */
     public function testAStoreOfAnotherKindIsIgnored()
     {
         $event = $this->event(self::connection(), new Schema());
@@ -67,10 +65,6 @@ class DataKeyStoreSchemaListenerTest extends TestCase
         $this->assertSame([], $event->getSchema()->getTables());
     }
 
-    /**
-     * An application that told Doctrine to ignore that table meant it, even though the table is
-     * added by a listener rather than by a mapping.
-     */
     public function testPostGenerateSchemaRespectsSchemaFilter()
     {
         $connection = self::connection();

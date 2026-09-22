@@ -46,10 +46,6 @@ class KeyManagementDataCollectorTest extends TestCase
         $this->assertSame(['default', 'aws'], $collector->getClients(), 'the panel says what is wired even when a request used none of it.');
     }
 
-    /**
-     * The panel has to stay readable, and the profile has to stay small, when an entity with ten
-     * encrypted columns is hydrated over fifty rows.
-     */
     #[RequiresPhpExtension('openssl')]
     public function testAThousandOperationsFoldIntoAsManyRowsAsThereAreScopes()
     {
@@ -81,10 +77,6 @@ class KeyManagementDataCollectorTest extends TestCase
         $this->assertCount(1, $scope['data_keys'], 'every payload of a scope shares one data key.');
     }
 
-    /**
-     * The aggregates are what the collector holds between two requests of a long-running process,
-     * and the ORM hydrating an entity over thousands of rows is what fills them.
-     */
     #[RequiresPhpExtension('openssl')]
     public function testWhatIsHeldIsBoundedByTheCallSitesAndTheKeys()
     {

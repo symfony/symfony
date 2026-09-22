@@ -108,10 +108,6 @@ class FactoryRegistryTest extends TestCase
         $registry->fromString('sodium://?keys[main]=00');
     }
 
-    /**
-     * A DSN carries inline master keys and passwords, so every frame receiving one must keep it out
-     * of stack traces.
-     */
     public function testTheDsnIsASensitiveParameter()
     {
         foreach ([KmsFactoryInterface::class, FactoryRegistry::class] as $class) {

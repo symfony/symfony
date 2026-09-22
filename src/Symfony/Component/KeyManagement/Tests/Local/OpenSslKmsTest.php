@@ -202,9 +202,6 @@ class OpenSslKmsTest extends TestCase
         $this->kms->unwrapDataKey($tampered);
     }
 
-    /**
-     * Reads the IV out of the `[version][iv][tag][ciphertext]` blob layout.
-     */
     private static function ivOf(string $blob): string
     {
         return substr($blob, 1, 12);

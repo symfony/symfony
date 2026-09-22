@@ -105,8 +105,10 @@ final class Envelope implements \Stringable
     }
 
     /**
-     * The iv and tag are framed without a length prefix, so a value of the wrong length would
-     * frame fine and reparse shifted.
+     * The iv and the tag must have the length the format frames them at.
+     *
+     * They are framed without a length prefix, so a value of the wrong length would frame fine
+     * and reparse shifted.
      *
      * @throws InvalidArgumentException If the value does not have the length the format frames it at
      */

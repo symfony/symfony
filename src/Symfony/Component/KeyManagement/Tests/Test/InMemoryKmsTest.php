@@ -34,10 +34,6 @@ class InMemoryKmsTest extends TestCase
         $this->assertSame('encrypted/vault/app/'.bin2hex('tenant=acme').'/hello', $kms->encrypt('app', 'hello', 'tenant=acme')->blob);
     }
 
-    /**
-     * Two instances are two providers, each with key material of its own: what one wrote, the
-     * other cannot read. Without this, a test routing a ciphertext to the wrong client would pass.
-     */
     public function testAnotherInstanceCannotDecrypt()
     {
         $ciphertext = new InMemoryKms()->encrypt('app', 'hello');

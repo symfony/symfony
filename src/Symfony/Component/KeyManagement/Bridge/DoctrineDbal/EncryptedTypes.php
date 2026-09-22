@@ -62,9 +62,11 @@ final class EncryptedTypes
     }
 
     /**
-     * Replacing rather than adding when the name is taken is what a rebooted kernel needs: the
-     * type registry is global and outlives the container, so the types of the previous one are
-     * still there, pointing at encrypters nothing else uses any more.
+     * Replaces a type whose name is taken rather than refusing to add it.
+     *
+     * That is what a rebooted kernel needs: the type registry is global and outlives the
+     * container, so the types of the previous one are still there, pointing at encrypters nothing
+     * else uses any more.
      *
      * @throws InvalidArgumentException If a declaration names no Doctrine type or no key
      */

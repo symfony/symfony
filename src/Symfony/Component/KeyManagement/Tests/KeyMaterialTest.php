@@ -59,11 +59,6 @@ class KeyMaterialTest extends TestCase
         $this->assertStringNotContainsString(self::SECRET, $printed);
     }
 
-    /**
-     * Which is what covers `dump()`, the profiler and the exception page in one go.
-     *
-     * @param \Closure(): object $factory
-     */
     #[DataProvider('objectsHoldingKeyMaterial')]
     public function testTheVarClonerShowsNoKeyEither(\Closure $factory)
     {

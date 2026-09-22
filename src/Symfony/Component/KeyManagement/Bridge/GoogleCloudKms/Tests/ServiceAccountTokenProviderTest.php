@@ -59,8 +59,6 @@ class ServiceAccountTokenProviderTest extends TestCase
         $this->assertSame('sa@my-proj.iam.gserviceaccount.com', $claims['iss']);
         $this->assertSame('https://www.googleapis.com/auth/cloudkms', $claims['scope']);
         $this->assertSame('https://oauth2.googleapis.com/token', $claims['aud']);
-        // "iat" is backdated by 10s so a clock slightly ahead of Google's does not invalidate the JWT,
-        // and "exp" must stay at most one hour after it, or Google rejects the assertion.
         $this->assertGreaterThanOrEqual($before - 10, $claims['iat']);
         $this->assertLessThanOrEqual($after - 10, $claims['iat']);
         $this->assertSame(3600, $claims['exp'] - $claims['iat']);

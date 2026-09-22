@@ -57,10 +57,6 @@ class BlindIndexTest extends TestCase
         $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $index->of(str_repeat('x', 10_000)));
     }
 
-    /**
-     * The whole point of the key: the tag of a guessed value cannot be computed without it, so an
-     * attacker holding the table cannot ask whether a given address is in it.
-     */
     public function testTheTagCannotBeReproducedWithoutTheKey()
     {
         $tag = (new BlindIndex($this->kms, $this->wrappedKey))->of('ada@example.org');
@@ -80,10 +76,6 @@ class BlindIndexTest extends TestCase
         $this->assertNotSame($index->of(' ada'), $index->of('ada'));
     }
 
-    /**
-     * RFC 5321 makes the domain case-insensitive and leaves the local part to the receiving
-     * server, so only the domain is folded.
-     */
     public function testAnEmailIsFoldedTheWayTheStandardSaysAndNoFurther()
     {
         $index = new Email($this->kms, $this->wrappedKey);
@@ -101,10 +93,6 @@ class BlindIndexTest extends TestCase
         $this->assertNotSame($index->of('not-an-address'), $index->of('NOT-AN-ADDRESS'));
     }
 
-    /**
-     * The second column is how a partial search is answered here: name the question, index the
-     * answer.
-     */
     public function testTheDomainIndexGroupsAddressesOfOneCompany()
     {
         $domain = new EmailDomain($this->kms, $this->wrappedKey);
@@ -115,10 +103,6 @@ class BlindIndexTest extends TestCase
         $this->assertNotSame($domain->of('ada@example.org'), $address->of('ada@example.org'));
     }
 
-    /**
-     * Both paths need it: a row is indexed from the address it carries, a query has only the
-     * domain, and the two have to meet on the same tag.
-     */
     public function testTheDomainIsIndexedFromAnAddressOrFromItself()
     {
         $domain = new EmailDomain($this->kms, $this->wrappedKey);
@@ -129,9 +113,6 @@ class BlindIndexTest extends TestCase
         $this->assertSame($domain->of('a@b@example.org'), $domain->of('example.org'), 'the last @ is the separator');
     }
 
-    /**
-     * A subclass is the whole extension point, and it cannot get at the key.
-     */
     public function testAnApplicationIndexesItsOwnProjection()
     {
         $index = new class($this->kms, $this->wrappedKey) extends BlindIndex {
@@ -156,10 +137,6 @@ class BlindIndexTest extends TestCase
         $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $blake->of('ada@example.org'));
     }
 
-    /**
-     * The KMS is reached to unwrap the index key and never again, which is what makes indexing many
-     * values, or many tags per value, affordable on a backend that answers over the network.
-     */
     public function testTheKeyIsUnwrappedOnceWhateverTheNumberOfValues()
     {
         $counting = new class($this->kms) implements DataKeyGeneratorInterface {
@@ -190,10 +167,6 @@ class BlindIndexTest extends TestCase
         $this->assertSame(1, $counting->unwrapped);
     }
 
-    /**
-     * The index key is handed to a closure, which is a function like any other: its argument lands
-     * in the trace of anything the algorithm raises.
-     */
     public function testTheIndexKeyDoesNotReachStackTraces()
     {
         $indexKey = $this->kms->unwrapDataKey($this->wrappedKey)->use(static fn (string $key): string => $key);

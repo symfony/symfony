@@ -14,9 +14,10 @@ namespace Symfony\Component\KeyManagement;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 
 /**
- * Result of a `generateDataKey()` call: a freshly generated symmetric data key
- * (DEK) returned both in plaintext form (for local use) and in KMS-wrapped
- * form (for persistence).
+ * Result of a `generateDataKey()` call.
+ *
+ * A freshly generated symmetric data key (DEK), returned both in plaintext
+ * form (for local use) and in KMS-wrapped form (for persistence).
  *
  * The plaintext is not a field at all, so that no dump of this object can print
  * it, see {@see KeyMaterial}. Access is mediated by {@see use()}, which passes
@@ -55,8 +56,9 @@ final class DataKey
 
     /**
      * Passes the plaintext data key to `$consumer`, then drops the reference.
-     * The plaintext is released on both success and exception paths.
-     * Subsequent calls throw {@see LogicException}.
+     *
+     * The plaintext is released on both success and exception paths. Subsequent calls throw
+     * {@see LogicException}.
      *
      * @template T
      *

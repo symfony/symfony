@@ -116,18 +116,19 @@ final class SodiumKms implements DecrypterInterface, EncrypterInterface, DataKey
     }
 
     /**
-     * Derives the nonce of a deterministic encryption from the AAD as well as
-     * the plaintext, the way SIV constructions do. Two encryptions differing
-     * only by their AAD must not land on the same nonce: the pair of Poly1305
-     * tags they would produce under one key reveals the one-time
-     * authentication key, and with it the ability to forge tags for that
-     * (key, nonce) pair. The length prefix keeps the concatenation
-     * unambiguous, so no (aad, plaintext) pair can be read as another one. It
-     * spans 8 big-endian bytes, as the `J` format code would write them, that
-     * one being unavailable on 32-bit builds where no string is ever long
-     * enough for the high word to be anything but zero. The hash is keyed with
-     * a subkey derived from the AEAD key rather than with the AEAD key itself,
-     * so the two primitives never share a key.
+     * Derives the nonce of a deterministic encryption from the AAD as well as the plaintext.
+     *
+     * This is what SIV constructions do. Two encryptions differing only by
+     * their AAD must not land on the same nonce: the pair of Poly1305 tags
+     * they would produce under one key reveals the one-time authentication
+     * key, and with it the ability to forge tags for that (key, nonce) pair.
+     * The length prefix keeps the concatenation unambiguous, so no
+     * (aad, plaintext) pair can be read as another one. It spans 8 big-endian
+     * bytes, as the `J` format code would write them, that one being
+     * unavailable on 32-bit builds where no string is ever long enough for the
+     * high word to be anything but zero. The hash is keyed with a subkey
+     * derived from the AEAD key rather than with the AEAD key itself, so the
+     * two primitives never share a key.
      */
     private static function syntheticNonce(#[\SensitiveParameter] string $key, string $aad, #[\SensitiveParameter] string $plaintext): string
     {

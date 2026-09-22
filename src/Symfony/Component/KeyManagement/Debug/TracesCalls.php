@@ -20,8 +20,9 @@ use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 
 /**
- * Plumbing shared by the debug decorators: where a call is reported, and which frame of the
- * application made it.
+ * Plumbing shared by the debug decorators.
+ *
+ * It says where a call is reported, and which frame of the application made it.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -74,9 +75,10 @@ trait TracesCalls
     }
 
     /**
-     * Walks out of the component to report the frame that asked for the operation: an envelope
-     * encrypter asking its KMS for a data key is not what the reader is after, the code that
-     * called the encrypter is.
+     * Walks out of the component to report the frame that asked for the operation.
+     *
+     * An envelope encrypter asking its KMS for a data key is not what the reader is after, the
+     * code that called the encrypter is.
      *
      * @return array{name: string, file: string, line: int}|null
      */
@@ -114,6 +116,7 @@ trait TracesCalls
 
     /**
      * Whether `$class` is a piece of the encryption path rather than the code that asked for it.
+     *
      * Recognizing it by contract rather than by namespace covers the decorators an application
      * writes of its own.
      */

@@ -67,10 +67,6 @@ class EncryptedTypeTest extends TestCase
         $this->assertSame(42, $type->convertToPHPValue($encrypted, $this->platform));
     }
 
-    /**
-     * The parent type hands a float over as is, and a cast to string would round it to the
-     * `precision` ini setting, fourteen digits, which the bare float type never does.
-     */
     #[DataProvider('provideFloats')]
     public function testAFloatParentRoundTripsExactly(float $value)
     {
@@ -149,10 +145,6 @@ class EncryptedTypeTest extends TestCase
         $this->assertCount(1, iterator_to_array($store->all(), false), 'sharing the key is what spares the KMS round trips.');
     }
 
-    /**
-     * A column half migrated to the store: rows written before keep resolving through the KMS,
-     * rows written after refer to a stored key, and one type reads both.
-     */
     public function testAColumnMayHoldBothFormatsDuringAMigration()
     {
         $legacy = new EncryptedType(new StringType(), $this->envelopes, 'app');
@@ -165,11 +157,6 @@ class EncryptedTypeTest extends TestCase
         $this->assertSame('written after', $migrating->convertToPHPValue($after, $this->platform));
     }
 
-    /**
-     * A column moved to another KMS: a decrypter routing on the key id reads what the old provider
-     * wrote for as long as rows are left to rewrite, and a rewritten row comes back under the new
-     * provider alone.
-     */
     public function testAColumnIsMovedToAnotherKms()
     {
         $target = new EnvelopeEncrypter(new OpenSslKms(new InMemoryKeyLoader(['next' => random_bytes(32)])));
@@ -215,10 +202,6 @@ class EncryptedTypeTest extends TestCase
         $type->convertToPHPValue('not-an-envelope', $this->platform);
     }
 
-    /**
-     * PHP records the arguments of every frame of a stack trace, so a backend failing while a column
-     * is being written would carry the column value, in clear, into the logs.
-     */
     public function testTheColumnValueDoesNotReachStackTraces()
     {
         $ignoreArguments = (string) \ini_get('zend.exception_ignore_args');
@@ -279,10 +262,6 @@ class EncryptedTypeTest extends TestCase
         return new EncryptedType($parent, $this->envelopes, 'app');
     }
 
-    /**
-     * Reads what the old KMS wrote and writes everything through the new one, which is what a
-     * column being moved to another provider is handed while it is being rewritten.
-     */
     private function routingOnKeyId(EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $target): EnvelopeEncrypterInterface&EnvelopeDecrypterInterface
     {
         return new class($target, $this->envelopes) implements EnvelopeEncrypterInterface, EnvelopeDecrypterInterface {
@@ -304,12 +283,6 @@ class EncryptedTypeTest extends TestCase
         };
     }
 
-    /**
-     * Mimics the drivers and the blob types that carry a binary value as a stream rather than as a
-     * string.
-     *
-     * @return resource
-     */
     private static function asStream(string $value)
     {
         $stream = fopen('php://memory', 'r+');

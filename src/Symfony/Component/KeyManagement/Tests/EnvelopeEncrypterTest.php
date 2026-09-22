@@ -127,10 +127,6 @@ class EnvelopeEncrypterTest extends TestCase
         $this->encrypter->decrypt($tampered);
     }
 
-    /**
-     * The data key is handed to a closure, which is a function like any other: its argument lands in
-     * the trace of anything the local AEAD raises.
-     */
     public function testTheDataKeyDoesNotReachStackTraces()
     {
         $envelope = $this->encrypter->encrypt('app-key', 'hello world');
@@ -172,16 +168,10 @@ class EnvelopeEncrypterTest extends TestCase
         $this->encrypter->decrypt($envelope);
         $afterDecrypt = $this->kms->calls - $countBefore - $afterEncrypt;
 
-        // encrypt: generateDataKey() -> 1 call to encrypt() inside InMemoryKms.
         $this->assertSame(2, $afterEncrypt);
-        // decrypt: unwrapDataKey() -> 1 call to decrypt() inside InMemoryKms.
         $this->assertSame(1, $afterDecrypt);
     }
 
-    /**
-     * The cipher would zero-pad a short key and truncate a long one without a word, so a backend
-     * ignoring the requested length would silently weaken every payload.
-     */
     public function testADataKeyOfTheWrongLengthIsRefusedAtEncryptTime()
     {
         $encrypter = new EnvelopeEncrypter(new WrongLengthDataKeyKms(16));

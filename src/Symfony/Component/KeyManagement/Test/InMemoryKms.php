@@ -19,10 +19,12 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 
 /**
- * No-crypto, in-memory implementation of {@see EncrypterInterface} /
- * {@see DecrypterInterface} for tests. The `$blob` of returned ciphertexts
- * is the plaintext prefixed with a marker that embeds the instance, the key
- * id and the AAD (`encrypted/<name>/<keyId>/<hex(aad)>/<plaintext>`) so that:
+ * No-crypto, in-memory KMS client for tests.
+ *
+ * It implements {@see EncrypterInterface} / {@see DecrypterInterface}. The
+ * `$blob` of returned ciphertexts is the plaintext prefixed with a marker that
+ * embeds the instance, the key id and the AAD
+ * (`encrypted/<name>/<keyId>/<hex(aad)>/<plaintext>`) so that:
  *
  *   - tests cannot accidentally compare a plaintext to a ciphertext;
  *   - decrypting something that was never produced by encrypt() fails with

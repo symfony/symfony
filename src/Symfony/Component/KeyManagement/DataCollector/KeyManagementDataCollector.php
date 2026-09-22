@@ -119,8 +119,10 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
     private float $floor = 0.0;
 
     /**
-     * Scope each data key seen in this request belongs to, so that reading a payload lands under
-     * the scope that wrote it rather than under the reference it names.
+     * Scope each data key seen in this request belongs to.
+     *
+     * Reading a payload then lands under the scope that wrote it rather than under the reference
+     * it names.
      *
      * @var array<string, string>
      */
@@ -135,8 +137,10 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
     }
 
     /**
-     * Marks the start of a traced call and returns it. Every decorator pairs it with a
-     * {@see collectCall()} in a finally block, so that the depth stays balanced whatever the outcome.
+     * Marks the start of a traced call and returns it.
+     *
+     * Every decorator pairs it with a {@see collectCall()} in a finally block, so that the depth
+     * stays balanced whatever the outcome.
      *
      * @internal
      */
@@ -290,8 +294,9 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
     }
 
     /**
-     * Wall time of the outermost calls only, so that an envelope operation and the KMS round trip
-     * it made under it are not counted twice.
+     * Wall time of the outermost calls only.
+     *
+     * An envelope operation and the KMS round trip it made under it are then not counted twice.
      */
     public function getTotalTime(): float
     {
@@ -478,8 +483,10 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
     }
 
     /**
-     * What a call is about, from the point of view of someone reading the panel: the master key of
-     * a direct operation, the scope a stored data key is shared over, or that data key itself.
+     * What a call is about, from the point of view of someone reading the panel.
+     *
+     * That is the master key of a direct operation, the scope a stored data key is shared over, or
+     * that data key itself.
      *
      * A stored envelope records a reference and no scope, by design, since the reference is what
      * resolves the key. Whoever writes under a scope teaches this request which scope a reference
@@ -513,8 +520,10 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
     }
 
     /**
-     * A data key reference is opaque bytes, and the Doctrine store keeps UUIDs in their binary
-     * form, so what reaches a template has to be printable first.
+     * Makes a data key reference printable.
+     *
+     * A reference is opaque bytes, and the Doctrine store keeps UUIDs in their binary form, so what
+     * reaches a template has to be printable first.
      */
     private static function printable(string $value): string
     {
@@ -526,10 +535,11 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
     }
 
     /**
-     * Whether a call was served inside the process or by something outside it. A bridge is what
-     * turns an operation into a network round trip, or into a query, which is a different thing to
-     * read than the local AEAD of an envelope, so the panel keeps the two apart. Anything the
-     * component does not ship is read as a bridge: it is not this process either.
+     * Whether a call was served inside the process or by something outside it.
+     *
+     * A bridge is what turns an operation into a network round trip, or into a query, which is a
+     * different thing to read than the local AEAD of an envelope, so the panel keeps the two apart.
+     * Anything the component does not ship is read as a bridge: it is not this process either.
      */
     private static function originOf(?string $backend): string
     {

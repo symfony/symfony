@@ -12,8 +12,10 @@
 namespace Symfony\Component\KeyManagement;
 
 /**
- * URL-safe base64 helpers (RFC 4648 section 5): `+`/`/` of standard base64 are
- * replaced by `-`/`_` and the trailing `=` padding is dropped.
+ * URL-safe base64 helpers, RFC 4648 section 5.
+ *
+ * The `+` and `/` of standard base64 are replaced by `-` and `_`, and the
+ * trailing `=` padding is dropped.
  *
  * Encoding is strictly URL-safe and unpadded. Decoding is permissive on
  * purpose: it accepts URL-safe input (`-`/`_`, with or without padding) AND

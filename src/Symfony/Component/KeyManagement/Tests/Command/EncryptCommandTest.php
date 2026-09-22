@@ -170,11 +170,6 @@ class EncryptCommandTest extends TestCase
         $this->assertStringContainsString('STDIN', $help);
     }
 
-    /**
-     * Scoped to the frame of the command itself: the console invokes it through
-     * `\ReflectionFunction::invoke()`, whose own frame holds every resolved parameter in clear, and
-     * that one is the Console component's business rather than this one's.
-     */
     public function testThePlaintextDoesNotReachStackTraces()
     {
         $tester = new CommandTester(new EncryptCommand(self::locator(['default' => new UnreachableKms()])));

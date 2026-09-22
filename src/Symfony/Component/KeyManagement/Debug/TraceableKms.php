@@ -49,8 +49,9 @@ class TraceableKms implements EncrypterInterface, DecrypterInterface
     }
 
     /**
-     * Wraps `$kms` in the decorator that mirrors what it can do, so that the capabilities the
-     * application detects are the ones the backend actually has.
+     * Wraps `$kms` in the decorator that mirrors what it can do.
+     *
+     * The capabilities the application detects are then the ones the backend actually has.
      */
     public static function wrap(EncrypterInterface&DecrypterInterface $kms, KeyManagementDataCollector $collector, string $name): self
     {
@@ -60,8 +61,10 @@ class TraceableKms implements EncrypterInterface, DecrypterInterface
     }
 
     /**
-     * The decorated client, for whoever needs to look past the decorator: an application reporting
-     * which backend it talks to reads a class name, and would otherwise read this one.
+     * The decorated client, for whoever needs to look past the decorator.
+     *
+     * An application reporting which backend it talks to reads a class name, and would otherwise
+     * read this one.
      */
     public function getKms(): EncrypterInterface&DecrypterInterface
     {

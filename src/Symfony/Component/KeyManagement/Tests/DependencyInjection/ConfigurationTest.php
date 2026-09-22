@@ -153,12 +153,27 @@ class ConfigurationTest extends TestCase
         $this->assertNull($config['store']['client']);
     }
 
+    public function testANullMaxAgeNeverRetiresTheCurrentKey()
+    {
+        $config = $this->process(['store' => ['client' => 'app', 'key_id' => 'k', 'max_age' => null]]);
+
+        $this->assertNull($config['store']['max_age']);
+    }
+
     public function testANegativeMaxAgeIsRefused()
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('key_management.store.max_age');
 
         $this->process(['store' => ['client' => 'app', 'key_id' => 'k', 'max_age' => -1]]);
+    }
+
+    public function testANonIntegerMaxAgeIsRefused()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('key_management.store.max_age');
+
+        $this->process(['store' => ['client' => 'app', 'key_id' => 'k', 'max_age' => '3600']]);
     }
 
     private function process(mixed $config): array

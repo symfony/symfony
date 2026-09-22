@@ -282,6 +282,23 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame(DataKeyStore::DEFAULT_MAX_AGE_SECONDS, $container->getDefinition('key_management.store')->getArgument(6));
     }
 
+    public function testStoreNeverRotatesWhenTheMaxAgeIsNull()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key', 'max_age' => null],
+            ]);
+        });
+
+        $this->assertNull($container->getDefinition('key_management.store')->getArgument(6));
+    }
+
     public function testWithoutAStoreRegistersNoSchemaListener()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-22T11:29:06Z
+
+Good point, PR updated: PHP's own functions and attribute constructors are explicitly allowed now.

@@ -5,7 +5,8 @@ The KeyManagement component provides a unified abstraction over Key Management
 Systems such as AWS KMS, Azure Key Vault, Google Cloud KMS and HashiCorp Vault
 Transit. It exposes a small high-level API for encrypting/decrypting payloads,
 generating data keys for envelope encryption, and is designed so that the
-secret material never leaves the underlying KMS.
+secret material never leaves the underlying KMS. A client made of several
+providers keeps every ciphertext readable when one of them is lost.
 
 **This Component is experimental**.
 [Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)

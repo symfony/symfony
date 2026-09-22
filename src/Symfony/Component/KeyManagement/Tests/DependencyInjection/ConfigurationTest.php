@@ -12,7 +12,9 @@
 namespace Symfony\Component\KeyManagement\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\ArrayShapeGenerator;
 use Symfony\Component\Config\Definition\Configuration;
+use Symfony\Component\Config\Definition\Dumper\JsonSchemaDumper;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\KeyManagement\KeyManagementBundle;
@@ -32,7 +34,7 @@ class ConfigurationTest extends TestCase
     {
         $config = $this->process('sodium://?keys[app]=AAAA');
 
-        $this->assertSame(['default' => 'sodium://?keys[app]=AAAA'], $config['clients']);
+        $this->assertSame(['default' => ['dsn' => 'sodium://?keys[app]=AAAA', 'members' => []]], $config['clients']);
         $this->assertTrue($config['enabled']);
     }
 
@@ -40,8 +42,69 @@ class ConfigurationTest extends TestCase
     {
         $config = $this->process(['clients' => 'sodium://?keys[app]=AAAA', 'enabled' => false]);
 
-        $this->assertSame(['default' => 'sodium://?keys[app]=AAAA'], $config['clients']);
+        $this->assertSame(['default' => ['dsn' => 'sodium://?keys[app]=AAAA', 'members' => []]], $config['clients']);
         $this->assertFalse($config['enabled']);
+    }
+
+    /**
+     * A composite client is declared where the others are, by its members instead of a DSN.
+     *
+     * The members are a map of member name to the master key it wraps under, null standing for the
+     * key id each call names.
+     */
+    public function testAClientCanBeTheMembersOfACompositeOne()
+    {
+        $config = $this->process(['clients' => [
+            'aws' => 'aws-kms://default',
+            'azure' => 'azure-keyvault://default',
+            'main' => ['members' => ['aws' => null, 'azure' => 'https://vault.azure.net/keys/app']],
+        ]]);
+
+        $this->assertSame(['members' => ['aws' => null, 'azure' => 'https://vault.azure.net/keys/app']], $config['clients']['main']);
+        $this->assertSame(['dsn' => 'aws-kms://default', 'members' => []], $config['clients']['aws']);
+    }
+
+    public function testAClientIsADsnOrMembersNotBoth()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A KMS client is either a DSN or the members of a composite client, not both nor neither.');
+
+        $this->process(['clients' => ['main' => ['dsn' => 'aws-kms://default', 'members' => ['aws' => null]]]]);
+    }
+
+    public function testAClientIsADsnOrMembersNotNeither()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A KMS client is either a DSN or the members of a composite client, not both nor neither.');
+
+        $this->process(['clients' => ['main' => ['members' => []]]]);
+    }
+
+    public function testACompositeClientCannotBeItsOwnMember()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The composite KMS client "main" cannot be a member of itself.');
+
+        $this->process(['clients' => ['main' => ['members' => ['main' => null, 'aws' => null]]]]);
+    }
+
+    /**
+     * The schema and the array shape say a client is a DSN string or the map of its members.
+     *
+     * The JSON schema is what an IDE validates the YAML files against, and the array shape is what
+     * the config builder is documented with: both say what the normalization accepts, and nothing
+     * else.
+     */
+    public function testAClientIsDocumentedAsADsnOrItsMembers()
+    {
+        $tree = new Configuration(new KeyManagementBundle(), null, 'key_management')->getConfigTreeBuilder()->buildTree();
+
+        $client = new JsonSchemaDumper()->dump($tree)['anyOf'][0]['properties']['clients']['anyOf'][0]['additionalProperties'];
+        $this->assertContains(['type' => ['string']], $client['anyOf'] ?? [], 'a client is a DSN string');
+
+        $shape = ArrayShapeGenerator::generate($tree);
+        $this->assertMatchesRegularExpression('/clients\?: [^\n]*array<string, [^\n]*string\|array\{/', $shape, 'or the map of its members');
+        $this->assertStringNotContainsString('...<string, mixed>', $shape, 'and nothing else');
     }
 
     public function testClientNamesAreKeptAsTheyAre()
@@ -66,9 +129,9 @@ class ConfigurationTest extends TestCase
     public function testADsnMustBeAString()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "key_management.clients.app": The DSN of a KMS client must be a string, got 5.');
+        $this->expectExceptionMessage('Invalid configuration for path "key_management.clients.app.dsn": The DSN of a KMS client must be a string, got 5.');
 
-        $this->process(['clients' => ['app' => 5]]);
+        $this->process(['clients' => ['app' => ['dsn' => 5]]]);
     }
 
     public function testAnEmptyDsnIsRefused()
@@ -92,12 +155,24 @@ class ConfigurationTest extends TestCase
         ], $config['store']);
     }
 
-    public function testTheStoreNeedsAClientAndAKeyId()
+    public function testTheStoreNeedsAKeyId()
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The child config "key_id" under "key_management.store" must be configured');
 
         $this->process(['store' => ['client' => 'app']]);
+    }
+
+    /**
+     * The store client is inferred from the default one when the container is built.
+     *
+     * That is where the composite client, if any, is known.
+     */
+    public function testTheStoreClientIsOptional()
+    {
+        $config = $this->process(['store' => ['key_id' => 'alias/app-key']]);
+
+        $this->assertNull($config['store']['client']);
     }
 
     public function testANegativeMaxAgeIsRefused()

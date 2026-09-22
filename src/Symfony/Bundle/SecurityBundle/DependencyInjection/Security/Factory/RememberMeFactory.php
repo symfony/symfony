@@ -51,6 +51,11 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
             $loader->load('security_authenticator_remember_me.php');
         }
 
+        $config['secure'] ??= $this->options['secure'];
+        if (!\array_key_exists('samesite', $config)) {
+            $config['samesite'] = $this->options['samesite'];
+        }
+
         if ('auto' === $config['secure']) {
             $config['secure'] = null;
         }
@@ -166,9 +171,9 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
 
         foreach ($this->options as $name => $value) {
             if ('secure' === $name) {
-                $builder->enumNode($name)->values([true, false, 'auto'])->defaultValue($value);
+                $builder->enumNode($name)->values([true, false, 'auto'])->info('Defaults to the value of "framework.session.cookie_secure", or to "auto".');
             } elseif ('samesite' === $name) {
-                $builder->enumNode($name)->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->defaultValue($value);
+                $builder->enumNode($name)->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->info('Defaults to the value of "framework.session.cookie_samesite", or to "lax".');
             } elseif (\is_bool($value)) {
                 $builder->booleanNode($name)->defaultValue($value);
             } elseif (\is_int($value)) {

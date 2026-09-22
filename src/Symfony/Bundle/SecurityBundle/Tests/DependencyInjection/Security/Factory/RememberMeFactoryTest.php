@@ -52,22 +52,40 @@ class RememberMeFactoryTest extends TestCase
         $this->assertNull($options['samesite']);
     }
 
-    public function testSecureDefaultIsAnAllowedValue()
+    public function testSecureIsAnAllowedValue()
     {
-        $factory = new RememberMeFactory();
-        $factory->addConfiguration($nodeDefinition = new ArrayNodeDefinition('remember_me'));
-        $node = $nodeDefinition->getNode();
-
-        $config = $node->finalize($node->normalize(['secret' => 'very']));
+        $config = $this->createFirewallConfig(null, ['secure' => 'auto']);
 
         $this->assertSame('auto', $config['secure']);
-        $this->assertSame('auto', $node->finalize($node->normalize(['secret' => 'very', 'secure' => $config['secure']]))['secure']);
+    }
+
+    public function testTheConfigTreeDoesNotDependOnTheSessionCookie()
+    {
+        $withSessionDefaults = $this->createFirewallConfig(['session' => ['enabled' => true]]);
+        $withConfiguredSession = $this->createFirewallConfig(['session' => ['enabled' => true, 'cookie_secure' => false, 'cookie_samesite' => null]]);
+
+        $this->assertSame($withSessionDefaults, $withConfiguredSession);
+        $this->assertArrayNotHasKey('secure', $withSessionDefaults);
+        $this->assertArrayNotHasKey('samesite', $withSessionDefaults);
     }
 
     private function createHandlerOptions(?array $frameworkConfig, array $rememberMeConfig = []): array
     {
         $container = new ContainerBuilder();
+        $factory = $this->createFactory($container, $frameworkConfig);
 
+        $factory->createAuthenticator($container, 'main', $this->processConfig($factory, $rememberMeConfig), 'security.user.provider.concrete.default');
+
+        return $container->getDefinition('security.authenticator.remember_me_handler.main')->getArgument(3);
+    }
+
+    private function createFirewallConfig(?array $frameworkConfig, array $rememberMeConfig = []): array
+    {
+        return $this->processConfig($this->createFactory(new ContainerBuilder(), $frameworkConfig), $rememberMeConfig);
+    }
+
+    private function createFactory(ContainerBuilder $container, ?array $frameworkConfig): RememberMeFactory
+    {
         if (null !== $frameworkConfig) {
             $container->registerExtension(new FrameworkExtension());
             $container->loadFromExtension('framework', $frameworkConfig);
@@ -76,12 +94,14 @@ class RememberMeFactoryTest extends TestCase
         $factory = new RememberMeFactory();
         $factory->prepend($container);
 
+        return $factory;
+    }
+
+    private function processConfig(RememberMeFactory $factory, array $rememberMeConfig): array
+    {
         $factory->addConfiguration($nodeDefinition = new ArrayNodeDefinition('remember_me'));
         $node = $nodeDefinition->getNode();
-        $config = $node->finalize($node->normalize($rememberMeConfig + ['secret' => 'very']));
 
-        $factory->createAuthenticator($container, 'main', $config, 'security.user.provider.concrete.default');
-
-        return $container->getDefinition('security.authenticator.remember_me_handler.main')->getArgument(3);
+        return $node->finalize($node->normalize($rememberMeConfig + ['secret' => 'very']));
     }
 }

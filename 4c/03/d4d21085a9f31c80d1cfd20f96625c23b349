@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-09-20T20:36:44Z
+
+@nicolas-grekas I followed up on all three points:
+
+* I updated the PR description to remove `ignoreSelfDeprecations="true"` from the example. It now makes `ignoreIndirectDeprecations` optional, explains that `ignoreSuppressionOfDeprecations="true"` is required, and explicitly documents that `ignoreSelfDeprecations` hides the actionable "will require a new argument" deprecations because those resolve to the loaded first-party class as both caller and callee. The description also documents the new direct classification for current and legacy return-type messages.
+* I went with the optional return-type implementation change in [46b5d2a](https://github.com/symfony/symfony/commit/46b5d2a2bd8e4ae24c5c8da2d390aac4cdecff20). Current and legacy return-type deprecations now use the declaring parent class or interface as the callee and the loaded class as the caller. When application code extends or implements a third-party declaration, PHPUnit therefore classifies the deprecation as direct. I agreed this was the more useful classification because the application must act on the dependency's upcoming signature change, and the warning stays visible when only indirect deprecations are ignored. The tests now assert this for parent classes, interfaces and legacy return-type messages.
+* I opened [symfony/symfony-docs#23070](https://github.com/symfony/symfony-docs/pull/23070) targeting 8.2. It documents the XML registration in `phpunit.dist.xml`, how `<source>` defines application code, the required suppression setting, optional indirect filtering and which `DebugClassLoader` notices become direct or self. The docs CI is green.

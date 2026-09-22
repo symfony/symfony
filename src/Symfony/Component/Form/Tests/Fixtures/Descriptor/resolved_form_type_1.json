@@ -22,7 +22,8 @@
             "placeholder_attr",
             "preferred_choices",
             "separator",
-            "separator_html"
+            "separator_html",
+            "sort_choices"
         ],
         "overridden": {
             "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [

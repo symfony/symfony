@@ -25,7 +25,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   preferred_choices                                    help_html                                             
   separator                                            help_translation_parameters                           
   separator_html                                       inherit_data                                          
-                                                       invalid_message_parameters                            
+  sort_choices                                         invalid_message_parameters                            
                                                        is_empty_callback                                     
                                                        label                                                 
                                                        label_attr                                            

@@ -137,6 +137,16 @@ class FlysystemKmsFactoryTest extends TestCase
         $factory->create(Dsn::fromString('sodium+fly://fs/keys?ext[]=.bin'));
     }
 
+    public function testInvalidResetOptionIsRejected()
+    {
+        $factory = new FlysystemKmsFactory(new ServiceLocator([]));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"reset" option');
+        $this->expectExceptionMessage('must be a boolean');
+        $factory->create(Dsn::fromString('sodium+fly://fs/keys?reset=sometimes'));
+    }
+
     public function testHonoursPathAndExtensionOptions()
     {
         $key = random_bytes(32);
@@ -154,5 +164,33 @@ class FlysystemKmsFactoryTest extends TestCase
         $kms->encrypt('app', 'hello');
 
         $this->assertSame('keys/app.bin', $captured);
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testOnlyOptedInLoadersAreClearedOnReset()
+    {
+        $reads = [];
+        $reader = $this->createStub(FilesystemReader::class);
+        $reader->method('read')->willReturnCallback(static function (string $path) use (&$reads): string {
+            $reads[] = $path;
+
+            return str_repeat("\xAA", 32);
+        });
+
+        $factory = new FlysystemKmsFactory(new ServiceLocator(['fs' => static fn () => $reader]));
+        $resettable = $factory->create(Dsn::fromString('openssl+fly://fs/resettable?reset=1'));
+        $retained = $factory->create(Dsn::fromString('openssl+fly://fs/retained'));
+
+        $resettable->encrypt('app', 'hello');
+        $retained->encrypt('app', 'hello');
+        $resettable->encrypt('app', 'hello');
+        $retained->encrypt('app', 'hello');
+        $this->assertSame(['resettable/app', 'retained/app'], $reads);
+
+        $factory->reset();
+
+        $resettable->encrypt('app', 'hello');
+        $retained->encrypt('app', 'hello');
+        $this->assertSame(['resettable/app', 'retained/app', 'resettable/app'], $reads);
     }
 }

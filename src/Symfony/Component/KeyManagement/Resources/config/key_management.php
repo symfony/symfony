@@ -41,6 +41,7 @@ return static function (ContainerConfigurator $container) {
         ->set('key_management.factory.flysystem', FlysystemKmsFactory::class)
             ->args([tagged_locator('key_management.flysystem', 'key')])
             ->tag('key_management.factory')
+            ->tag('kernel.reset', ['method' => 'reset'])
             ->tag('container.remove_if_missing', ['class' => FlysystemKmsFactory::class, 'package' => 'symfony/flysystem-key-management', 'parent_packages' => ['symfony/key-management']])
 
         // the factories talking HTTP scope the application's client to the DSN's base URI, so a

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\Flysystem\Tests;
 
+use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemReader;
 use League\Flysystem\UnableToReadFile;
@@ -19,16 +20,87 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKeyLoader;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
+use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
 
 class FlysystemKeyLoaderTest extends TestCase
 {
+    private const string SECRET = 'S3CR3T-KEY-MATERIAL-0123456789ab';
+
     public function testReadsKeyFromFlysystem()
     {
         $key = str_repeat("\xAA", 32);
         $reader = $this->buildReader(['app' => $key]);
 
         $this->assertSame($key, (new FlysystemKeyLoader($reader))->load('app'));
+    }
+
+    public function testLoadedKeysAreMemoized()
+    {
+        $key = str_repeat("\xAA", 32);
+        $reader = $this->createMock(FilesystemReader::class);
+        $reader->expects($this->once())->method('read')->with('app')->willReturn($key);
+
+        $loader = new FlysystemKeyLoader($reader);
+
+        $this->assertSame($key, $loader->load('app'));
+        $this->assertSame($key, $loader->load('app'));
+    }
+
+    public function testResetClearsLoadedKeys()
+    {
+        $firstKey = str_repeat("\xAA", 32);
+        $secondKey = str_repeat("\xBB", 32);
+        $reader = $this->createMock(FilesystemReader::class);
+        $reader->expects($this->exactly(2))->method('read')->with('app')->willReturnOnConsecutiveCalls($firstKey, $secondKey);
+
+        $loader = new FlysystemKeyLoader($reader);
+
+        $this->assertSame($firstKey, $loader->load('app'));
+        $loader->reset();
+        $this->assertSame($secondKey, $loader->load('app'));
+        $this->assertSame($secondKey, $loader->load('app'));
+    }
+
+    public function testClonesHaveIndependentCaches()
+    {
+        $firstKey = str_repeat("\xAA", 32);
+        $secondKey = str_repeat("\xBB", 32);
+        $reader = $this->createMock(FilesystemReader::class);
+        $reader->expects($this->exactly(2))->method('read')->with('app')->willReturnOnConsecutiveCalls($firstKey, $secondKey);
+
+        $loader = new FlysystemKeyLoader($reader);
+        $this->assertSame($firstKey, $loader->load('app'));
+
+        $clone = clone $loader;
+
+        $this->assertSame($secondKey, $clone->load('app'));
+        $this->assertSame($firstKey, $loader->load('app'));
+        $this->assertSame($secondKey, $clone->load('app'));
+    }
+
+    public function testFailedReadsAreNotMemoized()
+    {
+        $key = str_repeat("\xAA", 32);
+        $attempt = 0;
+        $reader = $this->createMock(FilesystemReader::class);
+        $reader->expects($this->exactly(2))->method('read')->with('app')->willReturnCallback(static function (string $location) use (&$attempt, $key): string {
+            if (0 === $attempt++) {
+                throw UnableToReadFile::fromLocation($location);
+            }
+
+            return $key;
+        });
+
+        $loader = new FlysystemKeyLoader($reader);
+
+        try {
+            $loader->load('app');
+            $this->fail('A KeyNotFoundException should have been thrown.');
+        } catch (KeyNotFoundException) {
+        }
+
+        $this->assertSame($key, $loader->load('app'));
     }
 
     public function testDirectoryAndExtensionAreCombined()
@@ -90,6 +162,45 @@ class FlysystemKeyLoaderTest extends TestCase
         $this->assertSame($key, $loader->load('raw'));
         $this->assertSame($key."\n", $loader->load('lf'));
         $this->assertSame($key."\r\n", $loader->load('crlf'));
+    }
+
+    public function testCachedKeyMaterialIsNotExposedByPrintingTools()
+    {
+        $reader = new class extends Filesystem {
+            private const string SECRET = 'S3CR3T-KEY-MATERIAL-0123456789ab';
+
+            public function __construct()
+            {
+            }
+
+            public function read(string $location): string
+            {
+                return self::SECRET;
+            }
+        };
+        $loader = new FlysystemKeyLoader($reader);
+        $this->assertSame(self::SECRET, $loader->load('app'));
+
+        ob_start();
+        var_dump($loader);
+        print_r($loader);
+        var_export($loader);
+        $printed = ob_get_clean();
+
+        $this->assertStringNotContainsString(self::SECRET, $printed);
+    }
+
+    public function testSerializingAfterCachingKeyMaterialIsRefused()
+    {
+        $reader = $this->createStub(FilesystemReader::class);
+        $reader->method('read')->willReturn(self::SECRET);
+        $loader = new FlysystemKeyLoader($reader);
+        $loader->load('app');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('cannot be serialized');
+
+        serialize($loader);
     }
 
     /**

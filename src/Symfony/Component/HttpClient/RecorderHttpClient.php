@@ -68,11 +68,13 @@ final class RecorderHttpClient implements HttpClientInterface
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        // the request is normalized for the recorded modes only, so that Passthrough stays a no-op
+        // the caller's original options are forwarded as is in every mode, so that a client
+        // decorated by this one keeps applying its own defaults; normalization only happens
+        // internally, to compute the HAR key or feed the replay client
         return match ($this->configuration->getMode()) {
             RecorderMode::Passthrough => new AsyncResponse($this->client, $method, $url, $options),
-            RecorderMode::Record => $this->record(...$this->prepare($method, $url, $options)),
-            RecorderMode::Replay => $this->replay(...$this->prepare($method, $url, $options)),
+            RecorderMode::Record => $this->record($method, $url, $options),
+            RecorderMode::Replay => $this->replay($method, $url, $options),
         };
     }
 
@@ -103,11 +105,15 @@ final class RecorderHttpClient implements HttpClientInterface
      */
     private function replay(string $method, string $url, array $options): ResponseInterface
     {
+        // the replay client never touches the network, so it can safely be fed the fully
+        // normalized request: there is no inner client whose own defaults could be shadowed
+        [, $normalizedUrl, $normalizedOptions] = $this->prepare($method, $url, $options);
+
         $harFilePath = $this->configuration->getHarFilePath();
 
         // clear the query option before handing the options over, because the URL
         // prepared by this client already carries it and MockHttpClient would otherwise merge it a second time
-        $options['query'] = [];
+        $normalizedOptions['query'] = [];
 
         // a new file means a new playback cursor
         if ($this->consumedPath !== $harFilePath) {
@@ -123,21 +129,26 @@ final class RecorderHttpClient implements HttpClientInterface
             // The client is shared so that multiple responses can be streamed together (AsyncResponse::stream() requires all responses to share one client)
             $this->replayClient ??= new MockHttpClient(fn (string $method, string $url, array $options) => HarFile::fromFile($this->configuration->getHarFilePath())->findResponse($this->matcher, $method, $url, $options, $this->consumed));
 
-            return new AsyncResponse($this->replayClient, $method, $url, $options);
+            return new AsyncResponse($this->replayClient, $method, $normalizedUrl, $normalizedOptions);
         } catch (HarEntryNotFoundException $e) {
             if (!$this->configuration->shouldRecordIfMissing()) {
                 throw $e;
             }
 
+            // the caller's original options, untouched, so the real request below gets them
             return $this->record($method, $url, $options);
         }
     }
 
     private function record(string $method, string $url, array $options): ResponseInterface
     {
-        $matchUrl = $this->redactor->redactUrl($url);
-        $requestBody = \is_string($options['body']) && '' !== $options['body'] ? $this->redactor->redactBody($options['body']) : null;
-        $requestHeaders = $this->redactor->redactHeaders(self::normalizeHeadersForRedactor($options['normalized_headers'] ?? []));
+        // normalized only to compute the HAR key: the real request below keeps the caller's
+        // original options, so that $this->client still applies its own default options
+        [, $normalizedUrl, $normalizedOptions] = $this->prepare($method, $url, $options);
+
+        $matchUrl = $this->redactor->redactUrl($normalizedUrl);
+        $requestBody = \is_string($normalizedOptions['body']) && '' !== $normalizedOptions['body'] ? $this->redactor->redactBody($normalizedOptions['body']) : null;
+        $requestHeaders = $this->redactor->redactHeaders(self::normalizeHeadersForRedactor($normalizedOptions['normalized_headers'] ?? []));
 
         $buffer = '';
 

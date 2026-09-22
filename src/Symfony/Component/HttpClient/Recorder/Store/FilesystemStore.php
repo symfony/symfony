@@ -86,7 +86,10 @@ final class FilesystemStore implements StoreInterface
         }
     }
 
-    private static function isAbsolutePath(string $path): bool
+    /**
+     * @internal
+     */
+    public static function isAbsolutePath(string $path): bool
     {
         return '' !== $path && ('/' === $path[0] || '\\' === $path[0] || preg_match('#^[a-zA-Z]:[\\\/]#', $path));
     }

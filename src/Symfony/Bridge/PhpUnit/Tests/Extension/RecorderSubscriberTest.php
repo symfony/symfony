@@ -14,6 +14,7 @@ namespace Symfony\Bridge\PhpUnit\Tests\Extension;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\Extension\RecorderSubscriber;
+use Symfony\Bridge\PhpUnit\Metadata\AttributeReader;
 use Symfony\Component\HttpClient\Recorder\RecorderMode;
 
 class RecorderSubscriberTest extends TestCase
@@ -64,5 +65,15 @@ class RecorderSubscriberTest extends TestCase
     public function testIsAbsolutePath(string $path, bool $expected): void
     {
         $this->assertSame($expected, RecorderSubscriber::isAbsolutePath($path));
+    }
+
+    public function testShouldTruncateOnlyOncePerPath(): void
+    {
+        $subscriber = new RecorderSubscriber(new AttributeReader(), '/records/');
+
+        $this->assertTrue($subscriber->shouldTruncate('/tests/Foo/shared.har'));
+        $this->assertFalse($subscriber->shouldTruncate('/tests/Foo/shared.har'));
+        $this->assertTrue($subscriber->shouldTruncate('/tests/Foo/other.har'));
+        $this->assertFalse($subscriber->shouldTruncate('/tests/Foo/other.har'));
     }
 }

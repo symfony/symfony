@@ -481,6 +481,29 @@ class RecorderHttpClientTest extends TestCase
         $this->assertArrayNotHasKey('normalized_headers', $inner->capturedOptions);
     }
 
+    public function testRecordDoesNotInventTimeoutAndMaxRedirectsForTheInnerClient()
+    {
+        $inner = new class(new MockResponse('body', ['http_code' => 200])) extends MockHttpClient {
+            public array $capturedOptions = [];
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                // capture the options before the inner client normalizes and applies its own defaults
+                $this->capturedOptions = $options;
+
+                return parent::request($method, $url, $options);
+            }
+        };
+
+        $recorder = new RecorderHttpClient($inner, new FilesystemStore(), new RecorderConfiguration(RecorderMode::Record, $this->harFile));
+        $recorder->request('GET', 'https://example.com/x')->getContent();
+
+        // neither option was set by the caller, so the inner client (e.g. HttpClient::create(['timeout' => 5,
+        // 'max_redirects' => 7])) must be free to apply its own defaults instead of this decorator's generic ones
+        $this->assertArrayNotHasKey('timeout', $inner->capturedOptions);
+        $this->assertArrayNotHasKey('max_redirects', $inner->capturedOptions);
+    }
+
     public function testReplayedJsonBodyIsByteIdenticalWhenNothingWasRedacted()
     {
         $body = '{"url":"https://x/y","name":"caf\u00e9"}';

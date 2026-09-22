@@ -21,6 +21,8 @@ use Symfony\Component\HttpClient\Recorder\RecorderMode;
 
 final class RecorderSubscriber implements PreparationStartedSubscriber
 {
+    private array $truncatedPaths = [];
+
     public function __construct(
         private AttributeReader $reader,
         private string $defaultDirectory,
@@ -53,6 +55,22 @@ final class RecorderSubscriber implements PreparationStartedSubscriber
         }
 
         return $testDir.'/'.$record;
+    }
+
+    /**
+     * Truncates a given path only the first time it is resolved in this process, so that a
+     * class-level #[UseRecord] pointing at one shared file lets every test of that class
+     * append to it instead of restarting from empty on each of them.
+     *
+     * @internal
+     */
+    public function shouldTruncate(string $path): bool
+    {
+        if (isset($this->truncatedPaths[$path])) {
+            return false;
+        }
+
+        return $this->truncatedPaths[$path] = true;
     }
 
     public function notify(PreparationStarted $event): void
@@ -88,9 +106,9 @@ final class RecorderSubscriber implements PreparationStartedSubscriber
 
         $record = self::resolveRecordPath($attribute->record, $currentTestDir, $matches['className'], $test->methodName(), $this->defaultDirectory);
 
-        if (RecorderMode::Record === $mode) {
-            // recording rewrites the fixture: the file starts empty for each test, and every client of
-            // that test appends to it
+        if (RecorderMode::Record === $mode && $this->shouldTruncate($record)) {
+            // recording rewrites the fixture: it starts empty the first time this path is
+            // resolved in this process, and every client of every test using it then appends to it
             @unlink($record);
         }
 

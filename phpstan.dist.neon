@@ -8,6 +8,7 @@ parameters:
     treatPhpDocTypesAsCertain: false
     tmpDir: .github/sa-tools/phpstan-cache
     scanFiles:
+        - .github/sa-tools/stubs/ext-terminal.php
         - .github/sa-tools/stubs/phpunit-13.php
     paths:
         - src
@@ -23,13 +24,6 @@ parameters:
     ignoreErrors:
         # Added in PHP 8.4
         - '#^Class BcMath\\Number not found\.$#'
-        # These guarded calls use an optional extension that is absent during static analysis.
-        -
-            message: '#^Call to static method create\(\) on an unknown class Io\\Terminal\\Terminal\.$#'
-            path: src/Symfony/Component/Console/Terminal.php
-        -
-            message: '#^Call to static method fromStreams\(\) on an unknown class Io\\Terminal\\Terminal\.$#'
-            path: src/Symfony/Component/Console/Helper/QuestionHelper.php
         # DeferredBatchMessage::$acked aliases a bool that batch handlers flip during dispatch()
         -
             message: '#^If condition is always false\.$#'

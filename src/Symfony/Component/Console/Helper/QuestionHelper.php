@@ -433,7 +433,7 @@ class QuestionHelper extends Helper
      */
     private function getHiddenResponse(OutputInterface $output, $inputStream, bool $trimmable = true): string
     {
-        if (self::$stty && \extension_loaded('terminal') && version_compare(phpversion('terminal'), '1.0.0', '>=') && @stream_isatty($inputStream)) {
+        if (self::$stty && Terminal::hasExtTerminal() && @stream_isatty($inputStream)) {
             try {
                 $value = \Io\Terminal\Terminal::fromStreams($inputStream)->readSecret();
             } catch (\RuntimeException $e) {

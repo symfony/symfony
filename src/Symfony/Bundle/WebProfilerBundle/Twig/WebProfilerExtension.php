@@ -21,6 +21,7 @@ use Twig\Environment;
 use Twig\Extension\ProfilerExtension;
 use Twig\Profiler\Profile;
 use Twig\Runtime\EscaperRuntime;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /**
@@ -69,6 +70,13 @@ class WebProfilerExtension extends ProfilerExtension
         ];
     }
 
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('profiler_format_bytes', $this->formatBytes(...)),
+        ];
+    }
+
     /**
      * Returns null when the part refers to a file that cannot be read anymore.
      */
@@ -91,6 +99,21 @@ class WebProfilerExtension extends ProfilerExtension
         } catch (InvalidArgumentException) {
             return null;
         }
+    }
+
+    /**
+     * Formats a number of bytes using decimal units, the convention for transferred and stored sizes.
+     */
+    public function formatBytes(int|float $bytes): string
+    {
+        if ($bytes < 1000) {
+            return $bytes.' bytes';
+        }
+
+        $units = ['kB', 'MB', 'GB', 'TB', 'PB'];
+        $exponent = max(1, min((int) log($bytes, 1000), \count($units)));
+
+        return number_format($bytes / 1000 ** $exponent, 2).' '.$units[$exponent - 1];
     }
 
     public function dumpData(Environment $env, Data $data, int $maxDepth = 0): string

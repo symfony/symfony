@@ -19,6 +19,7 @@ use Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
@@ -150,6 +151,75 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertCount(0, $collectedData['http_client3']['traces']);
     }
 
+    public function testItCollectsTimingAndSizeOfEachRequest()
+    {
+        $httpClient = $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'GET',
+                'url' => 'http://localhost:8057/',
+            ],
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/post',
+                'options' => ['body' => 'foo=0123456789'],
+            ],
+        ]);
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $httpClient);
+        $sut->lateCollect();
+        $traces = $sut->getClients()['http_client']['traces'];
+        $this->assertCount(2, $traces);
+
+        $this->assertIsFloat($traces[0]['total_time']);
+        $this->assertGreaterThan(0, $traces[0]['total_time']);
+        $this->assertIsInt($traces[0]['size_download']);
+        $this->assertGreaterThan(0, $traces[0]['size_download']);
+        $this->assertArrayNotHasKey('size_upload', $traces[0]);
+
+        $this->assertIsFloat($traces[1]['total_time']);
+        $this->assertGreaterThan(0, $traces[1]['total_time']);
+        $this->assertGreaterThan(0, $traces[1]['size_download']);
+        $this->assertSame(14, $traces[1]['size_upload']);
+    }
+
+    public function testItSkipsEmptyTimingAndSize()
+    {
+        $httpClient = new TraceableHttpClient(new MockHttpClient([
+            new MockResponse('', ['total_time' => 0.0, 'size_download' => 0, 'size_upload' => 0]),
+            new MockResponse('hello'),
+        ]));
+        $httpClient->request('GET', 'http://example.com/')->getContent(false);
+        $httpClient->request('GET', 'http://example.com/other')->getContent(false);
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $httpClient);
+        $sut->lateCollect();
+        $traces = $sut->getClients()['http_client']['traces'];
+
+        // an empty response body is a meaningful value, an empty request body is the default
+        $this->assertArrayNotHasKey('total_time', $traces[0]);
+        $this->assertSame(0, $traces[0]['size_download']);
+        $this->assertArrayNotHasKey('size_upload', $traces[0]);
+
+        // transports that report no size at all are not reported either
+        $this->assertArrayNotHasKey('size_download', $traces[1]);
+        $this->assertArrayNotHasKey('size_upload', $traces[1]);
+    }
+
+    public function testItCollectsTotalTime()
+    {
+        $httpClient1 = new TraceableHttpClient(new MockHttpClient(new MockResponse('', ['total_time' => 0.5])));
+        $httpClient1->request('GET', 'http://example.com/')->getContent(false);
+        $httpClient2 = new TraceableHttpClient(new MockHttpClient(new MockResponse('', ['total_time' => 0.25])));
+        $httpClient2->request('GET', 'http://example.com/other')->getContent(false);
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client1', $httpClient1);
+        $sut->registerClient('http_client2', $httpClient2);
+        $this->assertSame(0.0, $sut->getTotalTime());
+        $sut->lateCollect();
+
+        $this->assertSame(0.75, $sut->getTotalTime());
+    }
+
     public function testItIsEmptyAfterReset()
     {
         $httpClient1 = $this->httpClientThatHasTracedRequests([
@@ -167,6 +237,7 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertSame([], $sut->getClients());
         $this->assertSame(0, $sut->getErrorCount());
         $this->assertSame(0, $sut->getRequestCount());
+        $this->assertSame(0.0, $sut->getTotalTime());
     }
 
     #[DataProvider('provideCurlRequests')]

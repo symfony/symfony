@@ -44,4 +44,24 @@ class WebProfilerExtensionTest extends TestCase
         yield ['Some message {foo}', ['foo' => 'foo', 'bar' => 'bar'], true, false];
         yield ['Some message {foo}', ['bar' => 'bar'], false, true];
     }
+
+    #[DataProvider('provideBytes')]
+    public function testFormatBytes(int|float $bytes, string $expected)
+    {
+        self::assertSame($expected, (new WebProfilerExtension())->formatBytes($bytes));
+    }
+
+    public static function provideBytes(): iterable
+    {
+        yield [0, '0 bytes'];
+        yield [999, '999 bytes'];
+        yield [1000, '1.00 kB'];
+        yield [1536, '1.54 kB'];
+        yield [999999, '1,000.00 kB'];
+        yield [1000 ** 2, '1.00 MB'];
+        yield [1.5 * 1000 ** 3, '1.50 GB'];
+        yield [2.5 * 1000 ** 4, '2.50 TB'];
+        yield [1000 ** 5, '1.00 PB'];
+        yield [1000 ** 6, '1,000.00 PB'];
+    }
 }

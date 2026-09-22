@@ -46,6 +46,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
     {
         $this->data['request_count'] ??= 0;
         $this->data['error_count'] ??= 0;
+        $this->data['total_time'] ??= 0.0;
         $this->data += ['clients' => []];
 
         foreach ($this->clients as $name => $client) {
@@ -61,6 +62,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             $this->data['clients'][$name]['traces'] = array_merge($this->data['clients'][$name]['traces'], $traces);
             $this->data['request_count'] += \count($traces);
             $this->data['error_count'] += $errorCount;
+            $this->data['total_time'] += array_sum(array_column($traces, 'total_time'));
             $this->data['clients'][$name]['error_count'] += $errorCount;
 
             if ($traces) {
@@ -84,6 +86,17 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         return $this->data['error_count'] ?? 0;
     }
 
+    /**
+     * The sum of the durations of all requests, in seconds.
+     *
+     * Concurrent requests are each counted in full, so this total can exceed
+     * the wall time actually spent waiting for them.
+     */
+    public function getTotalTime(): float
+    {
+        return $this->data['total_time'] ?? 0.0;
+    }
+
     public function getName(): string
     {
         return 'http_client';
@@ -95,6 +108,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             'clients' => [],
             'request_count' => 0,
             'error_count' => 0,
+            'total_time' => 0.0,
         ];
     }
 
@@ -120,7 +134,20 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             $info = $trace['info'];
             $traces[$i]['http_code'] = $info['http_code'] ?? 0;
 
-            unset($info['filetime'], $info['http_code'], $info['ssl_verify_result'], $info['content_type']);
+            if (0 < ($info['total_time'] ?? 0)) {
+                $traces[$i]['total_time'] = (float) $info['total_time'];
+            }
+
+            // an empty response body is worth reporting, an empty request body is the default for most requests
+            if (isset($info['size_download'])) {
+                $traces[$i]['size_download'] = (int) $info['size_download'];
+            }
+
+            if (0 < ($info['size_upload'] ?? 0)) {
+                $traces[$i]['size_upload'] = (int) $info['size_upload'];
+            }
+
+            unset($info['filetime'], $info['http_code'], $info['ssl_verify_result'], $info['content_type'], $info['total_time'], $info['size_download'], $info['size_upload']);
 
             if (($info['http_method'] ?? null) === $trace['method']) {
                 unset($info['http_method']);

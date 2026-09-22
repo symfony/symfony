@@ -9,6 +9,8 @@ CHANGELOG
  * Allow passing a stream or a closure to `HttpOptions::buffer()`
  * Add `QUERY` to the list of cacheable HTTP methods in `CachingHttpClient`
  * Add `ScopingHttpClient::forBaseUris()` to scope a client to several base URIs at once
+ * Collect the duration and the transferred sizes of each request in `HttpClientDataCollector`
+ * Add `HttpClientDataCollector::getTotalTime()`, the sum of the durations of all requests, in seconds
 
 8.1
 ---

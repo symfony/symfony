@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 class ExtTerminalTest extends TestCase
 {
     #[RequiresPhpExtension('terminal', '>= 1.0.0')]
+    #[Group('integration')]
     public function testDimensionsFromNativeTerminal()
     {
         $this->assertSame([113, 37], $this->runTerminal('dimensions'));
@@ -38,6 +40,7 @@ class ExtTerminalTest extends TestCase
     #[TestWith(['untrimmed', " secret \n", ' secret '])]
     #[TestWith(['hidden', "\n", null])]
     #[RequiresPhpExtension('terminal', '>= 1.0.0')]
+    #[Group('integration')]
     public function testHiddenResponseUsesOutputInterface(string $scenario, string $input, ?string $expected)
     {
         $this->assertSame(['value' => $expected, 'output' => "Password: \n"], $this->runTerminal($scenario, $input));
@@ -47,6 +50,7 @@ class ExtTerminalTest extends TestCase
     #[TestWith(["\x04"])]
     #[TestWith(["\x1b"])]
     #[RequiresPhpExtension('terminal', '>= 1.0.0')]
+    #[Group('integration')]
     public function testCancellationWithoutFallback(string $key)
     {
         $this->assertSame([
@@ -60,12 +64,14 @@ class ExtTerminalTest extends TestCase
     #[TestWith(["\x04"])]
     #[TestWith(["\x1b"])]
     #[RequiresPhpExtension('terminal', '>= 1.0.0')]
+    #[Group('integration')]
     public function testCancellationWithFallback(string $key)
     {
         $this->assertSame(['value' => 'visible', 'output' => 'Password: '], $this->runTerminal('fallback', 'secret'.$key));
     }
 
     #[RequiresPhpExtension('terminal', '>= 1.0.0')]
+    #[Group('integration')]
     public function testDisableSttyPreventsNativeHiddenInput()
     {
         $this->assertSame([

@@ -984,6 +984,60 @@ class AccessTokenFactoryTest extends TestCase
         return $node->finalize($normalizedConfig);
     }
 
+    public function testTheTokensOfAFirewallAreBearerTokensByDefault()
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig(['token_handler' => 'in_memory_token_handler_service_id'], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $this->assertNull($container->getDefinition('security.authenticator.access_token.firewall1')->getArgument(7));
+        $this->assertFalse($container->hasDefinition('security.authenticator.access_token.sender_constraint.dpop.firewall1'));
+        $this->assertSame('security.access_token_extractor.header', (string) $container->getDefinition('security.authenticator.access_token.firewall1')->getArgument(1));
+    }
+
+    public function testDpopBindsTheTokensOfTheFirewallToTheKeyOfTheirProof()
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig([
+            'token_handler' => 'in_memory_token_handler_service_id',
+            'dpop' => true,
+        ], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $senderConstraintId = 'security.authenticator.access_token.sender_constraint.dpop.firewall1';
+        $this->assertSame($senderConstraintId, (string) $container->getDefinition('security.authenticator.access_token.firewall1')->getArgument(7));
+
+        $senderConstraint = $container->getDefinition($senderConstraintId);
+        $this->assertSame(['ES256', 'PS256', 'RS256'], $senderConstraint->getArgument(0)->getArgument(0));
+        $this->assertSame('cache.app', (string) $senderConstraint->getArgument(1));
+        $this->assertSame(60, $senderConstraint->getArgument(3));
+        $this->assertSame(5, $senderConstraint->getArgument(4));
+
+        // the same constraint names the scheme of the 403 a missing scope is answered with
+        $this->assertSame($senderConstraintId, (string) $container->getDefinition('security.fallback_access_denied_handler.firewall1')->getArgument(3));
+    }
+
+    public function testADpopBoundTokenIsReadFromTheSchemeItIsPresentedUnder()
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig([
+            'token_handler' => 'in_memory_token_handler_service_id',
+            'dpop' => true,
+            'resource_metadata' => ['resource' => 'https://api.example.com'],
+        ], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $this->assertSame('security.access_token_extractor.dpop_header', (string) $container->getDefinition('security.authenticator.access_token.firewall1')->getArgument(1));
+        // RFC 9728, Section 2: the method is where the token travels, which the scheme does not change
+        $this->assertSame(['header'], $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller')->getArgument(0)['firewall1']['bearer_methods_supported']);
+    }
+
     public function testNoResourceMetadataIsServedByDefault()
     {
         $container = $this->createContainerBuilder();

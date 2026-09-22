@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Http\AccessToken\SenderConstraintInterface;
 use Symfony\Component\Security\Http\Authorization\InsufficientScopeAccessDeniedHandler;
 
 class InsufficientScopeAccessDeniedHandlerTest extends TestCase
@@ -57,6 +58,18 @@ class InsufficientScopeAccessDeniedHandlerTest extends TestCase
 
         $this->assertStringEndsWith('scope="openid profile:read"', $handler->handle(Request::create('/test'), $this->createException(['OAUTH2_SCOPE(openid profile:read)']))->headers->get('WWW-Authenticate'));
         $this->assertStringEndsWith('scope="profile:read openid"', $handler->handle(Request::create('/test'), $this->createException(['OAUTH2_SCOPE(profile:read openid)']))->headers->get('WWW-Authenticate'));
+    }
+
+    public function testTheChallengeNamesTheSchemeTheTokensOfTheFirewallArePresentedUnder()
+    {
+        $senderConstraint = $this->createStub(SenderConstraintInterface::class);
+        $senderConstraint
+            ->method('getChallenge')
+            ->willReturn(['DPoP', ['algs' => 'ES256']]);
+
+        $handler = new InsufficientScopeAccessDeniedHandler(null, null, null, $senderConstraint);
+
+        $this->assertSame('DPoP error="insufficient_scope",error_description="The request requires higher privileges than provided by the access token.",scope="openid"', $handler->handle(Request::create('/test'), $this->createException(['OAUTH2_SCOPE(openid)']))->headers->get('WWW-Authenticate'));
     }
 
     private function createException(array $attributes): AccessDeniedException

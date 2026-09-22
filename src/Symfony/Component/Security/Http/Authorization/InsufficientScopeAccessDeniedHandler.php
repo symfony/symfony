@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Authorization;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Http\AccessToken\SenderConstraintInterface;
 
 /**
  * Answers the RFC 6750 §3.1 "insufficient_scope" challenge when access was denied for a missing OAuth2 scope.
@@ -33,10 +34,16 @@ class InsufficientScopeAccessDeniedHandler implements AccessDeniedHandlerInterfa
      */
     private const ERROR_DESCRIPTION = 'The request requires higher privileges than provided by the access token.';
 
+    /**
+     * @param SenderConstraintInterface|null $senderConstraint What the firewall binds its access tokens to, which
+     *                                                         names the scheme of this challenge as it names the
+     *                                                         one of a 401 (RFC 9449, Section 7.1)
+     */
     public function __construct(
         private ?string $realm = null,
         private ?AccessDeniedHandlerInterface $inner = null,
         private ?string $resourceMetadataUri = null,
+        private ?SenderConstraintInterface $senderConstraint = null,
     ) {
     }
 
@@ -71,6 +78,10 @@ class InsufficientScopeAccessDeniedHandler implements AccessDeniedHandlerInterfa
      */
     private function getAuthenticateHeader(Request $request, array $scopes): string
     {
+        // a denial is no failure of the proof of possession, so the constraint answers it with its scheme
+        // and with nothing else; "insufficient_scope" describes the token, which is a valid one
+        [$scheme] = $this->senderConstraint?->getChallenge(null) ?? ['Bearer'];
+
         $data = [
             'realm' => $this->realm,
             'error' => 'insufficient_scope',
@@ -90,6 +101,6 @@ class InsufficientScopeAccessDeniedHandler implements AccessDeniedHandlerInterfa
             $values[] = \sprintf('%s="%s"', $k, $v);
         }
 
-        return \sprintf('Bearer %s', implode(',', $values));
+        return \sprintf('%s %s', $scheme, implode(',', $values));
     }
 }

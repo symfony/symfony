@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-19T14:53:48Z
+
+Thanks for the review @GromNaN.
+All comments addressed. Let me know if the design is better now.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-20T12:06:30Z
+
+> Regarding the naming, RedundantKms should be named CompositeKms  to be more descriptive.
+
+As I mentioned a composite KMS yesterday in the discussion we had, I will change to that. It is neutral and the docblock is clear on the intent
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-20T14:15:36Z
+
+Many thanks @nicolas-grekas . I am OK with the changes 👍
+Both points will be addressed soon. I noted InMemoryKms does not work as expected and will be ~changed in this PR too~ addressed in another PR.

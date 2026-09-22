@@ -70,10 +70,6 @@ class DataKeyStoreTest extends TestCase
         $this->assertSame(['id', 'scope', 'key_material', 'master_key_id', 'client'], array_keys($row));
     }
 
-    /**
-     * The column is 191 characters wide and only the server enforces it, when it does at all: a
-     * MySQL running without strict mode truncates, so two long scopes would silently share a key.
-     */
     public function testAScopeLongerThanItsColumnIsRefused()
     {
         $store = $this->store();
@@ -170,10 +166,6 @@ class DataKeyStoreTest extends TestCase
         $this->assertSame('written before', $encrypter->decrypt($envelope));
     }
 
-    /**
-     * A key row written inside a transaction goes away with it, and a payload sealed with that key
-     * afterwards would be lost for good: nothing can unwrap what no row holds.
-     */
     public function testAKeyMintedInARolledBackTransactionIsNotEncryptedWith()
     {
         $store = $this->store();
@@ -207,11 +199,6 @@ class DataKeyStoreTest extends TestCase
         $this->assertSame(1, $this->rowCount());
     }
 
-    /**
-     * The row of a key minted inside a transaction is looked up again until the transaction is over,
-     * since nothing else tells a rollback from a commit; once seen committed, it is trusted for as
-     * long as it is remembered.
-     */
     public function testAKeyMintedInATransactionIsTrustedOnceItsCommitWasSeen()
     {
         $queries = [];
@@ -262,11 +249,6 @@ class DataKeyStoreTest extends TestCase
         $this->assertSame(1, $this->rowCount());
     }
 
-    /**
-     * A store that was told nothing about rotation still rotates, because the envelopes it feeds
-     * are sealed under a random 96-bit IV: what they cannot survive is a key that seals payloads
-     * forever. The retired row stays, so what it sealed stays readable.
-     */
     public function testAStoreThatWasToldNothingRetiresAKeyOlderThanTheDefaultAge()
     {
         $store = new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => new InMemoryKms()]), 'default', 'app');
@@ -290,9 +272,6 @@ class DataKeyStoreTest extends TestCase
         $this->assertSame(1, $this->rowCount());
     }
 
-    /**
-     * Turning rotation off is something an application can still ask for, and then owns.
-     */
     public function testANullMaxAgeNeverRotates()
     {
         $store = $this->store(maxAgeSeconds: null);
@@ -412,10 +391,6 @@ class DataKeyStoreTest extends TestCase
         $this->assertCount(5, $table->getColumns(), 'the queries name these five columns and no other.');
     }
 
-    /**
-     * The two branches of configureSchema(), the schema editor of doctrine/dbal >= 4.5 and the
-     * legacy createTable() below it, must describe the same table; this is what says so.
-     */
     public function testConfigureSchemaKeysTheTableOnItsReferenceAndIndexesTheScopeLookup()
     {
         $schema = $this->storeWithoutTable()->configureSchema(new Schema(), static fn (): bool => true);
@@ -472,10 +447,6 @@ class DataKeyStoreTest extends TestCase
         return $store;
     }
 
-    /**
-     * The store of {@see self::store()} with its table left uncreated, since creating it is what
-     * configureSchema() is being asked to describe.
-     */
     private function storeWithoutTable(string $table = DataKeyStore::DEFAULT_TABLE): DataKeyStore
     {
         $kms = new InMemoryKms();
@@ -483,10 +454,6 @@ class DataKeyStoreTest extends TestCase
         return new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', $table);
     }
 
-    /**
-     * Backdates a row by rewriting its reference as a UUIDv7 minted that long ago, which is where
-     * the store reads the age of a key from, and returns the reference it now answers to.
-     */
     private function age(string $reference, int $seconds): string
     {
         $backdated = Uuid::fromString(UuidV7::generate(new \DateTimeImmutable(\sprintf('@%d', time() - $seconds))))->toBinary();

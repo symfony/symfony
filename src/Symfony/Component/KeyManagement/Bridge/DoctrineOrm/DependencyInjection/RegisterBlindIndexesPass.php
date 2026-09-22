@@ -18,8 +18,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 
 /**
- * Hands {@see \Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener}
- * the blind indexes of the application, keyed by class name.
+ * Hands the blind indexes of the application to the listener, keyed by class name.
+ *
+ * The listener is {@see \Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener}.
  *
  * Keyed by class rather than by service id, because that is what {@see BlindIndexed} names: an
  * entity says `Email::class`, which an application reads and a typo in which is a fatal error

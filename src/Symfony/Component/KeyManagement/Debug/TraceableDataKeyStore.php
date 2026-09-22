@@ -48,8 +48,10 @@ final class TraceableDataKeyStore implements DataKeyStoreInterface
     }
 
     /**
-     * The decorated store, for whoever needs to look past the decorator, and for the rewrapping
-     * half this one does not claim.
+     * The decorated store.
+     *
+     * For whoever needs to look past the decorator, and for the rewrapping half this one does not
+     * claim.
      */
     public function getStore(): DataKeyStoreInterface
     {

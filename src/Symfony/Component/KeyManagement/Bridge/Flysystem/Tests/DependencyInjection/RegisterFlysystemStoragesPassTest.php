@@ -31,10 +31,6 @@ class RegisterFlysystemStoragesPassTest extends TestCase
         );
     }
 
-    /**
-     * Anything else producing that tag without the attribute the bundle sets is still reachable,
-     * under the id it was registered as.
-     */
     public function testAStorageWithoutTheAttributeFallsBackToItsServiceId()
     {
         $container = new ContainerBuilder();
@@ -48,10 +44,6 @@ class RegisterFlysystemStoragesPassTest extends TestCase
         );
     }
 
-    /**
-     * An application exposing a storage under a name of its own has said what it wants, and that
-     * has to stay the only name the DSN answers to.
-     */
     public function testAStorageTaggedByHandIsLeftAlone()
     {
         $container = new ContainerBuilder();

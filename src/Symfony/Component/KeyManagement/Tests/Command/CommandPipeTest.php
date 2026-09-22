@@ -49,10 +49,6 @@ class CommandPipeTest extends TestCase
         $this->assertSame("hello world\n", $output);
     }
 
-    /**
-     * The scenario raised in the review: re-encrypt an existing envelope by piping the decryption
-     * into a fresh encryption.
-     */
     public function testDecryptPipedIntoEncryptReEncryptsThePayload()
     {
         $payload = 'a secret worth rotating';

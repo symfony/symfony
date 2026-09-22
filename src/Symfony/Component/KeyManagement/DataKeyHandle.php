@@ -40,9 +40,10 @@ final class DataKeyHandle
     use KeyMaterial;
 
     /**
-     * Takes the plaintext out of `$dataKey`, which is consumed in the process: the key moves here
-     * instead of being shared, so the DataKey wipes what it held and the handle becomes the only
-     * thing able to hand the key out, or to wipe it.
+     * Takes the plaintext out of `$dataKey`, which is consumed in the process.
+     *
+     * The key moves here instead of being shared, so the DataKey wipes what it held and the handle
+     * becomes the only thing able to hand the key out, or to wipe it.
      */
     public function __construct(
         public readonly string $reference,

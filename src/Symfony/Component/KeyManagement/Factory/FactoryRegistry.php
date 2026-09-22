@@ -17,10 +17,10 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
 
 /**
- * Composite {@see KmsFactoryInterface} that delegates to the first registered
- * factory whose `supports()` returns true. Bridges register themselves with
- * the `key_management.factory` DI tag so installing a new bridge is enough to
- * extend the set of supported schemes.
+ * Composite {@see KmsFactoryInterface} delegating to the first factory that supports a DSN.
+ *
+ * Bridges register themselves with the `key_management.factory` DI tag, so
+ * installing a new bridge is enough to extend the set of supported schemes.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *

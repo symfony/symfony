@@ -19,8 +19,10 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Serializes an {@see Envelope} to (and from) a base64-encoded string so it
- * can travel through any structured format (JSON, XML, YAML, ...).
+ * Serializes an {@see Envelope} to (and from) a base64-encoded string.
+ *
+ * The envelope can then travel through any structured format (JSON, XML,
+ * YAML, ...).
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *

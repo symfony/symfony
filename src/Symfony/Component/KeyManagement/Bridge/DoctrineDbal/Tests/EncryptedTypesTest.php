@@ -24,8 +24,9 @@ use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
 
 /**
- * The type registry is global and has no way of forgetting a name, so each test declares one of
- * its own rather than leaking a type into the next.
+ * Each test declares a type name of its own rather than leaking one into the next.
+ *
+ * The type registry is global and has no way of forgetting a name.
  */
 #[RequiresPhpExtension('openssl')]
 class EncryptedTypesTest extends TestCase
@@ -70,10 +71,6 @@ class EncryptedTypesTest extends TestCase
         $this->assertSame('other', Envelope::fromBytes(Type::getType($text)->convertToDatabaseValue('x', new SQLitePlatform()))->keyId);
     }
 
-    /**
-     * What a rebooted kernel does: the registry outlives the container, so the second pass has to
-     * replace the types of the first rather than refuse to declare them.
-     */
     public function testDeclaringTwiceReplacesTheTypeInsteadOfFailing()
     {
         $name = self::uniqueName();

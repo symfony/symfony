@@ -37,8 +37,10 @@ interface RewrappableDataKeyStoreInterface extends DataKeyStoreInterface
     public function all(?string $client = null): iterable;
 
     /**
-     * Replaces the wrapping of a stored key, leaving its reference and its scope untouched so that
-     * payloads referring to it keep resolving.
+     * Replaces the wrapping of a stored key.
+     *
+     * Its reference and its scope are left untouched, so that payloads referring to it keep
+     * resolving.
      *
      * @throws DataKeyNotFoundException If no stored key matches `$reference`
      */

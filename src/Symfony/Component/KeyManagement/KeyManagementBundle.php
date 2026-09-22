@@ -46,8 +46,9 @@ use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 class KeyManagementBundle extends AbstractBundle
 {
     /**
-     * Prefix of a "key_management.clients" DSN naming a client the application registered itself,
-     * rather than one the factory registry has to build.
+     * Prefix of a "key_management.clients" DSN naming a client the application registered itself.
+     *
+     * Such a client is referenced rather than built by the factory registry.
      */
     private const string SERVICE_SCHEME = 'service://';
 
@@ -170,11 +171,12 @@ class KeyManagementBundle extends AbstractBundle
     }
 
     /**
-     * A client an application built itself is named in "clients" like any other, through a
-     * "service://<id>" DSN. That scheme is resolved here, when the container is built, so it never
-     * reaches the factory registry: an application that hides it behind an environment variable
-     * gets an unsupported scheme at runtime instead, since nothing can be referenced from a value
-     * that is unknown until then.
+     * A client the application built itself is named in "clients" through a "service://<id>" DSN.
+     *
+     * That scheme is resolved here, when the container is built, so it never reaches the factory
+     * registry: an application that hides it behind an environment variable gets an unsupported
+     * scheme at runtime instead, since nothing can be referenced from a value that is unknown until
+     * then.
      *
      * What the scheme registers is a definition rather than an alias, and that is the point: the
      * client keeps the tag the console commands look it up by, the profiler decorates it, and it
@@ -289,11 +291,13 @@ class KeyManagementBundle extends AbstractBundle
     }
 
     /**
+     * Makes the store-backed encrypter the one the envelope interfaces resolve to.
+     *
      * Configuring a store is what an application does to stop carrying a wrapped data key in every
-     * payload, so the store-backed encrypter becomes the one the envelope interfaces resolve to.
-     * Nothing is lost by that: it is given the default client's encrypter as a fallback, so it
-     * reads the payloads written before it as well as the ones it writes. The per-client encrypters
-     * stay reachable under their own name for whoever wants the other regime explicitly.
+     * payload. Nothing is lost by that: the encrypter is given the default client's encrypter as a
+     * fallback, so it reads the payloads written before it as well as the ones it writes. The
+     * per-client encrypters stay reachable under their own name for whoever wants the other regime
+     * explicitly.
      *
      * The clients it can rewrap a data key under are the tagged ones rather than the configured
      * ones, so a client contributed by a bundle is a rewrap target as well. The one it wraps with

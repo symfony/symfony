@@ -17,8 +17,9 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 
 /**
- * An encrypted column next to a unique one, so that a flush can fail after the column was
- * converted.
+ * An encrypted column next to a unique one.
+ *
+ * A flush can then fail after the column was converted.
  */
 #[Entity]
 class EncryptedColumnEntity

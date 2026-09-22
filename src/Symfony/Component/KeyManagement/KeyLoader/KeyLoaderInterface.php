@@ -15,9 +15,10 @@ use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
 
 /**
- * Sources raw key material by id for the local symmetric KMS backends
- * ({@see \Symfony\Component\KeyManagement\Local\SodiumKms},
- * {@see \Symfony\Component\KeyManagement\Local\OpenSslKms}).
+ * Sources raw key material by id for the local symmetric KMS backends.
+ *
+ * Those are {@see \Symfony\Component\KeyManagement\Local\SodiumKms} and
+ * {@see \Symfony\Component\KeyManagement\Local\OpenSslKms}.
  *
  * Implementations decide where keys live (in-memory map, filesystem, secret
  * store, ...) and when to read them. The contract is intentionally narrow:

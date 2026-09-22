@@ -17,8 +17,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * Acquires Azure AD bearer tokens for the Azure Key Vault audience using the
- * OAuth2 `client_credentials` grant: tenant id + client id + client secret.
+ * Acquires Azure AD bearer tokens for the Azure Key Vault audience.
+ *
+ * It uses the OAuth2 `client_credentials` grant: tenant id + client id +
+ * client secret.
  *
  * The token is cached in memory until 60s before its advertised expiration to
  * give long-running operations a safety margin against clock skew.

@@ -41,8 +41,10 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
 interface DataKeyStoreInterface
 {
     /**
-     * Returns the data key to encrypt with in `$scope`, creating one when the scope has none yet
-     * or when the implementation considers the current one retired.
+     * Returns the data key to encrypt with in `$scope`.
+     *
+     * One is created when the scope has none yet or when the implementation considers the current
+     * one retired.
      *
      * @throws RuntimeException If the key cannot be created or unwrapped
      */

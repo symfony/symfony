@@ -55,7 +55,6 @@ class AzureKeyVaultFactoryTest extends TestCase
 
     public function testUnknownAlgorithmIsRejected()
     {
-        // Azure answers HTTP 400 to an unknown "alg", which the decrypt path masks as a decryption failure
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "algorithm" option of the "azure-keyvault://" DSN must be one of "RSA-OAEP-256", "RSA-OAEP", "RSA1_5", ');
         (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t&algorithm=RSA-OAEP-265'));
@@ -98,7 +97,6 @@ class AzureKeyVaultFactoryTest extends TestCase
 
     public function testUnknownDsnOptionIsRejected()
     {
-        // A near miss like "algorithms" must not silently keep the default algorithm.
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option "algorithms"');
         (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t&algorithms=A256GCM'));
@@ -127,8 +125,6 @@ class AzureKeyVaultFactoryTest extends TestCase
 
     public function testLookAlikeHostDoesNotMatchManagedHsm()
     {
-        // "managedhsm" appears as a substring but is not the suffix; the previous
-        // str_contains() heuristic would incorrectly treat this as Managed HSM.
         $kms = (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@managedhsm-fake.example.com?tenant=t'));
 
         $this->assertSame('https://vault.azure.net/.default', self::audienceOf($kms));

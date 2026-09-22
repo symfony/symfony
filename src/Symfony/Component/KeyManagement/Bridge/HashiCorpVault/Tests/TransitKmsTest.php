@@ -92,8 +92,6 @@ class TransitKmsTest extends TestCase
 
     public function testAadOnANonDerivedKeyIsRefused()
     {
-        // Vault silently ignores the context parameter on non-derived keys, so
-        // an AAD mismatch would decrypt fine; the bridge must refuse instead.
         $client = new MockHttpClient(
             new MockResponse(json_encode(['data' => ['derived' => false]])),
             'https://vault.local/v1/',
@@ -213,8 +211,6 @@ class TransitKmsTest extends TestCase
             'https://vault.local/v1/',
         );
 
-        // Distinguishing "unknown key id" from "wrong ciphertext" would be a
-        // key-enumeration oracle.
         $this->expectException(DecryptionFailedException::class);
         (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:x', 'missing'));
     }
@@ -353,8 +349,6 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:x']]));
         }, 'https://vault.local/v1/');
 
-        // A mount point like "kms/transit" must not be percent-encoded as a whole,
-        // otherwise the slash becomes %2F and Vault returns 404.
         (new TransitKms($client, 't', 'kms/transit'))->encrypt('app', 'hello');
 
         $this->assertSame('https://vault.local/v1/kms/transit/encrypt/app', $captured);

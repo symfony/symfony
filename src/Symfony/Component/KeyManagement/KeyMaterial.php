@@ -14,8 +14,9 @@ namespace Symfony\Component\KeyManagement;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 
 /**
- * Keeps key material out of the object that owns it, so that printing the object cannot print the
- * key.
+ * Keeps key material out of the object that owns it.
+ *
+ * Printing the object then cannot print the key.
  *
  * A key held in a property is printed by everything that walks an object: `var_dump()`,
  * `print_r()`, `var_export()`, `serialize()`, and the `VarCloner` behind `dump()`, the profiler and

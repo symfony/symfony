@@ -87,8 +87,10 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * The cached handle survives on purpose: rewrapping changes how the data key is protected, not
-     * the key itself, so anything already encrypted with it stays valid.
+     * The cached handle survives a rewrap on purpose.
+     *
+     * Rewrapping changes how the data key is protected, not the key itself, so anything already
+     * encrypted with it stays valid.
      */
     public function rewrap(string $reference, Ciphertext $wrapped, string $client): void
     {
@@ -98,9 +100,10 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * The plaintext is deliberately taken out of the {@see DataKey} and retained: a store exists to
-     * unwrap once and encrypt many payloads. The handle takes a buffer of its own as it does so, so
-     * the DataKey still wipes what it held.
+     * The plaintext is deliberately taken out of the {@see DataKey} and retained.
+     *
+     * A store exists to unwrap once and encrypt many payloads. The handle takes a buffer of its own
+     * as it does so, so the DataKey still wipes what it held.
      */
     public function rotate(string $scope): DataKeyHandle
     {
@@ -113,8 +116,9 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * Drops the retained plaintexts, so the next resolution goes back through the KMS the way a
-     * fresh process would.
+     * Drops the retained plaintexts.
+     *
+     * The next resolution then goes back through the KMS the way a fresh process would.
      */
     public function forget(): void
     {
@@ -149,8 +153,9 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * The creation instant is read back from the UUIDv7 reference, which is why the store needs no
-     * timestamp of its own.
+     * The creation instant is read back from the UUIDv7 reference.
+     *
+     * That is why the store needs no timestamp of its own.
      */
     private function isRetired(StoredDataKey $row): bool
     {

@@ -17,10 +17,11 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
 use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
- * Capability interface for KMS backends that produce envelope-encryption
- * data keys (DEKs). The DEK is returned both in plaintext (for local symmetric
- * encryption of large payloads) and wrapped by the master key (for
- * persistence). The master key never leaves the KMS.
+ * Capability interface for KMS backends that produce envelope-encryption data keys (DEKs).
+ *
+ * The DEK is returned both in plaintext (for local symmetric encryption of
+ * large payloads) and wrapped by the master key (for persistence). The master
+ * key never leaves the KMS.
  *
  * Backends expose this primitive in different ways. Concrete bridges may:
  *   - call a native one-shot endpoint (AWS KMS `GenerateDataKey`, Vault
@@ -56,9 +57,10 @@ interface DataKeyGeneratorInterface
     public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey;
 
     /**
-     * Inverse of {@see generateDataKey()}: unwraps a previously-wrapped DEK and
-     * returns it as a {@see DataKey}, so the recovered plaintext is subject to
-     * the same auto-wipe semantics as a freshly generated one.
+     * Unwraps a previously-wrapped DEK and returns it as a {@see DataKey}.
+     *
+     * This is the inverse of {@see generateDataKey()}: the recovered plaintext is subject to the
+     * same auto-wipe semantics as a freshly generated one.
      *
      * @param string $aad Must match the AAD supplied at wrap time
      *

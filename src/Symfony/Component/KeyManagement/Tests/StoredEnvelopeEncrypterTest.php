@@ -128,10 +128,6 @@ class StoredEnvelopeEncrypterTest extends TestCase
         $this->encrypter->decrypt($tampered);
     }
 
-    /**
-     * The data key is handed to a closure, which is a function like any other: its argument lands in
-     * the trace of anything the local AEAD raises.
-     */
     public function testTheDataKeyDoesNotReachStackTraces()
     {
         $envelope = $this->encrypter->encrypt('user.email', 'jane@example.com');

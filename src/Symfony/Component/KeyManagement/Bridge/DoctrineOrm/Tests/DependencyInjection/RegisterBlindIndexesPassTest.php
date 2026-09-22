@@ -43,10 +43,6 @@ class RegisterBlindIndexesPassTest extends TestCase
         $this->assertSame([Email::class], array_keys($this->indexesOf($container)));
     }
 
-    /**
-     * The attribute names a class, so two services sharing one leave it with no way to say which it
-     * meant. Refused at compile time rather than resolved by chance.
-     */
     public function testTwoIndexesOfTheSameClassAreRefused()
     {
         $container = $this->createContainer();

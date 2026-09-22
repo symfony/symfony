@@ -100,11 +100,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield 'aws' => ['key_management.factory.aws_kms'];
     }
 
-    /**
-     * The container drops each of these when its package is absent, which a typo in the class or in
-     * the package name would turn into a service that is never there, or one that is always there
-     * and fails on its first use.
-     */
     #[DataProvider('provideOptionalServices')]
     public function testAnOptionalServiceNamesThePackageItNeeds(string $serviceId, array $expectedTag)
     {
@@ -145,12 +140,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertInstanceOf(ServiceLocatorArgument::class, $arguments[1]);
     }
 
-    /**
-     * The host of a "...+fly://" DSN is looked up under the "key" attribute of the tag, the same
-     * one the clients are indexed by. Left implicit, the index would be "flysystem", the last
-     * segment of the tag name, and a service tagged as documented would only ever be found when
-     * its id happens to equal the host.
-     */
     public function testFlysystemFactoryIsWiredWithTaggedLocator()
     {
         if (!class_exists(FlysystemKmsFactory::class)) {
@@ -169,12 +158,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key', $iterator->getIndexAttribute());
     }
 
-    /**
-     * A client the application built itself is named in the configuration through a "service://"
-     * DSN, and is registered as a definition rather than as an alias. What an alias would silently
-     * drop is what is asserted here: the tag the console commands and the profiler find a client by,
-     * the envelope encrypter, and the named argument aliases.
-     */
     public function testClientCanBeAServiceTheApplicationRegistered()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -202,11 +185,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    /**
-     * The scheme is resolved when the container is built, so a DSN whose value is unknown until
-     * runtime is handed to the factory registry whatever it holds: an application that puts
-     * "service://" in an environment variable gets an unsupported scheme, not a reference.
-     */
     public function testClientFromAnEnvVarIsAlwaysBuiltFromADsn()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -266,10 +244,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key_management.envelope_encrypter.app', (string) $encrypter[1], 'the default client provides the fallback that reads self-contained envelopes.');
     }
 
-    /**
-     * The store writes a table of its own, so Doctrine has to be told about it or a schema update
-     * ignores it and a migration diff proposes to drop it.
-     */
     public function testStoreBringsTheListenerThatPutsItsTableInTheSchema()
     {
         if (!class_exists(AbstractSchemaListener::class) || !class_exists(DataKeyStoreSchemaListener::class)) {
@@ -291,10 +265,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame(['key_management.store'], array_map(strval(...), $definition->getArgument(0)->getValues()));
     }
 
-    /**
-     * A store that seals payloads under one key forever is what the default must not produce, so
-     * the configuration carries the age the store itself would have applied.
-     */
     public function testStoreRotatesOnTheDefaultAgeWhenTheConfigurationIsSilent()
     {
         if (!class_exists(DataKeyStore::class)) {
@@ -380,10 +350,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertTrue($container->hasAlias('.'.EnvelopeDecrypterInterface::class.' $stored'));
     }
 
-    /**
-     * The store registers the autowiring aliases of the name "stored", and a client of that name
-     * computes the very same ids, so the two would silently overwrite each other.
-     */
     public function testAClientCannotBeNamedAfterTheStore()
     {
         $this->expectException(LogicException::class);
@@ -469,11 +435,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key_management.stored_envelope_encrypter', $container->getDefinition('debug.key_management.stored_envelope_encrypter')->getDecoratedService()[0]);
     }
 
-    /**
-     * The fallback reading self-contained envelopes is the default client's envelope encrypter,
-     * which the pass decorates as well. Reached through its decorator, one read would be recorded
-     * twice, so the stored encrypter is given the decorated service itself.
-     */
     public function testProfilerHandsTheStoredEncrypterAFallbackThatIsNotTracedTwice()
     {
         if (!class_exists(DataKeyStore::class)) {
@@ -577,10 +538,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    /**
-     * A store names the client wrapping its data keys, so a store configured without any client is
-     * a configuration that cannot work.
-     */
     public function testStoreWithoutAnyClientIsRefused()
     {
         $this->expectException(LogicException::class);
@@ -604,11 +561,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    /**
-     * Enabling the bundle without configuring a client stays valid: the factories, the commands and
-     * the blind index listener are what an application registering its clients as services of its
-     * own uses, and it gets no default client since it declared none.
-     */
     public function testWithoutAnyClientRegistersTheFactoriesAndNoDefault()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -672,12 +624,10 @@ class KeyManagementBundleExtensionTest extends TestCase
             ]);
         });
 
-        // `#[Target('vault')] EncrypterInterface $foo` resolves through this alias chain.
         foreach ([EncrypterInterface::class, DecrypterInterface::class, DataKeyGeneratorInterface::class, EnvelopeEncrypterInterface::class, EnvelopeDecrypterInterface::class] as $type) {
             $this->assertTrue($container->hasAlias('.'.$type.' $vault'), $type);
         }
 
-        // The named-argument fallback, which the attribute deprecates, names the role of the service.
         $this->assertSame('key_management.vault', (string) $container->getAlias(EncrypterInterface::class.' $vaultKms'));
         $this->assertSame('key_management.vault', (string) $container->getAlias(DataKeyGeneratorInterface::class.' $vaultKms'));
         $this->assertSame('key_management.envelope_encrypter.vault', (string) $container->getAlias(EnvelopeEncrypterInterface::class.' $vaultEnvelopeEncrypter'));
@@ -732,12 +682,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    /**
-     * Nesting composite clients is refused rather than cycle-checked.
-     *
-     * Two composite clients naming each other would read in circles, and one listing the other
-     * gains nothing over listing its members.
-     */
     public function testAMemberCannotBeACompositeClientItself()
     {
         $this->expectException(LogicException::class);
@@ -755,10 +699,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    /**
-     * Every backend generates data keys, and a blind index is built around one, so an application
-     * registering its own indexes autowires the generator like the rest.
-     */
     public function testTheDefaultClientIsTheDataKeyGeneratorToo()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {

@@ -20,8 +20,7 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
 use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
 
 /**
- * Reads each key from a Flysystem-backed storage at
- * `<directory>/<keyId><extension>`.
+ * Reads each key from a Flysystem-backed storage at `<directory>/<keyId><extension>`.
  *
  * Useful when keys live in remote stores (S3, FTP/SFTP, Azure Blob, Google
  * Cloud Storage, ...). The user wires a Flysystem instance separately

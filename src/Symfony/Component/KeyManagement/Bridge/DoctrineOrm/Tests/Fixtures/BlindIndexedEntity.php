@@ -20,8 +20,9 @@ use Symfony\Component\KeyManagement\BlindIndex\EmailDomain;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 
 /**
- * Two indexes over the same value, and a private source, which is what an entity holding an
- * encrypted column actually looks like.
+ * Two indexes over the same value, and a private source.
+ *
+ * This is what an entity holding an encrypted column actually looks like.
  */
 #[Entity]
 class BlindIndexedEntity

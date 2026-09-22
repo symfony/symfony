@@ -40,9 +40,11 @@ use Psr\Clock\ClockInterface;
 final class PrivateKeyJwt extends AbstractClientAssertion
 {
     /**
-     * The asymmetric signature algorithms {@see \Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier}
-     * accepts on the way in. No MAC algorithm is among them, so a client secret can never be
-     * passed off as the private key this method is built on.
+     * The asymmetric signature algorithms the OIDC signature verifier accepts on the way in.
+     *
+     * They are the ones {@see \Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier}
+     * supports. No MAC algorithm is among them, so a client secret can never be passed off as
+     * the private key this method is built on.
      *
      * @var array<string, class-string<SignatureAlgorithm>>
      */

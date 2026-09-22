@@ -18,8 +18,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * Fetches OpenID Connect signing keys (JWKS) and derives their cache lifetime
- * from the provider's HTTP cache headers.
+ * Fetches OpenID Connect signing keys (JWKS).
+ *
+ * Their cache lifetime is derived from the provider's HTTP cache headers.
  *
  * The "oidc" access token handler and the "oidc_login" authenticator both parse
  * and filter JWKS responses through this class, so the two OIDC entry points
@@ -37,15 +38,17 @@ final class OidcJwks
     public const MAX_TTL = 30 * 24 * 60 * 60;
 
     /**
-     * JWKS documents are small. This limits untrusted data retained by the cache,
-     * as done for the discovery document.
+     * JWKS documents are small.
+     *
+     * This limits untrusted data retained by the cache, as done for the discovery document.
      */
     private const MAX_JWKS_SIZE = 1024 * 1024;
 
     /**
-     * Extracts the signing keys from a JWKS endpoint response, together with the TTL
-     * (in seconds) advertised by the provider via "Cache-Control: max-age" or
-     * "Expires", or null when none is advertised.
+     * Extracts the signing keys from a JWKS endpoint response, together with their TTL.
+     *
+     * The TTL, in seconds, is the one the provider advertises through "Cache-Control: max-age"
+     * or "Expires", and is null when it advertises none.
      *
      * @param bool $enforceKeyUsageVerification When true (default, strict), only JWKs whose `use` is "sig" or whose
      *                                          `key_ops` contains "sign"/"verify" are kept. When false (lax), JWKs
@@ -89,8 +92,9 @@ final class OidcJwks
     }
 
     /**
-     * Fetches the provider signing keys from the given JWKS URI and adjusts the
-     * cache item lifetime from the response headers (capped at 30 days).
+     * Fetches the provider signing keys from the given JWKS URI.
+     *
+     * The cache item lifetime is adjusted from the response headers, capped at 30 days.
      *
      * @return list<array<string, mixed>>
      */

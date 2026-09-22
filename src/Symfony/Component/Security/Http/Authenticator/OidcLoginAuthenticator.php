@@ -58,10 +58,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     private readonly ClockInterface $clock;
 
     /**
-     * A public client, which authenticates with "none", sends no secret: PKCE is then the
-     * only thing binding the authorization code to it, and the ID token signature the only
-     * thing tying the token endpoint response to the provider beyond the TLS verification.
-     * Neither can be turned off for such a client, which is what this constructor refuses.
+     * Refuses a public client that turns PKCE or the ID token signature check off.
+     *
+     * Such a client, which authenticates with "none", sends no secret: PKCE is then the only
+     * thing binding the authorization code to it, and the ID token signature the only thing
+     * tying the token endpoint response to the provider beyond the TLS verification.
      *
      * @param array<string, string>         $authorizationParams Additional parameters of the authorization request, e.g.
      *                                                           "prompt" or "ui_locales"; the protocol parameters the
@@ -148,6 +149,8 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
+     * Sends an authorization request asking the provider to authenticate the End-User again.
+     *
      * "prompt=login" is what OIDC Core 1.0, Section 3.1.2.1 defines for this: the provider
      * prompts the End-User for credentials again instead of answering from the session it
      * already holds. The previous ID token goes along as "id_token_hint" so the provider
@@ -451,12 +454,13 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
-     * Checks the "iss" authorization response parameter of RFC 9207, which ties the
-     * callback to the provider that issued it: without it, a client registered with
-     * several providers can be led to send the code of an honest one to the token
-     * endpoint of a malicious one (the mix-up attack of the OAuth 2.0 Security BCP).
-     * It is checked before the "error" parameter, which RFC 9207, Section 2 requires
-     * it to accompany too.
+     * Checks the "iss" authorization response parameter of RFC 9207.
+     *
+     * It ties the callback to the provider that issued it: without it, a client registered
+     * with several providers can be led to send the code of an honest one to the token
+     * endpoint of a malicious one (the mix-up attack of the OAuth 2.0 Security BCP). It is
+     * checked before the "error" parameter, which RFC 9207, Section 2 requires it to
+     * accompany too.
      */
     private function checkIssuerParameter(string $iss): void
     {
@@ -479,8 +483,9 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
-     * Exchanges the authorization code for tokens and ensures the token endpoint
-     * returned an ID and access token.
+     * Exchanges the authorization code for tokens.
+     *
+     * The token endpoint is held to returning both an ID token and an access token.
      *
      * @return array<string, mixed>
      */
@@ -499,10 +504,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
-     * Returns the user claims from the configured source, the UserInfo endpoint or
-     * the validated ID token, and checks the claim the user identifier is read from.
-     * Claims fetched from UserInfo are tied to the authenticated user by the OIDC
-     * Core 1.0, Section 5.3.2 rule that its "sub" matches the ID token "sub".
+     * Returns the user claims from the configured source, and checks the identifier claim.
+     *
+     * The source is the UserInfo endpoint or the validated ID token. Claims fetched from
+     * UserInfo are tied to the authenticated user by the OIDC Core 1.0, Section 5.3.2 rule
+     * that its "sub" matches the ID token "sub".
      *
      * @param array<string, mixed> $idTokenClaims
      *
@@ -533,10 +539,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
-     * Returns the scopes of the authorization request, always including "openid",
-     * which OIDC Core 1.0, Section 3.1.2.1 requires for the request to return an
-     * ID token. Each configured value may hold several space-separated scopes, so
-     * that an environment variable can carry them all.
+     * Returns the scopes of the authorization request, always including "openid".
+     *
+     * OIDC Core 1.0, Section 3.1.2.1 requires that one for the request to return an ID token.
+     * Each configured value may hold several space-separated scopes, so that an environment
+     * variable can carry them all.
      *
      * @return list<string>
      */

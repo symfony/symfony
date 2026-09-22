@@ -55,9 +55,10 @@ class ClientSecretJwtTest extends TestCase
     }
 
     /**
-     * OIDC Core 1.0, Section 9: the HMAC key is the octets of the UTF-8 representation of the
-     * client secret, so the provider verifies the assertion with the secret it already holds
-     * and nothing has to be registered for this method.
+     * The HMAC key is the octets of the UTF-8 representation of the client secret.
+     *
+     * OIDC Core 1.0, Section 9 defines it, so the provider verifies the assertion with the
+     * secret it already holds and nothing has to be registered for this method.
      */
     public function testKeysTheHmacWithTheOctetsOfTheSecret()
     {
@@ -71,8 +72,9 @@ class ClientSecretJwtTest extends TestCase
     }
 
     /**
-     * An asymmetric algorithm would make the client sign with a secret the provider also
-     * holds, which no key of that kind is meant to be.
+     * An asymmetric algorithm would make the client sign with a shared secret.
+     *
+     * No key of that kind is meant to be one the provider also holds.
      */
     public function testRejectsASignatureAlgorithm()
     {
@@ -83,10 +85,12 @@ class ClientSecretJwtTest extends TestCase
     }
 
     /**
-     * RFC 7518, Section 3.2: the key of an HMAC must be at least as long as the digest it
-     * produces, or the secret and not the algorithm sets the strength of the signature. The
-     * rule belongs to the algorithm, which is asked about the key when the service is built
-     * so that the secret is refused there and not on the first token request.
+     * The key of an HMAC must be at least as long as the digest it produces.
+     *
+     * RFC 7518, Section 3.2 says so, or the secret and not the algorithm sets the strength of
+     * the signature. The rule belongs to the algorithm, which is asked about the key when the
+     * service is built so that the secret is refused there and not on the first token
+     * request.
      */
     #[DataProvider('provideSecretsShorterThanTheDigest')]
     public function testRejectsASecretTheAlgorithmRefusesToBeKeyedWith(string $algorithm, int $length)

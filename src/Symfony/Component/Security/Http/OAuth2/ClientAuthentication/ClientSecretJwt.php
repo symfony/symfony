@@ -44,10 +44,12 @@ final class ClientSecretJwt extends AbstractClientAssertion
     ];
 
     /**
-     * The secret is not measured here: how long a key an algorithm needs is the business of
-     * that algorithm, which RFC 7518, Section 3.2 gives at least as many bytes as the digest
-     * it produces. The algorithm is exercised once on the key instead, so that a secret it
-     * refuses fails on the service rather than on the first token request made with it.
+     * The secret is not measured here.
+     *
+     * How long a key an algorithm needs is the business of that algorithm, which RFC 7518,
+     * Section 3.2 gives at least as many bytes as the digest it produces. The algorithm is
+     * exercised once on the key instead, so that a secret it refuses fails on the service
+     * rather than on the first token request made with it.
      *
      * @param string          $clientSecret The secret shared with the provider, used as the HMAC key
      * @param string          $algorithm    The JWA name of the MAC algorithm, which must be one the provider lists

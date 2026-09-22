@@ -26,8 +26,9 @@ class NoClientAuthenticationTest extends TestCase
     }
 
     /**
-     * Without a secret and without PKCE, nothing binds the authorization code to this
-     * client: an intercepted code could be redeemed by anyone.
+     * Without a secret and without PKCE, nothing binds the authorization code to this client.
+     *
+     * An intercepted code could then be redeemed by anyone.
      */
     public function testRefusesToExchangeACodeWithoutPkce()
     {
@@ -49,8 +50,9 @@ class NoClientAuthenticationTest extends TestCase
     }
 
     /**
-     * PKCE binds the authorization code to this client; the refresh token grant of
-     * RFC 6749, Section 6 carries neither a code nor a verifier.
+     * PKCE binds the authorization code to this client.
+     *
+     * The refresh token grant of RFC 6749, Section 6 carries neither a code nor a verifier.
      */
     public function testAsksForNoCodeVerifierOnTheRefreshTokenGrant()
     {
@@ -60,8 +62,10 @@ class NoClientAuthenticationTest extends TestCase
     }
 
     /**
-     * Only the refresh token grant is exempted, so a grant added later cannot reach the
-     * token endpoint unprotected by being unknown to this check.
+     * Only the refresh token grant is exempted.
+     *
+     * A grant added later cannot reach the token endpoint unprotected by being unknown to
+     * this check.
      */
     public function testRefusesAnyOtherGrantWithoutACodeVerifier()
     {

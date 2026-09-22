@@ -89,10 +89,6 @@ class OidcClientTest extends TestCase
         $this->createClient()->exchangeCode('auth-code', 'https://app.example.com/callback', 'my-code-verifier');
     }
 
-    /**
-     * The client authentication owns the request options, so whatever it puts there is
-     * what the token endpoint is called with.
-     */
     public function testTheTokenRequestIsMadeWithTheOptionsTheClientAuthenticationReturns()
     {
         $clientAuthentication = $this->createMock(ClientAuthenticationInterface::class);
@@ -127,8 +123,9 @@ class OidcClientTest extends TestCase
     }
 
     /**
-     * The client secret and the tokens travel through the token endpoint: a discovery
-     * document announcing a plain HTTP endpoint takes their confidentiality away.
+     * The client secret and the tokens travel through the token endpoint.
+     *
+     * A discovery document announcing a plain HTTP endpoint takes their confidentiality away.
      */
     public function testExchangeCodeRejectsAnInsecureTokenEndpoint()
     {
@@ -155,8 +152,10 @@ class OidcClientTest extends TestCase
     }
 
     /**
-     * The UserInfo endpoint is a protected resource: it takes the access token as a bearer
-     * credential, so the client authentication has no say in that request.
+     * The UserInfo endpoint is a protected resource.
+     *
+     * It takes the access token as a bearer credential, so the client authentication has no
+     * say in that request.
      */
     public function testFetchUserInfoUsesTheAccessTokenAndNoClientAuthentication()
     {
@@ -263,8 +262,10 @@ class OidcClientTest extends TestCase
     }
 
     /**
-     * RFC 6749, Section 5.2: only "invalid_grant" says the refresh token is gone for good,
-     * so it is the only failure a caller may act on by ending the session.
+     * Only "invalid_grant" says the refresh token is gone for good.
+     *
+     * RFC 6749, Section 5.2 makes it the only failure a caller may act on by ending the
+     * session.
      */
     public function testRefreshTokenReportsAnInvalidGrantOnItsOwn()
     {

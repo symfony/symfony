@@ -171,8 +171,9 @@ class OidcTokenRefresherTest extends TestCase
     }
 
     /**
-     * Without the ID token of the original authentication there is nothing to bind the refreshed
-     * one to, so nothing says it still describes the user this security token authenticated.
+     * Without the original ID token there is nothing to bind the refreshed one to.
+     *
+     * Nothing then says it still describes the user this security token authenticated.
      */
     public function testRefreshRejectsARefreshedIdTokenWithNothingToBindItTo()
     {

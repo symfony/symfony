@@ -32,9 +32,11 @@ final class ClientSecretBasic implements ClientAuthenticationInterface
     }
 
     /**
-     * RFC 6749, Section 2.3.1: the client identifier and the secret are each
-     * form-urlencoded before being combined into the HTTP Basic credentials, so that a
-     * colon, a percent sign or a non-ASCII byte in either of them survives the round trip.
+     * Builds the HTTP Basic credentials of RFC 6749, Section 2.3.1.
+     *
+     * The client identifier and the secret are each form-urlencoded before being combined, so
+     * that a colon, a percent sign or a non-ASCII byte in either of them survives the round
+     * trip.
      */
     public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
     {

@@ -15,9 +15,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Dispatched before the user is redirected to the OIDC authorization endpoint, so that the
- * extra parameters of the authorization request can be computed per request, e.g. a
- * "ui_locales" following the current locale or a "login_hint" read from the session.
+ * Dispatched before the user is redirected to the OIDC authorization endpoint.
+ *
+ * The extra parameters of the authorization request can then be computed per request, e.g.
+ * a "ui_locales" following the current locale or a "login_hint" read from the session.
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
@@ -53,9 +54,10 @@ final class OidcAuthorizationRequestEvent extends Event
     }
 
     /**
-     * Replaces the whole list; use setParam() and removeParam() to touch one parameter,
-     * so that several listeners can each set their own without overwriting what the
-     * others did.
+     * Replaces the whole list of extra parameters.
+     *
+     * Use setParam() and removeParam() to touch one parameter, so that several listeners can
+     * each set their own without overwriting what the others did.
      *
      * @param array<string, string> $params
      */

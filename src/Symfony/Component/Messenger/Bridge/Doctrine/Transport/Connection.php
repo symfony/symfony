@@ -138,7 +138,13 @@ class Connection implements ResetInterface
     public function send(string $body, array $headers, int $delay = 0): string
     {
         $now = new \DateTimeImmutable('UTC');
-        $availableAt = $now->modify(\sprintf('%+d seconds', $delay / 1000));
+        $availableAt = $now->modify(\sprintf('%+d milliseconds', $delay));
+
+        if (0 < $delay && '000000' !== $availableAt->format('u')) {
+            // "available_at" is stored with second precision, so a truncated instant would make
+            // the message available before the delay elapsed
+            $availableAt = $availableAt->modify('+1 second');
+        }
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
             ->insert($this->configuration['table_name'])

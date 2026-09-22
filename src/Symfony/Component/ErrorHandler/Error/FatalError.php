@@ -26,6 +26,9 @@ class FatalError extends \Error
     ) {
         parent::__construct($message, $code);
 
+        // the backtrace is exposed by getTrace(), keeping a copy here would leak it and its arguments when the error is dumped
+        unset($this->error['trace']);
+
         if (null !== $trace) {
             if (!$traceArgs) {
                 foreach ($trace as $index => $frame) {

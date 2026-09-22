@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Add `before` and `after` to the `#[As*Listener]` attributes, whose `$priority` is now nullable
- * Add `#[AsWorkflowDefinition]`, `#[Place]`, `#[Transition]`, and `WeightedPlace` to define workflows and state machines with enums
+ * Add `#[AsWorkflowDefinition]`, `#[Place]`, `#[Transition]`, and `WeightedPlace` to define workflows and state machines with string-backed enums
  * Add `WorkflowBundle`, which provides the `workflow` configuration and the services previously provided by `FrameworkBundle` under `framework.workflows`
  * Allow prefixing entries with `!` in the `$eventsToDispatch` constructor argument of `Workflow` and `StateMachine` to permanently disable an event; e.g. `new Workflow(..., eventsToDispatch: ['!workflow.announce'])` fires every event except `workflow.announce`. The GuardEvent can never be suppressed; `!workflow.guard` throws an `InvalidArgumentException`. Mixing allow-list and block-list entries also throws an `InvalidArgumentException`.
 

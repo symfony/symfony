@@ -118,8 +118,8 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
         if ('' === $attribute->name) {
             throw new LogicException(\sprintf('Workflow name cannot be empty on enum "%s".', $enumName));
         }
-        if (($backingType = $enum->getBackingType()) instanceof \ReflectionNamedType && 'int' === $backingType->getName()) {
-            throw new LogicException(\sprintf('Integer-backed workflow definition enums are not supported; use a unit or string-backed enum for "%s".', $enumName));
+        if (!($backingType = $enum->getBackingType()) instanceof \ReflectionNamedType || 'string' !== $backingType->getName()) {
+            throw new LogicException(\sprintf('Workflow definition enum "%s" must be string-backed.', $enumName));
         }
         if ($attribute->supports && null !== $attribute->supportStrategy) {
             throw new LogicException(\sprintf('"supports" and "supportStrategy" cannot be used together on workflow definition enum "%s".', $enumName));
@@ -193,7 +193,9 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
                     throw new LogicException(\sprintf('Transition "%s" on case "%s::%s" must not declare "from"; the case is the inferred source place.', $transition->name, $enumName, $case->getName()));
                 }
 
-                $transitions[] = $this->normalizeTransition($transition, $case->getValue(), $enum, $placeNames, $attribute->type);
+                /** @var \BackedEnum $source */
+                $source = $case->getValue();
+                $transitions[] = $this->normalizeTransition($transition, $source, $enum, $placeNames, $attribute->type);
             }
         }
 
@@ -239,10 +241,10 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
     }
 
     /**
-     * @param \UnitEnum|WeightedPlace|list<\UnitEnum|WeightedPlace> $from
-     * @param array<string, true>                                   $places
+     * @param \BackedEnum|WeightedPlace|list<\BackedEnum|WeightedPlace> $from
+     * @param array<string, true>                                       $places
      */
-    private function normalizeTransition(Transition $transition, \UnitEnum|WeightedPlace|array $from, \ReflectionEnum $enum, array $places, WorkflowType $type): TransitionConfig
+    private function normalizeTransition(Transition $transition, \BackedEnum|WeightedPlace|array $from, \ReflectionEnum $enum, array $places, WorkflowType $type): TransitionConfig
     {
         if ('' === $transition->name) {
             throw new LogicException(\sprintf('Transition name cannot be empty on workflow definition enum "%s".', $enum->getName()));
@@ -272,12 +274,12 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
     }
 
     /**
-     * @param \UnitEnum|WeightedPlace|list<\UnitEnum|WeightedPlace>|null $values
-     * @param array<string, true>                                        $places
+     * @param \BackedEnum|WeightedPlace|list<\BackedEnum|WeightedPlace>|null $values
+     * @param array<string, true>                                            $places
      *
      * @return list<ArcConfig>
      */
-    private function normalizeArcs(\UnitEnum|WeightedPlace|array|null $values, \ReflectionEnum $enum, array $places, string $transition, string $direction): array
+    private function normalizeArcs(\BackedEnum|WeightedPlace|array|null $values, \ReflectionEnum $enum, array $places, string $transition, string $direction): array
     {
         $values = null === $values ? [] : (\is_array($values) ? $values : [$values]);
         if (!$values) {
@@ -289,7 +291,7 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
             if ($value instanceof WeightedPlace) {
                 $place = $this->normalizeCase($value->place, $enum, \sprintf('Transition "%s"', $transition));
                 $weight = $value->weight;
-            } elseif ($value instanceof \UnitEnum) {
+            } elseif ($value instanceof \BackedEnum) {
                 $place = $this->normalizeCase($value, $enum, \sprintf('Transition "%s"', $transition));
                 $weight = 1;
             } else {
@@ -307,21 +309,16 @@ final class WorkflowDefinitionPass implements CompilerPassInterface
 
     private function normalizeCase(mixed $case, \ReflectionEnum $enum, string $context): string
     {
-        if (!$case instanceof \UnitEnum || $case::class !== $enum->getName()) {
+        if (!$case instanceof \BackedEnum || $case::class !== $enum->getName()) {
             $caseName = $case instanceof \UnitEnum ? $case::class.'::'.$case->name : get_debug_type($case);
 
             throw new LogicException($context.\sprintf(' references "%s", which is not a case of "%s".', $caseName, $enum->getName()));
         }
 
-        if ($case instanceof \BackedEnum) {
-            if (!\is_string($case->value)) {
-                throw new LogicException($context.\sprintf(' references integer-backed case "%s::%s", which cannot be used as a workflow place.', $case::class, $case->name));
-            }
+        /** @var string $value */
+        $value = $case->value;
 
-            return $case->value;
-        }
-
-        return $case->name;
+        return $value;
     }
 
     /**

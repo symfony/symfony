@@ -19,17 +19,14 @@ final class WeightedPlaceTest extends TestCase
 {
     public function testConstructor()
     {
-        $place = new WeightedPlace(WeightedUnitPlace::Published, 2);
-        $backedPlace = new WeightedPlace(WeightedBackedPlace::Draft, 3);
+        $place = new WeightedPlace(WeightedBackedPlace::Draft, 3);
 
-        $this->assertSame(WeightedUnitPlace::Published, $place->place);
-        $this->assertSame(2, $place->weight);
-        $this->assertSame(WeightedBackedPlace::Draft, $backedPlace->place);
-        $this->assertSame(3, $backedPlace->weight);
+        $this->assertSame(WeightedBackedPlace::Draft, $place->place);
+        $this->assertSame(3, $place->weight);
     }
 
     #[DataProvider('provideInvalidPlaces')]
-    public function testConstructorRejectsInvalidPlace(\UnitEnum $place, string $message)
+    public function testConstructorRejectsInvalidPlace(\BackedEnum $place, string $message)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($message);
@@ -48,13 +45,8 @@ final class WeightedPlaceTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The weight must be greater than 0, 0 given.');
 
-        new WeightedPlace(WeightedUnitPlace::Published, 0);
+        new WeightedPlace(WeightedBackedPlace::Draft, 0);
     }
-}
-
-enum WeightedUnitPlace
-{
-    case Published;
 }
 
 enum WeightedBackedPlace: string

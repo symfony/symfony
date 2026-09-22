@@ -18,15 +18,15 @@ namespace Symfony\Component\Workflow;
  */
 final class WeightedPlace
 {
-    public function __construct(public readonly \UnitEnum $place, public readonly int $weight)
+    public function __construct(public readonly \BackedEnum $place, public readonly int $weight)
     {
-        if ($place instanceof \BackedEnum && !\is_string($place->value)) {
+        if (!\is_string($place->value)) {
             throw new \InvalidArgumentException('Integer-backed enums cannot be used as workflow places.');
         }
         if ($weight < 1) {
             throw new \InvalidArgumentException(\sprintf('The weight must be greater than 0, %d given.', $weight));
         }
-        if ($place instanceof \BackedEnum && '' === $place->value) {
+        if ('' === $place->value) {
             throw new \InvalidArgumentException('The place name cannot be empty.');
         }
     }

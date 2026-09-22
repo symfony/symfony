@@ -110,7 +110,7 @@ final class WorkflowDefinitionPassTest extends TestCase
         $this->assertTrue(DefinitionValidator::$called);
     }
 
-    public function testRegistersAStateMachineFromAUnitEnumWithRepeatedTransitionAttributes()
+    public function testRegistersAStateMachineFromAStringBackedEnumWithRepeatedTransitionAttributes()
     {
         $container = $this->createContainer([PostStateDefinition::class]);
         $container->compile();
@@ -135,6 +135,16 @@ final class WorkflowDefinitionPassTest extends TestCase
         $this->assertTransition($container, '.state_machine.post.transition.0', 'publish', [['Draft', 1]], [['Published', 1]], $definition->getArgument(1)[0]);
         $this->assertTransition($container, '.state_machine.post.transition.1', 'publish', [['Reviewed', 1]], [['Published', 1]], $definition->getArgument(1)[1]);
         $this->assertTransition($container, '.state_machine.post.transition.2', 'review', [['Draft', 1]], [['Reviewed', 1]], $definition->getArgument(1)[2]);
+    }
+
+    public function testRejectsAUnitEnumDefinition()
+    {
+        $container = $this->createContainer([UnitStateDefinition::class]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Workflow definition enum "Symfony\\Component\\Workflow\\Tests\\DependencyInjection\\UnitStateDefinition" must be string-backed.');
+
+        $container->compile();
     }
 
     public function testRegistersCustomSupportAndMarkingStoreServices()
@@ -460,7 +470,7 @@ final class WorkflowDefinitionPassTest extends TestCase
 
     public static function provideInvalidDefinitions(): iterable
     {
-        yield 'integer-backed enum' => [IntegerStateDefinition::class, 'Integer-backed workflow definition enums are not supported'];
+        yield 'integer-backed enum' => [IntegerStateDefinition::class, 'Workflow definition enum "Symfony\\Component\\Workflow\\Tests\\DependencyInjection\\IntegerStateDefinition" must be string-backed.'];
         yield 'case from' => [CaseWithExplicitFromDefinition::class, 'must not declare "from"; the case is the inferred source place'];
         yield 'class without from' => [ClassWithoutFromDefinition::class, 'must declare at least one "from" place'];
         yield 'foreign case' => [ForeignCaseDefinition::class, 'which is not a case of'];
@@ -576,54 +586,54 @@ enum ArticleWorkflowDefinition: string
 #[AsWorkflowDefinition(name: 'post', supports: [\stdClass::class], initialMarking: self::Draft)]
 #[Transition(name: 'publish', from: self::Draft, to: self::Published)]
 #[Transition(name: 'publish', from: self::Reviewed, to: self::Published)]
-enum PostStateDefinition
+enum PostStateDefinition: string
 {
     #[Transition(name: 'review', to: self::Reviewed)]
-    case Draft;
-    case Reviewed;
-    case Published;
+    case Draft = 'Draft';
+    case Reviewed = 'Reviewed';
+    case Published = 'Published';
 }
 
 #[AsWorkflowDefinition(name: 'post', supports: [\stdClass::class])]
-enum DuplicatePostStateDefinition
+enum DuplicatePostStateDefinition: string
 {
     #[Transition(name: 'stay', to: self::Draft)]
-    case Draft;
+    case Draft = 'Draft';
 }
 
 #[AsWorkflowDefinition(name: 'collision', supports: [\stdClass::class], auditTrail: true)]
-enum CollisionStateDefinition
+enum CollisionStateDefinition: string
 {
     #[Transition(name: 'stay', to: self::Draft, guard: 'true')]
-    case Draft;
+    case Draft = 'Draft';
 }
 
 #[AsWorkflowDefinition(name: 'collision.definition', supports: [\stdClass::class])]
-enum DerivedCollisionStateDefinition
+enum DerivedCollisionStateDefinition: string
 {
     #[Transition(name: 'stay', to: self::Draft)]
-    case Draft;
+    case Draft = 'Draft';
 }
 
 #[AsWorkflowDefinition(name: 'alias_collision', supports: [\stdClass::class])]
-enum UnderscoreAliasStateDefinition
+enum UnderscoreAliasStateDefinition: string
 {
     #[Transition(name: 'stay', to: self::Draft)]
-    case Draft;
+    case Draft = 'Draft';
 }
 
 #[AsWorkflowDefinition(name: 'alias.collision', supports: [\stdClass::class])]
-enum DottedAliasStateDefinition
+enum DottedAliasStateDefinition: string
 {
     #[Transition(name: 'stay', to: self::Draft)]
-    case Draft;
+    case Draft = 'Draft';
 }
 
 #[AsWorkflowDefinition(name: '123.foo', supports: [\stdClass::class])]
-enum InvalidAliasNameStateDefinition
+enum InvalidAliasNameStateDefinition: string
 {
     #[Transition(name: 'stay', to: self::Draft)]
-    case Draft;
+    case Draft = 'Draft';
 }
 
 #[AsWorkflowDefinition(name: 'integer', supports: [\stdClass::class])]
@@ -632,78 +642,84 @@ enum IntegerStateDefinition: int
     case Draft = 1;
 }
 
+#[AsWorkflowDefinition(name: 'unit', supports: [\stdClass::class])]
+enum UnitStateDefinition
+{
+    case Draft;
+}
+
 #[AsWorkflowDefinition(name: 'case_from', supports: [\stdClass::class])]
-enum CaseWithExplicitFromDefinition
+enum CaseWithExplicitFromDefinition: string
 {
     #[Transition(name: 'go', from: self::A, to: self::B)]
-    case A;
-    case B;
+    case A = 'A';
+    case B = 'B';
 }
 
 #[AsWorkflowDefinition(name: 'class_without_from', supports: [\stdClass::class])]
 #[Transition(name: 'go', to: self::B)]
-enum ClassWithoutFromDefinition
+enum ClassWithoutFromDefinition: string
 {
-    case A;
-    case B;
+    case A = 'A';
+    case B = 'B';
 }
 
-enum OtherState
+enum OtherState: string
 {
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'foreign', supports: [\stdClass::class])]
 #[Transition(name: 'go', from: self::A, to: OtherState::A)]
-enum ForeignCaseDefinition
+enum ForeignCaseDefinition: string
 {
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'foreign_arc', supports: [\stdClass::class])]
 #[Transition(name: 'go', from: new WeightedPlace(OtherState::A, 2), to: self::B)]
-enum ForeignArcDefinition
+enum ForeignArcDefinition: string
 {
-    case A;
-    case B;
+    case A = 'A';
+    case B = 'B';
 }
 
 #[AsWorkflowDefinition(name: 'support', supports: [\stdClass::class], supportStrategy: 'support_strategy')]
-enum ConflictingSupportDefinition
+enum ConflictingSupportDefinition: string
 {
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'store', supports: [\stdClass::class], markingStoreProperty: 'state', markingStoreService: 'marking_store')]
-enum ConflictingMarkingStoreDefinition
+enum ConflictingMarkingStoreDefinition: string
 {
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'custom', supportStrategy: 'custom.support_strategy', markingStoreService: 'custom.marking_store')]
-enum CustomServicesDefinition
+enum CustomServicesDefinition: string
 {
     #[Transition(name: 'go', to: self::B)]
-    case A;
-    case B;
+    case A = 'A';
+    case B = 'B';
 }
 
 #[AsWorkflowDefinition(name: 'weighted', supports: [\stdClass::class])]
 #[Transition(name: 'go', from: new WeightedPlace(self::A, 2), to: self::B)]
-enum WeightedStateDefinition
+enum WeightedStateDefinition: string
 {
-    case A;
-    case B;
+    case A = 'A';
+    case B = 'B';
 }
 
 #[AsWorkflowDefinition(name: 'duplicate_outgoing', supports: [\stdClass::class])]
-enum DuplicateOutgoingTransitionDefinition
+enum DuplicateOutgoingTransitionDefinition: string
 {
     #[Transition(name: 'go', to: self::B)]
     #[Transition(name: 'go', to: self::C)]
-    case A;
-    case B;
-    case C;
+    case A = 'A';
+    case B = 'B';
+    case C = 'C';
 }
 
 #[AsWorkflowDefinition(name: 'not_an_enum', supports: [\stdClass::class])]
@@ -712,69 +728,69 @@ class NotAnEnumWorkflowDefinition
 }
 
 #[AsWorkflowDefinition(name: 'missing_support')]
-enum MissingSupportDefinition
+enum MissingSupportDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: '', supports: [\stdClass::class])]
-enum EmptyNameDefinition
+enum EmptyNameDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'empty_output', supports: [\stdClass::class])]
-enum EmptyOutputDefinition
+enum EmptyOutputDefinition: string
 {
     #[Transition(name: 'go', to: [])]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'foreign_initial', supports: [\stdClass::class], initialMarking: OtherState::A)]
-enum ForeignInitialMarkingDefinition
+enum ForeignInitialMarkingDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'constant_attribute', supports: [\stdClass::class])]
-enum AttributeOnConstantDefinition
+enum AttributeOnConstantDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 
     #[Transition(name: 'invalid', to: self::A)]
     public const INVALID = 'invalid';
 }
 
 #[AsWorkflowDefinition(name: 'unknown_event', supports: [\stdClass::class], eventsToDispatch: ['workflow.unknown'])]
-enum UnknownEventDefinition
+enum UnknownEventDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'invalid_validator', supports: [\stdClass::class], definitionValidators: [\DateTime::class])]
-enum InvalidValidatorDefinition
+enum InvalidValidatorDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'mixed_events', supports: [\stdClass::class], eventsToDispatch: [WorkflowEvents::ENTER, '!'.WorkflowEvents::ANNOUNCE])]
-enum MixedEventsDefinition
+enum MixedEventsDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'disabled_guard', supports: [\stdClass::class], eventsToDispatch: ['!'.WorkflowEvents::GUARD])]
-enum DisabledGuardEventDefinition
+enum DisabledGuardEventDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'empty_place', supports: [\stdClass::class])]
@@ -786,65 +802,65 @@ enum EmptyPlaceDefinition: string
 }
 
 #[AsWorkflowDefinition(name: 'empty_transition_name', supports: [\stdClass::class])]
-enum EmptyTransitionNameDefinition
+enum EmptyTransitionNameDefinition: string
 {
     #[Transition(name: '', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'non_string_transition_name', supports: [\stdClass::class])]
-enum NonStringTransitionNameDefinition
+enum NonStringTransitionNameDefinition: string
 {
     public const NAME = 1;
 
     #[Transition(name: self::NAME, to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'empty_guard', supports: [\stdClass::class])]
-enum EmptyGuardDefinition
+enum EmptyGuardDefinition: string
 {
     #[Transition(name: 'stay', to: self::A, guard: '')]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'nonexistent_support', supports: ['Missing\\Subject'])]
-enum NonexistentSupportDefinition
+enum NonexistentSupportDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'empty_support_strategy', supportStrategy: '')]
-enum EmptySupportStrategyDefinition
+enum EmptySupportStrategyDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'empty_store_property', supports: [\stdClass::class], markingStoreProperty: '')]
-enum EmptyMarkingStorePropertyDefinition
+enum EmptyMarkingStorePropertyDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'empty_store_service', supports: [\stdClass::class], markingStoreService: '')]
-enum EmptyMarkingStoreServiceDefinition
+enum EmptyMarkingStoreServiceDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'empty_enum', supports: [\stdClass::class])]
-enum EmptyEnumDefinition
+enum EmptyEnumDefinition: string
 {
 }
 
 #[AsWorkflowDefinition(name: 'no_transition', supports: [\stdClass::class])]
-enum NoTransitionDefinition
+enum NoTransitionDefinition: string
 {
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'duplicate_place', supports: [\stdClass::class])]
@@ -856,31 +872,31 @@ enum DuplicatePlaceDefinition: string
 }
 
 #[AsWorkflowDefinition(name: 'invalid_arc', supports: [\stdClass::class])]
-enum InvalidArcDefinition
+enum InvalidArcDefinition: string
 {
     #[Transition(name: 'stay', to: [self::A, 'invalid'])]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'invalid_initial', supports: [\stdClass::class], initialMarking: [self::A, 'invalid'])]
-enum InvalidInitialMarkingDefinition
+enum InvalidInitialMarkingDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'non_string_event', supports: [\stdClass::class], eventsToDispatch: [1])]
-enum NonStringEventDefinition
+enum NonStringEventDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'missing_validator', supports: [\stdClass::class], definitionValidators: ['Missing\\DefinitionValidator'])]
-enum MissingValidatorDefinition
+enum MissingValidatorDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 class RequiredConstructorValidator implements DefinitionValidatorInterface
@@ -895,17 +911,17 @@ class RequiredConstructorValidator implements DefinitionValidatorInterface
 }
 
 #[AsWorkflowDefinition(name: 'required_validator_argument', supports: [\stdClass::class], definitionValidators: [RequiredConstructorValidator::class])]
-enum RequiredConstructorValidatorDefinition
+enum RequiredConstructorValidatorDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'place_constant_attribute', supports: [\stdClass::class])]
-enum PlaceAttributeOnConstantDefinition
+enum PlaceAttributeOnConstantDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 
     #[Place]
     public const INVALID = 'invalid';
@@ -913,20 +929,20 @@ enum PlaceAttributeOnConstantDefinition
 
 #[AsWorkflowDefinition(name: 'multiple_source', supports: [\stdClass::class])]
 #[Transition(name: 'go', from: [self::A, self::B], to: self::C)]
-enum MultipleSourceStateMachineDefinition
+enum MultipleSourceStateMachineDefinition: string
 {
-    case A;
-    case B;
-    case C;
+    case A = 'A';
+    case B = 'B';
+    case C = 'C';
 }
 
 #[AsWorkflowDefinition(name: 'multiple_destination', supports: [\stdClass::class])]
-enum MultipleDestinationStateMachineDefinition
+enum MultipleDestinationStateMachineDefinition: string
 {
     #[Transition(name: 'go', to: [self::B, self::C])]
-    case A;
-    case B;
-    case C;
+    case A = 'A';
+    case B = 'B';
+    case C = 'C';
 }
 
 interface SupportedSubjectInterface
@@ -938,39 +954,39 @@ class SupportedSubject implements SupportedSubjectInterface
 }
 
 #[AsWorkflowDefinition(name: 'multiple_supports', supports: [SupportedSubject::class, SupportedSubjectInterface::class])]
-enum MultipleSupportsDefinition
+enum MultipleSupportsDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'state_machine_store', supports: [\stdClass::class], markingStoreProperty: 'state')]
-enum StateMachineMarkingStoreDefinition
+enum StateMachineMarkingStoreDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'events', supports: [\stdClass::class], eventsToDispatch: [WorkflowEvents::ENTER, WorkflowEvents::LEAVE])]
-enum AllowedEventsDefinition
+enum AllowedEventsDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'events', supports: [\stdClass::class], eventsToDispatch: ['!'.WorkflowEvents::ANNOUNCE, '!'.WorkflowEvents::COMPLETED])]
-enum BlockedEventsDefinition
+enum BlockedEventsDefinition: string
 {
     #[Transition(name: 'stay', to: self::A)]
-    case A;
+    case A = 'A';
 }
 
 #[AsWorkflowDefinition(name: 'transition_name', supports: [\stdClass::class])]
-enum TransitionNameConstantDefinition
+enum TransitionNameConstantDefinition: string
 {
     public const GO = 'go';
 
     #[Transition(self::GO, self::B)]
-    case A;
-    case B;
+    case A = 'A';
+    case B = 'B';
 }

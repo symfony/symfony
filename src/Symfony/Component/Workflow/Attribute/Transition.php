@@ -22,14 +22,14 @@ use Symfony\Component\Workflow\WeightedPlace;
 final class Transition
 {
     /**
-     * @param \UnitEnum|WeightedPlace|list<\UnitEnum|WeightedPlace>      $to
-     * @param \UnitEnum|WeightedPlace|list<\UnitEnum|WeightedPlace>|null $from
-     * @param array<string, mixed>                                       $metadata
+     * @param \BackedEnum|WeightedPlace|list<\BackedEnum|WeightedPlace>      $to
+     * @param \BackedEnum|WeightedPlace|list<\BackedEnum|WeightedPlace>|null $from
+     * @param array<string, mixed>                                           $metadata
      */
     public function __construct(
         public readonly string $name,
-        public readonly \UnitEnum|WeightedPlace|array $to,
-        public readonly \UnitEnum|WeightedPlace|array|null $from = null,
+        public readonly \BackedEnum|WeightedPlace|array $to,
+        public readonly \BackedEnum|WeightedPlace|array|null $from = null,
         public readonly ?string $guard = null,
         public readonly array $metadata = [],
     ) {

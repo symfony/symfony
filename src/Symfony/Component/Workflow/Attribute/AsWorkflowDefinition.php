@@ -15,7 +15,7 @@ use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 use Symfony\Component\Workflow\WorkflowType;
 
 /**
- * Defines a workflow from an enum whose cases are places.
+ * Defines a workflow from a string-backed enum whose cases are places.
  *
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  */
@@ -24,7 +24,7 @@ final class AsWorkflowDefinition
 {
     /**
      * @param list<class-string>                               $supports
-     * @param \UnitEnum|list<\UnitEnum>|null                   $initialMarking
+     * @param \BackedEnum|list<\BackedEnum>|null               $initialMarking
      * @param list<string>|null                                $eventsToDispatch
      * @param array<string, mixed>                             $metadata
      * @param list<class-string<DefinitionValidatorInterface>> $definitionValidators
@@ -34,7 +34,7 @@ final class AsWorkflowDefinition
         public readonly WorkflowType $type = WorkflowType::StateMachine,
         public readonly array $supports = [],
         public readonly ?string $supportStrategy = null,
-        public readonly \UnitEnum|array|null $initialMarking = null,
+        public readonly \BackedEnum|array|null $initialMarking = null,
         public readonly ?string $markingStoreProperty = null,
         public readonly ?string $markingStoreService = null,
         public readonly bool $auditTrail = false,

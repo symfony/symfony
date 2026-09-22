@@ -589,71 +589,71 @@
             </trans-unit>
             <trans-unit id="149">
                 <source>This file is not a valid audio file.</source>
-                <target state="needs-review-translation">Ky fajl nuk është fajl audio i vlefshëm.</target>
+                <target>Ky nuk është një skedar i vlefshëm audio.</target>
             </trans-unit>
             <trans-unit id="150">
                 <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
-                <target state="needs-review-translation">Audioja është shumë e shkurtër ({{ duration }} sekonda). Kohëzgjatja minimale e pritur është {{ min_duration }} sekonda.</target>
+                <target>Audioja është tepër e shkurtër ({{ duration }} sekonda). Kohëzgjatja minimale e pritur është {{ min_duration }} sekonda.</target>
             </trans-unit>
             <trans-unit id="151">
                 <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
-                <target state="needs-review-translation">Audioja është shumë e gjatë ({{ duration }} sekonda). Kohëzgjatja maksimale e lejuar është {{ max_duration }} sekonda.</target>
+                <target>Audioja është tepër e gjatë ({{ duration }} sekonda). Kohëzgjatja maksimale e lejuar është {{ max_duration }} sekonda.</target>
             </trans-unit>
             <trans-unit id="152">
                 <source>The duration of the audio could not be detected.</source>
-                <target state="needs-review-translation">Kohëzgjatja e audios nuk mund të zbulohej.</target>
+                <target>Kohëzgjatja e audios nuk mund të përcaktohej.</target>
             </trans-unit>
             <trans-unit id="153">
                 <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
-                <target state="needs-review-translation">Bitrate-i i audios është shumë i ulët ({{ bitrate }} bps). Bitrate-i minimal i pritur është {{ min_bitrate }} bps.</target>
+                <target>Bitrate-i i audios është tepër i ulët ({{ bitrate }} bps). Bitrate-i minimal i pritur është {{ min_bitrate }} bps.</target>
             </trans-unit>
             <trans-unit id="154">
                 <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
-                <target state="needs-review-translation">Bitrate-i i audios është shumë i lartë ({{ bitrate }} bps). Bitrate-i maksimal i lejuar është {{ max_bitrate }} bps.</target>
+                <target>Bitrate-i i audios është tepër i lartë ({{ bitrate }} bps). Bitrate-i maksimal i lejuar është {{ max_bitrate }} bps.</target>
             </trans-unit>
             <trans-unit id="155">
                 <source>The bitrate of the audio could not be detected.</source>
-                <target state="needs-review-translation">Bitrate-i i audios nuk mund të zbulohej.</target>
+                <target>Bitrate-i i audios nuk mund të përcaktohej.</target>
             </trans-unit>
             <trans-unit id="156">
                 <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
-                <target state="needs-review-translation">Shkallë e kampionimit audio e pambështetur ({{ sample_rate }} Hz).</target>
+                <target>Shkallë e kampionimit të audios nuk mbështetet ({{ sample_rate }} Hz).</target>
             </trans-unit>
             <trans-unit id="157">
                 <source>The sample rate of the audio could not be detected.</source>
-                <target state="needs-review-translation">Shkalla e kampionimit e audios nuk mund të zbulohej.</target>
+                <target>Shkalla e kampionimit të audios nuk mund të përcaktohej.</target>
             </trans-unit>
             <trans-unit id="158">
                 <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
-                <target state="needs-review-translation">Audioja ka shumë pak kanale ({{ channels }}). Sasia minimale e pritur është {{ min_channels }}.</target>
+                <target>Audio ka shumë pak kanale ({{ channels }}). Sasia minimale e pritur është {{ min_channels }}.</target>
             </trans-unit>
             <trans-unit id="159">
                 <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
-                <target state="needs-review-translation">Audioja ka tepër kanale ({{ channels }}). Sasia maksimale e pritur është {{ max_channels }}.</target>
+                <target>Audio ka tepër kanale ({{ channels }}). Sasia maksimale e pritur është {{ max_channels }}.</target>
             </trans-unit>
             <trans-unit id="160">
                 <source>The number of audio channels could not be detected.</source>
-                <target state="needs-review-translation">Numri i kanaleve audio nuk mund të zbulohej.</target>
+                <target>Numri i kanaleve audio nuk mund të përcaktohej.</target>
             </trans-unit>
             <trans-unit id="161">
                 <source>The audio file is corrupted.</source>
-                <target state="needs-review-translation">Fajli i audios është i korruptuar.</target>
+                <target>Skedari i audios është i dëmtuar.</target>
             </trans-unit>
             <trans-unit id="162">
                 <source>The audio contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">Audioja përmban disa rrjedha. Lejohet vetëm një rrjedhë.</target>
+                <target>Audio përmban rryma (streams) të shumëfishta. Vetëm një rrymë është e lejuar.</target>
             </trans-unit>
             <trans-unit id="163">
                 <source>Unsupported audio codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Kodeku i audios është i pambështetur „{{ codec }}“.</target>
+                <target>Kodek i pambështetur i audios „{{ codec }}“.</target>
             </trans-unit>
             <trans-unit id="164">
                 <source>Unsupported audio container "{{ container }}".</source>
-                <target state="needs-review-translation">Kontejneri i audios është i pambështetur "{{ container }}".</target>
+                <target>Kontejner i pambështetur i audios "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="165">
                 <source>The file does not contain any audio stream.</source>
-                <target state="needs-review-translation">Fajli nuk përmban asnjë rrjedhë audio.</target>
+                <target>Skedari nuk përmban asnjë rrymë audio.</target>
             </trans-unit>
         </body>
     </file>

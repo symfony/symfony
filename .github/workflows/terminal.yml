@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terminal: ['0.8.0', '0.9.0', '1.0.0']
+        terminal: ['0.8.0', '0.9.0', '1.0.0', '1.0.1']
     env:
       COMPOSER_ROOT_VERSION: 8.2.x-dev
       SYMFONY_REQUIRE: '>=8.2'

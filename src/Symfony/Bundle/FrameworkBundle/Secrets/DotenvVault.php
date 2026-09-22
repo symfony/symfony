@@ -37,7 +37,7 @@ class DotenvVault extends AbstractVault
         $v = str_replace("'", "'\\''", $value);
 
         $content = is_file($this->dotenvFile) ? file_get_contents($this->dotenvFile) : '';
-        $content = preg_replace("/^$name=((\\\\'|'[^']++')++|.*)/m", "$name='$v'", $content, -1, $count);
+        $content = preg_replace_callback("/^$name=((\\\\'|'[^']++')++|.*)/m", static fn () => "$name='$v'", $content, -1, $count);
 
         if (!$count) {
             $content .= "$name='$v'\n";

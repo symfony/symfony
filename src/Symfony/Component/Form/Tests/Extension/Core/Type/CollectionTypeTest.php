@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -22,9 +21,6 @@ use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\BlockPrefixedFooTextType;
 use Symfony\Component\Form\Tests\Fixtures\CollectionWithPreSetDataType;
 use Symfony\Component\Form\Tests\Fixtures\CollectionWithRecursiveSetDataType;
-use Symfony\Component\Form\Tests\Fixtures\Product;
-use Symfony\Component\Form\Tests\Fixtures\ProductType;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CollectionTypeTest extends BaseTypeTestCase
 {
@@ -583,169 +579,6 @@ class CollectionTypeTest extends BaseTypeTestCase
 
         $this->assertCount(0, $collectionView);
         $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
-    }
-
-    public function testEntryNameMapsTheSubmittedDataByNameInsteadOfIndex()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'entry_type' => ProductType::class,
-            'entry_name' => 'id',
-        ]);
-        $form->setData([$coffee = new Product(2, 'Coffee'), $tea = new Product(1, 'Tea')]);
-
-        $this->assertSame([2, 1], array_keys(iterator_to_array($form)));
-        $this->assertSame('[0]', (string) $form[2]->getPropertyPath());
-        $this->assertSame('[1]', (string) $form[1]->getPropertyPath());
-        $this->assertSame($coffee, $form[2]->getData());
-        $this->assertSame($tea, $form[1]->getData());
-
-        // submitted from a page that was rendered when the entries were in the other order
-        $form->submit([1 => ['name' => 'Green tea'], 2 => ['name' => 'Coffee']]);
-
-        $this->assertSame('Green tea', $tea->name);
-        $this->assertSame('Coffee', $coffee->name);
-        $this->assertSame([$coffee, $tea], $form->getData());
-    }
-
-    public function testEntryNameAcceptsAPropertyPathObjectOrACallable()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, [new Product(7, 'Tea')], [
-            'entry_type' => ProductType::class,
-            'entry_name' => new PropertyPath('id'),
-        ]);
-
-        $this->assertSame([7], array_keys(iterator_to_array($form)));
-
-        $form = $this->factory->create(static::TESTED_TYPE, [new Product(7, 'Tea'), new Product(null, 'Coffee')], [
-            'entry_type' => ProductType::class,
-            'entry_name' => static fn (Product $product, int $key) => $product->id ?? 'new_'.$key,
-        ]);
-
-        $this->assertSame([7, 'new_1'], array_keys(iterator_to_array($form)));
-        $this->assertSame('[1]', (string) $form['new_1']->getPropertyPath());
-    }
-
-    public function testEntryNameRemovesTheEntriesMissingFromTheSubmissionIfAllowDelete()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'entry_type' => ProductType::class,
-            'entry_name' => 'id',
-            'allow_delete' => true,
-        ]);
-        $form->setData([$tea = new Product(1, 'Tea'), new Product(2, 'Coffee'), $milk = new Product(3, 'Milk')]);
-        $form->submit([3 => ['name' => 'Milk'], 1 => ['name' => 'Tea']]);
-
-        $this->assertSame([1, 3], array_keys(iterator_to_array($form)));
-        $this->assertSame([0 => $tea, 2 => $milk], $form->getData());
-    }
-
-    public function testEntryNameAppendsNewEntriesAfterTheExistingOnesIfAllowAdd()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'entry_type' => ProductType::class,
-            'entry_name' => 'id',
-            'allow_add' => true,
-        ]);
-        $form->setData([$tea = new Product(1, 'Tea'), $coffee = new Product(2, 'Coffee')]);
-
-        // "0" is what a client-side counter names a new entry; it must not overwrite the entry at index 0
-        $form->submit([1 => ['name' => 'Tea'], 2 => ['name' => 'Coffee'], 0 => ['name' => 'Milk'], 'new_1' => ['name' => 'Sugar']]);
-
-        $this->assertSame([1, 2, 0, 'new_1'], array_keys(iterator_to_array($form)));
-        $this->assertSame('[2]', (string) $form[0]->getPropertyPath());
-        $this->assertSame('[3]', (string) $form['new_1']->getPropertyPath());
-
-        $data = $form->getData();
-
-        $this->assertSame([0, 1, 2, 3], array_keys($data));
-        $this->assertSame($tea, $data[0]);
-        $this->assertSame($coffee, $data[1]);
-        $this->assertSame('Milk', $data[2]->name);
-        $this->assertSame('Sugar', $data[3]->name);
-    }
-
-    public function testEntryNameWithDeleteEmpty()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'entry_type' => ProductType::class,
-            'entry_name' => 'id',
-            'allow_add' => true,
-            'allow_delete' => true,
-            'delete_empty' => static fn (?Product $product) => !$product?->name,
-        ]);
-        $form->setData([new Product(1, 'Tea'), $coffee = new Product(2, 'Coffee')]);
-        $form->submit([1 => ['name' => ''], 2 => ['name' => 'Coffee'], 'new_1' => ['name' => ''], 'new_2' => ['name' => 'Milk']]);
-
-        $this->assertSame([2, 'new_2'], array_keys(iterator_to_array($form)));
-        $this->assertSame('[3]', (string) $form['new_2']->getPropertyPath());
-
-        $data = $form->getData();
-
-        $this->assertSame([1, 3], array_keys($data));
-        $this->assertSame($coffee, $data[1]);
-        $this->assertSame('Milk', $data[3]->name);
-    }
-
-    public function testEntryNameWithKeepAsList()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'entry_type' => ProductType::class,
-            'entry_name' => 'id',
-            'allow_add' => true,
-            'allow_delete' => true,
-            'keep_as_list' => true,
-        ]);
-        $form->setData([new Product(1, 'Tea'), $coffee = new Product(2, 'Coffee'), $milk = new Product(3, 'Milk')]);
-        $form->submit([2 => ['name' => 'Coffee'], 3 => ['name' => 'Milk'], 'new_1' => ['name' => 'Sugar']]);
-
-        $this->assertSame([2, 3, 'new_1'], array_keys(iterator_to_array($form)));
-        $this->assertSame('[0]', (string) $form[2]->getPropertyPath());
-        $this->assertSame('[1]', (string) $form[3]->getPropertyPath());
-        $this->assertSame('[2]', (string) $form['new_1']->getPropertyPath());
-
-        $data = $form->getData();
-
-        $this->assertSame([0, 1, 2], array_keys($data));
-        $this->assertSame($coffee, $data[0]);
-        $this->assertSame($milk, $data[1]);
-        $this->assertSame('Sugar', $data[2]->name);
-    }
-
-    public function testEntryNameDoesNotRenameThePrototype()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, [new Product(1, 'Tea')], [
-            'entry_type' => ProductType::class,
-            'entry_name' => 'id',
-            'allow_add' => true,
-        ]);
-
-        $this->assertSame('__name__', $form->createView()->vars['prototype']->vars['name']);
-    }
-
-    public function testEntryNameMustGiveEachEntryAName()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'entry_type' => ProductType::class,
-            'entry_name' => 'id',
-        ]);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The "entry_name" option must return an int or a string for each entry, but it returned null for the entry at key 1.');
-
-        $form->setData([new Product(1, 'Tea'), new Product(null, 'Coffee')]);
-    }
-
-    public function testEntryNameMustBeUnique()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'entry_type' => ProductType::class,
-            'entry_name' => 'id',
-        ]);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The "entry_name" option must return a distinct name for each entry, but it returned "1" for the entries at keys 0 and 2.');
-
-        $form->setData([new Product(1, 'Tea'), new Product(2, 'Coffee'), new Product(1, 'Milk')]);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

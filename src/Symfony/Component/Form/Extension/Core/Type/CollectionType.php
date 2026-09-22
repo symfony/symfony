@@ -18,7 +18,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CollectionType extends AbstractType
 {
@@ -47,8 +46,7 @@ class CollectionType extends AbstractType
             $options['allow_delete'],
             $options['delete_empty'],
             $resizePrototypeOptions,
-            $options['keep_as_list'],
-            entryName: $options['entry_name'],
+            $options['keep_as_list']
         );
 
         $builder->addEventSubscriber($resizeListener);
@@ -114,7 +112,6 @@ class CollectionType extends AbstractType
             'prototype_name' => '__name__',
             'entry_type' => TextType::class,
             'entry_options' => [],
-            'entry_name' => null,
             'prototype_options' => [],
             'delete_empty' => false,
             'invalid_message' => 'The collection is invalid.',
@@ -123,7 +120,6 @@ class CollectionType extends AbstractType
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
 
-        $resolver->setAllowedTypes('entry_name', ['null', 'string', 'callable', PropertyPathInterface::class]);
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
         $resolver->setAllowedTypes('prototype_options', 'array');
         $resolver->setAllowedTypes('keep_as_list', ['bool']);

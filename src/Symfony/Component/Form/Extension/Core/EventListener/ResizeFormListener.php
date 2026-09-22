@@ -15,15 +15,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\EntryTypeProviderInterface;
 use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Event\PreSetDataEvent;
-use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Resize a collection form element based on the data sent from the client.
@@ -35,15 +31,13 @@ class ResizeFormListener implements EventSubscriberInterface
     protected array $prototypeOptions;
 
     private \Closure|bool $deleteEmpty;
-    private ?\Closure $entryName;
     private array $preSetDataChildrenStack = [];
 
     /**
-     * @param string|array<string, string>               $type              A type, or one type per entry name when $entryTypeProvider is given
-     * @param array<mixed>                               $options           Options for $type, or one set of options per entry name
-     * @param array<mixed>|null                          $prototypeOptions  Same shape as $options
-     * @param EntryTypeProviderInterface|null            $entryTypeProvider Picks the entry name to use for a given entry's data
-     * @param string|PropertyPathInterface|callable|null $entryName         Names the form of each entry from the entry itself instead of its key: a property path read from the entry, or a callable taking the entry and its key
+     * @param string|array<string, string>    $type              A type, or one type per entry name when $entryTypeProvider is given
+     * @param array<mixed>                    $options           Options for $type, or one set of options per entry name
+     * @param array<mixed>|null               $prototypeOptions  Same shape as $options
+     * @param EntryTypeProviderInterface|null $entryTypeProvider Picks the entry name to use for a given entry's data
      */
     public function __construct(
         private string|array $type,
@@ -54,18 +48,9 @@ class ResizeFormListener implements EventSubscriberInterface
         ?array $prototypeOptions = null,
         private bool $keepAsList = false,
         private ?EntryTypeProviderInterface $entryTypeProvider = null,
-        string|PropertyPathInterface|callable|null $entryName = null,
     ) {
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
         $this->prototypeOptions = $prototypeOptions ?? $options;
-
-        if (\is_string($entryName) || $entryName instanceof PropertyPathInterface) {
-            $propertyPath = \is_string($entryName) ? new PropertyPath($entryName) : $entryName;
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-            $entryName = static fn (mixed $entry) => $propertyAccessor->getValue($entry, $propertyPath);
-        }
-
-        $this->entryName = null === $entryName ? null : $entryName(...);
     }
 
     public static function getSubscribedEvents(): array
@@ -109,26 +94,13 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         // Then add all rows again in the correct order
-        $names = [];
-        foreach ($data as $key => $value) {
-            $name = $key;
-
-            if (null !== $this->entryName) {
-                $name = $this->nameOf($value, $key);
-
-                if (isset($names[$name])) {
-                    throw new RuntimeException(\sprintf('The "entry_name" option must return a distinct name for each entry, but it returned "%s" for the entries at keys %s and %s.', $name, $names[$name], $key));
-                }
-
-                $names[$name] = $key;
-            }
-
+        foreach ($data as $name => $value) {
             if ($form->has($name)) {
                 continue;
             }
 
             $form->add($name, $this->forModelData($this->type, $value), array_replace(
-                ['property_path' => '['.$key.']'],
+                ['property_path' => '['.$name.']'],
                 $this->forModelData($this->options, $value),
             ));
         }
@@ -154,28 +126,13 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // Add all additional rows
         if ($this->allowAdd) {
-            $usedKeys = null;
             foreach ($data as $name => $value) {
-                if ($form->has($name)) {
-                    continue;
+                if (!$form->has($name)) {
+                    $form->add($name, $this->forSubmittedData($this->type, $value), array_replace(
+                        ['property_path' => '['.$name.']'],
+                        $this->forSubmittedData($this->prototypeOptions, $value),
+                    ));
                 }
-
-                if (null === $this->entryName) {
-                    $key = $name;
-                } else {
-                    // the name comes from the client, the entry is appended after the existing ones
-                    $usedKeys ??= $this->usedKeys($form);
-                    $key = \count($usedKeys);
-                    while (isset($usedKeys[$key])) {
-                        ++$key;
-                    }
-                    $usedKeys[$key] = true;
-                }
-
-                $form->add($name, $this->forSubmittedData($this->type, $value), array_replace(
-                    ['property_path' => '['.$key.']'],
-                    $this->forSubmittedData($this->prototypeOptions, $value),
-                ));
             }
         }
     }
@@ -201,14 +158,13 @@ class ResizeFormListener implements EventSubscriberInterface
                     continue;
                 }
 
-                $key = $this->keyOf($child);
-                $isNew = !isset($previousData[$key]);
+                $isNew = !isset($previousData[$name]);
                 $isEmpty = \is_callable($this->deleteEmpty) ? ($this->deleteEmpty)($child->getData()) : $child->isEmpty();
 
                 // $isNew can only be true if allowAdd is true, so we don't
                 // need to check allowAdd again
                 if ($isEmpty && ($isNew || $this->allowDelete)) {
-                    unset($data[$key]);
+                    unset($data[$name]);
                     $form->remove($name);
                 }
             }
@@ -217,20 +173,16 @@ class ResizeFormListener implements EventSubscriberInterface
         // The data mapper only adds, but does not remove items, so do this
         // here
         if ($this->allowDelete) {
-            $keptKeys = $toDelete = [];
+            $toDelete = [];
 
-            foreach ($form as $child) {
-                $keptKeys[$this->keyOf($child)] = true;
-            }
-
-            foreach ($data as $key => $child) {
-                if (!isset($keptKeys[$key])) {
-                    $toDelete[] = $key;
+            foreach ($data as $name => $child) {
+                if (!$form->has($name)) {
+                    $toDelete[] = $name;
                 }
             }
 
-            foreach ($toDelete as $key) {
-                unset($data[$key]);
+            foreach ($toDelete as $name) {
+                unset($data[$name]);
             }
         }
 
@@ -247,7 +199,7 @@ class ResizeFormListener implements EventSubscriberInterface
                 $form->remove($name);
             }
             foreach ($formReindex as $index => $child) {
-                $form->add(null === $this->entryName ? $index : $child->getName(), $this->forModelData($this->type, $child->getData()), array_replace(
+                $form->add($index, $this->forModelData($this->type, $child->getData()), array_replace(
                     ['property_path' => '['.$index.']'],
                     $this->forModelData($this->options, $child->getData()),
                     ['data' => $child->getData()],
@@ -276,52 +228,5 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         return $value[$name];
-    }
-
-    private function nameOf(mixed $entry, int|string $key): int|string
-    {
-        $name = ($this->entryName)($entry, $key);
-
-        if ($name instanceof \Stringable) {
-            $name = (string) $name;
-        }
-
-        if (!\is_int($name) && !\is_string($name)) {
-            throw new RuntimeException(\sprintf('The "entry_name" option must return an int or a string for each entry, but it returned %s for the entry at key %s.', get_debug_type($name), $key));
-        }
-
-        return $name;
-    }
-
-    /**
-     * Returns the key of the entry that a child form is mapped to.
-     */
-    private function keyOf(FormInterface $child): string
-    {
-        if (null === $this->entryName) {
-            return $child->getName();
-        }
-
-        $propertyPath = $child->getPropertyPath();
-
-        return $propertyPath->getElement($propertyPath->getLength() - 1);
-    }
-
-    /**
-     * @return array<int|string, true>
-     */
-    private function usedKeys(FormInterface $form): array
-    {
-        $keys = [];
-
-        foreach ($form->getData() ?? [] as $key => $value) {
-            $keys[$key] = true;
-        }
-
-        foreach ($form as $child) {
-            $keys[$this->keyOf($child)] = true;
-        }
-
-        return $keys;
     }
 }

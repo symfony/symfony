@@ -70,6 +70,7 @@ description: Principles for rigorously reviewing a pull request and making it me
 - Never apologize for a late or missing review. Thank the author for their patience and stop there. Do not editorialize about the project's failure to review; credit what the author did well instead.
 - Comments are published under the maintainer's own account, so write their past review comments in the first person and everyone else's in the third.
 - Private methods go at the end of the class, after all public and protected ones. Do not move existing ones in the same patch.
+- Do not call a Symfony or third-party method or constructor with PHP named arguments, in a patch you write or in one you review. Parameter names are outside the backward compatibility promise except for the constructors of attribute classes (note 10 of https://symfony.com/doc/current/contributing/code/bc.html), so a renamed parameter breaks such a call in a minor release. Pass the intermediate defaults explicitly to reach a later optional parameter. Named arguments stay fine for attribute constructors and for PHP's own functions, whose parameter names are part of the language.
 - Use plain English: common words, short sentences, one idea per sentence. Avoid idioms, cultural references and rare vocabulary. Most readers are not native speakers.
 
 ## Reporting

@@ -137,7 +137,7 @@ class Terminal
      */
     public static function hasExtTerminal(): bool
     {
-        return \extension_loaded('terminal') && version_compare(phpversion('terminal'), '1.0.0', '>=') && version_compare(phpversion('terminal'), '2.0.0', '<');
+        return \extension_loaded('terminal') && version_compare(phpversion('terminal'), '1.0.0', '>=') && version_compare(phpversion('terminal'), '2.0.0', '<') && class_exists(\Io\Terminal\Terminal::class, false);
     }
 
     public static function supportsKittyGraphics(): bool

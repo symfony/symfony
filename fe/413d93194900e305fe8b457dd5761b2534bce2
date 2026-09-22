@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T10:13:48Z
+
+Thanks @X-Coder264, nice work on this one - the group-sequence case is exactly the subtle part and you got it right.
+
+I pushed one change: the cascaded groups now travel on `ExecutionContext` (a private field plus two accessors) instead of the static `WeakMap`, so `RecursiveValidationState` is gone and `AtLeastOneOfValidator` is untouched again, since `clone` copies the field for free. Same test counts, 5421/9667, and Form and Doctrine are identical to base.
+
+The `WeakMap` did work, my concern was process-wide mutable state in a component that runs re-entrantly and in long-running workers. `ExecutionContext` is already `@internal` and already carries the group and constraint of the current frame, so it is the natural place. The one thing it gives up is support for a foreign `ExecutionContextInterface`, but there is exactly one implementation in the repo and `RecursiveContextualValidator::validate()` already uses the same `instanceof` idiom for `getConstraint()`.
+
+Also trimmed the changelog line to just the new behaviour.
+
+Two things for the docs PR, both worth stating explicitly because they will surprise people:
+
+- groups on `Sequentially` also become the groups the child is cascaded in, so `#[Sequentially([...], groups: ['g1'])]` will not run the child's `Default` constraints. It matches what `#[Valid(groups: [...])]` does directly, so it is consistent, but it is not obvious.
+- order matters: `Valid` first is legal but reintroduces the `NoSuchMetadataException` on scalars that the feature exists to avoid. Guard first, cascade last.
+
+One smaller point: `Valid(restrictGroups: false)` inside `Sequentially` is accepted but can never do anything, since the groups must be null for the nested case to work at all. Fine to leave, just be aware the test only asserts that it constructs.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-09-20T02:59:24Z
+
+Thanks @nicolas-grekas for the review and the changes. I've rebased the PR and fixed the `CHANGELOG.md` conflict in the process. I've also updated the PR description to match the updated implementation.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-09-20T21:04:18Z
+
+docs PR: https://github.com/symfony/symfony-docs/pull/23071

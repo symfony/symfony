@@ -20,6 +20,8 @@ interface ConfigurableInterface
 {
     /**
      * Generates the configuration tree builder.
+     *
+     * The tree must not depend on anything external, such as container parameters, env vars or the machine it is built on: the same tree must come out whatever the environment.
      */
     public function configure(DefinitionConfigurator $definition): void;
 }

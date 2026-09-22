@@ -51,6 +51,13 @@ class LockBundleExtensionTest extends TestCase
         $this->assertSame('lock.factory', (string) $container->getAlias(LockFactory::class));
     }
 
+    public function testEmptyResourcesUseTheDefaultStore()
+    {
+        $container = $this->createContainerFromFile('lock_empty_resources');
+
+        $this->assertSame(SemaphoreStore::isSupported() ? '.lock.semaphore.store' : '.lock.flock.store', (string) $container->getDefinition('lock.default.factory')->getArgument(0));
+    }
+
     public function testLockFromARootLevelDsn()
     {
         $config = (new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()[1]->getType();

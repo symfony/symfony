@@ -171,7 +171,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('locale: en', $tester->getDisplay());
         $this->assertStringContainsString('secret: test', $tester->getDisplay());
         $this->assertStringContainsString('cookie_httponly: true', $tester->getDisplay());
-        $this->assertStringContainsString('ide: '.($debug ? ($_ENV['SYMFONY_IDE'] ?? $_SERVER['SYMFONY_IDE'] ?? 'null') : 'null'), $tester->getDisplay());
+        $this->assertStringContainsString('ide: null', $tester->getDisplay());
     }
 
     #[TestWith([true])]

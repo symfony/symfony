@@ -26,7 +26,7 @@ class ConfigurationTest extends TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [[
+        $config = $processor->processConfiguration(new Configuration(), [[
             'secret' => 's3cr3t',
         ]]);
 
@@ -46,7 +46,7 @@ class ConfigurationTest extends TestCase
     #[DataProvider('provideEquivalentProfilerExclusions')]
     public function testProfilerExcludedHttpCodesAreNormalized(array $excludedHttpCodes)
     {
-        $config = (new Processor())->processConfiguration(new Configuration(true), [[
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_http_codes' => $excludedHttpCodes],
         ]]);
 
@@ -66,7 +66,7 @@ class ConfigurationTest extends TestCase
 
     public function testProfilerExcludedHttpCodesAcceptsABareStatusCode()
     {
-        $config = (new Processor())->processConfiguration(new Configuration(true), [[
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_http_codes' => 404],
         ]]);
 
@@ -75,7 +75,7 @@ class ConfigurationTest extends TestCase
 
     public function testProfilerExcludedHttpCodesAcceptsASinglePathAsAString()
     {
-        $config = (new Processor())->processConfiguration(new Configuration(true), [[
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_http_codes' => [404 => '^/foo']],
         ]]);
 
@@ -84,7 +84,7 @@ class ConfigurationTest extends TestCase
 
     public function testProfilerExcludedHttpCodesSkipsCodesDisabledWithFalse()
     {
-        $config = (new Processor())->processConfiguration(new Configuration(true), [[
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_http_codes' => [404 => false, 400 => null]],
         ]]);
 
@@ -93,7 +93,7 @@ class ConfigurationTest extends TestCase
 
     public function testProfilerExcludedHttpCodesAreOverriddenAcrossFiles()
     {
-        $config = (new Processor())->processConfiguration(new Configuration(true), [
+        $config = (new Processor())->processConfiguration(new Configuration(), [
             ['profiler' => ['excluded_http_codes' => [404]]],
             ['profiler' => ['excluded_http_codes' => [404 => ['^/api']]]],
         ]);
@@ -103,7 +103,7 @@ class ConfigurationTest extends TestCase
 
     public function testProfilerExcludedPathsAcceptsABareRegularExpression()
     {
-        $config = (new Processor())->processConfiguration(new Configuration(true), [[
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_paths' => '^/\.well-known/'],
         ]]);
 
@@ -116,7 +116,7 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($message);
 
-        (new Processor())->processConfiguration(new Configuration(true), [[
+        (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_http_codes' => [$code]],
         ]]);
     }
@@ -132,7 +132,7 @@ class ConfigurationTest extends TestCase
     {
         $this->expectException(InvalidConfigurationException::class);
 
-        (new Processor())->processConfiguration(new Configuration(true), [[
+        (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_paths' => ['']],
         ]]);
     }
@@ -141,7 +141,7 @@ class ConfigurationTest extends TestCase
     {
         $this->expectException(InvalidConfigurationException::class);
 
-        (new Processor())->processConfiguration(new Configuration(true), [[
+        (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_http_codes' => [404 => ['']]],
         ]]);
     }
@@ -151,7 +151,7 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid regular expression in the "excluded_paths" option');
 
-        (new Processor())->processConfiguration(new Configuration(true), [[
+        (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_paths' => ['^/foo(']],
         ]]);
     }
@@ -161,7 +161,7 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid regular expression in the "excluded_http_codes" option');
 
-        (new Processor())->processConfiguration(new Configuration(true), [[
+        (new Processor())->processConfiguration(new Configuration(), [[
             'profiler' => ['excluded_http_codes' => [404 => ['^/foo(']]],
         ]]);
     }
@@ -174,7 +174,7 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
 
         $processor->processConfiguration(
-            new Configuration(true),
+            new Configuration(),
             [[
                 'session' => ['name' => $sessionName, 'cookie_secure' => 'auto', 'cookie_samesite' => 'lax'],
             ]]
@@ -196,7 +196,7 @@ class ConfigurationTest extends TestCase
     public function testFormCsrfProtectionFieldAttrDoNotNormalizeKeys()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(false), [
+        $config = $processor->processConfiguration(new Configuration(), [
             [
                 'form' => [
                     'csrf_protection' => [
@@ -221,7 +221,7 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage('The HTTP methods "GET", "HEAD", "CONNECT", and "TRACE" cannot be overridden.');
 
         $processor->processConfiguration(
-            new Configuration(true),
+            new Configuration(),
             [[
                 'allowed_http_method_override' => [$method],
             ]]
@@ -234,7 +234,7 @@ class ConfigurationTest extends TestCase
 
         foreach (['remote_event', 'remote-event'] as $key) {
             foreach ([true, false] as $enabled) {
-                $config = $processor->processConfiguration(new Configuration(true), [
+                $config = $processor->processConfiguration(new Configuration(), [
                     [
                         'http_method_override' => false,
                         'handle_all_throwables' => true,
@@ -255,7 +255,7 @@ class ConfigurationTest extends TestCase
             'allowed_http_method_override' => null,
             'handle_all_throwables' => true,
             'trust_x_sendfile_type_header' => '%env(bool:default::SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER)%',
-            'ide' => '%env(default::SYMFONY_IDE)%',
+            'ide' => null,
             'default_locale' => 'en',
             'enabled_locales' => [],
             'set_locale_from_accept_language' => false,
@@ -314,9 +314,9 @@ class ConfigurationTest extends TestCase
             ],
             'php_errors' => [
                 'log' => true,
-                'throw' => true,
+                'throw' => null,
             ],
-            'disallow_search_engine_index' => true,
+            'disallow_search_engine_index' => null,
             'error_controller' => 'error_controller',
             'secrets' => [
                 'enabled' => true,
@@ -341,9 +341,18 @@ class ConfigurationTest extends TestCase
         $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.1: Setting the "framework.http_cache.terminate_on_cache_hit" configuration option is deprecated. It will be removed in version 9.0.');
 
         $processor = new Processor();
-        $processor->processConfiguration(new Configuration(true), [[
+        $processor->processConfiguration(new Configuration(), [[
             'http_cache' => ['terminate_on_cache_hit' => true],
         ]]);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDebugArgumentDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Passing "$debug" to "'.Configuration::class.'::__construct()" is deprecated, the argument will be removed in 9.0.');
+
+        new Configuration(true);
     }
 
     #[Group('legacy')]
@@ -353,7 +362,7 @@ class ConfigurationTest extends TestCase
         $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Setting the "framework.ide" configuration option is deprecated, use the "SYMFONY_IDE" env var instead.');
 
         $processor = new Processor();
-        $processor->processConfiguration(new Configuration(true), [[
+        $processor->processConfiguration(new Configuration(), [[
             'ide' => 'phpstorm',
         ]]);
     }
@@ -365,7 +374,7 @@ class ConfigurationTest extends TestCase
         $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Setting the "framework.fragments.hinclude_default_template" configuration option is deprecated. It will be removed in version 9.0.');
 
         $processor = new Processor();
-        $processor->processConfiguration(new Configuration(true), [[
+        $processor->processConfiguration(new Configuration(), [[
             'fragments' => ['hinclude_default_template' => 'default.html.twig'],
         ]]);
     }

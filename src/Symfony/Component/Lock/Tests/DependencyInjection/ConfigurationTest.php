@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\Configuration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Lock\LockBundle;
-use Symfony\Component\Lock\Store\SemaphoreStore;
 
 class ConfigurationTest extends TestCase
 {
@@ -29,12 +28,11 @@ class ConfigurationTest extends TestCase
 
     public static function provideValidLockConfigurationTests(): iterable
     {
-        $defaultStore = SemaphoreStore::isSupported() ? 'semaphore' : 'flock';
-
-        yield [null, ['enabled' => true, 'resources' => ['default' => [$defaultStore]]]];
-        yield [[], ['enabled' => true, 'resources' => ['default' => [$defaultStore]]]];
-        yield [true, ['enabled' => true, 'resources' => ['default' => [$defaultStore]]]];
-        yield [false, ['enabled' => false, 'resources' => ['default' => [$defaultStore]]]];
+        yield [null, ['enabled' => true, 'resources' => []]];
+        yield [[], ['enabled' => true, 'resources' => []]];
+        yield [true, ['enabled' => true, 'resources' => []]];
+        yield [false, ['enabled' => false, 'resources' => []]];
+        yield [['enabled' => true], ['enabled' => true, 'resources' => []]];
         yield [['enabled' => false], ['enabled' => false, 'resources' => []]];
 
         yield ['flock', ['enabled' => true, 'resources' => ['default' => ['flock']]]];
@@ -136,14 +134,6 @@ class ConfigurationTest extends TestCase
     public function testLockCanBeDisabled()
     {
         $this->assertFalse($this->process(['enabled' => false])['enabled']);
-    }
-
-    public function testEnabledLockNeedsResources()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "lock": At least one resource must be defined.');
-
-        $this->process(['enabled' => true]);
     }
 
     private function process(mixed $config): array

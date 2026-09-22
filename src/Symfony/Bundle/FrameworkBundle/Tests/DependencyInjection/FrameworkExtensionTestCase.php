@@ -635,6 +635,37 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(0, $container->getParameter('debug.error_handler.throw_at'));
     }
 
+    public function testPhpErrorsThrowFollowsDebugByDefault()
+    {
+        foreach ([true, false] as $debug) {
+            $container = $this->createContainer(['kernel.debug' => $debug]);
+            (new FrameworkExtension())->load([], $container);
+
+            $this->assertSame($debug ? -1 : 0, $container->getParameter('debug.error_handler.throw_at'));
+        }
+    }
+
+    public function testNullPhpErrorsSettingsFollowDebug()
+    {
+        foreach ([true, false] as $debug) {
+            $container = $this->createContainer(['kernel.debug' => $debug]);
+            (new FrameworkExtension())->load([['php_errors' => ['log' => null, 'throw' => null]]], $container);
+
+            $this->assertEquals($debug ? new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE) : null, $container->getDefinition('debug.error_handler_configurator')->getArgument(0));
+            $this->assertSame($debug ? -1 : 0, $container->getParameter('debug.error_handler.throw_at'));
+        }
+    }
+
+    public function testIdeFollowsDebugByDefault()
+    {
+        foreach ([true, false] as $debug) {
+            $container = $this->createContainer(['kernel.debug' => $debug]);
+            (new FrameworkExtension())->load([], $container);
+
+            $this->assertSame($debug ? '%env(default::SYMFONY_IDE)%' : null, $container->getParameter('debug.file_link_format'));
+        }
+    }
+
     public function testPhpErrorsWithLogLevel()
     {
         $container = $this->createContainerFromFile('php_errors_log_level');
@@ -1394,6 +1425,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('default_config', ['kernel.debug' => false, 'kernel.container_class' => __CLASS__]);
 
         $this->assertFalse($container->hasDefinition('cache_pool_clearer.cache_warmer'));
+    }
+
+    public function testNullRobotsTagSettingFollowsDebug()
+    {
+        foreach ([true, false] as $debug) {
+            $container = $this->createContainer(['kernel.debug' => $debug]);
+            (new FrameworkExtension())->load([['disallow_search_engine_index' => null]], $container);
+
+            $this->assertSame($debug, $container->has('disallow_search_engine_index_response_listener'));
+        }
     }
 
     public function testSessionCookieSecureAuto()

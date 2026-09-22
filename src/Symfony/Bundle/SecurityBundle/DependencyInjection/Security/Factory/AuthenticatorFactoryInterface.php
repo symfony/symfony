@@ -30,6 +30,11 @@ interface AuthenticatorFactoryInterface
      */
     public function getKey(): string;
 
+    /**
+     * Configures the node of this authenticator in the firewall config tree.
+     *
+     * The node must not depend on anything external, such as container parameters, env vars or the machine it is built on: the same tree must come out whatever the environment.
+     */
     public function addConfiguration(NodeDefinition $builder): void;
 
     /**

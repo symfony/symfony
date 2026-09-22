@@ -55,15 +55,11 @@ class LockBundle extends AbstractBundle
                     return $v;
                 })
             ->end()
-            ->validate()
-                ->ifTrue(static fn ($v) => $v['enabled'] && !$v['resources'])
-                ->thenInvalid('At least one resource must be defined.')
-            ->end()
             ->children()
                 ->arrayNode('resources', 'resource')
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('name')
-                    ->defaultValue(['default' => [SemaphoreStore::isSupported() ? 'semaphore' : 'flock']])
+                    ->info('Defaults to a "default" resource using the semaphore store when it is supported, the flock store otherwise.')
                     ->acceptAndWrap(['string'], 'default')
                     ->beforeNormalization()
                         ->ifArray()
@@ -115,6 +111,10 @@ class LockBundle extends AbstractBundle
     {
         if (!$config['enabled']) {
             return;
+        }
+
+        if (!$config['resources']) {
+            $config['resources'] = ['default' => [SemaphoreStore::isSupported() ? 'semaphore' : 'flock']];
         }
 
         $configurator->import('Resources/config/lock.php');

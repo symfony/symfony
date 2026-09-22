@@ -29,11 +29,13 @@ use Symfony\Component\HttpFoundation\IpUtils;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * @param bool $debug Whether debugging is enabled or not
+     * @param bool|null $debug Passing this argument is deprecated since Symfony 8.2, a config tree should not depend on anything external
      */
-    public function __construct(
-        private bool $debug,
-    ) {
+    public function __construct(?bool $debug = null)
+    {
+        if (null !== $debug) {
+            trigger_deprecation('symfony/framework-bundle', '8.2', 'Passing "$debug" to "%s::__construct()" is deprecated, the argument will be removed in 9.0.', self::class);
+        }
     }
 
     /**
@@ -76,7 +78,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue('%env(bool:default::SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER)%')
                 ->end()
                 ->scalarNode('ide')
-                    ->defaultValue($this->debug ? '%env(default::SYMFONY_IDE)%' : null)
+                    ->defaultNull()
                     ->setDeprecated('symfony/framework-bundle', '8.2', 'Setting the "%path%.%node%" configuration option is deprecated, use the "SYMFONY_IDE" env var instead.')
                 ->end()
                 ->booleanNode('test')->end()
@@ -536,34 +538,15 @@ class Configuration implements ConfigurationInterface
                         ->variableNode('log')
                             ->info('Use the application logger instead of the PHP logger for logging PHP errors.')
                             ->example('"true" to use the default configuration: log all errors. "false" to disable. An integer bit field of E_* constants, or an array mapping E_* constants to log levels.')
-                            ->treatNullLike($this->debug)
                             ->defaultTrue()
-                            ->beforeNormalization()
-                                ->ifArray()
-                                ->then(static function (array $v): array {
-                                    if (!($v[0]['type'] ?? false)) {
-                                        return $v;
-                                    }
-
-                                    // Fix XML normalization
-
-                                    $ret = [];
-                                    foreach ($v as ['type' => $type, 'logLevel' => $logLevel]) {
-                                        $ret[$type] = $logLevel;
-                                    }
-
-                                    return $ret;
-                                })
-                            ->end()
                             ->validate()
-                                ->ifTrue(static fn ($v) => !(\is_int($v) || \is_bool($v) || \is_array($v)))
+                                ->ifTrue(static fn ($v) => !(null === $v || \is_int($v) || \is_bool($v) || \is_array($v)))
                                 ->thenInvalid('The "php_errors.log" parameter should be either an integer, a boolean, or an array')
                             ->end()
                         ->end()
                         ->booleanNode('throw')
-                            ->info('Throw PHP errors as \ErrorException instances.')
-                            ->defaultValue($this->debug)
-                            ->treatNullLike($this->debug)
+                            ->info('Throw PHP errors as \ErrorException instances. Enabled by default when debug is enabled.')
+                            ->defaultNull()
                         ->end()
                     ->end()
                 ->end()
@@ -619,8 +602,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('disallow_search_engine_index')
                     ->info('Enabled by default when debug is enabled.')
-                    ->defaultValue($this->debug)
-                    ->treatNullLike($this->debug)
+                    ->defaultNull()
                 ->end()
             ->end()
         ;

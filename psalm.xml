@@ -48,6 +48,7 @@
                 <referencedClass name="CurlSharePersistentHandle"/>
                 <!-- These classes come from optional extensions -->
                 <referencedClass name="Couchbase\Collection"/>
+                <referencedClass name="Io\Terminal\ModeToken"/>
                 <referencedClass name="Io\Terminal\Terminal"/>
                 <referencedClass name="Io\Terminal\TerminalSize"/>
                 <referencedClass name="Relay\Cluster"/>

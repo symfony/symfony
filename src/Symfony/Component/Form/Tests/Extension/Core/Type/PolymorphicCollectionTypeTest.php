@@ -226,6 +226,30 @@ class PolymorphicCollectionTypeTest extends BaseTypeTestCase
         $this->assertEquals([0 => new Author('Bob'), 2 => 'John'], $form->getData());
     }
 
+    public function testEntryNameMapsTheSubmittedDataByNameInsteadOfIndex()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_types' => [
+                'text' => TextTypeTest::TESTED_TYPE,
+                'author' => AuthorType::class,
+            ],
+            'entry_type_provider' => new AuthorEntryTypeProvider(),
+            'entry_name' => static fn (string|Author $entry) => $entry instanceof Author ? $entry->firstName : $entry,
+            'allow_add' => true,
+            'allow_delete' => true,
+        ]);
+        $form->setData([$bob = new Author('Bob'), 'John', $alice = new Author('Alice')]);
+
+        $this->assertSame(['Bob', 'John', 'Alice'], array_keys(iterator_to_array($form)));
+        $this->assertSame('[2]', (string) $form['Alice']->getPropertyPath());
+
+        $form->submit(['Alice' => ['firstName' => 'Alice', 'lastName' => 'Smith'], 'Bob' => ['firstName' => 'Bob'], 'new_1' => 'Jane']);
+
+        $this->assertSame(['Bob', 'Alice', 'new_1'], array_keys(iterator_to_array($form)));
+        $this->assertSame('Smith', $alice->getLastName());
+        $this->assertSame([0 => $bob, 2 => $alice, 3 => 'Jane'], $form->getData());
+    }
+
     public function testResizedDownIfSubmittedWithCompoundEmptyDataDeleteEmptyAndNoDataClass()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

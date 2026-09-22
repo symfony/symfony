@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.1/phpunit.xsd"
+         bootstrap="bootstrap.php"
+         cacheDirectory=".phpunit.cache"
+         failOnDeprecation="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+>
+    <testsuites>
+        <testsuite name="Issue trigger resolver integration test">
+            <file>IssueTrigger.php</file>
+        </testsuite>
+    </testsuites>
+
+    <source ignoreIndirectDeprecations="true" ignoreSuppressionOfDeprecations="true">
+        <include>
+            <file>../IssueTriggerResolver/ExtendsFinalParent.php</file>
+        </include>
+    </source>
+</phpunit>

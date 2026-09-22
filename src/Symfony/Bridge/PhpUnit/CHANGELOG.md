@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `DebugClassLoaderIssueTriggerResolver` to classify `DebugClassLoader` deprecations with PHPUnit 13.1+
+
 8.1
 ---
 

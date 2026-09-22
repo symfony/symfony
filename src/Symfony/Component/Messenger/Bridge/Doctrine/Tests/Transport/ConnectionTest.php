@@ -319,6 +319,77 @@ class ConnectionTest extends TestCase
         $connection->keepalive('1', 60);
     }
 
+    #[DataProvider('provideDelays')]
+    public function testSendMakesTheMessageAvailableNoEarlierThanTheDelay(int $delay)
+    {
+        $beforeSend = new \DateTimeImmutable('UTC');
+        $availableAt = $this->getAvailableAtOfSentMessage($delay);
+        $afterSend = new \DateTimeImmutable('UTC');
+
+        self::assertGreaterThanOrEqual($beforeSend->modify(\sprintf('+%d milliseconds', $delay)), $availableAt);
+        self::assertLessThan($afterSend->modify(\sprintf('+%d milliseconds', $delay + 1000)), $availableAt);
+    }
+
+    public static function provideDelays(): iterable
+    {
+        yield '1ms' => [1];
+        yield '500ms' => [500];
+        yield '999ms' => [999];
+        yield '1000ms' => [1000];
+        yield '1001ms' => [1001];
+        yield '2500ms' => [2500];
+    }
+
+    public function testSendMakesAMessageWithoutDelayAvailableImmediately()
+    {
+        $availableAt = $this->getAvailableAtOfSentMessage(0);
+
+        self::assertLessThanOrEqual(new \DateTimeImmutable('UTC'), $availableAt);
+    }
+
+    private function getAvailableAtOfSentMessage(int $delay): \DateTimeImmutable
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnection(true);
+
+        $driverConnection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('insert')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('values')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('INSERT');
+
+        $availableAt = null;
+        $driverConnection->expects($this->once())
+            ->method('executeStatement')
+            ->with('INSERT', $this->callback(static function (array $parameters) use (&$availableAt) {
+                $availableAt = $parameters[4];
+
+                return true;
+            }))
+            ->willReturn(1);
+
+        $driverConnection->expects($this->once())
+            ->method('lastInsertId')
+            ->willReturn('1');
+
+        (new Connection([], $driverConnection))->send('test', [], $delay);
+
+        self::assertInstanceOf(\DateTimeImmutable::class, $availableAt);
+
+        // the column holds seconds, so the fractional part never reaches the database
+        return $availableAt->setTime((int) $availableAt->format('H'), (int) $availableAt->format('i'), (int) $availableAt->format('s'));
+    }
+
     private function getDBALConnection(bool $mock = false)
     {
         $driverConnection = $mock ? $this->createMock(DBALConnection::class) : $this->createStub(DBALConnection::class);

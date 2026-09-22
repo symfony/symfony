@@ -11,8 +11,18 @@
 
 namespace Symfony\Component\Workflow;
 
-enum WorkflowType
+/**
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ */
+enum WorkflowType: string
 {
-    case StateMachine;
-    case Workflow;
+    /**
+     * The subject can be in one and only one place at the same time.
+     */
+    case StateMachine = 'state_machine';
+
+    /**
+     * The subject can be in many places at the same time.
+     */
+    case Workflow = 'workflow';
 }

@@ -1,0 +1,3 @@
+workflow:
+    path: /workflow
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Workflow\WorkflowController

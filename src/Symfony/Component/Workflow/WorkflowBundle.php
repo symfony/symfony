@@ -26,10 +26,12 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\Finder\Glob;
 use Symfony\Component\Workflow\Attribute\AsWorkflow;
-use Symfony\Component\Workflow\Configuration\AttributeReader;
+use Symfony\Component\Workflow\DependencyInjection\TransitionDescriptor;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowAttributePass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowDescriptor;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
-use Symfony\Component\Workflow\DependencyInjection\WorkflowServiceCreatorPass;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowServiceRegistrar;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 
@@ -53,7 +55,10 @@ class WorkflowBundle extends AbstractBundle
             $container->addCompilerPass(new AddEventAliasesPass(WorkflowEvents::ALIASES));
         }
 
-        $container->addCompilerPass(new WorkflowServiceCreatorPass(), priority: 2); // Must be before the validator
+        $container->registerAttributeForAutoconfiguration(AsWorkflow::class, static function (ChildDefinition $definition) {
+            $definition->addTag('.workflow.attribute');
+        });
+        $container->addCompilerPass(new WorkflowAttributePass(), priority: 2); // Must be before the validator
         $container->addCompilerPass(new WorkflowGuardListenerPass());
         $container->addCompilerPass(new WorkflowValidatorPass());
 
@@ -452,14 +457,48 @@ class WorkflowBundle extends AbstractBundle
             $configurator->import('Resources/config/workflow_debug.php');
         }
 
-        $attributeReader = new AttributeReader();
-        $container->registerAttributeForAutoconfiguration(AsWorkflow::class, static function (ChildDefinition $definition, AsWorkflow $attribute, \ReflectionClass $reflection) use ($attributeReader): void {
-            $configuration = $attributeReader->extractConfiguration($attribute, $reflection);
-            $definition->addTag('.workflow.attribute', [
-                'configuration' => $configuration,
-            ]);
-        });
+        $registrar = new WorkflowServiceRegistrar();
+        foreach ($config['workflows'] as $name => $workflow) {
+            $registrar->register($container, $this->createDescriptor($name, $workflow));
+        }
+    }
 
-        $container->setParameter('.workflow.workflows', $config['workflows']);
+    private function createDescriptor(string $name, array $workflow): WorkflowDescriptor
+    {
+        $createArc = static fn (array $arc): Arc => new Arc($arc['place'], $arc['weight']);
+        $transitions = [];
+        foreach ($workflow['transitions'] as $transition) {
+            $transitions[] = new TransitionDescriptor(
+                $transition['name'],
+                array_map($createArc, $transition['from']),
+                array_map($createArc, $transition['to']),
+                $transition['guard'] ?? null,
+                $transition['metadata'],
+            );
+        }
+
+        $markingProperty = null;
+        $markingStore = null;
+        if (isset($workflow['marking_store']['type']) || isset($workflow['marking_store']['property'])) {
+            $markingProperty = $workflow['marking_store']['property'] ?? 'marking';
+        } elseif (isset($workflow['marking_store']['service'])) {
+            $markingStore = $workflow['marking_store']['service'];
+        }
+
+        return new WorkflowDescriptor(
+            $name,
+            WorkflowType::from($workflow['type']),
+            array_column($workflow['places'], 'metadata', 'name'),
+            $transitions,
+            $workflow['initial_marking'],
+            $workflow['supports'],
+            $workflow['support_strategy'] ?? null,
+            $markingProperty,
+            $markingStore,
+            $workflow['metadata'],
+            $workflow['audit_trail']['enabled'],
+            $workflow['events_to_dispatch'],
+            $workflow['definition_validators'] ?? [],
+        );
     }
 }

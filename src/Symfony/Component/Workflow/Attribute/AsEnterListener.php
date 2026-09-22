@@ -24,7 +24,7 @@ final class AsEnterListener extends AsEventListener
     use BuildEventNameTrait;
 
     /**
-     * @param string|null              $workflow   The id of the workflow to listen to
+     * @param string|null              $workflow   The name of the workflow to listen to; can be omitted in a class using the AsWorkflow attribute
      * @param string|null              $place      The place name to which the listener listens to
      * @param string|null              $method     The method to run when the listened event is triggered
      * @param int|null                 $priority   The priority of this listener; null lets "before"/"after" decide it, else they only reorder within that priority

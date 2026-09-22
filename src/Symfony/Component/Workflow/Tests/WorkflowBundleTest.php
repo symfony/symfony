@@ -12,11 +12,17 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\StateMachine;
+use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\Task;
+use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\TaskConsumer;
+use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\TaskStep;
+use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\TaskWorkflow;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\WorkflowBundle;
 
@@ -48,6 +54,44 @@ class WorkflowBundleTest extends TestCase
         $registry = $container->get('test.workflow.registry');
         $this->assertInstanceOf(Registry::class, $registry);
         $this->assertSame([$workflow], $registry->all(new \stdClass()));
+    }
+
+    public function testWorkflowsAreDefinedWithAttributes()
+    {
+        $kernel = new TestWorkflowKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $consumer = $container->get('test.workflow.task_consumer');
+        $this->assertInstanceOf(TaskConsumer::class, $consumer);
+        $this->assertInstanceOf(TaskWorkflow::class, $consumer->taskWorkflow);
+        $this->assertInstanceOf(StateMachine::class, $consumer->workflow);
+        $this->assertSame('task', $consumer->taskWorkflow->getName());
+        $this->assertSame($consumer->workflow->getDefinition(), $consumer->taskWorkflow->getDefinition());
+        $this->assertSame(['new', 'processing', 'done', 'failed'], array_values($consumer->taskWorkflow->getDefinition()->getPlaces()));
+        $this->assertSame(['new'], $consumer->taskWorkflow->getDefinition()->getInitialPlaces());
+        $this->assertSame('Task', $consumer->taskWorkflow->getMetadataStore()->getMetadata('title'));
+        $this->assertSame('Processing', $consumer->taskWorkflow->getMetadataStore()->getMetadata('label', TaskStep::Processing->value));
+
+        $task = new Task();
+        $this->assertTrue($consumer->taskWorkflow->can($task, TaskWorkflow::START));
+        $consumer->taskWorkflow->start($task);
+        $this->assertSame(TaskStep::Processing, $task->step);
+        $this->assertSame(['started_by' => 'start()'], $task->context, 'The transition listener of the class is registered');
+        $this->assertTrue($consumer->taskWorkflow->can($task, TaskWorkflow::FINISH));
+        $this->assertTrue($consumer->taskWorkflow->can($task, TaskWorkflow::FAIL));
+
+        $blockedTask = new Task();
+        $blockedTask->blocked = true;
+        $this->assertFalse($consumer->taskWorkflow->can($blockedTask, TaskWorkflow::START), 'The guard listener of the class is registered');
+
+        $registry = $container->get('test.workflow.registry');
+        $this->assertSame([$consumer->workflow], $registry->all($task));
+
+        $command = new CommandTester($container->get('test.workflow.dump_command'));
+        $this->assertSame(0, $command->execute(['name' => 'task']));
+        $this->assertStringContainsString('digraph workflow', $command->getDisplay());
+        $this->assertSame(2, substr_count($command->getDisplay(), 'label="finish"'));
     }
 }
 
@@ -82,7 +126,12 @@ class TestWorkflowKernel extends AbstractKernel
                 ],
             ],
         ]);
-        $container->services()->alias('test.workflow.article', 'workflow.article')->public();
-        $container->services()->alias('test.workflow.registry', 'workflow.registry')->public();
+
+        $services = $container->services()->defaults()->autowire()->autoconfigure();
+        $services->load('Symfony\\Component\\Workflow\\Tests\\Fixtures\\AttributeWorkflow\\', __DIR__.'/Fixtures/AttributeWorkflow/');
+        $services->alias('test.workflow.article', 'workflow.article')->public();
+        $services->alias('test.workflow.registry', 'workflow.registry')->public();
+        $services->alias('test.workflow.task_consumer', TaskConsumer::class)->public();
+        $services->alias('test.workflow.dump_command', 'console.command.workflow_dump')->public();
     }
 }

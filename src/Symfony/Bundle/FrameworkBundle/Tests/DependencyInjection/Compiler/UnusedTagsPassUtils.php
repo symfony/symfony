@@ -22,7 +22,6 @@ class UnusedTagsPassUtils
             'doctrine.orm.entity' => true,
             'proxy' => true,
             'routing.controller' => true,
-            '.workflow.attribute' => true,
         ];
 
         // get all tags used in XML configs

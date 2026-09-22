@@ -26,9 +26,10 @@ class ClientSecretBasicTest extends TestCase
     }
 
     /**
-     * RFC 6749, Section 2.3.1: the client identifier and the secret are each form-urlencoded
-     * before being combined, so that a colon, a percent sign or a non-ASCII byte in either
-     * of them survives the round trip.
+     * The client identifier and the secret are each form-urlencoded before being combined.
+     *
+     * RFC 6749, Section 2.3.1 asks for it, so that a colon, a percent sign or a non-ASCII byte
+     * in either of them survives the round trip.
      */
     public function testFormUrlEncodesEachCredential()
     {

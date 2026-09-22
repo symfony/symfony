@@ -67,9 +67,10 @@ final class OidcUserProvider implements AttributesBasedUserProviderInterface
     }
 
     /**
-     * Drops any claim that would be mapped onto a security-sensitive OidcUser
-     * constructor argument, so the provider cannot populate "roles" or override
-     * the "userIdentifier" through the claims it returns (privilege escalation).
+     * Drops any claim that would be mapped onto a security-sensitive OidcUser argument.
+     *
+     * The provider cannot then populate "roles" nor override the "userIdentifier" through the
+     * claims it returns (privilege escalation).
      *
      * The claim name is reduced to its letters and digits, lower-cased, to also
      * catch the separator and case variants that {@see OidcUser::fromClaims()}

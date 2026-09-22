@@ -146,8 +146,9 @@ final class OidcDiscovery implements ResetInterface
     }
 
     /**
-     * Sends the discovery request, without waiting for its response, when the document is
-     * not cached yet.
+     * Sends the discovery request without waiting for its response.
+     *
+     * Nothing is sent when the document is already cached.
      *
      * Calling it on several instances before reading any of them lets their requests travel
      * concurrently, since the response is only consumed by {@see getConfiguration()}.
@@ -175,8 +176,9 @@ final class OidcDiscovery implements ResetInterface
     }
 
     /**
-     * Returns an endpoint announced by the discovery document, checking that it provides
-     * the transport security the ID token relies on.
+     * Returns an endpoint announced by the discovery document.
+     *
+     * It is checked to provide the transport security the ID token relies on.
      *
      * The document is fetched from the provider, so a tampered or misconfigured one must
      * not be able to downgrade a request to plain HTTP: enforcing HTTPS on the configured
@@ -239,8 +241,9 @@ final class OidcDiscovery implements ResetInterface
     }
 
     /**
-     * The discovery specification requires the endpoints it advertises to use the "https"
-     * scheme: they are rejected when they downgrade the transport that carried the document.
+     * The discovery specification requires the endpoints it advertises to use "https".
+     *
+     * They are rejected when they downgrade the transport that carried the document.
      */
     private static function checkEndpointScheme(mixed $endpoint, string $key, string $discoveryUrl): void
     {

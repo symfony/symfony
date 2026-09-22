@@ -43,8 +43,10 @@ class OidcTokenRefreshListenerTest extends TestCase
     }
 
     /**
-     * A lazy firewall calls supports() before the security token is restored, and drops
-     * every listener that answers false: anything but null evicts this one for good.
+     * A lazy firewall calls supports() before the security token is restored.
+     *
+     * It drops every listener that answers false, so anything but null evicts this one for
+     * good.
      */
     public function testSupportsDefersToAuthenticateSoLazyFirewallsKeepTheListener()
     {

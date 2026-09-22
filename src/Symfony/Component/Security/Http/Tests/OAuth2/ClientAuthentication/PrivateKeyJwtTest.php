@@ -55,9 +55,10 @@ class PrivateKeyJwtTest extends TestCase
     }
 
     /**
-     * RFC 7523, Section 3: the client is both the issuer and the subject of the assertion it
-     * authenticates itself with, and the token endpoint the request goes to is the audience,
-     * so that the provider it is sent to is the only one that can use it.
+     * The client is both the issuer and the subject of the assertion.
+     *
+     * RFC 7523, Section 3 also makes the token endpoint the request goes to the audience, so
+     * that the provider it is sent to is the only one that can use it.
      */
     public function testNamesTheClientAsIssuerAndSubjectAndTheTokenEndpointAsAudience()
     {
@@ -82,9 +83,10 @@ class PrivateKeyJwtTest extends TestCase
     }
 
     /**
-     * OIDC Core 1.0, Section 10.1: a client that publishes several keys makes the provider
-     * pick the right one by naming it, and one that publishes a single unnamed key sends
-     * no "kid" at all rather than an empty one.
+     * A client that publishes several keys makes the provider pick the right one by naming it.
+     *
+     * OIDC Core 1.0, Section 10.1 covers this; a client that publishes a single unnamed key
+     * sends no "kid" at all rather than an empty one.
      */
     public function testSetsTheKeyIdentifierHeaderOnlyWhenTheKeyCarriesOne()
     {
@@ -109,9 +111,10 @@ class PrivateKeyJwtTest extends TestCase
     }
 
     /**
-     * RFC 7523, Section 3, item 7: the "jti" is what a provider rejects a replayed assertion
-     * on, so two assertions must never share one, not even when they are built in the same
-     * second for the same request.
+     * The "jti" is what a provider rejects a replayed assertion on.
+     *
+     * RFC 7523, Section 3, item 7 defines it, so two assertions must never share one, not even
+     * when they are built in the same second for the same request.
      */
     public function testGivesEveryAssertionAnIdentifierOfItsOwn()
     {
@@ -125,8 +128,10 @@ class PrivateKeyJwtTest extends TestCase
     }
 
     /**
-     * A MAC algorithm would turn the shared secret of the provider into a signature only the
-     * client is supposed to be able to make, which is the whole point of this method.
+     * A MAC algorithm would sign with the secret the provider also holds.
+     *
+     * Only the client is supposed to be able to make this signature, which is the whole point
+     * of the method.
      */
     public function testRejectsAMacAlgorithm()
     {

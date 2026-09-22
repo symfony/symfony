@@ -315,8 +315,9 @@ class OidcSignatureVerifierTest extends TestCase
     }
 
     /**
-     * Verifies a token announcing a "kid" the provider does publish, so that the JWKS ends
-     * up cached without any rotation refetch being attempted.
+     * Verifies a token announcing a "kid" the provider does publish.
+     *
+     * The JWKS then ends up cached without any rotation refetch being attempted.
      */
     private function warmTheJwksCache(OidcSignatureVerifier $verifier): void
     {

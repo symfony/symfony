@@ -20,8 +20,9 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 /**
- * Handles RP-Initiated Logout by redirecting to the OIDC provider's
- * end_session_endpoint on logout.
+ * Handles RP-Initiated Logout.
+ *
+ * The logout redirects to the end_session_endpoint of the OIDC provider.
  *
  * @see https://openid.net/specs/openid-connect-rpinitiated-1_0.html
  *

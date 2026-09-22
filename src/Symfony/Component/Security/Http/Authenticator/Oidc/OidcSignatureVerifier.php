@@ -50,9 +50,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class OidcSignatureVerifier
 {
     /**
-     * The asymmetric algorithms the "oidc" access token handler supports too. No HMAC
-     * algorithm is part of them, so a public key published by the provider can never be
-     * turned into the shared secret of an "HS256" token (key confusion).
+     * The asymmetric algorithms the "oidc" access token handler supports too.
+     *
+     * No HMAC algorithm is part of them, so a public key published by the provider can never
+     * be turned into the shared secret of an "HS256" token (key confusion).
      */
     private const SIGNATURE_ALGORITHMS = [
         'RS256' => RS256::class,
@@ -184,8 +185,9 @@ final class OidcSignatureVerifier
     }
 
     /**
-     * Returns the cached signing keys of the provider, refetching them when the ID token
-     * announces a "kid" none of them holds.
+     * Returns the cached signing keys of the provider.
+     *
+     * They are refetched when the ID token announces a "kid" none of them holds.
      *
      * A provider that rotated its keys signs with one the cached JWKS does not know yet.
      * The refetch is throttled, so that tokens carrying an unknown "kid" cannot drive

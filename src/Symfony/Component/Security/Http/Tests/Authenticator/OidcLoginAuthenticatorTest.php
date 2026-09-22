@@ -790,7 +790,6 @@ class OidcLoginAuthenticatorTest extends TestCase
         $session = $request->getSession();
         $prefix = '_security.oidc_login.main.';
 
-        // pending attempts from other tabs
         $session->set($prefix.'attempt.'.$state2, ['nonce' => bin2hex(random_bytes(16)), 'code_verifier' => bin2hex(random_bytes(32))]);
         $session->set($prefix.'attempt.'.$state3, ['nonce' => bin2hex(random_bytes(16)), 'code_verifier' => bin2hex(random_bytes(32))]);
 
@@ -1120,7 +1119,6 @@ class OidcLoginAuthenticatorTest extends TestCase
     public function testStartDispatchesTheAuthorizationRequestEvent()
     {
         $dispatcher = new EventDispatcher();
-        // two listeners, each touching its own parameter, and one dropping a configured one
         $dispatcher->addListener(OidcAuthorizationRequestEvent::class, static function (OidcAuthorizationRequestEvent $event) {
             $event->removeParam('prompt');
             $event->setParam('ui_locales', 'es-ES');
@@ -1391,7 +1389,6 @@ class OidcLoginAuthenticatorTest extends TestCase
             $this->assertSame('Missing authorization code in OIDC callback.', $e->getMessage());
         }
 
-        // The matched attempt is consumed even though there's no code
         $this->assertNull($session->get('_security.oidc_login.main.attempt.'.$state));
     }
 
@@ -1665,13 +1662,11 @@ class OidcLoginAuthenticatorTest extends TestCase
         }
 
         $session = $request->getSession();
-        // The matched attempt was already consumed before the exchange, so it's gone
         $this->assertNull($session->get('_security.oidc_login.main.attempt.'.$state));
     }
 
     public function testConcurrentLoginsPreserveSeparateAttempts()
     {
-        // Two tabs starting a login concurrently must not overwrite each other's state/nonce/verifier
         $state1 = bin2hex(random_bytes(16));
         $state2 = bin2hex(random_bytes(16));
         $nonce1 = bin2hex(random_bytes(16));
@@ -1683,11 +1678,9 @@ class OidcLoginAuthenticatorTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $prefix = '_security.oidc_login.main.';
 
-        // Simulate two start() calls on the same session
         $session->set($prefix.'attempt.'.$state1, ['nonce' => $nonce1, 'code_verifier' => $codeVerifier1, 'redirect_uri' => 'http://localhost/oidc/callback']);
         $session->set($prefix.'attempt.'.$state2, ['nonce' => $nonce2, 'code_verifier' => $codeVerifier2, 'redirect_uri' => 'http://localhost/oidc/callback']);
 
-        // First callback succeeds with its own state and nonce
         $idToken1 = $this->buildIdToken(['nonce' => $nonce1]);
         $this->oidcClient->method('exchangeCode')->willReturnOnConsecutiveCalls(
             ['access_token' => 'access-123', 'id_token' => $idToken1],
@@ -1723,7 +1716,6 @@ class OidcLoginAuthenticatorTest extends TestCase
             $states[] = $params['state'];
         }
 
-        // Session should only have MAX_CONCURRENT_ATTEMPTS (5) attempts
         $attemptKeys = array_filter(array_keys($session->all()), static fn (string $key): bool => str_starts_with($key, $prefix.'attempt.'));
         $this->assertCount(5, $attemptKeys);
 
@@ -1902,8 +1894,9 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * The same callback, posted by the self-submitting page of the "form_post" response
-     * mode instead of being followed as a redirect.
+     * The same callback, posted instead of being followed as a redirect.
+     *
+     * This is what the self-submitting page of the "form_post" response mode sends.
      */
     private function createPostedCallbackRequest(string $state, string $nonce, array $extraParameters = []): Request
     {
@@ -1969,7 +1962,7 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * The very same claims, signed with nothing at all.
+     * The very same claims, carrying a signature the provider key does not verify.
      */
     private function buildForgedIdToken(array $extraClaims = []): string
     {
@@ -2007,8 +2000,9 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * A public client sends no secret, so PKCE is the only thing binding the authorization
-     * code to it: the option that turns PKCE off cannot apply to such a client.
+     * A public client sends no secret, so PKCE is all that binds the code to it.
+     *
+     * The option that turns PKCE off cannot apply to such a client.
      */
     public function testRejectsAPublicClientWithoutPkce()
     {
@@ -2021,9 +2015,10 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * Without the signature check, only the TLS verification of the token request ties the
-     * ID token to the provider, which is too little for a client that has nothing but PKCE
-     * protecting its code exchange.
+     * Without the signature check, only TLS ties the ID token to the provider.
+     *
+     * That is too little for a client that has nothing but PKCE protecting its code
+     * exchange.
      */
     public function testRejectsAPublicClientThatDoesNotVerifyTheIdTokenSignature()
     {
@@ -2043,8 +2038,9 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * A confidential client authenticates at the token endpoint, so OIDC Core 1.0,
-     * Section 3.1.3.7, item 6 lets it rely on that request alone.
+     * A confidential client authenticates at the token endpoint.
+     *
+     * OIDC Core 1.0, Section 3.1.3.7, item 6 lets it rely on that request alone.
      */
     public function testAConfidentialClientMayTurnBothOff()
     {

@@ -78,10 +78,13 @@ abstract class Compound extends Composite
         }
     }
 
-    private static function propagateGroupsToNestedConstraints(array $constraints, array $groups): void
+    private static function propagateGroupsToNestedConstraints(array $constraints, array $groups, bool $preserveUngroupedValid = false): void
     {
         foreach ($constraints as $constraint) {
             if (!$constraint instanceof Constraint) {
+                continue;
+            }
+            if ($preserveUngroupedValid && $constraint instanceof Valid && null === $constraint->groups) {
                 continue;
             }
             if ($constraint instanceof Composite && $groups !== $constraint->groups) {
@@ -89,7 +92,7 @@ abstract class Compound extends Composite
             }
             $constraint->groups = $groups;
             if ($constraint instanceof Composite) {
-                self::propagateGroupsToNestedConstraints($constraint->getNestedConstraints(), $groups);
+                self::propagateGroupsToNestedConstraints($constraint->getNestedConstraints(), $groups, $constraint instanceof Sequentially);
             }
         }
     }

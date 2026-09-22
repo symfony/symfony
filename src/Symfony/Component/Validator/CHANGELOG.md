@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `Audio` constraint for validating audio files
+ * Allow nesting a group-less `Valid` constraint in `Sequentially` to cascade only after preceding constraints pass
  * Add `#[WithHttpStatus(422)]` to `ValidationFailedException`, so that an uncaught one renders as an "Unprocessable Content" response instead of a 500 one
  * Add `ValidationBundle`, which provides the `validation` configuration and the services previously provided by `FrameworkBundle` under `framework.validation`
  * Add `CacheWarmer\ValidatorCacheWarmer` and `DependencyInjection\AddValidatorSecurityExpressionLanguageProviderPass`, which `FrameworkBundle` used to provide

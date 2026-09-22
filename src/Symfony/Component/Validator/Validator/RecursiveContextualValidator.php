@@ -111,6 +111,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $this->defaultPropertyPath,
                 $groups,
                 null,
+                $this->context instanceof ExecutionContext ? $this->context->getCascadedGroups() : null,
                 TraversalStrategy::IMPLICIT,
                 $this->context
             );
@@ -195,6 +196,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $propertyPath,
                 $groups,
                 null,
+                null,
                 TraversalStrategy::IMPLICIT,
                 $this->context
             );
@@ -248,6 +250,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $propertyMetadata,
                 $propertyPath,
                 $groups,
+                null,
                 null,
                 TraversalStrategy::IMPLICIT,
                 $this->context
@@ -504,7 +507,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 continue;
             }
 
-            $this->validateInGroup($object, $cacheKey, $metadata, $group, $context);
+            $this->validateInGroup($object, $cacheKey, $metadata, $group, $cascadedGroups, $context);
         }
 
         // If no more groups should be validated for the property nodes,
@@ -536,6 +539,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $propertyMetadata,
                     PropertyPath::append($propertyPath, $propertyName),
                     $groups,
+                    $cascadedGroups,
                     $cascadedGroups,
                     TraversalStrategy::IMPLICIT,
                     $context
@@ -591,7 +595,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @see TraversalStrategy
      */
-    private function validateGenericNode(mixed $value, ?object $object, ?string $cacheKey, ?MetadataInterface $metadata, string $propertyPath, array $groups, ?array $cascadedGroups, int $traversalStrategy, ExecutionContextInterface $context): void
+    private function validateGenericNode(mixed $value, ?object $object, ?string $cacheKey, ?MetadataInterface $metadata, string $propertyPath, array $groups, ?array $cascadedGroups, ?array $nestedCascadedGroups, int $traversalStrategy, ExecutionContextInterface $context): void
     {
         $context->setNode($value, $object, $metadata, $propertyPath);
 
@@ -616,7 +620,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 continue;
             }
 
-            $this->validateInGroup($value, $cacheKey, $metadata, $group, $context);
+            $this->validateInGroup($value, $cacheKey, $metadata, $group, $nestedCascadedGroups, $context);
         }
 
         if (!$groups) {
@@ -733,6 +737,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $propertyPath,
                     $groups,
                     $stepCascadedGroups,
+                    $stepCascadedGroups,
                     $traversalStrategy,
                     $context
                 );
@@ -748,7 +753,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Validates a node's value against all constraints in the given group.
      */
-    private function validateInGroup(mixed $value, ?string $cacheKey, MetadataInterface $metadata, string $group, ExecutionContextInterface $context): void
+    private function validateInGroup(mixed $value, ?string $cacheKey, MetadataInterface $metadata, string $group, ?array $cascadedGroups, ExecutionContextInterface $context): void
     {
         $context->setGroup($group);
 
@@ -786,6 +791,13 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $value = $value->getPropertyValue();
             }
 
+            $previousCascadedGroups = null;
+
+            if ($context instanceof ExecutionContext) {
+                $previousCascadedGroups = $context->getCascadedGroups();
+                $context->setCascadedGroups($cascadedGroups);
+            }
+
             try {
                 if ($validator instanceof ConstraintValidator || method_exists($validator, 'validateInContext')) {
                     $validator->validateInContext($value, $constraint, $context);
@@ -797,6 +809,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $context->buildViolation('This value should be of type {{ type }}.')
                     ->setParameter('{{ type }}', $e->getExpectedType())
                     ->addViolation();
+            } finally {
+                if ($context instanceof ExecutionContext) {
+                    $context->setCascadedGroups($previousCascadedGroups);
+                }
             }
         }
     }

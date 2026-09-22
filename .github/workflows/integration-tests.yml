@@ -218,7 +218,13 @@ jobs:
           extensions: "json,couchbase-3.2.2,memcached,mongodb,redis,rdkafka,xsl,ldap,relay"
           ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1,intl.default_locale=en,intl.error_level=0
           php-version: "${{ matrix.php }}"
-          tools: pecl
+          tools: pecl, pie
+
+      - name: Install ext-terminal
+        run: |
+          # PIE needs root to write the extension, so its Composer home is kept out of the one the test setup writes to next
+          sudo env "COMPOSER_HOME=$RUNNER_TEMP/pie-composer" "XDG_CONFIG_HOME=$RUNNER_TEMP/pie-config" \
+            "$(command -v pie)" install prateekbhujel/php-terminal:^1.0 --with-php-config="$(command -v php-config)"
 
       - name: Display versions
         run: |

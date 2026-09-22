@@ -17,6 +17,7 @@ description: Principles for rigorously reviewing a pull request and making it me
 - Use three-state verification to judge a rework: base (bug present), PR as submitted (what it really does), final (fixed). Run the same checks in the three states. The pattern of failures across the states is the proof.
 - Validate the test harness before trusting it: run it on the known-broken state and watch it fail. A check that cannot tell "read the right thing" from "fell back to a default" proves nothing. Give each outcome its own marker.
 - Check the branch target in both directions. Find the commit that introduced the flaw and probe the older maintained branches directly. Bugfixes go to the oldest affected maintained branch. Behavior changes and features go to the dev branch, and a released X.Y is not the dev branch anymore. The reported symptom and the underlying flaw can have different oldest branches: check both.
+- A config tree must not depend on anything external. Reject a `Configuration` class, a `configure()` method or a security factory `addConfiguration()` that reads container parameters (`kernel.debug`), env vars, another extension's raw config or machine state (`extension_loaded()`, `isSupported()`) into node defaults, normalization or validation: the same tree must come out whatever the environment or the machine, because `config:dump-reference`, `config/reference.php` and `config/schema.json` are generated from it. Such a default belongs in the extension, behind a `defaultNull()` node whose `info()` names the fallback, or behind a static `'%kernel.debug%'` default that the extension resolves.
 - List the edge cases and run them. Do not accept plausible reasoning when a probe can answer: nullable, union and interface types, empty input, recursion, encodings, interaction with sibling state.
 - Check every symbol the change borrows from another package against that package's declared version constraint. A symbol added in the current release cannot be satisfied by the oldest version the constraint allows, so the call site needs an existence guard, or the test belongs in the package that owns the code. The lowest-dependency job is only the symptom: the same code is broken at runtime for anyone on that older version.
 - Test composition: rebase onto the current base tip and rerun. When sibling PRs touch the same area, also run the combined result.
@@ -60,13 +61,16 @@ description: Principles for rigorously reviewing a pull request and making it me
 
 ## House rules
 
-- Write code comments sparingly, only where they add value the code cannot express. Never reference issues or pull requests in code or tests.
+- Write code comments sparingly, only where they add value the code cannot express. A test method or a test helper carries no docblock and no comment narrating it: its name and its assertions say what it checks. The comment that stays in a test is the one saying why a fixture looks wrong on purpose. Never reference issues or pull requests in code or tests.
+- A prose docblock opens with one line that summarizes, then a blank line, then the details. Before reshaping a comment into that form, ask whether it should exist at all.
+- Do not wrap prose at a column. A line ends where a sentence, a paragraph, a list item or a code sample ends, and a sentence stays on one line unless it runs very long, in which case it breaks where a clause ends: a line break has to mean something, and a column count is not a meaning. The same holds for a `@param` description.
 - Use TDD for every fix: failing test first, implementation second, full suite of the touched component last.
 - No em-dashes, no `Co-Authored-By` trailers, no credit to AI tools anywhere: code, commit messages, PR titles and bodies, review comments, issue comments.
 - Keep a factual tone in everything published: findings and evidence, no self-promotion, no filler.
 - Never apologize for a late or missing review. Thank the author for their patience and stop there. Do not editorialize about the project's failure to review; credit what the author did well instead.
 - Comments are published under the maintainer's own account, so write their past review comments in the first person and everyone else's in the third.
 - Private methods go at the end of the class, after all public and protected ones. Do not move existing ones in the same patch.
+- Do not call a Symfony or third-party method or constructor with PHP named arguments, in a patch you write or in one you review. Parameter names are outside the backward compatibility promise except for the constructors of attribute classes (note 10 of https://symfony.com/doc/current/contributing/code/bc.html), so a renamed parameter breaks such a call in a minor release. Pass the intermediate defaults explicitly to reach a later optional parameter. Named arguments stay fine for attribute constructors and for PHP's own functions, whose parameter names are part of the language.
 - Use plain English: common words, short sentences, one idea per sentence. Avoid idioms, cultural references and rare vocabulary. Most readers are not native speakers.
 
 ## Reporting

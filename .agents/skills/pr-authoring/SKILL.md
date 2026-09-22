@@ -54,6 +54,6 @@ description: >
 These hold whether or not the review skill is open, and they cover inherited content too, such as a commit you amend or a patch you rebase.
 
 - Use TDD: the failing test comes first, the implementation second, the full suite of the touched component last.
-- Write code comments sparingly, only where they add value the code cannot express. Never reference an issue or a pull request from code or from tests.
+- Write code comments sparingly, only where they add value the code cannot express. A test method or a test helper carries no docblock and no comment narrating it: its name and its assertions say what it checks. The comment that stays in a test is the one saying why a fixture looks wrong on purpose. Never reference an issue or a pull request from code or from tests.
 - No em-dashes. No `Co-Authored-By` trailer. No credit to Claude, to Anthropic or to any other AI tool, anywhere: code, commit messages, pull request titles and bodies, review comments, issue comments.
 - Keep a factual tone in everything published, and use plain English: common words, short sentences, one idea per sentence. Most readers are not native speakers.

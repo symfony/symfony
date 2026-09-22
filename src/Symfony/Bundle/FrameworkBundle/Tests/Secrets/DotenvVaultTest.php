@@ -63,4 +63,17 @@ class DotenvVaultTest extends TestCase
 
         $this->assertArrayNotHasKey('foo', $vault->list());
     }
+
+    public function testSealOverwritesValueContainingBackReference()
+    {
+        $vault = new DotenvVault($this->envFile);
+
+        $vault->seal('foo', 'old');
+        $vault->seal('foo', 'abc$0xyz');
+
+        unset($_SERVER['foo'], $_ENV['foo']);
+        (new Dotenv())->load($this->envFile);
+
+        $this->assertSame('abc$0xyz', $vault->reveal('foo'));
+    }
 }

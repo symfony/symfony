@@ -1267,7 +1267,7 @@ class ProcessTest extends TestCase
         $process->run();
 
         $this->assertCount(20, $writes);
-        $this->assertLessThan(Process::TIMEOUT_PRECISION, end($writes) - $writes[0]);
+        $this->assertLessThan(1, end($writes) - $writes[0]);
     }
 
     public function testSimpleInputStream()

@@ -34,8 +34,10 @@ use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 
 /**
- * The store-backed type as the ORM drives it: a flush is a transaction, and the row of a data key
- * minted during one that fails is rolled back with it.
+ * The store-backed type as the ORM drives it.
+ *
+ * A flush is a transaction, and the row of a data key minted during one that fails is rolled
+ * back with it.
  */
 #[RequiresPhpExtension('pdo_sqlite')]
 class EncryptedColumnTest extends TestCase
@@ -92,10 +94,6 @@ class EncryptedColumnTest extends TestCase
         return new EntityManager($this->connection, $this->config);
     }
 
-    /**
-     * A store on the same connection, as another process, or a request served after the store was
-     * reset, would have.
-     */
     private function store(): DataKeyStore
     {
         $store = new DataKeyStore($this->connection, new ServiceLocator(['default' => fn (): InMemoryKms => $this->kms]), 'default', 'app');

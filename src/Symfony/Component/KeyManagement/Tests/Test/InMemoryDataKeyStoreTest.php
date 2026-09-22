@@ -154,11 +154,6 @@ class InMemoryDataKeyStoreTest extends TestCase
         $store->current('user.email');
     }
 
-    /**
-     * The migration scenario: both providers configured at once, each row unwrapped by the client it
-     * records. Two distinct master keys make the assertion discriminating, unwrapping with the wrong
-     * one failing instead of silently succeeding.
-     */
     #[RequiresPhpExtension('openssl')]
     public function testARewrappedRowUnwrapsThroughItsNewClient()
     {

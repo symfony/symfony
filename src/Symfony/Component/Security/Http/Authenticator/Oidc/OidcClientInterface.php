@@ -61,8 +61,10 @@ interface OidcClientInterface
     public function fetchUserInfo(string $accessToken): array;
 
     /**
-     * Returns the RFC 7591, Section 2 name of the method the client authenticates with at
-     * the token endpoint, e.g. "client_secret_basic" or "none" for a public client.
+     * Returns the name of the method the client authenticates with at the token endpoint.
+     *
+     * The names are the ones RFC 7591, Section 2 registers, e.g. "client_secret_basic", or
+     * "none" for a public client.
      *
      * Whether the client holds a secret is what the security of the whole flow rests on,
      * so the flow is entitled to ask, and to refuse to run with a configuration a public

@@ -109,7 +109,7 @@ final class PufferPostApiTransport extends AbstractApiTransport implements Remot
         // the API would refuse.
         $from = $email->getFrom();
         $shared = [
-            'from' => $from ? $from[0]->getAddress() : $envelope->getSender()->getAddress(),
+            'from' => $from ? $from[0]->toString() : $envelope->getSender()->toString(),
         ];
 
         // A stored template renders server side, and the API refuses a message that carries both a
@@ -153,7 +153,7 @@ final class PufferPostApiTransport extends AbstractApiTransport implements Remot
         // The API carries a single reply-to; the rest cannot be passed as a raw Reply-To header
         // because the headers map is allow-listed to X- names and would refuse the message.
         if ($replyTo = $email->getReplyTo()) {
-            $shared['replyTo'] = $replyTo[0]->getAddress();
+            $shared['replyTo'] = $replyTo[0]->toString();
         }
 
         if ($attachments = $this->getAttachments($email)) {
@@ -186,7 +186,7 @@ final class PufferPostApiTransport extends AbstractApiTransport implements Remot
 
         $messages = [];
         foreach ($recipients as $index => $recipient) {
-            $message = ['to' => $recipient->getAddress()] + $shared;
+            $message = ['to' => $recipient->toString()] + $shared;
             if (0 === $index) {
                 if ($cc) {
                     $message['cc'] = $cc;
@@ -243,7 +243,7 @@ final class PufferPostApiTransport extends AbstractApiTransport implements Remot
         $list = [];
         foreach ($addresses as $address) {
             if (\in_array($address->getAddress(), $allowed, true)) {
-                $list[] = $address->getAddress();
+                $list[] = $address->toString();
             }
         }
 

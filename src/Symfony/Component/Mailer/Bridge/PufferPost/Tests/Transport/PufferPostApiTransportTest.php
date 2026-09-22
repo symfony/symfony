@@ -73,11 +73,11 @@ class PufferPostApiTransportTest extends TestCase
             $body = json_decode($options['body'], true);
             $this->assertCount(1, $body['messages']);
             $message = $body['messages'][0];
-            $this->assertSame('foo@example.com', $message['from']);
-            $this->assertSame('bar@example.com', $message['to']);
+            $this->assertSame('"Ms. Foo Bar" <foo@example.com>', $message['from']);
+            $this->assertSame('"Mr. Recipient" <bar@example.com>', $message['to']);
             $this->assertSame(['cc@example.com'], $message['cc']);
             $this->assertSame(['baz@example.com'], $message['bcc']);
-            $this->assertSame('reply@example.com', $message['replyTo']);
+            $this->assertSame('"Ms. Reply" <reply@example.com>', $message['replyTo']);
             $this->assertSame('Hello!', $message['subject']);
             $this->assertSame('Hello There!', $message['text']);
             $this->assertSame('<p>Hello There!</p>', $message['html']);
@@ -89,6 +89,31 @@ class PufferPostApiTransportTest extends TestCase
         $sentMessage = $transport->send($email);
 
         $this->assertSame('msg_foobar', $sentMessage->getMessageId());
+    }
+
+    public function testKeepsDisplayNamesOnEveryAddress()
+    {
+        $email = (new Email())
+            ->from(new Address('foo@example.com', 'Foo Bar'))
+            ->to(new Address('bar@example.com', 'Recipient'))
+            ->cc(new Address('cc@example.com', 'Copy'))
+            ->bcc(new Address('bcc@example.com', 'Blind'))
+            ->replyTo(new Address('reply@example.com', 'Reply'))
+            ->subject('Hello!')
+            ->text('Hello There!');
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $message = json_decode($options['body'], true)['messages'][0];
+            $this->assertSame('"Foo Bar" <foo@example.com>', $message['from']);
+            $this->assertSame('"Recipient" <bar@example.com>', $message['to']);
+            $this->assertSame(['"Copy" <cc@example.com>'], $message['cc']);
+            $this->assertSame(['"Blind" <bcc@example.com>'], $message['bcc']);
+            $this->assertSame('"Reply" <reply@example.com>', $message['replyTo']);
+
+            return new JsonMockResponse(['data' => [['index' => 0, 'status' => 'accepted', 'id' => 'msg_1']]], ['http_code' => 200]);
+        });
+
+        (new PufferPostApiTransport('KEY', $client))->send($email);
     }
 
     public function testSendFansOutOverEveryToRecipient()

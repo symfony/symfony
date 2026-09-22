@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Register the security expression functions on `controller.expression_language`
  * Add the `configure_container` option to `WebTestCase::createClient()` to configure the container after every kernel reboot
  * Deprecate `Command\RouterMatchCommand`, use the one from the Routing component instead
  * Deprecate `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass`, `DependencyInjection\Compiler\AssetsContextPass` and `DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass`, use the ones from the Translation, Asset and Validator components instead
@@ -45,6 +46,7 @@ CHANGELOG
  * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration
  * Add `--dispatchers` option to `debug:event-dispatcher` command
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
+ * Make the config tree independent from `kernel.debug` and deprecate passing the `$debug` argument to `DependencyInjection\Configuration::__construct()`
  * Allow prefixing entries with `!` in `framework.workflows.<name>.events_to_dispatch` to permanently disable an event; e.g. `events_to_dispatch: ['!workflow.announce']` fires every event except `workflow.announce`. The GuardEvent can never be disabled; `!workflow.guard` is rejected at config compile time. Mixing allow-list and block-list entries in the same list is rejected at config compile time too.
  * Add support for the HttpClient `max_connect_duration` option to the `http_client` configuration
  * Add `framework.scheduler.use_messenger_routing` to send scheduled messages through the Messenger senders configured for their class

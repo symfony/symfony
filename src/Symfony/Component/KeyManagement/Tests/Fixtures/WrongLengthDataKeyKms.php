@@ -17,16 +17,23 @@ use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 
 /**
- * Backend that ignores the data key length it is asked for and hands out keys of its own length,
- * both when generating and when unwrapping, the way a misconfigured or buggy backend would.
+ * Backend that ignores the data key length it is asked for.
+ *
+ * It hands out keys of its own length, both when generating and when unwrapping, the way a
+ * misconfigured or buggy backend would.
  */
 final class WrongLengthDataKeyKms implements DataKeyGeneratorInterface
 {
     private readonly InMemoryKms $kms;
 
-    public function __construct(private readonly int $length)
-    {
-        $this->kms = new InMemoryKms();
+    /**
+     * @param InMemoryKms|null $kms The backend whose wrappings are read, so that an envelope written through it is what this one hands back at the wrong length
+     */
+    public function __construct(
+        private readonly int $length,
+        ?InMemoryKms $kms = null,
+    ) {
+        $this->kms = $kms ?? new InMemoryKms();
     }
 
     public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey

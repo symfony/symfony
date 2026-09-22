@@ -12,8 +12,9 @@
 namespace Symfony\Component\KeyManagement;
 
 /**
- * Opaque container for encrypted data returned by a KMS, paired with the key
- * identifier needed to decrypt it.
+ * Opaque container for encrypted data returned by a KMS.
+ *
+ * It is paired with the identifier of the key needed to decrypt it.
  *
  * The `$blob` is the raw, backend-specific ciphertext (with whatever framing
  * the backend uses internally: nonce, version byte, key version, ...). Callers

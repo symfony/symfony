@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>
-                <target state="needs-review-translation">Batas bawah tidak boleh lebih besar dari batas atas.</target>
+                <target>Batas bawah tidak boleh lebih besar dari batas atas.</target>
             </trans-unit>
         </body>
     </file>

@@ -16,3 +16,12 @@ use Symfony\Component\Cache\CacheWarmer\AbstractPhpFileCacheWarmer as BaseAbstra
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer', BaseAbstractPhpFileCacheWarmer::class);
 
 class_alias(BaseAbstractPhpFileCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Cache\CacheWarmer\AbstractPhpFileCacheWarmer instead
+     */
+    class AbstractPhpFileCacheWarmer
+    {
+    }
+}

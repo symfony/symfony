@@ -16,8 +16,7 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 
 /**
- * Decrypts an {@see Envelope} produced by an
- * {@see EnvelopeEncrypterInterface}.
+ * Decrypts an {@see Envelope} produced by an {@see EnvelopeEncrypterInterface}.
  *
  * The same `$aad` bytes used at encrypt time MUST be supplied here,
  * otherwise decryption fails.

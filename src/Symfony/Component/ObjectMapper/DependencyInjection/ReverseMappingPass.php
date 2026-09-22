@@ -40,5 +40,9 @@ final class ReverseMappingPass implements CompilerPassInterface
         }
 
         $reverseClassObjectMapperMetadataFactory->replaceArgument(1, $classes);
+
+        if ($container->hasDefinition('object_mapper.metadata.cache_warmer')) {
+            $container->getDefinition('object_mapper.metadata.cache_warmer')->replaceArgument(0, $classes);
+        }
     }
 }

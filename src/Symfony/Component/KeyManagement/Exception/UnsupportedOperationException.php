@@ -12,8 +12,10 @@
 namespace Symfony\Component\KeyManagement\Exception;
 
 /**
- * Thrown when the underlying KMS does not support a requested operation
- * (e.g. additional authenticated data, key rotation, asymmetric signing, ...).
+ * Thrown when the underlying KMS does not support a requested operation.
+ *
+ * Additional authenticated data, key rotation and asymmetric signing are
+ * examples of what a backend may lack.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *

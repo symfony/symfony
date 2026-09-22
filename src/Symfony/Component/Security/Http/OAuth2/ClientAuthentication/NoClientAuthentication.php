@@ -30,9 +30,11 @@ namespace Symfony\Component\Security\Http\OAuth2\ClientAuthentication;
 final class NoClientAuthentication implements ClientAuthenticationInterface
 {
     /**
-     * The refresh token grant of RFC 6749, Section 6 carries neither a code nor a verifier,
-     * so it is the one grant exempted here; every other one is refused without a verifier,
-     * so that a grant added later never reaches the token endpoint unprotected.
+     * Refuses every grant but the refresh token one when no PKCE verifier is given.
+     *
+     * The refresh token grant of RFC 6749, Section 6 carries neither a code nor a verifier, so
+     * it is the one exempted; a grant added later never reaches the token endpoint
+     * unprotected.
      */
     public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
     {

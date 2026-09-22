@@ -123,10 +123,6 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             return '';
         }
 
-        // For ASCII-only strings, byte positions equal character positions,
-        // so we can use native strlen/substr which is much faster than Helper::length/substr.
-        $isAscii = !preg_match('/[\x80-\xFF]/', $message);
-
         $offset = 0;
         $output = '';
         $openTagRegex = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
@@ -141,17 +137,10 @@ class OutputFormatter implements WrappableOutputFormatterInterface
                 continue;
             }
 
-            if ($isAscii) {
-                // For ASCII, byte position = character position, no conversion needed
-                $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset), $output, $width, $currentLineLength);
-                $offset = $pos + \strlen($text);
-            } else {
-                // convert byte position to character position.
-                $pos = Helper::length(substr($message, 0, $pos));
-                // add the text up to the next tag
-                $output .= $this->applyCurrentStyle(Helper::substr($message, $offset, $pos - $offset), $output, $width, $currentLineLength);
-                $offset = $pos + Helper::length($text);
-            }
+            // tags are delimited by "<" and ">", which are ASCII, so a tag offset can never
+            // fall inside a multibyte sequence: slicing by bytes is safe here
+            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset), $output, $width, $currentLineLength);
+            $offset = $pos + \strlen($text);
 
             // opening tag?
             if ($open = '/' !== $text[1]) {
@@ -172,7 +161,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             }
         }
 
-        $output .= $this->applyCurrentStyle($isAscii ? substr($message, $offset) : Helper::substr($message, $offset), $output, $width, $currentLineLength);
+        $output .= $this->applyCurrentStyle(substr($message, $offset), $output, $width, $currentLineLength);
 
         return strtr($output, ["\0" => '\\', '\\<' => '<', '\\>' => '>']);
     }

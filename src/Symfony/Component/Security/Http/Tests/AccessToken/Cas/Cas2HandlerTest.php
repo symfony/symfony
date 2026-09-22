@@ -110,9 +110,6 @@ final class Cas2HandlerTest extends TestCase
 
     public function testWithInvalidPrefix()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Invalid CAS response.');
-
         $response = new MockResponse(<<<BODY
                 <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
                     <cas:authenticationSuccess>
@@ -128,8 +125,11 @@ final class Cas2HandlerTest extends TestCase
         $requestStack->push(new Request(['ticket' => 'PGTIOU-84678-8a9d']));
 
         $cas2Handler = new Cas2Handler($requestStack, 'https://www.example.com/cas', 'invalid-one', $httpClient);
-        $username = $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
-        $this->assertEquals('lobster', $username);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Invalid CAS response.');
+
+        $cas2Handler->getUserBadgeFrom('PGTIOU-84678-8a9d');
     }
 
     public function testServiceUrlIsBuiltFromCurrentRequest()

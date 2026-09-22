@@ -88,7 +88,6 @@ class AzureKeyVaultTest extends TestCase
     {
         $kms = new AzureKeyVault(new MockHttpClient([], self::VAULT), $this->staticToken('T'));
 
-        // "app-key/" would build the broken URL "keys/app-key//encrypt".
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"<name>" or "<name>/<version>"');
         $kms->encrypt('app-key/', 'hello');
@@ -172,8 +171,6 @@ class AzureKeyVaultTest extends TestCase
             return new MockResponse(json_encode(['value' => Base64UrlSafe::encode('hello')]));
         }, self::VAULT);
 
-        // Bridge configured for RSA-OAEP-256 today, but a previous run wrote the blob
-        // with A256GCM. Decrypt must read the algorithm from the blob prefix.
         $kms = new AzureKeyVault($client, $this->staticToken('T'));
         $plaintext = $kms->decrypt(new Ciphertext('A256GCM.IV.TAG.CTVAL', 'app-key'));
 
@@ -186,7 +183,6 @@ class AzureKeyVaultTest extends TestCase
     {
         $kms = new AzureKeyVault(new MockHttpClient([], self::VAULT), $this->staticToken('T'), 'A256GCM', 'A256GCM');
 
-        // Configured AEAD but the blob has neither dots nor a known prefix.
         $this->expectException(DecryptionFailedException::class);
         $kms->decrypt(new Ciphertext('CipherBlobWithoutPrefix', 'app-key'));
     }

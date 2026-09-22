@@ -481,6 +481,60 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertSame('test@example.com', $userProvider->claims['email']);
     }
 
+    public function testAuthenticateReadsAResponsePostedByTheProvider()
+    {
+        // OAuth 2.0 Form Post Response Mode: the provider answers with a page that submits
+        // the authorization response to the "check_path", so the parameters arrive in the
+        // body of a POST instead of the query string
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->expects($this->once())
+            ->method('exchangeCode')
+            ->willReturn(['access_token' => 'access-123', 'id_token' => $this->buildIdToken(['nonce' => $nonce])]);
+        $this->oidcClient->expects($this->once())
+            ->method('fetchUserInfo')
+            ->willReturn(['sub' => 'user-42']);
+
+        $passport = $this->createAuthenticator()->authenticate($this->createPostedCallbackRequest($state, $nonce, ['iss' => 'https://provider.example.com']));
+
+        $this->assertSame('user-42', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+    }
+
+    public function testAuthenticateReadsNothingFromTheQueryStringOfAPostedResponse()
+    {
+        // the response is the one the provider posted: a query string added to the action
+        // of the form is not another half of it
+        $state = bin2hex(random_bytes(16));
+
+        $request = $this->createPostedCallbackRequest($state, bin2hex(random_bytes(16)));
+        $request->query->set('state', $state);
+        $request->query->set('iss', 'https://attacker.example.com');
+        $request->request->remove('state');
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Invalid OIDC state');
+
+        $this->createAuthenticator()->authenticate($request);
+    }
+
+    public function testAuthenticateReportsAnErrorPostedByTheProvider()
+    {
+        // an error response travels in the response mode that was asked for too
+        // (OIDC Core 1.0, Section 3.1.2.6)
+        $state = bin2hex(random_bytes(16));
+
+        $request = $this->createPostedCallbackRequest($state, bin2hex(random_bytes(16)));
+        $request->request->remove('code');
+        $request->request->set('error', 'access_denied');
+        $request->request->set('error_description', 'User denied access');
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('OIDC provider returned an error: "User denied access"');
+
+        $this->createAuthenticator()->authenticate($request);
+    }
+
     public function testAuthenticateWithInvalidState()
     {
         $authenticator = $this->createAuthenticator();
@@ -736,7 +790,6 @@ class OidcLoginAuthenticatorTest extends TestCase
         $session = $request->getSession();
         $prefix = '_security.oidc_login.main.';
 
-        // pending attempts from other tabs
         $session->set($prefix.'attempt.'.$state2, ['nonce' => bin2hex(random_bytes(16)), 'code_verifier' => bin2hex(random_bytes(32))]);
         $session->set($prefix.'attempt.'.$state3, ['nonce' => bin2hex(random_bytes(16)), 'code_verifier' => bin2hex(random_bytes(32))]);
 
@@ -1066,7 +1119,6 @@ class OidcLoginAuthenticatorTest extends TestCase
     public function testStartDispatchesTheAuthorizationRequestEvent()
     {
         $dispatcher = new EventDispatcher();
-        // two listeners, each touching its own parameter, and one dropping a configured one
         $dispatcher->addListener(OidcAuthorizationRequestEvent::class, static function (OidcAuthorizationRequestEvent $event) {
             $event->removeParam('prompt');
             $event->setParam('ui_locales', 'es-ES');
@@ -1337,7 +1389,6 @@ class OidcLoginAuthenticatorTest extends TestCase
             $this->assertSame('Missing authorization code in OIDC callback.', $e->getMessage());
         }
 
-        // The matched attempt is consumed even though there's no code
         $this->assertNull($session->get('_security.oidc_login.main.attempt.'.$state));
     }
 
@@ -1428,6 +1479,44 @@ class OidcLoginAuthenticatorTest extends TestCase
         $token = $authenticator->createToken($passport, 'main');
 
         $this->assertSame([AuthenticationMethod::PASSWORD => $authTime, AuthenticationMethod::ONE_TIME_PASSWORD => $authTime], $token->getAuthenticationProofs());
+    }
+
+    public function testCreateTokenRecordsTheAcrClaim()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'acr' => 'phr']),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame('phr', $token->getAttribute('oidc_acr'));
+    }
+
+    public function testCreateTokenReportsAnUnusableAcrClaimAsNull()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'acr' => ['phr']]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertNull($token->getAttribute('oidc_acr'));
     }
 
     public function testCreateTokenKeepsOnlyTheStringEntriesOfTheAmrClaim()
@@ -1573,13 +1662,11 @@ class OidcLoginAuthenticatorTest extends TestCase
         }
 
         $session = $request->getSession();
-        // The matched attempt was already consumed before the exchange, so it's gone
         $this->assertNull($session->get('_security.oidc_login.main.attempt.'.$state));
     }
 
     public function testConcurrentLoginsPreserveSeparateAttempts()
     {
-        // Two tabs starting a login concurrently must not overwrite each other's state/nonce/verifier
         $state1 = bin2hex(random_bytes(16));
         $state2 = bin2hex(random_bytes(16));
         $nonce1 = bin2hex(random_bytes(16));
@@ -1591,11 +1678,9 @@ class OidcLoginAuthenticatorTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $prefix = '_security.oidc_login.main.';
 
-        // Simulate two start() calls on the same session
         $session->set($prefix.'attempt.'.$state1, ['nonce' => $nonce1, 'code_verifier' => $codeVerifier1, 'redirect_uri' => 'http://localhost/oidc/callback']);
         $session->set($prefix.'attempt.'.$state2, ['nonce' => $nonce2, 'code_verifier' => $codeVerifier2, 'redirect_uri' => 'http://localhost/oidc/callback']);
 
-        // First callback succeeds with its own state and nonce
         $idToken1 = $this->buildIdToken(['nonce' => $nonce1]);
         $this->oidcClient->method('exchangeCode')->willReturnOnConsecutiveCalls(
             ['access_token' => 'access-123', 'id_token' => $idToken1],
@@ -1631,7 +1716,6 @@ class OidcLoginAuthenticatorTest extends TestCase
             $states[] = $params['state'];
         }
 
-        // Session should only have MAX_CONCURRENT_ATTEMPTS (5) attempts
         $attemptKeys = array_filter(array_keys($session->all()), static fn (string $key): bool => str_starts_with($key, $prefix.'attempt.'));
         $this->assertCount(5, $attemptKeys);
 
@@ -1809,6 +1893,26 @@ class OidcLoginAuthenticatorTest extends TestCase
         return $request;
     }
 
+    /**
+     * The same callback, posted instead of being followed as a redirect.
+     *
+     * This is what the self-submitting page of the "form_post" response mode sends.
+     */
+    private function createPostedCallbackRequest(string $state, string $nonce, array $extraParameters = []): Request
+    {
+        $request = Request::create('/oidc/callback', 'POST', ['code' => 'auth-code', 'state' => $state] + $extraParameters);
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $session->set('_security.oidc_login.main.attempt.'.$state, [
+            'nonce' => $nonce,
+            'code_verifier' => bin2hex(random_bytes(32)),
+            'redirect_uri' => 'http://localhost/oidc/callback',
+        ]);
+
+        return $request;
+    }
+
     private function buildIdToken(array $extraClaims = []): string
     {
         return $this->buildIdTokenFromClaims($this->buildIdTokenClaims($extraClaims));
@@ -1858,7 +1962,7 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * The very same claims, signed with nothing at all.
+     * The very same claims, carrying a signature the provider key does not verify.
      */
     private function buildForgedIdToken(array $extraClaims = []): string
     {
@@ -1896,8 +2000,9 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * A public client sends no secret, so PKCE is the only thing binding the authorization
-     * code to it: the option that turns PKCE off cannot apply to such a client.
+     * A public client sends no secret, so PKCE is all that binds the code to it.
+     *
+     * The option that turns PKCE off cannot apply to such a client.
      */
     public function testRejectsAPublicClientWithoutPkce()
     {
@@ -1910,9 +2015,10 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * Without the signature check, only the TLS verification of the token request ties the
-     * ID token to the provider, which is too little for a client that has nothing but PKCE
-     * protecting its code exchange.
+     * Without the signature check, only TLS ties the ID token to the provider.
+     *
+     * That is too little for a client that has nothing but PKCE protecting its code
+     * exchange.
      */
     public function testRejectsAPublicClientThatDoesNotVerifyTheIdTokenSignature()
     {
@@ -1932,8 +2038,9 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * A confidential client authenticates at the token endpoint, so OIDC Core 1.0,
-     * Section 3.1.3.7, item 6 lets it rely on that request alone.
+     * A confidential client authenticates at the token endpoint.
+     *
+     * OIDC Core 1.0, Section 3.1.3.7, item 6 lets it rely on that request alone.
      */
     public function testAConfidentialClientMayTurnBothOff()
     {

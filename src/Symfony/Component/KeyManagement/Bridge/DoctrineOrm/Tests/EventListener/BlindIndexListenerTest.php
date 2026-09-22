@@ -89,11 +89,6 @@ class BlindIndexListenerTest extends TestCase
         ], $this->row());
     }
 
-    /**
-     * The reason the listener runs on "onFlush" rather than on "prePersist": the value is set after
-     * the entity is handed to the manager, which "prePersist" would have missed, leaving a row no
-     * search ever returns.
-     */
     public function testTheTagsAreWrittenWhateverTheOrderTheEntityIsFilledIn()
     {
         $entity = new BlindIndexedEntity();
@@ -133,10 +128,6 @@ class BlindIndexListenerTest extends TestCase
         $this->assertSame($this->email->of('ada@example.org'), $this->row()['emailIndex']);
     }
 
-    /**
-     * Which is what makes a row written before the index existed repair itself the next time it is
-     * saved, and what keeps a hand-written tag from surviving.
-     */
     public function testTheTagIsRederivedOverWhateverThePropertyHeld()
     {
         $entity = (new BlindIndexedEntity())->setEmail('ada@example.org')->setEmailIndex('stale');
@@ -190,10 +181,6 @@ class BlindIndexListenerTest extends TestCase
         $this->entityManager->flush();
     }
 
-    /**
-     * A null value gives no tag, so the property holding the tag must accept one; the alternative
-     * is a TypeError thrown from the middle of a flush.
-     */
     public function testATargetThatCannotHoldTheNullTagOfANullableSourceIsRefused()
     {
         $this->entityManager->persist(new BlindIndexedNonNullableTargetEntity());
@@ -204,9 +191,6 @@ class BlindIndexListenerTest extends TestCase
         $this->entityManager->flush();
     }
 
-    /**
-     * A tag written to a property that is not a column is written nowhere.
-     */
     public function testATargetThatIsNotAMappedColumnIsRefused()
     {
         $entity = new BlindIndexedUnmappedTargetEntity();

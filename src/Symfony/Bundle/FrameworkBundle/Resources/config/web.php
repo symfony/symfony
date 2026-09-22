@@ -175,6 +175,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('controller.expression_language', ExpressionLanguage::class)
             ->args([service('cache.controller_expression_language')->nullOnInvalid()])
+            ->call('registerProvider', [service('security.expression_language_provider')->ignoreOnInvalid()])
 
         ->set('cache.controller_expression_language')
             ->parent('cache.system')

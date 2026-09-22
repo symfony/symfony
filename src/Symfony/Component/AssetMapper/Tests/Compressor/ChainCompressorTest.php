@@ -25,10 +25,18 @@ class ChainCompressorTest extends TestCase
 {
     private const WRITABLE_ROOT = __DIR__.'/../Fixtures/chain_compressor_filesystem';
 
-    private Filesystem $filesystem;
+    private ?Filesystem $filesystem = null;
 
     protected function setUp(): void
     {
+        if (\PHP_VERSION_ID >= 80600 && \extension_loaded('brotli') && version_compare(phpversion('brotli'), '0.21.0', '<=')) {
+            $this->markTestSkipped('ext-brotli up to 0.21.0 reports a failure when closing a compressing stream.');
+        }
+
+        if (\PHP_VERSION_ID >= 80600 && \extension_loaded('zstd') && version_compare(phpversion('zstd'), '0.18.0', '<=')) {
+            $this->markTestSkipped('ext-zstd up to 0.18.0 reports a failure when closing a compressing stream.');
+        }
+
         $this->filesystem = new Filesystem();
         if (!file_exists(self::WRITABLE_ROOT)) {
             $this->filesystem->mkdir(self::WRITABLE_ROOT);
@@ -37,7 +45,7 @@ class ChainCompressorTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove(self::WRITABLE_ROOT);
+        $this->filesystem?->remove(self::WRITABLE_ROOT);
     }
 
     public function testCompress()

@@ -39,7 +39,7 @@ class MermaidDumper
         $allRoles = $this->getAllRoles($hierarchy);
 
         foreach ($allRoles as $role) {
-            $output[] = '    '.$this->normalizeRoleName($role);
+            $output[] = '    '.$this->dumpNode($role);
         }
 
         foreach ($hierarchy as $parentRole => $childRoles) {
@@ -76,6 +76,22 @@ class MermaidDumper
         }
 
         return array_unique($allRoles);
+    }
+
+    /**
+     * Node IDs only allow a limited set of characters, so roles whose name
+     * is changed by the normalization (e.g. "ROLE_ADMIN-TEST") need an explicit label.
+     */
+    private function dumpNode(string $role): string
+    {
+        $id = $this->normalizeRoleName($role);
+
+        if ($id === $role) {
+            return $id;
+        }
+
+        // "#" goes first so that the entity inserted after it is not escaped again
+        return \sprintf('%s["%s"]', $id, str_replace(['#', '"'], ['#35;', '#quot;'], $role));
     }
 
     /**

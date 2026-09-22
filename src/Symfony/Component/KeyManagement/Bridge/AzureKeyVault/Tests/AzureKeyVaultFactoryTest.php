@@ -12,6 +12,8 @@
 namespace Symfony\Component\KeyManagement\Bridge\AzureKeyVault\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVault;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVaultFactory;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\ClientCredentialsTokenProvider;
@@ -53,7 +55,6 @@ class AzureKeyVaultFactoryTest extends TestCase
 
     public function testUnknownAlgorithmIsRejected()
     {
-        // Azure answers HTTP 400 to an unknown "alg", which the decrypt path masks as a decryption failure
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "algorithm" option of the "azure-keyvault://" DSN must be one of "RSA-OAEP-256", "RSA-OAEP", "RSA1_5", ');
         (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t&algorithm=RSA-OAEP-265'));
@@ -96,7 +97,6 @@ class AzureKeyVaultFactoryTest extends TestCase
 
     public function testUnknownDsnOptionIsRejected()
     {
-        // A near miss like "algorithms" must not silently keep the default algorithm.
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option "algorithms"');
         (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t&algorithms=A256GCM'));
@@ -125,8 +125,6 @@ class AzureKeyVaultFactoryTest extends TestCase
 
     public function testLookAlikeHostDoesNotMatchManagedHsm()
     {
-        // "managedhsm" appears as a substring but is not the suffix; the previous
-        // str_contains() heuristic would incorrectly treat this as Managed HSM.
         $kms = (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@managedhsm-fake.example.com?tenant=t'));
 
         $this->assertSame('https://vault.azure.net/.default', self::audienceOf($kms));
@@ -146,5 +144,24 @@ class AzureKeyVaultFactoryTest extends TestCase
         $audienceProperty = (new \ReflectionClass(ClientCredentialsTokenProvider::class))->getProperty('audience');
 
         return $audienceProperty->getValue($tokens);
+    }
+
+    public function testTheGivenHttpClientIsScopedToTheDsn()
+    {
+        $urls = [];
+        $client = new MockHttpClient(static function (string $method, string $url) use (&$urls): MockResponse {
+            $urls[] = $url;
+
+            return str_contains($url, '/oauth2/')
+                ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
+                : new MockResponse(json_encode(['kid' => 'https://my-vault.vault.azure.net/keys/app/v1', 'value' => 'CipherFromAzure']));
+        });
+
+        $kms = (new AzureKeyVaultFactory($client))->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t'));
+        $kms->encrypt('app', 'hello');
+
+        $this->assertCount(2, $urls);
+        $this->assertStringStartsWith('https://login.microsoftonline.com/t/oauth2/', $urls[0]);
+        $this->assertStringStartsWith('https://my-vault.vault.azure.net/keys/app/encrypt', $urls[1]);
     }
 }

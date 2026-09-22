@@ -23,7 +23,6 @@ use Symfony\Bundle\FullStack;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsTargetedValueResolver as AsTargetedConsoleValueResolver;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
@@ -40,7 +39,6 @@ use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Attribute\AsFormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
@@ -79,8 +77,6 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  */
 class FrameworkExtension extends Extension
 {
-    private const MAPPING_FILE_PATTERN = '/\.(xml|ya?ml)$/';
-
     private array $configsEnabled = [];
 
     /**
@@ -201,7 +197,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!$container->hasParameter('debug.file_link_format')) {
-            $container->setParameter('debug.file_link_format', $config['ide']);
+            $container->setParameter('debug.file_link_format', $config['ide'] ?? ($container->getParameter('kernel.debug') ? '%env(default::SYMFONY_IDE)%' : null));
         }
 
         if (!empty($config['test'])) {
@@ -323,18 +319,17 @@ class FrameworkExtension extends Extension
             $definition->addTag('container.excluded', ['source' => 'because it\'s a Doctrine mapped superclass'])->addTag('doctrine.orm.entity');
         });
 
-        if (!$config['disallow_search_engine_index']) {
+        if (!($config['disallow_search_engine_index'] ?? $container->getParameter('kernel.debug'))) {
             $container->removeDefinition('disallow_search_engine_index_response_listener');
         }
 
         $container->registerForAutoconfiguration(RouteLoaderInterface::class)
             ->addTag('routing.route_loader');
-
     }
 
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
-        return new Configuration($container->getParameter('kernel.debug'));
+        return new Configuration();
     }
 
     protected function hasConsole(): bool
@@ -529,13 +524,15 @@ class FrameworkExtension extends Extension
 
         $definition = $container->findDefinition('debug.error_handler_configurator');
 
+        $config['log'] ??= $debug;
+
         if (false === $config['log']) {
             $definition->replaceArgument(0, null);
         } elseif (true !== $config['log']) {
             $definition->replaceArgument(1, $config['log']);
         }
 
-        if (!$config['throw']) {
+        if (!($config['throw'] ?? $debug)) {
             $container->setParameter('debug.error_handler.throw_at', 0);
         }
 
@@ -549,7 +546,6 @@ class FrameworkExtension extends Extension
                 ->setArguments([new Reference('debug.log_processor'), '%kernel.runtime_mode.web%']);
         }
     }
-
 
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
@@ -607,42 +603,6 @@ class FrameworkExtension extends Extension
 
             $listener = $container->getDefinition('request.add_request_formats_listener');
             $listener->replaceArgument(0, $config['formats']);
-        }
-    }
-
-
-    /**
-     * Returns a definition for an asset package.
-     */
-
-
-    /**
-     * @param-immediately-invoked-callable $fileRecorder
-     */
-    private function registerMappingFilesFromDir(string $dir, callable $fileRecorder): void
-    {
-        foreach (Finder::create()->followLinks()->files()->in($dir)->name(self::MAPPING_FILE_PATTERN)->sortByName() as $file) {
-            $fileRecorder($file->getExtension(), $file->getRealPath());
-        }
-    }
-
-    /**
-     * @param-immediately-invoked-callable $fileRecorder
-     */
-    private function registerMappingFilesFromConfig(ContainerBuilder $container, array $config, callable $fileRecorder, bool $trackContents): void
-    {
-        foreach ($container->getParameterBag()->unescapeValue($config['mapping']['paths']) as $path) {
-            if (is_dir($path)) {
-                $this->registerMappingFilesFromDir($path, $fileRecorder);
-                $container->addResource(new DirectoryResource($path, $trackContents ? self::MAPPING_FILE_PATTERN : '/^$/'));
-            } elseif ($container->fileExists($path, $trackContents)) {
-                if (!preg_match(self::MAPPING_FILE_PATTERN, $path, $matches)) {
-                    throw new \RuntimeException(\sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
-                }
-                $fileRecorder($matches[1], $path);
-            } else {
-                throw new \RuntimeException(\sprintf('Could not open file or directory "%s".', $path));
-            }
         }
     }
 
@@ -732,7 +692,6 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(2, null);
         }
     }
-
 
     protected function isConfigEnabled(ContainerBuilder $container, array $config): bool
     {

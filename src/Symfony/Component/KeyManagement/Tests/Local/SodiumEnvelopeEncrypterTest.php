@@ -21,8 +21,9 @@ use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\SodiumKms;
 
 /**
- * End-to-end coverage of the EnvelopeEncrypter + SodiumKms pair: every
- * crypto step uses a real primitive (libsodium for the wrapped data key,
+ * End-to-end coverage of the EnvelopeEncrypter + SodiumKms pair.
+ *
+ * Every crypto step uses a real primitive (libsodium for the wrapped data key,
  * OpenSSL AES-256-GCM for the bulk payload), so this exercises the wire
  * format produced by SodiumKms feeding back into Envelope::fromBytes()
  * and the unwrap path returning a DEK that AES-GCM accepts.

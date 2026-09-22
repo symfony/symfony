@@ -14,8 +14,9 @@ namespace Symfony\Component\KeyManagement\Bridge\GoogleCloudKms;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
 
 /**
- * Returns an OAuth2 access token usable against the Google Cloud KMS REST API
- * (scope `https://www.googleapis.com/auth/cloudkms`).
+ * Returns an OAuth2 access token usable against the Google Cloud KMS REST API.
+ *
+ * The scope is `https://www.googleapis.com/auth/cloudkms`.
  *
  * Implementations are expected to cache the token until it expires and to
  * refresh it transparently. {@see ServiceAccountTokenProvider} ships the

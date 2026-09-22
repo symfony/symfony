@@ -40,8 +40,9 @@ class OidcJwksTest extends TestCase
     }
 
     /**
-     * The very filtering the "oidc" access token handler applies, so that both OIDC
-     * entry points accept the same key material.
+     * The very filtering the "oidc" access token handler applies.
+     *
+     * Both OIDC entry points then accept the same key material.
      */
     public static function getKeyUsages(): iterable
     {
@@ -68,8 +69,10 @@ class OidcJwksTest extends TestCase
     }
 
     /**
-     * Entries that make JWKSet::createFromKeyData() throw: no "kty", a "kty" that is
-     * not a non-empty string, or a "kid" that is not a string.
+     * Entries that make JWKSet::createFromKeyData() throw.
+     *
+     * Those are no "kty", a "kty" that is not a non-empty string, or a "kid" that is not a
+     * string.
      */
     public static function getMalformedKeys(): iterable
     {

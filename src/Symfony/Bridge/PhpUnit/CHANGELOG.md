@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `#[UseRecord]` attribute and the `http-recorder-directory` parameter of `SymfonyExtension` to record/replay HTTP calls made through `RecorderHttpClient` in tests
+ * Add `DebugClassLoaderIssueTriggerResolver` to classify `DebugClassLoader` deprecations with PHPUnit 13.1+
 
 8.1
 ---

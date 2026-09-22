@@ -19,8 +19,9 @@ use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 /**
- * Renews the OIDC tokens a security token carries, with the refresh token grant
- * of RFC 6749, Section 6.
+ * Renews the OIDC tokens a security token carries.
+ *
+ * The renewal goes through the refresh token grant of RFC 6749, Section 6.
  *
  * The tokens the "oidc_login" authenticator obtained are held as attributes of the
  * security token, which the firewall keeps in the session: renewing them in place is
@@ -89,8 +90,9 @@ final class OidcTokenRefresher
     }
 
     /**
-     * Renews the access token, whatever its expiry, and stores the new tokens on the
-     * security token: the access token and its expiry, the refresh token when the
+     * Renews the access token, whatever its expiry, and stores the new tokens.
+     *
+     * The security token receives the access token and its expiry, the refresh token when the
      * provider rotated it, and the ID token when it issued a new one.
      *
      * @throws OidcInvalidGrantException If the provider no longer honors the refresh token
@@ -127,8 +129,9 @@ final class OidcTokenRefresher
     }
 
     /**
-     * Validates an ID token returned by the refresh token grant, per OIDC Core 1.0,
-     * Section 12.2.
+     * Validates an ID token returned by the refresh token grant.
+     *
+     * The rules are the ones of OIDC Core 1.0, Section 12.2.
      *
      * Neither a "nonce" nor a "max_age" is checked here: no authorization request was
      * made, and the "auth_time" claim still reports the original authentication.

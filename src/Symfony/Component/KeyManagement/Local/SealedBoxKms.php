@@ -24,8 +24,9 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
 
 /**
- * Local libsodium-backed asymmetric KMS using anonymous public-key encryption
- * (Curve25519 + XSalsa20-Poly1305 via `sodium_crypto_box_seal`).
+ * Local libsodium-backed asymmetric KMS using anonymous public-key encryption.
+ *
+ * The primitive is Curve25519 + XSalsa20-Poly1305, via `sodium_crypto_box_seal`.
  *
  * Enables the "Symfony Secrets" pattern in self-hosted setups: deployments
  * that load only the public key can encrypt new payloads (devs commit

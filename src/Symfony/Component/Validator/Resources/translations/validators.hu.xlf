@@ -578,6 +578,74 @@
                 <source>This value is not a valid ULID.</source>
                 <target>Ez az érték nem érvényes ULID.</target>
             </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target state="needs-review-translation">Ez a fájl nem érvényes hangfájl.</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target state="needs-review-translation">A hang túl rövid ({{ duration }} másodperc). Az elvárt legrövidebb hossz {{ min_duration }} másodperc.</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target state="needs-review-translation">A hang túl hosszú ({{ duration }} másodperc). A megengedett leghosszabb hossz {{ max_duration }} másodperc.</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target state="needs-review-translation">A hang hosszát nem sikerült megállapítani.</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target state="needs-review-translation">A hang bitrátája túl alacsony ({{ bitrate }} bps). Az elvárt legkisebb bitráta {{ min_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target state="needs-review-translation">A hang bitrátája túl magas ({{ bitrate }} bps). A megengedett legnagyobb bitráta {{ max_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target state="needs-review-translation">A hang bitrátáját nem sikerült megállapítani.</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target state="needs-review-translation">Nem támogatott hangmintavételi frekvencia ({{ sample_rate }} Hz).</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target state="needs-review-translation">A hang mintavételi frekvenciáját nem sikerült megállapítani.</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target state="needs-review-translation">A hangban túl kevés a csatorna ({{ channels }}). Az elvárt legkisebb mennyiség {{ min_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target state="needs-review-translation">A hangban túl sok a csatorna ({{ channels }}). A megengedett legnagyobb mennyiség {{ max_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target state="needs-review-translation">A hangcsatornák számát nem sikerült megállapítani.</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target state="needs-review-translation">A hangfájl sérült.</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">A hang több adatfolyamot tartalmaz. Csak egy adatfolyam engedélyezett.</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target state="needs-review-translation">Nem támogatott hangkodek „{{ codec }}".</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target state="needs-review-translation">Nem támogatott hangkonténer „{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target state="needs-review-translation">A fájl nem tartalmaz hang adatfolyamot.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

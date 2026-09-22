@@ -42,8 +42,10 @@ use Symfony\Component\Clock\Clock;
 abstract class AbstractClientAssertion implements ClientAuthenticationInterface
 {
     /**
-     * The assertion format RFC 7523, Section 2.2 registers, and the only value the
-     * "client_assertion_type" parameter takes when the assertion is a JWT.
+     * The assertion format RFC 7523, Section 2.2 registers.
+     *
+     * It is the only value the "client_assertion_type" parameter takes when the assertion is
+     * a JWT.
      */
     public const ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
 
@@ -74,9 +76,10 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
     }
 
     /**
-     * RFC 7523, Section 2.2: the assertion is added to the token request body next to the
-     * "client_assertion_type" naming its format, and nothing else the request already
-     * carries is touched, the "client_id" of RFC 7521, Section 4.2 among it.
+     * Adds the assertion to the token request body, per RFC 7523, Section 2.2.
+     *
+     * It goes next to the "client_assertion_type" naming its format, and nothing else the
+     * request already carries is touched, the "client_id" of RFC 7521, Section 4.2 among it.
      */
     final public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
     {
@@ -87,8 +90,9 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
     }
 
     /**
-     * Resolves an algorithm name to the implementation of it, refusing the ones the method
-     * does not allow.
+     * Resolves an algorithm name to the implementation of it.
+     *
+     * The ones the method does not allow are refused.
      *
      * The algorithm decides what the key may be, so this allowlist is what keeps a shared
      * secret out of "private_key_jwt" and an asymmetric key out of "client_secret_jwt":

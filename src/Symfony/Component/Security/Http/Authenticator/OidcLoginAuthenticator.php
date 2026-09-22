@@ -58,10 +58,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     private readonly ClockInterface $clock;
 
     /**
-     * A public client, which authenticates with "none", sends no secret: PKCE is then the
-     * only thing binding the authorization code to it, and the ID token signature the only
-     * thing tying the token endpoint response to the provider beyond the TLS verification.
-     * Neither can be turned off for such a client, which is what this constructor refuses.
+     * Refuses a public client that turns PKCE or the ID token signature check off.
+     *
+     * Such a client, which authenticates with "none", sends no secret: PKCE is then the only
+     * thing binding the authorization code to it, and the ID token signature the only thing
+     * tying the token endpoint response to the provider beyond the TLS verification.
      *
      * @param array<string, string>         $authorizationParams Additional parameters of the authorization request, e.g.
      *                                                           "prompt" or "ui_locales"; the protocol parameters the
@@ -148,6 +149,8 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
+     * Sends an authorization request asking the provider to authenticate the End-User again.
+     *
      * "prompt=login" is what OIDC Core 1.0, Section 3.1.2.1 defines for this: the provider
      * prompts the End-User for credentials again instead of answering from the session it
      * already holds. The previous ID token goes along as "id_token_hint" so the provider
@@ -258,12 +261,28 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         $session = $this->getSession($request);
         $prefix = $this->getSessionPrefix();
 
+        // "form_post" has the provider post the response to the "check_path", the default
+        // "query" mode puts it in the redirect; a provider on another site makes that POST
+        // a cross-site one, which carries no "SameSite=Lax" cookie, hence no session
+        if ($request->isMethod('POST')) {
+            $state = $request->request->getString('state');
+            $code = $request->request->getString('code');
+            $iss = $request->request->getString('iss');
+            $error = $request->request->getString('error');
+            $errorDescription = $request->request->getString('error_description');
+        } else {
+            $state = $request->query->getString('state');
+            $code = $request->query->getString('code');
+            $iss = $request->query->getString('iss');
+            $error = $request->query->getString('error');
+            $errorDescription = $request->query->getString('error_description');
+        }
+
         // the "state" is validated first: an unauthenticated request would otherwise get an
         // attacker-supplied "error_description" stored in the session, through the exception
         // the failure handler keeps there (the provider echoes "state" back on errors too,
         // as RFC 6749, Section 4.1.2.1 requires)
-        $state = $request->query->get('state');
-        if (!\is_string($state) || '' === $state) {
+        if ('' === $state) {
             throw new AuthenticationException('Invalid OIDC state parameter.');
         }
 
@@ -293,11 +312,10 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         $codeVerifier = \is_array($attempt) ? $attempt['code_verifier'] ?? null : null;
         $redirectUri = \is_array($attempt) ? $attempt['redirect_uri'] ?? null : null;
 
-        $this->checkIssuerParameter($request);
-        $this->checkForProviderError($request);
+        $this->checkIssuerParameter($iss);
+        $this->checkForProviderError($error, $errorDescription);
 
-        $code = $request->query->get('code');
-        if (null === $code) {
+        if ('' === $code) {
             throw new AuthenticationException('Missing authorization code in OIDC callback.');
         }
 
@@ -358,6 +376,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         // which is what lets a trust resolver require one of them and not just any login
         $amr = $idTokenClaims['amr'] ?? null;
         $passport->setAttribute('oidc_amr', \is_array($amr) ? array_values(array_filter($amr, \is_string(...))) : []);
+        // "acr" names the authentication context class the provider asserts, in the vocabulary it
+        // shares with this application, and is the claim answering the "acr_values" an authorization
+        // request asks for; it is compared as-is, so anything but a non-empty string is no class
+        $acr = $idTokenClaims['acr'] ?? null;
+        $passport->setAttribute('oidc_acr', \is_string($acr) && '' !== $acr ? $acr : null);
 
         return $passport;
     }
@@ -376,6 +399,8 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             $token->setAttribute('oidc_refresh_token', $tokenData['refresh_token'] ?? null);
             $token->setAttribute('oidc_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? $this->clock->now()->getTimestamp() + (int) $tokenData['expires_in'] : null);
         }
+
+        $token->setAttribute('oidc_acr', $passport->getAttribute('oidc_acr'));
 
         $methods = $passport->getAttribute('oidc_amr');
         $methods = \is_array($methods) && $methods ? $methods : [AuthenticationMethod::UNSPECIFIED];
@@ -417,11 +442,10 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         return true;
     }
 
-    private function checkForProviderError(Request $request): void
+    private function checkForProviderError(string $error, string $errorDescription): void
     {
-        $error = $request->query->get('error');
-        if (null !== $error) {
-            $description = $request->query->get('error_description', $error);
+        if ('' !== $error) {
+            $description = '' !== $errorDescription ? $errorDescription : $error;
 
             // only the matched attempt was consumed: a provider error for one tab
             // must not cancel the logins pending in the others
@@ -430,19 +454,19 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
-     * Checks the "iss" authorization response parameter of RFC 9207, which ties the
-     * callback to the provider that issued it: without it, a client registered with
-     * several providers can be led to send the code of an honest one to the token
-     * endpoint of a malicious one (the mix-up attack of the OAuth 2.0 Security BCP).
-     * It is checked before the "error" parameter, which RFC 9207, Section 2 requires
-     * it to accompany too.
+     * Checks the "iss" authorization response parameter of RFC 9207.
+     *
+     * It ties the callback to the provider that issued it: without it, a client registered
+     * with several providers can be led to send the code of an honest one to the token
+     * endpoint of a malicious one (the mix-up attack of the OAuth 2.0 Security BCP). It is
+     * checked before the "error" parameter, which RFC 9207, Section 2 requires it to
+     * accompany too.
      */
-    private function checkIssuerParameter(Request $request): void
+    private function checkIssuerParameter(string $iss): void
     {
         $configuration = $this->discovery->getConfiguration();
-        $iss = $request->query->get('iss');
 
-        if (null === $iss) {
+        if ('' === $iss) {
             // a provider announcing support for the parameter sends it on every
             // authorization response, so a callback without it did not come from it
             if (true === ($configuration['authorization_response_iss_parameter_supported'] ?? null)) {
@@ -453,14 +477,15 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         }
 
         $expectedIssuer = $configuration['issuer'] ?? null;
-        if (!\is_string($iss) || '' === $iss || !\is_string($expectedIssuer) || !hash_equals($expectedIssuer, $iss)) {
+        if (!\is_string($expectedIssuer) || !hash_equals($expectedIssuer, $iss)) {
             throw new AuthenticationException('The OIDC callback "iss" parameter does not match the expected issuer.');
         }
     }
 
     /**
-     * Exchanges the authorization code for tokens and ensures the token endpoint
-     * returned an ID and access token.
+     * Exchanges the authorization code for tokens.
+     *
+     * The token endpoint is held to returning both an ID token and an access token.
      *
      * @return array<string, mixed>
      */
@@ -479,10 +504,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
-     * Returns the user claims from the configured source, the UserInfo endpoint or
-     * the validated ID token, and checks the claim the user identifier is read from.
-     * Claims fetched from UserInfo are tied to the authenticated user by the OIDC
-     * Core 1.0, Section 5.3.2 rule that its "sub" matches the ID token "sub".
+     * Returns the user claims from the configured source, and checks the identifier claim.
+     *
+     * The source is the UserInfo endpoint or the validated ID token. Claims fetched from
+     * UserInfo are tied to the authenticated user by the OIDC Core 1.0, Section 5.3.2 rule
+     * that its "sub" matches the ID token "sub".
      *
      * @param array<string, mixed> $idTokenClaims
      *
@@ -513,10 +539,11 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     }
 
     /**
-     * Returns the scopes of the authorization request, always including "openid",
-     * which OIDC Core 1.0, Section 3.1.2.1 requires for the request to return an
-     * ID token. Each configured value may hold several space-separated scopes, so
-     * that an environment variable can carry them all.
+     * Returns the scopes of the authorization request, always including "openid".
+     *
+     * OIDC Core 1.0, Section 3.1.2.1 requires that one for the request to return an ID token.
+     * Each configured value may hold several space-separated scopes, so that an environment
+     * variable can carry them all.
      *
      * @return list<string>
      */

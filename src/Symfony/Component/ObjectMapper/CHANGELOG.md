@@ -8,6 +8,7 @@ CHANGELOG
  * Add automatic conversion between `BackedEnum` and scalar types (both ways)
  * Add a `MappingAwareTransformCallableInterface` to pass the `Map` attribute being applied to transformers
  * Add `PropertyTypeMappingMetadataFactory` to map a nested object to the class typing the property it is written into
+ * Add `ObjectMapperCacheWarmer` to store the mapping metadata of every `#[Map]` class pair in a PHP file at cache warmup
 
 8.1
 ---

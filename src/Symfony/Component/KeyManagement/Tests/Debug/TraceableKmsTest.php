@@ -117,9 +117,6 @@ class TraceableKmsTest extends TestCase
         $this->assertSame(2, $this->collector->getKmsCallCount());
     }
 
-    /**
-     * The panel exists to count round trips, not to leak what they carried.
-     */
     public function testNeitherThePlaintextNorTheCiphertextIsCollected()
     {
         $traceable = TraceableKms::wrap(new InMemoryKms(), $this->collector, 'default');

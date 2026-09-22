@@ -25,8 +25,9 @@ use Psr\Clock\ClockInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
- * Decodes and validates OIDC ID tokens using the web-token (JOSE) library,
- * reusing the same claim checkers as the OIDC access-token handlers.
+ * Decodes and validates OIDC ID tokens using the web-token (JOSE) library.
+ *
+ * The claim checkers are the ones the OIDC access-token handlers use.
  *
  * The signature is not verified here: it is the job of {@see OidcSignatureVerifier},
  * which the "oidc_login" authenticator uses by default, and which the ID token

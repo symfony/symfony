@@ -18,6 +18,7 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
 use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Builds an {@see AzureKeyVault} from a DSN of the form:
@@ -44,6 +45,14 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
     private const string SCHEME = 'azure-keyvault';
     private const string DEFAULT_AUDIENCE = 'https://vault.azure.net/.default';
     private const string MANAGED_HSM_AUDIENCE = 'https://managedhsm.azure.net/.default';
+
+    /**
+     * @param HttpClientInterface|null $client The client the DSN's base URI is applied to, so that a timeout, a retry policy or the profiler set on the application's client reach the KMS; a client of its own is built when none is given
+     */
+    public function __construct(
+        private readonly ?HttpClientInterface $client = null,
+    ) {
+    }
     private const array MANAGED_HSM_HOST_SUFFIXES = [
         '.managedhsm.azure.net',
         '.managedhsm.usgovcloudapi.net',
@@ -101,7 +110,7 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
 
         $audience = $dsn->getOption('audience') ?? self::inferAudience($dsn->host);
 
-        $client = HttpClient::createForBaseUri($baseUri);
+        $client = $this->scopedClient($baseUri);
 
         return new AzureKeyVault(
             $client,
@@ -146,5 +155,10 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
                 throw new InvalidArgumentException(\sprintf('The "%s" option of the "%s://" DSN must be a scalar value.', $option, $dsn->scheme));
             }
         }
+    }
+
+    private function scopedClient(string $baseUri): HttpClientInterface
+    {
+        return $this->client?->withOptions(['base_uri' => $baseUri]) ?? HttpClient::createForBaseUri($baseUri);
     }
 }

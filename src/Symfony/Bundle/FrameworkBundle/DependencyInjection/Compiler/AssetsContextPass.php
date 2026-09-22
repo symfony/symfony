@@ -16,3 +16,12 @@ use Symfony\Component\Asset\DependencyInjection\AssetsContextPass as BaseAssetsC
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass', BaseAssetsContextPass::class);
 
 class_alias(BaseAssetsContextPass::class, 'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass');
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Asset\DependencyInjection\AssetsContextPass instead
+     */
+    class AssetsContextPass
+    {
+    }
+}

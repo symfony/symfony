@@ -19,6 +19,7 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
 use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Builds an {@see AwsKms} from a DSN of the form:
@@ -32,8 +33,10 @@ use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
  * `scheme` option defaults to `https`; pass `http` to talk to a local
  * sandbox (LocalStack).
  *
- * Users that need fine-grained tuning (custom HTTP client, retry, ...)
- * should wire {@see AwsKms} manually.
+ * The HTTP client given to the factory is the one async-aws talks through,
+ * so that its timeout, its certificates and the profiler reach KMS. async-aws
+ * retries throttled calls on the client it builds itself and takes a given one
+ * as is, so a client passed here carries whatever retry policy it was given.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -42,6 +45,14 @@ use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 final class AwsKmsFactory implements KmsFactoryInterface
 {
     private const string SCHEME = 'aws-kms';
+
+    /**
+     * @param HttpClientInterface|null $client The client async-aws talks through, so that a timeout, certificates and the profiler set on the application's client reach the KMS
+     */
+    public function __construct(
+        private readonly ?HttpClientInterface $client = null,
+    ) {
+    }
 
     public function supports(#[\SensitiveParameter] Dsn $dsn): bool
     {
@@ -92,7 +103,7 @@ final class AwsKmsFactory implements KmsFactoryInterface
             $options['endpoint'] = $scheme.'://'.$dsn->host.(null !== $dsn->port ? ':'.$dsn->port : '');
         }
 
-        return new AwsKms(new KmsClient(Configuration::create($options)));
+        return new AwsKms(new KmsClient(Configuration::create($options), null, $this->client));
     }
 
     /**

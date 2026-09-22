@@ -56,11 +56,6 @@ class Base64UrlSafeTest extends TestCase
         yield 'a wrapped key' => [184];
     }
 
-    /**
-     * Decoding is permissive on purpose: a value pasted from a tool that emits standard base64, with
-     * or without padding, still decodes, and the two alphabets do not overlap so the translation is
-     * idempotent for either.
-     */
     #[DataProvider('provideEquivalentEncodings')]
     public function testDecodingAcceptsBothAlphabetsPaddedOrNot(string $encoded)
     {
@@ -94,10 +89,6 @@ class Base64UrlSafeTest extends TestCase
         yield 'a non-ascii byte' => ["-__\xC3\xA9AA"];
     }
 
-    /**
-     * Inherited from `base64_decode()` in strict mode, which lets whitespace through: a key pasted
-     * across two lines still decodes.
-     */
     public function testWhitespaceIsTolerated()
     {
         $this->assertSame("\xFB\xFF\xFE\x00", Base64UrlSafe::decode("-__-\n AA"));

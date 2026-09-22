@@ -142,8 +142,6 @@ class SodiumKmsTest extends TestCase
 
     public function testAadIsForwardedAsOpaqueBytes()
     {
-        // Caller must produce identical bytes on both sides; the bridge does
-        // not canonicalize arrays for them.
         $ciphertext = $this->kms->encrypt('app', 'hello', "\x00\xFFopaque-bytes");
 
         $this->assertSame('hello', $this->kms->decrypt($ciphertext, "\x00\xFFopaque-bytes"));
@@ -157,7 +155,6 @@ class SodiumKmsTest extends TestCase
 
     public function testDecryptOnUnknownKeyMasksAsDecryptionFailure()
     {
-        // Avoids leaking which key ids exist via a distinguishable exception.
         $this->expectException(DecryptionFailedException::class);
         $this->kms->decrypt(new Ciphertext('whatever', 'missing'));
     }
@@ -198,7 +195,6 @@ class SodiumKmsTest extends TestCase
             $dataKey->use(static fn () => throw new \RuntimeException('boom'));
             $this->fail('Exception should have bubbled out of use().');
         } catch (\RuntimeException) {
-            // expected
         }
 
         $this->assertTrue($dataKey->isConsumed());
@@ -228,9 +224,6 @@ class SodiumKmsTest extends TestCase
         $this->kms->unwrapDataKey($tampered);
     }
 
-    /**
-     * Reads the nonce out of the `[version][nonce][ciphertext||tag]` blob layout.
-     */
     private static function nonceOf(string $blob): string
     {
         return substr($blob, 1, \SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);

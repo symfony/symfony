@@ -47,7 +47,6 @@ class OidcDiscoveryTest extends TestCase
         $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER);
 
         $this->assertSame(self::CONFIGURATION, $discovery->getConfiguration());
-        // the second read is served by the cache
         $this->assertSame(self::CONFIGURATION, $discovery->getConfiguration());
         $this->assertSame(1, $requests);
     }
@@ -478,20 +477,15 @@ class OidcDiscoveryTest extends TestCase
 
         $discovery = new OidcDiscovery($httpClient, $cache, self::URL, self::ISSUER);
 
-        // first read: getConfiguration()
         $this->assertSame(self::CONFIGURATION, $discovery->getConfiguration());
-        // second read: getSecureEndpoint('authorization_endpoint')
         $discovery->getSecureEndpoint('authorization_endpoint');
-        // third read: getSecureEndpoint('token_endpoint')
         $discovery->getSecureEndpoint('token_endpoint');
 
-        // only one HTTP request was made thanks to memoization
         $this->assertSame(1, $requests);
     }
 
     public function testResetClearsTheMemoizedDocument()
     {
-        // after reset(), the next read goes back to the cache/HTTP path
         $requests = 0;
         $httpClient = new MockHttpClient(static function (string $method, string $url) use (&$requests): MockResponse {
             ++$requests;
@@ -510,14 +504,11 @@ class OidcDiscoveryTest extends TestCase
 
         $discovery = new OidcDiscovery($httpClient, $cache, self::URL, self::ISSUER);
 
-        // first read
         $this->assertSame(self::CONFIGURATION, $discovery->getConfiguration());
         $this->assertSame(1, $requests);
 
-        // reset the memo
         $discovery->reset();
 
-        // second read: should hit the cache/HTTP path again
         $this->assertSame(self::CONFIGURATION, $discovery->getConfiguration());
         $this->assertSame(2, $requests);
     }

@@ -132,6 +132,7 @@ FrameworkBundle
 ---------------
 
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
+ * Deprecate passing the `$debug` argument to `DependencyInjection\Configuration::__construct()`, the config tree no longer depends on `kernel.debug`
  * BrowserKit assertions are no longer verbose by default. Failed response assertions no longer include the response body unless `setBrowserKitAssertionsAsVerbose(true)` is called or `verbose: true` is passed to the assertion.
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use the `esi` or `inline` fragment renderer, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
  * Most of what this bundle configured now lives in a bundle shipped by the component itself: `asset`,

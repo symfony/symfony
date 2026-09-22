@@ -7,6 +7,8 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
     tmpDir: .github/sa-tools/phpstan-cache
+    scanFiles:
+        - .github/sa-tools/stubs/phpunit-13.php
     paths:
         - src
     excludePaths:

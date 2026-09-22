@@ -23,8 +23,9 @@ use Symfony\Component\KeyManagement\Local\SealedBoxKms;
 use Symfony\Component\KeyManagement\Local\SodiumKms;
 
 /**
- * Builds one of the local KMS backends (`SodiumKms`, `OpenSslKms`,
- * `SealedBoxKms`) wrapped around a {@see FlysystemKeyLoader}.
+ * Builds a local KMS backend wrapped around a {@see FlysystemKeyLoader}.
+ *
+ * The backend is one of `SodiumKms`, `OpenSslKms` and `SealedBoxKms`.
  *
  * Three schemes are supported, one per backend:
  *

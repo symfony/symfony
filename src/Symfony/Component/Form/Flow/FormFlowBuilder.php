@@ -142,7 +142,9 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
             return $defaultStep;
         }
 
-        return (string) $this->stepAccessor->getStep($this->initialOptions['data'], $defaultStep);
+        $initialStep = (string) $this->stepAccessor->getStep($this->initialOptions['data'], $defaultStep);
+
+        return $this->hasStep($initialStep) ? $initialStep : $defaultStep;
     }
 
     public function getInitialOptions(): array
@@ -235,23 +237,55 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
 
         uasort($this->steps, static fn (StepFlowBuilderConfigInterface $a, StepFlowBuilderConfigInterface $b) => $b->getPriority() <=> $a->getPriority());
 
-        $config = $this->getFormConfig();
+        if (null === $this->getData()) {
+            $this->setData($this->createEmptyData());
+        }
+
         $currentStep = $this->resolveCurrentStep();
+        $config = $this->getFormConfig();
 
         $step = $this->getStep($currentStep);
         $this->add($step->getName(), $step->getType(), $step->getOptions());
 
-        $cursor = new FormFlowCursor($config->getSteps(), $currentStep);
+        $cursor = new FormFlowCursor($config->getSteps(), $currentStep, $this->getData());
         $this->pruneActionButtons($this, $cursor);
 
         return new FormFlow($config, $cursor);
+    }
+
+    /**
+     * Creates the data of the flow when none was passed.
+     *
+     * A regular form creates its data lazily from the "empty_data" option on
+     * submission, but a flow needs it before that to resolve the current step.
+     */
+    private function createEmptyData(): object|array
+    {
+        $emptyData = $this->getEmptyData();
+
+        if ($emptyData instanceof \Closure) {
+            // The closure expects the form it creates the data for, use a provisional flow built from the same config
+            $config = $this->getFormConfig();
+            $cursor = new FormFlowCursor($config->getSteps(), $this->resolveFirstNonGroupStep($this->steps) ?? (string) key($this->steps));
+
+            $emptyData = $emptyData(new FormFlow($config, $cursor), null);
+        } elseif (\is_object($emptyData)) {
+            $emptyData = clone $emptyData;
+        }
+
+        if (\is_object($emptyData) || \is_array($emptyData)) {
+            return $emptyData;
+        }
+
+        return null !== ($dataClass = $this->getDataClass()) ? new $dataClass() : [];
     }
 
     private function resolveCurrentStep(): string
     {
         $data = $this->getData();
 
-        if (!$currentStep = $this->getStepAccessor()->getStep($data)) {
+        // fall back to the first step when no step is stored yet or when the stored one no longer exists
+        if (!($currentStep = $this->getStepAccessor()->getStep($data)) || !$this->hasStep($currentStep)) {
             $currentStep = $this->resolveFirstStep();
             $this->getStepAccessor()->setStep($data, $currentStep);
             $this->setData($data);
@@ -265,10 +299,38 @@ class FormFlowBuilder extends FormBuilder implements FormFlowBuilderInterface
      *
      * A step is navigable if it is neither a group nor skipped.
      */
+    /**
+     * Returns the first step that is not a group, or null when every step is one.
+     *
+     * Unlike resolveFirstStep(), this ignores skip conditions: it runs while the data
+     * is still being created, so a skip closure cannot be evaluated yet.
+     *
+     * @param array<StepFlowBuilderConfigInterface> $steps
+     */
+    private function resolveFirstNonGroupStep(array $steps): ?string
+    {
+        foreach ($steps as $step) {
+            if (!$step->isGroup()) {
+                return $step->getName();
+            }
+
+            if (null !== $name = $this->resolveFirstNonGroupStep($step->getSteps())) {
+                return $name;
+            }
+        }
+
+        return null;
+    }
+
     private function resolveFirstStep(?array $steps = null): string
     {
         foreach ($steps ?? $this->steps as $step) {
-            if (!$step->isGroup() && !$step->isSkipped($this->getData())) {
+            if ($step->isSkipped($this->getData())) {
+                // a skipped step takes its whole subtree with it
+                continue;
+            }
+
+            if (!$step->isGroup()) {
                 return $step->getName();
             }
 

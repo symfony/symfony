@@ -95,8 +95,9 @@ final class BlindIndexListener
     }
 
     /**
-     * The reflection is resolved once per class, since a flush walks every entity it holds and most
-     * of them carry no index at all.
+     * The reflection is resolved once per class.
+     *
+     * A flush walks every entity it holds, and most of them carry no index at all.
      *
      * @return list<array{\ReflectionProperty, \ReflectionProperty, class-string<BlindIndex>}>
      */

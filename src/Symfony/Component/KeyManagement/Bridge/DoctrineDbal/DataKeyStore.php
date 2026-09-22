@@ -118,8 +118,9 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * The current key of a scope is its newest row, which `ORDER BY id DESC` gives for free since a
-     * UUIDv7 sorts chronologically.
+     * The current key of a scope is its newest row.
+     *
+     * `ORDER BY id DESC` gives it for free, since a UUIDv7 sorts chronologically.
      *
      * A scope is resolved once and then remembered, because an encrypter asks for it on every
      * single payload while the answer only changes when the key is retired, which the reference
@@ -186,8 +187,10 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * The cached handle survives on purpose: rewrapping changes how the data key is protected, not
-     * the key itself, so anything already encrypted with it stays valid.
+     * The cached handle survives a rewrap on purpose.
+     *
+     * Rewrapping changes how the data key is protected, not the key itself, so anything already
+     * encrypted with it stays valid.
      */
     public function rewrap(string $reference, Ciphertext $wrapped, string $client): void
     {
@@ -203,8 +206,9 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * The plaintext is deliberately taken out of the {@see DataKey} and retained by the handle: a
-     * store exists to unwrap once and encrypt many payloads. The handle takes a buffer of its own
+     * The plaintext is deliberately taken out of the {@see DataKey} and retained by the handle.
+     *
+     * A store exists to unwrap once and encrypt many payloads. The handle takes a buffer of its own
      * as it does so, so the DataKey still wipes what it held.
      */
     public function rotate(string $scope): DataKeyHandle
@@ -235,11 +239,12 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * Drops the retained plaintexts and everything remembered about them, so the next resolution
-     * goes back to the database and to the KMS. Worth calling between two units of work in a
-     * long-running process, which is what the `kernel.reset` tag does in a Symfony application:
-     * the plaintexts are held for as long as the store is, and a rotation performed elsewhere is
-     * only seen afterwards.
+     * Drops the retained plaintexts and everything remembered about them.
+     *
+     * The next resolution then goes back to the database and to the KMS. Worth calling between two
+     * units of work in a long-running process, which is what the `kernel.reset` tag does in a
+     * Symfony application: the plaintexts are held for as long as the store is, and a rotation
+     * performed elsewhere is only seen afterwards.
      */
     public function forget(): void
     {
@@ -317,8 +322,10 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * The remembered key of a scope, as long as its plaintext is still held, its age has not
-     * caught up with it, and its row was not rolled back.
+     * The remembered key of a scope, while it is still good to use.
+     *
+     * That is as long as its plaintext is still held, its age has not caught up with it, and its
+     * row was not rolled back.
      */
     private function remembered(string $scope): ?DataKeyHandle
     {
@@ -339,11 +346,12 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
+     * A remembered row is looked up again until it is seen outside of any transaction.
+     *
      * A row inserted inside a transaction goes away if that transaction is rolled back, and a key
      * remembered from it would then seal payloads nothing can ever unwrap. The connection tells
      * whether a transaction is active, not whether it is the same one, so the row is looked up
-     * again on every use until it is seen outside of any transaction, which is what proves it
-     * committed; from then on it is trusted.
+     * again on every use until it is seen committed; from then on it is trusted.
      */
     private function rowStillExists(string $reference): bool
     {
@@ -399,6 +407,8 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
+     * A scope has to fit in its column.
+     *
      * The column is only as wide as the schema says, and a server that truncates rather than
      * refuses, as a MySQL out of strict mode does, would make two long scopes share a key.
      */
@@ -419,10 +429,11 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     }
 
     /**
-     * The creation instant is read back from the UUIDv7 reference, which is why the table needs no
-     * timestamp of its own, and why the age of the remembered key can be checked without going back
-     * to the database. Parsing the reference is what a remembered key is asked on every payload,
-     * hence the instant is kept once computed.
+     * The creation instant is read back from the UUIDv7 reference.
+     *
+     * That is why the table needs no timestamp of its own, and why the age of the remembered key
+     * can be checked without going back to the database. Parsing the reference is what a
+     * remembered key is asked on every payload, hence the instant is kept once computed.
      */
     private function retirementOf(string $reference): int
     {

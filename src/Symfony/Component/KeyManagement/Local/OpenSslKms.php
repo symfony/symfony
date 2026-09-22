@@ -24,8 +24,10 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
 use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
 
 /**
- * Local KMS backed by ext-openssl (AES-256-GCM AEAD), useful when libsodium
- * is not available or when an OpenSSL-compatible wire format is required.
+ * Local KMS backed by ext-openssl (AES-256-GCM AEAD).
+ *
+ * Useful when libsodium is not available or when an OpenSSL-compatible wire
+ * format is required.
  *
  * The wire format of a {@see Ciphertext} blob is:
  *
@@ -124,13 +126,14 @@ final class OpenSslKms implements DecrypterInterface, EncrypterInterface, DataKe
     }
 
     /**
-     * Derives the IV of a deterministic encryption from the AAD as well as the
-     * plaintext, the way SIV constructions do. Two encryptions differing only
-     * by their AAD must not land on the same IV: the pair of GCM tags they
-     * would produce under one key reveals the authentication subkey, and with
-     * it the ability to forge tags for anything encrypted under that key. The
-     * length prefix keeps the concatenation unambiguous, so no (aad, plaintext)
-     * pair can be read as another one. It spans 8 big-endian bytes, as the `J`
+     * Derives the IV of a deterministic encryption from the AAD as well as the plaintext.
+     *
+     * This is what SIV constructions do. Two encryptions differing only by
+     * their AAD must not land on the same IV: the pair of GCM tags they would
+     * produce under one key reveals the authentication subkey, and with it the
+     * ability to forge tags for anything encrypted under that key. The length
+     * prefix keeps the concatenation unambiguous, so no (aad, plaintext) pair
+     * can be read as another one. It spans 8 big-endian bytes, as the `J`
      * format code would write them, that one being unavailable on 32-bit builds
      * where no string is ever long enough for the high word to be anything but
      * zero. The HMAC is keyed with a subkey derived from the AEAD key rather

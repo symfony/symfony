@@ -76,10 +76,6 @@ class KeyManagementBundleTest extends TestCase
         $this->assertInstanceOf(KeyManagementDataCollector::class, $container->get('test.data_collector'));
     }
 
-    /**
-     * A self-contained envelope read through the stored encrypter goes through the fallback, which
-     * is the default client's envelope encrypter: what the profiler must report is one read.
-     */
     #[RequiresPhpExtension('sodium')]
     public function testAStoredEncrypterReadingASelfContainedEnvelopeIsRecordedOnce()
     {
@@ -101,6 +97,30 @@ class KeyManagementBundleTest extends TestCase
         $this->assertSame(2, $collector->getEnvelopeCallCount(), 'the write and the read, not the fallback the read went through.');
         $this->assertSame(['decrypt' => 1], $services['stored']['operations']);
         $this->assertSame(['encrypt' => 1], $services['default']['operations']);
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    public function testACompositeClientIsADefaultLikeAnyOtherAndEachMemberIsTraced()
+    {
+        $kernel = new TestKeyManagementKernel('redundant', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $kms = $container->get('test.kms');
+        $this->assertInstanceOf(TraceableKms::class, $kms);
+        $this->assertSame($container->get('test.redundant_kms'), $kms);
+        $this->assertSame('secret', $kms->decrypt($kms->encrypt('app', 'secret')));
+
+        $envelopeEncrypter = $container->get('test.envelope_encrypter');
+        $this->assertSame('secret', $envelopeEncrypter->decrypt($envelopeEncrypter->encrypt('app', 'secret')));
+
+        $collector = $container->get('test.data_collector');
+        $collector->lateCollect();
+        $services = $collector->getServices()[KeyManagementDataCollector::LAYER_KMS];
+
+        $this->assertSame(['encrypt' => 1, 'decrypt' => 1, 'generate_data_key' => 1, 'unwrap_data_key' => 1], $services['redundant']['operations']);
+        $this->assertSame(['encrypt' => 1, 'decrypt' => 1, 'generate_data_key' => 1, 'unwrap_data_key' => 1], $services['primary']['operations'], 'the first member is asked to read and answers.');
+        $this->assertSame(['encrypt' => 2], $services['secondary']['operations'], 'the second member wraps everything and is never asked to read while the first one answers.');
     }
 
     public function testTheDataCollectorGoesWithTheProfiler()
@@ -125,11 +145,6 @@ class KeyManagementBundleTest extends TestCase
         $this->assertContains(KeyManagementPass::class, $this->buildPasses());
     }
 
-    /**
-     * The pass is what makes the storages of league/flysystem-bundle answer to the host of a
-     * "...+fly://" DSN; without it registered, every such DSN names a service the factory has no
-     * way of seeing.
-     */
     public function testTheFlysystemStoragesPassIsRegisteredWhenTheBridgeIsInstalled()
     {
         if (!class_exists(RegisterFlysystemStoragesPass::class)) {
@@ -139,11 +154,6 @@ class KeyManagementBundleTest extends TestCase
         $this->assertContains(RegisterFlysystemStoragesPass::class, $this->buildPasses());
     }
 
-    /**
-     * The pass is what hands the listener the blind indexes of the application; without it
-     * registered, the listener keeps the empty locator the extension gave it and every entity
-     * carrying a "#[BlindIndexed]" property fails on a flush.
-     */
     public function testTheBlindIndexesPassIsRegisteredWhenTheBridgeIsInstalled()
     {
         if (!class_exists(RegisterBlindIndexesPass::class)) {
@@ -193,6 +203,22 @@ class TestKeyManagementKernel extends AbstractKernel
             ->alias('test.kms', 'key_management.default')->public()
             ->alias('test.envelope_encrypter', 'key_management.envelope_encrypter.default')->public()
         ;
+
+        if ('redundant' === $this->environment) {
+            $config = [
+                'clients' => [
+                    'primary' => 'sodium://?keys[app]='.Base64UrlSafe::encode(random_bytes(32)),
+                    'secondary' => 'sodium://?keys[backup]='.Base64UrlSafe::encode(random_bytes(32)),
+                    'redundant' => ['members' => ['primary' => null, 'secondary' => 'backup']],
+                ],
+                'default_client' => 'redundant',
+            ];
+            $services
+                ->alias('test.kms', EncrypterInterface::class)->public()
+                ->alias('test.redundant_kms', 'key_management.redundant')->public()
+                ->alias('test.envelope_encrypter', EnvelopeEncrypterInterface::class)->public()
+            ;
+        }
 
         if ($this->isDebug()) {
             // the data collector is kept only when a profiler collects it

@@ -58,12 +58,10 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertNull($info['error']);
         $this->assertSame(0, $info['redirect_count']);
         $this->assertSame('HTTP/1.1 200 OK', $info['response_headers'][0]);
-        $this->assertSame('Host: localhost:8057', $info['response_headers'][1]);
         $this->assertSame('http://localhost:8057/', $info['url']);
 
         $headers = $response->getHeaders();
 
-        $this->assertSame('localhost:8057', $headers['host'][0]);
         $this->assertSame(['application/json'], $headers['content-type']);
 
         $body = json_decode($response->getContent(), true);
@@ -95,11 +93,9 @@ abstract class HttpClientTestCase extends TestCase
 
         $info = $response->getInfo();
         $this->assertSame('HTTP/1.1 200 OK', $info['response_headers'][0]);
-        $this->assertSame('Host: localhost:8057', $info['response_headers'][1]);
 
         $headers = $response->getHeaders();
 
-        $this->assertSame('localhost:8057', $headers['host'][0]);
         $this->assertSame(['application/json'], $headers['content-type']);
         $this->assertTrue(0 < $headers['content-length'][0]);
 

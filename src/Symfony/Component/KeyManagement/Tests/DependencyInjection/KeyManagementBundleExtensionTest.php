@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -32,6 +33,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeySto
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKmsFactory;
+use Symfony\Component\KeyManagement\CompositeKms;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyStoreInterface;
 use Symfony\Component\KeyManagement\Debug\TraceableDataKeyStore;
@@ -73,11 +75,31 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield ['console.command.key_management_generate_data_key'];
     }
 
-    /**
-     * The container drops each of these when its package is absent, which a typo in the class or in
-     * the package name would turn into a service that is never there, or one that is always there
-     * and fails on its first use.
-     */
+    #[DataProvider('provideHttpFactoryIds')]
+    public function testAnHttpFactoryGetsTheApplicationHttpClient(string $serviceId)
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', []);
+        });
+
+        if (!$container->hasDefinition($serviceId)) {
+            $this->markTestSkipped(\sprintf('"%s" is not installed.', $serviceId));
+        }
+
+        $client = $container->getDefinition($serviceId)->getArgument(0);
+        $this->assertInstanceOf(Reference::class, $client);
+        $this->assertSame('http_client', (string) $client);
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $client->getInvalidBehavior());
+    }
+
+    public static function provideHttpFactoryIds(): iterable
+    {
+        yield 'hashicorp vault' => ['key_management.factory.hashicorp_vault_transit'];
+        yield 'azure' => ['key_management.factory.azure_key_vault'];
+        yield 'google cloud' => ['key_management.factory.google_cloud_kms'];
+        yield 'aws' => ['key_management.factory.aws_kms'];
+    }
+
     #[DataProvider('provideOptionalServices')]
     public function testAnOptionalServiceNamesThePackageItNeeds(string $serviceId, array $expectedTag)
     {
@@ -118,12 +140,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertInstanceOf(ServiceLocatorArgument::class, $arguments[1]);
     }
 
-    /**
-     * The host of a "...+fly://" DSN is looked up under the "key" attribute of the tag, the same
-     * one the clients are indexed by. Left implicit, the index would be "flysystem", the last
-     * segment of the tag name, and a service tagged as documented would only ever be found when
-     * its id happens to equal the host.
-     */
     public function testFlysystemFactoryIsWiredWithTaggedLocator()
     {
         if (!class_exists(FlysystemKmsFactory::class)) {
@@ -142,12 +158,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key', $iterator->getIndexAttribute());
     }
 
-    /**
-     * A client the application built itself is named in the configuration through a "service://"
-     * DSN, and is registered as a definition rather than as an alias. What an alias would silently
-     * drop is what is asserted here: the tag the console commands and the profiler find a client by,
-     * the envelope encrypter, and the named argument aliases.
-     */
     public function testClientCanBeAServiceTheApplicationRegistered()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -175,11 +185,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    /**
-     * The scheme is resolved when the container is built, so a DSN whose value is unknown until
-     * runtime is handed to the factory registry whatever it holds: an application that puts
-     * "service://" in an environment variable gets an unsupported scheme, not a reference.
-     */
     public function testClientFromAnEnvVarIsAlwaysBuiltFromADsn()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -239,10 +244,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key_management.envelope_encrypter.app', (string) $encrypter[1], 'the default client provides the fallback that reads self-contained envelopes.');
     }
 
-    /**
-     * The store writes a table of its own, so Doctrine has to be told about it or a schema update
-     * ignores it and a migration diff proposes to drop it.
-     */
     public function testStoreBringsTheListenerThatPutsItsTableInTheSchema()
     {
         if (!class_exists(AbstractSchemaListener::class) || !class_exists(DataKeyStoreSchemaListener::class)) {
@@ -264,10 +265,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame(['key_management.store'], array_map(strval(...), $definition->getArgument(0)->getValues()));
     }
 
-    /**
-     * A store that seals payloads under one key forever is what the default must not produce, so
-     * the configuration carries the age the store itself would have applied.
-     */
     public function testStoreRotatesOnTheDefaultAgeWhenTheConfigurationIsSilent()
     {
         if (!class_exists(DataKeyStore::class)) {
@@ -353,10 +350,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertTrue($container->hasAlias('.'.EnvelopeDecrypterInterface::class.' $stored'));
     }
 
-    /**
-     * The store registers the autowiring aliases of the name "stored", and a client of that name
-     * computes the very same ids, so the two would silently overwrite each other.
-     */
     public function testAClientCannotBeNamedAfterTheStore()
     {
         $this->expectException(LogicException::class);
@@ -442,11 +435,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key_management.stored_envelope_encrypter', $container->getDefinition('debug.key_management.stored_envelope_encrypter')->getDecoratedService()[0]);
     }
 
-    /**
-     * The fallback reading self-contained envelopes is the default client's envelope encrypter,
-     * which the pass decorates as well. Reached through its decorator, one read would be recorded
-     * twice, so the stored encrypter is given the decorated service itself.
-     */
     public function testProfilerHandsTheStoredEncrypterAFallbackThatIsNotTracedTwice()
     {
         if (!class_exists(DataKeyStore::class)) {
@@ -475,6 +463,67 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertFalse($container->hasAlias(DataKeyStoreInterface::class));
     }
 
+    public function testStoreWrapsWithTheDefaultClientWhenToldNoOther()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key'],
+            ]);
+        });
+
+        $this->assertSame('app', $container->getDefinition('key_management.store')->getArgument(2));
+    }
+
+    public function testStoreWrapsWithACompositeClientLikeAnyOther()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'azure' => 'backup']],
+                ],
+                'default_client' => 'main',
+                'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key'],
+            ]);
+        });
+
+        $this->assertSame('main', $container->getDefinition('key_management.store')->getArgument(2));
+        $this->assertSame('key_management.envelope_encrypter.main', (string) $container->getDefinition('key_management.stored_envelope_encrypter')->getArgument(1), 'the fallback reads the self-contained envelopes the composite client wrote.');
+    }
+
+    public function testStoreWithoutAClientNorADefaultOneIsRefused()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "key_management.store" needs a client to wrap its data keys with');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                ],
+                'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key'],
+            ]);
+        });
+    }
+
     public function testStoreRejectsAClientThatIsNotRegistered()
     {
         $this->expectException(LogicException::class);
@@ -489,10 +538,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    /**
-     * A store names the client wrapping its data keys, so a store configured without any client is
-     * a configuration that cannot work.
-     */
     public function testStoreWithoutAnyClientIsRefused()
     {
         $this->expectException(LogicException::class);
@@ -516,11 +561,6 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
-    /**
-     * Enabling the bundle without configuring a client stays valid: the factories, the commands and
-     * the blind index listener are what an application registering its clients as services of its
-     * own uses, and it gets no default client since it declared none.
-     */
     public function testWithoutAnyClientRegistersTheFactoriesAndNoDefault()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -584,21 +624,81 @@ class KeyManagementBundleExtensionTest extends TestCase
             ]);
         });
 
-        // `#[Target('vault')] EncrypterInterface $foo` resolves through this alias chain.
         foreach ([EncrypterInterface::class, DecrypterInterface::class, DataKeyGeneratorInterface::class, EnvelopeEncrypterInterface::class, EnvelopeDecrypterInterface::class] as $type) {
             $this->assertTrue($container->hasAlias('.'.$type.' $vault'), $type);
         }
 
-        // The named-argument fallback, which the attribute deprecates, names the role of the service.
         $this->assertSame('key_management.vault', (string) $container->getAlias(EncrypterInterface::class.' $vaultKms'));
         $this->assertSame('key_management.vault', (string) $container->getAlias(DataKeyGeneratorInterface::class.' $vaultKms'));
         $this->assertSame('key_management.envelope_encrypter.vault', (string) $container->getAlias(EnvelopeEncrypterInterface::class.' $vaultEnvelopeEncrypter'));
     }
 
-    /**
-     * Every backend generates data keys, and a blind index is built around one, so an application
-     * registering its own indexes autowires the generator like the rest.
-     */
+    public function testAClientDeclaredByItsMembersIsACompositeOne()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'azure' => 'backup']],
+                ],
+                'default_client' => 'main',
+            ]);
+        });
+
+        $definition = $container->getDefinition('key_management.main');
+        $this->assertSame(CompositeKms::class, $definition->getClass());
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $definition->getArgument(0));
+        $this->assertSame('key_management.client', $definition->getArgument(0)->getTaggedIteratorArgument()->getTag(), 'the members are resolved lazily through the locator of the tagged clients.');
+        $this->assertSame('key', $definition->getArgument(0)->getTaggedIteratorArgument()->getIndexAttribute());
+        $this->assertSame(['aws' => null, 'azure' => 'backup'], $definition->getArgument(1));
+        $this->assertSame('logger', (string) $definition->getArgument(2), 'a member passed over is only ever reported to the logger.');
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $definition->getArgument(2)->getInvalidBehavior());
+        $this->assertSame([['channel' => 'key_management']], $definition->getTag('monolog.logger'));
+        $this->assertSame([['key' => 'main']], $definition->getTag('key_management.client'), 'a composite client is a client like any other for the commands and the profiler.');
+
+        $this->assertSame('key_management.main', (string) $container->getDefinition('key_management.envelope_encrypter.main')->getArgument(0));
+        $this->assertSame('key_management.main', (string) $container->getAlias(EncrypterInterface::class), 'and it is the default when named so, like any other.');
+        $this->assertSame('key_management.envelope_encrypter.main', (string) $container->getAlias(EnvelopeEncrypterInterface::class));
+
+        foreach ([EncrypterInterface::class, DecrypterInterface::class, DataKeyGeneratorInterface::class, EnvelopeEncrypterInterface::class, EnvelopeDecrypterInterface::class] as $type) {
+            $this->assertTrue($container->hasAlias('.'.$type.' $main'), $type);
+            $this->assertTrue($container->hasAlias('.'.$type.' $aws'), 'each member stays reachable on its own.');
+        }
+    }
+
+    public function testAMemberMustBeARegisteredClient()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The member "gcp" of the composite KMS client "main" is not registered in "key_management.clients".');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['aws' => null, 'gcp' => 'backup']],
+                ],
+            ]);
+        });
+    }
+
+    public function testAMemberCannotBeACompositeClientItself()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The member "inner" of the composite KMS client "outer" is a composite client itself');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'inner' => ['members' => ['aws' => null]],
+                    'outer' => ['members' => ['inner' => null]],
+                ],
+                'default_client' => 'outer',
+            ]);
+        });
+    }
+
     public function testTheDefaultClientIsTheDataKeyGeneratorToo()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {

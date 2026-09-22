@@ -269,6 +269,11 @@ the store at the new client so the keys it creates afterwards are wrapped there.
 No payload is read or rewritten, the references stay what they were, and the old
 client goes away once a `--from=aws --dry-run` run lists nothing.
 
+A store wrapping with a `CompositeKms` records that client, so its rows are
+wrapped by every member at once and read through whichever answers. Losing a
+member for good is then a change of members, followed by the same command from
+the composite client to itself, which wraps every key under the new list.
+
 **Rows carrying their own wrapped data key.** Each one is wrapped by the master
 key of the provider that wrote it, so moving to another provider means rewriting
 every row, and a row not yet rewritten still needs the old client to be read. A

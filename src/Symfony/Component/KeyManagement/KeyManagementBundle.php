@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
@@ -84,7 +86,7 @@ class KeyManagementBundle extends AbstractBundle
                     ->defaultNull()
                 ->end()
                 ->arrayNode('clients', 'client')
-                    ->info('Map of client name to DSN; "service://<id>" takes the client the application registered under that service id instead of building one from a DSN.')
+                    ->info('Map of client name to DSN, or to the members of a composite client; "service://<id>" takes the client the application registered under that service id instead of building one from a DSN.')
                     ->beforeNormalization()
                         ->ifString()
                         ->then(static fn (string $dsn): array => ['default' => $dsn])
@@ -93,20 +95,43 @@ class KeyManagementBundle extends AbstractBundle
                     ->useAttributeAsKey('name')
                     ->validate()
                         ->always(static function (array $clients): array {
-                            foreach ($clients as $name => $dsn) {
+                            foreach ($clients as $name => $client) {
                                 if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $name)) {
                                     throw new InvalidArgumentException(\sprintf('The KMS client name "%s" is invalid: it must start with a letter or an underscore and contain only letters, digits, underscores, dots and dashes.', $name));
+                                }
+                                if (\array_key_exists($name, $client['members'])) {
+                                    throw new InvalidArgumentException(\sprintf('The composite KMS client "%s" cannot be a member of itself.', $name));
                                 }
                             }
 
                             return $clients;
                         })
                     ->end()
-                    ->scalarPrototype()
-                        ->cannotBeEmpty()
+                    ->arrayPrototype()
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(static fn (string $dsn): array => ['dsn' => $dsn])
+                        ->end()
                         ->validate()
-                            ->ifTrue(static fn ($dsn): bool => !\is_string($dsn))
-                            ->thenInvalid('The DSN of a KMS client must be a string, got %s.')
+                            ->ifTrue(static fn (array $client): bool => isset($client['dsn']) === (bool) $client['members'])
+                            ->thenInvalid('A KMS client is either a DSN or the members of a composite client, not both nor neither.')
+                        ->end()
+                        ->children()
+                            ->scalarNode('dsn')
+                                ->cannotBeEmpty()
+                                ->validate()
+                                    ->ifTrue(static fn ($dsn): bool => !\is_string($dsn))
+                                    ->thenInvalid('The DSN of a KMS client must be a string, got %s.')
+                                ->end()
+                            ->end()
+                            ->arrayNode('members', 'member')
+                                ->info('Map of member name to the master key it wraps under, null for the key id given to each call. Everything the composite client encrypts is wrapped by each member and read back through the first one that answers, the first member minting the data keys, so that losing one provider loses nothing. Each member is a full path to the data.')
+                                ->normalizeKeys(false)
+                                ->useAttributeAsKey('name')
+                                ->scalarPrototype()
+                                    ->defaultNull()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -119,8 +144,8 @@ class KeyManagementBundle extends AbstractBundle
                             ->cannotBeEmpty()
                         ->end()
                         ->scalarNode('client')
-                            ->info('Name of the client wrapping the data keys this store creates (must match an entry of "clients").')
-                            ->isRequired()
+                            ->info('Name of the client wrapping the data keys this store creates (must match an entry of "clients"); defaults to the default client.')
+                            ->defaultNull()
                             ->cannotBeEmpty()
                         ->end()
                         ->scalarNode('key_id')
@@ -185,13 +210,15 @@ class KeyManagementBundle extends AbstractBundle
             throw new LogicException(\sprintf('Default KMS client "%s" is not registered in "key_management.clients".', $defaultName));
         }
 
-        foreach ($clients as $name => $dsn) {
+        foreach ($clients as $name => $client) {
             $serviceId = 'key_management.'.$name;
 
             $definition = $container->register($serviceId, EncrypterInterface::class)
                 ->addTag('key_management.client', ['key' => $name]);
 
-            if (str_starts_with($dsn, self::SERVICE_SCHEME)) {
+            if ($client['members']) {
+                $this->configureCompositeClient($definition, $name, $client['members'], $clients);
+            } elseif (str_starts_with($dsn = $client['dsn'], self::SERVICE_SCHEME)) {
                 if ('' === $referencedId = substr($dsn, \strlen(self::SERVICE_SCHEME))) {
                     throw new InvalidArgumentException(\sprintf('The DSN of the KMS client "%s" must name a service id after "%s".', $name, self::SERVICE_SCHEME));
                 }
@@ -223,9 +250,42 @@ class KeyManagementBundle extends AbstractBundle
             $container->setAlias(EnvelopeDecrypterInterface::class, 'key_management.envelope_encrypter.'.$defaultName);
         }
 
-        if (isset($config['store']['client'])) {
+        if (isset($config['store']['key_id'])) {
             $this->registerStore($config['store'], array_keys($clients), $defaultName, $container);
         }
+    }
+
+    /**
+     * Registers a composite client as a client like any other, tagged and aliased under its name.
+     *
+     * Its members are the configured clients, resolved lazily through the locator of the tagged
+     * ones, and they are checked here so that a typo is reported at compile time against a name.
+     * A client the application registers itself joins through a "service://" DSN, which makes it
+     * a configured client. A member cannot be composite itself: two of them naming each other
+     * would read in circles.
+     *
+     * @param array<string, string|null>  $members
+     * @param array<string, array<mixed>> $clients
+     */
+    private function configureCompositeClient(Definition $definition, string $name, array $members, array $clients): void
+    {
+        foreach (array_keys($members) as $member) {
+            if (!isset($clients[$member])) {
+                throw new LogicException(\sprintf('The member "%s" of the composite KMS client "%s" is not registered in "key_management.clients".', $member, $name));
+            }
+
+            if ($clients[$member]['members']) {
+                throw new LogicException(\sprintf('The member "%s" of the composite KMS client "%s" is a composite client itself, which is not supported: list its members instead.', $member, $name));
+            }
+        }
+
+        $definition->setClass(CompositeKms::class)
+            ->setArguments([
+                new ServiceLocatorArgument(new TaggedIteratorArgument('key_management.client', 'key', true)),
+                $members,
+                new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+            ])
+            ->addTag('monolog.logger', ['channel' => 'key_management']);
     }
 
     /**
@@ -251,15 +311,16 @@ class KeyManagementBundle extends AbstractBundle
             throw new LogicException(\sprintf('A KMS client cannot be named "%1$s" while a data key store is configured: the store registers the autowiring aliases of that name, which would leave the client of the same name unreachable. Rename the "%1$s" client.', self::STORE_TARGET));
         }
 
-        if (!\in_array($config['client'], $clientNames, true)) {
-            throw new LogicException(\sprintf('The KMS client "%s" set on "key_management.store" is not registered in "key_management.clients".', $config['client']));
+        $client = $config['client'] ?? $defaultName ?? throw new LogicException('The "key_management.store" needs a client to wrap its data keys with: set "key_management.store.client", or "key_management.default_client" to have it inferred.');
+        if (!\in_array($client, $clientNames, true)) {
+            throw new LogicException(\sprintf('The KMS client "%s" set on "key_management.store" is not registered in "key_management.clients".', $client));
         }
 
         $container->register('key_management.store', DataKeyStore::class)
             ->setArguments([
                 new Reference($config['connection']),
                 new ServiceLocatorArgument(new TaggedIteratorArgument('key_management.client', 'key', true)),
-                $config['client'],
+                $client,
                 $config['key_id'],
                 $config['table'],
                 32,

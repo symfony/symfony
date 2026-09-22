@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-22T18:40:11Z
+
+Thank you @janedbal, I squashed and turned the named arguments into positional ones, including the two calls that came in with #66145: parameter names aren't covered by our BC promise so we avoid them on Symfony's own constructors.

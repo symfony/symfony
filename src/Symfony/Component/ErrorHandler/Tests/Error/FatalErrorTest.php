@@ -24,19 +24,12 @@ class FatalErrorTest extends TestCase
 
             return $frame;
         }, $originalExceptionWithTrace->getTrace());
-        $fatalException = new FatalError(
-            message: 'Whoops!',
-            code: 10,
-            error: [
-                'type' => \E_ERROR,
-                'message' => 'Whoops!',
-                'file' => '/path/to/file.php',
-                'line' => 10,
-            ],
-            traceOffset: null,
-            traceArgs: false,
-            trace: $originalExceptionTrace,
-        );
+        $fatalException = new FatalError('Whoops!', 10, [
+            'type' => \E_ERROR,
+            'message' => 'Whoops!',
+            'file' => '/path/to/file.php',
+            'line' => 10,
+        ], null, false, $originalExceptionTrace);
 
         $expectedTrace = array_reduce($originalExceptionTrace, function ($carry, $frame) {
             $this->assertArrayHasKey('args', $frame);
@@ -61,19 +54,12 @@ class FatalErrorTest extends TestCase
 
             return $frame;
         }, $originalExceptionWithTrace->getTrace());
-        $fatalException = new FatalError(
-            message: 'Whoops!',
-            code: 10,
-            error: [
-                'type' => \E_ERROR,
-                'message' => 'Whoops!',
-                'file' => '/path/to/file.php',
-                'line' => 10,
-            ],
-            traceOffset: null,
-            traceArgs: false,
-            trace: $originalExceptionTrace,
-        );
+        $fatalException = new FatalError('Whoops!', 10, [
+            'type' => \E_ERROR,
+            'message' => 'Whoops!',
+            'file' => '/path/to/file.php',
+            'line' => 10,
+        ], null, false, $originalExceptionTrace);
         set_error_handler(fn (int $errno, string $errstr) => $this->fail('Error handler should not be called. Received error: '.$errstr));
 
         try {
@@ -81,5 +67,27 @@ class FatalErrorTest extends TestCase
         } finally {
             restore_error_handler();
         }
+    }
+
+    public function testGetErrorDoesNotKeepTheTrace()
+    {
+        $trace = [
+            ['file' => '/path/to/caller.php', 'line' => 20, 'function' => 'foo', 'args' => ['secret']],
+        ];
+        $fatalError = new FatalError('Whoops!', 0, [
+            'type' => \E_ERROR,
+            'message' => 'Whoops!',
+            'file' => '/path/to/file.php',
+            'line' => 10,
+            'trace' => $trace,
+        ], null, true, $trace);
+
+        $this->assertSame($trace, $fatalError->getTrace());
+        $this->assertSame([
+            'type' => \E_ERROR,
+            'message' => 'Whoops!',
+            'file' => '/path/to/file.php',
+            'line' => 10,
+        ], $fatalError->getError());
     }
 }

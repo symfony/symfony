@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\FileLocatorInterface;
@@ -418,6 +419,16 @@ class YamlFileLoaderTest extends TestCase
         $this->expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "\\d+" of route "foo"');
 
         $loader->load('requirements_without_placeholder_name.yml');
+    }
+
+    #[IgnoreDeprecations]
+    public function testUnusedRequirement()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 8.2: Defining a requirement for the "client" parameter of route "foo_url" is deprecated because this parameter does not exist.');
+
+        $loader->load('unused_requirement.yml');
     }
 
     public function testImportingRoutesWithHostsInImporter()

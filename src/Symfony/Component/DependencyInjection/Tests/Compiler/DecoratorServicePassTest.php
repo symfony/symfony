@@ -224,6 +224,49 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'container.decorator' => [['id' => 'foo', 'inner' => 'deco1.inner']]], $container->getDefinition('deco2')->getTags());
     }
 
+    /**
+     * @dataProvider provideDecoratorsOfDecorators
+     */
+    public function testProcessMovesTagsToTheOutermostDecoratorOfTheService(array $decorators, string $expectedOutermostDecorator)
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setTags(['bar' => ['attr' => 'baz']])
+        ;
+        foreach ($decorators as $id => [$decoratedId, $priority]) {
+            $container->register($id)->setDecoratedService($decoratedId, null, $priority);
+        }
+
+        $this->process($container);
+
+        $this->assertSame([$expectedOutermostDecorator], array_keys($container->findTaggedServiceIds('bar')));
+    }
+
+    public static function provideDecoratorsOfDecorators(): iterable
+    {
+        yield 'decorator of a decorator processed first' => [['deco1' => ['foo', 0], 'deco2' => ['deco1', 5]], 'deco2'];
+        yield 'decorator of a decorator processed in between' => [['deco1' => ['foo', 5], 'deco2' => ['deco1', 3], 'deco3' => ['foo', 0]], 'deco3'];
+        yield 'decorator of an inner decorator' => [['deco1' => ['foo', 0], 'deco2' => ['foo', -1], 'deco3' => ['deco1', 5]], 'deco2'];
+    }
+
+    public function testProcessKeepsTheOrderOfTheDecoratorsOfADecoratorOfAMissingService()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('deco1')
+            ->setDecoratedService('foo', null, 0, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+        ;
+        $container
+            ->register('deco2')
+            ->setDecoratedService('deco1', null, 5)
+        ;
+
+        $this->process($container);
+
+        $this->assertSame('deco2', (string) $container->getAlias('deco1'));
+    }
+
     public function testProcessLeavesServiceLocatorTagOnOriginalDefinition()
     {
         $container = new ContainerBuilder();

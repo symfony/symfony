@@ -33,4 +33,17 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 interface ReAuthenticationEntryPointInterface
 {
     public function startReAuthentication(Request $request, TokenInterface $token): Response;
+
+    /**
+     * Tells whether re-authenticating can satisfy the given denied attribute.
+     *
+     * The firewall asks before starting one, so that what a fresh authentication is worth is
+     * answered by what starts it rather than by a list the firewall holds: an entry point that
+     * can ask its provider for more than a fresh proof, an authentication context class among
+     * it, is the one that knows the attributes naming what it can ask for.
+     *
+     * Returning true for an attribute that a fresh authentication cannot satisfy loops the user
+     * through the provider, so an entry point answers for the attributes it acts on and no other.
+     */
+    public function supportsAttribute(string $attribute): bool;
 }

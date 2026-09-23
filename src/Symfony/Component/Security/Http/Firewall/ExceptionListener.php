@@ -22,7 +22,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -155,27 +154,31 @@ class ExceptionListener
             return;
         }
 
-        // Matching the whole attribute list rather than searching it is deliberate: an
-        // access_control rule is decided on all of its roles at once, so a denial of
-        // [ROLE_ADMIN, IS_AUTHENTICATED_RECENTLY] does not say which one failed, and
-        // re-authenticating would not help a user who simply lacks the role.
         // a firewall entry point that already knows how to force a fresh proof is used
         // without any configuration; one that only starts an ordinary login cannot be,
         // which is exactly what implementing the interface asserts
         $reAuthenticationEntryPoint = $this->reAuthenticationEntryPoint
             ?? ($this->authenticationEntryPoint instanceof ReAuthenticationEntryPointInterface ? $this->authenticationEntryPoint : null);
 
+        // Requiring a single attribute rather than searching the list is deliberate: an
+        // access_control rule is decided on all of its roles at once, so a denial of
+        // [ROLE_ADMIN, IS_AUTHENTICATED_RECENTLY] does not say which one failed, and
+        // re-authenticating would not help a user who simply lacks the role.
+        $attributes = $exception->getAttributes();
+        $attribute = 1 === \count($attributes) && \is_string($attributes[0] ?? null) ? $attributes[0] : null;
+
         if (null !== $token
             && null !== $reAuthenticationEntryPoint
-            && \in_array($exception->getAttributes(), [[AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY], [AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]], true)
+            && null !== $attribute
+            && $reAuthenticationEntryPoint->supportsAttribute($attribute)
         ) {
-            $this->logger?->debug('The authentication is not recent enough, starting re-authentication.', ['entry_point' => $reAuthenticationEntryPoint]);
+            $this->logger?->debug('Re-authenticating, the denied attribute is one the entry point can ask the user for.', ['entry_point' => $reAuthenticationEntryPoint, 'attribute' => $attribute]);
 
             if (!$this->stateless) {
                 $this->setTargetPath($event->getRequest());
             }
 
-            $event->getRequest()->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $exception->getAttributes()[0]);
+            $event->getRequest()->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $attribute);
 
             $event->setResponse($reAuthenticationEntryPoint->startReAuthentication($event->getRequest(), $token));
 

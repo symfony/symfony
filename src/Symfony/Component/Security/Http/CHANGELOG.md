@@ -11,7 +11,7 @@ CHANGELOG
  * Handle security exceptions from a `kernel.exception` listener of the firewall, and deprecate `ExceptionListener::register()`, `ExceptionListener::unregister()` and the `$dispatcher` argument of `Firewall::__construct()`
  * Stop registering `ContextListener::onKernelResponse()` on the event dispatcher at runtime, register it on the `kernel.response` event instead
  * Make `OidcLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, starting an authorization request with `prompt=login` and the previous ID token as `id_token_hint`
- * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when `IS_AUTHENTICATED_RECENTLY` or `IS_AUTHENTICATED_VERY_RECENTLY` is denied
+ * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` for a single denied attribute its `supportsAttribute()` acts on; `OidcLoginAuthenticator` acts on `IS_AUTHENTICATED_RECENTLY` and `IS_AUTHENTICATED_VERY_RECENTLY`
  * Add `IsGrantedContext::isAuthenticatedVeryRecently()`
  * Record the OIDC `acr` claim as the `oidc_acr` token attribute, the authentication context class the provider asserts
  * Add `SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE`, holding the denied attribute while a `ReAuthenticationEntryPointInterface` starts a re-authentication

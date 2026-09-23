@@ -329,7 +329,7 @@ final class Terminal implements TerminalInterface
      */
     private static function createNativeTerminal(): ?\Io\Terminal\Terminal
     {
-        if (\extension_loaded('terminal') && version_compare(phpversion('terminal'), '1.0.0', '>=') && version_compare(phpversion('terminal'), '2.0.0', '<')) {
+        if (\extension_loaded('terminal') && version_compare(phpversion('terminal'), '1.0.0', '>=') && version_compare(phpversion('terminal'), '2.0.0', '<') && class_exists(\Io\Terminal\Terminal::class, false)) {
             return \Io\Terminal\Terminal::create();
         }
 

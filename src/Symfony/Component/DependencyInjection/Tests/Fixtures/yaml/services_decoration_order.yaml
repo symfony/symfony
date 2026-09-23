@@ -1,0 +1,88 @@
+services:
+    http_client:
+        class: stdClass
+        public: true
+        properties:
+            label: original
+
+    retryable:
+        class: stdClass
+        decorates: http_client
+        decoration_priority: 10
+        properties:
+            label: retryable
+            inner: '@.inner'
+
+    traceable:
+        class: stdClass
+        decorates: http_client
+        decoration_priority: 5
+        properties:
+            label: traceable
+            inner: '@.inner'
+
+    uri_template:
+        class: stdClass
+        decorates: http_client
+        decoration_around: retryable
+        decoration_within: traceable
+        properties:
+            label: uri_template
+            inner: '@.inner'
+
+    handler:
+        class: stdClass
+        public: true
+        tags: [app.handler]
+        properties:
+            label: handler
+
+    logging:
+        class: stdClass
+        decorates_tag: app.handler
+        decoration_around: [caching]
+        properties:
+            label: logging
+            inner: '@.inner'
+
+    caching:
+        class: stdClass
+        decorates_tag: app.handler
+        properties:
+            label: caching
+            inner: '@.inner'
+
+    mailer:
+        class: stdClass
+        public: true
+        properties:
+            label: mailer
+
+    mailer_stack:
+        decorates: mailer
+        decoration_priority: 0
+        decoration_around: throttling
+        stack:
+            - class: stdClass
+              properties:
+                  label: A
+                  inner: '@.inner'
+            - class: stdClass
+              properties:
+                  label: B
+                  inner: '@.inner'
+
+    throttling:
+        class: stdClass
+        decorates: mailer
+        properties:
+            label: throttling
+            inner: '@.inner'
+
+    audit:
+        class: stdClass
+        decorates: mailer
+        decoration_within: mailer_stack
+        properties:
+            label: audit
+            inner: '@.inner'

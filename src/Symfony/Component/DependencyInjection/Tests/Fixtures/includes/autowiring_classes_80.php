@@ -173,6 +173,22 @@ class AsDecoratorBar20 implements AsDecoratorInterface
     }
 }
 
+#[AsDecorator(decorates: AsDecoratorFoo::class, within: AsDecoratorBar10::class)]
+class AsDecoratorWithinBar10 implements AsDecoratorInterface
+{
+    public function __construct(#[AutowireDecorated] AsDecoratorInterface $inner)
+    {
+    }
+}
+
+#[AsDecorator(decorates: AsDecoratorFoo::class, priority: 20, around: AsDecoratorBar20::class)]
+class AsDecoratorAroundBar20 implements AsDecoratorInterface
+{
+    public function __construct(#[AutowireDecorated] AsDecoratorInterface $inner)
+    {
+    }
+}
+
 #[AsDecorator(decorates: \NonExistent::class, onInvalid: ContainerInterface::NULL_ON_INVALID_REFERENCE)]
 class AsDecoratorBaz implements AsDecoratorInterface
 {
@@ -194,6 +210,14 @@ class AsDecoratorMultipleBar implements AsDecoratorInterface
 class AsDecoratorMultiple implements AsDecoratorInterface
 {
     public function __construct(string $arg1, #[AutowireDecorated] AsDecoratorInterface $inner)
+    {
+    }
+}
+
+#[AsDecorator(decorates: AsDecoratorMultipleFoo::class, around: 'app.multiple')]
+class AsDecoratorAroundMultiple implements AsDecoratorInterface
+{
+    public function __construct(#[AutowireDecorated] AsDecoratorInterface $inner)
     {
     }
 }
@@ -308,6 +332,22 @@ class AsTagDecoratorBar implements AsTagDecoratorInterface
 
 #[AsTagDecorator('test.tag')]
 class AsTagDecoratorService implements AsTagDecoratorInterface
+{
+    public function __construct(#[AutowireDecorated] AsTagDecoratorInterface $inner)
+    {
+    }
+}
+
+#[AsTagDecorator(tag: 'test.tag', around: AsTagDecoratorService::class)]
+class AsTagDecoratorAroundService implements AsTagDecoratorInterface
+{
+    public function __construct(#[AutowireDecorated] AsTagDecoratorInterface $inner)
+    {
+    }
+}
+
+#[AsTagDecorator(tag: 'test.tag', around: 'app.tag_decorator')]
+class AsTagDecoratorAroundServiceId implements AsTagDecoratorInterface
 {
     public function __construct(#[AutowireDecorated] AsTagDecoratorInterface $inner)
     {

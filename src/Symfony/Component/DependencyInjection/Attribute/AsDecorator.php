@@ -20,14 +20,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class AsDecorator
 {
     /**
-     * @param string $decorates The service id to decorate
-     * @param int    $priority  The priority of this decoration when multiple decorators are declared for the same service
-     * @param int    $onInvalid The behavior to adopt when the decoration is invalid; must be one of the {@see ContainerInterface} constants
+     * @param string                   $decorates The service id to decorate
+     * @param int|null                 $priority  The priority of this decoration; null lets "within"/"around" decide it, else they only reorder the decorators that share it
+     * @param int                      $onInvalid The behavior to adopt when the decoration is invalid; must be one of the {@see ContainerInterface} constants
+     * @param string|list<string>|null $within    Decorators of the same service that wrap this one, as service ids or classes
+     * @param string|list<string>|null $around    Decorators of the same service that this one wraps, as service ids or classes
      */
     public function __construct(
         public string $decorates,
-        public int $priority = 0,
+        public ?int $priority = null,
         public int $onInvalid = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+        public string|array|null $within = null,
+        public string|array|null $around = null,
     ) {
     }
 }

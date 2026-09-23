@@ -104,6 +104,54 @@ class ResolveDecoratorStackPassTest extends TestCase
         $this->assertTrue($innermostFound, 'The innermost stack definition should decorate "original_service"');
     }
 
+    public function testStackDecoratesWithOrderConstraints()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('original_service', \stdClass::class);
+
+        $stack = (new ChildDefinition(''))
+            ->addTag('container.stack')
+            ->addTag('container.decoration_order', ['around' => ['other_decorator']])
+            ->setArguments([
+                new Definition(\stdClass::class),
+                new Definition(\stdClass::class),
+            ])
+            ->setDecoratedService('original_service')
+        ;
+
+        $container->setDefinition('my_stack', $stack);
+
+        (new ResolveDecoratorStackPass())->process($container);
+
+        $this->assertSame(['original_service', null, 0], $container->getDefinition('.my_stack.1')->getDecoratedService());
+        $this->assertSame([['around' => ['other_decorator']], ['alias' => 'my_stack']], $container->getDefinition('.my_stack.1')->getTag('container.decoration_order'));
+        $this->assertFalse($container->getDefinition('.my_stack.0')->hasTag('container.decoration_order'));
+    }
+
+    public function testStackDecoratingATagCanBeTargetedByItsId()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', \stdClass::class)->addTag('my_tag');
+
+        $stack = (new ChildDefinition(''))
+            ->addTag('container.stack')
+            ->addResourceTag('container.tag_decorator', ['decorates_tag' => 'my_tag'])
+            ->setArguments([
+                new Definition(\stdClass::class),
+                new Definition(\stdClass::class),
+            ])
+        ;
+
+        $container->setDefinition('my_stack', $stack);
+
+        (new ResolveDecoratorStackPass())->process($container);
+
+        $this->assertSame(['foo', null, 0], $container->getDefinition('..stack.foo.my_stack.1')->getDecoratedService());
+        $this->assertContains(['alias' => 'my_stack'], $container->getDefinition('..stack.foo.my_stack.1')->getTag('container.decoration_order'));
+    }
+
     public function testStackDecoratesWithInvalidBehavior()
     {
         $container = new ContainerBuilder();

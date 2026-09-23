@@ -1465,6 +1465,53 @@ class YamlFileLoaderTest extends TestCase
         yield 'calls' => ['calls', [['method' => 'setFoo', 'arguments' => ['bar']]]];
     }
 
+    public function testDecorationOrder()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_decoration_order.yaml');
+
+        $this->assertSame([['within' => ['traceable'], 'around' => ['retryable'], 'priority' => null]], $container->getDefinition('uri_template')->getTag('container.decoration_order'));
+        $this->assertSame([['around' => ['caching'], 'priority' => null]], $container->getDefinition('logging')->getTag('container.decoration_order'));
+        $this->assertSame([['around' => ['throttling']]], $container->getDefinition('mailer_stack')->getTag('container.decoration_order'));
+        $this->assertFalse($container->getDefinition('retryable')->hasTag('container.decoration_order'));
+
+        $container->compile();
+
+        $this->assertEquals((object) [
+            'label' => 'traceable',
+            'inner' => (object) [
+                'label' => 'uri_template',
+                'inner' => (object) [
+                    'label' => 'retryable',
+                    'inner' => (object) ['label' => 'original'],
+                ],
+            ],
+        ], $container->get('http_client'));
+
+        $this->assertEquals((object) [
+            'label' => 'logging',
+            'inner' => (object) [
+                'label' => 'caching',
+                'inner' => (object) ['label' => 'handler'],
+            ],
+        ], $container->get('handler'));
+
+        $this->assertEquals((object) [
+            'label' => 'A',
+            'inner' => (object) [
+                'label' => 'B',
+                'inner' => (object) [
+                    'label' => 'audit',
+                    'inner' => (object) [
+                        'label' => 'throttling',
+                        'inner' => (object) ['label' => 'mailer'],
+                    ],
+                ],
+            ],
+        ], $container->get('mailer'));
+    }
+
     public function testDecoratesTag()
     {
         $container = new ContainerBuilder();

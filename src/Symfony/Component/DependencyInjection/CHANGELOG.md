@@ -9,6 +9,7 @@ CHANGELOG
  * Pass top-level extension values that are not arrays to the extension instead of replacing them with an empty array, so that a configuration tree can accept a scalar at its root
  * Add the `before` and `after` tag attributes and `#[AsTaggedItem]` arguments to order tagged services
  * Add `BeforeAfterSorter`
+ * Add `within` and `around` to `#[AsDecorator]` and `#[AsTagDecorator]`, the `decoration_within` and `decoration_around` keys and the `container.decoration_order` tag, to order decorators
  * Name the package to install when an extension is missing, for the configuration keys declared in the `.container.extension_packages` build parameter
  * Add the `container.remove_if_missing` tag to drop a definition when a service, a class or a package it needs is not there
  * Add `ContainerBuilder::setExtensionConfig()`

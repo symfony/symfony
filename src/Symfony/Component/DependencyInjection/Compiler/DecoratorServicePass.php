@@ -34,12 +34,20 @@ class DecoratorServicePass extends AbstractRecursivePass
     {
         $definitions = new \SplPriorityQueue();
         $order = \PHP_INT_MAX;
+        $orderTags = $priorities = [];
 
         foreach ($container->getDefinitions() as $id => $definition) {
+            if ($definition->hasTag('container.decoration_order')) {
+                $orderTags[$id] = $definition->getTag('container.decoration_order');
+                $definition->clearTag('container.decoration_order');
+            }
             if (!$decorated = $definition->getDecoratedService()) {
                 continue;
             }
             $definitions->insert([$id, $definition], [$decorated[2], --$order]);
+        }
+        if ($orderTags) {
+            [$definitions, $priorities] = self::sortByOrderConstraints($container, $definitions, $orderTags);
         }
         $decoratingDefinitions = [];
         $decoratedIds = [];
@@ -69,7 +77,7 @@ class DecoratorServicePass extends AbstractRecursivePass
 
             $definition->innerServiceId = $renamedId;
             $definition->decorationOnInvalid = $invalidBehavior;
-            $definition->decorationPriority = $decoratedService[2];
+            $definition->decorationPriority = $priorities[$id] ?? $decoratedService[2];
 
             // we create a new alias/service for the service we are replacing
             // to be able to reference it in the new one
@@ -175,5 +183,81 @@ class DecoratorServicePass extends AbstractRecursivePass
         }
 
         return array_merge($sorted, $delayed);
+    }
+
+    /**
+     * @param \SplPriorityQueue<array{int, int}, array{string, Definition}> $queue
+     * @param array<string, list<array<string, mixed>>>                     $orderTags
+     *
+     * @return array{list<array{string, Definition}>, array<string, int>} The decorators in the order to process them, and the priorities of the reordered ones
+     */
+    private static function sortByOrderConstraints(ContainerBuilder $container, \SplPriorityQueue $queue, array $orderTags): array
+    {
+        $definitions = iterator_to_array($queue, false);
+        $groups = $priorities = [];
+
+        foreach ($definitions as $i => [$id, $definition]) {
+            $groups[$definition->getDecoratedService()[0]][$i] = $id;
+        }
+
+        foreach ($groups as $inner => $ids) {
+            $groupPriorities = $constraints = $keysById = $aliases = [];
+
+            foreach ($ids as $i => $id) {
+                $definition = $definitions[$i][1];
+                $priority = $definition->getDecoratedService()[2];
+
+                foreach ($orderTags[$id] ?? [] as $tag) {
+                    foreach (['within', 'around'] as $direction) {
+                        if ($targets = (array) ($tag[$direction] ?? [])) {
+                            $constraints[$id][$direction] = [...$constraints[$id][$direction] ?? [], ...$targets];
+                        }
+                    }
+
+                    foreach ((array) ($tag['alias'] ?? []) as $alias) {
+                        $aliases[$alias][] = $id;
+                    }
+                }
+
+                // a "priority" in the tag replaces the decoration priority, null letting the constraints decide
+                foreach ($orderTags[$id] ?? [] as $tag) {
+                    if (\array_key_exists('priority', $tag)) {
+                        $priority = $tag['priority'];
+                        break;
+                    }
+                }
+
+                $groupPriorities[$id] = $priority;
+                $keysById[$id] = [$id];
+
+                if ($class = $container->getParameterBag()->resolveValue($definition->getClass())) {
+                    $aliases[$class][] = $id;
+                }
+            }
+
+            if (!$constraints) {
+                continue;
+            }
+
+            try {
+                $sorted = BeforeAfterSorter::sortWithPriorities($groupPriorities, $constraints, $keysById + $aliases, 'within', 'around');
+            } catch (InvalidArgumentException $e) {
+                throw new InvalidArgumentException(\sprintf('Invalid "within"/"around" constraints on the decorators of "%s": ', $inner).lcfirst($e->getMessage()), 0, $e);
+            }
+
+            // the group takes back the slots it had, so that decorators of other services keep their place
+            $entries = [];
+            foreach ($ids as $i => $id) {
+                $entries[$id] = $definitions[$i];
+            }
+            $slots = array_keys($ids);
+            foreach (array_keys($sorted) as $n => $id) {
+                $definitions[$slots[$n]] = $entries[$id];
+            }
+
+            $priorities += $sorted;
+        }
+
+        return [$definitions, $priorities];
     }
 }

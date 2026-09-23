@@ -47,6 +47,8 @@ DependencyInjection
    dispatcher of the application, which must not be mutated at runtime, so the type to ask for is the one
    that only dispatches. A service that needs to read the listeners of the dispatcher, a debug tool for
    instance, can still be given the `event_dispatcher` service explicitly
+ * `AsDecorator::$priority` and `AsTagDecorator::$priority` are now `?int` and default to `null`, which means "no priority declared".
+   Code that read the properties as an `int` should read `$attribute->priority ?? 0`
 
 DoctrineBridge
 --------------

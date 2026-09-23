@@ -122,6 +122,7 @@ class UlidTest extends TestCase
         $this->assertTrue(Ulid::isValid('00000000000000000000000000'));
         $this->assertTrue(Ulid::isValid('1BVXue8CnY8ogucrHX3TeF', Ulid::FORMAT_BASE_58));
         $this->assertFalse(Ulid::isValid('1BVXue8CnY8ogucrHX3TeF', Ulid::FORMAT_BASE_32));
+        $this->assertFalse(Ulid::isValid('zzzzzzzzzzzzzzzzzzzzzz', Ulid::FORMAT_BASE_58));
         $this->assertTrue(Ulid::isValid('0177058f-4dac-d0b2-a990-a49af02bc008', Ulid::FORMAT_RFC_4122));
         $this->assertFalse(Ulid::isValid('0177058f-4dac-d0b2-a990-a49af02bc008', Ulid::FORMAT_BASE_32));
         $this->assertTrue(Ulid::isValid("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08", Ulid::FORMAT_BINARY));

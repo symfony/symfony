@@ -17,6 +17,7 @@ use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -167,7 +168,7 @@ class WebDebugToolbarStreamedResponseListenerTest extends TestCase
         $events = WebDebugToolbarListener::getSubscribedEvents();
 
         $this->assertArrayHasKey(KernelEvents::RESPONSE, $events);
-        $this->assertSame(['onKernelResponse', -2048], $events[KernelEvents::RESPONSE]);
+        $this->assertSame(['method' => 'onKernelResponse', 'priority' => -2048, 'after' => ProfilerListener::class], $events[KernelEvents::RESPONSE]);
     }
 
     private function getTwigStub(string $render = 'WDT'): Environment

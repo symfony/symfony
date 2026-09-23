@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -215,8 +216,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // Run after ProfilerListener::onKernelResponse since we need the X-Debug-Token header
-            KernelEvents::RESPONSE => ['onKernelResponse', -2048],
+            // needs the X-Debug-Token header
+            KernelEvents::RESPONSE => ['method' => 'onKernelResponse', 'priority' => -2048, 'after' => ProfilerListener::class],
         ];
     }
 }

@@ -82,9 +82,8 @@ final class OidcEndSessionListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // before the default logout listener at priority 64, whose response this
-            // one replaces when RP-Initiated Logout is enabled
-            LogoutEvent::class => ['onLogout', 65],
+            // replaces the response of the default logout listener when RP-Initiated Logout is enabled
+            LogoutEvent::class => ['method' => 'onLogout', 'priority' => 65, 'before' => DefaultLogoutListener::class],
         ];
     }
 }

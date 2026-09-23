@@ -62,8 +62,8 @@ final class ReleaseDeduplicationLockOnFailureListener implements EventSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
-            // must have lower priority than SendFailedMessageForRetryListener (100) so willRetry() is already set
-            WorkerMessageFailedEvent::class => ['onMessageFailed', 0],
+            // willRetry() must already be set
+            WorkerMessageFailedEvent::class => ['method' => 'onMessageFailed', 'priority' => 0, 'after' => SendFailedMessageForRetryListener::class],
         ];
     }
 }

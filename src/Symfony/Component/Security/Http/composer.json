@@ -39,6 +39,7 @@
         "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {
+        "symfony/event-dispatcher": "<8.2",
         "symfony/http-client-contracts": "<3.0",
         "symfony/security-bundle": "<8.2"
     },

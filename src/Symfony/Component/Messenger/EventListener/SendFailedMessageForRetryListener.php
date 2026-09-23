@@ -109,8 +109,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // must have higher priority than SendFailedMessageToFailureTransportListener
-            WorkerMessageFailedEvent::class => ['onMessageFailed', 100],
+            WorkerMessageFailedEvent::class => ['method' => 'onMessageFailed', 'priority' => 100, 'before' => SendFailedMessageToFailureTransportListener::class],
         ];
     }
 

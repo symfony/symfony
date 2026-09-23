@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -169,8 +170,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // priority higher than RouterListener
-            KernelEvents::REQUEST => [['onKernelRequest', 35]],
+            KernelEvents::REQUEST => ['method' => 'onKernelRequest', 'priority' => 35, 'before' => RouterListener::class],
             // Highest priority possible to bypass all other listeners
             KernelEvents::RESPONSE => [['onKernelResponse', 2048]],
         ];

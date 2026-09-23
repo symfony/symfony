@@ -32,6 +32,9 @@
         "symfony/notifier": "^8.2",
         "symfony/var-dumper": "^7.4|^8.0"
     },
+    "conflict": {
+        "symfony/event-dispatcher": "<8.2"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Monolog\\": "" },
         "exclude-from-classmap": [

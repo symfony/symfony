@@ -24,7 +24,9 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\EventDispatcher\CompiledEventDispatcher;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
+use Symfony\Component\EventDispatcher\DependencyInjection\CompileListenersPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -36,6 +38,96 @@ use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedUnionTypeListener;
 
 class RegisterListenersPassTest extends TestCase
 {
+    public function testRelativeListenerOrderOverridesPriority()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('event_dispatcher', EventDispatcher::class);
+        $builder->register('first')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'priority' => 100]);
+        $builder->register('second')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'priority' => -100, 'before' => 'first']);
+        $builder->register('third')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'after' => ['first', 'missing']]);
+
+        (new RegisterListenersPass())->process($builder);
+
+        $calls = $builder->getDefinition('event_dispatcher')->getMethodCalls();
+        $priorities = [];
+        foreach ($calls as [, $arguments]) {
+            $priorities[(string) $arguments[1][0]->getValues()[0]] = $arguments[2];
+        }
+
+        $this->assertGreaterThan($priorities['first'], $priorities['second']);
+        $this->assertGreaterThan($priorities['third'], $priorities['first']);
+
+        $dispatcher = new EventDispatcher();
+        $fired = [];
+        foreach ($calls as [, $arguments]) {
+            $id = (string) $arguments[1][0]->getValues()[0];
+            $dispatcher->addListener($arguments[0], static function () use (&$fired, $id) {
+                $fired[] = $id;
+            }, $arguments[2]);
+        }
+        $dispatcher->dispatch(new \stdClass(), 'event');
+        $this->assertSame(['second', 'first', 'third'], $fired);
+    }
+
+    public function testRelativeListenerOrderFallsBackToPriorityWhenTargetIsMissing()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('event_dispatcher', EventDispatcher::class);
+        $builder->register('first')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'priority' => 10, 'after' => 'missing']);
+        $builder->register('second')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke']);
+
+        (new RegisterListenersPass())->process($builder);
+
+        $calls = $builder->getDefinition('event_dispatcher')->getMethodCalls();
+        $this->assertSame([10, 0], array_column(array_column($calls, 1), 2));
+    }
+
+    public function testRelativeListenerOrderIncludesSubscribers()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('event_dispatcher', EventDispatcher::class);
+        $builder->register('first')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'priority' => 100]);
+        $builder->register('subscriber', SubscriberService::class)->addTag('kernel.event_subscriber', ['before' => 'first']);
+
+        (new RegisterListenersPass())->process($builder);
+
+        $calls = $builder->getDefinition('event_dispatcher')->getMethodCalls();
+        $priorities = [];
+        foreach ($calls as [, $arguments]) {
+            $priorities[(string) $arguments[1][0]->getValues()[0]] = $arguments[2];
+        }
+
+        $this->assertGreaterThan($priorities['first'], $priorities['subscriber']);
+    }
+
+    public function testRelativeListenerOrderRejectsCycles()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('event_dispatcher', EventDispatcher::class);
+        $builder->register('first')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'after' => 'second']);
+        $builder->register('second')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'after' => 'first']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Circular "before" or "after" ordering detected.');
+
+        (new RegisterListenersPass())->process($builder);
+    }
+
+    public function testRelativeListenerOrderIsPreservedByCompiledDispatcher()
+    {
+        $builder = new ContainerBuilder();
+        $definition = $builder->register('event_dispatcher', EventDispatcher::class)->addTag('event_dispatcher.dispatcher');
+        $builder->register('first')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'priority' => 100]);
+        $builder->register('second')->addTag('kernel.event_listener', ['event' => 'event', 'method' => '__invoke', 'before' => 'first']);
+
+        (new RegisterListenersPass())->process($builder);
+        (new CompileListenersPass())->process($builder);
+
+        $this->assertSame(CompiledEventDispatcher::class, $definition->getClass());
+        $listeners = $definition->getArguments()[0]['event'];
+        $this->assertSame(['second', 'first'], array_column(array_merge(...array_values($listeners)), 0));
+    }
+
     /**
      * Tests that event subscribers not implementing EventSubscriberInterface
      * trigger an exception.

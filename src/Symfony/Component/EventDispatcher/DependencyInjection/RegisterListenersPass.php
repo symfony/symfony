@@ -13,6 +13,7 @@ namespace Symfony\Component\EventDispatcher\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\RelativeOrderer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -80,6 +81,7 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         $globalDispatcherDefinition = $container->findDefinition('event_dispatcher');
+        $listenerCalls = [];
 
         foreach ($container->findTaggedServiceIds('kernel.event_listener', true) as $id => $events) {
             $noPreload = 0;
@@ -127,7 +129,7 @@ class RegisterListenersPass implements CompilerPassInterface
                     $dispatcherDefinition = $container->findDefinition($event['dispatcher']);
                 }
 
-                $dispatcherDefinition->addMethodCall('addListener', [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority]);
+                $listenerCalls[] = [$dispatcherDefinition, $id, $event['event'], [$event['event'], [new ServiceClosureArgument(new Reference($id)), $event['method']], $priority], $event['before'] ?? [], $event['after'] ?? []];
 
                 if (isset($hotPathEvents[$event['event']])) {
                     $container->getDefinition($id)->addTag('container.hot_path');
@@ -163,11 +165,12 @@ class RegisterListenersPass implements CompilerPassInterface
                     continue;
                 }
 
-                $dispatcherDefinitions[$attributes['dispatcher']] = $container->findDefinition($attributes['dispatcher']);
+                $dispatcherDefinitions[$attributes['dispatcher']] = [$container->findDefinition($attributes['dispatcher']), $attributes['before'] ?? [], $attributes['after'] ?? []];
             }
 
             if (!$dispatcherDefinitions) {
-                $dispatcherDefinitions = [$globalDispatcherDefinition];
+                $attributes = $tags[0] ?? [];
+                $dispatcherDefinitions = [[$globalDispatcherDefinition, $attributes['before'] ?? [], $attributes['after'] ?? []]];
             }
 
             $noPreload = 0;
@@ -176,8 +179,8 @@ class RegisterListenersPass implements CompilerPassInterface
             $extractingDispatcher->addSubscriber($extractingDispatcher);
             foreach ($extractingDispatcher->listeners as $args) {
                 $args[1] = [new ServiceClosureArgument(new Reference($id)), $args[1]];
-                foreach ($dispatcherDefinitions as $dispatcherDefinition) {
-                    $dispatcherDefinition->addMethodCall('addListener', $args);
+                foreach ($dispatcherDefinitions as [$dispatcherDefinition, $before, $after]) {
+                    $listenerCalls[] = [$dispatcherDefinition, $id, $args[0], $args, $before, $after];
                 }
 
                 if (isset($hotPathEvents[$args[0]])) {
@@ -191,6 +194,42 @@ class RegisterListenersPass implements CompilerPassInterface
             }
             $extractingDispatcher->listeners = [];
             ExtractingEventDispatcher::$aliases = [];
+        }
+
+        $this->registerOrderedListeners($listenerCalls);
+    }
+
+    private function registerOrderedListeners(array $listenerCalls): void
+    {
+        $groups = [];
+        foreach ($listenerCalls as $position => [$dispatcher, , $event]) {
+            $groups[spl_object_id($dispatcher)][$event][] = $position;
+        }
+
+        foreach ($groups as $events) {
+            foreach ($events as $positions) {
+                usort($positions, static fn ($a, $b) => $listenerCalls[$b][3][2] <=> $listenerCalls[$a][3][2] ?: $a <=> $b);
+                $orders = array_map(static fn ($position) => ['id' => $listenerCalls[$position][1], 'before' => $listenerCalls[$position][4], 'after' => $listenerCalls[$position][5]], $positions);
+                if (!array_filter($orders, static fn ($order) => (array) $order['before'] || (array) $order['after'])) {
+                    continue;
+                }
+
+                if (!class_exists(RelativeOrderer::class)) {
+                    throw new \LogicException('Relative listener ordering requires symfony/dependency-injection 8.2 or later.');
+                }
+
+                $sorted = array_map(static fn ($position) => $positions[$position], RelativeOrderer::sort($orders));
+
+                if ($sorted !== $positions) {
+                    foreach ($sorted as $rank => $position) {
+                        $listenerCalls[$position][3][2] = \count($sorted) - $rank;
+                    }
+                }
+            }
+        }
+
+        foreach ($listenerCalls as [$dispatcher, , , $arguments]) {
+            $dispatcher->addMethodCall('addListener', $arguments);
         }
     }
 

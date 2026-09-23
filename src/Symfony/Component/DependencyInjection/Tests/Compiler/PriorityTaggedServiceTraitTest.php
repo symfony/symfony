@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedForInvalidDefaultMethodClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\IntTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\RelativeOrderedTaggedService;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 class PriorityTaggedServiceTraitTest extends TestCase
@@ -97,6 +98,64 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $container = new ContainerBuilder();
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
         $this->assertEquals([], $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+    }
+
+    public function testRelativeOrderOverridesPriorityAndIgnoresMissingServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first')->addTag('my_custom_tag', ['priority' => 100]);
+        $container->register('second')->addTag('my_custom_tag', ['priority' => -100, 'before' => 'first']);
+        $container->register('third')->addTag('my_custom_tag', ['priority' => 50, 'after' => ['second', 'missing']]);
+
+        $services = (new PriorityTaggedServiceTraitImplementation())->test('my_custom_tag', $container);
+
+        $this->assertEquals([new Reference('second'), new Reference('first'), new Reference('third')], $services);
+    }
+
+    public function testRelativeOrderFallsBackToPriorityWhenTargetIsMissing()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first')->addTag('my_custom_tag', ['priority' => 10, 'after' => 'missing']);
+        $container->register('second')->addTag('my_custom_tag');
+
+        $services = (new PriorityTaggedServiceTraitImplementation())->test('my_custom_tag', $container);
+
+        $this->assertEquals([new Reference('first'), new Reference('second')], $services);
+    }
+
+    public function testRelativeOrderUsesServiceIdsForIndexedIterators()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first', \stdClass::class)->addTag('my_custom_tag', ['key' => 'one', 'priority' => 10]);
+        $container->register('second', \stdClass::class)->addTag('my_custom_tag', ['key' => 'two', 'after' => 'first']);
+        $container->register('third', \stdClass::class)->addTag('my_custom_tag', ['key' => 'three', 'before' => 'first']);
+
+        $services = (new PriorityTaggedServiceTraitImplementation())->test(new TaggedIteratorArgument('my_custom_tag', 'key'), $container);
+
+        $this->assertSame(['three', 'one', 'two'], array_keys($services));
+    }
+
+    public function testRelativeOrderRejectsCycles()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first')->addTag('my_custom_tag', ['after' => 'second']);
+        $container->register('second')->addTag('my_custom_tag', ['after' => 'first']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Circular "before" or "after" ordering detected.');
+
+        (new PriorityTaggedServiceTraitImplementation())->test('my_custom_tag', $container);
+    }
+
+    public function testRelativeOrderFromAsTaggedItemAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first')->addTag('my_custom_tag', ['priority' => 10]);
+        $container->register('second', RelativeOrderedTaggedService::class)->setAutoconfigured(true)->addTag('my_custom_tag');
+
+        $services = (new PriorityTaggedServiceTraitImplementation())->test('my_custom_tag', $container);
+
+        $this->assertEquals([new Reference('second'), new Reference('first')], $services);
     }
 
     public function testOnlyTheFirstNonIndexedTagIsListed()

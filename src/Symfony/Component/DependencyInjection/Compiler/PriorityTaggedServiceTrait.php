@@ -59,6 +59,7 @@ trait PriorityTaggedServiceTrait
             }
 
             $defaultPriority = $defaultAttributePriority = null;
+            $defaultAttributeBefore = $defaultAttributeAfter = [];
             $defaultIndex = $defaultAttributeIndex = null;
             $indexes = [];
             $definition = $container->getDefinition($serviceId);
@@ -72,10 +73,14 @@ trait PriorityTaggedServiceTrait
                 $phpAttributes[$i] = [
                     'priority' => $attribute->priority,
                     $indexAttribute ?? '' => $attribute->index,
+                    'before' => $attribute->before,
+                    'after' => $attribute->after,
                 ];
                 if (null === $defaultAttributePriority) {
                     $defaultAttributePriority = $attribute->priority ?? 0;
                     $defaultAttributeIndex = $attribute->index;
+                    $defaultAttributeBefore = $attribute->before;
+                    $defaultAttributeAfter = $attribute->after;
                 }
             }
             if (1 >= \count($phpAttributes)) {
@@ -114,7 +119,7 @@ trait PriorityTaggedServiceTrait
                 $priority ??= $defaultPriority ??= 0;
 
                 if (null === $indexAttribute && !$defaultIndexMethod && !$needsIndexes) {
-                    $services[] = [$priority, $i, null, $serviceId, null];
+                    $services[] = [$priority, $i, null, $serviceId, null, $attribute['before'] ?? $defaultAttributeBefore, $attribute['after'] ?? $defaultAttributeAfter];
                     continue 2;
                 }
 
@@ -140,11 +145,12 @@ trait PriorityTaggedServiceTrait
                 }
                 $indexes[$index] = true;
 
-                $services[] = [$priority, $i, $index, $serviceId, $class];
+                $services[] = [$priority, $i, $index, $serviceId, $class, $attribute['before'] ?? $defaultAttributeBefore, $attribute['after'] ?? $defaultAttributeAfter];
             }
         }
 
         uasort($services, static fn ($a, $b) => $b[0] <=> $a[0] ?: $a[1] <=> $b[1]);
+        $services = $this->sortByRelativeOrder($services);
 
         $refs = [];
         foreach ($services as [, , $index, $serviceId, $class]) {
@@ -162,6 +168,14 @@ trait PriorityTaggedServiceTrait
         }
 
         return $refs;
+    }
+
+    private function sortByRelativeOrder(array $services): array
+    {
+        $services = array_values($services);
+        $orders = array_map(static fn ($service) => ['id' => $service[3], 'before' => $service[5], 'after' => $service[6]], $services);
+
+        return array_map(static fn ($position) => $services[$position], RelativeOrderer::sort($orders));
     }
 }
 

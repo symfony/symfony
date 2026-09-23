@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `Compiler\RelativeOrderer` and support optional `before` and `after` service ids on tagged iterators and `#[AsTaggedItem]`
  * Add an autowiring alias for `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`
  * Deprecate the `Symfony\Component\EventDispatcher\EventDispatcherInterface` autowiring alias, type the one from the EventDispatcher contracts instead
  * Pass top-level extension values that are not arrays to the extension instead of replacing them with an empty array, so that a configuration tree can accept a scalar at its root

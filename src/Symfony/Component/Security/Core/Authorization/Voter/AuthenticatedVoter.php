@@ -136,6 +136,14 @@ class AuthenticatedVoter implements CacheableVoterInterface
                     break;
                 }
             }
+
+            foreach ([self::IS_AUTHENTICATED_VERY_RECENTLY, self::IS_AUTHENTICATED_RECENTLY] as $attribute) {
+                if (null !== $vote && \in_array($attribute, $attributes, true)) {
+                    $vote->requestReAuthentication($attribute);
+
+                    break;
+                }
+            }
         }
 
         return $result;

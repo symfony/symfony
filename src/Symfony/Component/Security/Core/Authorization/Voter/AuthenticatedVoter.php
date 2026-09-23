@@ -38,6 +38,14 @@ class AuthenticatedVoter implements CacheableVoterInterface
     public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
 
     /**
+     * Key of Vote::$extraData a voter sets to the attribute it denied when a fresh authentication could grant it.
+     *
+     * The firewall then starts a re-authentication rather than answering with a 403.
+     * With a strategy other than "affirmative", another voter denying the same attribute can leave the user denied after re-authenticating.
+     */
+    public const RE_AUTHENTICATION = 're_authentication';
+
+    /**
      * Most restrictive first: only the reason of the strictest attribute that failed is reported.
      */
     private const DENIAL_REASONS = [
@@ -132,6 +140,14 @@ class AuthenticatedVoter implements CacheableVoterInterface
             foreach (self::DENIAL_REASONS as $deniedAttribute => $reason) {
                 if (\in_array($deniedAttribute, $attributes, true)) {
                     $vote?->addReason($reason);
+
+                    break;
+                }
+            }
+
+            foreach ([self::IS_AUTHENTICATED_VERY_RECENTLY, self::IS_AUTHENTICATED_RECENTLY] as $attribute) {
+                if (null !== $vote && \in_array($attribute, $attributes, true)) {
+                    $vote->extraData[self::RE_AUTHENTICATION] = $attribute;
 
                     break;
                 }

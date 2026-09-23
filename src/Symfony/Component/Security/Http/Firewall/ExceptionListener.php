@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -155,10 +156,9 @@ class ExceptionListener
             return;
         }
 
-        // Matching the whole attribute list rather than searching it is deliberate: an
-        // access_control rule is decided on all of its roles at once, so a denial of
-        // [ROLE_ADMIN, IS_AUTHENTICATED_RECENTLY] does not say which one failed, and
-        // re-authenticating would not help a user who simply lacks the role.
+        // Requiring a single attribute is deliberate: an access_control rule is decided on all of its roles at once,
+        // so a denial of [ROLE_ADMIN, IS_AUTHENTICATED_RECENTLY] does not say which one failed,
+        // and re-authenticating would not help a user who simply lacks the role.
         // a firewall entry point that already knows how to force a fresh proof is used
         // without any configuration; one that only starts an ordinary login cannot be,
         // which is exactly what implementing the interface asserts
@@ -167,7 +167,8 @@ class ExceptionListener
 
         if (null !== $token
             && null !== $reAuthenticationEntryPoint
-            && \in_array($exception->getAttributes(), [[AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY], [AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]], true)
+            && 1 === \count($exception->getAttributes())
+            && self::isCurableByReAuthentication($exception)
         ) {
             $this->logger?->debug('The authentication is not recent enough, starting re-authentication.', ['entry_point' => $reAuthenticationEntryPoint]);
 
@@ -248,6 +249,25 @@ class ExceptionListener
         if ($request->hasSession() && $request->isMethodSafe() && !$request->isXmlHttpRequest()) {
             $this->saveTargetPath($request->getSession(), $this->firewallName, $request->getUri());
         }
+    }
+
+    /**
+     * Tells whether a voter that denied the attribute says a fresh authentication could grant it.
+     *
+     * The votes of the checks a voter makes on other attributes land in the same decision,
+     * so the flag has to name the denied attribute for the denial to be told apart from them.
+     */
+    private static function isCurableByReAuthentication(AccessDeniedException $exception): bool
+    {
+        [$attribute] = $exception->getAttributes();
+
+        foreach ($exception->getAccessDecision()?->votes ?? [] as $vote) {
+            if (VoterInterface::ACCESS_DENIED === $vote->result && $attribute === ($vote->extraData[AuthenticatedVoter::RE_AUTHENTICATION] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function throwUnauthorizedException(AuthenticationException $authException): never

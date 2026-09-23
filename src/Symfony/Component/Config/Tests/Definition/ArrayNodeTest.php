@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\ScalarNode;
@@ -27,6 +28,21 @@ class ArrayNodeTest extends TestCase
         $this->expectException(InvalidTypeException::class);
 
         $node->normalize(false);
+    }
+
+    public function testNormalizeRejectsEnvPlaceholderOfUnknownType()
+    {
+        $node = new ArrayNode('root');
+        BaseNode::setPlaceholderUniquePrefix('env_1234');
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('A dynamic value is not compatible with a "Symfony\Component\Config\Definition\ArrayNode" node type at path "root".');
+
+        try {
+            $node->normalize('env_1234_bool_FOO_5678');
+        } finally {
+            BaseNode::resetPlaceholders();
+        }
     }
 
     public function testExceptionThrownOnUnrecognizedChild()

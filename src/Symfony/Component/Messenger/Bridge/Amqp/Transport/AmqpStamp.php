@@ -51,7 +51,14 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr['content_type'] ??= $amqpEnvelope->getContentType();
         $attr['content_encoding'] ??= $amqpEnvelope->getContentEncoding();
         $attr['delivery_mode'] ??= $amqpEnvelope->getDeliveryMode();
-        $attr['priority'] ??= $amqpEnvelope->getPriority();
+        if (!isset($attr['priority'])) {
+            $priority = $amqpEnvelope->getPriority();
+
+            // ext-amqp returns 0 when the priority property is not set, making it indistinguishable from explicit 0.
+            if (0 !== $priority) {
+                $attr['priority'] = $priority;
+            }
+        }
         $attr['timestamp'] ??= $amqpEnvelope->getTimestamp();
         $attr['app_id'] ??= $amqpEnvelope->getAppId();
         $attr['message_id'] ??= $amqpEnvelope->getMessageId();

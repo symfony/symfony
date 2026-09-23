@@ -225,4 +225,60 @@ class AmqpSenderTest extends TestCase
         $sender = new AmqpSender($connection, $serializer);
         $sender->send($envelope);
     }
+
+    public function testItDoesNotRepublishAReceivedZeroPriorityOnRetry()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getPriority')->willReturn(0);
+
+        $envelope = new Envelope(new DummyMessage('Oy'), [
+            new AmqpReceivedStamp($amqpEnvelope, 'original_queue'),
+            new RedeliveryStamp(0),
+        ]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publish')
+            ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) {
+                $this->assertSame('original_queue', $stamp->getRoutingKey());
+                $this->assertTrue($stamp->isRetryAttempt());
+                $this->assertArrayNotHasKey('priority', $stamp->getAttributes());
+
+                return true;
+            }));
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testItRepublishesAnExplicitZeroPriorityOnRetry()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getPriority')->willReturn(5);
+
+        $envelope = new Envelope(new DummyMessage('Oy'), [
+            new AmqpPriorityStamp(0),
+            new AmqpReceivedStamp($amqpEnvelope, 'original_queue'),
+            new RedeliveryStamp(0),
+        ]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publish')
+            ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) {
+                $this->assertTrue($stamp->isRetryAttempt());
+                $this->assertSame(0, $stamp->getAttributes()['priority']);
+
+                return true;
+            }));
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
 }

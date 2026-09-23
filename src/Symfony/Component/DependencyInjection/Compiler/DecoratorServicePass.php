@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -51,7 +52,7 @@ class DecoratorServicePass extends AbstractRecursivePass
             ? $container->getParameter('container.behavior_describing_tags')
             : ['proxy', 'container.do_not_inline', 'container.service_locator', 'container.service_subscriber', 'container.service_subscriber.locator'];
 
-        foreach ($definitions as [$id, $definition]) {
+        foreach (self::delayDecoratorsOfDecorators($container, iterator_to_array($definitions, false)) as [$id, $definition]) {
             $decoratedService = $definition->getDecoratedService();
             [$inner, $renamedId] = $decoratedService;
             $invalidBehavior = $decoratedService[3] ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
@@ -130,5 +131,49 @@ class DecoratorServicePass extends AbstractRecursivePass
         }
 
         return parent::processValue($value, $isRoot);
+    }
+
+    /**
+     * Delays the decorators of a decorator until all the decorators of the service it decorates are processed.
+     *
+     * Tags move from a decorated service to its outermost decorator one decorator at a time, and decorating a decorator too early would strand them on it.
+     *
+     * @param list<array{string, Definition}> $definitions
+     *
+     * @return list<array{string, Definition}>
+     */
+    private static function delayDecoratorsOfDecorators(ContainerBuilder $container, array $definitions): array
+    {
+        $decoratedIds = $remaining = [];
+
+        foreach ($definitions as [$id, $definition]) {
+            $inner = $decoratedIds[$id] = $definition->getDecoratedService()[0];
+            $remaining[$inner] = ($remaining[$inner] ?? 0) + 1;
+        }
+
+        $sorted = $delayed = [];
+
+        foreach ($definitions as $entry) {
+            $delayed[] = $entry;
+
+            do {
+                $count = \count($sorted);
+
+                foreach ($delayed as $k => [$id]) {
+                    $inner = $decoratedIds[$id];
+
+                    // a missing service has no tags to move, and delaying would change which decorators end up ignored
+                    if (isset($decoratedIds[$inner]) && $remaining[$decoratedIds[$inner]] && $container->has($decoratedIds[$inner])) {
+                        continue;
+                    }
+
+                    $sorted[] = $delayed[$k];
+                    unset($delayed[$k]);
+                    --$remaining[$inner];
+                }
+            } while ($delayed && $count < \count($sorted));
+        }
+
+        return array_merge($sorted, $delayed);
     }
 }

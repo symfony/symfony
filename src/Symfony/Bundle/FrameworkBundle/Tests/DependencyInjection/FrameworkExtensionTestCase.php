@@ -1857,11 +1857,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertTrue($container->hasParameter('container.behavior_describing_tags'));
         $this->assertEquals([
-            'proxy',
-            'container.do_not_inline',
-            'container.service_locator',
-            'container.service_subscriber',
-            'container.service_subscriber.locator',
+            ...$defaultTags,
             'kernel.event_subscriber',
             'kernel.event_listener',
             'kernel.reset',

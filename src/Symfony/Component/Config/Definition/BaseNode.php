@@ -387,6 +387,16 @@ abstract class BaseNode implements NodeInterface
 
         // resolve placeholder value
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+            // the types of the placeholder are not known yet, but no type fits a node that accepts no placeholder
+            if (!$placeholders && !$this->allowPlaceholders()) {
+                $this->handlingPlaceholder = $value;
+                try {
+                    $this->doValidateType($value);
+                } finally {
+                    $this->handlingPlaceholder = null;
+                }
+            }
+
             foreach ($placeholders as $placeholder) {
                 $this->handlingPlaceholder = $value;
                 try {

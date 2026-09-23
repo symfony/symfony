@@ -399,9 +399,6 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
-     * Get the currently focused component.
-     */
-    /**
      * Returns where a widget was drawn during the last render, or null if it was not drawn.
      *
      * A widget's own render() reports the height of its content, not the row the layout gave it,
@@ -413,6 +410,9 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         return $this->renderer->getWidgetRect($widget);
     }
 
+    /**
+     * Get the currently focused component.
+     */
     public function getFocus(): ?AbstractWidget
     {
         return $this->focusManager->getFocus();

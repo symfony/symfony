@@ -233,7 +233,8 @@ class TranslationBundle extends AbstractBundle
 
             $container
                 ->register('translator.pseudo', PseudoLocalizationTranslator::class)
-                ->setDecoratedService('translator', null, -1) // lower priority than "translator.data_collector"
+                ->setDecoratedService('translator', null, -1)
+                ->addTag('container.decoration_order', ['around' => 'translator.data_collector'])
                 ->setArguments([
                     new Reference('translator.pseudo.inner'),
                     $options,

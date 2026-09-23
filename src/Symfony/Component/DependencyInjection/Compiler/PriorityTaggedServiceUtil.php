@@ -59,7 +59,7 @@ class PriorityTaggedServiceUtil
         try {
             $keys = array_keys(BeforeAfterSorter::sortWithPriorities($priorities, $constraints, $aliases));
         } catch (InvalidArgumentException $e) {
-            throw new InvalidArgumentException(\sprintf('Invalid "before"/"after" constraints on tag "%s": ', $tagName).lcfirst($e->getMessage()), previous: $e);
+            throw new InvalidArgumentException(\sprintf('Cannot order the services tagged "%s": ', $tagName).lcfirst($e->getMessage()), previous: $e);
         }
 
         $sorted = [];

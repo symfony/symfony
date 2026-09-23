@@ -624,7 +624,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $container->register('c')->addTag('my_tag', ['priority' => -10, 'before' => 'a']);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "before"/"after" constraints on tag "my_tag": the priority of "c" (-10) contradicts its "before" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.');
+        $this->expectExceptionMessage('Cannot order the services tagged "my_tag": the priority of "c" (-10) contradicts its "before" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.');
 
         $this->getTaggedIds($container);
     }
@@ -664,7 +664,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $container->register('b')->addTag('my_tag', ['before' => 'a']);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "before"/"after" constraints on tag "my_tag": cycle detected in the "before"/"after" constraints: "a" -> "b" -> "a".');
+        $this->expectExceptionMessage('Cannot order the services tagged "my_tag": cycle detected in the "before"/"after" constraints: "a" -> "b" -> "a".');
 
         $this->getTaggedIds($container);
     }

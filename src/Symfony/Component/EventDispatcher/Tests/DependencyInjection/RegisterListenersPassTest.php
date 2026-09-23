@@ -806,7 +806,7 @@ class RegisterListenersPassTest extends TestCase
         $container->register('b', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo', 'method' => 'onEvent', 'before' => 'a']);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "before"/"after" constraints for event "foo": cycle detected in the "before"/"after" constraints: "a" -> "b" -> "a".');
+        $this->expectExceptionMessage('Cannot order the listeners of event "foo": cycle detected in the "before"/"after" constraints: "a" -> "b" -> "a".');
 
         (new RegisterListenersPass())->process($container);
     }
@@ -917,7 +917,7 @@ class RegisterListenersPassTest extends TestCase
         $container->register('b', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo', 'method' => 'onEvent', 'priority' => 0, 'before' => 'a']);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "before"/"after" constraints for event "foo": the priority of "b" (0) contradicts its "before" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.');
+        $this->expectExceptionMessage('Cannot order the listeners of event "foo": the priority of "b" (0) contradicts its "before" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.');
 
         (new RegisterListenersPass())->process($container);
     }

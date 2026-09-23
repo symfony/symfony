@@ -78,7 +78,8 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
                     $cloneId = '.stack.'.$taggedServiceId.'.'.$id;
                     $container->setDefinition($cloneId, $definitionCloner->clone())
                         ->clearTag('container.tag_decorator')->clearTag('container.excluded')
-                        ->setDecoratedService($taggedServiceId, null, $priority, $invalidBehavior);
+                        ->setDecoratedService($taggedServiceId, null, $priority, $invalidBehavior)
+                        ->addTag('container.decoration_order', ['alias' => $id]);
                     $stacks[$cloneId] = $stackCloner->clone();
                 }
             }
@@ -104,10 +105,15 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
             $resolved = $this->resolveStack($stacks, [$id]);
 
             if ($decoratedService = $definition->getDecoratedService()) {
-                // Propagate decoration to the innermost definition in the stack,
+                // Propagate decoration and its order constraints to the innermost definition in the stack,
                 // so that DecoratorServicePass can wire it to the original service.
                 end($resolved);
                 $resolved[key($resolved)]->setDecoratedService($decoratedService[0], $decoratedService[1], $decoratedService[2], $decoratedService[3] ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+
+                foreach ($definition->getTag('container.decoration_order') as $constraints) {
+                    $resolved[key($resolved)]->addTag('container.decoration_order', $constraints);
+                }
+                $resolved[key($resolved)]->addTag('container.decoration_order', ['alias' => $id]);
             }
 
             foreach (array_reverse($resolved, true) as $k => $v) {

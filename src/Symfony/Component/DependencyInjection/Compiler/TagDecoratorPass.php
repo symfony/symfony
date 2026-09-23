@@ -50,7 +50,8 @@ final class TagDecoratorPass implements CompilerPassInterface
                 foreach ($taggedServices as $taggedServiceId => $_) {
                     $container->setDefinition(\sprintf('.decorator.%s.%s', $taggedServiceId, $id), $definitionCloner->clone())
                         ->clearTag('container.tag_decorator')->clearTag('container.excluded')
-                        ->setDecoratedService($taggedServiceId, null, $priority, $invalidBehavior);
+                        ->setDecoratedService($taggedServiceId, null, $priority, $invalidBehavior)
+                        ->addTag('container.decoration_order', ['alias' => $id]);
                 }
             }
 

@@ -23,8 +23,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * How the client authenticates at the token endpoint (RFC 6749 §2.3) is a property of
  * its registration at the provider, not of this class: it is injected, so that sending
- * a secret, sending nothing at all, or signing an assertion (OIDC Core §9) are the same
- * client with a different dependency.
+ * a secret, sending nothing at all, signing an assertion (OIDC Core §9) or presenting a
+ * certificate in the TLS handshake (RFC 8705 §2) are the same client with a different
+ * dependency. The last one is the only one the requests themselves differ for, being made
+ * to the endpoints the provider publishes for it (RFC 8705 §5).
  *
  * @see https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth OIDC Core 1.0 §3.1
  * @see https://datatracker.ietf.org/doc/html/rfc6749                      OAuth 2.0 (RFC 6749)
@@ -33,12 +35,25 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class OidcClient implements OidcClientInterface
 {
+    /**
+     * The methods of RFC 8705, Section 2, which authenticate in the TLS handshake.
+     *
+     * They are the ones putting nothing of their own in the request, so their options can be
+     * applied to a request that is not a token request, and the ones the "mtls_endpoint_aliases"
+     * of Section 5 are published for. They are recognized by the name they report, which is
+     * the one RFC 7591, Section 2 registers them under and the one the provider knows.
+     */
+    private const MUTUAL_TLS_METHODS = ['tls_client_auth', 'self_signed_tls_client_auth'];
+
+    private readonly bool $mutualTls;
+
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly OidcDiscovery $discovery,
         private readonly string $clientId,
         private readonly ClientAuthenticationInterface $clientAuthentication,
     ) {
+        $this->mutualTls = \in_array($clientAuthentication->getMethod(), self::MUTUAL_TLS_METHODS, true);
     }
 
     public function getClientAuthenticationMethod(): string
@@ -48,7 +63,7 @@ final class OidcClient implements OidcClientInterface
 
     public function exchangeCode(string $code, string $redirectUri, ?string $codeVerifier = null): array
     {
-        $tokenEndpoint = $this->discovery->getSecureEndpoint('token_endpoint');
+        $tokenEndpoint = $this->discovery->getSecureEndpoint('token_endpoint', $this->mutualTls);
 
         $body = [
             'grant_type' => 'authorization_code',
@@ -73,7 +88,7 @@ final class OidcClient implements OidcClientInterface
 
     public function refreshToken(#[\SensitiveParameter] string $refreshToken, array $scopes = []): array
     {
-        $tokenEndpoint = $this->discovery->getSecureEndpoint('token_endpoint');
+        $tokenEndpoint = $this->discovery->getSecureEndpoint('token_endpoint', $this->mutualTls);
 
         $body = [
             'grant_type' => 'refresh_token',
@@ -106,15 +121,29 @@ final class OidcClient implements OidcClientInterface
         }
     }
 
+    /**
+     * Reads the user claims from the UserInfo endpoint, a protected resource.
+     *
+     * The access token is what authorizes the request, so the client authentication has no
+     * say in it, with one exception: a client authenticating in the TLS handshake presents
+     * its certificate here too, since a provider doing so binds the access token to that
+     * certificate (RFC 8705, Section 3) and serves the endpoint under an alias asking for it.
+     */
     public function fetchUserInfo(string $accessToken): array
     {
-        $userInfoEndpoint = $this->discovery->getSecureEndpoint('userinfo_endpoint');
+        $userInfoEndpoint = $this->discovery->getSecureEndpoint('userinfo_endpoint', $this->mutualTls);
+
+        $options = [
+            'auth_bearer' => $accessToken,
+            'max_redirects' => 0,
+        ];
+
+        if ($this->mutualTls) {
+            $options = $this->clientAuthentication->authenticate($this->clientId, $userInfoEndpoint, $options);
+        }
 
         try {
-            return $this->httpClient->request('GET', $userInfoEndpoint, [
-                'auth_bearer' => $accessToken,
-                'max_redirects' => 0,
-            ])->toArray();
+            return $this->httpClient->request('GET', $userInfoEndpoint, $options)->toArray();
         } catch (HttpClientExceptionInterface $e) {
             throw new AuthenticationException(\sprintf('The OIDC userinfo endpoint request failed: "%s"', $e->getMessage()), previous: $e);
         }

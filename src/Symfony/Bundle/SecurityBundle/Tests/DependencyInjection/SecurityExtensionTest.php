@@ -56,6 +56,8 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -1854,6 +1856,59 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('a-client-secret-of-thirty-two-by', $clientAuthentication->getArgument(0));
         $this->assertSame('HS256', $clientAuthentication->getArgument(1));
         $this->assertSame(60, $clientAuthentication->getArgument(2));
+    }
+
+    /**
+     * The mutual-TLS methods are wired end to end too, their class being what tells the OIDC
+     * client to make the requests carrying the certificate to the endpoints of RFC 8705,
+     * Section 5.
+     */
+    public function testOidcLoginBuildsTheTlsClientAuthClientAuthentication()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['tls_client_auth' => ['certificate' => '/certs/client.pem', 'key' => '/certs/client.key']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame(TlsClientAuth::class, $clientAuthentication->getClass());
+        $this->assertSame('/certs/client.pem', $clientAuthentication->getArgument(0));
+        $this->assertSame('/certs/client.key', $clientAuthentication->getArgument(1));
+        $this->assertNull($clientAuthentication->getArgument(2));
+    }
+
+    public function testOidcLoginBuildsTheSelfSignedTlsClientAuthClientAuthentication()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['self_signed_tls_client_auth' => '/certs/self-signed.pem'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame(SelfSignedTlsClientAuth::class, $clientAuthentication->getClass());
+        $this->assertSame('/certs/self-signed.pem', $clientAuthentication->getArgument(0));
     }
 
     public function testOidcLoginCallbackRouteLoaderIsAlwaysRegistered()

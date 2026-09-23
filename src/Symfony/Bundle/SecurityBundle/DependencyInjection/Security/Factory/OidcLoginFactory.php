@@ -86,7 +86,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 // "isRequired" must be set otherwise the following custom validation is not called
                 ->validate()
                     ->ifTrue(static fn (array $v): bool => 1 !== \count($v))
-                    ->thenInvalid('Exactly one OIDC "client_authentication" method must be configured, got %s. Set "client_secret_basic", "client_secret_post", "client_secret_jwt", "private_key_jwt" or "none", or the "id" of your own implementation.')
+                    ->thenInvalid('Exactly one OIDC "client_authentication" method must be configured, got %s. Set "client_secret_basic", "client_secret_post", "client_secret_jwt", "private_key_jwt", "tls_client_auth", "self_signed_tls_client_auth" or "none", or the "id" of your own implementation.')
                 ->end()
                 ->validate()
                     ->ifTrue(static fn (array $v): bool => false === ($v['none'] ?? null))
@@ -155,9 +155,17 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                             ->end()
                         ->end()
                     ->end()
+                    ->append(self::createMutualTlsNode(
+                        'tls_client_auth',
+                        'Authenticate with a certificate a certificate authority issued to the client, the "tls_client_auth" method of RFC 8705, Section 2.1. Nothing of the credential is in the request: the certificate is presented in the TLS handshake, and the provider matches the subject registered as the "tls_client_auth_subject_dn" or one of the "tls_client_auth_san_*" metadata of the client. Takes the path to the certificate, or a mapping to also set "key" and "passphrase".',
+                    ))
+                    ->append(self::createMutualTlsNode(
+                        'self_signed_tls_client_auth',
+                        'Authenticate with a certificate the client signed itself, the "self_signed_tls_client_auth" method of RFC 8705, Section 2.2. The provider matches the certificate presented in the TLS handshake against the keys registered as the "jwks" of the client or served from its "jwks_uri", so renewing the certificate means publishing the new key. Takes the path to the certificate, or a mapping to also set "key" and "passphrase".',
+                    ))
                     ->scalarNode('id')
                         ->cannotBeEmpty()
-                        ->info('The id of a service implementing "ClientAuthenticationInterface", for a scheme Symfony does not ship, such as the "tls_client_auth" of RFC 8705, Section 2. The method it reports is only known once it is built, so the rules a public client cannot bend are then checked on the first request to this firewall instead of while the container compiles.')
+                        ->info('The id of a service implementing "ClientAuthenticationInterface", for a scheme Symfony does not ship, such as the "tls_client_auth" of RFC 8705, Section 2 with a certificate the HTTP client of the firewall already carries. The method it reports is only known once it is built, so the rules a public client cannot bend are then checked on the first request to this firewall instead of while the container compiles, and a service reporting one of the two mutual-TLS methods gets the endpoints of RFC 8705, Section 5 as a built-in one does.')
                     ->end()
                 ->end()
             ->end()
@@ -283,6 +291,45 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
     }
 
     /**
+     * Builds the node of one of the two mutual-TLS client authentication methods.
+     *
+     * They take the same certificate and differ only in what the provider checks it against,
+     * which is its business and not a parameter of the client, so their nodes only differ by
+     * the name they are written under and by what that name means.
+     */
+    private static function createMutualTlsNode(string $method, string $info): ArrayNodeDefinition
+    {
+        $node = new ArrayNodeDefinition($method);
+        $node
+            ->info($info)
+            ->example(['certificate' => '%kernel.project_dir%/config/oidc/client.pem', 'key' => '%kernel.project_dir%/config/oidc/client.key'])
+            ->beforeNormalization()
+                ->ifString()
+                ->then(static fn (string $v): array => ['certificate' => $v])
+            ->end()
+            ->children()
+                ->scalarNode('certificate')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                    ->info('Path to the PEM file holding the client certificate, and its private key when the same file holds both.')
+                ->end()
+                ->scalarNode('key')
+                    ->defaultNull()
+                    ->cannotBeEmpty()
+                    ->info('Path to the PEM file holding the private key of the certificate, when the certificate file does not hold it.')
+                ->end()
+                ->scalarNode('passphrase')
+                    ->defaultNull()
+                    ->cannotBeEmpty()
+                    ->info('The passphrase the private key is encrypted with, if it is one.')
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    /**
      * Registers the client authentication of the firewall and returns its service id.
      *
      * A method this bundle knows is built here, which is what lets the configuration check the
@@ -307,6 +354,11 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 (new ChildDefinition('security.oauth2.client_authentication.private_key_jwt.signing_key'))->replaceArgument(0, $config[$method]['key']),
                 $config[$method]['algorithm'],
                 $config[$method]['lifetime'],
+            ],
+            'tls_client_auth', 'self_signed_tls_client_auth' => [
+                $config[$method]['certificate'],
+                $config[$method]['key'],
+                $config[$method]['passphrase'],
             ],
             default => [$config[$method]],
         };

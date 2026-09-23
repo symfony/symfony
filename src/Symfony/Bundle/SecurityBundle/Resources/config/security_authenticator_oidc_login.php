@@ -25,6 +25,8 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 return static function (ContainerConfigurator $container) {
@@ -122,6 +124,22 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('signature algorithm'),
                 abstract_arg('assertion lifetime'),
                 service('clock'),
+            ])
+
+        ->set('security.oauth2.client_authentication.tls_client_auth', TlsClientAuth::class)
+            ->abstract()
+            ->args([
+                abstract_arg('client certificate'),
+                abstract_arg('client private key'),
+                abstract_arg('private key passphrase'),
+            ])
+
+        ->set('security.oauth2.client_authentication.self_signed_tls_client_auth', SelfSignedTlsClientAuth::class)
+            ->abstract()
+            ->args([
+                abstract_arg('client certificate'),
+                abstract_arg('client private key'),
+                abstract_arg('private key passphrase'),
             ])
 
         // the private key of the "private_key_jwt" method, parsed from the JSON-encoded JWK

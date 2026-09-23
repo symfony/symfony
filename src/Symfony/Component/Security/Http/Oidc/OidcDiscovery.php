@@ -184,18 +184,32 @@ final class OidcDiscovery implements ResetInterface
      * not be able to downgrade a request to plain HTTP: enforcing HTTPS on the configured
      * issuer would be pointless if the endpoints it announces were used as they are.
      *
+     * A provider accepting a client certificate on a second set of endpoints publishes them
+     * under "mtls_endpoint_aliases" (RFC 8705, Section 5), and a client authenticating with
+     * that certificate must use those instead: $preferMtlsAlias asks for the alias of the
+     * endpoint, which only the requests carrying the certificate are to be made to, never
+     * the ones the browser is sent to. An endpoint the provider publishes no alias for is
+     * returned unchanged, the ordinary one being the only one it has.
+     *
      * @throws AuthenticationException If the endpoint is not announced, or does not use HTTPS
      */
-    public function getSecureEndpoint(string $endpoint): string
+    public function getSecureEndpoint(string $endpoint, bool $preferMtlsAlias = false): string
     {
-        $url = $this->getConfiguration()[$endpoint] ?? null;
+        $configuration = $this->getConfiguration();
+        $aliases = $preferMtlsAlias && \is_array($configuration['mtls_endpoint_aliases'] ?? null) ? $configuration['mtls_endpoint_aliases'] : [];
+        // an alias that is announced but unusable is reported as such rather than silently
+        // giving way to the ordinary endpoint, which asks for no certificate and would fail
+        // the very authentication it is announced for
+        $isAliased = \array_key_exists($endpoint, $aliases);
+        $name = $isAliased ? 'mtls_endpoint_aliases.'.$endpoint : $endpoint;
+        $url = $isAliased ? $aliases[$endpoint] : $configuration[$endpoint] ?? null;
 
         if (!\is_string($url) || '' === $url) {
-            throw new AuthenticationException(\sprintf('The OIDC provider does not announce any "%s".', $endpoint));
+            throw new AuthenticationException(\sprintf('The OIDC provider does not announce any "%s".', $name));
         }
 
         if (!self::isSecureUrl($url)) {
-            throw new AuthenticationException(\sprintf('The "%s" announced by the OIDC provider must use HTTPS (got "%s"): the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS.', $endpoint, $url));
+            throw new AuthenticationException(\sprintf('The "%s" announced by the OIDC provider must use HTTPS (got "%s"): the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS.', $name, $url));
         }
 
         return $url;

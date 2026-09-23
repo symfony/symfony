@@ -800,6 +800,99 @@ class OidcLoginFactoryTest extends TestCase
     }
 
     /**
+     * The certificate is named by its path, which the HTTP client reads when it makes the
+     * request, so that no key material travels through the container.
+     */
+    public function testTheTlsClientAuthMethodIsBuiltFromTheConfiguration()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['tls_client_auth' => [
+                'certificate' => '/certs/client.pem',
+                'key' => '/certs/client.key',
+                'passphrase' => 'my-passphrase',
+            ]],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame('security.oauth2.client_authentication.tls_client_auth', $clientAuthentication->getParent());
+        $this->assertSame('/certs/client.pem', $clientAuthentication->getArgument(0));
+        $this->assertSame('/certs/client.key', $clientAuthentication->getArgument(1));
+        $this->assertSame('my-passphrase', $clientAuthentication->getArgument(2));
+    }
+
+    /**
+     * A PEM file holding both the certificate and its private key is all the method needs.
+     */
+    public function testTheTlsClientAuthMethodTakesTheCertificateAlone()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['tls_client_auth' => '/certs/client.pem'],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame('/certs/client.pem', $clientAuthentication->getArgument(0));
+        $this->assertNull($clientAuthentication->getArgument(1));
+        $this->assertNull($clientAuthentication->getArgument(2));
+    }
+
+    /**
+     * The two mutual-TLS methods take the same certificate and differ only in what the
+     * provider checks it against, which is the method the client is registered with.
+     */
+    public function testTheSelfSignedTlsClientAuthMethodIsBuiltFromTheConfiguration()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['self_signed_tls_client_auth' => ['certificate' => '/certs/self-signed.pem']],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $clientAuthentication = $container->getDefinition('security.authenticator.oidc_login.client_authentication.main');
+        $this->assertSame('security.oauth2.client_authentication.self_signed_tls_client_auth', $clientAuthentication->getParent());
+        $this->assertSame('/certs/self-signed.pem', $clientAuthentication->getArgument(0));
+    }
+
+    #[DataProvider('provideMutualTlsMethodsWithoutACertificate')]
+    public function testRejectsAMutualTlsMethodWithoutACertificate(array $clientAuthentication, string $message)
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => $clientAuthentication,
+        ], $factory);
+    }
+
+    public static function provideMutualTlsMethodsWithoutACertificate(): iterable
+    {
+        yield 'tls_client_auth' => [['tls_client_auth' => ['key' => '/certs/client.key']], 'The child config "certificate" under "oidc-login.client_authentication.tls_client_auth" must be configured'];
+        yield 'self_signed_tls_client_auth' => [['self_signed_tls_client_auth' => []], 'The child config "certificate" under "oidc-login.client_authentication.self_signed_tls_client_auth" must be configured'];
+    }
+
+    /**
      * Each assertion method takes the algorithms it can be signed with and no other, so that
      * a shared secret never keys an asymmetric signature nor a private key a MAC.
      */

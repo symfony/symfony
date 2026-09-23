@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * A collection whose entries do not all share the same type.
@@ -61,6 +62,7 @@ class PolymorphicCollectionType extends AbstractType
             $resizePrototypeOptions,
             $options['keep_as_list'],
             $options['entry_type_provider'],
+            $options['entry_name'],
         ));
     }
 
@@ -107,6 +109,7 @@ class PolymorphicCollectionType extends AbstractType
             'prototype' => true,
             'prototype_name' => '__name__',
             'entry_options' => [],
+            'entry_name' => null,
             'prototype_options' => [],
             'prototype_data' => [],
             'delete_empty' => false,
@@ -131,6 +134,7 @@ class PolymorphicCollectionType extends AbstractType
         $resolver->setAllowedTypes('entry_types', 'string[]');
         $resolver->setAllowedTypes('entry_type_provider', EntryTypeProviderInterface::class);
         $resolver->setAllowedTypes('entry_options', 'array');
+        $resolver->setAllowedTypes('entry_name', ['null', 'string', 'callable', PropertyPathInterface::class]);
         $resolver->setAllowedTypes('prototype_options', 'array');
         $resolver->setAllowedTypes('prototype_data', 'array');
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);

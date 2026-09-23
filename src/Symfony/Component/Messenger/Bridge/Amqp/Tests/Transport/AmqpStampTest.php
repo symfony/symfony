@@ -53,6 +53,29 @@ class AmqpStampTest extends TestCase
         $this->assertSame(\AMQP_NOPARAM, $stamp->getFlags());
     }
 
+    public function testCreateFromAmqpEnvelopeDoesNotCopyZeroPriority()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getPriority')->willReturn(0);
+
+        $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope);
+
+        $this->assertArrayNotHasKey('priority', $stamp->getAttributes());
+    }
+
+    public function testCreateFromAmqpEnvelopeKeepsPreviousZeroPriority()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getPriority')->willReturn(0);
+
+        $previousStamp = new AmqpStamp(null, \AMQP_NOPARAM, ['priority' => 0]);
+
+        $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, $previousStamp);
+
+        $this->assertArrayHasKey('priority', $stamp->getAttributes());
+        $this->assertSame(0, $stamp->getAttributes()['priority']);
+    }
+
     public function testCreateFromAmqpEnvelopeWithPreviousStamp()
     {
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);

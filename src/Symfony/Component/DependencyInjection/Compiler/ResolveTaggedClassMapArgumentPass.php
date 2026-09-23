@@ -34,6 +34,8 @@ final class ResolveTaggedClassMapArgumentPass extends AbstractRecursivePass
         $exclude = $value->getExclude();
         $parameterBag = $this->container->getParameterBag();
         $resources = [];
+        $classById = [];
+        $constrained = false;
 
         foreach ($this->container->findTaggedResourceIds($value->getTag(), false) as $resourceId => $attributes) {
             $definition = $this->container->getDefinition($resourceId);
@@ -49,18 +51,26 @@ final class ResolveTaggedClassMapArgumentPass extends AbstractRecursivePass
             }
 
             $defaultIndex = $defaultPriority = null;
+            $defaultConstraints = [];
+            $firstAttribute = true;
+            $classById[$resourceId] = $class;
             $phpAttributes = $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes') ? $this->container->getReflectionClass($class)?->getAttributes(AsTaggedItem::class) : [];
 
             foreach ($phpAttributes ??= [] as $i => $attribute) {
                 $attribute = $attribute->newInstance();
                 $phpAttributes[$i] = [
                     'priority' => $attribute->priority,
+                    'before' => $attribute->before,
+                    'after' => $attribute->after,
                     $indexAttribute => $attribute->index,
                 ];
-                if (null === $defaultPriority) {
-                    $defaultPriority = $attribute->priority ?? 0;
+                if ($firstAttribute) {
+                    $firstAttribute = false;
+                    $defaultPriority = $attribute->priority;
                     $defaultIndex = $attribute->index;
                 }
+                $defaultConstraints['before'] ??= $attribute->before;
+                $defaultConstraints['after'] ??= $attribute->after;
             }
             if (1 >= \count($phpAttributes)) {
                 $phpAttributes = [];
@@ -73,17 +83,32 @@ final class ResolveTaggedClassMapArgumentPass extends AbstractRecursivePass
                     continue;
                 }
 
-                $priority = $attribute['priority'] ?? $defaultPriority ?? 0;
+                // null stays null: a resource that declared no priority is placed by its "before"/"after" constraints
+                $declaredPriority = $attribute['priority'] ?? $defaultPriority;
                 $index = isset($attribute[$indexAttribute]) ? $parameterBag->resolveValue($attribute[$indexAttribute]) : ($defaultIndex ?? $class);
 
-                $resources[] = [$priority, $i, $index, $class];
+                $constraints = [];
+                foreach (['before', 'after'] as $direction) {
+                    $targets = \array_key_exists($direction, $attribute) ? $attribute[$direction] : ($defaultConstraints[$direction] ?? null);
+
+                    if ($targets = (array) ($targets ?? [])) {
+                        $constraints[$direction] = $targets;
+                        $constrained = true;
+                    }
+                }
+
+                $resources[] = [$declaredPriority ?? 0, $i, $index, $resourceId, $class, $constraints, $declaredPriority];
             }
         }
 
         uasort($resources, static fn ($a, $b) => $b[0] <=> $a[0] ?: $a[1] <=> $b[1]);
 
+        if ($constrained) {
+            $resources = PriorityTaggedServiceUtil::applyConstraints($resources, $classById, $value->getTag());
+        }
+
         $classMap = [];
-        foreach ($resources as [, , $index, $class]) {
+        foreach ($resources as [, , $index, , $class]) {
             $classMap[$index] ??= $class;
         }
 

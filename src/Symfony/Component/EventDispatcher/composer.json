@@ -23,7 +23,7 @@
     "require-dev": {
         "psr/log": "^1|^2|^3",
         "symfony/config": "^7.4|^8.0",
-        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.2",
         "symfony/error-handler": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",
         "symfony/framework-bundle": "^7.4|^8.0",
@@ -32,6 +32,7 @@
         "symfony/stopwatch": "^7.4|^8.0"
     },
     "conflict": {
+        "symfony/dependency-injection": "<8.2",
         "symfony/security-http": "<7.4",
         "symfony/service-contracts": "<2.5"
     },

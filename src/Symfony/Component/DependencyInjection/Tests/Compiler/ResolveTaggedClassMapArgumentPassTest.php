@@ -13,12 +13,14 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedClassMapArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BazTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IntTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\QuxTagClass;
 
 class ResolveTaggedClassMapArgumentPassTest extends TestCase
@@ -38,6 +40,55 @@ class ResolveTaggedClassMapArgumentPassTest extends TestCase
             'foo' => FooTagClass::class,
         ]);
         $this->assertEquals($expected, $container->getDefinition('service')->getArgument(0));
+    }
+
+    public function testProcessAppliesBeforeAndAfterConstraints()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class, BarTagClass::class)->addResourceTag('my_tag', ['key' => 'bar']);
+        $container->register(FooTagClass::class, FooTagClass::class)->addResourceTag('my_tag', ['key' => 'foo']);
+        $container->register(IntTagClass::class, IntTagClass::class)->addResourceTag('my_tag', ['key' => 'int', 'before' => BarTagClass::class]);
+        $container->register('service', 'stdClass')->setArguments([new TaggedClassMapArgument('my_tag', 'key')]);
+
+        (new ResolveTaggedClassMapArgumentPass())->process($container);
+
+        $expected = new TaggedClassMapArgument('my_tag', 'key');
+        $expected->setValues([
+            'int' => IntTagClass::class,
+            'bar' => BarTagClass::class,
+            'foo' => FooTagClass::class,
+        ]);
+        $this->assertEquals($expected, $container->getDefinition('service')->getArgument(0));
+    }
+
+    public function testProcessReadsBeforeAndAfterFromAsTaggedItem()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class, BarTagClass::class)->addResourceTag('my_tag', ['key' => 'bar']);
+        $container->register(ResourceOrderedBeforeBar::class, ResourceOrderedBeforeBar::class)->setAutoconfigured(true)->addResourceTag('my_tag', ['key' => 'first']);
+        $container->register('service', 'stdClass')->setArguments([new TaggedClassMapArgument('my_tag', 'key')]);
+
+        (new ResolveTaggedClassMapArgumentPass())->process($container);
+
+        $expected = new TaggedClassMapArgument('my_tag', 'key');
+        $expected->setValues([
+            'first' => ResourceOrderedBeforeBar::class,
+            'bar' => BarTagClass::class,
+        ]);
+        $this->assertEquals($expected, $container->getDefinition('service')->getArgument(0));
+    }
+
+    public function testProcessReportsAConstraintContradictingAnExplicitPriority()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class, BarTagClass::class)->addResourceTag('my_tag', ['key' => 'bar', 'priority' => 10]);
+        $container->register(FooTagClass::class, FooTagClass::class)->addResourceTag('my_tag', ['key' => 'foo', 'priority' => 0, 'before' => BarTagClass::class]);
+        $container->register('service', 'stdClass')->setArguments([new TaggedClassMapArgument('my_tag', 'key')]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "before"/"after" constraints on tag "my_tag": the priority of "'.FooTagClass::class.'" (0) contradicts its "before" constraint on "'.BarTagClass::class.'" (10)');
+
+        (new ResolveTaggedClassMapArgumentPass())->process($container);
     }
 
     public function testProcessWithDefaultIndexAttribute()
@@ -208,4 +259,9 @@ class ResolveTaggedClassMapArgumentPassTest extends TestCase
 
         (new ResolveTaggedClassMapArgumentPass())->process($container);
     }
+}
+
+#[AsTaggedItem(before: BarTagClass::class)]
+class ResourceOrderedBeforeBar
+{
 }

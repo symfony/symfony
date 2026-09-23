@@ -24,19 +24,23 @@ final class AsTransitionListener extends AsEventListener
     use BuildEventNameTrait;
 
     /**
-     * @param string|null $workflow   The id of the workflow to listen to
-     * @param string|null $transition The transition name to which the listener listens to
-     * @param string|null $method     The method to run when the listened event is triggered
-     * @param int         $priority   The priority of this listener if several are declared for the same transition
-     * @param string|null $dispatcher The service id of the event dispatcher to listen to
+     * @param string|null              $workflow   The id of the workflow to listen to
+     * @param string|null              $transition The transition name to which the listener listens to
+     * @param string|null              $method     The method to run when the listened event is triggered
+     * @param int|null                 $priority   The priority of this listener; null lets "before"/"after" decide it, else they only reorder within that priority
+     * @param string|null              $dispatcher The service id of the event dispatcher to listen to
+     * @param string|list<string>|null $before     Listeners this one runs before, as service ids, classes or "service::method"
+     * @param string|list<string>|null $after      Listeners this one runs after, as service ids, classes or "service::method"
      */
     public function __construct(
         ?string $workflow = null,
         ?string $transition = null,
         ?string $method = null,
-        int $priority = 0,
+        ?int $priority = null,
         ?string $dispatcher = null,
+        string|array|null $before = null,
+        string|array|null $after = null,
     ) {
-        parent::__construct($this->buildEventName('transition', 'transition', $workflow, $transition), $method, $priority, $dispatcher);
+        parent::__construct($this->buildEventName('transition', 'transition', $workflow, $transition), $method, $priority, $dispatcher, $before, $after);
     }
 }

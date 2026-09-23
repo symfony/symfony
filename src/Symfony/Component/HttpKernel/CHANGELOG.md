@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `before` and `after` to `#[AsControllerAttributeListener]`, whose `$priority` is now nullable
  * [BC BREAK] Answer a scheme redirect from `RouterListener` itself, so that no other listener runs on a request whose route is not served over the requested scheme
  * Add the `cache_status` option to `HttpCache` to emit the RFC 9211 `Cache-Status` header
  * Add `#[AsControllerAttributeListener]` attribute to declare event listeners for controller attributes

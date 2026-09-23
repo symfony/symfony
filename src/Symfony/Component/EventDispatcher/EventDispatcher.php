@@ -190,12 +190,12 @@ class EventDispatcher implements EventDispatcherInterface
             if (\is_string($params)) {
                 $this->addListener($eventName, [$subscriber, $params]);
             } elseif (isset($params['method'])) {
-                $this->addListener($eventName, [$subscriber, $params['method']], $params['priority'] ?? 0);
+                $this->addListener($eventName, [$subscriber, $params['method']], $params['priority'] ?? self::getDefaultPriority($subscriber, $eventName, $params));
             } elseif (\is_string($params[0])) {
                 $this->addListener($eventName, [$subscriber, $params[0]], $params[1] ?? 0);
             } else {
                 foreach ($params as $listener) {
-                    $this->addListener($eventName, [$subscriber, $listener['method'] ?? $listener[0]], $listener['priority'] ?? $listener[1] ?? 0);
+                    $this->addListener($eventName, [$subscriber, $listener['method'] ?? $listener[0]], $listener['priority'] ?? $listener[1] ?? self::getDefaultPriority($subscriber, $eventName, $listener));
                 }
             }
         }
@@ -239,6 +239,18 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Sorts the internal list of listeners for the given event by priority.
      */
+    /**
+     * Rejects "before"/"after" keys when no priority is declared, since the dispatcher would otherwise ignore them and use 0.
+     */
+    private static function getDefaultPriority(EventSubscriberInterface $subscriber, string $eventName, array $params): int
+    {
+        if ((array) ($params['before'] ?? []) || (array) ($params['after'] ?? [])) {
+            throw new \LogicException(\sprintf('The "before"/"after" keys of "%s::getSubscribedEvents()" for event "%s" need a "priority" when the subscriber is added with "addSubscriber()": they only apply to subscribers registered as services.', get_debug_type($subscriber), $eventName));
+        }
+
+        return 0;
+    }
+
     private function sortListeners(string $eventName): void
     {
         $removedListeners = $this->removedListeners[$eventName] ?? null;

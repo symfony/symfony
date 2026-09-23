@@ -12,7 +12,9 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Event\EnteredEvent;
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
@@ -62,6 +64,23 @@ class WorkflowTraitTest extends TestCase
         $this->assertSame(['b' => 1], $facade->apply($subject, 'go', ['foo' => 'bar'])->getPlaces());
         $this->assertSame(['foo' => 'bar'], $subject->getContext());
         $this->assertFalse($facade->can($subject, 'go'));
+    }
+
+    public function testTheTraitForwardsTheContextOfGetMarking()
+    {
+        $dispatcher = new EventDispatcher();
+        $context = null;
+        $dispatcher->addListener('workflow.entered', static function (EnteredEvent $event) use (&$context) {
+            $context = $event->getContext();
+        });
+        $facade = new class {
+            use WorkflowTrait;
+        };
+        $facade->setWorkflow(new Workflow(new Definition(['a', 'b'], [new Transition('go', 'a', 'b')]), new MethodMarkingStore(true), $dispatcher));
+
+        $facade->getMarking(new Subject(), ['foo' => 'bar']);
+
+        $this->assertSame(['foo' => 'bar'], $context);
     }
 
     public function testTheClassCanImplementTheWorkflowInterface()

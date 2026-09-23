@@ -39,7 +39,7 @@ final class AsWorkflow
     /**
      * @param string|null                                              $name                 The name of the workflow; defaults to the snake_cased short name of the class, without its "Workflow" or "StateMachine" suffix
      * @param WorkflowType                                             $type                 Whether the subject can be in a single place (state machine) or in many places at the same time (workflow)
-     * @param class-string|list<class-string>                          $supports             The classes or interfaces of the subjects supported by the workflow
+     * @param class-string|list<class-string>                          $supports             The classes or interfaces of the subjects supported by the workflow; without "supports" nor "supportStrategy", the workflow is not added to the registry and can only be used by injection
      * @param string|null                                              $supportStrategy      The id of a WorkflowSupportStrategyInterface service; cannot be used with "supports"
      * @param \BackedEnum|string|list<\BackedEnum|string>|null         $initialMarking       The initial place(s) of the subjects; defaults to the first place
      * @param string|null                                              $markingProperty      The property or method of the subjects storing their marking, read by a MethodMarkingStore; defaults to "marking"
@@ -48,7 +48,7 @@ final class AsWorkflow
      * @param bool                                                     $auditTrail           Whether to log the transitions
      * @param list<string>|null                                        $eventsToDispatch     The events to dispatch, or the events not to dispatch when prefixed with "!"; all the events by default
      * @param list<class-string<DefinitionValidatorInterface>>         $definitionValidators The validators of the definition, in addition to the one of the type
-     * @param class-string<\BackedEnum>|list<Place|\BackedEnum|string> $places               The places are inferred from the transitions; use this argument to define places without transitions, to attach metadata to places, or to require all the places to be cases of a string-backed enum
+     * @param class-string<\BackedEnum>|list<Place|\BackedEnum|string> $places               The places are inferred from the transitions, and the Place attributes of the cases of the string-backed enums used in the definition are read (an enum case wrapped in an Arc does not count); use this argument to define places without transitions, to attach metadata to places, or to require all the places to be cases of a string-backed enum
      * @param list<Transition>                                         $transitions          The transitions, in addition to the ones defined with the Transition attribute on the constants of the class
      */
     public function __construct(

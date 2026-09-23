@@ -147,6 +147,12 @@ class AttributeReaderTest extends TestCase
         yield 'int-backed enum' => [IntEnumWorkflow::class, 'Only string-backed enums can be used as places of the workflow defined by "'.$ns.'IntEnumWorkflow", "'.$ns.'IntStep" is not.'];
         yield 'supports and support strategy' => [SupportsAndStrategyWorkflow::class, 'The "supports" and "supportStrategy" arguments of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" cannot be used together on "'.$ns.'SupportsAndStrategyWorkflow".'];
         yield 'marking property and marking store' => [MarkingPropertyAndStoreWorkflow::class, 'The "markingProperty" and "markingStore" arguments of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" cannot be used together on "'.$ns.'MarkingPropertyAndStoreWorkflow".'];
+        yield 'empty support strategy' => [EmptySupportStrategyWorkflow::class, 'The "supportStrategy" argument of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" on "'.$ns.'EmptySupportStrategyWorkflow" cannot be empty.'];
+        yield 'empty marking property' => [EmptyMarkingPropertyWorkflow::class, 'The "markingProperty" argument of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" on "'.$ns.'EmptyMarkingPropertyWorkflow" cannot be empty.'];
+        yield 'empty marking store' => [EmptyMarkingStoreWorkflow::class, 'The "markingStore" argument of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" on "'.$ns.'EmptyMarkingStoreWorkflow" cannot be empty.'];
+        yield 'empty place name' => [EmptyPlaceNameWorkflow::class, 'The name of a place defined in the "places" argument of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" on "'.$ns.'EmptyPlaceNameWorkflow" cannot be empty.'];
+        yield 'empty place name in a Place' => [EmptyPlaceNameInPlaceWorkflow::class, 'The name of a place defined in the "places" argument of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" on "'.$ns.'EmptyPlaceNameInPlaceWorkflow" cannot be empty.'];
+        yield 'empty enum case' => [EmptyEnumCaseWorkflow::class, 'The value of "'.$ns.'EmptyStep::Empty" cannot be empty as it is used as the name of a place of the workflow defined by "'.$ns.'EmptyEnumCaseWorkflow".'];
         yield 'missing supported class' => [MissingSupportWorkflow::class, 'The supported class or interface "Missing\Subject" of the workflow defined by "'.$ns.'MissingSupportWorkflow" does not exist.'];
         yield 'unknown event' => [UnknownEventWorkflow::class, 'The "eventsToDispatch" argument of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" on "'.$ns.'UnknownEventWorkflow" must be a list of workflow events (like "workflow.enter"), "workflow.unknown" given.'];
         yield 'non-string event' => [NonStringEventWorkflow::class, 'The "eventsToDispatch" argument of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" on "'.$ns.'NonStringEventWorkflow" must be a list of event names, "int" given.'];
@@ -213,6 +219,11 @@ enum NamedStep: string
 {
     #[Place('a')]
     case A = 'a';
+}
+
+enum EmptyStep: string
+{
+    case Empty = '';
 }
 
 class ValidatorWithRequiredArgument implements DefinitionValidatorInterface
@@ -361,6 +372,48 @@ class SupportsAndStrategyWorkflow
 
 #[AsWorkflow(supports: \stdClass::class, markingProperty: 'step', markingStore: 'app.marking_store')]
 class MarkingPropertyAndStoreWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[AsWorkflow(supportStrategy: '')]
+class EmptySupportStrategyWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[AsWorkflow(supports: \stdClass::class, markingProperty: '')]
+class EmptyMarkingPropertyWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[AsWorkflow(supports: \stdClass::class, markingStore: '')]
+class EmptyMarkingStoreWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[AsWorkflow(supports: \stdClass::class, places: [''])]
+class EmptyPlaceNameWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[AsWorkflow(supports: \stdClass::class, places: [new Place('')])]
+class EmptyPlaceNameInPlaceWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[AsWorkflow(supports: \stdClass::class, places: EmptyStep::class)]
+class EmptyEnumCaseWorkflow
 {
     #[Transition(from: 'a', to: 'b')]
     public const GO = 'go';

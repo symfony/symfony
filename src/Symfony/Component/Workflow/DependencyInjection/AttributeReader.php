@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Attribute\AsWorkflow;
@@ -28,7 +29,10 @@ use Symfony\Component\Workflow\WorkflowEvents;
  */
 final class AttributeReader
 {
-    public function read(AsWorkflow $attribute, \ReflectionClass $class): WorkflowDescriptor
+    /**
+     * @param ContainerBuilder|null $container When set, the enums used by the definition are tracked as resources of the container
+     */
+    public function read(AsWorkflow $attribute, \ReflectionClass $class, ?ContainerBuilder $container = null): WorkflowDescriptor
     {
         $className = $class->name;
 
@@ -48,6 +52,11 @@ final class AttributeReader
         if (null !== $attribute->markingProperty && null !== $attribute->markingStore) {
             throw new LogicException(\sprintf('The "markingProperty" and "markingStore" arguments of "#[%s]" cannot be used together on "%s".', AsWorkflow::class, $className));
         }
+        foreach (['supportStrategy', 'markingProperty', 'markingStore'] as $argument) {
+            if ('' === $attribute->$argument) {
+                throw new LogicException(\sprintf('The "%s" argument of "#[%s]" on "%s" cannot be empty.', $argument, AsWorkflow::class, $className));
+            }
+        }
         $this->validateEventsToDispatch($attribute->eventsToDispatch, $className);
         $this->validateDefinitionValidators($attribute->definitionValidators, $className);
 
@@ -62,8 +71,12 @@ final class AttributeReader
             if (!enum_exists($placesEnum) || !is_subclass_of($placesEnum, \BackedEnum::class)) {
                 throw new LogicException(\sprintf('The "places" argument of "#[%s]" on "%s" must be a list of places or the name of a string-backed enum, "%s" given.', AsWorkflow::class, $className, $placesEnum));
             }
+            $enums[$placesEnum] = $placesEnum;
             foreach ($placesEnum::cases() as $case) {
-                $places[$this->getPlaceName($case, $className, $enums)] = null;
+                if ('' === $placeName = $this->getPlaceName($case, $className, $enums)) {
+                    throw new LogicException(\sprintf('The value of "%s::%s" cannot be empty as it is used as the name of a place of the workflow defined by "%s".', $placesEnum, $case->name, $className));
+                }
+                $places[$placeName] = null;
             }
         } else {
             foreach ($attribute->places as $place) {
@@ -80,6 +93,9 @@ final class AttributeReader
                     throw new LogicException(\sprintf('The "places" argument of "#[%s]" on "%s" must be a list of "%s" instances, enum cases or strings, "%s" given.', AsWorkflow::class, $className, Place::class, get_debug_type($place)));
                 }
 
+                if ('' === $placeName) {
+                    throw new LogicException(\sprintf('The name of a place defined in the "places" argument of "#[%s]" on "%s" cannot be empty.', AsWorkflow::class, $className));
+                }
                 if (\array_key_exists($placeName, $places)) {
                     throw new LogicException(\sprintf('The place "%s" is defined twice in the "places" argument of "#[%s]" on "%s".', $placeName, AsWorkflow::class, $className));
                 }
@@ -123,11 +139,13 @@ final class AttributeReader
             }
         }
 
+        $placesMetadata = [];
         foreach ($places as $placeName => $metadata) {
+            $placeName = (string) $placeName;
             if (null !== $placesEnum && null === $placesEnum::tryFrom($placeName)) {
                 throw new LogicException(\sprintf('The place "%s" of the workflow defined by "%s" is not a case of "%s".', $placeName, $className, $placesEnum));
             }
-            $places[$placeName] = $metadata ?? $this->readPlaceMetadata((string) $placeName, $enums);
+            $placesMetadata[$placeName] = $metadata ?? $this->readPlaceMetadata($placeName, $enums);
         }
 
         $initialMarking = [];
@@ -143,10 +161,15 @@ final class AttributeReader
             $initialMarking[] = $placeName;
         }
 
+        foreach ($enums as $enum) {
+            // Changing the cases of the enums or their #[Place] attributes must invalidate the container
+            $container?->getReflectionClass($enum);
+        }
+
         return new WorkflowDescriptor(
             $name,
             $attribute->type,
-            $places,
+            $placesMetadata,
             $transitions,
             $initialMarking,
             $supports,

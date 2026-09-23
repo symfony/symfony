@@ -12,6 +12,7 @@
 namespace Symfony\Component\Workflow\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -23,9 +24,11 @@ use Symfony\Component\Workflow\Attribute\AsWorkflow;
 use Symfony\Component\Workflow\Attribute\Transition;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\Task;
+use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\TaskStep;
 use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\TaskWorkflow;
 use Symfony\Component\Workflow\WorkflowBundle;
 use Symfony\Component\Workflow\WorkflowInterface;
+use Symfony\Component\Workflow\WorkflowTrait;
 use Symfony\Component\Workflow\WorkflowType;
 
 class WorkflowAttributePassTest extends TestCase
@@ -77,16 +80,43 @@ class WorkflowAttributePassTest extends TestCase
         $this->assertCount(1, $registryCalls);
         $this->assertSame('state_machine.task', (string) $registryCalls[0][1][0]);
         $this->assertSame(Task::class, $registryCalls[0][1][1]->getArgument(0));
+
+        $resources = array_map(strval(...), $container->getResources());
+        $this->assertContains((string) new ReflectionClassResource(new \ReflectionClass(TaskWorkflow::class)), $resources);
+        $this->assertContains((string) new ReflectionClassResource(new \ReflectionEnum(TaskStep::class)), $resources, 'The enums used by the definition are tracked');
+    }
+
+    public function testTheWorkflowIsNotAddedToTheRegistryWithoutSupports()
+    {
+        $container = $this->createContainer();
+        $container->register(PassRegistryLessWorkflow::class, PassRegistryLessWorkflow::class)->setAutoconfigured(true);
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('state_machine.pass_registry_less'));
+        $this->assertSame([], $container->getDefinition('workflow.registry')->getMethodCalls());
     }
 
     public function testTheWorkflowIsNotInjectedWhenTheClassDoesNotUseTheTrait()
     {
         $container = $this->createContainer();
         $container->register(PassPlainWorkflow::class, PassPlainWorkflow::class)->setAutoconfigured(true);
+        $container->register(PassUnrelatedSetterWorkflow::class, PassUnrelatedSetterWorkflow::class)->setAutoconfigured(true);
         $container->compile();
 
         $this->assertSame([], $container->getDefinition(PassPlainWorkflow::class)->getMethodCalls());
         $this->assertTrue($container->hasDefinition('workflow.pass_plain'));
+        $this->assertSame([], $container->getDefinition(PassUnrelatedSetterWorkflow::class)->getMethodCalls(), 'A method named setWorkflow() is not enough to inject the workflow');
+    }
+
+    public function testTheWorkflowIsInjectedWhenTheTraitIsInheritedOrNested()
+    {
+        $container = $this->createContainer();
+        $container->register(PassInheritedTraitWorkflow::class, PassInheritedTraitWorkflow::class)->setAutoconfigured(true);
+        $container->register(PassNestedTraitWorkflow::class, PassNestedTraitWorkflow::class)->setAutoconfigured(true);
+        $container->compile();
+
+        $this->assertEquals([['setWorkflow', [new Reference('state_machine.pass_inherited_trait')]]], $container->getDefinition(PassInheritedTraitWorkflow::class)->getMethodCalls());
+        $this->assertEquals([['setWorkflow', [new Reference('state_machine.pass_nested_trait')]]], $container->getDefinition(PassNestedTraitWorkflow::class)->getMethodCalls());
     }
 
     public function testTheTransitionsOfAStateMachineAreSplit()
@@ -219,6 +249,50 @@ class WorkflowAttributePassTest extends TestCase
 #[AsWorkflow(type: WorkflowType::Workflow, supports: \stdClass::class)]
 class PassPlainWorkflow
 {
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[AsWorkflow]
+class PassRegistryLessWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class PassUnrelatedSetterWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+
+    public function setWorkflow(string $workflow): void
+    {
+    }
+}
+
+abstract class PassWorkflowBase
+{
+    use WorkflowTrait;
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class PassInheritedTraitWorkflow extends PassWorkflowBase
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+trait PassNestedTrait
+{
+    use WorkflowTrait;
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class PassNestedTraitWorkflow
+{
+    use PassNestedTrait;
+
     #[Transition(from: 'a', to: 'b')]
     public const GO = 'go';
 }

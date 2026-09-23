@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Workflow\Attribute\AsWorkflow;
+use Symfony\Component\Workflow\WorkflowTrait;
 
 /**
  * Registers the workflows defined with the #[AsWorkflow] attribute.
@@ -54,14 +55,14 @@ final class WorkflowAttributePass implements CompilerPassInterface
                 throw new LogicException(\sprintf('The "%s" service is tagged ".workflow.attribute" but its class "%s" does not use the "#[%s]" attribute.', $id, $class, AsWorkflow::class));
             }
 
-            $workflow = $reader->read($attribute, $reflection);
+            $workflow = $reader->read($attribute, $reflection, $container);
             if (isset($workflowIds[$workflow->name])) {
                 throw new LogicException(\sprintf('The workflow "%s" defined by "%s" is already defined by the "%s" service.', $workflow->name, $class, $workflowIds[$workflow->name]));
             }
             $workflowIds[$workflow->name] = $id;
             $workflowId = $registrar->register($container, $workflow);
 
-            if ($reflection->hasMethod('setWorkflow')) {
+            if (self::usesWorkflowTrait($reflection)) {
                 $definition->addMethodCall('setWorkflow', [new Reference($workflowId)]);
             }
 
@@ -76,6 +77,17 @@ final class WorkflowAttributePass implements CompilerPassInterface
                 }
             }
         }
+    }
+
+    private static function usesWorkflowTrait(\ReflectionClass $class): bool
+    {
+        foreach ($class->getTraits() as $trait) {
+            if (WorkflowTrait::class === $trait->name || self::usesWorkflowTrait($trait)) {
+                return true;
+            }
+        }
+
+        return ($parent = $class->getParentClass()) && self::usesWorkflowTrait($parent);
     }
 
     /**

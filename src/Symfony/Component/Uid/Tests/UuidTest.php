@@ -13,6 +13,7 @@ namespace Symfony\Component\Uid\Tests;
 
 use Ds\Set;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -185,6 +186,19 @@ class UuidTest extends TestCase
         $this->assertSame($now, $uuid->getDateTime()->format('Y-m-d H:i'));
     }
 
+    #[Group('time-sensitive')]
+    public function testV7IsMonotonicWhenTheClockGoesBackwards()
+    {
+        $prev = UuidV7::generate();
+
+        for ($i = 0; $i < 3; ++$i) {
+            usleep(-500);
+            $uuid = UuidV7::generate();
+            $this->assertGreaterThan($prev, $uuid);
+            $prev = $uuid;
+        }
+    }
+
     public function testBinary()
     {
         $uuid = new UuidV4(self::A_UUID_V4);
@@ -283,6 +297,15 @@ class UuidTest extends TestCase
 
         $this->assertFalse(UuidV5::isValid('ffffffff-ffff-ffff-ffff-ffffffffffff'));
         $this->assertFalse(UuidV6::isValid('ffffffff-ffff-ffff-ffff-ffffffffffff'));
+    }
+
+    public function testCompareWithUlid()
+    {
+        $uuid = new UuidV4(self::A_UUID_V4);
+        $ulid = new Ulid('01EW2RYKDCT2SAK454KBR2QG08');
+
+        $this->assertGreaterThan(0, $uuid->compare($ulid));
+        $this->assertLessThan(0, $ulid->compare($uuid));
     }
 
     public function testEquals()

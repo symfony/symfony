@@ -98,6 +98,11 @@ class UuidV7 extends Uuid implements TimeOrderedUidInterface
             self::$rand = unpack(\PHP_INT_SIZE >= 8 ? 'L*' : 'S*', isset(self::$seed) ? random_bytes(8) : self::$seed = random_bytes(16));
             self::$time = $time;
         } else {
+            // When the clock goes backwards, keep the sub-millisecond part from going backwards too
+            if (null === $mtime && $subMs < self::$subMs) {
+                $subMs = self::$subMs;
+            }
+
             // Within the same ms, we increment the rand part by a random 24-bit number.
             // Instead of getting this number from random_bytes(), which is slow, we get
             // it by sha512-hashing self::$seed. This produces 64 bytes of entropy,

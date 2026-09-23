@@ -13,6 +13,7 @@ namespace Symfony\Component\Uid\Tests;
 
 use Ds\Set;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -168,6 +169,19 @@ class UuidTest extends TestCase
         $uuid = Uuid::fromString($uuid);
         $this->assertInstanceOf(UuidV7::class, $uuid);
         $this->assertSame($now, $uuid->getDateTime()->format('Y-m-d H:i'));
+    }
+
+    #[Group('time-sensitive')]
+    public function testV7IsMonotonicWhenTheClockGoesBackwards()
+    {
+        $prev = UuidV7::generate();
+
+        for ($i = 0; $i < 3; ++$i) {
+            usleep(-500);
+            $uuid = UuidV7::generate();
+            $this->assertGreaterThan($prev, $uuid);
+            $prev = $uuid;
+        }
     }
 
     public function testBinary()

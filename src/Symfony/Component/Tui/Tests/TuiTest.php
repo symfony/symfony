@@ -58,6 +58,33 @@ class TuiTest extends TestCase
         $this->assertStringContainsString('Hello World', $output);
     }
 
+    public function testGetWidgetRectReturnsWhereAWidgetWasDrawn()
+    {
+        $terminal = new VirtualTerminal(40, 10);
+        $tui = new Tui(terminal: $terminal);
+        $tui->add($first = new TextWidget("First\nSecond"));
+        $tui->add($third = new TextWidget('Third'));
+
+        $tui->start();
+        $tui->processRender();
+
+        $this->assertSame(0, $tui->getWidgetRect($first)?->row);
+        $this->assertSame(2, $tui->getWidgetRect($first)?->rows);
+        $this->assertSame(2, $tui->getWidgetRect($third)?->row, 'A widget starts where the one above it ends.');
+    }
+
+    public function testGetWidgetRectReturnsNullForAWidgetThatWasNotDrawn()
+    {
+        $terminal = new VirtualTerminal(40, 10);
+        $tui = new Tui(terminal: $terminal);
+        $tui->add(new TextWidget('Drawn'));
+
+        $tui->start();
+        $tui->processRender();
+
+        $this->assertNull($tui->getWidgetRect(new TextWidget('Never added')));
+    }
+
     public function testMultipleComponents()
     {
         $terminal = new VirtualTerminal(40, 10);

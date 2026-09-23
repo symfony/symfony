@@ -25,6 +25,7 @@ use Symfony\Component\Tui\Loop\AdaptativeTicker;
 use Symfony\Component\Tui\Loop\TickRuntimeInterface;
 use Symfony\Component\Tui\Loop\TickScheduler;
 use Symfony\Component\Tui\Render\Renderer;
+use Symfony\Component\Tui\Render\WidgetRect;
 use Symfony\Component\Tui\Render\RenderRequestorInterface;
 use Symfony\Component\Tui\Render\ScreenWriter;
 use Symfony\Component\Tui\Style\StyleSheet;
@@ -400,6 +401,18 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     /**
      * Get the currently focused component.
      */
+    /**
+     * Returns where a widget was drawn during the last render, or null if it was not drawn.
+     *
+     * A widget's own render() reports the height of its content, not the row the layout gave it,
+     * so it cannot place a pointer event. The renderer knows, and already exposes it; this is the
+     * way through for a caller that only holds the Tui.
+     */
+    public function getWidgetRect(AbstractWidget $widget): ?WidgetRect
+    {
+        return $this->renderer->getWidgetRect($widget);
+    }
+
     public function getFocus(): ?AbstractWidget
     {
         return $this->focusManager->getFocus();

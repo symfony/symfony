@@ -124,7 +124,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     _instanceof?: %SInstanceofType%S,
  *     ...<string, DefinitionType|AliasType|PrototypeType|StackType|ArgumentsType|null>
  * }
- * @psalm-type ExtensionType = array<string, mixed>
+ * @psalm-type ExtensionType = %s
  * @psalm-type TestConfig = array{
  *     enabled?: scalar|Param|null, // Default: false
  *     options?: array{

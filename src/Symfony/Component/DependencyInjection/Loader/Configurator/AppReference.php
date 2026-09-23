@@ -140,7 +140,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     _instanceof?: array<class-string, InstanceofType>,
  *     ...<string, DefinitionType|AliasType|PrototypeType|StackType|ArgumentsType|null>
  * }
- * @psalm-type ExtensionType = array<string, mixed>
+ * @psalm-type ExtensionType = array<mixed>|scalar|\UnitEnum|\Symfony\Component\Config\Loader\ParamConfigurator|null
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,

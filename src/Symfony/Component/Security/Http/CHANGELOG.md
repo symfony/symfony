@@ -6,6 +6,7 @@ CHANGELOG
 
  * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in and the denied attribute kept in the session
  * Add `AuthenticationUtils::getReAuthenticationAttribute()`, the security attribute the current request is asking a re-authentication for
+ * Add `DpopProofFactory`, signing the DPoP proofs of RFC 9449; `OidcClient` carries one on every request to the provider and presents the access token under the `DPoP` scheme, and `OidcLoginAuthenticator` names the key in the `dpop_jkt` of the authorization request
  * Add the `$discovery` argument to `ClientSecretJwt` and `PrivateKeyJwt`, and `OidcDiscovery::getIssuer()`
  * Support the OAuth 2.0 Form Post Response Mode in `OidcLoginAuthenticator`, reading the authorization response from the request body
  * Add `RefreshedUserCheckerListener`, running a user checker on `CheckRefreshedUserEvent` so an account disabled during a session is rejected on the next request

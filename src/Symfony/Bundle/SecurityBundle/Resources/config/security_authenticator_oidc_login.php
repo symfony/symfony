@@ -27,6 +27,7 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthenti
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
+use Symfony\Component\Security\Http\OAuth2\Dpop\DpopProofFactory;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 return static function (ContainerConfigurator $container) {
@@ -48,6 +49,8 @@ return static function (ContainerConfigurator $container) {
                 null,
                 service('clock'),
                 abstract_arg('firewall event dispatcher'),
+                // replaced by the firewall proof factory, unless the firewall binds nothing to a key
+                null,
             ])
 
         ->set('security.authenticator.oidc_login.signature_verifier', OidcSignatureVerifier::class)
@@ -92,6 +95,8 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('client ID'),
                 abstract_arg('client authentication'),
                 abstract_arg('HTTP client options presenting the client certificate, or none'),
+                // replaced by the firewall proof factory, unless the firewall binds nothing to a key
+                null,
             ])
 
         // a client authentication method that has nothing to configure, so that
@@ -134,6 +139,21 @@ return static function (ContainerConfigurator $container) {
         ->set('security.oauth2.client_authentication.tls_client_auth', TlsClientAuth::class)
 
         ->set('security.oauth2.client_authentication.self_signed_tls_client_auth', SelfSignedTlsClientAuth::class)
+
+        ->set('security.oauth2.dpop.proof_factory', DpopProofFactory::class)
+            ->abstract()
+            ->args([
+                abstract_arg('proof signing key'),
+                abstract_arg('signature algorithm'),
+                service('clock'),
+            ])
+
+        ->set('security.oauth2.dpop.signing_key', JWK::class)
+            ->abstract()
+            ->factory([JWK::class, 'createFromJson'])
+            ->args([
+                abstract_arg('JSON-encoded JWK'),
+            ])
 
         // the private key of the "private_key_jwt" method, parsed from the JSON-encoded JWK
         // the firewall configures, as the "oidc" access token handler parses its own keyset

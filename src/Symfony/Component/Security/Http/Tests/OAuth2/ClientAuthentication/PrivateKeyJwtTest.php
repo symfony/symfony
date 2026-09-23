@@ -15,9 +15,13 @@ use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\AbstractClientAssertion;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 #[RequiresPhpExtension('openssl')]
 class PrivateKeyJwtTest extends TestCase
@@ -170,9 +174,52 @@ class PrivateKeyJwtTest extends TestCase
         $this->assertSame('private_key_jwt', $this->createClientAuthentication()->getMethod());
     }
 
-    private function createClientAuthentication(): PrivateKeyJwt
+    /**
+     * FAPI 2.0 Security Profile, Section 5.2.2 takes the issuer and nothing else: an assertion
+     * made for one endpoint of a provider authenticates the client at every other endpoint of
+     * that same provider.
+     */
+    public function testNamesTheIssuerTheProviderAnnouncesAsAudienceWhenOneIsGiven()
     {
-        return new PrivateKeyJwt(new JWK(self::PRIVATE_JWK), 'ES256');
+        // Given
+        $clientAuthentication = $this->createClientAuthentication(self::createDiscovery('https://provider.example.com'));
+
+        // When
+        $options = $clientAuthentication->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []]);
+
+        // Then
+        $this->assertSame('https://provider.example.com', self::decodePayload($options['body']['client_assertion'])['aud']);
+    }
+
+    /**
+     * The announced spelling, not the configured one: the discovery compares the two ignoring a
+     * trailing slash, so the audience a provider verifies against is the one it writes itself.
+     */
+    public function testNamesTheAnnouncedIssuerEvenWhenItEndsWithASlash()
+    {
+        // Given
+        $clientAuthentication = $this->createClientAuthentication(self::createDiscovery('https://provider.example.com/'));
+
+        // When
+        $options = $clientAuthentication->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []]);
+
+        // Then
+        $this->assertSame('https://provider.example.com/', self::decodePayload($options['body']['client_assertion'])['aud']);
+    }
+
+    private static function createDiscovery(string $announcedIssuer): OidcDiscovery
+    {
+        return new OidcDiscovery(
+            new MockHttpClient(new JsonMockResponse(['issuer' => $announcedIssuer])),
+            new ArrayAdapter(),
+            'https://provider.example.com/.well-known/openid-configuration',
+            'https://provider.example.com',
+        );
+    }
+
+    private function createClientAuthentication(?OidcDiscovery $issuerAudience = null): PrivateKeyJwt
+    {
+        return new PrivateKeyJwt(new JWK(self::PRIVATE_JWK), 'ES256', issuerAudience: $issuerAudience);
     }
 
     private static function decodeHeader(string $assertion): array

@@ -457,6 +457,12 @@ TwigBridge
    `form_start` block renders no id until that block is updated
  * Deprecate the `render_hinclude()` Twig function; use `render_esi()` or `render()`, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
 
+Uid
+---
+
+ * The component does not require `symfony/polyfill-uuid` anymore; require it if your code calls the `uuid_*()` functions without the `uuid` extension
+ * `UuidV1` uses a random node instead of the MAC address of the host, also when the `uuid` extension is installed
+
 Validator
 ---------
 

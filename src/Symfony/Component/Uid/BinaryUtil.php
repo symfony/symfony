@@ -41,7 +41,7 @@ class BinaryUtil
     // https://datatracker.ietf.org/doc/html/rfc9562#section-5.1
     // 0x01b21dd213814000 is the number of 100-ns intervals between the
     // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
-    private const TIME_OFFSET_INT = 0x01B21DD213814000;
+    public const TIME_OFFSET_INT = 0x01B21DD213814000;
     private const TIME_OFFSET_BIN = "\x01\xb2\x1d\xd2\x13\x81\x40\x00";
     private const TIME_OFFSET_COM1 = "\xfe\x4d\xe2\x2d\xec\x7e\xbf\xff";
     private const TIME_OFFSET_COM2 = "\xfe\x4d\xe2\x2d\xec\x7e\xc0\x00";
@@ -49,15 +49,49 @@ class BinaryUtil
     public static function toBase(string $bytes, array $map): string
     {
         $base = \strlen($alphabet = $map['']);
-        $bytes = array_values(unpack(\PHP_INT_SIZE >= 8 ? 'n*' : 'C*', $bytes));
         $digits = '';
+
+        if (\PHP_INT_SIZE >= 8) {
+            // Dividing 32-bit limbs by the largest power of the base below 2^31 yields several digits per division
+            for ($power = $base, $n = 1; $power * $base < 0x80000000; ++$n) {
+                $power *= $base;
+            }
+
+            $limbs = unpack('N*', str_pad($bytes, (\strlen($bytes) + 3) & ~3, "\0", \STR_PAD_LEFT));
+
+            while ($limbs) {
+                $quotient = [];
+                $remainder = 0;
+
+                foreach ($limbs as $limb) {
+                    $carry = $limb | $remainder << 32;
+                    $remainder = $carry % $power;
+
+                    if (($digit = intdiv($carry, $power)) || $quotient) {
+                        $quotient[] = $digit;
+                    }
+                }
+
+                $limbs = $quotient;
+                $i = $n;
+
+                do {
+                    $digits = $alphabet[$remainder % $base].$digits;
+                    $remainder = intdiv($remainder, $base);
+                } while ($limbs ? --$i : $remainder);
+            }
+
+            return $digits;
+        }
+
+        $bytes = array_values(unpack('C*', $bytes));
 
         while ($count = \count($bytes)) {
             $quotient = [];
             $remainder = 0;
 
             for ($i = 0; $i !== $count; ++$i) {
-                $carry = $bytes[$i] + ($remainder << (\PHP_INT_SIZE >= 8 ? 16 : 8));
+                $carry = $bytes[$i] + ($remainder << 8);
                 $digit = intdiv($carry, $base);
                 $remainder = $carry % $base;
 
@@ -77,6 +111,36 @@ class BinaryUtil
     {
         $base = \strlen($map['']);
         $count = \strlen($digits);
+
+        if (\PHP_INT_SIZE >= 8) {
+            // Reading the digits by chunks that fit in 31 bits means one multiplication of the 32-bit limbs per chunk
+            for ($power = $base, $n = 1; $power * $base < 0x80000000; ++$n) {
+                $power *= $base;
+            }
+
+            $limbs = [];
+
+            for ($i = 0, $j = $count % $n ?: $n; $i < $count; $i += $j, $j = $n) {
+                for ($carry = 0, $k = $i; $k < $i + $j; ++$k) {
+                    $carry = $carry * $base + $map[$digits[$k]];
+                }
+
+                $multiplier = $n === $j ? $power : $base ** $j;
+
+                foreach ($limbs as $k => $limb) {
+                    $carry += $limb * $multiplier;
+                    $limbs[$k] = $carry & 0xFFFFFFFF;
+                    $carry >>= 32;
+                }
+
+                if ($carry) {
+                    $limbs[] = $carry;
+                }
+            }
+
+            return pack('N*', ...array_reverse($limbs ?: [0]));
+        }
+
         $bytes = [];
 
         while ($count) {
@@ -85,14 +149,8 @@ class BinaryUtil
 
             for ($i = 0; $i !== $count; ++$i) {
                 $carry = ($bytes ? $digits[$i] : $map[$digits[$i]]) + $remainder * $base;
-
-                if (\PHP_INT_SIZE >= 8) {
-                    $digit = $carry >> 16;
-                    $remainder = $carry & 0xFFFF;
-                } else {
-                    $digit = $carry >> 8;
-                    $remainder = $carry & 0xFF;
-                }
+                $digit = $carry >> 8;
+                $remainder = $carry & 0xFF;
 
                 if ($digit || $quotient) {
                     $quotient[] = $digit;
@@ -103,7 +161,7 @@ class BinaryUtil
             $count = \count($digits = $quotient);
         }
 
-        return pack(\PHP_INT_SIZE >= 8 ? 'n*' : 'C*', ...array_reverse($bytes));
+        return pack('C*', ...array_reverse($bytes));
     }
 
     public static function add(string $a, string $b): string
@@ -154,6 +212,10 @@ class BinaryUtil
      */
     public static function hexToDateTime(string $time): \DateTimeImmutable
     {
+        if (\PHP_INT_SIZE >= 8 && 0 <= $ticks = hexdec($time) - self::TIME_OFFSET_INT) {
+            return \DateTimeImmutable::createFromTimestamp(intdiv($ticks, 10000000))->setMicrosecond(intdiv($ticks % 10000000, 10));
+        }
+
         return \DateTimeImmutable::createFromFormat('U.u?', substr_replace(self::hexToNumericString($time), '.', -7, 0));
     }
 

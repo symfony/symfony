@@ -120,15 +120,21 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableIn
     public function toBase32(): string
     {
         $uid = bin2hex($this->toBinary());
-        $uid = \sprintf('%02s%04s%04s%04s%04s%04s%04s',
-            base_convert(substr($uid, 0, 2), 16, 32),
-            base_convert(substr($uid, 2, 5), 16, 32),
-            base_convert(substr($uid, 7, 5), 16, 32),
-            base_convert(substr($uid, 12, 5), 16, 32),
-            base_convert(substr($uid, 17, 5), 16, 32),
-            base_convert(substr($uid, 22, 5), 16, 32),
-            base_convert(substr($uid, 27, 5), 16, 32)
-        );
+
+        if (\PHP_INT_SIZE >= 8) {
+            // 15 hex digits make 60 bits, which base_convert() handles exactly and which make 12 base-32 digits
+            $uid = \sprintf('%02s%012s%012s', base_convert(substr($uid, 0, 2), 16, 32), base_convert(substr($uid, 2, 15), 16, 32), base_convert(substr($uid, 17), 16, 32));
+        } else {
+            $uid = \sprintf('%02s%04s%04s%04s%04s%04s%04s',
+                base_convert(substr($uid, 0, 2), 16, 32),
+                base_convert(substr($uid, 2, 5), 16, 32),
+                base_convert(substr($uid, 7, 5), 16, 32),
+                base_convert(substr($uid, 12, 5), 16, 32),
+                base_convert(substr($uid, 17, 5), 16, 32),
+                base_convert(substr($uid, 22, 5), 16, 32),
+                base_convert(substr($uid, 27, 5), 16, 32)
+            );
+        }
 
         return strtr($uid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
     }

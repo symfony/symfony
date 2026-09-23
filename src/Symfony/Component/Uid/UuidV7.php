@@ -45,7 +45,14 @@ class UuidV7 extends Uuid implements TimeOrderedUidInterface
     public function getDateTime(): \DateTimeImmutable
     {
         $time = substr($this->uid, 0, 8).substr($this->uid, 9, 4);
-        $time = \PHP_INT_SIZE >= 8 ? (string) hexdec($time) : BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10);
+
+        if (\PHP_INT_SIZE >= 8) {
+            $time = hexdec($time);
+
+            return \DateTimeImmutable::createFromTimestamp(intdiv($time, 1000))->setMicrosecond($time % 1000 * 1000 + (hexdec(substr($this->uid, 14, 4)) >> 2 & 0x3FF) % 1000);
+        }
+
+        $time = BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10);
 
         if (4 > \strlen($time)) {
             $time = '000'.$time;
@@ -83,9 +90,16 @@ class UuidV7 extends Uuid implements TimeOrderedUidInterface
     public static function generate(?\DateTimeInterface $time = null): string
     {
         if (null === $mtime = $time) {
-            $time = microtime(false);
-            $subMs = (int) substr($time, 5, 3);
-            $time = substr($time, 11).substr($time, 2, 3);
+            if (\PHP_INT_SIZE >= 8) {
+                // microtime(true) is faster than microtime(false), and precise enough to give the exact microsecond
+                $time = (int) (microtime(true) * 1000000 + .5);
+                $subMs = $time % 1000;
+                $time = (string) intdiv($time, 1000);
+            } else {
+                $time = microtime(false);
+                $subMs = (int) substr($time, 5, 3);
+                $time = substr($time, 11).substr($time, 2, 3);
+            }
         } elseif (0 > $time = $time->format('Uu')) {
             throw new InvalidArgumentException('The timestamp must be positive.');
         } else {

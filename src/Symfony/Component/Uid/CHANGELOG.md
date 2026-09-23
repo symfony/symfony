@@ -7,6 +7,8 @@ CHANGELOG
  * Add `UidBundle`, which provides the `uid` configuration and the services previously provided by `FrameworkBundle` under `framework.uid`
  * Add `TimeOrderedUidInterface`, implemented by `Ulid`, `UuidV6` and `UuidV7`
  * Add `Ulid::createBoundaries()`, `UuidV6::createBoundaries()` and `UuidV7::createBoundaries()` returning the lowest and highest ids sharing a timestamp
+ * Generate `UuidV1` and `UuidV6` without the `uuid` extension, with a random node instead of the MAC address of the host
+ * Remove the dependency on `symfony/polyfill-uuid`
 
 8.1
 ---

@@ -156,12 +156,54 @@ class UuidTest extends TestCase
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
-    public function testV6IsSeeded()
+    public function testV1AndV6DoNotUseTheMacAddress()
     {
-        $uuidV1 = Uuid::v1();
-        $uuidV6 = Uuid::v6();
+        // the multicast bit is set on nodes that are not a MAC address
+        $this->assertSame(1, hexdec(Uuid::v1()->getNode()[1]) & 1);
+        $this->assertSame(1, hexdec(Uuid::v6()->getNode()[1]) & 1);
+    }
 
-        $this->assertNotSame(substr($uuidV1, 24), substr($uuidV6, 24));
+    #[Group('time-sensitive')]
+    public function testV1AndV6ReadTheClock()
+    {
+        $now = microtime(false);
+        $now = substr($now, 11).'.'.substr($now, 2, 6);
+
+        $this->assertSame($now, (new UuidV1())->getDateTime()->format('U.u'));
+        $this->assertSame($now, (new UuidV6())->getDateTime()->format('U.u'));
+    }
+
+    #[Group('time-sensitive')]
+    public function testV6IsMonotonic()
+    {
+        $prev = UuidV6::generate();
+
+        for ($i = 0; $i < 100; ++$i) {
+            $uuid = UuidV6::generate();
+            $this->assertGreaterThan($prev, $uuid);
+            $prev = $uuid;
+        }
+
+        usleep(-1000);
+        $this->assertGreaterThan($prev, UuidV6::generate());
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testV1AndV6NodesAreNotSharedWithForks()
+    {
+        $node = Uuid::v1()->getNode();
+        [$parentSocket, $childSocket] = stream_socket_pair(\STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
+
+        if (!$pid = pcntl_fork()) {
+            fwrite($childSocket, Uuid::v1()->getNode());
+            exit(0);
+        }
+
+        fclose($childSocket);
+        $childNode = stream_get_contents($parentSocket);
+        pcntl_waitpid($pid, $status);
+
+        $this->assertNotSame($node, $childNode);
     }
 
     public function testV7()

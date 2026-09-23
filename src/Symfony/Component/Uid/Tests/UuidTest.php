@@ -232,6 +232,15 @@ class UuidTest extends TestCase
         $this->assertFalse(UuidV6::isValid('ffffffff-ffff-ffff-ffff-ffffffffffff'));
     }
 
+    public function testCompareWithUlid()
+    {
+        $uuid = new UuidV4(self::A_UUID_V4);
+        $ulid = new Ulid('01EW2RYKDCT2SAK454KBR2QG08');
+
+        $this->assertGreaterThan(0, $uuid->compare($ulid));
+        $this->assertLessThan(0, $ulid->compare($uuid));
+    }
+
     public function testEquals()
     {
         $uuid1 = new UuidV1(self::A_UUID_V1);

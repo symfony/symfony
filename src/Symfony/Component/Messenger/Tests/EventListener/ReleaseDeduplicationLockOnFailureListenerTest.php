@@ -72,8 +72,8 @@ final class ReleaseDeduplicationLockOnFailureListenerTest extends TestCase
 
     public function testListenerRunsAfterRetryListener()
     {
-        $retryPriority = SendFailedMessageForRetryListener::getSubscribedEvents()[WorkerMessageFailedEvent::class][1];
-        $ownPriority = ReleaseDeduplicationLockOnFailureListener::getSubscribedEvents()[WorkerMessageFailedEvent::class][1];
+        $retryPriority = SendFailedMessageForRetryListener::getSubscribedEvents()[WorkerMessageFailedEvent::class]['priority'];
+        $ownPriority = ReleaseDeduplicationLockOnFailureListener::getSubscribedEvents()[WorkerMessageFailedEvent::class]['priority'];
 
         $this->assertLessThan($retryPriority, $ownPriority, 'Must run after SendFailedMessageForRetryListener so willRetry() is set.');
     }

@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContext;
@@ -35,7 +36,7 @@ class LocaleListenerTest extends TestCase
     {
         $this->assertEquals(
             [
-                KernelEvents::REQUEST => [['setDefaultLocale', 100], ['onKernelRequest', 16]],
+                KernelEvents::REQUEST => [['setDefaultLocale', 100], ['method' => 'onKernelRequest', 'priority' => 16, 'after' => RouterListener::class]],
                 KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
             ],
             LocaleListener::getSubscribedEvents()

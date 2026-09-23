@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Monolog\Processor;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Monolog\ResettableInterface;
+use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -73,9 +74,8 @@ final class ConsoleCommandProcessor implements EventSubscriberInterface, ResetIn
     {
         return [
             ConsoleEvents::COMMAND => ['addCommandData', 1],
-            // lower than ConsoleHandler::onTerminate() (-255) so that records logged
-            // on ConsoleEvents::TERMINATE still carry the command information
-            ConsoleEvents::TERMINATE => ['removeCommandData', -2048],
+            // records logged on ConsoleEvents::TERMINATE must still carry the command information
+            ConsoleEvents::TERMINATE => ['method' => 'removeCommandData', 'priority' => -2048, 'after' => ConsoleHandler::class],
         ];
     }
 }

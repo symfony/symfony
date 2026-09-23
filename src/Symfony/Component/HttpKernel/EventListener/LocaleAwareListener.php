@@ -74,8 +74,7 @@ class LocaleAwareListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // must be registered after the Locale listener
-            KernelEvents::REQUEST => [['onKernelRequest', 15]],
+            KernelEvents::REQUEST => ['method' => 'onKernelRequest', 'priority' => 15, 'after' => LocaleListener::class.'::onKernelRequest'],
             KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', -15]],
         ];
     }

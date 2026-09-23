@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Middleware\IdleConnection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\EventListener\SessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -54,7 +55,8 @@ final class Listener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => ['onKernelRequest', 192], // before session listeners since they could use the DB
+            // session listeners could use the DB
+            KernelEvents::REQUEST => ['method' => 'onKernelRequest', 'priority' => 192, 'before' => SessionListener::class],
         ];
     }
 }

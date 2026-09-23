@@ -40,7 +40,8 @@
         "symfony/web-link": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<8.2"
+        "symfony/dependency-injection": "<8.2",
+        "symfony/event-dispatcher": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\AssetMapper\\": "" },

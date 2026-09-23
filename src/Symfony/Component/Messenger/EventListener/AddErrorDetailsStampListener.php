@@ -31,8 +31,7 @@ final class AddErrorDetailsStampListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // must have higher priority than SendFailedMessageForRetryListener
-            WorkerMessageFailedEvent::class => ['onMessageFailed', 200],
+            WorkerMessageFailedEvent::class => ['method' => 'onMessageFailed', 'priority' => 200, 'before' => SendFailedMessageForRetryListener::class],
         ];
     }
 }

@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
@@ -211,10 +212,9 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
     public static function getSubscribedEvents(): array
     {
-        // Keep this priority lower than ControllerAttributesListener (-10000) so that gate
-        // attributes such as #[IsGranted] are handled before the payload is mapped.
+        // gate attributes such as #[IsGranted] must be handled before the payload is mapped
         return [
-            KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', -10100],
+            KernelEvents::CONTROLLER_ARGUMENTS => ['method' => 'onKernelControllerArguments', 'priority' => -10100, 'after' => ControllerAttributesListener::class],
         ];
     }
 

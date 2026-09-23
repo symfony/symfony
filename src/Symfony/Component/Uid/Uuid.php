@@ -171,15 +171,6 @@ class Uuid extends AbstractUid
         return $this->uid;
     }
 
-    public function compare(AbstractUid $other): int
-    {
-        if (false !== $cmp = uuid_compare($this->uid, $other->uid)) {
-            return $cmp;
-        }
-
-        return parent::compare($other);
-    }
-
     private static function format(string $uuid, string $version): string
     {
         $uuid[8] = $uuid[8] & "\x3F" | "\x80";

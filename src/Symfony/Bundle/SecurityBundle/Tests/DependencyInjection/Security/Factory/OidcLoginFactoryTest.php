@@ -1323,6 +1323,98 @@ class OidcLoginFactoryTest extends TestCase
         ], $factory);
     }
 
+    /**
+     * The proof factory reaches both the client, which signs the requests it makes, and the
+     * authenticator, which names the key in the authorization request.
+     */
+    public function testTheDpopProofFactoryIsBuiltFromTheConfiguration()
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+            'dpop' => ['key' => self::SIGNING_KEY, 'algorithm' => 'ES256'],
+        ];
+
+        // When
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        // Then
+        $proofFactory = $container->getDefinition('security.authenticator.oidc_login.dpop.main');
+        $this->assertSame('security.oauth2.dpop.proof_factory', $proofFactory->getParent());
+        $this->assertSame('ES256', $proofFactory->getArgument(1));
+        $this->assertSame(self::SIGNING_KEY, $proofFactory->getArgument(0)->getArgument(0));
+
+        $reference = new Reference('security.authenticator.oidc_login.dpop.main');
+        $this->assertEquals($reference, $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+        $this->assertEquals($reference, $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
+    }
+
+    public function testTheDpopNodeTakesTheKeyAlone()
+    {
+        // Given
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+            'dpop' => self::SIGNING_KEY,
+        ];
+
+        // When
+        $finalized = $this->processConfig($config, new OidcLoginFactory());
+
+        // Then
+        $this->assertSame(self::SIGNING_KEY, $finalized['dpop']['key']);
+        $this->assertSame('ES256', $finalized['dpop']['algorithm']);
+    }
+
+    /**
+     * Nothing is bound to a key unless the firewall says so.
+     */
+    public function testNothingIsWiredForDpopByDefault()
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+        ];
+
+        // When
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        // Then
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.dpop.main'));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
+    }
+
+    /**
+     * RFC 9449, Section 4.2 excludes symmetric algorithms.
+     */
+    public function testTheDpopNodeRefusesAMacAlgorithm()
+    {
+        // Given
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+            'dpop' => ['key' => self::SIGNING_KEY, 'algorithm' => 'HS256'],
+        ];
+
+        // Then
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The value "HS256" is not allowed for path "oidc-login.dpop.algorithm".');
+
+        // When
+        $this->processConfig($config, new OidcLoginFactory());
+    }
+
     private function processConfig(array $config, OidcLoginFactory $factory): array
     {
         $nodeDefinition = new ArrayNodeDefinition('oidc-login');

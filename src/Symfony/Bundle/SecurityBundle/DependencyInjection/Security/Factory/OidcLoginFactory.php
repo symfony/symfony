@@ -161,6 +161,26 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                     ->end()
                 ->end()
             ->end()
+            ->arrayNode('dpop')
+                ->info('Binds what the provider issues to a key this client holds, the Demonstrating Proof of Possession of RFC 9449. Every request to the provider then carries a proof signed with that key, the access token comes back bound to it and is presented under the "DPoP" scheme rather than "Bearer", and the authorization request names the key in "dpop_jkt" so that a stolen code cannot be exchanged by whoever does not hold it. Only configure it for a provider that announces "dpop_signing_alg_values_supported".')
+                ->example(['key' => '%env(OIDC_DPOP_KEY)%', 'algorithm' => 'ES256'])
+                ->beforeNormalization()
+                    ->ifString()
+                    ->then(static fn (string $v): array => ['key' => $v])
+                ->end()
+                ->children()
+                    ->scalarNode('key')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                        ->info('JSON-encoded JWK of the private key the proofs are signed with. Nothing is registered at the provider for it: the public half travels in the header of every proof. Keep it as you keep a client secret, since what it signs is what makes a bound token usable.')
+                    ->end()
+                    ->enumNode('algorithm')
+                        ->values(['ES256', 'ES384', 'ES512', 'PS256', 'PS384', 'PS512', 'RS256', 'RS384', 'RS512'])
+                        ->defaultValue('ES256')
+                        ->info('The signature algorithm the proofs are signed with, which must be one your provider announces in "dpop_signing_alg_values_supported". All asymmetric, RFC 9449, Section 4.2 excluding a shared secret, which would let whoever shares it sign a proof.')
+                    ->end()
+                ->end()
+            ->end()
             ->arrayNode('scope')
                 ->beforeNormalization()->castToArray()->end()
                 ->scalarPrototype()->end()
@@ -375,6 +395,17 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             )
         ;
 
+        $dpopProofFactory = null;
+        if (isset($config['dpop'])) {
+            $dpopProofFactoryId = 'security.authenticator.oidc_login.dpop.'.$firewallName;
+            $container
+                ->setDefinition($dpopProofFactoryId, new ChildDefinition('security.oauth2.dpop.proof_factory'))
+                ->replaceArgument(0, (new ChildDefinition('security.oauth2.dpop.signing_key'))->replaceArgument(0, $config['dpop']['key']))
+                ->replaceArgument(1, $config['dpop']['algorithm'])
+            ;
+            $dpopProofFactory = new Reference($dpopProofFactoryId);
+        }
+
         $oidcClientId = 'security.authenticator.oidc_login.client.'.$firewallName;
         $container
             ->setDefinition($oidcClientId, new ChildDefinition('security.authenticator.oidc_login.client'))
@@ -382,6 +413,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(1, new Reference($discoveryId))
             ->replaceArgument(2, $config['client_id'])
             ->replaceArgument(3, new Reference($this->createClientAuthentication($container, $firewallName, $config['client_authentication'])))
+            ->replaceArgument(4, $dpopProofFactory)
         ;
 
         $signatureVerifier = null;
@@ -433,6 +465,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(9, $config['authorization_params'])
             ->replaceArgument(10, $signatureVerifier)
             ->replaceArgument(12, new Reference('security.event_dispatcher.'.$firewallName))
+            ->replaceArgument(13, $dpopProofFactory)
         ;
 
         if ($config['enable_end_session']) {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator\Oidc;
 
+use Jose\Component\Core\JWK;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
+use Symfony\Component\Security\Http\OAuth2\Dpop\DpopProofFactory;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -31,8 +33,26 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 #[AllowMockObjectsWithoutExpectations]
 class OidcClientTest extends TestCase
 {
+    private const DPOP_JWK = [
+        'kty' => 'EC',
+        'crv' => 'P-256',
+        'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+        'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+        'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
+    ];
+
     private OidcDiscovery $discovery;
     private HttpClientInterface $httpClient;
+
+    /**
+     * @var list<array<string, string>>
+     */
+    private array $sentHeaders = [];
+
+    /**
+     * @var list<?string>
+     */
+    private array $sentProofs = [];
 
     protected function setUp(): void
     {
@@ -338,6 +358,204 @@ class OidcClientTest extends TestCase
             'test-client-id',
             $clientAuthentication ?? new ClientSecretPost('test-client-secret'),
         );
+    }
+
+    /**
+     * RFC 9449, Section 5: the token request carries a proof, and what comes back is bound
+     * to the key it names.
+     */
+    public function testATokenRequestCarriesAProofOfTheKey()
+    {
+        // Given
+        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-123']));
+
+        // When
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+
+        // Then
+        $proof = self::decodePayload($this->sentProofs[0]);
+        $this->assertSame('POST', $proof['htm']);
+        $this->assertSame('https://provider.example.com/token', $proof['htu']);
+        $this->assertArrayNotHasKey('nonce', $proof);
+    }
+
+    public function testARefreshCarriesAProofOfTheKey()
+    {
+        // Given
+        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-456']));
+
+        // When
+        $client->refreshToken('refresh-123');
+
+        // Then
+        $this->assertSame('https://provider.example.com/token', self::decodePayload($this->sentProofs[0])['htu']);
+    }
+
+    /**
+     * Section 7.1: a bound token is presented under the "DPoP" scheme, and the proof names it.
+     */
+    public function testUserInfoPresentsTheTokenUnderTheDpopSchemeWithItsDigest()
+    {
+        // Given
+        $client = $this->createDpopClient(new JsonMockResponse(['sub' => 'user-1']));
+
+        // When
+        $client->fetchUserInfo('access-123');
+
+        // Then
+        $this->assertSame('DPoP access-123', $this->sentHeaders[0]['Authorization']);
+        $proof = self::decodePayload($this->sentProofs[0]);
+        $this->assertSame('GET', $proof['htm']);
+        $this->assertSame(rtrim(strtr(base64_encode(hash('sha256', 'access-123', true)), '+/', '-_'), '='), $proof['ath']);
+    }
+
+    public function testUserInfoStaysABearerTokenWithoutDpop()
+    {
+        // Given
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('toArray')->willReturn(['sub' => 'user-1']);
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'https://provider.example.com/userinfo', $this->callback(function (array $options): bool {
+                $this->assertSame('access-123', $options['auth_bearer']);
+                $this->assertArrayNotHasKey('headers', $options);
+
+                return true;
+            }))
+            ->willReturn($response);
+
+        // When
+        $client = new OidcClient($this->httpClient, $this->discovery, 'client-id', new NoClientAuthentication());
+
+        // Then
+        $this->assertSame(['sub' => 'user-1'], $client->fetchUserInfo('access-123'));
+    }
+
+    /**
+     * Section 8: a provider may refuse a proof until it carries a nonce of its own.
+     */
+    public function testARequestRefusedForWantOfANonceIsSentAgainWithIt()
+    {
+        // Given
+        $client = $this->createDpopClient(
+            new JsonMockResponse(['error' => 'use_dpop_nonce'], ['http_code' => 400, 'response_headers' => ['DPoP-Nonce' => 'nonce-1']]),
+            new JsonMockResponse(['access_token' => 'access-123']),
+        );
+
+        // When
+        $tokens = $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+
+        // Then
+        $this->assertSame('access-123', $tokens['access_token']);
+        $this->assertCount(2, $this->sentProofs);
+        $this->assertArrayNotHasKey('nonce', self::decodePayload($this->sentProofs[0]));
+        $this->assertSame('nonce-1', self::decodePayload($this->sentProofs[1])['nonce']);
+    }
+
+    /**
+     * A client assertion carries a "jti" the provider remembers, so the retry is a new request.
+     */
+    public function testTheRetryAuthenticatesTheClientAgain()
+    {
+        // Given
+        $assertions = [];
+        $clientAuthentication = $this->createStub(ClientAuthenticationInterface::class);
+        $clientAuthentication->method('getMethod')->willReturn('private_key_jwt');
+        $clientAuthentication->method('authenticate')->willReturnCallback(static function (string $clientId, string $endpoint, array $options) use (&$assertions): array {
+            $options['body']['client_assertion'] = 'assertion-'.\count($assertions);
+            $assertions[] = $options['body']['client_assertion'];
+
+            return $options;
+        });
+
+        $client = $this->createDpopClient(
+            new JsonMockResponse(['error' => 'use_dpop_nonce'], ['http_code' => 400, 'response_headers' => ['DPoP-Nonce' => 'nonce-1']]),
+            new JsonMockResponse(['access_token' => 'access-123']),
+            clientAuthentication: $clientAuthentication,
+        );
+
+        // When
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+
+        // Then
+        $this->assertSame(['assertion-0', 'assertion-1'], $assertions);
+    }
+
+    /**
+     * A provider that keeps refusing is not retried forever: the caller reads the refusal.
+     */
+    public function testARequestIsNotSentAgainWhenTheProviderNamesNoNewNonce()
+    {
+        // Given
+        $client = $this->createDpopClient(
+            new JsonMockResponse(['error' => 'use_dpop_nonce'], ['http_code' => 400]),
+        );
+
+        // Then
+        $this->expectException(AuthenticationException::class);
+
+        // When
+        try {
+            $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+        } finally {
+            $this->assertCount(1, $this->sentProofs);
+        }
+    }
+
+    /**
+     * The nonce the provider last named is kept for the requests that follow.
+     */
+    public function testTheNonceIsKeptForTheNextRequest()
+    {
+        // Given
+        $client = $this->createDpopClient(
+            new JsonMockResponse(['access_token' => 'access-123'], ['response_headers' => ['DPoP-Nonce' => 'nonce-1']]),
+            new JsonMockResponse(['sub' => 'user-1']),
+        );
+
+        // When
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+        $client->fetchUserInfo('access-123');
+
+        // Then
+        $this->assertArrayNotHasKey('nonce', self::decodePayload($this->sentProofs[0]));
+        $this->assertSame('nonce-1', self::decodePayload($this->sentProofs[1])['nonce']);
+    }
+
+    /**
+     * A client whose requests are answered by the given responses, recording what it sent.
+     */
+    private function createDpopClient(MockResponse $response, ?MockResponse $then = null, ?ClientAuthenticationInterface $clientAuthentication = null): OidcClient
+    {
+        $responses = null === $then ? [$response] : [$response, $then];
+        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$responses): MockResponse {
+            $headers = [];
+            foreach ($options['headers'] ?? [] as $name => $value) {
+                // MockHttpClient normalizes the headers it hands back to "Name: value" lines
+                [$name, $value] = \is_int($name) ? explode(': ', $value, 2) : [$name, $value];
+                $headers[$name] = \is_array($value) ? $value[0] : $value;
+            }
+
+            $this->sentHeaders[] = $headers;
+            $this->sentProofs[] = $headers['DPoP'] ?? null;
+
+            return array_shift($responses) ?? throw new \LogicException('The client made more requests than the test answers.');
+        });
+
+        return new OidcClient(
+            $httpClient,
+            $this->discovery,
+            'client-id',
+            $clientAuthentication ?? new NoClientAuthentication(),
+            new DpopProofFactory(new JWK(self::DPOP_JWK), 'ES256'),
+        );
+    }
+
+    private static function decodePayload(string $proof): array
+    {
+        $payload = explode('.', $proof)[1];
+
+        return json_decode(base64_decode(strtr($payload, '-_', '+/').str_repeat('=', 3 - (3 + \strlen($payload)) % 4)), true, flags: \JSON_THROW_ON_ERROR);
     }
 
     /**

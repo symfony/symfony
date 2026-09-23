@@ -111,22 +111,13 @@ class Ulid extends AbstractUid implements TimeOrderedUidInterface
             };
         }
 
-        $ulid = bin2hex($ulid);
-        $ulid = \sprintf('%02s%04s%04s%04s%04s%04s%04s',
-            base_convert(substr($ulid, 0, 2), 16, 32),
-            base_convert(substr($ulid, 2, 5), 16, 32),
-            base_convert(substr($ulid, 7, 5), 16, 32),
-            base_convert(substr($ulid, 12, 5), 16, 32),
-            base_convert(substr($ulid, 17, 5), 16, 32),
-            base_convert(substr($ulid, 22, 5), 16, 32),
-            base_convert(substr($ulid, 27, 5), 16, 32)
-        );
+        $ulid = self::binaryToBase32($ulid);
 
         if (self::NIL === $ulid) {
             return new NilUlid();
         }
 
-        if (self::MAX === $ulid = strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ')) {
+        if (self::MAX === $ulid) {
             return new MaxUlid();
         }
 
@@ -140,15 +131,20 @@ class Ulid extends AbstractUid implements TimeOrderedUidInterface
     {
         $ulid = strtr($this->uid, 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');
 
-        $ulid = \sprintf('%02s%05s%05s%05s%05s%05s%05s',
-            base_convert(substr($ulid, 0, 2), 32, 16),
-            base_convert(substr($ulid, 2, 4), 32, 16),
-            base_convert(substr($ulid, 6, 4), 32, 16),
-            base_convert(substr($ulid, 10, 4), 32, 16),
-            base_convert(substr($ulid, 14, 4), 32, 16),
-            base_convert(substr($ulid, 18, 4), 32, 16),
-            base_convert(substr($ulid, 22, 4), 32, 16)
-        );
+        if (\PHP_INT_SIZE >= 8) {
+            // 12 base-32 digits make 60 bits, which base_convert() handles exactly and which make 15 hex digits
+            $ulid = \sprintf('%02s%015s%015s', base_convert(substr($ulid, 0, 2), 32, 16), base_convert(substr($ulid, 2, 12), 32, 16), base_convert(substr($ulid, 14), 32, 16));
+        } else {
+            $ulid = \sprintf('%02s%05s%05s%05s%05s%05s%05s',
+                base_convert(substr($ulid, 0, 2), 32, 16),
+                base_convert(substr($ulid, 2, 4), 32, 16),
+                base_convert(substr($ulid, 6, 4), 32, 16),
+                base_convert(substr($ulid, 10, 4), 32, 16),
+                base_convert(substr($ulid, 14, 4), 32, 16),
+                base_convert(substr($ulid, 18, 4), 32, 16),
+                base_convert(substr($ulid, 22, 4), 32, 16)
+            );
+        }
 
         return hex2bin($ulid);
     }
@@ -170,15 +166,17 @@ class Ulid extends AbstractUid implements TimeOrderedUidInterface
         $time = strtr(substr($this->uid, 0, 10), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');
 
         if (\PHP_INT_SIZE >= 8) {
-            $time = (string) hexdec(base_convert($time, 32, 16));
-        } else {
-            $time = \sprintf('%02s%05s%05s',
-                base_convert(substr($time, 0, 2), 32, 16),
-                base_convert(substr($time, 2, 4), 32, 16),
-                base_convert(substr($time, 6, 4), 32, 16)
-            );
-            $time = BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10);
+            $time = (int) base_convert($time, 32, 10);
+
+            return \DateTimeImmutable::createFromTimestamp(intdiv($time, 1000))->setMicrosecond($time % 1000 * 1000);
         }
+
+        $time = \sprintf('%02s%05s%05s',
+            base_convert(substr($time, 0, 2), 32, 16),
+            base_convert(substr($time, 2, 4), 32, 16),
+            base_convert(substr($time, 6, 4), 32, 16)
+        );
+        $time = BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10);
 
         if (4 > \strlen($time)) {
             $time = '000'.$time;
@@ -214,8 +212,13 @@ class Ulid extends AbstractUid implements TimeOrderedUidInterface
     public static function generate(?\DateTimeInterface $time = null): string
     {
         if (null === $mtime = $time) {
-            $time = microtime(false);
-            $time = substr($time, 11).substr($time, 2, 3);
+            if (\PHP_INT_SIZE >= 8) {
+                // microtime(true) is faster than microtime(false), and precise enough to give the exact microsecond
+                $time = (string) intdiv((int) (microtime(true) * 1000000 + .5), 1000);
+            } else {
+                $time = microtime(false);
+                $time = substr($time, 11).substr($time, 2, 3);
+            }
         } elseif (0 > $time = $time->format('Uv')) {
             throw new InvalidArgumentException('The timestamp must be positive.');
         }
@@ -247,6 +250,11 @@ class Ulid extends AbstractUid implements TimeOrderedUidInterface
 
             ++self::$rand[$i];
             $time = self::$time;
+        }
+
+        if (\PHP_INT_SIZE >= 8) {
+            // Pairs of 20-bit random numbers make 40 bits, which is 8 base-32 digits
+            return strtr(\sprintf('%010s%08s%08s', base_convert($time, 10, 32), base_convert((string) (self::$rand[1] << 20 | self::$rand[2]), 10, 32), base_convert((string) (self::$rand[3] << 20 | self::$rand[4]), 10, 32)), 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
         }
 
         return self::timestampToBase32($time).strtr(\sprintf('%04s%04s%04s%04s',
@@ -307,15 +315,21 @@ class Ulid extends AbstractUid implements TimeOrderedUidInterface
     private static function binaryToBase32(string $ulid): string
     {
         $ulid = bin2hex($ulid);
-        $ulid = \sprintf('%02s%04s%04s%04s%04s%04s%04s',
-            base_convert(substr($ulid, 0, 2), 16, 32),
-            base_convert(substr($ulid, 2, 5), 16, 32),
-            base_convert(substr($ulid, 7, 5), 16, 32),
-            base_convert(substr($ulid, 12, 5), 16, 32),
-            base_convert(substr($ulid, 17, 5), 16, 32),
-            base_convert(substr($ulid, 22, 5), 16, 32),
-            base_convert(substr($ulid, 27, 5), 16, 32)
-        );
+
+        if (\PHP_INT_SIZE >= 8) {
+            // 15 hex digits make 60 bits, which base_convert() handles exactly and which make 12 base-32 digits
+            $ulid = \sprintf('%02s%012s%012s', base_convert(substr($ulid, 0, 2), 16, 32), base_convert(substr($ulid, 2, 15), 16, 32), base_convert(substr($ulid, 17), 16, 32));
+        } else {
+            $ulid = \sprintf('%02s%04s%04s%04s%04s%04s%04s',
+                base_convert(substr($ulid, 0, 2), 16, 32),
+                base_convert(substr($ulid, 2, 5), 16, 32),
+                base_convert(substr($ulid, 7, 5), 16, 32),
+                base_convert(substr($ulid, 12, 5), 16, 32),
+                base_convert(substr($ulid, 17, 5), 16, 32),
+                base_convert(substr($ulid, 22, 5), 16, 32),
+                base_convert(substr($ulid, 27, 5), 16, 32)
+            );
+        }
 
         return strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
     }

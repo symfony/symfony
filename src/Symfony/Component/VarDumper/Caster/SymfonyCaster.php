@@ -121,4 +121,52 @@ class SymfonyCaster
 
         return $a;
     }
+
+    /**
+     * Masks the credentials a security token carries in its attributes.
+     *
+     * An authenticator can store bearer credentials there, e.g. the OIDC ID, access and
+     * refresh tokens of a login, and a dump of the token lands in the profiler, in the
+     * logs or on an error page, where none of them belongs.
+     */
+    public static function castSecurityToken($token, array $a, Stub $stub, bool $isNested): array
+    {
+        return self::maskCredentialAttributes($a);
+    }
+
+    /**
+     * Masks the credentials a passport carries in its attributes, e.g. the raw response
+     * of an OIDC token endpoint.
+     */
+    public static function castPassport($passport, array $a, Stub $stub, bool $isNested): array
+    {
+        return self::maskCredentialAttributes($a);
+    }
+
+    private static function maskCredentialAttributes(array $a): array
+    {
+        foreach ($a as $k => $v) {
+            if (\is_array($v) && ('attributes' === $k || str_ends_with($k, "\0attributes"))) {
+                $a[$k] = self::maskCredentialValues($v, 3);
+            }
+        }
+
+        return $a;
+    }
+
+    /**
+     * Masks the string values whose key names a token, a secret, a password or a credential.
+     */
+    private static function maskCredentialValues(array $values, int $depth): array
+    {
+        foreach ($values as $k => $v) {
+            if (\is_string($v) && \is_string($k) && preg_match('/token$|secret|password|credential/i', $k)) {
+                $values[$k] = '******';
+            } elseif (\is_array($v) && 0 < $depth) {
+                $values[$k] = self::maskCredentialValues($v, $depth - 1);
+            }
+        }
+
+        return $values;
+    }
 }

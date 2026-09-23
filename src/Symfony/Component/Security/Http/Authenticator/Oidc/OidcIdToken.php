@@ -56,7 +56,7 @@ final class OidcIdToken
      *
      * @throws AuthenticationException If the token cannot be decoded
      */
-    public function decode(string $jwt): array
+    public function decode(#[\SensitiveParameter] string $jwt): array
     {
         if (!class_exists(JWSSerializerManager::class)) {
             throw new \LogicException('You cannot decode OIDC ID tokens since the "web-token/jwt-library" package is not installed. Try running "composer require web-token/jwt-library".');

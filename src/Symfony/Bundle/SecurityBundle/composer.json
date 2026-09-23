@@ -57,7 +57,8 @@
         "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {
-        "symfony/framework-bundle": "<8.2"
+        "symfony/framework-bundle": "<8.2",
+        "symfony/var-dumper": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },

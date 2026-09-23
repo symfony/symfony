@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add an OpenID Connect tab to the security profiler panel, showing the configuration, the cached discovery document and signing keys, the calls made to the provider and the tokens of the logged-in user of an `oidc_login` firewall, with every credential redacted
  * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session
  * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which now takes the logout URL generator there
  * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service used when `IS_AUTHENTICATED_RECENTLY` is denied

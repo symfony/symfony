@@ -19,7 +19,12 @@ use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,10 +44,14 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\OidcLoginInspector;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableOidcClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClientInterface;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -279,6 +288,59 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($firewallConfig->getAccessDeniedUrl(), $collected['access_denied_url']);
         $this->assertSame($firewallConfig->getUserChecker(), $collected['user_checker']);
         $this->assertSame($firewallConfig->getAuthenticators(), $collected['authenticators']->getValue());
+    }
+
+    public function testCollectTheOidcLoginOfTheFirewall()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('jane', 'password'), 'oidc', ['ROLE_USER']);
+        $token->setAttribute('oidc_id_token', 'raw-id-token');
+        $token->setAttribute('oidc_access_token', 'raw-access-token');
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+
+        $discovery = new OidcDiscovery(new MockHttpClient(new JsonMockResponse(['issuer' => 'https://provider.example.com'])), new ArrayAdapter(), 'https://provider.example.com/.well-known/openid-configuration', 'https://provider.example.com');
+        $discovery->getConfiguration();
+        $client = $this->createStub(OidcClientInterface::class);
+        $client->method('getClientAuthenticationMethod')->willReturn('client_secret_basic');
+        $inspector = new OidcLoginInspector('oidc', $discovery, null, new TraceableOidcClient($client), ['client_id' => 'my-client'], new MockClock());
+
+        $collector = new SecurityDataCollector($tokenStorage, null, null, null, $this->createFirewallMap(new FirewallConfig('oidc', 'security.user_checker.oidc', authenticators: ['oidc_login'])), null, null, new MermaidDumper(), new ServiceLocator(['oidc' => static fn () => $inspector]));
+        $collector->collect(new Request(), new Response());
+        $collector->lateCollect();
+
+        $collected = $collector->getOidcLogin();
+        $this->assertInstanceOf(Data::class, $collected);
+        $this->assertSame('oidc', $collected['firewall']);
+        $this->assertSame('client_secret_basic', $collected['config']['client_authentication']);
+        $this->assertSame('cached', $collected['discovery']['status']);
+        $this->assertSame('opaque', $collected['token']['access_token']['format']);
+
+        // the tokens of the user are described, the raw values never leave the security token
+        $this->assertStringNotContainsString('raw-', serialize($collector));
+    }
+
+    public function testTheOidcLoginIsNullWhenTheFirewallHasNoInspector()
+    {
+        $collector = new SecurityDataCollector(null, null, null, null, $this->createFirewallMap(new FirewallConfig('main', 'security.user_checker.main')), null, null, new MermaidDumper(), new ServiceLocator([]));
+        $collector->collect(new Request(), new Response());
+        $collector->lateCollect();
+
+        $this->assertNull($collector->getOidcLogin());
+
+        // and when no inspector locator is wired at all, e.g. in production
+        $collector = new SecurityDataCollector(null, null, null, null, $this->createFirewallMap(new FirewallConfig('main', 'security.user_checker.main')));
+        $collector->collect(new Request(), new Response());
+        $collector->lateCollect();
+
+        $this->assertNull($collector->getOidcLogin());
+    }
+
+    private function createFirewallMap(FirewallConfig $firewallConfig): FirewallMap
+    {
+        $firewallMap = $this->createStub(FirewallMap::class);
+        $firewallMap->method('getFirewallConfig')->willReturn($firewallConfig);
+
+        return $firewallMap;
     }
 
     public function testGetFirewallReturnsNull()

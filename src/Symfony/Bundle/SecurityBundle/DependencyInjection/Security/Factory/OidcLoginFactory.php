@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\Authenticator\Debug\OidcLoginInspector;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableOidcClient;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -442,6 +444,50 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->replaceArgument(0, new Reference($discoveryId))
                 ->replaceArgument(2, $config['post_logout_redirect_path'])
                 ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName])
+            ;
+        }
+
+        // the profiler gets, per firewall, the calls made to the provider and an inspector
+        // of the OIDC state; both exist only with the debug firewall, as the traceable
+        // authenticators do, so that production pays nothing for them
+        if ($container->hasDefinition('debug.security.firewall')) {
+            $container
+                ->register('debug.'.$oidcClientId, TraceableOidcClient::class)
+                ->setDecoratedService($oidcClientId)
+                ->setArguments([new Reference('debug.'.$oidcClientId.'.inner')])
+                ->addTag('kernel.reset', ['method' => 'reset'])
+            ;
+
+            $container
+                ->register('debug.security.authenticator.oidc_login.inspector.'.$firewallName, OidcLoginInspector::class)
+                ->setArguments([
+                    $firewallName,
+                    new Reference($discoveryId),
+                    $signatureVerifier,
+                    new Reference('debug.'.$oidcClientId),
+                    // no secret goes here: the client authentication is asked to the client at runtime
+                    [
+                        'provider_uri' => $config['provider_uri'],
+                        'http_client' => $config['http_client'] ?? 'http_client',
+                        'client_id' => $config['client_id'],
+                        'scope' => $config['scope'],
+                        'check_path' => $config['check_path'],
+                        'start_path' => $config['start_path'],
+                        'pkce' => $config['pkce'],
+                        'user_data_source' => $config['user_data_source'],
+                        'user_identifier_claim' => $config['user_identifier_claim'],
+                        'id_token_signature' => $config['id_token_signature'],
+                        'allowed_time_drift' => $config['allowed_time_drift'],
+                        'max_age' => $config['max_age'] ?? null,
+                        'discovery_cache_ttl' => $config['discovery_cache_ttl'],
+                        'refresh_access_token' => $config['refresh_access_token'],
+                        'enable_end_session' => $config['enable_end_session'],
+                        'post_logout_redirect_path' => $config['post_logout_redirect_path'] ?? null,
+                        'authorization_params' => $config['authorization_params'],
+                    ],
+                    new Reference('clock'),
+                ])
+                ->addTag('security.authenticator.oidc_login.inspector', ['firewall' => $firewallName])
             ;
         }
 

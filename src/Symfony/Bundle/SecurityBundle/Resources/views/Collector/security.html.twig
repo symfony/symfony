@@ -541,6 +541,343 @@
                 </div>
             </div>
 
+            <div class="tab {{ collector.oidcLogin is empty ? 'disabled' }}">
+                <h3 class="tab-title">OpenID Connect</h3>
+                <div class="tab-content">
+                    {% if collector.oidcLogin is empty %}
+                        <div class="empty">
+                            <p>The firewall of this request has no <code>oidc_login</code> authenticator.</p>
+                        </div>
+                    {% else %}
+                        {% set oidc = collector.oidcLogin %}
+
+                        {% if oidc.warnings is not empty %}
+                            <h4>Warnings</h4>
+                            <table class="oidc-warnings">
+                                <tbody>
+                                    {% for warning in oidc.warnings %}
+                                        <tr>
+                                            <td class="font-normal text-small"><span class="label status-warning">warning</span></td>
+                                            <td>{{ warning }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+
+                        <h4>Configuration</h4>
+                        <p class="help">The secrets of the firewall are not collected: the client authentication method is shown, never the secret or the key it uses.</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="key">Option</th>
+                                    <th scope="col">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Firewall</th>
+                                    <td>{{ oidc.firewall }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Provider (issuer)</th>
+                                    <td>{{ oidc.config.provider_uri }}</td>
+                                </tr>
+                                <tr>
+                                    <th>HTTP client</th>
+                                    <td>{{ oidc.config.http_client }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Client id</th>
+                                    <td>{{ oidc.config.client_id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Client authentication</th>
+                                    <td>{{ oidc.config.client_authentication }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Scopes</th>
+                                    <td>{{ oidc.config.scope is empty ? '(none)' : oidc.config.scope|join(' ') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Callback path</th>
+                                    <td>{{ oidc.config.check_path }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Start path</th>
+                                    <td>{{ oidc.config.start_path }}</td>
+                                </tr>
+                                <tr>
+                                    <th>PKCE</th>
+                                    <td>{{ oidc.config.pkce.enabled ? 'enabled (' ~ oidc.config.pkce.method ~ ')' : 'disabled' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>User claims</th>
+                                    <td>from the {{ 'userinfo' == oidc.config.user_data_source ? 'UserInfo endpoint' : 'ID token' }}, identified by the <code>{{ oidc.config.user_identifier_claim }}</code> claim</td>
+                                </tr>
+                                <tr>
+                                    <th>ID token signature</th>
+                                    <td>
+                                        {% if oidc.config.id_token_signature.required %}
+                                            verified ({{ oidc.config.id_token_signature.algorithms|join(', ') }}){{ oidc.config.id_token_signature.enforce_key_usage_verification ? ', with keys designated for signature only' }}
+                                        {% else %}
+                                            not verified
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Allowed time drift</th>
+                                    <td>{{ oidc.config.allowed_time_drift }} s</td>
+                                </tr>
+                                <tr>
+                                    <th>Max age</th>
+                                    <td>{{ oidc.config.max_age is null ? '(not requested)' : oidc.config.max_age ~ ' s' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Discovery cache TTL</th>
+                                    <td>{{ oidc.config.discovery_cache_ttl is null ? '(pool default)' : oidc.config.discovery_cache_ttl ~ ' s' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Access token renewal</th>
+                                    <td>{{ oidc.config.refresh_access_token.enabled ? 'enabled (' ~ oidc.config.refresh_access_token.leeway ~ ' s before expiry)' : 'disabled' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>RP-Initiated Logout</th>
+                                    <td>{{ oidc.config.enable_end_session ? 'enabled' ~ (oidc.config.post_logout_redirect_path ? ', back to ' ~ oidc.config.post_logout_redirect_path) : 'disabled' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Authorization parameters</th>
+                                    <td>{{ oidc.config.authorization_params is empty ? '(none)' : profiler_dump(oidc.config.authorization_params, maxDepth: 1) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Discovery document</h4>
+                        {% if 'error' == oidc.discovery.status %}
+                            <div class="empty">
+                                <p>The discovery document could not be read: {{ oidc.discovery.error }}</p>
+                            </div>
+                        {% else %}
+                            <div class="metrics">
+                                <div class="metric">
+                                    <span class="value">
+                                        {%- if 'cached' == oidc.discovery.status -%}
+                                            cached
+                                        {%- elseif 'memoized' == oidc.discovery.status -%}
+                                            loaded
+                                        {%- elseif 'not_cached' == oidc.discovery.status -%}
+                                            not cached
+                                        {%- else -%}
+                                            unknown
+                                        {%- endif -%}
+                                    </span>
+                                    <span class="label">Status</span>
+                                </div>
+                                {% if oidc.discovery.expires_at is not null %}
+                                    <div class="metric">
+                                        <span class="value">{{ oidc.discovery.expires_in > 0 ? (oidc.discovery.expires_in // 60) ~ ' min' : 'expired' }}</span>
+                                        <span class="label">Cached for</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="key">Key</th>
+                                        <th scope="col">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>Document URL</th>
+                                        <td>{{ oidc.discovery.url }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Cache key</th>
+                                        <td><code>{{ oidc.discovery.cache_key }}</code>{% if oidc.discovery.expires_at is not null %}, expires at {{ oidc.discovery.expires_at|date('Y-m-d H:i:s') }}{% endif %}</td>
+                                    </tr>
+                                    {% if oidc.discovery.document is not empty %}
+                                        <tr>
+                                            <th>Document</th>
+                                            <td>{{ profiler_dump(oidc.discovery.document, maxDepth: 1) }}</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+
+                        {% if oidc.jwks is not empty %}
+                            <h4>Signing keys</h4>
+                            {% if 'error' == oidc.jwks.status %}
+                                <div class="empty">
+                                    <p>The signing keys could not be read: {{ oidc.jwks.error }}</p>
+                                </div>
+                            {% else %}
+                                <p class="help">
+                                    The ID token signature is verified with {{ oidc.jwks.algorithms|join(', ') }} against the keys the provider publishes
+                                    {%- if oidc.jwks.uri %} at <code>{{ oidc.jwks.uri }}</code>{% endif %}.
+                                    {% if 'cached' == oidc.jwks.status %}
+                                        They were fetched at {{ oidc.jwks.fetched_at|date('Y-m-d H:i:s') }}{% if oidc.jwks.expires_at is not null %} and are cached until {{ oidc.jwks.expires_at|date('Y-m-d H:i:s') }}{% endif %} under <code>{{ oidc.jwks.cache_key }}</code>.
+                                    {% elseif 'not_cached' == oidc.jwks.status %}
+                                        They are not cached: the next verification fetches them.
+                                    {% else %}
+                                        Whether they are cached is unknown, as the discovery document is not available.
+                                    {% endif %}
+                                </p>
+                                {% if oidc.jwks.keys is not empty %}
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">kid</th>
+                                                <th scope="col">kty</th>
+                                                <th scope="col">alg</th>
+                                                <th scope="col">use</th>
+                                                <th scope="col">crv</th>
+                                                <th scope="col"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for key in oidc.jwks.keys %}
+                                                <tr>
+                                                    <td><code>{{ key.kid ?? '-' }}</code></td>
+                                                    <td>{{ key.kty ?? '-' }}</td>
+                                                    <td>{{ key.alg ?? '-' }}</td>
+                                                    <td>{{ key.use ?? '-' }}</td>
+                                                    <td>{{ key.crv ?? '-' }}</td>
+                                                    <td class="font-normal text-small">{% if key.current %}<span class="label status-success">ID token of the user</span>{% endif %}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+
+                        <h4>Calls to the provider</h4>
+                        {% if oidc.calls is empty %}
+                            <div class="empty">
+                                <p>No call was made to the provider during this request.</p>
+                            </div>
+                        {% else %}
+                            <p class="help">The tokens of a token endpoint response are described, never kept: a JWT by its decoded header and claims, an opaque token by a fingerprint.</p>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Call</th>
+                                        <th scope="col">Duration</th>
+                                        <th scope="col">Request</th>
+                                        <th scope="col">Response</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for call in oidc.calls %}
+                                        <tr>
+                                            <td class="font-normal text-small"><span class="label {{ call.error is empty ? 'status-success' : 'status-error' }}">{{ call.error is empty ? 'success' : 'failure' }}</span></td>
+                                            <td class="nowrap">{{ call.operation }}</td>
+                                            <td class="nowrap">{{ '%0.2f ms'|format(call.duration * 1000) }}</td>
+                                            <td>{{ call.request is empty ? '(none)' : profiler_dump(call.request, maxDepth: 1) }}</td>
+                                            <td>
+                                                {% if call.error is not empty %}
+                                                    <strong>{{ call.error.class|abbr_class }}</strong>: {{ call.error.message }}
+                                                    {% if call.error.status_code is not null %}
+                                                        <br>HTTP {{ call.error.status_code }}
+                                                        {%- if call.error.error %}, <code>{{ call.error.error }}</code>{% endif %}
+                                                        {%- if call.error.error_description %}: {{ call.error.error_description }}{% endif %}
+                                                        {%- if call.error.error_uri %} (<a href="{{ call.error.error_uri }}">{{ call.error.error_uri }}</a>){% endif %}
+                                                    {% endif %}
+                                                {% elseif call.response is not empty %}
+                                                    {{ profiler_dump(call.response, maxDepth: 2) }}
+                                                {% else %}
+                                                    (none)
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+
+                        <h4>Tokens of the logged-in user</h4>
+                        {% if oidc.token is empty %}
+                            <div class="empty">
+                                <p>The security token of this request holds no OIDC token: the user did not log in with <code>oidc_login</code>.</p>
+                            </div>
+                        {% elseif 'error' == oidc.token.status|default(null) %}
+                            <div class="empty">
+                                <p>The tokens could not be read: {{ oidc.token.error }}</p>
+                            </div>
+                        {% else %}
+                            <p class="help">
+                                The tokens are held by the security token, in the session. They are described here, never shown: a JWT by its decoded header and claims,
+                                an opaque token by a fingerprint only, as nothing but the provider can read it. The expiry of the access token is the one the token endpoint announced, whatever its format.
+                            </p>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="key">Token</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>ID token</th>
+                                        <td>
+                                            {% if oidc.token.id_token is empty %}
+                                                (none)
+                                            {% else %}
+                                                {{ _self.oidc_token_format(oidc.token.id_token) }}
+                                                {% if oidc.token.id_token.header is not empty %}<br>Header: {{ profiler_dump(oidc.token.id_token.header, maxDepth: 1) }}{% endif %}
+                                                {% if oidc.token.id_token.claims is not empty %}<br>Claims: {{ profiler_dump(oidc.token.id_token.claims, maxDepth: 1) }}{% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Access token</th>
+                                        <td>
+                                            {% if oidc.token.access_token is empty %}
+                                                (none)
+                                            {% else %}
+                                                {% if oidc.token.access_token_type is null %}token of an unknown type{% else %}<code>{{ oidc.token.access_token_type }}</code> token{% endif %}, {{ _self.oidc_token_format(oidc.token.access_token) }}
+                                                {% if oidc.token.access_token_expires_at is not null %}
+                                                    <br>
+                                                    {% if oidc.token.access_token_expires_in > 0 %}
+                                                        Expires at {{ oidc.token.access_token_expires_at|date('Y-m-d H:i:s') }}, in {{ oidc.token.access_token_expires_in }} s
+                                                    {% else %}
+                                                        <span class="label status-warning">expired</span> at {{ oidc.token.access_token_expires_at|date('Y-m-d H:i:s') }}
+                                                    {% endif %}
+                                                    {% if oidc.token.refresh.due %}, renewed on the next request{% endif %}
+                                                {% endif %}
+                                                {% if oidc.token.access_token.claims is not empty %}<br>Claims: {{ profiler_dump(oidc.token.access_token.claims, maxDepth: 1) }}{% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Refresh token</th>
+                                        <td>
+                                            {% if oidc.token.refresh_token is empty %}
+                                                (none)
+                                            {% else %}
+                                                {{ _self.oidc_token_format(oidc.token.refresh_token) }}
+                                                {% if oidc.token.refresh_token.claims is not empty %}<br>Claims: {{ profiler_dump(oidc.token.refresh_token.claims, maxDepth: 1) }}{% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Authentication context (acr)</th>
+                                        <td>{{ oidc.token.acr ?? '(not asserted by the provider)' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Authentication methods (amr)</th>
+                                        <td>{{ oidc.token.amr is empty ? '(not asserted by the provider)' : oidc.token.amr|join(', ') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
             <div class="tab {{ collector.accessDecisionLog|default([]) is empty ? 'disabled' }}">
                 <h3 class="tab-title">Access Decision</h3>
                 <div class="tab-content">
@@ -666,3 +1003,13 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% macro oidc_token_format(token) %}
+    {%- if 'jwt' == token.format -%}
+        JWT, fingerprint <code>{{ token.fingerprint }}</code>
+    {%- elseif 'jwe' == token.format -%}
+        encrypted JWT (JWE), fingerprint <code>{{ token.fingerprint }}</code>: only the provider can read its claims
+    {%- else -%}
+        opaque, fingerprint <code>{{ token.fingerprint }}</code>: only the provider can read it
+    {%- endif -%}
+{% endmacro %}

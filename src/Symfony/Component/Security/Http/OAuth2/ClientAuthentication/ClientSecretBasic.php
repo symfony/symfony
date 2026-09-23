@@ -38,7 +38,7 @@ final class ClientSecretBasic implements ClientAuthenticationInterface
      * that a colon, a percent sign or a non-ASCII byte in either of them survives the round
      * trip.
      */
-    public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
+    public function authenticate(string $clientId, string $tokenEndpoint, #[\SensitiveParameter] array $options): array
     {
         $options['auth_basic'] = urlencode($clientId).':'.urlencode($this->clientSecret);
 

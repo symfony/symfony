@@ -81,7 +81,7 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
      * It goes next to the "client_assertion_type" naming its format, and nothing else the
      * request already carries is touched, the "client_id" of RFC 7521, Section 4.2 among it.
      */
-    final public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
+    final public function authenticate(string $clientId, string $tokenEndpoint, #[\SensitiveParameter] array $options): array
     {
         $options['body']['client_assertion_type'] = self::ASSERTION_TYPE;
         $options['body']['client_assertion'] = $this->createAssertion($clientId, $tokenEndpoint);

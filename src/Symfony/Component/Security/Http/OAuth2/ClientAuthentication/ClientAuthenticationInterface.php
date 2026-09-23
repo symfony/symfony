@@ -44,7 +44,7 @@ interface ClientAuthenticationInterface
      *
      * @return array<string, mixed> The final HttpClient options
      */
-    public function authenticate(string $clientId, string $tokenEndpoint, array $options): array;
+    public function authenticate(string $clientId, string $tokenEndpoint, #[\SensitiveParameter] array $options): array;
 
     /**
      * Returns the RFC 7591, Section 2 name of the method, e.g. "client_secret_basic".

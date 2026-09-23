@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\DataCollector\EventListener\SecurityDataCollectorListener;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
+use Symfony\Component\Security\Core\Dumper\MermaidDumper;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -25,6 +26,9 @@ return static function (ContainerConfigurator $container) {
                 service('security.firewall.map'),
                 service('debug.security.firewall')->nullOnInvalid(),
                 service('security.impersonate_url_generator')->nullOnInvalid(),
+                inline_service(MermaidDumper::class),
+                // the inspectors of the "oidc_login" firewalls, registered in debug only
+                tagged_locator('security.authenticator.oidc_login.inspector', 'firewall'),
             ])
             ->tag('data_collector', [
                 'template' => '@Security/Collector/security.html.twig',

@@ -106,7 +106,7 @@ final class OidcSignatureVerifier
      *
      * @throws AuthenticationException If the signature cannot be verified
      */
-    public function verify(string $idToken): array
+    public function verify(#[\SensitiveParameter] string $idToken): array
     {
         if (!class_exists(JWSVerifier::class) || !class_exists(Checker\HeaderCheckerManager::class)) {
             throw new \LogicException('You cannot verify OIDC ID token signatures since the "web-token/jwt-library" package is not installed. Try running "composer require web-token/jwt-library".');
@@ -206,10 +206,7 @@ final class OidcSignatureVerifier
         // document downgrading its transport to plain HTTP must not be honored
         $jwksUri = $this->discovery->getSecureEndpoint('jwks_uri');
 
-        // strict and lax filters yield different key sets, so each gets its own entry;
-        // the strictness is kept out of the hash, where a "jwks_uri" ending with the
-        // marker would collide with the other strictness of the same endpoint
-        $cacheKey = 'oidc_jwks.'.($this->enforceKeyUsageVerification ? '' : 'lax.').hash('xxh128', $jwksUri);
+        $cacheKey = $this->getJwksCacheKey($jwksUri);
         $compute = fn (ItemInterface $item): array => [
             'keys' => OidcJwks::fetchKeys($this->httpClient, $jwksUri, $item, $this->jwksCacheTtl, $this->enforceKeyUsageVerification),
             // the JWKS is stored with the time it was fetched, so that the rotation
@@ -228,6 +225,16 @@ final class OidcSignatureVerifier
         }
 
         return $jwks['keys'];
+    }
+
+    /**
+     * Strict and lax filters yield different key sets, so each gets its own entry; the
+     * strictness is kept out of the hash, where a "jwks_uri" ending with the marker would
+     * collide with the other strictness of the same endpoint.
+     */
+    private function getJwksCacheKey(string $jwksUri): string
+    {
+        return 'oidc_jwks.'.($this->enforceKeyUsageVerification ? '' : 'lax.').hash('xxh128', $jwksUri);
     }
 
     /**

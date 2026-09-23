@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -42,6 +43,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     private bool $hasVarDumper;
     private ?array $deauthentication = null;
 
+    /**
+     * @param ContainerInterface|null $oidcLoginInspectors The OidcLoginInspector of each "oidc_login" firewall, by firewall name
+     */
     public function __construct(
         private ?TokenStorageInterface $tokenStorage = null,
         private ?RoleHierarchyInterface $roleHierarchy = null,
@@ -51,6 +55,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         private ?TraceableFirewallListener $firewall = null,
         private ?ImpersonateUrlGenerator $impersonateUrlGenerator = null,
         private MermaidDumper $mermaidDumper = new MermaidDumper(),
+        private ?ContainerInterface $oidcLoginInspectors = null,
     ) {
         $this->hasVarDumper = class_exists(ClassStub::class);
     }
@@ -213,6 +218,14 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         }
 
         $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
+
+        // the state of the OIDC login of the firewall, when it has one; the inspector
+        // reads the cache and the security token, it never contacts the provider
+        $this->data['oidc_login'] = null;
+        $firewallName = $this->data['firewall']['name'] ?? null;
+        if (null !== $firewallName && $this->oidcLoginInspectors?->has($firewallName)) {
+            $this->data['oidc_login'] = $this->oidcLoginInspectors->get($firewallName)->inspect($this->tokenStorage?->getToken());
+        }
 
         // kept until reset(), which runs before the next main request: sub-requests of the
         // same request must report it too, the main profile is not always collected first
@@ -384,6 +397,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function getAuthenticators(): array|Data
     {
         return $this->data['authenticators'];
+    }
+
+    /**
+     * Returns the state of the OIDC login of the firewall, or null when it has none.
+     *
+     * @see \Symfony\Component\Security\Http\Authenticator\Debug\OidcLoginInspector::inspect()
+     */
+    public function getOidcLogin(): array|Data|null
+    {
+        return $this->data['oidc_login'] ?? null;
     }
 
     public function getAuthProfileToken(): string|Data|null

@@ -88,11 +88,12 @@ class OidcTokenRefresherTest extends TestCase
     {
         // the access token is handed to a downstream call, which must not receive one
         // expiring while it is in flight
-        $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456', 'expires_in' => 300]), leeway: 30);
+        $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456', 'token_type' => 'DPoP', 'expires_in' => 300]), leeway: 30);
         $token = $this->createToken(['oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() + 29]);
 
         $this->assertTrue($refresher->refreshIfNeeded($token));
         $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('DPoP', $token->getAttribute('oidc_access_token_type'));
         $this->assertSame($this->clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
     }
 
@@ -121,14 +122,15 @@ class OidcTokenRefresherTest extends TestCase
         $this->assertSame('refresh-123', $token->getAttribute('oidc_refresh_token'));
     }
 
-    public function testRefreshClearsTheExpiryWhenTheProviderReportsNone()
+    public function testRefreshClearsTheTypeAndTheExpiryWhenTheProviderReportsNone()
     {
         $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456']));
-        $token = $this->createToken(['oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1]);
+        $token = $this->createToken(['oidc_access_token_type' => 'Bearer', 'oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1]);
 
         $refresher->refresh($token);
 
         $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
+        $this->assertNull($token->getAttribute('oidc_access_token_type'));
         $this->assertNull($token->getAttribute('oidc_access_token_expires_at'));
     }
 

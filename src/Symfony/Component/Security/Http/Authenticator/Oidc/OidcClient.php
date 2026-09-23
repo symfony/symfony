@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -46,7 +47,7 @@ final class OidcClient implements OidcClientInterface
         return $this->clientAuthentication->getMethod();
     }
 
-    public function exchangeCode(string $code, string $redirectUri, ?string $codeVerifier = null): array
+    public function exchangeCode(#[\SensitiveParameter] string $code, string $redirectUri, #[\SensitiveParameter] ?string $codeVerifier = null): array
     {
         $tokenEndpoint = $this->discovery->getSecureEndpoint('token_endpoint');
 
@@ -61,11 +62,8 @@ final class OidcClient implements OidcClientInterface
             $body['code_verifier'] = $codeVerifier;
         }
 
-        $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
-        $options['max_redirects'] = 0;
-
         try {
-            return $this->httpClient->request('POST', $tokenEndpoint, $options)->toArray();
+            return $this->httpClient->request('POST', $tokenEndpoint, $this->createTokenRequestOptions($tokenEndpoint, $body))->toArray();
         } catch (HttpClientExceptionInterface $e) {
             throw new AuthenticationException(\sprintf('The OIDC token endpoint request failed: "%s"', $e->getMessage()), previous: $e);
         }
@@ -85,11 +83,8 @@ final class OidcClient implements OidcClientInterface
             $body['scope'] = implode(' ', $scopes);
         }
 
-        $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
-        $options['max_redirects'] = 0;
-
         try {
-            $response = $this->httpClient->request('POST', $tokenEndpoint, $options);
+            $response = $this->httpClient->request('POST', $tokenEndpoint, $this->createTokenRequestOptions($tokenEndpoint, $body));
 
             // RFC 6749, Section 5.2: "invalid_grant" is the one error saying the refresh
             // token itself is gone, where every other failure only means the request may
@@ -97,7 +92,16 @@ final class OidcClient implements OidcClientInterface
             // page is never parsed as a token response
             $statusCode = $response->getStatusCode();
             if (400 <= $statusCode && $statusCode < 500 && 'invalid_grant' === ($response->toArray(false)['error'] ?? null)) {
-                throw new OidcInvalidGrantException('The OIDC provider rejected the refresh token: it expired, it was revoked, or it was issued to another client.');
+                // the rejection travels as the cause, so that whoever handles the
+                // exception can still read the "error_description" of the response
+                $previous = null;
+                try {
+                    $response->getHeaders();
+                } catch (ClientExceptionInterface $previous) {
+                    // a 4xx status always throws here
+                }
+
+                throw new OidcInvalidGrantException('The OIDC provider rejected the refresh token: it expired, it was revoked, or it was issued to another client.', previous: $previous);
             }
 
             return $response->toArray();
@@ -106,7 +110,27 @@ final class OidcClient implements OidcClientInterface
         }
     }
 
-    public function fetchUserInfo(string $accessToken): array
+    /**
+     * Builds the options of a token request, authenticated the way the client is configured to.
+     *
+     * The response carries bearer credentials, so the HttpClient profiler panel is told to
+     * keep neither it nor the request body: "extra.trace_content" is read by the traceable
+     * client the profiler decorates every client with, and ignored by every other client.
+     *
+     * @param array<string, string> $body
+     *
+     * @return array<string, mixed>
+     */
+    private function createTokenRequestOptions(string $tokenEndpoint, #[\SensitiveParameter] array $body): array
+    {
+        $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
+        $options['max_redirects'] = 0;
+        $options['extra']['trace_content'] = false;
+
+        return $options;
+    }
+
+    public function fetchUserInfo(#[\SensitiveParameter] string $accessToken): array
     {
         $userInfoEndpoint = $this->discovery->getSecureEndpoint('userinfo_endpoint');
 

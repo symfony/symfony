@@ -32,7 +32,7 @@ final class ClientSecretPost implements ClientAuthenticationInterface
         }
     }
 
-    public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
+    public function authenticate(string $clientId, string $tokenEndpoint, #[\SensitiveParameter] array $options): array
     {
         $options['body']['client_secret'] = $this->clientSecret;
 

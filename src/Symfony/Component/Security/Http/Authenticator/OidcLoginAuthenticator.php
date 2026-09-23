@@ -393,6 +393,9 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         if (\is_array($tokenData)) {
             $token->setAttribute('oidc_id_token', $tokenData['id_token'] ?? null);
             $token->setAttribute('oidc_access_token', $tokenData['access_token'] ?? null);
+            // RFC 6749, Section 5.1: "token_type" tells how the access token is presented to
+            // a resource, "Bearer" of RFC 6750 or "DPoP" of RFC 9449
+            $token->setAttribute('oidc_access_token_type', \is_string($tokenData['token_type'] ?? null) && '' !== $tokenData['token_type'] ? $tokenData['token_type'] : null);
             // the refresh token of RFC 6749, Section 6 and the expiry of the access token
             // it renews; both are null unless the provider issued them, as it only issues
             // a refresh token when it was asked for one, and "expires_in" is optional
@@ -401,9 +404,13 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         }
 
         $token->setAttribute('oidc_acr', $passport->getAttribute('oidc_acr'));
-
+        // the "amr" claim is kept as the provider asserted it: the authentication proofs
+        // below are not the claim, they fall back to an unspecified method without it and
+        // carry over the methods of a previous authentication of the same user
         $methods = $passport->getAttribute('oidc_amr');
-        $methods = \is_array($methods) && $methods ? $methods : [AuthenticationMethod::UNSPECIFIED];
+        $methods = \is_array($methods) ? $methods : [];
+        $token->setAttribute('oidc_amr', $methods);
+        $methods = $methods ?: [AuthenticationMethod::UNSPECIFIED];
         $now = $this->clock->now()->getTimestamp();
 
         // a provider whose clock runs ahead would otherwise extend the window that
@@ -489,7 +496,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
      *
      * @return array<string, mixed>
      */
-    private function exchangeAuthorizationCode(string $redirectUri, string $code, ?string $codeVerifier): array
+    private function exchangeAuthorizationCode(string $redirectUri, #[\SensitiveParameter] string $code, #[\SensitiveParameter] ?string $codeVerifier): array
     {
         $tokenData = $this->oidcClient->exchangeCode($code, $redirectUri, $codeVerifier);
 
@@ -514,7 +521,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
      *
      * @return array<string, mixed>
      */
-    private function fetchUserClaims(string $accessToken, array $idTokenClaims): array
+    private function fetchUserClaims(#[\SensitiveParameter] string $accessToken, array $idTokenClaims): array
     {
         if ('userinfo' === $this->options['user_data_source']) {
             $claims = $this->oidcClient->fetchUserInfo($accessToken);
@@ -566,7 +573,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         return bin2hex(random_bytes(32));
     }
 
-    private function deriveCodeChallenge(string $codeVerifier): string
+    private function deriveCodeChallenge(#[\SensitiveParameter] string $codeVerifier): string
     {
         return match ($this->options['pkce_method']) {
             // BASE64URL(SHA256(verifier)) without padding, per RFC 7636, Section 4.2

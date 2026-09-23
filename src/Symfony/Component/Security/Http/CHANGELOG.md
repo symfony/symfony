@@ -4,6 +4,10 @@ CHANGELOG
 8.2
 ---
 
+ * Keep the OIDC tokens, the authorization code and the PKCE verifier out of stack traces with `#[\SensitiveParameter]`, and out of the HttpClient profiler panel by not tracing the token endpoint requests of `OidcClient`
+ * Set the token endpoint rejection as the previous exception of `OidcInvalidGrantException`
+ * Add `TraceableOidcClient` and `OidcLoginInspector`, describing the OIDC login of a firewall for the profiler
+ * Add the `oidc_access_token_type` and `oidc_amr` attributes to the token `OidcLoginAuthenticator` creates, the type of the access token and the authentication methods the provider asserts
  * Support the OAuth 2.0 Form Post Response Mode in `OidcLoginAuthenticator`, reading the authorization response from the request body
  * Add `RefreshedUserCheckerListener`, running a user checker on `CheckRefreshedUserEvent` so an account disabled during a session is rejected on the next request
  * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, to add application-specific reasons to deauthenticate the token

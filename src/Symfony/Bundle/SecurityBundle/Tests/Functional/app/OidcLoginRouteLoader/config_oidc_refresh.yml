@@ -19,7 +19,7 @@ security:
                 provider_uri: 'https://accounts.example.com'
                 client_id: client_id
                 client_authentication:
-                    client_secret_post: client_secret
+                    client_secret_post: the-client-secret-value
                 refresh_access_token: true
         main:
             http_basic: ~

@@ -1414,13 +1414,14 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
     }
 
-    public function testCreateTokenStoresTheRefreshTokenAndTheAccessTokenExpiry()
+    public function testCreateTokenStoresTheAccessTokenTypeTheRefreshTokenAndTheAccessTokenExpiry()
     {
         $nonce = bin2hex(random_bytes(16));
         $state = bin2hex(random_bytes(16));
 
         $this->oidcClient->method('exchangeCode')->willReturn([
             'access_token' => 'access-123',
+            'token_type' => 'DPoP',
             'id_token' => $this->buildIdToken(['nonce' => $nonce]),
             'refresh_token' => 'refresh-123',
             'expires_in' => 300,
@@ -1433,6 +1434,7 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $token = $authenticator->createToken($passport, 'main');
 
+        $this->assertSame('DPoP', $token->getAttribute('oidc_access_token_type'));
         $this->assertSame('refresh-123', $token->getAttribute('oidc_refresh_token'));
         $this->assertSame($clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
     }
@@ -1479,6 +1481,7 @@ class OidcLoginAuthenticatorTest extends TestCase
         $token = $authenticator->createToken($passport, 'main');
 
         $this->assertSame([AuthenticationMethod::PASSWORD => $authTime, AuthenticationMethod::ONE_TIME_PASSWORD => $authTime], $token->getAuthenticationProofs());
+        $this->assertSame(['pwd', 'otp'], $token->getAttribute('oidc_amr'));
     }
 
     public function testCreateTokenRecordsTheAcrClaim()
@@ -1538,6 +1541,7 @@ class OidcLoginAuthenticatorTest extends TestCase
         $token = $authenticator->createToken($passport, 'main');
 
         $this->assertSame([AuthenticationMethod::PASSWORD => $authTime], $token->getAuthenticationProofs());
+        $this->assertSame(['pwd'], $token->getAttribute('oidc_amr'));
     }
 
     public function testCreateTokenFallsBackToAnUnspecifiedMethodWhenTheAmrClaimIsNotAList()
@@ -1559,6 +1563,7 @@ class OidcLoginAuthenticatorTest extends TestCase
         $token = $authenticator->createToken($passport, 'main');
 
         $this->assertSame([AuthenticationMethod::UNSPECIFIED => $authTime], $token->getAuthenticationProofs());
+        $this->assertSame([], $token->getAttribute('oidc_amr'));
     }
 
     public function testCreateTokenNeverDatesTheAuthenticationTimeInTheFuture()
@@ -1624,10 +1629,11 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertSame([AuthenticationMethod::PASSWORD => $clock->now()->getTimestamp(), AuthenticationMethod::ONE_TIME_PASSWORD => $clock->now()->getTimestamp()], $token->getAuthenticationProofs());
     }
 
-    public function testCreateTokenReportsAMissingRefreshTokenAndExpiryAsNull()
+    public function testCreateTokenReportsAMissingTokenTypeRefreshTokenAndExpiryAsNull()
     {
         // a provider only issues a refresh token when it was asked for one, e.g. with the
-        // "offline_access" scope, and "expires_in" is optional in RFC 6749, Section 5.1
+        // "offline_access" scope, and "expires_in" is optional in RFC 6749, Section 5.1;
+        // "token_type" is required there, but a provider may still leave it out
         $nonce = bin2hex(random_bytes(16));
         $state = bin2hex(random_bytes(16));
 
@@ -1642,6 +1648,7 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $token = $authenticator->createToken($passport, 'main');
 
+        $this->assertNull($token->getAttribute('oidc_access_token_type'));
         $this->assertNull($token->getAttribute('oidc_refresh_token'));
         $this->assertNull($token->getAttribute('oidc_access_token_expires_at'));
     }

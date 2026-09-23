@@ -96,6 +96,8 @@ abstract class AbstractCloner implements ClonerInterface
         'Symfony\Component\HttpClient\Response\CurlResponse' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castHttpClientResponse'],
         'Symfony\Component\HttpClient\Response\NativeResponse' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castHttpClientResponse'],
         'Symfony\Component\HttpFoundation\Request' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castRequest'],
+        'Symfony\Component\Security\Core\Authentication\Token\TokenInterface' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castSecurityToken'],
+        'Symfony\Component\Security\Http\Authenticator\Passport\Passport' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castPassport'],
         'Symfony\Component\Uid\Ulid' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castUlid'],
         'Symfony\Component\Uid\Uuid' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castUuid'],
         'Symfony\Component\VarExporter\Internal\LazyObjectState' => ['Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castLazyObjectState'],

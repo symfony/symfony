@@ -36,7 +36,7 @@ final class NoClientAuthentication implements ClientAuthenticationInterface
      * it is the one exempted; a grant added later never reaches the token endpoint
      * unprotected.
      */
-    public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
+    public function authenticate(string $clientId, string $tokenEndpoint, #[\SensitiveParameter] array $options): array
     {
         $body = $options['body'] ?? [];
 

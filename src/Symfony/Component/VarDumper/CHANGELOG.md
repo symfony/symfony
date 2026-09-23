@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Mask the attributes of a security token or passport whose name ends with `token` or contains `secret`, `password` or `credential`, so that a dump never exposes the credentials an authenticator stores there
  * Render dump toggles as `<button>` elements with `aria-expanded`, so they can be reached and operated with the keyboard
  * Add a `Ctrl/Cmd+Shift+ArrowDown`/`ArrowUp` shortcut to expand or collapse all children of the focused toggle
 

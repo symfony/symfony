@@ -19,6 +19,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\Authenticator\Debug\OidcLoginInspector;
+use Symfony\Component\Security\Http\Authenticator\Debug\TraceableOidcClient;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 
 class OidcLoginFactoryTest extends TestCase
@@ -1321,6 +1323,67 @@ class OidcLoginFactoryTest extends TestCase
             'client_authentication' => 'app.client_authentication',
             'http_client' => '',
         ], $factory);
+    }
+
+    public function testTheProfilerServicesAreRegisteredWithTheDebugFirewall()
+    {
+        $container = new ContainerBuilder();
+        $container->register('debug.security.firewall');
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'my-client-secret'],
+            'refresh_access_token' => true,
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        // the client is decorated, so that the calls to the provider are recorded
+        $traceableClient = $container->getDefinition('debug.security.authenticator.oidc_login.client.main');
+        $this->assertSame(TraceableOidcClient::class, $traceableClient->getClass());
+        $this->assertSame(['security.authenticator.oidc_login.client.main', null, 0], $traceableClient->getDecoratedService());
+        $this->assertEquals([new Reference('debug.security.authenticator.oidc_login.client.main.inner')], $traceableClient->getArguments());
+        $this->assertTrue($traceableClient->hasTag('kernel.reset'));
+
+        $inspector = $container->getDefinition('debug.security.authenticator.oidc_login.inspector.main');
+        $this->assertSame(OidcLoginInspector::class, $inspector->getClass());
+        $this->assertSame([['firewall' => 'main']], $inspector->getTag('security.authenticator.oidc_login.inspector'));
+        $this->assertSame('main', $inspector->getArgument(0));
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $inspector->getArgument(1));
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.signature_verifier.main'), $inspector->getArgument(2));
+        $this->assertEquals(new Reference('debug.security.authenticator.oidc_login.client.main'), $inspector->getArgument(3));
+        $this->assertEquals(new Reference('clock'), $inspector->getArgument(5));
+
+        // the configuration handed to the profiler carries no secret
+        $inspectorConfig = $inspector->getArgument(4);
+        $this->assertSame('https://provider.example.com', $inspectorConfig['provider_uri']);
+        $this->assertSame('my-client-id', $inspectorConfig['client_id']);
+        $this->assertSame(['openid'], $inspectorConfig['scope']);
+        $this->assertSame(['enabled' => true, 'method' => 'S256'], $inspectorConfig['pkce']);
+        $this->assertSame(['enabled' => true, 'leeway' => 30], $inspectorConfig['refresh_access_token']);
+        $this->assertTrue($inspectorConfig['id_token_signature']['required']);
+        $this->assertArrayNotHasKey('client_authentication', $inspectorConfig);
+        $this->assertStringNotContainsString('my-client-secret', json_encode($inspectorConfig));
+    }
+
+    public function testTheProfilerServicesAreNotRegisteredWithoutTheDebugFirewall()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertFalse($container->hasDefinition('debug.security.authenticator.oidc_login.client.main'));
+        $this->assertFalse($container->hasDefinition('debug.security.authenticator.oidc_login.inspector.main'));
+        $this->assertSame([], $container->findTaggedServiceIds('security.authenticator.oidc_login.inspector'));
     }
 
     private function processConfig(array $config, OidcLoginFactory $factory): array

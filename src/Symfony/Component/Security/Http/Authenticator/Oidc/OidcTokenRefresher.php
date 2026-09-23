@@ -92,8 +92,8 @@ final class OidcTokenRefresher
     /**
      * Renews the access token, whatever its expiry, and stores the new tokens.
      *
-     * The security token receives the access token and its expiry, the refresh token when the
-     * provider rotated it, and the ID token when it issued a new one.
+     * The security token receives the access token, its type and its expiry, the refresh token
+     * when the provider rotated it, and the ID token when it issued a new one.
      *
      * @throws OidcInvalidGrantException If the provider no longer honors the refresh token
      * @throws AuthenticationException   If the renewal fails for any other reason
@@ -119,6 +119,7 @@ final class OidcTokenRefresher
         }
 
         $token->setAttribute('oidc_access_token', $tokenData['access_token']);
+        $token->setAttribute('oidc_access_token_type', \is_string($tokenData['token_type'] ?? null) && '' !== $tokenData['token_type'] ? $tokenData['token_type'] : null);
         $token->setAttribute('oidc_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? $this->clock->now()->getTimestamp() + (int) $tokenData['expires_in'] : null);
 
         // RFC 6749, Section 6: issuing a new refresh token is a MAY, and the one just
@@ -138,7 +139,7 @@ final class OidcTokenRefresher
      *
      * @throws AuthenticationException If the refreshed ID token does not describe the same authentication
      */
-    private function verifyRefreshedIdToken(TokenInterface $token, mixed $idToken): void
+    private function verifyRefreshedIdToken(TokenInterface $token, #[\SensitiveParameter] mixed $idToken): void
     {
         if (!\is_string($idToken) || '' === $idToken) {
             throw new AuthenticationException('The token endpoint response does not contain a valid "id_token".');

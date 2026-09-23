@@ -18,6 +18,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
@@ -25,6 +26,7 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthentica
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -276,10 +278,88 @@ class OidcClientTest extends TestCase
             new ClientSecretPost('test-client-secret'),
         );
 
-        $this->expectException(OidcInvalidGrantException::class);
-        $this->expectExceptionMessage('The OIDC provider rejected the refresh token');
+        try {
+            $client->refreshToken('refresh-123');
+            $this->fail(\sprintf('Expected an "%s" to be thrown.', OidcInvalidGrantException::class));
+        } catch (OidcInvalidGrantException $e) {
+            $this->assertStringContainsString('The OIDC provider rejected the refresh token', $e->getMessage());
 
+            // the rejection is kept as the cause, with the response it came in
+            $this->assertInstanceOf(HttpExceptionInterface::class, $e->getPrevious());
+            $this->assertSame('Token is not active', $e->getPrevious()->getResponse()->toArray(false)['error_description']);
+        }
+    }
+
+    /**
+     * The token endpoint answers with bearer credentials, and the request carries the
+     * client secret and the authorization code or the refresh token: none of it belongs
+     * in the profiler, which the traceable client is told through "extra.trace_content".
+     */
+    public function testTheTokenRequestsAreNotTracedByTheProfiler()
+    {
+        $httpClient = new TraceableHttpClient(new MockHttpClient([
+            new JsonMockResponse(['access_token' => 'access-123', 'id_token' => 'id-token-abc']),
+            new JsonMockResponse(['access_token' => 'access-456']),
+            new JsonMockResponse(['sub' => 'user-42']),
+        ]));
+        $client = new OidcClient($httpClient, $this->discovery, 'test-client-id', new ClientSecretPost('test-client-secret'));
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'code-verifier');
         $client->refreshToken('refresh-123');
+        $client->fetchUserInfo('access-456');
+
+        $traces = $httpClient->getTracedRequests();
+        $this->assertCount(3, $traces);
+
+        foreach ([0, 1] as $tokenRequest) {
+            $this->assertNull($traces[$tokenRequest]['content']);
+            $this->assertArrayNotHasKey('body', $traces[$tokenRequest]['options']);
+            $this->assertStringNotContainsString('test-client-secret', json_encode($traces[$tokenRequest]['options']));
+        }
+
+        // the UserInfo response holds the claims, which are worth seeing
+        $this->assertSame(['sub' => 'user-42'], $traces[2]['content']);
+    }
+
+    /**
+     * A stack trace records the arguments of its frames, and an unhandled exception
+     * displays them: the credentials passed to the client must not be among them.
+     */
+    public function testTheCredentialsAreHiddenFromStackTraces()
+    {
+        $ignoreArgs = ini_set('zend.exception_ignore_args', '0');
+
+        try {
+            $this->httpClient->method('request')->willThrowException(new \RuntimeException('Unexpected failure.'));
+            $client = $this->createClient();
+
+            foreach ([
+                static fn () => $client->exchangeCode('raw-code', 'https://app.example.com/callback', 'raw-verifier'),
+                static fn () => $client->refreshToken('raw-refresh-token'),
+                static fn () => $client->fetchUserInfo('raw-access-token'),
+            ] as $call) {
+                try {
+                    $call();
+                    $this->fail('Expected the client to fail.');
+                } catch (\RuntimeException $e) {
+                    $this->assertStringNotContainsString('raw-', $e->getTraceAsString());
+
+                    // the frames of the component only: the mocked HTTP client receives
+                    // the request options as a plain argument, which is on the contracts
+                    foreach ($e->getTrace() as $frame) {
+                        if (!str_starts_with($frame['class'] ?? '', 'Symfony\\Component\\Security\\')) {
+                            continue;
+                        }
+
+                        foreach ($frame['args'] ?? [] as $arg) {
+                            $this->assertStringNotContainsString('raw-', json_encode($arg));
+                        }
+                    }
+                }
+            }
+        } finally {
+            ini_set('zend.exception_ignore_args', $ignoreArgs);
+        }
     }
 
     public function testRefreshTokenReportsAnotherProviderErrorAsAPlainFailure()

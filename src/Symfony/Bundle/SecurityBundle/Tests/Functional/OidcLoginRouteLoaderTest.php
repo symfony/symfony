@@ -130,6 +130,50 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
         $this->assertGreaterThan(time(), $token->getAttribute('oidc_access_token_expires_at'));
     }
 
+    public function testTheProfilerDescribesTheOidcLoginWithoutItsCredentials()
+    {
+        $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_refresh.yml', 'debug' => true]);
+        $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
+            'oidc_access_token' => 'access-123',
+            'oidc_refresh_token' => 'refresh-123',
+            'oidc_access_token_expires_at' => time() - 1,
+        ]);
+        $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider([
+            'access_token' => 'access-456',
+            'token_type' => 'Bearer',
+            'refresh_token' => 'refresh-456',
+            'expires_in' => 300,
+        ])));
+        $client->getContainer()->get('security.token_storage')->setToken(null);
+        $client->enableProfiler();
+
+        $client->request('GET', '/oidc/start');
+
+        $collector = $client->getProfile()->getCollector('security');
+        $oidc = $collector->getOidcLogin()->getValue(true);
+
+        $this->assertSame('oidc', $oidc['firewall']);
+        $this->assertSame('client_secret_post', $oidc['config']['client_authentication']);
+        $this->assertSame('cached', $oidc['discovery']['status']);
+        $this->assertSame('https://accounts.example.com/token', $oidc['discovery']['document']['token_endpoint']);
+
+        // the renewal made by the refresh listener is recorded, its tokens described
+        $this->assertCount(1, $oidc['calls']);
+        $this->assertSame('refresh_token', $oidc['calls'][0]['operation']);
+        $this->assertNull($oidc['calls'][0]['error']);
+        $this->assertSame('opaque', $oidc['calls'][0]['response']['access_token']['format']);
+        $this->assertTrue($oidc['calls'][0]['response']['refresh_token_rotated']);
+        $this->assertSame('opaque', $oidc['token']['access_token']['format']);
+        $this->assertSame('Bearer', $oidc['token']['access_token_type']);
+        $this->assertGreaterThan(0, $oidc['token']['access_token_expires_in']);
+
+        // nothing stored in the profile holds a token, before or after the renewal, nor the client secret
+        $profile = serialize($collector);
+        foreach (['access-123', 'refresh-123', 'access-456', 'refresh-456', 'the-client-secret-value'] as $credential) {
+            $this->assertStringNotContainsString($credential, $profile);
+        }
+    }
+
     /**
      * A lazy firewall, which is what the security recipe configures, asks every listener
      * whether it supports the request before it restores the security token, so a listener

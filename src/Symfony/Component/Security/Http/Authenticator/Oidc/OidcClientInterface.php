@@ -31,7 +31,7 @@ interface OidcClientInterface
      *
      * @throws AuthenticationException If the token endpoint is missing, cannot be reached or returns an invalid response
      */
-    public function exchangeCode(string $code, string $redirectUri, ?string $codeVerifier = null): array;
+    public function exchangeCode(#[\SensitiveParameter] string $code, string $redirectUri, #[\SensitiveParameter] ?string $codeVerifier = null): array;
 
     /**
      * Renews an access token with the refresh token grant of RFC 6749, Section 6.
@@ -58,7 +58,7 @@ interface OidcClientInterface
      *
      * @throws AuthenticationException If the userinfo endpoint is missing, cannot be reached or returns an invalid response
      */
-    public function fetchUserInfo(string $accessToken): array;
+    public function fetchUserInfo(#[\SensitiveParameter] string $accessToken): array;
 
     /**
      * Returns the name of the method the client authenticates with at the token endpoint.

@@ -12,6 +12,10 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV6;
@@ -59,5 +63,59 @@ final class SymfonyCasterTest extends TestCase
             EODUMP;
 
         $this->assertDumpEquals($expectedDump, $ulid);
+    }
+
+    public function testCastSecurityTokenMasksTheCredentialsItCarries()
+    {
+        if (!class_exists(UsernamePasswordToken::class)) {
+            $this->markTestSkipped('The Security component is not installed.');
+        }
+
+        $token = new UsernamePasswordToken(new InMemoryUser('jane', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
+        $token->setAttribute('oidc_id_token', 'raw-id-token');
+        $token->setAttribute('oidc_access_token', 'raw-access-token');
+        $token->setAttribute('oidc_refresh_token', 'raw-refresh-token');
+        $token->setAttribute('oidc_access_token_expires_at', 1234567890);
+        $token->setAttribute('api_secret', 'raw-secret');
+        $token->setAttribute('oidc_acr', 'urn:example:gold');
+
+        // dumped on its own, and as a log context, which is how the profiler sees it
+        foreach ([$token, ['token' => $token]] as $var) {
+            $dump = $this->getDump($var);
+
+            $this->assertStringNotContainsString('raw-', $dump);
+            $this->assertStringContainsString('"oidc_id_token" => "******"', $dump);
+            $this->assertStringContainsString('"oidc_access_token" => "******"', $dump);
+            $this->assertStringContainsString('"oidc_refresh_token" => "******"', $dump);
+            $this->assertStringContainsString('"api_secret" => "******"', $dump);
+            $this->assertStringContainsString('"oidc_access_token_expires_at" => 1234567890', $dump);
+            $this->assertStringContainsString('"oidc_acr" => "urn:example:gold"', $dump);
+        }
+    }
+
+    public function testCastPassportMasksTheCredentialsItCarries()
+    {
+        if (!class_exists(SelfValidatingPassport::class)) {
+            $this->markTestSkipped('The Security component is not installed.');
+        }
+
+        $passport = new SelfValidatingPassport(new UserBadge('jane', static fn () => null, ['sub' => 'jane']));
+        $passport->setAttribute('oidc_token_data', [
+            'id_token' => 'raw-id-token',
+            'access_token' => 'raw-access-token',
+            'refresh_token' => 'raw-refresh-token',
+            'token_type' => 'Bearer',
+            'expires_in' => 300,
+        ]);
+
+        $dump = $this->getDump($passport);
+
+        $this->assertStringNotContainsString('raw-', $dump);
+        $this->assertStringContainsString('"id_token" => "******"', $dump);
+        $this->assertStringContainsString('"access_token" => "******"', $dump);
+        $this->assertStringContainsString('"refresh_token" => "******"', $dump);
+        $this->assertStringContainsString('"token_type" => "Bearer"', $dump);
+        $this->assertStringContainsString('"expires_in" => 300', $dump);
+        $this->assertStringContainsString('"sub" => "jane"', $dump);
     }
 }

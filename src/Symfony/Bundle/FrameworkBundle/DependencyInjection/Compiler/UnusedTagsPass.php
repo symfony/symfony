@@ -105,6 +105,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'security.access_token_handler.oidc.encryption_algorithm',
         'security.access_token_handler.oidc.signature_algorithm',
         'security.authenticator.login_linker',
+        'security.authenticator.oidc_login.inspector',
         'security.expression_language_provider',
         'security.remember_me_handler',
         'security.voter',

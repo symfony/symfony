@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-14T16:28:34Z
+
+it would be extra nice to provide a Test helper with the same semantic `assertListenerTriggersAfterListenerOnEvent($event::class, $listenerReference, $listenerToAssert)` allowing us to migrate the tests first and then progressivelly migrate to using the syntax with `before / after`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-15T07:08:33Z
+
+@Neirda24 why not, as a separate PR: for this feat, testing before/after is mostly useless since the order is declared and guaranteed. For priority-based listeners that could be useful, and indeed ease migration: 1. add tests that pin the priority-based order then 2. move to before/after. PR welcome :)
+
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-09-16T13:00:23Z
+
+It might be worth extending this a little to support `before all` and `after all` constraints, maybe with something like `before: '*'` and `after: '*'` for cases where the constraint isn't relative to a specific listener/service
+
+---------------------------------------------------------------------------
+
+by stof at 2026-09-16T13:03:29Z
+
+@ayyoub-afwallah there is no way to guarantee being before all. What if multiple listeners use it, or another listener asks being before this one ?
+
+If the goal is to be a best effort, using a big priority (or a very negative one for `after all`) already covers this (and still composes fine with multiple listeners using it)
+
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-09-16T14:09:32Z
+
+@stof I was thinking more about the motivating case, where multiple listeners/services share the same priority but still need a specific ordering.
+
+For example, you might want one listener to remain first or last without having to know and reference the current first/last listener, It would also keep that position if new listeners with the same priority are added later.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-09-16T14:26:03Z
+
+@ayyoub-afwallah `before all` would not mean `before other listeners at the same priority`. That's not the same thing (and the later still suffers from the fact that only 1 listener would be able to use it at each priority before getting a compile error, so it requires knowledge of the fact that other listeners don't use it). Using different priorities is a much better solution.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-21T20:07:23Z
+
+PR updated: a declared priority is now never changed. Constraints reorder a listener only among the ones sharing its priority, and a constraint that would need to cross a priority fails the build, naming both priorities. A listener that declares none (`AsEventListener::$priority` is now nullable) is placed by its constraints and takes the priority its place needs. That also settles @stof's question above: nothing is rewritten, so the runtime sort can't disagree with the compile-time order.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2026-09-23T07:18:13Z
+
+Worked on this independently in https://github.com/symfony/symfony/pull/66231 - didn't check it before because I assumed that after all these years, surely there's nobody else working on it right now. Way off the mark! 😄
+But compared to my PR the DFS algorithm is the better choice indeed! Also the priority model of this PR is substantially better than in my initial draft. I did rewrite the priorities based on their final rank. Here, we are keeping explicit numbers and an additional relative one on top.
+
+Just wondering if the `AsEventListener::$priority` BC break is really needed 🤔
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-23T07:21:43Z
+
+See my take on the nullable prop here: https://github.com/symfony/symfony/pull/66012#discussion_r4066035509
+This shouldn't break anyone's code - nobody reads those attributes past the autoconfiguration rule.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2026-09-23T07:24:52Z
+
+Yeah I read that, we could probably work around it using some
+
+```php
+$arguments = $reflectionAttribute->getArguments();
+$priorityDeclared = // named or positional "priority" argument exists
+$attribute = $reflectionAttribute->newInstance();
+
+$definition->addTag('kernel.event_listener', [
+    'priority' => $attribute->priority, // remains int, default 0
+    'priority_declared' => $priorityDeclared,
+]);
+```
+
+but I agree, probably not worth the pain.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-23T07:27:10Z
+
+I thought about such workaround and decided them not worth indeed.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2026-09-23T07:40:00Z
+
+One more thing if I am not mistaken: Subscribers participate in relative ordering and can be targets but there is no syntax through which a subscriber itself can have constraints. Is that on purpose or did I miss something somehow?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-23T07:49:37Z
+
+This was taken care of in https://github.com/symfony/symfony/pull/66022
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-23T09:03:07Z
+
+PR updated: subscribers can declare `before`/`after` too, next to the named keys of `getSubscribedEvents()` added in #66022:
+
+```php
+return [KernelEvents::REQUEST => ['method' => 'onRequest', 'before' => ProfilerListener::class]];
+```
+
+This only works for subscribers registered as services: supporting it in `EventDispatcher::addSubscriber()` would need the sorter at runtime and class-only targets, not worth it. Instead, `addSubscriber()` throws when these keys come without a priority, rather than silently registering the listener at 0. The doc PR is updated too.

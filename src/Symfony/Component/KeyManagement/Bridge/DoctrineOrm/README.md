@@ -44,17 +44,22 @@ The listener gets their names by key and by the type they wrap:
 
 ```php
 use Doctrine\DBAL\Types\StringType;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\TypeRegistry;
 use Doctrine\ORM\Events;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 
-Type::getTypeRegistry()->register('app_speaker_contact', new EncryptedType(new StringType(), $encrypter, 'speaker.contact', 'string'));
+$connectionConfiguration->setTypeProvider(new TypeRegistry([
+    'app_speaker_contact' => new EncryptedType(new StringType(), $encrypter, 'speaker.contact'),
+]));
 
 $eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnListener([
     'speaker.contact' => ['string' => 'app_speaker_contact'],
 ]));
 ```
+
+The ORM resolves the types through the connection since doctrine/orm 3.8.
+With an older version, register them on the global type registry instead.
 
 Loading the metadata of a class fails when no encrypted type is registered for the key and the type of a column.
 It also fails when the attribute is on a property that is not a mapped column.
@@ -94,8 +99,7 @@ The metadata cache warmer of DoctrineBundle requires this.
 The listener runs after the other `loadClassMetadata` listeners, so it computes each scope from the final table and column names.
 When a listener that runs later still renames a table or a column, the types aren't cached.
 Each entity manager then loads all the metadata again, to fix the names in it.
-Applications using only explicit keys keep registration at connection creation.
-The connection's type provider must be a writable `TypeRegistry`.
+Automatic types are registered in the global type registry, which the type provider of the connection falls back to when DoctrineBundle installs one.
 Generated automatic type names use an internal namespace, `key_management_auto_v1_<base64-parent>.<64-hex-hash>`.
 Don't use that full name format for your own parent aliases.
 
@@ -113,8 +117,9 @@ With a cache, it does so once and saves the types under the name of the entity m
 Clear that cache when the mapping changes, like the metadata cache.
 Add the listener after the listeners that rename tables or columns.
 
-In a Symfony application, the `KeyManagementBundle` registers explicit-key types when DoctrineBundle creates a connection.
-When the container is compiled, the bundle finds the `#[Encrypted]` columns and collects one type per explicit key and type.
+In a Symfony application, the `KeyManagementBundle` registers the types for you.
+When the container is compiled, the bundle finds the `#[Encrypted]` columns and registers one type per explicit key and type.
+DoctrineBundle then declares each type on the connections of the entity managers that map its columns.
 It looks for these columns in the entities, embeddables and mapped superclasses found in the `resource` directories of your services.
 With the default `App\:` resource, this covers `src/Entity/`.
 The types encrypt with the encrypter `EnvelopeEncrypterInterface` resolves to, like the ones of `key_management.doctrine_dbal.types`.

@@ -206,6 +206,29 @@ class UuidTest extends TestCase
         $this->assertNotSame($node, $childNode);
     }
 
+    #[Group('time-sensitive')]
+    #[RequiresPhpExtension('pcntl')]
+    public function testV1AndV6NodesAreNotSharedWithForksAfterTheClockWentBackwards()
+    {
+        Uuid::v1();
+        usleep(-100);
+        $node = Uuid::v1()->getNode();
+        [$parentSocket, $childSocket] = stream_socket_pair(\STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
+
+        if (!$pid = pcntl_fork()) {
+            // the fork takes as long as the clock went backwards, so the clock is back to the last timestamp
+            usleep(100);
+            fwrite($childSocket, Uuid::v1()->getNode());
+            exit(0);
+        }
+
+        fclose($childSocket);
+        $childNode = stream_get_contents($parentSocket);
+        pcntl_waitpid($pid, $status);
+
+        $this->assertNotSame($node, $childNode);
+    }
+
     public function testV7()
     {
         $uuid = Uuid::fromString(self::A_UUID_V7);

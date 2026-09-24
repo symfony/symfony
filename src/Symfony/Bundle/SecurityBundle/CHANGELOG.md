@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Name the issuer of the provider as the audience of a `client_secret_jwt` or `private_key_jwt` assertion, which `draft-ietf-oauth-rfc7523bis` makes the sole accepted value, and add the `audience` option of those methods to name the token endpoint instead
+ * Name the issuer of the provider as the audience of a `client_secret_jwt` or `private_key_jwt` assertion and type it `client-authentication+jwt`, which `draft-ietf-oauth-rfc7523bis` makes the sole accepted value and asks for, and add the `audience` option of those methods to name the token endpoint instead, without that type, for a provider that refuses the issuer
  * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session
  * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which now takes the logout URL generator there
  * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service used when `IS_AUTHENTICATED_RECENTLY` is denied

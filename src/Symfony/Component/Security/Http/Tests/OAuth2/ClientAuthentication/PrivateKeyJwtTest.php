@@ -207,6 +207,44 @@ class PrivateKeyJwtTest extends TestCase
         $this->assertSame('https://provider.example.com/', self::decodePayload($options['body']['client_assertion'])['aud']);
     }
 
+    /**
+     * draft-ietf-oauth-rfc7523bis: "Client authentication JWTs SHOULD be explicitly typed by
+     * using the typ header parameter value client-authentication+jwt".
+     *
+     * It keeps one kind of JWT from being taken for another (RFC 8725, Section 3.11), and it
+     * is how a client signals "their compliance with the requirements herein".
+     */
+    public function testTypesTheAssertionExplicitlyWhenItNamesTheIssuer()
+    {
+        // Given
+        $clientAuthentication = $this->createClientAuthentication(self::createDiscovery('https://provider.example.com'));
+
+        // When
+        $options = $clientAuthentication->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []]);
+
+        // Then
+        $this->assertSame('client-authentication+jwt', self::decodeHeader($options['body']['client_assertion'])['typ']);
+    }
+
+    /**
+     * The type says the assertion was "produced in accordance" with the draft, and an
+     * assertion naming the endpoint is not: the same draft writes that "the token endpoint URL
+     * of the authorization server MUST NOT be used as an audience value". Typing it would
+     * claim a compliance it does not have, and the draft asks servers not to reject an
+     * untyped assertion anyway.
+     */
+    public function testTypesNothingWhenTheAssertionNamesTheEndpoint()
+    {
+        // Given
+        $clientAuthentication = $this->createClientAuthentication();
+
+        // When
+        $options = $clientAuthentication->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []]);
+
+        // Then
+        $this->assertArrayNotHasKey('typ', self::decodeHeader($options['body']['client_assertion']));
+    }
+
     private static function createDiscovery(string $announcedIssuer): OidcDiscovery
     {
         return new OidcDiscovery(

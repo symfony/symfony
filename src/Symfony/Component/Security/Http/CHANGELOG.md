@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Add the `$issuerAudience` argument to `ClientSecretJwt` and `PrivateKeyJwt`, which names the issuer the provider announces as the audience of the assertion instead of the endpoint the request is made to, as `draft-ietf-oauth-rfc7523bis` requires, and `OidcDiscovery::getIssuer()`
+ * Add the `$issuerAudience` argument to `ClientSecretJwt` and `PrivateKeyJwt`, which names the issuer the provider announces as the audience of the assertion instead of the endpoint the request is made to and types it `client-authentication+jwt`, as `draft-ietf-oauth-rfc7523bis` requires, and `OidcDiscovery::getIssuer()`
  * Support the OAuth 2.0 Form Post Response Mode in `OidcLoginAuthenticator`, reading the authorization response from the request body
  * Add `RefreshedUserCheckerListener`, running a user checker on `CheckRefreshedUserEvent` so an account disabled during a session is rejected on the next request
  * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, to add application-specific reasons to deauthenticate the token

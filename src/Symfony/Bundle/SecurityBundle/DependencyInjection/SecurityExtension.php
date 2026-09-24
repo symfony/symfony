@@ -599,19 +599,21 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
     private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId): string
     {
-        if (isset($this->contextListeners[$contextKey])) {
-            return $this->contextListeners[$contextKey];
-        }
-
         $listenerId = 'security.context_listener.'.\count($this->contextListeners);
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.context_listener'));
         $listener->replaceArgument(2, $contextKey);
         if (null !== $firewallEventDispatcherId) {
             $listener->replaceArgument(4, new Reference($firewallEventDispatcherId));
-            $listener->addTag('kernel.event_listener', ['event' => KernelEvents::RESPONSE, 'method' => 'onKernelResponse']);
+
+            // the firewalls sharing a context share its session key, so one listener per context is enough to write it
+            if (!\in_array($contextKey, $this->contextListeners, true)) {
+                $listener->addTag('kernel.event_listener', ['event' => KernelEvents::RESPONSE, 'method' => 'onKernelResponse']);
+            }
         }
 
-        return $this->contextListeners[$contextKey] = $listenerId;
+        $this->contextListeners[$listenerId] = $contextKey;
+
+        return $listenerId;
     }
 
     private function createAuthenticationListeners(ContainerBuilder $container, string $id, array $firewall, array &$authenticationProviders, ?string $defaultProvider, array $providerIds, ?string $defaultEntryPoint): array

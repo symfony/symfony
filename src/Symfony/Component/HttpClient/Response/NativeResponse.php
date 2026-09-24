@@ -311,15 +311,15 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                 continue;
             }
 
-            if ($response->pauseExpiry && hrtime(true) / 1E9 < $response->pauseExpiry) {
-                // Create empty open handles to tell we still have pending requests
-                $multi->openHandles[$i] = [\INF, null, null, null];
-            } elseif ($maxHosts && $maxHosts > ($multi->hosts[parse_url($response->url, \PHP_URL_HOST)] ?? 0)) {
+            if ($maxHosts && $response->pauseExpiry <= hrtime(true) / 1E9 && $maxHosts > ($multi->hosts[parse_url($response->url, \PHP_URL_HOST)] ?? 0)) {
                 // Open the next pending request - this is a blocking operation so we do only one of them
                 $response->open();
                 $multi->sleep = false;
                 self::perform($multi);
                 $maxHosts = 0;
+            } else {
+                // Create empty open handles to tell we still have pending requests
+                $multi->openHandles[$i] = [\INF, null, null, null];
             }
         }
     }

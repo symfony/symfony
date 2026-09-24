@@ -273,6 +273,23 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     protected function parseCacheControl(string $header): array
     {
+        // Fast path for plain tokens: no quotes, no escapes, no whitespace but spaces, at most one "=" per directive
+        if (!preg_match('/[^\x20-\x7E]|["\\\\]|=[^,=]*+=/', $header)) {
+            $directives = [];
+            foreach (explode(',', $header) as $directive) {
+                $directive = explode('=', $directive, 2);
+                $name = strtolower(trim($directive[0]));
+
+                if (isset($directive[1])) {
+                    $directives[$name] = trim($directive[1]);
+                } elseif ('' !== $name) {
+                    $directives[$name] = true;
+                }
+            }
+
+            return $directives;
+        }
+
         $parts = HeaderUtils::split($header, ',=');
 
         return HeaderUtils::combine($parts);

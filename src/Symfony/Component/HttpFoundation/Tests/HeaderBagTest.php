@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
@@ -167,6 +168,40 @@ class HeaderBagTest extends TestCase
         $bag = new HeaderBag(['cache-control' => 'max-age="0"']);
         $this->assertTrue($bag->hasCacheControlDirective('max-age'));
         $this->assertEquals(0, $bag->getCacheControlDirective('max-age'));
+    }
+
+    #[DataProvider('provideCacheControlHeaders')]
+    public function testCacheControlHeaderParsing(string $header, array $directives)
+    {
+        $bag = new class(['Cache-Control' => $header]) extends HeaderBag {
+            public function getCacheControlDirectives(): array
+            {
+                return $this->cacheControl;
+            }
+        };
+
+        $this->assertSame($directives, $bag->getCacheControlDirectives());
+    }
+
+    public static function provideCacheControlHeaders(): iterable
+    {
+        yield ['', []];
+        yield ['no-cache, private', ['no-cache' => true, 'private' => true]];
+        yield ['Public, MAX-AGE=Ten', ['public' => true, 'max-age' => 'Ten']];
+        yield ['max-age=10,public,s-maxage=20', ['max-age' => '10', 'public' => true, 's-maxage' => '20']];
+        yield ['  public ,, , max-age = 10 ,  ', ['public' => true, 'max-age' => '10']];
+        yield ['no cache,  max age  =  1 0', ['no cache' => true, 'max age' => '1 0']];
+        yield ['max-age=10, max-age=20, public', ['max-age' => '20', 'public' => true]];
+        yield ['123, 0=1', [123 => true, 0 => '1']];
+        yield ['max-age= , public', ['max-age' => '', 'public' => true]];
+        yield ['=10, =', ['' => '']];
+        yield ['foo=a=b, bar', ['foo' => 'a=b', 'bar' => true]];
+        yield ['foo=a= , bar', ['foo' => 'a= ', 'bar' => true]];
+        yield ['private="set-cookie, vary", max-age="10"', ['private' => 'set-cookie, vary', 'max-age' => '10']];
+        yield ['foo="a\"b", bar=c\d', ['foo' => 'a"b', 'bar' => 'cd']];
+        yield ["public,\tmax-age=10", ['public' => true, 'max-age' => '10']];
+        yield ["max-age=10\f, public", ['max-age' => '10', 'public' => true]];
+        yield ["no\tcache", ["no\tcache" => true]];
     }
 
     public function testCacheControlDirectiveOverrideWithReplace()

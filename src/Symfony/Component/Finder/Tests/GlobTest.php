@@ -112,4 +112,12 @@ class GlobTest extends TestCase
         $this->assertSame(1, preg_match($regex, 'foo/.bar/bar.txt'));
         $this->assertSame(1, preg_match($regex, '.file.txt'));
     }
+
+    public function testGlobToRegexMergesConsecutiveStarsWhenWildcardsCrossSlashes()
+    {
+        $this->assertSame('#^(?=[^\.])/?(?=[^\.]).*/(?=[^\.])controllers\.json$#', Glob::toRegex('**/controllers.json', true, false));
+        $this->assertSame('#^(?=[^\.])foo/(?=[^\.]).*/(?=[^\.])bar$#', Glob::toRegex('foo/**/bar', true, false));
+        $this->assertSame('#^(?=[^\.]).*$#', Glob::toRegex('**', true, false));
+        $this->assertSame('#^(?=[^\.])a\*.*$#', Glob::toRegex('a\**', true, false));
+    }
 }

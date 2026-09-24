@@ -31,8 +31,9 @@ class ImportMapRenderer
     private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL = 'https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js';
     private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY = 'sha384-ie1x72Xck445i0j4SlNJ5W5iGeL3Dpa0zD48MZopgWsjNB/lt60SuG1iduZGNnJn';
 
-    private const LOADER_JSON = "export default (async()=>await(await fetch('%s')).json())()";
-    private const LOADER_CSS = "document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:'%s'%s}))";
+    private const LOADER_JSON = 'export default (async()=>await(await fetch(`%s`)).json())()';
+    private const LOADER_CSS = 'document.head.appendChild(Object.assign(document.createElement(`link`),{rel:`stylesheet`,href:`%s`}))';
+    private const LOADER_CSS_WITH_INTEGRITY = 'document.head.appendChild(Object.assign(document.createElement(`link`),{rel:`stylesheet`,href:`%s`,integrity:`%s`}))';
 
     public function __construct(
         private readonly ImportMapGenerator $importMapGenerator,
@@ -78,7 +79,7 @@ class ImportMapRenderer
 
             $preload = $data['preload'] ?? false;
             if ('json' === $data['type']) {
-                $importMap[$importName] = 'data:application/javascript,'.str_replace('%', '%25', \sprintf(self::LOADER_JSON, addslashes($path)));
+                $importMap[$importName] = $this->createLoaderUrl(self::LOADER_JSON, $path);
                 if ($preload) {
                     $webLinks[$path] = 'fetch';
                 }
@@ -95,9 +96,10 @@ class ImportMapRenderer
                 $styleIntegrity[$path] = $data['integrity'] ?? null;
                 // importmap entry is a noop
                 $importMap[$importName] = 'data:application/javascript,';
+            } elseif (isset($data['integrity'])) {
+                $importMap[$importName] = $this->createLoaderUrl(self::LOADER_CSS_WITH_INTEGRITY, $path, $data['integrity']);
             } else {
-                $cssIntegrity = isset($data['integrity']) ? \sprintf(",integrity:'%s'", addslashes($data['integrity'])) : '';
-                $importMap[$importName] = 'data:application/javascript,'.str_replace('%', '%25', \sprintf(self::LOADER_CSS, addslashes($path), $cssIntegrity));
+                $importMap[$importName] = $this->createLoaderUrl(self::LOADER_CSS, $path);
             }
         }
 
@@ -187,6 +189,14 @@ class ImportMapRenderer
         }
 
         return $output;
+    }
+
+    private function createLoaderUrl(string $loader, string ...$values): string
+    {
+        $loader = \sprintf($loader, ...array_map(static fn ($value) => addcslashes($value, '\\`$'), $values));
+
+        // Polyfills like es-module-shims inline the URL in single-quoted strings without escaping it
+        return 'data:application/javascript,'.strtr($loader, ['%' => '%25', '#' => '%23', "'" => '%27', '\\' => '%5C']);
     }
 
     private function escapeAttributeValue(string $value, int $flags = \ENT_COMPAT | \ENT_SUBSTITUTE): string

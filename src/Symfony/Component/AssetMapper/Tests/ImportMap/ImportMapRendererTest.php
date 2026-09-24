@@ -96,7 +96,7 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString('"app_css_preload": "data:application/javascript,', $html);
         $this->assertStringContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-preload-d1g35t.css">', $html);
         // non-preloaded CSS file
-        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,document.head.appendChild(Object.assign(document.createElement(\'link\'),{rel:\'stylesheet\',href:\'/subdirectory/assets/styles/app-nopreload-d1g35t.css\'}))', $html);
+        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,document.head.appendChild(Object.assign(document.createElement(`link`),{rel:`stylesheet`,href:`/subdirectory/assets/styles/app-nopreload-d1g35t.css`}))', $html);
         $this->assertStringNotContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-nopreload-d1g35t.css">', $html);
         // remote js
         $this->assertStringContainsString('"remote_js": "https://cdn.example.com/assets/remote-d1g35t.js"', $html);
@@ -217,9 +217,25 @@ class ImportMapRendererTest extends TestCase
         // a preloaded stylesheet is rendered as a link tag
         $this->assertStringContainsString('<link rel="stylesheet" href="/assets/preloaded-d1g35t.css" integrity="sha384-css-preload">', $html);
         // a non preloaded one is injected by the loader
-        $this->assertStringContainsString("integrity:'sha384-css-loaded'", $html);
+        $this->assertStringContainsString('integrity:`sha384-css-loaded`', $html);
         // and a self hosted polyfill carries its own
         $this->assertStringContainsString("script.setAttribute('integrity', 'sha384-polyfill');", $html);
+    }
+
+    public function testCssLoaderEscapesTheIntegrity()
+    {
+        $importMapGenerator = $this->createStub(ImportMapGenerator::class);
+        $importMapGenerator->method('getImportMapData')->willReturn([
+            'app_css' => [
+                'path' => '/assets/loaded-d1g35t.css',
+                'type' => 'css',
+                'integrity' => 'sha384-`${x}',
+            ],
+        ]);
+
+        $html = (new ImportMapRenderer($importMapGenerator))->render(['app']);
+
+        $this->assertStringContainsString('integrity:`sha384-%5C`%5C${x}`', $html);
     }
 
     public function testIntegrityIsOmittedWhenNotComputed()
@@ -294,6 +310,35 @@ class ImportMapRendererTest extends TestCase
         $this->assertSame(['preload'], $linkProvider->getLinks()[0]->getRels());
         $this->assertSame(['as' => 'style'], $linkProvider->getLinks()[0]->getAttributes());
         $this->assertSame('/assets/styles/app-preload-d1g35t.css', $linkProvider->getLinks()[0]->getHref());
+    }
+
+    public function testLoadersCanBeInlinedInSingleQuotedJavaScriptStrings()
+    {
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
+            ->method('getImportMapData')
+            ->willReturn([
+                'app.css' => [
+                    'path' => '/assets/app.css',
+                    'type' => 'css',
+                ],
+                'app.json' => [
+                    'path' => '/assets/app.json',
+                    'type' => 'json',
+                ],
+                'odd.css' => [
+                    'path' => '/assets/it\'s `100%` #1 \ ${x}.css',
+                    'type' => 'css',
+                ],
+            ]);
+
+        $renderer = new ImportMapRenderer($importMapGenerator);
+        preg_match('{<script type="importmap">(.*?)</script>}s', $renderer->render([]), $m);
+        $imports = json_decode($m[1], true)['imports'];
+
+        $this->assertSame('data:application/javascript,document.head.appendChild(Object.assign(document.createElement(`link`),{rel:`stylesheet`,href:`/assets/app.css`}))', $imports['app.css']);
+        $this->assertSame('data:application/javascript,export default (async()=>await(await fetch(`/assets/app.json`)).json())()', $imports['app.json']);
+        $this->assertSame('data:application/javascript,document.head.appendChild(Object.assign(document.createElement(`link`),{rel:`stylesheet`,href:`/assets/it%27s %5C`100%25%5C` %231 %5C%5C %5C${x}.css`}))', $imports['odd.css']);
     }
 
     public function testEmptyImportMapRendersAsJsonObject()

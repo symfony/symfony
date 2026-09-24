@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
 use Symfony\Component\Config\ResourceCheckerInterface;
+use Symfony\Component\Config\Tests\Fixtures\ResourceFailingOnUnserialize;
 use Symfony\Component\Config\Tests\Fixtures\ResourceWithVeryVeryVeryVeryVeryVeryVeryVeryLongName;
 use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
@@ -130,6 +131,42 @@ class ResourceCheckerConfigCacheTest extends TestCase
         file_put_contents($metaFile, str_replace('FileResource', 'ClassNotHere', file_get_contents($metaFile)));
 
         $this->assertFalse($cache->isFresh());
+    }
+
+    public function testCacheIsNotFreshWhenMetaFileIsCorrupted()
+    {
+        $checker = $this->createStub(ResourceCheckerInterface::class);
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
+        $cache->write('foo', [new FileResource(__FILE__)]);
+
+        file_put_contents("{$this->cacheFile}.meta", 'a:1:{i:0;O:4');
+
+        $errors = [];
+        set_error_handler(static function (int $type, string $message) use (&$errors) {
+            $errors[] = $message;
+
+            return true;
+        });
+
+        try {
+            $this->assertFalse($cache->isFresh());
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $errors);
+    }
+
+    public function testExceptionThrownWhileUnserializingMetaFileIsNotSwallowed()
+    {
+        $checker = $this->createStub(ResourceCheckerInterface::class);
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
+        $cache->write('foo', [new ResourceFailingOnUnserialize()]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Cannot unserialize.');
+
+        $cache->isFresh();
     }
 
     public function testCacheKeepsContent()

@@ -229,7 +229,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     #[RequiresPhpExtension('openssl')]
     public function testRedirectToADifferentSchemeDropsCredentials()
     {
-        TestRedirectServer::start();
+        TestSocketServer::start('tls/redirect-server.php', 8059);
         $client = new NoPrivateNetworkHttpClient(new NativeHttpClient(), '10.0.0.0/8');
 
         $response = $client->request('GET', 'https://127.0.0.1:8059/', [

@@ -29,14 +29,33 @@ final class Dechunker
     private const STATE_DATA_CR = 4;
     private const STATE_DATA_LF = 5;
     private const STATE_TRAILER = 6;
+    private const STATE_DONE = 7;
+    private const MAX_TRAILER_SIZE = 16384;
 
     private int $state = self::STATE_SIZE;
     private string $size = '';
     private int $remaining = 0;
+    private string $trailerLine = '';
+    private int $trailerSize = 0;
+
+    /**
+     * @var array<string, list<string>>
+     */
+    private array $trailers = [];
 
     public function isFinished(): bool
     {
-        return self::STATE_TRAILER === $this->state;
+        return self::STATE_DONE === $this->state || (self::STATE_TRAILER === $this->state && 0 === $this->trailerSize);
+    }
+
+    /**
+     * Returns the trailer fields, with lowercase names as keys.
+     *
+     * @return array<string, list<string>>
+     */
+    public function getTrailers(): array
+    {
+        return $this->trailers;
     }
 
     /**
@@ -116,11 +135,39 @@ final class Dechunker
                     break;
 
                 case self::STATE_TRAILER:
-                    // Trailer fields and anything else after the terminal chunk are ignored
+                    if (false === $lf = strpos($data, "\n", $offset)) {
+                        $this->readTrailer(substr($data, $offset));
+
+                        return $out;
+                    }
+
+                    $this->readTrailer(substr($data, $offset, $lf - $offset));
+                    $offset = $lf + 1;
+                    $line = rtrim($this->trailerLine, "\r");
+                    $this->trailerLine = '';
+
+                    if ('' === $line) {
+                        $this->state = self::STATE_DONE;
+                    } elseif (false !== $colon = strpos($line, ':')) {
+                        $this->trailers[strtolower(trim(substr($line, 0, $colon)))][] = trim(substr($line, $colon + 1));
+                    }
+                    break;
+
+                case self::STATE_DONE:
+                    // Anything after the trailer section is ignored
                     return $out;
             }
         }
 
         return $out;
+    }
+
+    private function readTrailer(string $data): void
+    {
+        if (self::MAX_TRAILER_SIZE < $this->trailerSize += \strlen($data)) {
+            throw new TransportException('Malformed chunked body: trailer section is too big.');
+        }
+
+        $this->trailerLine .= $data;
     }
 }

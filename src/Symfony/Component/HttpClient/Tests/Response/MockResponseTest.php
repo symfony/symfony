@@ -39,6 +39,34 @@ class MockResponseTest extends TestCase
         $this->assertEquals($totalTime, $response->getInfo('total_time'));
     }
 
+    public function testTrailersAreHeldUntilTheResponseCompletes()
+    {
+        $client = new MockHttpClient(new MockResponse(['hel', 'lo'], ['trailers' => ['grpc-status' => ['0']]]));
+        $response = $client->request('GET', 'https://example.com');
+        $seen = [];
+
+        foreach ($client->stream($response) as $chunk) {
+            $seen[] = [$chunk->isLast(), $response->getInfo('trailers')];
+        }
+
+        $this->assertSame([false, null], $seen[0]);
+        $this->assertSame([true, ['grpc-status' => ['0']]], end($seen));
+    }
+
+    public function testTrailersOfAFailedResponseAreNull()
+    {
+        $client = new MockHttpClient(new MockResponse('', ['error' => 'boom', 'trailers' => ['grpc-status' => ['0']]]));
+        $response = $client->request('GET', 'https://example.com');
+
+        try {
+            $response->getContent();
+            $this->fail(TransportException::class.' expected');
+        } catch (TransportException) {
+        }
+
+        $this->assertNull($response->getInfo('trailers'));
+    }
+
     public function testToArray()
     {
         $data = ['color' => 'orange', 'size' => 42];

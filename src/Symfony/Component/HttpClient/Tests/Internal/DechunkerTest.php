@@ -54,6 +54,37 @@ class DechunkerTest extends TestCase
         yield 'empty body' => ['', "0\r\n\r\n"];
     }
 
+    #[DataProvider('provideTrailers')]
+    public function testTrailers(array $expected, string $chunked)
+    {
+        $dechunker = new Dechunker();
+        $dechunker->dechunk($chunked);
+
+        $this->assertSame($expected, $dechunker->getTrailers());
+    }
+
+    #[DataProvider('provideTrailers')]
+    public function testTrailersByteByByte(array $expected, string $chunked)
+    {
+        $dechunker = new Dechunker();
+
+        foreach (str_split($chunked) as $byte) {
+            $dechunker->dechunk($byte);
+        }
+
+        $this->assertSame($expected, $dechunker->getTrailers());
+    }
+
+    public static function provideTrailers(): iterable
+    {
+        yield 'no trailers' => [[], "b\r\nhello world\r\n0\r\n\r\n"];
+        yield 'one field' => [['grpc-status' => ['0']], "b\r\nhello world\r\n0\r\ngrpc-status: 0\r\n\r\n"];
+        yield 'names are lowercased, values trimmed' => [['x-trailer' => ['value']], "0\r\nX-Trailer:   value  \r\n\r\n"];
+        yield 'repeated fields' => [['x-a' => ['1', '2'], 'x-b' => ['3']], "0\r\nx-a: 1\r\nx-b: 3\r\nx-a: 2\r\n\r\n"];
+        yield 'bare LF line endings' => [['x-a' => ['1']], "0\nx-a: 1\n\n"];
+        yield 'lines after the section are ignored' => [['x-a' => ['1']], "0\r\nx-a: 1\r\n\r\nx-b: 2\r\n"];
+    }
+
     #[DataProvider('provideTruncatedChunkedData')]
     public function testTruncatedData(string $chunked)
     {
@@ -70,6 +101,8 @@ class DechunkerTest extends TestCase
         yield 'partial data' => ["b\r\nhel"];
         yield 'missing terminal chunk' => ["b\r\nhello world\r\n"];
         yield 'partial terminal chunk' => ["b\r\nhello world\r\n0"];
+        yield 'unterminated trailer section' => ["b\r\nhello world\r\n0\r\nx-a: 1\r\n"];
+        yield 'partial trailer line' => ["b\r\nhello world\r\n0\r\nx-a: 1\r\nx-b"];
     }
 
     #[DataProvider('provideInvalidChunkedData')]
@@ -89,5 +122,6 @@ class DechunkerTest extends TestCase
         yield 'missing line ending after data' => ["1\r\naX"];
         yield 'CR but no LF after data' => ["1\r\na\rX"];
         yield 'size overflow' => ["123456789abcdef01\r\n"];
+        yield 'oversized trailer section' => ["0\r\nx-a: ".str_repeat('a', 20000)."\r\n\r\n"];
     }
 }

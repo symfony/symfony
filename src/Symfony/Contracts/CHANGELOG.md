@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add a `$priority` argument to the `Required` attribute to control the order in which required methods are called
+ * Add support for the `trailers` info in `ResponseInterface`
 
 3.7
 ---

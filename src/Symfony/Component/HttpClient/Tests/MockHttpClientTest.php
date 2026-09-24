@@ -370,6 +370,12 @@ class MockHttpClientTest extends HttpClientTestCase
                 $this->markTestSkipped("MockHttpClient doesn't unzip");
                 break;
 
+            case 'testTrailersAreNullBeforeTheResponseCompletes':
+            case 'testTrailersOfAnIncompleteTransferAreNull':
+            case 'testTrailersOfAnIncompleteTrailerSectionAreNull':
+                $this->markTestSkipped('Real transport required');
+                break;
+
             case 'testTimeoutWithActiveConcurrentStream':
                 $this->markTestSkipped('Real transport required');
                 break;

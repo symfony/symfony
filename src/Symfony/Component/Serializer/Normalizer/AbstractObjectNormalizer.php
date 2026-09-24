@@ -377,6 +377,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $skipInvalidAttributes = $context[self::SKIP_INVALID_ATTRIBUTES] ?? $this->defaultContext[self::SKIP_INVALID_ATTRIBUTES] ?? false;
 
         foreach ($normalizedData as $attribute => $value) {
+            $convertedKey = null;
             if ($this->nameConverter) {
                 $notConverted = $attribute;
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
@@ -400,6 +401,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         // The key matching the serialized name is more specific, it wins over the one matching the property name
                         continue;
                     }
+
+                    // In 9.0, skip the key like any other unknown one: report it as extra when extra attributes are not allowed, ignore it otherwise
+                    $convertedKey = $normalizedAttribute;
                 }
             }
 
@@ -411,6 +415,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
 
                 continue;
+            }
+
+            if (null !== $convertedKey) {
+                trigger_deprecation('symfony/serializer', '8.2', 'Denormalizing the "%s" property of class "%s" from its PHP name is deprecated and the key will be ignored in 9.0, use the "%s" key instead.', $attribute, $resolvedClass, $convertedKey);
             }
 
             if ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
@@ -1289,6 +1297,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $typeKey = $this->nameConverter?->normalize($mapping->getTypeProperty(), $class, $format, $context) ?? $mapping->getTypeProperty();
 
+        // In 9.0, remove the fallback to the raw type property: denormalize() deprecates that key when the name converter renames it
         if (null === $type = $data[$typeKey] ?? $data[$mapping->getTypeProperty()] ?? $mapping->getDefaultType()) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty(), false);
         }

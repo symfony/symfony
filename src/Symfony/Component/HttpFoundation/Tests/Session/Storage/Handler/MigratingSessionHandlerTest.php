@@ -34,6 +34,22 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertInstanceOf(\SessionUpdateTimestampHandlerInterface::class, $this->dualHandler);
     }
 
+    public function testCannotBeSerialized()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot serialize '.MigratingSessionHandler::class);
+
+        serialize($this->dualHandler);
+    }
+
+    public function testCannotBeUnserialized()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot unserialize '.MigratingSessionHandler::class);
+
+        $this->dualHandler->__unserialize([]);
+    }
+
     public function testClose()
     {
         $this->currentHandler->expects($this->once())

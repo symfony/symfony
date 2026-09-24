@@ -13,6 +13,7 @@ namespace Symfony\Component\HtmlSanitizer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Symfony\Component\HtmlSanitizer\Reference\W3CReference;
 use Symfony\Component\HtmlSanitizer\Visitor\AttributeSanitizer\AttributeSanitizerInterface;
 
 class HtmlSanitizerConfigTest extends TestCase
@@ -93,6 +94,32 @@ class HtmlSanitizerConfigTest extends TestCase
 
         $config = $config->allowElement('div', ['width']);
         $this->assertSame(['div' => ['width' => true]], $config->getAllowedElements());
+        $this->assertSame([], $config->getBlockedElements());
+    }
+
+    public function testAllowSafeElements()
+    {
+        $config = new HtmlSanitizerConfig();
+        $config = $config->blockElement('span');
+        $config = $config->allowSafeElements();
+
+        $safeAttributes = array_fill_keys(array_keys(array_filter(W3CReference::ATTRIBUTES)), true);
+        $safeElements = array_keys(array_filter(W3CReference::HEAD_ELEMENTS + W3CReference::BODY_ELEMENTS));
+
+        $this->assertSame(array_fill_keys($safeElements, $safeAttributes), $config->getAllowedElements());
+        $this->assertSame([], $config->getBlockedElements());
+    }
+
+    public function testAllowStaticElements()
+    {
+        $config = new HtmlSanitizerConfig();
+        $config = $config->blockElement('span');
+        $config = $config->allowStaticElements();
+
+        $allAttributes = array_fill_keys(array_keys(W3CReference::ATTRIBUTES), true);
+        $allElements = array_keys(W3CReference::HEAD_ELEMENTS + W3CReference::BODY_ELEMENTS);
+
+        $this->assertSame(array_fill_keys($allElements, $allAttributes), $config->getAllowedElements());
         $this->assertSame([], $config->getBlockedElements());
     }
 

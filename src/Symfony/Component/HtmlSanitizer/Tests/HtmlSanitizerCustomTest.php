@@ -151,6 +151,19 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
+    public function testAllowSafeElementsAfterDropElement()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->dropElement('span')
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame(
+            '<span>Hello</span> world',
+            $this->sanitize($config, '<span>Hello</span> world')
+        );
+    }
+
     public function testAllowAttributeOnElement()
     {
         $config = (new HtmlSanitizerConfig())

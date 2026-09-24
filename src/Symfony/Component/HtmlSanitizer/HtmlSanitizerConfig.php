@@ -135,12 +135,7 @@ class HtmlSanitizerConfig
             array_keys(W3CReference::BODY_ELEMENTS)
         );
 
-        $clone = clone $this;
-        foreach ($elements as $element) {
-            $clone = $clone->allowElement($element, '*');
-        }
-
-        return $clone;
+        return $this->allowElements($elements, array_fill_keys(array_keys(W3CReference::ATTRIBUTES), true));
     }
 
     /**
@@ -153,25 +148,25 @@ class HtmlSanitizerConfig
         $attributes = [];
         foreach (W3CReference::ATTRIBUTES as $attribute => $isSafe) {
             if ($isSafe) {
-                $attributes[] = $attribute;
+                $attributes[$attribute] = true;
             }
         }
 
-        $clone = clone $this;
+        $elements = [];
 
         foreach (W3CReference::HEAD_ELEMENTS as $element => $isSafe) {
             if ($isSafe) {
-                $clone = $clone->allowElement($element, $attributes);
+                $elements[] = $element;
             }
         }
 
         foreach (W3CReference::BODY_ELEMENTS as $element => $isSafe) {
             if ($isSafe) {
-                $clone = $clone->allowElement($element, $attributes);
+                $elements[] = $element;
             }
         }
 
-        return $clone;
+        return $this->allowElements($elements, $attributes);
     }
 
     /**
@@ -549,5 +544,21 @@ class HtmlSanitizerConfig
     public function getAttributeSanitizers(): array
     {
         return $this->attributeSanitizers;
+    }
+
+    /**
+     * @param list<string>        $elements
+     * @param array<string, true> $attributes
+     */
+    private function allowElements(array $elements, array $attributes): static
+    {
+        $clone = clone $this;
+
+        foreach ($elements as $element) {
+            unset($clone->blockedElements[$element], $clone->droppedElements[$element]);
+            $clone->allowedElements[$element] = $attributes;
+        }
+
+        return $clone;
     }
 }

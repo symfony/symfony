@@ -247,7 +247,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, ?string $format = null): object
     {
-        if ($class !== $mappedClass = $this->getMappedClass($data, $class, $context)) {
+        if ($class !== $mappedClass = $this->getMappedClass($data, $class, $format, $context)) {
             return $this->instantiateObject($data, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
         }
 
@@ -338,7 +338,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = [];
 
-        $mappedClass = $this->getMappedClass($normalizedData, $type, $context);
+        $mappedClass = $this->getMappedClass($normalizedData, $type, $format, $context);
 
         $nestedAttributes = $this->getNestedAttributes($mappedClass);
         $nestedData = $originalNestedData = [];
@@ -1099,7 +1099,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * @return class-string
      */
-    private function getMappedClass(array $data, string $class, array $context): string
+    private function getMappedClass(array $data, string $class, ?string $format, array $context): string
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
             return $object::class;
@@ -1109,7 +1109,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $class;
         }
 
-        if (null === $type = $data[$mapping->getTypeProperty()] ?? $mapping->getDefaultType()) {
+        $typeKey = $this->nameConverter?->normalize($mapping->getTypeProperty(), $class, $format, $context) ?? $mapping->getTypeProperty();
+
+        if (null === $type = $data[$typeKey] ?? $data[$mapping->getTypeProperty()] ?? $mapping->getDefaultType()) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty(), false);
         }
 

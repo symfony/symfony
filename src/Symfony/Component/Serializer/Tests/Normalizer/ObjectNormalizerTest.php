@@ -27,6 +27,7 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -1489,6 +1490,35 @@ class ObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(DiscriminatorDummyTypeA::class, $obj);
     }
 
+    public function testDiscriminatorTypePropertyRenamedByNameConverter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, null, $discriminator)]);
+
+        $object = new CamelCaseDiscriminatorDummyTypeA();
+        $object->someValue = 'foo';
+
+        $data = $serializer->normalize($object);
+        $this->assertSame(['object_type' => 'type_a', 'some_value' => 'foo'], $data);
+
+        $this->assertEquals($object, $serializer->denormalize($data, CamelCaseDiscriminatorDummy::class));
+        $this->assertEquals($object, $serializer->denormalize($data, CamelCaseDiscriminatorDummy::class, null, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]));
+        $this->assertEquals($object, $serializer->denormalize(['objectType' => 'type_a', 'some_value' => 'foo'], CamelCaseDiscriminatorDummy::class));
+    }
+
+    public function testDiscriminatorTypePropertyWithSerializedName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, null, $discriminator)]);
+
+        $data = $serializer->normalize(new SerializedNameDiscriminatorDummyTypeA());
+        $this->assertSame(['@kind' => 'type_a'], $data);
+
+        $this->assertInstanceOf(SerializedNameDiscriminatorDummyTypeA::class, $serializer->denormalize($data, SerializedNameDiscriminatorDummy::class));
+    }
+
     public function testNameConverterWithWrongCaseAndAllowExtraAttributesFalse()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -2054,6 +2084,27 @@ class DiscriminatorDummyTypeA implements DiscriminatorDummyInterface
 }
 
 class DiscriminatorDummyTypeB implements DiscriminatorDummyInterface
+{
+}
+
+#[DiscriminatorMap(typeProperty: 'objectType', mapping: ['type_a' => CamelCaseDiscriminatorDummyTypeA::class])]
+abstract class CamelCaseDiscriminatorDummy
+{
+    public ?string $someValue = null;
+}
+
+class CamelCaseDiscriminatorDummyTypeA extends CamelCaseDiscriminatorDummy
+{
+}
+
+#[DiscriminatorMap(typeProperty: 'kind', mapping: ['type_a' => SerializedNameDiscriminatorDummyTypeA::class])]
+abstract class SerializedNameDiscriminatorDummy
+{
+    #[SerializedName('@kind')]
+    public string $kind = 'type_a';
+}
+
+class SerializedNameDiscriminatorDummyTypeA extends SerializedNameDiscriminatorDummy
 {
 }
 

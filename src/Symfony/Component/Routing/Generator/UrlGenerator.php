@@ -42,6 +42,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%2A' => '*',
     ];
 
+    // rawurlencode() keeps these chars as is
+    private const UNRESERVED_CHARS_AND_SLASH = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~/';
+
     protected ?bool $strictRequirements = true;
 
     /**
@@ -204,7 +207,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // the contexts base URL is already encoded (see Symfony\Component\HttpFoundation\Request)
-        $url = strtr(rawurlencode($url), $this->decodedChars);
+        if (\strlen($url) !== strspn($url, self::UNRESERVED_CHARS_AND_SLASH) || '/' !== ($this->decodedChars['%2F'] ?? null)) {
+            $url = strtr(rawurlencode($url), $this->decodedChars);
+        }
 
         // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
         // so we need to encode them as they are not used for this purpose here
@@ -282,27 +287,34 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // add a query string if needed
-        $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, static fn ($a, $b) => $a == $b ? 0 : 1);
-        $extra = array_replace($defaultQuery, $extra, $queryParameters);
+        if ($extra = array_diff_key($parameters, $variables)) {
+            $extra = array_udiff_assoc($extra, $defaults, static fn ($a, $b) => $a == $b ? 0 : 1);
+        }
 
-        $seen = [];
-        array_walk_recursive($extra, $caster = static function (&$v) use (&$caster, &$seen, $name) {
-            if (\is_object($v)) {
-                if (isset($seen[$id = spl_object_id($v)])) {
-                    throw new InvalidParameterException(\sprintf('Parameters for route "%s" cannot contain a circular reference (in object of class "%s").', $name, get_debug_type($v)));
+        if ($defaultQuery || $queryParameters) {
+            $extra = array_replace($defaultQuery, $extra, $queryParameters);
+        }
+
+        if ($extra) {
+            $seen = [];
+            array_walk_recursive($extra, $caster = static function (&$v) use (&$caster, &$seen, $name) {
+                if (\is_object($v)) {
+                    if (isset($seen[$id = spl_object_id($v)])) {
+                        throw new InvalidParameterException(\sprintf('Parameters for route "%s" cannot contain a circular reference (in object of class "%s").', $name, get_debug_type($v)));
+                    }
+                    if ($vars = get_object_vars($v)) {
+                        $seen[$id] = true;
+                        array_walk_recursive($vars, $caster);
+                        unset($seen[$id]);
+                        $v = $vars;
+                    } elseif ($v instanceof \Stringable) {
+                        $v = (string) $v;
+                    } else {
+                        $v = [];
+                    }
                 }
-                if ($vars = get_object_vars($v)) {
-                    $seen[$id] = true;
-                    array_walk_recursive($vars, $caster);
-                    unset($seen[$id]);
-                    $v = $vars;
-                } elseif ($v instanceof \Stringable) {
-                    $v = (string) $v;
-                } else {
-                    $v = [];
-                }
-            }
-        });
+            });
+        }
 
         // extract fragment
         $fragment = $defaults['_fragment'] ?? '';

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Use `prateekbhujel/php-terminal` 1.1+ low-level input events in TUI while keeping the existing fallback
  * Use the `prateekbhujel/php-terminal` extension 1.x for raw mode and terminal size when it is installed
  * Add `TerminalInterface::setProgramStatus()` and `TerminalInterface::clearProgramStatus()` to report the status of the program and its tasks with the Program Status Protocol (OSC 7501)
  * Add `Tui::getWidgetRect()` to know where a widget was drawn, so pointer events can be placed

@@ -69,6 +69,21 @@ class Terminal
             }
         }
 
+        if (self::hasExtTerminal()) {
+            $colorMode = match (\Io\Terminal\Terminal::create()->getColorDepth()->bits()) {
+                24 => AnsiColorMode::Ansi24,
+                8 => AnsiColorMode::Ansi8,
+                4 => AnsiColorMode::Ansi4,
+                default => null,
+            };
+
+            if (null !== $colorMode) {
+                self::setColorMode($colorMode);
+
+                return $colorMode;
+            }
+        }
+
         self::setColorMode(self::DEFAULT_COLOR_MODE);
 
         return self::$colorMode;

@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\Console\Tests;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Output\AnsiColorMode;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Terminal;
 
 class ExtTerminalTest extends TestCase
 {
@@ -79,6 +83,72 @@ class ExtTerminalTest extends TestCase
             'previous' => null,
             'output' => 'Password: ',
         ], $this->runTerminal('disabled'));
+    }
+
+    #[RequiresPhpExtension('terminal', '>= 1.0.0')]
+    #[Group('integration')]
+    public function testColorModeUsesNativeTerminalCapabilities()
+    {
+        $environment = [
+            'CLICOLOR_FORCE' => getenv('CLICOLOR_FORCE'),
+            'COLORTERM' => getenv('COLORTERM'),
+            'NO_COLOR' => getenv('NO_COLOR'),
+            'TERM' => getenv('TERM'),
+        ];
+
+        try {
+            putenv('CLICOLOR_FORCE=1');
+            putenv('COLORTERM');
+            putenv('NO_COLOR');
+            putenv('TERM=kitty');
+            Terminal::setColorMode(null);
+
+            $this->assertSame(AnsiColorMode::Ansi24, Terminal::getColorMode());
+        } finally {
+            foreach ($environment as $name => $value) {
+                false === $value ? putenv($name) : putenv($name.'='.$value);
+            }
+            Terminal::setColorMode(null);
+        }
+    }
+
+    #[RequiresPhpExtension('terminal', '>= 1.0.0')]
+    #[Group('integration')]
+    #[BackupGlobals(true)]
+    public function testStreamOutputUsesNativeAnsiSupport()
+    {
+        $environment = [
+            'CLICOLOR_FORCE' => getenv('CLICOLOR_FORCE'),
+            'FORCE_COLOR' => getenv('FORCE_COLOR'),
+            'MSYSTEM' => getenv('MSYSTEM'),
+            'NO_COLOR' => getenv('NO_COLOR'),
+            'TERM' => getenv('TERM'),
+        ];
+        $stream = tmpfile();
+
+        try {
+            unset($_SERVER['NO_COLOR'], $_SERVER['FORCE_COLOR']);
+            putenv('CLICOLOR_FORCE=1');
+            putenv('FORCE_COLOR');
+            putenv('MSYSTEM');
+            putenv('NO_COLOR');
+            putenv('TERM=dumb');
+
+            $this->assertTrue((new StreamOutput($stream))->isDecorated());
+
+            $_SERVER['NO_COLOR'] = '1';
+            $_SERVER['FORCE_COLOR'] = '1';
+            $this->assertFalse((new StreamOutput($stream))->isDecorated());
+
+            unset($_SERVER['NO_COLOR']);
+            putenv('CLICOLOR_FORCE');
+            $this->assertTrue((new StreamOutput($stream))->isDecorated());
+        } finally {
+            fclose($stream);
+            foreach ($environment as $name => $value) {
+                false === $value ? putenv($name) : putenv($name.'='.$value);
+            }
+        }
     }
 
     private function runTerminal(string $scenario, ?string $input = null): array

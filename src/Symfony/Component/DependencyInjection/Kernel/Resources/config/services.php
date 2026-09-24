@@ -20,6 +20,7 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Kernel\FileLocator;
 use Symfony\Component\DependencyInjection\Kernel\KernelInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
@@ -99,6 +100,7 @@ return static function (ContainerConfigurator $container) {
                 tagged_iterator('container.env_var_loader'),
             ])
             ->tag('container.env_var_processor')
+            ->tag('container.preload', ['class' => EnvNotFoundException::class])
             ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('clock', Clock::class)

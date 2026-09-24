@@ -33,6 +33,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authenticator.abstract_login_link_handler', LoginLinkHandler::class)
             ->abstract()
+            ->lazy()
             ->args([
                 service('router'),
                 abstract_arg('user provider'),

@@ -158,6 +158,7 @@ return static function (ContainerConfigurator $container) {
             ->args([[]])
 
         ->set('security.expression_language', ExpressionLanguage::class)
+            ->lazy()
             ->args([service('cache.security_expression_language')->nullOnInvalid()])
 
         // For the expression languages that evaluate expressions outside of an authorization check,

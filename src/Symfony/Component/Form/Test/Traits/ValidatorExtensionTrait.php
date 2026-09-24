@@ -38,8 +38,8 @@ trait ValidatorExtensionTrait
 
         $this->validator = $this->createMock(ValidatorInterface::class);
         $metadata = $this->getMockBuilder(ClassMetadata::class)->setConstructorArgs([''])->onlyMethods(['addPropertyConstraint'])->getMock();
-        $this->validator->expects($this->any())->method('getMetadataFor')->willReturn($metadata);
-        $this->validator->expects($this->any())->method('validate')->willReturn(new ConstraintViolationList());
+        $this->validator->method('getMetadataFor')->willReturn($metadata);
+        $this->validator->method('validate')->willReturn(new ConstraintViolationList());
 
         return new ValidatorExtension($this->validator, $violationMapper);
     }

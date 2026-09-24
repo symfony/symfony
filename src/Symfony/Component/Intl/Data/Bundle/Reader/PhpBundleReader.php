@@ -32,14 +32,14 @@ class PhpBundleReader implements BundleReaderInterface
             throw new ResourceBundleNotFoundException(\sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
+        if (is_file($fileName)) {
+            return include $fileName;
+        }
+
         if (is_file($fileName.'.gz')) {
             return GzipStreamWrapper::require($fileName.'.gz');
         }
 
-        if (!is_file($fileName)) {
-            throw new ResourceBundleNotFoundException(\sprintf('The resource bundle "%s" does not exist.', $fileName));
-        }
-
-        return include $fileName;
+        throw new ResourceBundleNotFoundException(\sprintf('The resource bundle "%s" does not exist.', $fileName));
     }
 }

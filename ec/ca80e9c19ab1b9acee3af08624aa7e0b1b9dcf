@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-09-23T09:16:13Z
+
+Please add a `reset` method that can be wired in the ServicesResetter by the bundle. Otherwise, the cache would last forever in a long-running worker that is not restarted.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-09-23T09:37:43Z
+
+I think it's safe to keep the key cached across requests, since it is immutable, while still allowing it to be explicitly cleared when needed. If registered in the `ServicesResetter`, this should be opt-in.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-09-23T15:48:57Z
+
+I added FlysystemKeyLoader::reset() and wired the Flysystem factory into kernel.reset. DSN clients opt in with reset=1; by default, keys stay cached across requests. The factory tracks opted-in loaders weakly, so it does not keep unused loaders alive.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-09-23T16:05:02Z
+
+@GromNaN there is no guarantee that the FlySystemLoader is used with an immutable storage.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-09-23T16:33:25Z
+
+You can't modify the key material for a given keyId (file name); otherwise every data everything that has been encrypted with this keyId will fail to be decrypted. That's a design contract of the KMS. The only permitted operations are: adding a new key with a new keyId, or remove a key (and loose all the encrypted data).

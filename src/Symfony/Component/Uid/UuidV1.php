@@ -22,6 +22,7 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
 
     private static int|false $pid = 0;
     private static int|string $time = 0;
+    private static int $clock = 0;
     private static string $seq;
     private static string $clockSeq;
     private static string $node;
@@ -66,8 +67,9 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
             $tick = 10 * (int) (microtime(true) * 1000000 + .5) + BinaryUtil::TIME_OFFSET_INT;
         }
 
-        // Forking takes much longer than 10µs: checking the pid only when the clock moved further than that since the previous UUID is enough to detect forks
-        if ((null === $tick || 100 < abs($tick - self::$time)) && self::$pid !== $pid = getmypid()) {
+        // Forking takes much longer than 10µs: checking the pid only when the clock moved further than that since it was last read is enough to detect forks.
+        // The last timestamp cannot tell, as it runs ahead of the clock after the clock went backwards.
+        if ((null === $tick || 100 < abs($tick - self::$clock)) && self::$pid !== $pid = getmypid()) {
             // Each process draws its own clock sequence and node, forks included, so that they never collide.
             // UUIDs generated for a given time use another clock sequence than the ones generated for the current time.
             // The multicast bit of the node tells that it is not a MAC address.
@@ -89,6 +91,7 @@ class UuidV1 extends Uuid implements TimeBasedUidInterface
 
             // The timestamp moves 100ns past the previous one when the clock did not move, or when it went backwards
             if (\PHP_INT_SIZE >= 8) {
+                self::$clock = $tick;
                 self::$time = $tick = $tick > self::$time ? $tick : self::$time + 1;
                 $time = \sprintf('%016x', $tick);
             } else {

@@ -287,8 +287,22 @@ final class GuzzleHttpHandler
             }
         }
 
-        $this->fireOnStats($options, $guzzleRequest, $psrResponse, null, $response);
-        $this->settle($promise, $psrResponse);
+        $reason = null;
+
+        if (isset($options['on_trailers'])) {
+            if (null === $trailers = $response->getInfo('trailers')) {
+                $reason = $this->createRequestException(\sprintf('Cannot honor the "on_trailers" request option: "%s" does not expose response trailers.', get_debug_type($this->client)), $guzzleRequest, $psrResponse);
+            } else {
+                try {
+                    ($options['on_trailers'])($trailers, $psrResponse, $guzzleRequest);
+                } catch (\Throwable $e) {
+                    $reason = $this->createRequestException('An error was encountered during the on_trailers event', $guzzleRequest, $psrResponse, $e);
+                }
+            }
+        }
+
+        $this->fireOnStats($options, $guzzleRequest, $psrResponse, $reason, $response);
+        $this->settle($promise, $reason ?? $psrResponse);
     }
 
     private function rejectResponse(SymfonyResponseInterface $response, TransportExceptionInterface $e): void
@@ -341,7 +355,7 @@ final class GuzzleHttpHandler
      * signature change between Guzzle 7 (response on RequestException) and
      * Guzzle 8 (response moved to the new ResponseException subclass).
      */
-    private function createRequestException(string $message, RequestInterface $guzzleRequest, ResponseInterface $psrResponse, \Throwable $previous): RequestException
+    private function createRequestException(string $message, RequestInterface $guzzleRequest, ResponseInterface $psrResponse, ?\Throwable $previous = null): RequestException
     {
         return class_exists(ResponseException::class)
             ? new ResponseException($message, $guzzleRequest, $psrResponse, $previous)

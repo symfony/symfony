@@ -19,6 +19,8 @@ use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpClient\Chunk\FirstChunk;
+use Symfony\Component\HttpClient\Chunk\LastChunk;
 use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\GuzzleHttpHandler;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -538,6 +540,146 @@ class GuzzleHttpHandlerTest extends TestCase
             $this->assertNotNull($e->getResponse());
             $this->assertSame(200, $e->getResponse()->getStatusCode());
         }
+    }
+
+    public function testOnTrailersIsCalledWithTheTrailersTheResponseAndTheRequest()
+    {
+        [$handler] = $this->makeHandler(static fn () => new MockResponse('body', ['trailers' => ['grpc-status' => ['0'], 'x-repeat' => ['a', 'b']]]));
+        $request = new Request('POST', 'https://example.com/');
+        $calls = [];
+
+        $response = $handler($request, [
+            'on_trailers' => static function (...$args) use (&$calls) { $calls[] = $args; },
+        ])->wait();
+
+        $this->assertSame([[['grpc-status' => ['0'], 'x-repeat' => ['a', 'b']], $response, $request]], $calls);
+    }
+
+    public function testOnTrailersReceivesAnEmptyArrayWhenThereAreNone()
+    {
+        [$handler] = $this->makeHandler();
+        $trailers = null;
+
+        $handler(new Request('GET', 'https://example.com/'), [
+            'on_trailers' => static function (array $t) use (&$trailers) { $trailers = $t; },
+        ])->wait();
+
+        $this->assertSame([], $trailers);
+    }
+
+    public function testOnTrailersIsCalledForErrorResponses()
+    {
+        [$handler] = $this->makeHandler(static fn () => new MockResponse('oops', ['http_code' => 500, 'trailers' => ['grpc-status' => ['13']]]));
+        $trailers = null;
+
+        $response = $handler(new Request('GET', 'https://example.com/'), [
+            'on_trailers' => static function (array $t) use (&$trailers) { $trailers = $t; },
+        ])->wait();
+
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertSame(['grpc-status' => ['13']], $trailers);
+    }
+
+    public function testOnTrailersRunsBeforeOnStats()
+    {
+        [$handler] = $this->makeHandler();
+        $events = [];
+
+        $handler(new Request('GET', 'https://example.com/'), [
+            'on_trailers' => static function () use (&$events) { $events[] = 'on_trailers'; },
+            'on_stats' => static function () use (&$events) { $events[] = 'on_stats'; },
+        ])->wait();
+
+        $this->assertSame(['on_trailers', 'on_stats'], $events);
+    }
+
+    public function testOnTrailersIsNotCalledWhenTheTransferFails()
+    {
+        $client = new MockHttpClient(static fn () => new MockResponse((static function (): \Generator {
+            yield 'partial body';
+            yield new \RuntimeException('Connection reset by peer');
+        })(), ['trailers' => ['grpc-status' => ['0']]]));
+        $called = false;
+
+        $promise = (new GuzzleHttpHandler($client))(new Request('GET', 'https://example.com/'), [
+            'on_trailers' => static function () use (&$called) { $called = true; },
+        ]);
+
+        try {
+            $promise->wait();
+            $this->fail('Expected RequestException');
+        } catch (RequestException) {
+        }
+
+        $this->assertFalse($called);
+    }
+
+    public function testOnTrailersExceptionRejectsWithRequestException()
+    {
+        [$handler] = $this->makeHandler(static fn () => new MockResponse('body', ['trailers' => ['grpc-status' => ['0']]]));
+        $statsError = null;
+
+        $promise = $handler(new Request('GET', 'https://example.com/'), [
+            'on_trailers' => static function () { throw new \RuntimeException('Abort!'); },
+            'on_stats' => static function (\GuzzleHttp\TransferStats $stats) use (&$statsError) { $statsError = $stats->getHandlerErrorData(); },
+        ]);
+
+        try {
+            $promise->wait();
+            $this->fail('Expected RequestException');
+        } catch (RequestException $e) {
+            $this->assertSame('An error was encountered during the on_trailers event', $e->getMessage());
+            $this->assertSame('Abort!', $e->getPrevious()?->getMessage());
+            $this->assertSame(200, $e->getResponse()->getStatusCode());
+            $this->assertSame($e, $statsError);
+        }
+    }
+
+    public function testOnTrailersRejectsWhenTheClientDoesNotExposeTrailers()
+    {
+        $response = $this->createStub(SymfonyResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $response->method('getHeaders')->willReturn([]);
+        $response->method('getInfo')->willReturnCallback(static fn (?string $type = null) => null === $type ? [] : null);
+
+        $client = new class($response) implements HttpClientInterface {
+            public function __construct(private SymfonyResponseInterface $response)
+            {
+            }
+
+            public function request(string $method, string $url, array $options = []): SymfonyResponseInterface
+            {
+                return $this->response;
+            }
+
+            public function stream(SymfonyResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
+            {
+                return new ResponseStream((function (): \Generator {
+                    yield $this->response => new FirstChunk();
+                    yield $this->response => new LastChunk();
+                })());
+            }
+
+            public function withOptions(array $options): static
+            {
+                return $this;
+            }
+        };
+        $called = false;
+
+        $promise = (new GuzzleHttpHandler($client))(new Request('GET', 'https://example.com/'), [
+            'on_trailers' => static function () use (&$called) { $called = true; },
+        ]);
+
+        try {
+            $promise->wait();
+            $this->fail('Expected RequestException');
+        } catch (RequestException $e) {
+            $this->assertSame('Cannot honor the "on_trailers" request option: "Symfony\Contracts\HttpClient\HttpClientInterface@anonymous" does not expose response trailers.', $e->getMessage());
+            $this->assertNull($e->getPrevious());
+        }
+
+        $this->assertFalse($called);
     }
 
     // -- Async / concurrency --------------------------------------------------

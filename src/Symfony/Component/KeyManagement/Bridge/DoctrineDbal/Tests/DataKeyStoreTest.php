@@ -21,6 +21,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\BinaryType;
 use Doctrine\DBAL\Types\BlobType;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
@@ -378,7 +379,9 @@ class DataKeyStoreTest extends TestCase
         $table = $schema->getTable(DataKeyStore::DEFAULT_TABLE);
         $columns = [];
         foreach (['id', 'scope', 'key_material', 'master_key_id', 'client'] as $name) {
-            $columns[$name] = [$table->getColumn($name)->getType()::class, $table->getColumn($name)->getLength()];
+            $column = $table->getColumn($name);
+            $type = method_exists($column, 'getTypeName') ? Type::getType($column->getTypeName()) : $column->getType();
+            $columns[$name] = [$type::class, $column->getLength()];
         }
 
         $this->assertSame([

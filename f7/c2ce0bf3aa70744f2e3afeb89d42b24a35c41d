@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-09-24T16:34:42Z
+
+should this be applied in the 6.4 branch ? Generally, we merge performance optimizations in the next minor version, not as bugfix

@@ -86,6 +86,31 @@ class IntlFormatterTest extends TestCase
                 '',
                 [],
             ],
+            [
+                'There is one apple',
+                'There is one apple',
+                ['apple' => 'pear'],
+            ],
+            [
+                "It's one apple",
+                "It''s one apple",
+                [],
+            ],
+            [
+                'One apple }',
+                'One apple }',
+                [],
+            ],
+            [
+                "L'utilisateur n'existe pas",
+                "L'utilisateur n'existe pas",
+                [],
+            ],
+            [
+                'One } apple',
+                "One '}' apple",
+                [],
+            ],
         ];
     }
 

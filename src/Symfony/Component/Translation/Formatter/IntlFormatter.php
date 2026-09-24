@@ -34,6 +34,10 @@ class IntlFormatter implements IntlFormatterInterface
             if (!$this->hasMessageFormatter ??= class_exists(\MessageFormatter::class)) {
                 throw new LogicException('Cannot parse message translation: please install the "intl" PHP extension or the "symfony/polyfill-intl-messageformatter" package.');
             }
+            // without argument, MessageFormatter returns the message as is, unless a quote is doubled or precedes "}"
+            if (false === strpbrk($message, "{'") || (!str_contains($message, '{') && !str_contains($message, "''") && !str_contains($message, "'}"))) {
+                return $message;
+            }
             try {
                 $this->cache[$locale][$message] = $formatter = new \MessageFormatter($locale, $message);
             } catch (\IntlException $e) {

@@ -11,9 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\DataCollector;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Types\TypeRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
@@ -170,6 +172,15 @@ class DoctrineDataCollectorWithDebugStackTest extends TestCase
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
             ->willReturn(new MySqlPlatform());
+        // The connection resolves its types through the provider of its configuration, which is the
+        // registry it carries on doctrine/dbal 4.5 and above, and the global registry below that.
+        $config = new Configuration();
+        if (method_exists($config, 'setTypeProvider')) {
+            $config->setTypeProvider(new TypeRegistry());
+        }
+        $connection->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($config);
 
         $registry = $this->createMock(ManagerRegistry::class);
         $registry

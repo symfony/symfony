@@ -158,6 +158,24 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertTrue(feof($stream));
     }
 
+    public function testStreamYieldsAllResponses()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $responses = [
+            $client->request('GET', 'http://localhost:8057/'),
+            $client->request('GET', 'http://localhost:8057/'),
+        ];
+        $completed = [];
+
+        foreach ($client->stream($responses) as $response => $chunk) {
+            if ($chunk->isLast()) {
+                $completed[spl_object_id($response)] = true;
+            }
+        }
+
+        $this->assertCount(2, $completed);
+    }
+
     public function testSeekAsyncStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);

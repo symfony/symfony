@@ -48,9 +48,13 @@ final class FlysystemKmsFactory implements KmsFactoryInterface
 {
     private const array SCHEMES = ['sodium+fly', 'openssl+fly', 'sodium-sealed-box+fly'];
 
+    /** @var \WeakMap<FlysystemKeyLoader, true> */
+    private \WeakMap $resettableLoaders;
+
     public function __construct(
         private readonly ContainerInterface $flysystems,
     ) {
+        $this->resettableLoaders = new \WeakMap();
     }
 
     public function supports(Dsn $dsn): bool
@@ -64,9 +68,16 @@ final class FlysystemKmsFactory implements KmsFactoryInterface
             throw new UnsupportedSchemeException($dsn, self::SCHEMES);
         }
 
-        self::validateOptions($dsn, ['ext']);
+        self::validateOptions($dsn, ['ext', 'reset']);
+
+        if (null === $reset = filter_var($dsn->getOption('reset', '0'), \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE)) {
+            throw new InvalidArgumentException(\sprintf('The "reset" option of the "%s://" DSN must be a boolean.', $dsn->scheme));
+        }
 
         $loader = $this->buildKeyLoader($dsn);
+        if ($reset) {
+            $this->resettableLoaders[$loader] = true;
+        }
 
         return match ($dsn->scheme) {
             'sodium+fly' => new SodiumKms($loader),
@@ -74,6 +85,13 @@ final class FlysystemKmsFactory implements KmsFactoryInterface
             'sodium-sealed-box+fly' => new SealedBoxKms($loader),
             default => throw new UnsupportedSchemeException($dsn, self::SCHEMES),
         };
+    }
+
+    public function reset(): void
+    {
+        foreach ($this->resettableLoaders as $loader => $_) {
+            $loader->reset();
+        }
     }
 
     private function buildKeyLoader(Dsn $dsn): FlysystemKeyLoader

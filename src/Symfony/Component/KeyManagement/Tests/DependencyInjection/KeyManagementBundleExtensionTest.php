@@ -156,6 +156,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         $iterator = $locator->getTaggedIteratorArgument();
         $this->assertSame('key_management.flysystem', $iterator->getTag());
         $this->assertSame('key', $iterator->getIndexAttribute());
+        $this->assertSame([['method' => 'reset']], $container->getDefinition('key_management.factory.flysystem')->getTag('kernel.reset'));
     }
 
     public function testClientCanBeAServiceTheApplicationRegistered()

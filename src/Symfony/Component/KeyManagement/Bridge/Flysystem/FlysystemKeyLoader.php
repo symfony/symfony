@@ -18,9 +18,10 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
 use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
+use Symfony\Component\KeyManagement\KeyMaterial;
 
 /**
- * Reads each key from a Flysystem-backed storage at `<directory>/<keyId><extension>`.
+ * Reads and memoizes each key from a Flysystem-backed storage at `<directory>/<keyId><extension>`.
  *
  * Useful when keys live in remote stores (S3, FTP/SFTP, Azure Blob, Google
  * Cloud Storage, ...). The user wires a Flysystem instance separately
@@ -36,11 +37,24 @@ use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
  */
 final class FlysystemKeyLoader implements KeyLoaderInterface
 {
+    use KeyMaterial;
+
     public function __construct(
         private readonly FilesystemReader $flysystem,
         private readonly string $directory = '',
         private readonly string $extension = '',
     ) {
+        $this->keepMaterial([]);
+    }
+
+    public function __clone()
+    {
+        $this->reset();
+    }
+
+    public function reset(): void
+    {
+        $this->keepMaterial([]);
     }
 
     public function load(string $keyId): string
@@ -53,14 +67,25 @@ final class FlysystemKeyLoader implements KeyLoaderInterface
             }
         }
 
+        /** @var array<string, string> $keys */
+        $keys = $this->material();
+        if (isset($keys[$keyId])) {
+            return $keys[$keyId];
+        }
+
         $path = ltrim($this->directory.'/'.$keyId.$this->extension, '/');
 
         try {
-            return $this->flysystem->read($path);
+            $key = $this->flysystem->read($path);
         } catch (UnableToReadFile $e) {
             throw new KeyNotFoundException($keyId, $e);
         } catch (FilesystemException $e) {
             throw new RuntimeException(\sprintf('Failed to read key material for "%s".', $keyId), 0, $e);
         }
+
+        $keys[$keyId] = $key;
+        $this->keepMaterial($keys);
+
+        return $key;
     }
 }

@@ -26,9 +26,7 @@ $ciphertext = $kms->encrypt('app', 'hello world');
 $plaintext  = $kms->decrypt($ciphertext);
 ```
 
-The loader reads the key from Flysystem on every lookup and caches nothing, so
-a remote storage costs one read per KMS operation with self-contained envelopes,
-and one per data key with a data key store.
+The loader caches each key after its first successful read. The cache lasts for the lifetime of the loader service. Call `reset()` to clear it. To clear a loader registered as a service between requests, opt in by tagging that service `kernel.reset` with `method: reset`.
 
 DSN schemes
 -----------
@@ -56,6 +54,8 @@ key_management:
     clients:
         app: 'sodium+fly://keys.storage/keys?ext=.key'
 ```
+
+DSN clients keep cached keys across requests by default. Add `reset=1` to a Flysystem DSN to clear that client's cache when the bundle's services resetter runs between requests. This also lets a long-running worker pick up a key changed in Flysystem on its next lookup.
 
 A Flysystem instance registered by hand, or one that has to answer to another
 name than its service id, is declared by tagging it `key_management.flysystem`

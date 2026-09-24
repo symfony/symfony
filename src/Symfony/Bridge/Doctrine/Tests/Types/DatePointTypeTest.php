@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine\Tests\Types;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
-use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Types\DatePointType;
 use Symfony\Component\Clock\DatePoint;
@@ -22,19 +21,9 @@ final class DatePointTypeTest extends TestCase
 {
     private DatePointType $type;
 
-    public static function setUpBeforeClass(): void
-    {
-        $name = DatePointType::NAME;
-        if (Type::hasType($name)) {
-            Type::overrideType($name, DatePointType::class);
-        } else {
-            Type::addType($name, DatePointType::class);
-        }
-    }
-
     protected function setUp(): void
     {
-        $this->type = Type::getType(DatePointType::NAME);
+        $this->type = new DatePointType();
     }
 
     public function testDatePointConvertsToDatabaseValue()

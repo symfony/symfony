@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
@@ -76,9 +75,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $config = DoctrineTestHelper::createTestConfiguration();
         $config->setRepositoryFactory($this->repositoryFactory);
 
-        if (!Type::hasType('string_wrapper')) {
-            Type::addType('string_wrapper', StringWrapperType::class);
-        }
+        DoctrineTestHelper::registerTypes($config, ['string_wrapper' => StringWrapperType::class]);
 
         $this->em = DoctrineTestHelper::createTestEntityManager($config);
         $this->registry = $this->createRegistryMock($this->em);

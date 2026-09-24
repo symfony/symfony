@@ -15,6 +15,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\GuidType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -36,7 +37,9 @@ class ORMQueryBuilderLoaderTest extends TestCase
 {
     protected function tearDown(): void
     {
-        if (Type::hasType('uuid')) {
+        // Only doctrine/dbal versions without a per-connection registry leak the type declared by
+        // a test into the next one.
+        if (!method_exists(Configuration::class, 'setTypeProvider') && Type::hasType('uuid')) {
             Type::overrideType('uuid', GuidType::class);
         }
     }
@@ -148,19 +151,14 @@ class ORMQueryBuilderLoaderTest extends TestCase
     #[DataProvider('provideUidEntityClasses')]
     public function testFilterUid(string $entityClass)
     {
-        if (Type::hasType('uuid')) {
-            Type::overrideType('uuid', UuidType::class);
-        } else {
-            Type::addType('uuid', UuidType::class);
-        }
-        if (!Type::hasType('ulid')) {
-            Type::addType('ulid', UlidType::class);
-        }
-        if (!Type::hasType(CustomUuidIdType::class)) {
-            Type::addType(CustomUuidIdType::class, CustomUuidIdType::class);
-        }
+        $config = DoctrineTestHelper::createTestConfiguration();
+        DoctrineTestHelper::registerTypes($config, [
+            'uuid' => UuidType::class,
+            'ulid' => UlidType::class,
+            CustomUuidIdType::class => CustomUuidIdType::class,
+        ]);
 
-        $em = DoctrineTestHelper::createTestEntityManager();
+        $em = DoctrineTestHelper::createTestEntityManager($config);
 
         $query = $this->getQueryMock();
 
@@ -192,19 +190,14 @@ class ORMQueryBuilderLoaderTest extends TestCase
     #[DataProvider('provideUidEntityClasses')]
     public function testUidThrowProperException(string $entityClass)
     {
-        if (Type::hasType('uuid')) {
-            Type::overrideType('uuid', UuidType::class);
-        } else {
-            Type::addType('uuid', UuidType::class);
-        }
-        if (!Type::hasType('ulid')) {
-            Type::addType('ulid', UlidType::class);
-        }
-        if (!Type::hasType(CustomUuidIdType::class)) {
-            Type::addType(CustomUuidIdType::class, CustomUuidIdType::class);
-        }
+        $config = DoctrineTestHelper::createTestConfiguration();
+        DoctrineTestHelper::registerTypes($config, [
+            'uuid' => UuidType::class,
+            'ulid' => UlidType::class,
+            CustomUuidIdType::class => CustomUuidIdType::class,
+        ]);
 
-        $em = DoctrineTestHelper::createTestEntityManager();
+        $em = DoctrineTestHelper::createTestEntityManager($config);
 
         $qb = $this->getMockBuilder(QueryBuilder::class)
             ->setConstructorArgs([$em])

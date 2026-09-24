@@ -171,7 +171,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $data = serialize($data);
 
         if (\function_exists('gzencode')) {
-            $data = gzencode($data, 3);
+            $data = gzencode($data, 1);
         }
 
         if (false === file_put_contents($file, $data, \LOCK_EX)) {

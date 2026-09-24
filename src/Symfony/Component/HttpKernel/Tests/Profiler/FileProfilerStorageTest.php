@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
@@ -150,6 +151,24 @@ class FileProfilerStorageTest extends TestCase
 
         $this->assertTrue($this->storage->write($profile));
         $this->assertSame('http://example.com/', $this->storage->read('a-token')->getUrl());
+    }
+
+    #[RequiresPhpExtension('zlib')]
+    public function testWriteCompressesTheProfile()
+    {
+        $url = 'http://example.com/'.str_repeat('a', 1000);
+        $profile = new Profile('token');
+        $profile->setUrl($url);
+        $profile->setIp('127.0.0.1');
+        $profile->setStatusCode(200);
+        $profile->setMethod('GET');
+
+        $this->assertTrue($this->storage->write($profile));
+
+        $data = file_get_contents($this->tmpDir.'/en/ok/token');
+        $this->assertLessThan(500, \strlen($data));
+        $this->assertSame($url, unserialize(gzdecode($data))['url']);
+        $this->assertSame($url, $this->storage->read('token')->getUrl());
     }
 
     public function testReadDoesNotLeaveTheStorageFolder()

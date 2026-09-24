@@ -46,14 +46,6 @@ final class DpopProofFactory
     public const TYPE = 'dpop+jwt';
 
     /**
-     * The scheme an access token bound to a key is presented under, Section 7.1.
-     *
-     * A provider refuses a bound token presented as a bearer token, so this replaces
-     * "Bearer" everywhere such a token is sent.
-     */
-    public const SCHEME = 'DPoP';
-
-    /**
      * The header a provider names a nonce in, Section 8.
      */
     public const NONCE_HEADER = 'dpop-nonce';
@@ -90,6 +82,10 @@ final class DpopProofFactory
         }
 
         $this->algorithm = new (JwsAlgorithms::ASYMMETRIC[$algorithm])();
+        // read here and not at the first signature: the first proof is signed on the callback
+        // of a user who has already logged in at the provider, where a key of the wrong type
+        // is a 500 and a key on the wrong curve is a signature the provider cannot verify
+        JwsAlgorithms::checkKey($signingKey, $this->algorithm);
         $this->clock = $clock ?? new Clock();
         // the public half is derived once: it goes in the header of every proof, and a
         // private parameter leaking into it would hand the key to whoever gets the proof

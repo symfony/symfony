@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Add the `dpop` option to the `oidc_login` authenticator, binding what the provider issues to a key the client holds (RFC 9449)
+ * Add the `dpop` option to the `oidc_login` authenticator, binding what the provider issues to a key the client holds (RFC 9449); a provider that answers with a token it did not bind is refused rather than used unbound
  * Add the `audience` option to the `client_secret_jwt` and `private_key_jwt` client authentication methods of `oidc_login`, defaulting to `issuer`
  * Deprecate the `Symfony\Component\Security\Http\Firewall` autowiring alias
  * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session

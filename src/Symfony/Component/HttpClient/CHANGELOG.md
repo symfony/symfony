@@ -12,6 +12,7 @@ CHANGELOG
  * Collect the duration and the transferred sizes of each request in `HttpClientDataCollector`
  * Add `HttpClientDataCollector::getTotalTime()`, the sum of the durations of all requests, in seconds
  * Add the `trailers` response info
+ * Add support for the `on_trailers` request option to `GuzzleHttpHandler`
 
 8.1
 ---

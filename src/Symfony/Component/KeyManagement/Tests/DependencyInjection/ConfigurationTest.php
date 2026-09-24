@@ -34,7 +34,7 @@ class ConfigurationTest extends TestCase
     {
         $config = $this->process('sodium://?keys[app]=AAAA');
 
-        $this->assertSame(['default' => ['dsn' => 'sodium://?keys[app]=AAAA', 'members' => []]], $config['clients']);
+        $this->assertSame(['default' => ['dsn' => 'sodium://?keys[app]=AAAA', 'members' => [], 'retired' => []]], $config['clients']);
         $this->assertTrue($config['enabled']);
     }
 
@@ -42,7 +42,7 @@ class ConfigurationTest extends TestCase
     {
         $config = $this->process(['clients' => 'sodium://?keys[app]=AAAA', 'enabled' => false]);
 
-        $this->assertSame(['default' => ['dsn' => 'sodium://?keys[app]=AAAA', 'members' => []]], $config['clients']);
+        $this->assertSame(['default' => ['dsn' => 'sodium://?keys[app]=AAAA', 'members' => [], 'retired' => []]], $config['clients']);
         $this->assertFalse($config['enabled']);
     }
 
@@ -54,8 +54,27 @@ class ConfigurationTest extends TestCase
             'main' => ['members' => ['aws' => null, 'azure' => 'https://vault.azure.net/keys/app']],
         ]]);
 
-        $this->assertSame(['members' => ['aws' => null, 'azure' => 'https://vault.azure.net/keys/app']], $config['clients']['main']);
-        $this->assertSame(['dsn' => 'aws-kms://default', 'members' => []], $config['clients']['aws']);
+        $this->assertSame(['members' => ['aws' => null, 'azure' => 'https://vault.azure.net/keys/app'], 'retired' => []], $config['clients']['main']);
+        $this->assertSame(['dsn' => 'aws-kms://default', 'members' => [], 'retired' => []], $config['clients']['aws']);
+    }
+
+    public function testACompositeCanListFormerMembersForReadsOnly()
+    {
+        $config = $this->process(['clients' => [
+            'old' => 'aws-kms://default',
+            'new' => 'aws-kms://default',
+            'main' => ['members' => ['new' => null], 'retired' => ['old']],
+        ]]);
+
+        $this->assertSame(['members' => ['new' => null], 'retired' => ['old']], $config['clients']['main']);
+    }
+
+    public function testADsnCannotListRetiredMembers()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A KMS client with a DSN cannot have retired members.');
+
+        $this->process(['clients' => ['main' => ['dsn' => 'aws-kms://default', 'retired' => ['old']]]]);
     }
 
     public function testAClientIsADsnOrMembersNotBoth()
@@ -80,6 +99,17 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage('The composite KMS client "main" cannot be a member of itself.');
 
         $this->process(['clients' => ['main' => ['members' => ['main' => null, 'aws' => null]]]]);
+    }
+
+    public function testACompositeClientCannotRetireItself()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The composite KMS client "main" cannot be a retired member of itself.');
+
+        $this->process(['clients' => [
+            'aws' => 'aws-kms://default',
+            'main' => ['members' => ['aws' => null], 'retired' => ['main']],
+        ]]);
     }
 
     public function testAClientIsDocumentedAsADsnOrItsMembers()

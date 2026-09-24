@@ -103,6 +103,9 @@ class KeyManagementBundle extends AbstractBundle
                                 if (\array_key_exists($name, $client['members'])) {
                                     throw new InvalidArgumentException(\sprintf('The composite KMS client "%s" cannot be a member of itself.', $name));
                                 }
+                                if (\in_array($name, $client['retired'], true)) {
+                                    throw new InvalidArgumentException(\sprintf('The composite KMS client "%s" cannot be a retired member of itself.', $name));
+                                }
                             }
 
                             return $clients;
@@ -116,6 +119,10 @@ class KeyManagementBundle extends AbstractBundle
                         ->validate()
                             ->ifTrue(static fn (array $client): bool => isset($client['dsn']) === (bool) $client['members'])
                             ->thenInvalid('A KMS client is either a DSN or the members of a composite client, not both nor neither.')
+                        ->end()
+                        ->validate()
+                            ->ifTrue(static fn (array $client): bool => isset($client['dsn']) && (bool) $client['retired'])
+                            ->thenInvalid('A KMS client with a DSN cannot have retired members.')
                         ->end()
                         ->children()
                             ->scalarNode('dsn')
@@ -131,6 +138,12 @@ class KeyManagementBundle extends AbstractBundle
                                 ->useAttributeAsKey('name')
                                 ->scalarPrototype()
                                     ->defaultNull()
+                                ->end()
+                            ->end()
+                            ->arrayNode('retired')
+                                ->info('Former member names accepted for reads but never used for writes. Each remains a full path to the plaintext.')
+                                ->scalarPrototype()
+                                    ->cannotBeEmpty()
                                 ->end()
                             ->end()
                         ->end()
@@ -222,7 +235,7 @@ class KeyManagementBundle extends AbstractBundle
                 ->addTag('key_management.client', ['key' => $name]);
 
             if ($client['members']) {
-                $this->configureCompositeClient($definition, $name, $client['members'], $clients);
+                $this->configureCompositeClient($definition, $name, $client['members'], $client['retired'], $clients);
             } elseif (str_starts_with($dsn = $client['dsn'], self::SERVICE_SCHEME)) {
                 if ('' === $referencedId = substr($dsn, \strlen(self::SERVICE_SCHEME))) {
                     throw new InvalidArgumentException(\sprintf('The DSN of the KMS client "%s" must name a service id after "%s".', $name, self::SERVICE_SCHEME));
@@ -266,15 +279,37 @@ class KeyManagementBundle extends AbstractBundle
      * Its members are the configured clients, resolved lazily through the locator of the tagged
      * ones, and they are checked here so that a typo is reported at compile time against a name.
      * A client the application registers itself joins through a "service://" DSN, which makes it
-     * a configured client. A member cannot be composite itself: two of them naming each other
-     * would read in circles.
+     * a configured client. Active and retired members cannot be configured composites themselves:
+     * two of them naming each other would read in circles.
      *
      * @param array<string, string|null>  $members
+     * @param list<string>                $retired
      * @param array<string, array<mixed>> $clients
      */
-    private function configureCompositeClient(Definition $definition, string $name, array $members, array $clients): void
+    private function configureCompositeClient(Definition $definition, string $name, array $members, array $retired, array $clients): void
     {
-        foreach (array_keys($members) as $member) {
+        if (!array_is_list($retired)) {
+            throw new LogicException(\sprintf('Retired members of the composite KMS client "%s" must be listed by name.', $name));
+        }
+
+        $seen = [];
+        foreach ($retired as $member) {
+            if (!\is_string($member) || '' === $member || 0xFF < \strlen($member)) {
+                throw new LogicException(\sprintf('Retired members of the composite KMS client "%s" must be listed by name.', $name));
+            }
+
+            if (\array_key_exists($member, $members)) {
+                throw new LogicException(\sprintf('The KMS client "%s" cannot be both an active and a retired member of the composite KMS client "%s".', $member, $name));
+            }
+
+            if (isset($seen[$member])) {
+                throw new LogicException(\sprintf('The retired KMS client "%s" is listed more than once in the composite KMS client "%s".', $member, $name));
+            }
+
+            $seen[$member] = true;
+        }
+
+        foreach (array_merge(array_keys($members), $retired) as $member) {
             if (!isset($clients[$member])) {
                 throw new LogicException(\sprintf('The member "%s" of the composite KMS client "%s" is not registered in "key_management.clients".', $member, $name));
             }
@@ -289,6 +324,7 @@ class KeyManagementBundle extends AbstractBundle
                 new ServiceLocatorArgument(new TaggedIteratorArgument('key_management.client', 'key', true)),
                 $members,
                 new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                $retired,
             ])
             ->addTag('monolog.logger', ['channel' => 'key_management']);
     }

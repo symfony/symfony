@@ -260,19 +260,37 @@ name: `EncryptedType` knows an envelope encrypter and a `$key`, and that is all.
 Changing provider is a change of the encrypter handed to the type, and what it
 costs depends on what the column already holds. Both clients are configured at
 once meanwhile, which in a Symfony application makes their encrypters available
-through `#[Target('aws')]` and `#[Target('azure')]`.
+through `#[Target('old')]` and `#[Target('new')]`.
 
 **Rows referring to a stored data key.** Nothing to do on the Doctrine side.
-Declare the new client next to the old one, move the data keys over with
-`key-management:rewrap-data-keys --from=aws --to=azure --key-id=...`, then point
+Declare the new client next to the old one. For a target whose `encrypt()`
+output can be unwrapped as a data key, move the data keys over with
+`key-management:rewrap-data-keys --from=old --to=new --key-id=...`, then point
 the store at the new client so the keys it creates afterwards are wrapped there.
 No payload is read or rewritten, the references stay what they were, and the old
-client goes away once a `--from=aws --dry-run` run lists nothing.
+client goes away once a `--from=old --dry-run` run lists nothing.
 
 A store wrapping with a `CompositeKms` records that client, so its rows are
-wrapped by every member at once and read through whichever answers. Losing a
-member for good is then a change of members, followed by the same command from
-the composite client to itself, which wraps every key under the new list.
+wrapped by every member at once and read through whichever answers. When a
+member is lost for good, rows with a wrapping from a surviving member stay
+readable after the member list changes. New writes use the new list. Stored
+keys need rewrapping under a replacement member to regain redundancy;
+`key-management:rewrap-data-keys --from=main --to=main --key-id=...` writes
+them under the current active members.
+A member's name is stored in each wrapping. When replacing a member, list its
+old name under the composite client's `retired` option to read old values
+without asking it to wrap new ones. Rewrap stored keys before removing the old
+name from `retired`; direct ciphertexts and self-contained envelopes are not
+visited by the command and need separate migration. A retired member remains
+a full decryption path and needs the same protection as an active member.
+
+The rewrap command currently writes data keys with the target client's
+`encrypt()` method. Its result must be readable by `unwrapDataKey()` before
+the old wrapping is discarded. Do not use it with a target that needs a
+separate data-key wrapping operation, such as Azure Key Vault's `wrapkey`.
+In a composite, the first active member mints data keys with `generateDataKey()`,
+but rewrapping calls `encrypt()` on every member. The first member must also
+be able to unwrap what its `encrypt()` writes.
 
 **Rows carrying their own wrapped data key.** Each one is wrapped by the master
 key of the provider that wrote it, so moving to another provider means rewriting

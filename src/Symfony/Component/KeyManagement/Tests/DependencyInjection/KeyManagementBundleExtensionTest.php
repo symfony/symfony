@@ -700,6 +700,99 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
     }
 
+    public function testARetiredMemberIsPassedToTheCompositeClient()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'old' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'new' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['new' => null], 'retired' => ['old']],
+                ],
+            ]);
+        });
+
+        $this->assertSame(['old'], $container->getDefinition('key_management.main')->getArgument(3));
+    }
+
+    public function testARetiredMemberMustBeRegistered()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The member "old" of the composite KMS client "main" is not registered');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'new' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['new' => null], 'retired' => ['old']],
+                ],
+            ]);
+        });
+    }
+
+    public function testARetiredMemberCannotAlsoBeActive()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The KMS client "old" cannot be both an active and a retired member');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'old' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['old' => null], 'retired' => ['old']],
+                ],
+            ]);
+        });
+    }
+
+    public function testARetiredMemberCannotBeListedTwice()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The retired KMS client "old" is listed more than once');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'old' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'new' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['new' => null], 'retired' => ['old', 'old']],
+                ],
+            ]);
+        });
+    }
+
+    public function testARetiredMemberMustBeAList()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Retired members of the composite KMS client "main" must be listed by name.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'old' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'new' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['new' => null], 'retired' => ['alias' => 'old']],
+                ],
+            ]);
+        });
+    }
+
+    public function testARetiredMemberCannotBeACompositeClientItself()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The member "inner" of the composite KMS client "outer" is a composite client itself');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'inner' => ['members' => ['aws' => null]],
+                    'outer' => ['members' => ['aws' => null], 'retired' => ['inner']],
+                ],
+            ]);
+        });
+    }
+
     public function testAMemberCannotBeACompositeClientItself()
     {
         $this->expectException(LogicException::class);

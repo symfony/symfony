@@ -576,6 +576,17 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/dir/foo/bar%2Fbaz/dir2', $this->getGenerator($routes)->generate('test', ['path' => 'foo/bar%2Fbaz']));
     }
 
+    public function testEncodingWithCustomDecodedChars()
+    {
+        $routes = $this->getRoutes('test', new Route('/dir/{path}'));
+        $generator = new class($routes, new RequestContext('/app.php')) extends UrlGenerator {
+            protected array $decodedChars = ['%40' => '@'];
+        };
+
+        $this->assertSame('/app.php%2Fdir%2Ffoo', $generator->generate('test', ['path' => 'foo']));
+        $this->assertSame('/app.php%2Fdir%2Ffoo@bar', $generator->generate('test', ['path' => 'foo@bar']));
+    }
+
     public function testEncodingOfSlashInQueryParameters()
     {
         $routes = $this->getRoutes('test', new Route('/get'));

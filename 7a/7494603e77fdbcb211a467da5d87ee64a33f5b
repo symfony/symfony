@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-24T06:42:41Z
+
+I pushed an update so that the deprecation is triggered only for keys that are actually denormalized: it also fired for unknown keys, ignored properties and properties outside the requested groups. The 9.0 plan changed too: collecting the key as an extra attribute would throw even when `allow_extra_attributes` is true, so the key will be ignored instead, like any unknown key. Thanks @mdalikadar!

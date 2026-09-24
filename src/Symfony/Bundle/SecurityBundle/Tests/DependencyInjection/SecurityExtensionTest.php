@@ -29,6 +29,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -1037,6 +1038,44 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertTrue($container->has('security.listener.session.'.$firewallId));
+    }
+
+    public function testFirewallsSharingAContextDispatchOnTheirOwnEventDispatcher()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'admin' => [
+                    'pattern' => '^/admin',
+                    'context' => 'shared',
+                    'http_basic' => true,
+                ],
+                'main' => [
+                    'pattern' => '/.*',
+                    'context' => 'shared',
+                    'http_basic' => true,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $responseListeners = 0;
+        foreach (['admin', 'main'] as $firewallName) {
+            $listeners = $container->getDefinition('security.firewall.map.context.'.$firewallName)->getArgument(0)->getValues();
+            $contextListeners = array_values(array_filter(array_map('strval', $listeners), static fn ($id) => str_starts_with($id, 'security.context_listener.')));
+            $this->assertCount(1, $contextListeners);
+
+            $contextListener = $container->getDefinition($contextListeners[0]);
+            $this->assertEquals(new Reference('security.event_dispatcher.'.$firewallName), $contextListener->getArgument(4));
+
+            foreach ($contextListener->getTag('kernel.event_listener') as $tag) {
+                $responseListeners += KernelEvents::RESPONSE === $tag['event'] ? 1 : 0;
+            }
+        }
+
+        $this->assertSame(1, $responseListeners);
     }
 
     /**

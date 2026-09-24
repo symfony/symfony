@@ -36,6 +36,9 @@ class TypeContextTest extends TestCase
 
         $typeContextWithoutNamespace = new TypeContext('Foo', 'Bar');
         $this->assertSame('unknown', $typeContextWithoutNamespace->normalize('unknown'));
+
+        $typeContextInGlobalNamespace = (new TypeContextFactory())->createFromClassName(\stdClass::class);
+        $this->assertSame('unknown', $typeContextInGlobalNamespace->normalize('unknown'));
     }
 
     public function testGetDeclaringClass()

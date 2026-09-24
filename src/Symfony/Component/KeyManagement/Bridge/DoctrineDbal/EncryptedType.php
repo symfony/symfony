@@ -53,14 +53,11 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * ciphertext outgrows it by the envelope's framing, so a column sized after it
  * would truncate the ciphertext and destroy the authentication tag with it.
  *
- * Register one instance per (parent type, key) pair:
- *
- *     $type = new EncryptedType(
- *         Type::getTypeRegistry()->get('string'),
- *         $container->get(EnvelopeEncrypterInterface::class),
- *         'alias/app-key',
- *     );
- *     Type::getTypeRegistry()->register('app_user_email', $type);
+ * Register one instance per (parent type, key) pair. In a Symfony application,
+ * declare one service per type, tagged `doctrine.dbal.type`: the container
+ * builds it with its encrypter injected, and the connection resolves it from
+ * there. Outside Symfony, register it on the type registry the connection
+ * configuration carries. The README covers both.
  *
  * Then on the entity:
  *

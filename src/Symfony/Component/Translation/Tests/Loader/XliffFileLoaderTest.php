@@ -165,6 +165,35 @@ class XliffFileLoaderTest extends TestCase
         (new XliffFileLoader())->load(__DIR__.'/../Fixtures/non-valid.xlf', 'en', 'domain1');
     }
 
+    public function testFilesInSkipValidationDirsAreNotValidated()
+    {
+        $loader = new XliffFileLoader([__DIR__.'/../Fixtures']);
+
+        $this->assertSame(['foo' => 'bar'], $loader->load(__DIR__.'/../Fixtures/non-valid.xlf', 'en', 'domain1')->all('domain1'));
+    }
+
+    public function testFilesOutsideSkipValidationDirsAreValidated()
+    {
+        $loader = new XliffFileLoader([__DIR__.'/../Fixture', __DIR__.'/../Fixtures/translations']);
+
+        $this->expectException(InvalidResourceException::class);
+
+        $loader->load(__DIR__.'/../Fixtures/non-valid.xlf', 'en', 'domain1');
+    }
+
+    public function testChildClassesDoNotHaveToCallTheParentConstructor()
+    {
+        $loader = new class extends XliffFileLoader {
+            public function __construct()
+            {
+            }
+        };
+
+        $this->expectException(InvalidResourceException::class);
+
+        $loader->load(__DIR__.'/../Fixtures/non-valid.xlf', 'en', 'domain1');
+    }
+
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);

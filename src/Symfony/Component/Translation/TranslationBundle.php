@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation;
 
 use PhpParser\Parser;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\Alias;
@@ -197,6 +198,9 @@ class TranslationBundle extends AbstractBundle
         [$dirs, $transPaths, $nonExistingDirs] = $this->discoverTranslationDirs($config, $container);
         // the directories were collected from the filesystem as literals, the container needs them escaped
         $escapedTransPaths = $container->getParameterBag()->escapeValue($transPaths);
+
+        // the XLIFF files of vendor packages are validated by their own test suites, and the app can't fix them anyway
+        $container->getDefinition('translation.loader.xliff')->setArgument(0, $container->getParameterBag()->escapeValue((new ComposerResource())->getVendors()));
 
         if ($hasConsole) {
             $container->getDefinition('console.command.translation_xliff_update_sources')

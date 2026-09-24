@@ -29,6 +29,19 @@ use Symfony\Component\Translation\Util\XliffUtils;
  */
 class XliffFileLoader implements LoaderInterface
 {
+    /**
+     * @var string[]
+     */
+    private array $skipValidationDirs = [];
+
+    /**
+     * @param string[] $skipValidationDirs Directories holding XLIFF files that are known to be valid, which are loaded without validating them against the XLIFF schema
+     */
+    public function __construct(array $skipValidationDirs = [])
+    {
+        $this->skipValidationDirs = $skipValidationDirs;
+    }
+
     public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
     {
         if (!class_exists(XmlUtils::class)) {
@@ -59,9 +72,7 @@ class XliffFileLoader implements LoaderInterface
             throw new InvalidResourceException(\sprintf('Unable to load "%s": ', $resource).$e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($errors = XliffUtils::validateSchema($dom)) {
-            throw new InvalidResourceException(\sprintf('Invalid resource provided: "%s"; Errors: ', $resource).XliffUtils::getErrorsAsString($errors));
-        }
+        $this->validate($dom, $resource);
 
         $catalogue = new MessageCatalogue($locale);
         $this->extract($dom, $catalogue, $domain);
@@ -71,6 +82,21 @@ class XliffFileLoader implements LoaderInterface
         }
 
         return $catalogue;
+    }
+
+    private function validate(\DOMDocument $dom, string $resource): void
+    {
+        if (!$this->isXmlString($resource)) {
+            foreach ($this->skipValidationDirs as $dir) {
+                if (str_starts_with($resource, $dir.'/') || str_starts_with($resource, $dir.\DIRECTORY_SEPARATOR)) {
+                    return;
+                }
+            }
+        }
+
+        if ($errors = XliffUtils::validateSchema($dom)) {
+            throw new InvalidResourceException(\sprintf('Invalid resource provided: "%s"; Errors: ', $resource).XliffUtils::getErrorsAsString($errors));
+        }
     }
 
     private function extract(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain): void

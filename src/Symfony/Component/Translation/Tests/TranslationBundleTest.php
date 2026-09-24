@@ -12,7 +12,9 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
@@ -22,6 +24,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\DependencyInjection\RemoveMissingDependenciesPass;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\TranslationBundle;
@@ -120,6 +123,35 @@ class TranslationBundleTest extends TestCase
             $this->assertContains($projectDir.'/translations/messages.en.yaml', $files);
         } finally {
             @unlink($projectDir.'/translations/messages.en.yaml');
+            @rmdir($projectDir.'/translations');
+            @rmdir($projectDir);
+        }
+    }
+
+    public function testTheXliffLoaderDoesNotValidateTheTranslationsOfVendorPackages()
+    {
+        $container = $this->load(['paths' => [__DIR__.'/Fixtures/translations']]);
+
+        $this->assertSame((new ComposerResource())->getVendors(), $container->getDefinition('translation.loader.xliff')->getArgument(0));
+    }
+
+    public function testTheXliffFilesOfTheApplicationAreValidated()
+    {
+        $projectDir = sys_get_temp_dir().'/sf_translation_xliff_'.substr(md5(__METHOD__), 0, 8);
+        @mkdir($projectDir.'/translations', 0o777, true);
+        copy(__DIR__.'/Fixtures/non-valid.xlf', $projectDir.'/translations/messages.en.xlf');
+
+        try {
+            $container = $this->load(['cache_dir' => null, 'default_path' => '%kernel.project_dir%/translations'], merge: false, projectDir: $projectDir);
+            $container->register('config_cache_factory', ConfigCacheFactory::class)->setArguments([false]);
+            $container->compile();
+
+            $this->expectException(InvalidResourceException::class);
+            $this->expectExceptionMessageMatches('{^Invalid resource provided: ".*messages\.en\.xlf"; Errors: }');
+
+            $container->get('translator')->trans('foo');
+        } finally {
+            @unlink($projectDir.'/translations/messages.en.xlf');
             @rmdir($projectDir.'/translations');
             @rmdir($projectDir);
         }

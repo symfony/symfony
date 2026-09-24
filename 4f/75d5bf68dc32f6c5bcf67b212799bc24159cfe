@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by gplanchat at 2026-09-23T23:00:24Z
+
+About the red checks: HttpClient passes in every job, and none of the failures come from this change.
+
+- **Unit Tests, x86 and Integration**: they fail on KeyManagement, FrameworkBundle (`PhpConfigReferenceDumpPassTest`, high-deps), Uid/Mime (x86 minimal-exts) and doctrine/dbal (Integration). The same jobs fail on the current `8.2` head.
+- **PHPStan**: the job was killed (exit 143) while analysing the target branch, before reaching this PR.
+- **Fabbot**: it reports `SER ==> SET` in `HttpClientTestCase`. That is the existing `"SER"` / `VER_PROTOCOL` split of `SERVER_PROTOCOL`, flagged only because the file changed.
+- **Psalm**:
+    - `UnsupportedPropertyReferenceUsage` on `$trailers = &$this->trailers;` in `CurlResponse`. It follows `$headers = &$this->headers;` on the line above, so the header callback stays static. Happy to restructure it if you prefer another shape.
+    - `OverriddenMethodAccess` on `NativeResponse::perform()` is pre-existing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-24T06:39:22Z
+
+I pushed some changes: `ResponseInterface::getInfo()` now documents the `trailers` key, CurlHttpClient returns `[]` instead of `null` for HEAD, 204 and 304 responses, and NativeHttpClient now fails when the trailer section is cut short or larger than 16 KiB, as curl and amp do, instead of returning partial or empty trailers.

@@ -22,6 +22,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
+use Symfony\Component\Security\Http\OAuth2\AccessTokenType\BearerTokenType;
+use Symfony\Component\Security\Http\OAuth2\AccessTokenType\DpopTokenType;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
@@ -367,7 +369,7 @@ class OidcClientTest extends TestCase
     public function testATokenRequestCarriesAProofOfTheKey()
     {
         // Given
-        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-123']));
+        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'DPoP']));
 
         // When
         $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
@@ -382,7 +384,7 @@ class OidcClientTest extends TestCase
     public function testARefreshCarriesAProofOfTheKey()
     {
         // Given
-        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-456']));
+        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-456', 'token_type' => 'DPoP']));
 
         // When
         $client->refreshToken('refresh-123');
@@ -439,7 +441,7 @@ class OidcClientTest extends TestCase
         // Given
         $client = $this->createDpopClient(
             new JsonMockResponse(['error' => 'use_dpop_nonce'], ['http_code' => 400, 'response_headers' => ['DPoP-Nonce' => 'nonce-1']]),
-            new JsonMockResponse(['access_token' => 'access-123']),
+            new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'DPoP']),
         );
 
         // When
@@ -470,7 +472,7 @@ class OidcClientTest extends TestCase
 
         $client = $this->createDpopClient(
             new JsonMockResponse(['error' => 'use_dpop_nonce'], ['http_code' => 400, 'response_headers' => ['DPoP-Nonce' => 'nonce-1']]),
-            new JsonMockResponse(['access_token' => 'access-123']),
+            new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'DPoP']),
             clientAuthentication: $clientAuthentication,
         );
 
@@ -509,7 +511,7 @@ class OidcClientTest extends TestCase
     {
         // Given
         $client = $this->createDpopClient(
-            new JsonMockResponse(['access_token' => 'access-123'], ['response_headers' => ['DPoP-Nonce' => 'nonce-1']]),
+            new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'DPoP'], ['response_headers' => ['DPoP-Nonce' => 'nonce-1']]),
             new JsonMockResponse(['sub' => 'user-1']),
         );
 
@@ -525,9 +527,145 @@ class OidcClientTest extends TestCase
     /**
      * A client whose requests are answered by the given responses, recording what it sent.
      */
-    private function createDpopClient(MockResponse $response, ?MockResponse $then = null, ?ClientAuthenticationInterface $clientAuthentication = null): OidcClient
+    /**
+     * RFC 9449, Section 5: a provider "MAY elect to issue access tokens that are not DPoP
+     * bound, which is signaled to the client with a value of Bearer in the token_type".
+     *
+     * "The client MUST discard the response in this case if this protection is deemed
+     * important for the security of the application", and holding a key to bind the token to
+     * is what deems it important: the unbound token is refused instead of being used.
+     */
+    public function testATokenTheProviderDidNotBindIsRefused()
     {
-        $responses = null === $then ? [$response] : [$response, $then];
+        // Given
+        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'Bearer']));
+
+        // Then
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('it did not bind the access token to the key of this client (RFC 9449, Section 5)');
+
+        // When
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+    }
+
+    public function testATokenResponseNamingNoTypeIsRefusedWhenTheTokenIsToBeBound()
+    {
+        // Given
+        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-123']));
+
+        // Then
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('a "token_type" of "null"');
+
+        // When
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+    }
+
+    public function testARefreshedTokenTheProviderDidNotBindIsRefused()
+    {
+        // Given
+        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-456', 'token_type' => 'Bearer']));
+
+        // Then
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('it did not bind the access token to the key of this client');
+
+        // When
+        $client->refreshToken('refresh-123');
+    }
+
+    /**
+     * The type is compared as RFC 6749, Section 5.1 defines it, case insensitively.
+     */
+    public function testTheTokenTypeIsReadWhateverItsCase()
+    {
+        // Given
+        $client = $this->createDpopClient(new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'dpop']));
+
+        // When
+        $tokens = $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+
+        // Then
+        $this->assertSame('access-123', $tokens['access_token']);
+    }
+
+    /**
+     * RFC 6749, Section 7.1: "The client MUST NOT use an access token if it does not
+     * understand the token type.".
+     *
+     * A client presenting bearer tokens cannot use a bound one, and sending it as a bearer
+     * token is what RFC 9449, Section 7.1 has the resource server reject.
+     */
+    public function testAClientPresentingBearerTokensRefusesATokenOfAnotherType()
+    {
+        // Given
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'DPoP']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->discovery, 'client-id', new NoClientAuthentication());
+
+        // Then
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('issued an access token of the "DPoP" type, which this client cannot use');
+
+        // When
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+    }
+
+    /**
+     * A provider leaving "token_type" out is handing out a token to be used as a bearer
+     * token, which is what clients have always done with it.
+     */
+    public function testAClientPresentingBearerTokensAcceptsAResponseNamingNoType()
+    {
+        // Given
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->discovery, 'client-id', new NoClientAuthentication(), new BearerTokenType());
+
+        // When
+        $tokens = $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+
+        // Then
+        $this->assertSame('access-123', $tokens['access_token']);
+    }
+
+    /**
+     * RFC 9449, Section 9: "a nonce is only accepted by the server that issued it".
+     *
+     * The provider and a protected resource are not the same server, so the nonce of one is
+     * never sent to the other: it would be refused, and cost a round trip every time the
+     * client alternates between them.
+     */
+    public function testTheNonceOfOneServerIsNotSentToAnother()
+    {
+        // Given
+        $discovery = $this->createDiscovery([
+            'issuer' => 'https://provider.example.com',
+            'token_endpoint' => 'https://provider.example.com/token',
+            'userinfo_endpoint' => 'https://resource.example.com/userinfo',
+        ]);
+        $responses = [
+            new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'DPoP'], ['response_headers' => ['DPoP-Nonce' => 'provider-nonce']]),
+            new JsonMockResponse(['access_token' => 'access-456', 'token_type' => 'DPoP']),
+            new JsonMockResponse(['sub' => 'user-1']),
+        ];
+        $client = $this->createDpopClient($responses, discovery: $discovery);
+
+        // When
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
+        $client->refreshToken('refresh-123');
+        $client->fetchUserInfo('access-456');
+
+        // Then
+        $this->assertArrayNotHasKey('nonce', self::decodePayload($this->sentProofs[0]));
+        $this->assertSame('provider-nonce', self::decodePayload($this->sentProofs[1])['nonce']);
+        $this->assertArrayNotHasKey('nonce', self::decodePayload($this->sentProofs[2]));
+    }
+
+    /**
+     * @param list<MockResponse>|MockResponse $responses The answers to the requests the client makes, in order
+     */
+    private function createDpopClient(array|MockResponse $responses, ?MockResponse $then = null, ?ClientAuthenticationInterface $clientAuthentication = null, ?OidcDiscovery $discovery = null): OidcClient
+    {
+        $responses = \is_array($responses) ? $responses : (null === $then ? [$responses] : [$responses, $then]);
         $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$responses): MockResponse {
             $headers = [];
             foreach ($options['headers'] ?? [] as $name => $value) {
@@ -544,10 +682,10 @@ class OidcClientTest extends TestCase
 
         return new OidcClient(
             $httpClient,
-            $this->discovery,
+            $discovery ?? $this->discovery,
             'client-id',
             $clientAuthentication ?? new NoClientAuthentication(),
-            new DpopProofFactory(new JWK(self::DPOP_JWK), 'ES256'),
+            new DpopTokenType(new DpopProofFactory(new JWK(self::DPOP_JWK), 'ES256')),
         );
     }
 

@@ -20,6 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\Oidc\OidcTokenRefresher;
 use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
 use Symfony\Component\Security\Http\EventListener\OidcEndSessionListener;
 use Symfony\Component\Security\Http\Firewall\OidcTokenRefreshListener;
+use Symfony\Component\Security\Http\OAuth2\AccessTokenType\DpopTokenType;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretBasic;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
@@ -91,7 +92,8 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('OIDC discovery'),
                 abstract_arg('client ID'),
                 abstract_arg('client authentication'),
-                // replaced by the firewall proof factory, unless the firewall binds nothing to a key
+                // replaced by the access token type of the firewall, unless it asks for the
+                // bearer token the client defaults to
                 null,
             ])
 
@@ -135,6 +137,14 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('proof signing key'),
                 abstract_arg('signature algorithm'),
                 service('clock'),
+            ])
+
+        // the access token type of RFC 9449, which holds the nonce of each server it talks to
+        // and is therefore one per firewall, like the proof factory it signs with
+        ->set('security.oauth2.access_token_type.dpop', DpopTokenType::class)
+            ->abstract()
+            ->args([
+                abstract_arg('DPoP proof factory'),
             ])
 
         ->set('security.oauth2.dpop.signing_key', JWK::class)

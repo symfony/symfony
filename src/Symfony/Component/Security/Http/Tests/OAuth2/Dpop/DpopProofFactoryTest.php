@@ -208,6 +208,59 @@ class DpopProofFactoryTest extends TestCase
         new DpopProofFactory($publicKey);
     }
 
+    /**
+     * The key is read against the algorithm before anything is signed.
+     *
+     * The first proof is signed on the callback of a user who has already logged in at the
+     * provider, so a key the algorithm cannot use is a 500 on them rather than a container
+     * that refuses to build.
+     */
+    public function testRejectsAKeyOfTheWrongType()
+    {
+        // Given
+        $rsaKey = new JWK(['kty' => 'RSA', 'n' => 'xGkQ', 'e' => 'AQAB', 'd' => 'Vh6-Q']);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "ES256" algorithm signs with a key of the "EC" type, and the given JWK is of the "RSA" type.');
+
+        // When
+        new DpopProofFactory($rsaKey, 'ES256');
+    }
+
+    /**
+     * RFC 7518, Section 3.4 names a curve per algorithm, and "web-token/jwt-library" only
+     * checks that an EC key carries one: a P-384 key would otherwise sign something that is
+     * not a valid ES256 signature.
+     */
+    public function testRejectsAKeyOnTheWrongCurve()
+    {
+        // Given
+        $onP384 = new JWK(['kty' => 'EC', 'crv' => 'P-384'] + array_diff_key(self::PRIVATE_JWK, ['kty' => null, 'crv' => null]));
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "ES256" algorithm signs with a key on the "P-256" curve (RFC 7518, Section 3.4), and the given JWK is on the "P-384" curve.');
+
+        // When
+        new DpopProofFactory($onP384, 'ES256');
+    }
+
+    /**
+     * An RSA key signs under any of the RSA algorithms, which name no curve.
+     */
+    public function testAcceptsAnRsaKeyUnderAnRsaAlgorithm()
+    {
+        // Given
+        $rsaKey = new JWK(['kty' => 'RSA', 'n' => 'xGkQ', 'e' => 'AQAB', 'd' => 'Vh6-Q']);
+
+        // When
+        $factory = new DpopProofFactory($rsaKey, 'PS256');
+
+        // Then
+        $this->assertSame($rsaKey->thumbprint('sha256'), $factory->getKeyThumbprint());
+    }
+
     private function createFactory(): DpopProofFactory
     {
         return new DpopProofFactory(new JWK(self::PRIVATE_JWK), 'ES256', new MockClock('2026-09-23 10:00:00'));

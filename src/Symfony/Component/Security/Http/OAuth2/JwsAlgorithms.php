@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Http\OAuth2;
 
+use Jose\Component\Core\Algorithm;
+use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\Algorithm\ES384;
 use Jose\Component\Signature\Algorithm\ES512;
@@ -59,6 +61,21 @@ final class JwsAlgorithms
     ];
 
     /**
+     * The curve each ECDSA algorithm signs with, RFC 7518, Section 3.4.
+     *
+     * The algorithm names both the hash and the curve, and a signature made over another
+     * curve is of the wrong length for it: "web-token/jwt-library" only checks that an EC
+     * key carries a "crv", so this is what tells P-384 from P-256 before anything is signed.
+     *
+     * @var array<string, string>
+     */
+    public const CURVES = [
+        'ES256' => 'P-256',
+        'ES384' => 'P-384',
+        'ES512' => 'P-521',
+    ];
+
+    /**
      * The MAC algorithms, keyed with a secret both the client and the provider hold.
      *
      * @var array<string, class-string<MacAlgorithm>>
@@ -68,4 +85,33 @@ final class JwsAlgorithms
         'HS384' => HS384::class,
         'HS512' => HS512::class,
     ];
+
+    /**
+     * Checks that a key can make the signatures an algorithm is named for.
+     *
+     * Read before anything is signed rather than at the first signature: a key of the wrong
+     * type or of the wrong curve is a misconfiguration, and finding it out on the request
+     * that needed it turns it into a 500 on a user who has already logged in elsewhere.
+     *
+     * @throws \InvalidArgumentException When the key cannot be used with that algorithm
+     */
+    public static function checkKey(JWK $key, Algorithm $algorithm): void
+    {
+        $name = $algorithm->name();
+        $keyType = $key->has('kty') ? $key->get('kty') : null;
+
+        if (!\in_array($keyType, $algorithm->allowedKeyTypes(), true)) {
+            throw new \InvalidArgumentException(\sprintf('The "%s" algorithm signs with a key of the "%s" type, and the given JWK is of the "%s" type.', $name, implode('" or "', $algorithm->allowedKeyTypes()), \is_string($keyType) ? $keyType : get_debug_type($keyType)));
+        }
+
+        if (!isset(self::CURVES[$name])) {
+            return;
+        }
+
+        $curve = $key->has('crv') ? $key->get('crv') : null;
+
+        if (self::CURVES[$name] !== $curve) {
+            throw new \InvalidArgumentException(\sprintf('The "%s" algorithm signs with a key on the "%s" curve (RFC 7518, Section 3.4), and the given JWK is on the "%s" curve.', $name, self::CURVES[$name], \is_string($curve) ? $curve : get_debug_type($curve)));
+        }
+    }
 }

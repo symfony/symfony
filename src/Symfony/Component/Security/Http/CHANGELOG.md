@@ -4,7 +4,9 @@ CHANGELOG
 8.2
 ---
 
- * Add `DpopProofFactory`, signing the DPoP proofs of RFC 9449; `OidcClient` carries one on every request to the provider and presents the access token under the `DPoP` scheme, and `OidcLoginAuthenticator` names the key in the `dpop_jkt` of the authorization request
+ * Add `AccessTokenTypeInterface` and the `$accessTokenType` argument to `OidcClient`, which says what the provider must answer in the `token_type` of the access token response, how a request presenting the token is made, and what has to be proven along the way; a response of another type is refused (RFC 6749 §7.1)
+ * Add `BearerTokenType`, the bearer token of RFC 6750, which `OidcClient` asks for unless another type is given
+ * Add `DpopTokenType` and `DpopProofFactory`, which bind what the provider issues to a key the client holds (RFC 9449): every request carries a proof signed for it, the token is presented under the `DPoP` scheme, a token the provider did not bind is refused (§5), each server keeps its own nonce (§9), and `OidcLoginAuthenticator` names the key in the `dpop_jkt` of the authorization request
  * Support the OAuth 2.0 Form Post Response Mode in `OidcLoginAuthenticator`, reading the authorization response from the request body
  * Add `RefreshedUserCheckerListener`, running a user checker on `CheckRefreshedUserEvent` so an account disabled during a session is rejected on the next request
  * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, to add application-specific reasons to deauthenticate the token

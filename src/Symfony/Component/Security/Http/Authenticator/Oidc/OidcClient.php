@@ -13,8 +13,9 @@ namespace Symfony\Component\Security\Http\Authenticator\Oidc;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
+use Symfony\Component\Security\Http\OAuth2\AccessTokenType\AccessTokenTypeInterface;
+use Symfony\Component\Security\Http\OAuth2\AccessTokenType\BearerTokenType;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
-use Symfony\Component\Security\Http\OAuth2\Dpop\DpopProofFactory;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -28,9 +29,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * a secret, sending nothing at all, or signing an assertion (OIDC Core §9) are the same
  * client with a different dependency.
  *
- * Whether what it is given is bound to a key it holds (RFC 9449) is another such property:
- * given a proof factory, every request made here carries a proof of the key, and the access
- * token comes back bound to it.
+ * What kind of access token it asks for is another such property (RFC 6749 §7.1): the type
+ * says what the provider must answer, how a token is presented, and what has to be proven
+ * along the way, so that a bearer token (RFC 6750) and a token bound to a key the client
+ * holds (RFC 9449) are the same client with a different dependency here as well.
  *
  * @see https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth OIDC Core 1.0 §3.1
  * @see https://datatracker.ietf.org/doc/html/rfc6749                      OAuth 2.0 (RFC 6749)
@@ -39,22 +41,18 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class OidcClient implements OidcClientInterface
 {
-    /**
-     * The nonce the provider last named, RFC 9449, Section 8.
-     *
-     * It is held for the requests that follow in the same PHP request, the login flow making
-     * several: the provider answers the first one with the nonce it wants, and the token
-     * request, the refresh and the UserInfo call that follow carry it without asking again.
-     */
-    private ?string $dpopNonce = null;
+    private readonly AccessTokenTypeInterface $accessTokenType;
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly OidcDiscovery $discovery,
         private readonly string $clientId,
         private readonly ClientAuthenticationInterface $clientAuthentication,
-        private readonly ?DpopProofFactory $dpopProofFactory = null,
+        ?AccessTokenTypeInterface $accessTokenType = null,
     ) {
+        // the bearer token of RFC 6750 is what a client asks for unless it holds a key, and
+        // naming it here keeps the type a dependency rather than an absence of one
+        $this->accessTokenType = $accessTokenType ?? new BearerTokenType();
     }
 
     public function getClientAuthenticationMethod(): string
@@ -78,10 +76,14 @@ final class OidcClient implements OidcClientInterface
         }
 
         try {
-            return $this->requestToken($tokenEndpoint, $body)->toArray();
+            $tokenResponse = $this->requestToken($tokenEndpoint, $body)->toArray();
         } catch (HttpClientExceptionInterface $e) {
             throw new AuthenticationException(\sprintf('The OIDC token endpoint request failed: "%s"', $e->getMessage()), previous: $e);
         }
+
+        $this->accessTokenType->checkTokenResponse($tokenResponse);
+
+        return $tokenResponse;
     }
 
     public function refreshToken(#[\SensitiveParameter] string $refreshToken, array $scopes = []): array
@@ -110,10 +112,14 @@ final class OidcClient implements OidcClientInterface
                 throw new OidcInvalidGrantException('The OIDC provider rejected the refresh token: it expired, it was revoked, or it was issued to another client.');
             }
 
-            return $response->toArray();
+            $tokenResponse = $response->toArray();
         } catch (HttpClientExceptionInterface $e) {
             throw new AuthenticationException(\sprintf('The OIDC token endpoint request failed: "%s"', $e->getMessage()), previous: $e);
         }
+
+        $this->accessTokenType->checkTokenResponse($tokenResponse);
+
+        return $tokenResponse;
     }
 
     public function fetchUserInfo(string $accessToken): array
@@ -121,20 +127,11 @@ final class OidcClient implements OidcClientInterface
         $userInfoEndpoint = $this->discovery->getSecureEndpoint('userinfo_endpoint');
 
         try {
-            return $this->send(function (?string $nonce) use ($userInfoEndpoint, $accessToken): ResponseInterface {
-                $options = ['max_redirects' => 0];
-
-                if (null === $this->dpopProofFactory) {
-                    $options['auth_bearer'] = $accessToken;
-                } else {
-                    // RFC 9449, Section 7.1: a token bound to a key is presented under the
-                    // "DPoP" scheme, and a provider refuses it under "Bearer"
-                    $options['headers']['Authorization'] = DpopProofFactory::SCHEME.' '.$accessToken;
-                    $options['headers']['DPoP'] = $this->dpopProofFactory->createProof('GET', $userInfoEndpoint, $accessToken, $nonce);
-                }
-
-                return $this->httpClient->request('GET', $userInfoEndpoint, $options);
-            })->toArray();
+            return $this->send($userInfoEndpoint, fn (): ResponseInterface => $this->httpClient->request(
+                'GET',
+                $userInfoEndpoint,
+                $this->accessTokenType->presentToken($accessToken, 'GET', $userInfoEndpoint, ['max_redirects' => 0]),
+            ))->toArray();
         } catch (HttpClientExceptionInterface $e) {
             throw new AuthenticationException(\sprintf('The OIDC userinfo endpoint request failed: "%s"', $e->getMessage()), previous: $e);
         }
@@ -143,86 +140,43 @@ final class OidcClient implements OidcClientInterface
     /**
      * Makes a token endpoint request, with a fresh client authentication each time it is sent.
      *
-     * A request that has to be sent again for a nonce is authenticated again rather than
-     * repeated: a client assertion carries a "jti" a provider remembers until it expires
-     * (RFC 7523, Section 3), so sending the same one twice is a replay of it.
+     * A request that has to be sent again is authenticated again rather than repeated: a
+     * client assertion carries a "jti" a provider remembers until it expires (RFC 7523,
+     * Section 3), so sending the same one twice is a replay of it.
      *
      * @param array<string, string> $body
      */
     private function requestToken(string $tokenEndpoint, array $body): ResponseInterface
     {
-        return $this->send(function (?string $nonce) use ($tokenEndpoint, $body): ResponseInterface {
+        return $this->send($tokenEndpoint, function () use ($tokenEndpoint, $body): ResponseInterface {
             $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
             $options['max_redirects'] = 0;
-
-            if (null !== $this->dpopProofFactory) {
-                $options['headers']['DPoP'] = $this->dpopProofFactory->createProof('POST', $tokenEndpoint, null, $nonce);
-            }
+            $options = $this->accessTokenType->prepareTokenRequest($tokenEndpoint, $options);
 
             return $this->httpClient->request('POST', $tokenEndpoint, $options);
         });
     }
 
     /**
-     * Sends a request, once more with the nonce when the provider answers that it wants one.
+     * Sends a request, once more when the type says the answer asks for it.
      *
-     * RFC 9449, Section 8: a provider may refuse a proof until it carries a nonce of its own,
-     * which is the one thing it knows that the client cannot have chosen. It names the nonce
-     * in a header of that refusal, and of any later response, so the value is kept for the
-     * requests that follow instead of being asked for again.
+     * A server may answer a first request with what the next one has to carry, and the type
+     * is what knows it: it reads every response, keeps what it named, and says whether the
+     * request is to be built and sent again.
      *
-     * @param \Closure(?string): ResponseInterface $send
+     * @param \Closure(): ResponseInterface $send
      */
-    private function send(\Closure $send): ResponseInterface
+    private function send(string $url, \Closure $send): ResponseInterface
     {
-        $response = $send($this->dpopNonce);
+        $response = $send();
 
-        if (null === $this->dpopProofFactory) {
-            return $response;
-        }
-
-        $previousNonce = $this->dpopNonce;
-        $this->readNonce($response);
-
-        // sending the same proof again would be refused for the same reason, so the retry
-        // only happens once the provider has named a nonce this client did not already use
-        if (self::wantsNonce($response) && null !== $this->dpopNonce && $this->dpopNonce !== $previousNonce) {
-            $response = $send($this->dpopNonce);
-            $this->readNonce($response);
+        // at most one repeat: a server that named what the next request must carry answers
+        // the request carrying it, and a second refusal is a refusal and not an instruction
+        if ($this->accessTokenType->onResponse($response, $url)) {
+            $response = $send();
+            $this->accessTokenType->onResponse($response, $url);
         }
 
         return $response;
-    }
-
-    private function readNonce(ResponseInterface $response): void
-    {
-        $nonce = $response->getHeaders(false)[DpopProofFactory::NONCE_HEADER][0] ?? null;
-
-        if (\is_string($nonce) && '' !== $nonce) {
-            $this->dpopNonce = $nonce;
-        }
-    }
-
-    private static function wantsNonce(ResponseInterface $response): bool
-    {
-        $statusCode = $response->getStatusCode();
-
-        if (400 !== $statusCode && 401 !== $statusCode) {
-            return false;
-        }
-
-        // the token endpoint says it in the error of a JSON body, a resource such as the
-        // UserInfo endpoint in the challenge it answers with
-        if (str_contains(implode(' ', $response->getHeaders(false)['www-authenticate'] ?? []), 'use_dpop_nonce')) {
-            return true;
-        }
-
-        try {
-            return 'use_dpop_nonce' === ($response->toArray(false)['error'] ?? null);
-        } catch (HttpClientExceptionInterface) {
-            // an error page rather than the JSON the endpoint owes, which says nothing
-            // about a nonce and is reported by the caller reading the response
-            return false;
-        }
     }
 }

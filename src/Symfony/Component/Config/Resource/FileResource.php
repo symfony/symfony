@@ -23,6 +23,7 @@ namespace Symfony\Component\Config\Resource;
 class FileResource implements SelfCheckingResourceInterface
 {
     private string $resource;
+    private ?string $hash = null;
 
     /**
      * @param string $resource The file path to the resource
@@ -38,6 +39,11 @@ class FileResource implements SelfCheckingResourceInterface
         }
 
         $this->resource = $resolvedResource;
+
+        // mtimes have a one-second resolution: remember the content of recently modified files to tell if they change again in the same second
+        if (time() - 1 <= @filemtime($resolvedResource)) {
+            $this->hash = @hash_file('xxh128', $resolvedResource) ?: null;
+        }
     }
 
     public function __toString(): string
@@ -55,13 +61,26 @@ class FileResource implements SelfCheckingResourceInterface
 
     public function isFresh(int $timestamp): bool
     {
-        return false !== ($filemtime = @filemtime($this->resource)) && $filemtime <= $timestamp;
+        if (false === $filemtime = @filemtime($this->resource)) {
+            return false;
+        }
+
+        if ($filemtime !== $timestamp) {
+            return $filemtime < $timestamp;
+        }
+
+        // mtimes have a one-second resolution: a file modified in the same second as $timestamp may have changed after being loaded
+        return null !== $this->hash && $this->hash === @hash_file('xxh128', $this->resource);
     }
 
     public function __serialize(): array
     {
-        return [
-            'resource' => $this->resource,
-        ];
+        $data = ['resource' => $this->resource];
+
+        if (null !== $this->hash) {
+            $data['hash'] = $this->hash;
+        }
+
+        return $data;
     }
 }

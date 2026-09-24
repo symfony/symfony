@@ -47,7 +47,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 return false;
             }
 
-            if ($filemtime > $timestamp) {
+            if ($filemtime >= $timestamp) {
                 return $this->hash === $this->computeHash();
             }
         }

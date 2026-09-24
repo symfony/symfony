@@ -62,6 +62,25 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertFalse($res->isFresh($now), '->isFresh() returns false if the resource does not exist');
     }
 
+    public function testIsFreshComparesSignaturesOfFilesModifiedInSameSecond()
+    {
+        $tmp = sys_get_temp_dir().'/tmp_same_second.php';
+        file_put_contents($tmp, '<?php class ReflectionClassResourceSameSecondTestClass {}');
+        touch($tmp, $mtime = time() - 10);
+        require $tmp;
+
+        $res = unserialize(serialize(new ReflectionClassResource(new \ReflectionClass(\ReflectionClassResourceSameSecondTestClass::class))));
+        // simulates a signature that changed after the resource was created
+        (new \ReflectionProperty(ReflectionClassResource::class, 'hash'))->setValue($res, 'outdated');
+
+        try {
+            $this->assertTrue($res->isFresh($mtime + 1), '->isFresh() returns true if the file has not changed since the previous second');
+            $this->assertFalse($res->isFresh($mtime), '->isFresh() returns false if the signature changed in the same second');
+        } finally {
+            unlink($tmp);
+        }
+    }
+
     #[DataProvider('provideHashedSignature')]
     public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, int $resourceClassNameSuffix, ?\Closure $setContext = null)
     {

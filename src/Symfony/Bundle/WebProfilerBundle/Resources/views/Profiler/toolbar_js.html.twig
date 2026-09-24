@@ -208,7 +208,9 @@
                         pathLink.textContent = request.url;
                         pathCell.appendChild(pathLink);
                     } else {
-                        pathCell.textContent = request.url;
+                        var pathText = document.createElement('span');
+                        pathText.textContent = request.url;
+                        pathCell.appendChild(pathText);
                     }
                     pathCell.setAttribute('title', request.url);
                     row.appendChild(pathCell);

@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 // Help opcache.preload discover always-needed symbols
@@ -394,14 +395,40 @@ trait KernelTrait
 
         $rootCode = array_pop($content);
         $dir = \dirname($cache->getPath()).'/';
+        $containerDir = \dirname($dir.key($content));
 
         $fs = new Filesystem();
 
-        foreach ($content as $file => $code) {
-            $fs->dumpFile($dir.$file, $code);
-            @chmod($dir.$file, 0o666 & ~umask());
+        // The name of the container directory is a hash of its content, so an existing one is reused, only filling in missing files.
+        // A new one is written under a temporary name then renamed, so that concurrent processes never see it partially written.
+        if (!is_dir($containerDir) && @mkdir($tmpDir = $containerDir.'.'.bin2hex(random_bytes(4)).'.tmp')) {
+            $written = true;
+            foreach ($content as $file => $code) {
+                if (str_starts_with($dir.$file, $containerDir.'/') && \strlen($code) !== @file_put_contents($tmpDir.substr($dir.$file, \strlen($containerDir)), $code)) {
+                    $written = false;
+                    break;
+                }
+            }
+
+            if (!$written || !@rename($tmpDir, $containerDir)) {
+                try {
+                    $fs->remove($tmpDir);
+                } catch (IOException) {
+                }
+            }
         }
-        $legacyFile = \dirname($dir.key($content)).'.legacy';
+
+        foreach ($content as $file => $code) {
+            if (!str_starts_with($dir.$file, $containerDir.'/') || !is_file($dir.$file)) {
+                $fs->dumpFile($dir.$file, $code);
+                @chmod($dir.$file, 0o666 & ~umask());
+            }
+        }
+
+        // Even when the directory is reused, the modification time of the container class must tell when it was dumped
+        @touch($containerDir.'/'.$class.'.php');
+
+        $legacyFile = $containerDir.'.legacy';
         if (is_file($legacyFile)) {
             @unlink($legacyFile);
         }

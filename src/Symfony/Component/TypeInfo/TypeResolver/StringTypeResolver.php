@@ -141,7 +141,13 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof ConstTypeNode) {
             if ($node->constExpr instanceof ConstFetchNode) {
-                $className = match (strtolower($node->constExpr->className)) {
+                $classKeyword = strtolower($node->constExpr->className);
+
+                if (null === $typeContext && \in_array($classKeyword, ['self', 'static', 'parent'], true)) {
+                    throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, $classKeyword));
+                }
+
+                $className = match ($classKeyword) {
                     'self' => $typeContext->getDeclaringClass(),
                     'static' => $typeContext->getCalledClass(),
                     'parent' => $typeContext->getParentClass(),

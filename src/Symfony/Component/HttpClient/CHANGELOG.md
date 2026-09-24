@@ -11,6 +11,7 @@ CHANGELOG
  * Add `ScopingHttpClient::forBaseUris()` to scope a client to several base URIs at once
  * Collect the duration and the transferred sizes of each request in `HttpClientDataCollector`
  * Add `HttpClientDataCollector::getTotalTime()`, the sum of the durations of all requests, in seconds
+ * Add the `trailers` response info
 
 8.1
 ---

@@ -18,6 +18,7 @@ use Amp\Future;
 use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
+use Amp\Http\Client\Trailers;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
@@ -262,6 +263,9 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 $multi->handlesActivity[$id][] = $data;
             }
 
+            // HTTP/2 completes the future with a Trailers object, HTTP/1.1 with the header array itself
+            $trailers = $response->getTrailers()->await();
+            $info['trailers'] = $trailers instanceof Trailers ? $trailers->getHeaders() : $trailers;
             $multi->handlesActivity[$id][] = null;
             $multi->handlesActivity[$id][] = null;
         } catch (\Throwable $e) {

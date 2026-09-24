@@ -77,6 +77,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->info['original_url'] = $originalUrl ?? $this->info['url'] ?? curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL);
         $info = &$this->info;
         $headers = &$this->headers;
+        $trailers = &$this->trailers;
         $debugBuffer = $this->debugBuffer;
 
         if (!$info['response_headers']) {
@@ -84,8 +85,8 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             curl_setopt($ch, \CURLOPT_PRIVATE, \in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE', 'QUERY'], true) && 1.0 < (float) ($options['http_version'] ?? 1.1) ? 'H2' : 'H0'); // H = headers + retry counter
         }
 
-        curl_setopt($ch, \CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect, $logger): int {
-            return self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect, $logger);
+        curl_setopt($ch, \CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, &$trailers, $options, $multi, $id, &$location, $resolveRedirect, $logger): int {
+            return self::parseHeaderLine($ch, $data, $info, $headers, $trailers, $options, $multi, $id, $location, $resolveRedirect, $logger);
         });
 
         if (null === $options) {
@@ -382,7 +383,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
      *
      * @param-immediately-invoked-callable $resolveRedirect
      */
-    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, CurlClientState $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
+    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, array &$trailers, ?array $options, CurlClientState $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
     {
         if (!str_ends_with($data, "\r\n")) {
             return 0;
@@ -391,7 +392,12 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $waitFor = @curl_getinfo($ch, \CURLINFO_PRIVATE) ?: '_0';
 
         if ('H' !== $waitFor[0]) {
-            return \strlen($data); // Ignore HTTP trailers
+            // Header lines received after the body are trailer fields
+            if ('C' === $waitFor[0] && false !== $i = strpos($data, ':')) {
+                $trailers[strtolower(trim(substr($data, 0, $i)))][] = trim(substr($data, $i + 1));
+            }
+
+            return \strlen($data);
         }
 
         $statusCode = curl_getinfo($ch, \CURLINFO_RESPONSE_CODE);
@@ -469,6 +475,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
             if ('HEAD' === $info['http_method'] || \in_array($statusCode, [204, 304], true)) {
                 $waitFor = '_0'; // no content expected
+                $info['trailers'] = [];
                 $multi->handlesActivity[$id][] = null;
                 $multi->handlesActivity[$id][] = null;
             } else {

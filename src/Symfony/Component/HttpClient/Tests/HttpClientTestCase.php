@@ -25,6 +25,7 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
@@ -48,10 +49,120 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         parent::testTimeoutOnDestruct();
     }
 
+    public function testTrailersAreExposedOnceTheResponseIsComplete()
+    {
+        TestSocketServer::start('trailers/server.php', 8061);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://127.0.0.1:8061/trailers');
+
+        $this->assertSame('hello', $response->getContent());
+        $this->assertSame(['grpc-status' => ['0'], 'x-repeat' => ['a', 'b']], $response->getInfo('trailers'));
+        $this->assertArrayNotHasKey('grpc-status', $response->getHeaders());
+    }
+
+    public function testTrailersAreNullBeforeTheResponseCompletes()
+    {
+        TestSocketServer::start('trailers/server.php', 8061);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://127.0.0.1:8061/trailers');
+
+        $this->assertNull($response->getInfo('trailers'));
+        $response->getContent();
+        $this->assertNotNull($response->getInfo('trailers'));
+    }
+
+    public function testTrailersAreEmptyWhenTheServerSentNone()
+    {
+        TestSocketServer::start('trailers/server.php', 8061);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $chunked = $client->request('GET', 'http://127.0.0.1:8061/no-trailers');
+        $sized = $client->request('GET', 'http://127.0.0.1:8061/content-length');
+
+        $this->assertSame('hello', $chunked->getContent());
+        $this->assertSame([], $chunked->getInfo('trailers'));
+        $this->assertSame('hello', $sized->getContent());
+        $this->assertSame([], $sized->getInfo('trailers'));
+    }
+
+    public function testTrailersAreEmptyWhenNoContentIsExpected()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $head = $client->request('HEAD', 'http://localhost:8057/head');
+        $notModified = $client->request('GET', 'http://localhost:8057/304');
+
+        $this->assertSame(200, $head->getStatusCode());
+        $this->assertSame('', $head->getContent());
+        $this->assertSame([], $head->getInfo('trailers'));
+        $this->assertSame(304, $notModified->getStatusCode());
+        $this->assertSame('', $notModified->getContent(false));
+        $this->assertSame([], $notModified->getInfo('trailers'));
+    }
+
+    public function testTrailersOfAnErrorResponse()
+    {
+        TestSocketServer::start('trailers/server.php', 8061);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://127.0.0.1:8061/trailers-500');
+
+        $this->assertSame('hello', $response->getContent(false));
+        $this->assertSame(['grpc-status' => ['13']], $response->getInfo('trailers'));
+    }
+
+    public function testTrailersOfARedirectAreNotKept()
+    {
+        TestSocketServer::start('trailers/server.php', 8061);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://127.0.0.1:8061/redirect');
+
+        $this->assertSame('hello', $response->getContent());
+        $this->assertSame(['grpc-status' => ['0'], 'x-repeat' => ['a', 'b']], $response->getInfo('trailers'));
+    }
+
+    public function testTrailersOfAnIncompleteTransferAreNull()
+    {
+        TestSocketServer::start('trailers/server.php', 8061);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://127.0.0.1:8061/broken');
+
+        try {
+            $response->getContent();
+            $this->fail(TransportExceptionInterface::class.' expected');
+        } catch (TransportExceptionInterface) {
+        }
+
+        $this->assertNull($response->getInfo('trailers'));
+    }
+
+    #[TestWith(['/unterminated-trailers'])]
+    #[TestWith(['/truncated-trailers'])]
+    #[TestWith(['/oversized-trailers'])]
+    public function testTrailersOfAnIncompleteTrailerSectionAreNull(string $path)
+    {
+        TestSocketServer::start('trailers/server.php', 8061);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://127.0.0.1:8061'.$path);
+
+        try {
+            $response->getContent();
+            $this->fail(TransportExceptionInterface::class.' expected');
+        } catch (TransportExceptionInterface) {
+        }
+
+        $this->assertNull($response->getInfo('trailers'));
+    }
+
     #[RequiresPhpExtension('openssl')]
     public function testRedirectToADifferentSchemeDropsCredentials()
     {
-        TestRedirectServer::start();
+        TestSocketServer::start('tls/redirect-server.php', 8059);
         $client = $this->getHttpClient(__FUNCTION__);
 
         $response = $client->request('GET', 'https://127.0.0.1:8059/', [

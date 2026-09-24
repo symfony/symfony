@@ -288,6 +288,8 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                         $e = new TransportException(\sprintf('Transfer closed with %s bytes remaining to read.', $remaining));
                     } elseif (-1 === $remaining && !$dechunker->isFinished()) {
                         $e = new TransportException('Transfer closed with outstanding data remaining from chunked response.');
+                    } else {
+                        $info['trailers'] = -1 === $remaining ? $dechunker->getTrailers() : [];
                     }
                 }
 

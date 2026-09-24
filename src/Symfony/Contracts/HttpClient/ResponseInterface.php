@@ -99,6 +99,9 @@ interface ResponseInterface
      * When the "capture_peer_cert_chain" option is true, the "peer_certificate_chain"
      * attribute SHOULD list the peer certificates as an array of OpenSSL X.509 resources.
      *
+     * The "trailers" info SHOULD be null until the transfer completes successfully.
+     * Then, it SHOULD list the trailer fields sent after the body, in the same shape as getHeaders(false), or be an empty array when there are none.
+     *
      * Other info SHOULD be named after curl_getinfo()'s associative return value.
      *
      * @return mixed An array of all available info, or one of them when $type is

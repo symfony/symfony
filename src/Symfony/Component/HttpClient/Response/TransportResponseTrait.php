@@ -47,6 +47,13 @@ trait TransportResponseTrait
     private int $inflateIn = 0;
     private int $inflateOut = 0;
     private ?array $finalInfo = null;
+
+    /**
+     * Trailer fields collected by the transport, published as the "trailers" info once the response completes.
+     *
+     * @var array<string, list<string>>
+     */
+    private array $trailers = [];
     private ?LoggerInterface $logger = null;
     private bool $didTimeout = false;
 
@@ -244,6 +251,7 @@ trait TransportResponseTrait
                                     $response->content = fopen('php://memory', 'w+');
                                 }
 
+                                $response->info['trailers'] ??= $response->trailers;
                                 $chunk = new LastChunk($response->offset);
                             }
                         } elseif ($chunk instanceof ErrorChunk) {

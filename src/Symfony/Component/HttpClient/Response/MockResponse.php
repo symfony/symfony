@@ -287,6 +287,10 @@ class MockResponse implements ResponseInterface, StreamableInterface
             'http_code' => $response->info['http_code'],
         ] + $info + $response->info;
 
+        // Trailers arrive after the body: they are held until the response completes
+        $response->trailers = $response->info['trailers'] ?? [];
+        unset($response->info['trailers']);
+
         if (null !== $response->info['error']) {
             throw new TransportException($response->info['error']);
         }

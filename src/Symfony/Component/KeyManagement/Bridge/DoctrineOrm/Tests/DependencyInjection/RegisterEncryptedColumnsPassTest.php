@@ -16,8 +16,6 @@ use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterEncryptedColumnsPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\EncryptedColumnsAddress;
@@ -73,11 +71,30 @@ class RegisterEncryptedColumnsPassTest extends TestCase
         $this->assertSame([
             'encrypted_string@person.contact' => ['type' => 'string', 'key' => 'person.contact'],
             'encrypted_text@person.contact' => ['type' => 'text', 'key' => 'person.contact'],
-        ], $container->getDefinition('key_management.doctrine_dbal.encrypted_types')->getArgument(1));
+        ], $container->getParameter('.key_management.doctrine_dbal.types'));
         $this->assertSame(['person.contact' => [
             'string' => 'encrypted_string@person.contact',
             'text' => 'encrypted_text@person.contact',
         ]], $container->getDefinition('key_management.encrypted_column_listener')->getArgument(0));
+    }
+
+    public function testTheClassesOfTheColumnsOfEachRegisteredTypeAreKept()
+    {
+        $container = $this->createContainer(['speaker_contact' => ['type' => 'string', 'key' => 'person.contact']]);
+        $container->register('.abstract.person', EncryptedColumnsEntity::class)
+            ->addResourceTag('key_management.encrypted_column', ['key' => 'person.contact', 'type' => 'string'])
+            ->addResourceTag('key_management.encrypted_column', ['key' => 'person.contact', 'type' => 'text'])
+            ->addResourceTag('key_management.encrypted_column', ['key' => 'person.email', 'type' => 'text']);
+        $container->register('.abstract.address', EncryptedColumnsAddress::class)
+            ->addResourceTag('key_management.encrypted_column', ['key' => 'person.contact', 'type' => 'text'])
+            ->addResourceTag('key_management.encrypted_column', ['key' => 'person.contact', 'type' => 'text']);
+
+        (new RegisterEncryptedColumnsPass())->process($container);
+
+        $this->assertSame([
+            'encrypted_text@person.contact' => [EncryptedColumnsEntity::class, EncryptedColumnsAddress::class],
+            'encrypted_text@person.email' => [EncryptedColumnsEntity::class],
+        ], $container->getParameter('.key_management.encrypted_column_classes'), 'a configured type is not tied to the classes of its columns.');
     }
 
     public function testAConfiguredTypeServesTheColumnsOfItsKeyAndType()
@@ -92,7 +109,7 @@ class RegisterEncryptedColumnsPassTest extends TestCase
         $this->assertSame([
             'speaker_contact' => ['type' => 'string', 'key' => 'person.contact'],
             'encrypted_text@person.contact' => ['type' => 'text', 'key' => 'person.contact'],
-        ], $container->getDefinition('key_management.doctrine_dbal.encrypted_types')->getArgument(1));
+        ], $container->getParameter('.key_management.doctrine_dbal.types'));
         $this->assertSame(['person.contact' => [
             'string' => 'speaker_contact',
             'text' => 'encrypted_text@person.contact',
@@ -108,13 +125,13 @@ class RegisterEncryptedColumnsPassTest extends TestCase
         $this->assertSame(['person.contact' => ['string' => 'speaker_contact']], $container->getDefinition('key_management.encrypted_column_listener')->getArgument(0));
     }
 
-    public function testTheEncryptedTypesGoWhenNothingNeedsThem()
+    public function testNoTypeIsAddedWithoutEncryptedColumns()
     {
         $container = $this->createContainer([]);
 
         (new RegisterEncryptedColumnsPass())->process($container);
 
-        $this->assertFalse($container->hasDefinition('key_management.doctrine_dbal.encrypted_types'));
+        $this->assertSame([], $container->getParameter('.key_management.doctrine_dbal.types'));
         $this->assertTrue($container->hasDefinition('key_management.encrypted_column_listener'), 'the listener reports an encrypted column the container did not find.');
     }
 
@@ -145,11 +162,11 @@ class RegisterEncryptedColumnsPassTest extends TestCase
     public function testNothingHappensWithoutTheListener()
     {
         $container = new ContainerBuilder();
-        $container->register('key_management.doctrine_dbal.encrypted_types', EncryptedTypes::class)->setArguments([new Reference('app.envelopes'), []]);
+        $container->setParameter('.key_management.doctrine_dbal.types', []);
 
         (new RegisterEncryptedColumnsPass())->process($container);
 
-        $this->assertTrue($container->hasDefinition('key_management.doctrine_dbal.encrypted_types'));
+        $this->assertFalse($container->hasParameter('.key_management.encrypted_column_classes'));
     }
 
     private function createContainer(?array $types): ContainerBuilder
@@ -158,7 +175,7 @@ class RegisterEncryptedColumnsPassTest extends TestCase
         $container->register('key_management.encrypted_column_listener', EncryptedColumnListener::class)->setArguments([[]]);
 
         if (null !== $types) {
-            $container->register('key_management.doctrine_dbal.encrypted_types', EncryptedTypes::class)->setArguments([new Reference('app.envelopes'), $types]);
+            $container->setParameter('.key_management.doctrine_dbal.types', $types);
         }
 
         return $container;

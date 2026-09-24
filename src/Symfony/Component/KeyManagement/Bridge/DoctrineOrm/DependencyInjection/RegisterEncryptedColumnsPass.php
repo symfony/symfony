@@ -26,8 +26,10 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
  *
  * The types must be registered before the first query, even when the metadata comes from the cache, so they are collected when the container is compiled.
  * {@see self::autoconfigure()} tags the entities, embeddables and mapped superclasses that the container loads with their encrypted columns.
- * This pass then adds one type per key and type to the types declared in "key_management.doctrine_dbal.types".
+ * The ".key_management.doctrine_dbal.types" parameter holds the types declared in "key_management.doctrine_dbal.types".
+ * This pass adds one type per key and type to them.
  * A declared type is used for the columns of its key and type, instead of registering another one.
+ * The ".key_management.encrypted_column_classes" parameter lists the classes that use each registered type.
  *
  * {@see \Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener} gets the names of all these types.
  *
@@ -39,7 +41,8 @@ final class RegisterEncryptedColumnsPass implements CompilerPassInterface
 {
     private const string TAG = 'key_management.encrypted_column';
     private const string LISTENER = 'key_management.encrypted_column_listener';
-    private const string TYPES = 'key_management.doctrine_dbal.encrypted_types';
+    private const string TYPES = '.key_management.doctrine_dbal.types';
+    private const string CLASSES = '.key_management.encrypted_column_classes';
 
     /**
      * Tags a class mapped by the ORM with the key and the type of each of its encrypted columns.
@@ -67,40 +70,45 @@ final class RegisterEncryptedColumnsPass implements CompilerPassInterface
             return;
         }
 
-        $types = $container->hasDefinition(self::TYPES) ? $container->getDefinition(self::TYPES)->getArgument(1) : null;
+        $types = $container->hasParameter(self::TYPES) ? $container->getParameter(self::TYPES) : null;
 
         $names = [];
         foreach ($types ?? [] as $name => $type) {
             $names[$type['key']][$type['type']] ??= $name;
         }
 
+        $classes = [];
         foreach ($container->findTaggedResourceIds(self::TAG, false) as $id => $tags) {
+            $class = $container->getDefinition($id)->getClass();
+
             foreach ($tags as ['key' => $key, 'type' => $type]) {
-                if (isset($names[$key][$type])) {
-                    continue;
+                if (!isset($names[$key][$type])) {
+                    if (null === $types) {
+                        throw new \LogicException(\sprintf('The encrypted columns of "%s" need an envelope encrypter: configure "key_management.store", or set "key_management.default_client".', $class));
+                    }
+
+                    $name = 'encrypted_'.$type.'@'.$key;
+
+                    if (isset($types[$name])) {
+                        throw new \LogicException(\sprintf('The encrypted type "%s" is configured to wrap the "%s" type under the key "%s", but that name is the one given to the encrypted columns of type "%s" under that key. Rename it.', $name, $types[$name]['type'], $types[$name]['key'], $type));
+                    }
+
+                    $types[$name] = ['type' => $type, 'key' => $key];
+                    $names[$key][$type] = $name;
+                    $classes[$name] = [];
                 }
 
-                if (null === $types) {
-                    throw new \LogicException(\sprintf('The encrypted columns of "%s" need an envelope encrypter: configure "key_management.store", or set "key_management.default_client".', $container->getDefinition($id)->getClass()));
+                if (isset($classes[$names[$key][$type]])) {
+                    $classes[$names[$key][$type]][$class] = $class;
                 }
-
-                $name = 'encrypted_'.$type.'@'.$key;
-
-                if (isset($types[$name])) {
-                    throw new \LogicException(\sprintf('The encrypted type "%s" is configured to wrap the "%s" type under the key "%s", but that name is the one given to the encrypted columns of type "%s" under that key. Rename it.', $name, $types[$name]['type'], $types[$name]['key'], $type));
-                }
-
-                $types[$name] = ['type' => $type, 'key' => $key];
-                $names[$key][$type] = $name;
             }
         }
 
         $container->getDefinition(self::LISTENER)->setArgument(0, $names);
+        $container->setParameter(self::CLASSES, array_map(array_values(...), $classes));
 
-        if (!$types) {
-            $container->removeDefinition(self::TYPES);
-        } else {
-            $container->getDefinition(self::TYPES)->setArgument(1, $types);
+        if (null !== $types) {
+            $container->setParameter(self::TYPES, $types);
         }
     }
 

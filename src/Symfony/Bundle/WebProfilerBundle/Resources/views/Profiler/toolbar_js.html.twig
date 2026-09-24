@@ -348,6 +348,13 @@
                                 stackElement.toolbarReplace = true;
                                 finishAjaxRequest(idx);
                             });
+                            /* close() dispatches no event: wrap it to mark the request as finished */
+                            var originalClose = es.close.bind(es);
+                            es.close = function () {
+                                stackElement.duration = new Date() - stackElement.start;
+                                finishAjaxRequest(idx);
+                                originalClose();
+                            };
                         }
 
                         return es;

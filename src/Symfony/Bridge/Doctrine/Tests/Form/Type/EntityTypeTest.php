@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -70,16 +69,13 @@ class EntityTypeTest extends BaseTypeTestCase
 
     protected function setUp(): void
     {
-        if (Type::hasType('uuid')) {
-            Type::overrideType('uuid', UuidType::class);
-        } else {
-            Type::addType('uuid', UuidType::class);
-        }
-        if (!Type::hasType('ulid')) {
-            Type::addType('ulid', UlidType::class);
-        }
+        $config = DoctrineTestHelper::createTestConfiguration();
+        DoctrineTestHelper::registerTypes($config, [
+            'uuid' => UuidType::class,
+            'ulid' => UlidType::class,
+        ]);
 
-        $this->em = DoctrineTestHelper::createTestEntityManager();
+        $this->em = DoctrineTestHelper::createTestEntityManager($config);
         $this->emRegistry = $this->createRegistryMock($this->em);
 
         parent::setUp();

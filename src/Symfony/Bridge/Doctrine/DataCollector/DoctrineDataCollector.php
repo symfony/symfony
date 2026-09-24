@@ -151,18 +151,22 @@ class DoctrineDataCollector extends DataCollector
         if (!\is_array($query['types'])) {
             $query['types'] = [];
         }
+        $connection = $this->registry->getConnection($connectionName);
+
         foreach ($query['params'] as $j => $param) {
             $e = null;
             if (isset($query['types'][$j])) {
                 // Transform the param according to the type
                 $type = $query['types'][$j];
                 if (\is_string($type)) {
-                    $type = Type::getType($type);
+                    // doctrine/dbal 4.5 deprecates the static registry for a provider on the configuration
+                    $config = $connection->getConfiguration();
+                    $type = method_exists($config, 'getTypeProvider') ? $config->getTypeProvider()->get($type) : Type::getType($type);
                 }
                 if ($type instanceof Type) {
                     $query['types'][$j] = $type->getBindingType();
                     try {
-                        $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
+                        $param = $type->convertToDatabaseValue($param, $connection->getDatabasePlatform());
                     } catch (\TypeError|ConversionException) {
                     }
                 }

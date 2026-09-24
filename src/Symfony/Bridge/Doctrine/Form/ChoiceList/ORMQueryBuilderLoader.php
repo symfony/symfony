@@ -62,21 +62,24 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         // Guess type
         $entity = current($qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
+        // doctrine/dbal 4.5 deprecates the static registry for a provider on the configuration
+        $config = $qb->getEntityManager()->getConnection()->getConfiguration();
+        $types = method_exists($config, 'getTypeProvider') ? $config->getTypeProvider() : Type::getTypeRegistry();
         if (\in_array($type = $metadata->getTypeOfField($identifier), ['integer', 'bigint', 'smallint'], true)) {
             $parameterType = ArrayParameterType::INTEGER;
 
             // Filter out non-integer values (e.g. ""). If we don't, some
             // databases such as PostgreSQL fail.
             $values = array_values(array_filter($values, static fn ($v) => \is_string($v) && ctype_digit($v) || (string) $v === (string) (int) $v));
-        } elseif (null !== $type && (\in_array($type, ['ulid', 'uuid', 'guid'], true) || (Type::hasType($type) && is_subclass_of(Type::getType($type), AbstractUidType::class)))) {
+        } elseif (null !== $type && (\in_array($type, ['ulid', 'uuid', 'guid'], true) || ($types->has($type) && is_subclass_of($types->get($type), AbstractUidType::class)))) {
             $parameterType = ArrayParameterType::STRING;
 
             // Like above, but we just filter out empty strings.
             $values = array_values(array_filter($values, static fn ($v) => '' !== (string) $v));
 
             // Convert values into right type
-            if (Type::hasType($type)) {
-                $doctrineType = Type::getType($type);
+            if ($types->has($type)) {
+                $doctrineType = $types->get($type);
                 $platform = $qb->getEntityManager()->getConnection()->getDatabasePlatform();
                 foreach ($values as &$value) {
                     try {

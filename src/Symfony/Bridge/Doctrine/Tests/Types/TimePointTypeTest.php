@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Doctrine\Tests\Types;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Types\TimePointType;
 use Symfony\Component\Clock\DatePoint;
@@ -23,22 +22,12 @@ final class TimePointTypeTest extends TestCase
 {
     private TimePointType $type;
 
-    public static function setUpBeforeClass(): void
-    {
-        $name = TimePointType::NAME;
-        if (Type::hasType($name)) {
-            Type::overrideType($name, TimePointType::class);
-        } else {
-            Type::addType($name, TimePointType::class);
-        }
-    }
-
     protected function setUp(): void
     {
         if (!class_exists(DatePoint::class)) {
             self::markTestSkipped('The DatePoint class is not available.');
         }
-        $this->type = Type::getType(TimePointType::NAME);
+        $this->type = new TimePointType();
     }
 
     public function testDatePointConvertsToDatabaseValue()

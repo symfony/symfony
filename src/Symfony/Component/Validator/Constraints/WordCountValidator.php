@@ -41,10 +41,14 @@ final class WordCountValidator extends ConstraintValidator
 
         $iterator = \IntlBreakIterator::createWordInstance($constraint->locale);
         $iterator->setText($value);
-        $words = iterator_to_array($iterator->getPartsIterator());
 
         // erase "blank words" and don't count them as words
-        $wordsCount = \count(array_filter(array_map(trim(...), $words), static fn ($word) => '' !== $word));
+        $wordsCount = 0;
+        foreach ($iterator->getPartsIterator() as $word) {
+            if ('' !== trim($word)) {
+                ++$wordsCount;
+            }
+        }
 
         if (null !== $constraint->min && $wordsCount < $constraint->min) {
             $this->context->buildViolation($constraint->minMessage)

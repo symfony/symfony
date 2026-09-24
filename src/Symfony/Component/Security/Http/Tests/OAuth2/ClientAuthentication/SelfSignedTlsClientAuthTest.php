@@ -16,16 +16,17 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsCli
 
 class SelfSignedTlsClientAuthTest extends TestCase
 {
-    public function testPresentsTheCertificateOnTheRequest()
+    /**
+     * The certificate is presented in the handshake, before the provider reads anything of
+     * the request, and it is the HTTP client that carries it.
+     */
+    public function testLeavesTheRequestUntouched()
     {
-        $clientAuthentication = new SelfSignedTlsClientAuth('/certs/self-signed.pem', '/certs/self-signed.key', 'secret-passphrase');
+        $clientAuthentication = new SelfSignedTlsClientAuth();
 
         $options = $clientAuthentication->authenticate('test-client-id', 'https://mtls.provider.example.com/token', ['body' => ['grant_type' => 'authorization_code']]);
 
-        $this->assertSame('/certs/self-signed.pem', $options['local_cert']);
-        $this->assertSame('/certs/self-signed.key', $options['local_pk']);
-        $this->assertSame('secret-passphrase', $options['passphrase']);
-        $this->assertSame(['grant_type' => 'authorization_code'], $options['body']);
+        $this->assertSame(['body' => ['grant_type' => 'authorization_code']], $options);
     }
 
     /**
@@ -38,14 +39,6 @@ class SelfSignedTlsClientAuthTest extends TestCase
      */
     public function testReportsItsMethod()
     {
-        $this->assertSame('self_signed_tls_client_auth', (new SelfSignedTlsClientAuth('/certs/self-signed.pem'))->getMethod());
-    }
-
-    public function testRejectsAnEmptyCertificate()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The certificate of the "self_signed_tls_client_auth" OAuth2 client authentication cannot be empty');
-
-        new SelfSignedTlsClientAuth('');
+        $this->assertSame('self_signed_tls_client_auth', (new SelfSignedTlsClientAuth())->getMethod());
     }
 }

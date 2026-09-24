@@ -261,11 +261,11 @@ class OidcDiscoveryTest extends TestCase
      * A client authenticating with a certificate must make its requests to those, the
      * ordinary ones asking for no certificate.
      */
-    public function testGetSecureEndpointPrefersTheMtlsAlias()
+    public function testGetSecureMutualTlsEndpointPrefersTheMtlsAlias()
     {
         $discovery = $this->createDiscoveryWithMtlsAliases();
 
-        $this->assertSame('https://mtls.provider.example.com/token', $discovery->getSecureEndpoint('token_endpoint', true));
+        $this->assertSame('https://mtls.provider.example.com/token', $discovery->getSecureMutualTlsEndpoint('token_endpoint'));
     }
 
     public function testGetSecureEndpointIgnoresTheMtlsAliasWhenTheClientPresentsNoCertificate()
@@ -281,21 +281,21 @@ class OidcDiscoveryTest extends TestCase
      * Everything else has the one endpoint it announces, the authorization endpoint the
      * browser is sent to among it.
      */
-    public function testGetSecureEndpointFallsBackToTheAnnouncedEndpointWhenItHasNoMtlsAlias()
+    public function testGetSecureMutualTlsEndpointFallsBackToTheAnnouncedEndpointWhenItHasNoMtlsAlias()
     {
         $discovery = $this->createDiscoveryWithMtlsAliases();
 
-        $this->assertSame('https://provider.example.com/authorize', $discovery->getSecureEndpoint('authorization_endpoint', true));
+        $this->assertSame('https://provider.example.com/authorize', $discovery->getSecureMutualTlsEndpoint('authorization_endpoint'));
     }
 
-    public function testGetSecureEndpointReportsAnInsecureMtlsAliasAsSuch()
+    public function testGetSecureMutualTlsEndpointReportsAnInsecureMtlsAliasAsSuch()
     {
         $discovery = $this->createDiscoveryWithMtlsAliases(['token_endpoint' => 'http://mtls.provider.example.com/token']);
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('The "mtls_endpoint_aliases.token_endpoint" announced by the OIDC provider must use HTTPS');
 
-        $discovery->getSecureEndpoint('token_endpoint', true);
+        $discovery->getSecureMutualTlsEndpoint('token_endpoint');
     }
 
     /**
@@ -305,33 +305,48 @@ class OidcDiscoveryTest extends TestCase
      * authenticates to the endpoint that asks for none, which is the one way it cannot
      * succeed.
      */
-    public function testGetSecureEndpointReportsAnEmptyMtlsAliasAsSuch()
+    public function testGetSecureMutualTlsEndpointReportsAnEmptyMtlsAliasAsSuch()
     {
         $discovery = $this->createDiscoveryWithMtlsAliases(['token_endpoint' => '']);
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('does not announce any "mtls_endpoint_aliases.token_endpoint"');
 
-        $discovery->getSecureEndpoint('token_endpoint', true);
+        $discovery->getSecureMutualTlsEndpoint('token_endpoint');
     }
 
-    public function testGetSecureEndpointReportsAnMtlsAliasThatIsNoUrlAsSuch()
+    public function testGetSecureMutualTlsEndpointReportsAnMtlsAliasThatIsNoUrlAsSuch()
     {
         $discovery = $this->createDiscoveryWithMtlsAliases(['token_endpoint' => null]);
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('does not announce any "mtls_endpoint_aliases.token_endpoint"');
 
-        $discovery->getSecureEndpoint('token_endpoint', true);
+        $discovery->getSecureMutualTlsEndpoint('token_endpoint');
     }
 
-    public function testGetSecureEndpointIgnoresMtlsEndpointAliasesThatAreNotAnObject()
+    /**
+     * The common case: a provider accepting the certificate on its ordinary endpoints.
+     *
+     * Announcing no alias is announcing that there is nothing to prefer, so the endpoint of
+     * the document is the one the certificate is presented to.
+     */
+    public function testGetSecureMutualTlsEndpointReadsTheOrdinaryEndpointWhenNoAliasIsAnnounced()
+    {
+        $httpClient = new MockHttpClient(new JsonMockResponse(self::CONFIGURATION));
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER);
+
+        $this->assertSame('https://provider.example.com/token', $discovery->getSecureMutualTlsEndpoint('token_endpoint'));
+    }
+
+    public function testGetSecureMutualTlsEndpointIgnoresMtlsEndpointAliasesThatAreNotAnObject()
     {
         $httpClient = new MockHttpClient(new JsonMockResponse(self::CONFIGURATION + ['mtls_endpoint_aliases' => 'https://mtls.provider.example.com']));
 
         $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER);
 
-        $this->assertSame('https://provider.example.com/token', $discovery->getSecureEndpoint('token_endpoint', true));
+        $this->assertSame('https://provider.example.com/token', $discovery->getSecureMutualTlsEndpoint('token_endpoint'));
     }
 
     public function testGetSecureEndpointAllowsALoopbackAuthorizationEndpoint()

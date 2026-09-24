@@ -90,6 +90,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('OIDC discovery'),
                 abstract_arg('client ID'),
                 abstract_arg('client authentication'),
+                abstract_arg('whether a client certificate is presented to the provider'),
             ])
 
         // the only client authentication method that has nothing to configure, so that
@@ -126,21 +127,12 @@ return static function (ContainerConfigurator $container) {
                 service('clock'),
             ])
 
+        // the two methods of RFC 8705, Section 2, which hold no credential either: the
+        // certificate is the one the HTTP client of the firewall presents, so a single
+        // service of each is shared, as the public client one is
         ->set('security.oauth2.client_authentication.tls_client_auth', TlsClientAuth::class)
-            ->abstract()
-            ->args([
-                abstract_arg('client certificate'),
-                abstract_arg('client private key'),
-                abstract_arg('private key passphrase'),
-            ])
 
         ->set('security.oauth2.client_authentication.self_signed_tls_client_auth', SelfSignedTlsClientAuth::class)
-            ->abstract()
-            ->args([
-                abstract_arg('client certificate'),
-                abstract_arg('client private key'),
-                abstract_arg('private key passphrase'),
-            ])
 
         // the private key of the "private_key_jwt" method, parsed from the JSON-encoded JWK
         // the firewall configures, as the "oidc" access token handler parses its own keyset

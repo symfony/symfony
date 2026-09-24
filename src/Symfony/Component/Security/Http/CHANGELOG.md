@@ -56,7 +56,7 @@ CHANGELOG
  * Add `FallbackAuthenticationEntryPointInterface` for an entry point that only stands in for a firewall declaring no other one, and make `AccessTokenAuthenticator` one, so that a request carrying no access token gets the RFC 6750 challenge instead of a bare 401
  * Add `PrivateKeyJwt` and `ClientSecretJwt`, which authenticate the OAuth2 client at the token endpoint with a JWT assertion it signs itself, respectively with its private key and with its secret (RFC 7523, OIDC Core 1.0 §9)
  * Add `OidcAuthorizationRequestEvent` and the `$eventDispatcher` argument to `OidcLoginAuthenticator`, so that the extra parameters of the OIDC authorization request can be computed per request
- * Add `TlsClientAuth` and `SelfSignedTlsClientAuth`, which authenticate the OAuth2 client with the certificate it presents in the TLS handshake (RFC 8705 §2), and the `$preferMtlsAlias` argument to `OidcDiscovery::getSecureEndpoint()`, which returns the endpoint the provider publishes under `mtls_endpoint_aliases` (RFC 8705 §5); `OidcClient` makes every request carrying the certificate to those
+ * Add `TlsClientAuth` and `SelfSignedTlsClientAuth`, which have the provider authenticate the OAuth2 client on the certificate it presents in the TLS handshake (RFC 8705 §2), `OidcDiscovery::getSecureMutualTlsEndpoint()`, which returns the endpoint the provider publishes under `mtls_endpoint_aliases` (RFC 8705 §5), and the `$mutualTls` argument to `OidcClient`, which makes it use those
 
 8.1
 ---

@@ -22,13 +22,16 @@ namespace Symfony\Component\Security\Http\OAuth2\ClientAuthentication;
  * {@see TlsClientAuth} matching a subject a certificate authority vouches for,
  * {@see SelfSignedTlsClientAuth} a public key the client registered itself.
  *
- * Only the transport of the request is touched, so what a client authenticated this way
- * sends to the provider is what it would send with no authentication at all. The provider
- * expects those requests at the endpoints it publishes under "mtls_endpoint_aliases"
- * (Section 5) whenever its ordinary ones ask for no client certificate, which
- * {@see \Symfony\Component\Security\Http\Oidc\OidcDiscovery::getSecureEndpoint()} resolves.
+ * The certificate itself is not held here: Section 4 makes mutual-TLS client authentication
+ * and certificate-bound access tokens independent of each other, a public client with no
+ * credentials at all being able to present one only so that its tokens are bound to it. It
+ * is therefore a property of the client and not of the method, configured once and carried
+ * by the HTTP client every request to the provider is made with, which is also what decides
+ * the endpoints of Section 5 are to be used. Reporting one of these two methods only tells
+ * the provider to authenticate the client on that certificate.
  *
  * @see https://datatracker.ietf.org/doc/html/rfc8705#section-2 Mutual-TLS client authentication
+ * @see https://datatracker.ietf.org/doc/html/rfc8705#section-4 Public clients and certificate-bound tokens
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -37,45 +40,13 @@ namespace Symfony\Component\Security\Http\OAuth2\ClientAuthentication;
 abstract class AbstractTlsClientAuth implements ClientAuthenticationInterface
 {
     /**
-     * @param string      $certificate The path to the PEM file holding the client certificate, and its
-     *                                 private key when both are in the same file
-     * @param string|null $key         The path to the PEM file holding the private key, or null when the
-     *                                 certificate file holds it
-     * @param string|null $passphrase  The passphrase the private key is encrypted with, or null when it
-     *                                 is not encrypted
-     */
-    public function __construct(
-        private readonly string $certificate,
-        private readonly ?string $key = null,
-        #[\SensitiveParameter] private readonly ?string $passphrase = null,
-    ) {
-        if ('' === $certificate) {
-            throw new \InvalidArgumentException(\sprintf('The certificate of the "%s" OAuth2 client authentication cannot be empty: it is the only credential the method holds.', $this->getMethod()));
-        }
-
-        if ('' === $key) {
-            throw new \InvalidArgumentException(\sprintf('The private key of the "%s" OAuth2 client authentication cannot be empty. Pass null to read it from the certificate file, which a PEM file may hold both of.', $this->getMethod()));
-        }
-    }
-
-    /**
-     * Presents the client certificate on the request, and leaves its body untouched.
+     * Leaves the request untouched, credentials and body alike.
      *
-     * The certificate is sent on every request made with these options, the handshake
-     * happening before the provider gets to read any of them.
+     * Nothing of this method travels in the request: the handshake has happened before the
+     * provider gets to read any of it.
      */
     final public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
     {
-        $options['local_cert'] = $this->certificate;
-
-        if (null !== $this->key) {
-            $options['local_pk'] = $this->key;
-        }
-
-        if (null !== $this->passphrase) {
-            $options['passphrase'] = $this->passphrase;
-        }
-
         return $options;
     }
 }

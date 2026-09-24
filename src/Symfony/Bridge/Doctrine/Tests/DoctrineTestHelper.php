@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\TypeRegistry;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
@@ -94,6 +96,28 @@ final class DoctrineTestHelper
         $config->setMetadataDriverImpl($driverChain);
 
         return $config;
+    }
+
+    /**
+     * Declares types on the configuration, or on the global registry when doctrine/dbal is too old
+     * to carry a registry of its own.
+     *
+     * The global registry outlives the test, so declaring a name there twice has to override it
+     * rather than fail.
+     *
+     * @param array<string, class-string<Type>> $types
+     */
+    public static function registerTypes(Configuration $config, array $types): void
+    {
+        if (!method_exists($config, 'setTypeProvider')) {
+            foreach ($types as $name => $class) {
+                Type::hasType($name) ? Type::overrideType($name, $class) : Type::addType($name, $class);
+            }
+
+            return;
+        }
+
+        $config->setTypeProvider(new TypeRegistry($types));
     }
 
     /**

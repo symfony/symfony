@@ -17,7 +17,6 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\AbstractUid;
@@ -33,18 +32,9 @@ final class UuidTypeTest extends TestCase
 
     private UuidType $type;
 
-    public static function setUpBeforeClass(): void
-    {
-        if (Type::hasType('uuid')) {
-            Type::overrideType('uuid', UuidType::class);
-        } else {
-            Type::addType('uuid', UuidType::class);
-        }
-    }
-
     protected function setUp(): void
     {
-        $this->type = Type::getType('uuid');
+        $this->type = new UuidType();
     }
 
     public function testUuidConvertsToDatabaseValue()

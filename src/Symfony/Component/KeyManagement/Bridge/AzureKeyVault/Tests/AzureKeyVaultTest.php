@@ -686,6 +686,9 @@ class AzureKeyVaultTest extends TestCase
         yield 'too many segments' => ['a/b/c'];
         yield 'empty' => [''];
         yield 'empty version' => ['app-key/'];
+        yield 'parent traversal' => ['../secrets'];
+        yield 'name longer than 127 characters' => [str_repeat('a', 128)];
+        yield 'name outside Azure grammar' => ['app_key'];
     }
 
     #[DataProvider('provideMalformedKeyIds')]

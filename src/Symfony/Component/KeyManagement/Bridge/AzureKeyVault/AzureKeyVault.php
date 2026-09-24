@@ -65,6 +65,9 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
 {
     private const array AEAD_ALGORITHMS = ['A128GCM', 'A192GCM', 'A256GCM'];
 
+    // See https://learn.microsoft.com/azure/key-vault/general/about-keys-secrets-certificates#object-identifiers
+    private const string KEY_ID_PATTERN = '~\A([0-9A-Za-z-]{1,127})(?:/(?1))?\z~';
+
     public function __construct(
         private readonly HttpClientInterface $client,
         private readonly TokenProviderInterface $tokens,
@@ -202,9 +205,7 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
 
     private static function isKeyId(string $keyId): bool
     {
-        $segments = explode('/', $keyId);
-
-        return \count($segments) <= 2 && !\in_array('', $segments, true);
+        return 1 === preg_match(self::KEY_ID_PATTERN, $keyId);
     }
 
     /**

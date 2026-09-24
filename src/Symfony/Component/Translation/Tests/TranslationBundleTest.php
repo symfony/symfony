@@ -25,6 +25,7 @@ use Symfony\Component\Translation\DependencyInjection\RemoveMissingDependenciesP
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\TranslationBundle;
+use Symfony\Component\Validator\Validation;
 
 class TranslationBundleTest extends TestCase
 {
@@ -74,6 +75,34 @@ class TranslationBundleTest extends TestCase
         $files = array_map(static fn ($file) => str_replace('\\', '/', $file), $options['resource_files']['en']);
         $this->assertContains(str_replace('\\', '/', __DIR__).'/Fixtures/translations/messages.en.yaml', $files);
         $this->assertContains(__DIR__.'/Fixtures/translations', $options['scanned_directories']);
+    }
+
+    public function testTheTranslationsOfTheValidatorAreRegisteredOnceWhenItsBundleIsEnabled()
+    {
+        if (!class_exists(Validation::class)) {
+            $this->markTestSkipped('The Validator component is not installed.');
+        }
+
+        $validatorDir = \dirname(new \ReflectionClass(Validation::class)->getFileName());
+        $options = $this->load([], bundlesMetadata: ['ValidationBundle' => ['path' => $validatorDir, 'namespace' => 'Symfony\\Component\\Validator']])
+            ->getDefinition('translator.default')->getArgument(4);
+
+        // the finder appends to the directory it was given, so the separators are mixed on Windows
+        $files = array_map(static fn ($file) => str_replace('\\', '/', $file), $options['resource_files']['en']);
+
+        $this->assertSame(1, array_count_values($files)[str_replace('\\', '/', $validatorDir).'/Resources/translations/validators.en.xlf']);
+        $this->assertSame(1, array_count_values($options['scanned_directories'])[$validatorDir.'/Resources/translations']);
+    }
+
+    public function testADirectoryListedInPathsAndAsTheDefaultPathIsRegisteredOnce()
+    {
+        $dir = __DIR__.'/Fixtures/translations';
+        $options = $this->load(['paths' => [$dir], 'default_path' => $dir])->getDefinition('translator.default')->getArgument(4);
+
+        $files = array_map(static fn ($file) => str_replace('\\', '/', $file), $options['resource_files']['en']);
+
+        $this->assertSame(1, array_count_values($files)[str_replace('\\', '/', $dir).'/messages.en.yaml']);
+        $this->assertSame(1, array_count_values($options['scanned_directories'])[$dir]);
     }
 
     public function testDefaultPathContainingAPercentSign()
@@ -208,7 +237,7 @@ class TranslationBundleTest extends TestCase
     /**
      * @param array<string, mixed> $config
      */
-    private function load(array $config, bool $debug = false, bool $merge = true, bool $profiler = false, array $enabledLocales = [], ?string $projectDir = null): ContainerBuilder
+    private function load(array $config, bool $debug = false, bool $merge = true, bool $profiler = false, array $enabledLocales = [], ?string $projectDir = null, array $bundlesMetadata = []): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'kernel.debug' => $debug,
@@ -217,7 +246,7 @@ class TranslationBundleTest extends TestCase
             'kernel.project_dir' => str_replace('%', '%%', $projectDir ?? __DIR__),
             'kernel.default_locale' => 'en',
             'kernel.enabled_locales' => $enabledLocales,
-            'kernel.bundles_metadata' => [],
+            'kernel.bundles_metadata' => $bundlesMetadata,
             'kernel.container_class' => 'TestContainer',
         ]));
 

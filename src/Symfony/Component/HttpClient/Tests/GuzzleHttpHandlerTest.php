@@ -501,18 +501,22 @@ class GuzzleHttpHandlerTest extends TestCase
         [$handler] = $this->makeHandler(
             static fn () => new MockResponse('body', ['http_code' => 200]),
         );
+        $statsError = null;
 
         $promise = $handler(new Request('GET', 'https://example.com/'), [
             'on_headers' => static function () { throw new \RuntimeException('Abort!'); },
+            'on_stats' => static function (\GuzzleHttp\TransferStats $stats) use (&$statsError) { $statsError = $stats->getHandlerErrorData(); },
         ]);
 
         try {
             $promise->wait();
             $this->fail('Expected RequestException');
         } catch (RequestException $e) {
-            $this->assertSame('Abort!', $e->getMessage());
+            $this->assertSame('An error was encountered during the on_headers event', $e->getMessage());
+            $this->assertSame('Abort!', $e->getPrevious()?->getMessage());
             $this->assertNotNull($e->getResponse());
             $this->assertSame(200, $e->getResponse()->getStatusCode());
+            $this->assertSame($e, $statsError);
         }
     }
 

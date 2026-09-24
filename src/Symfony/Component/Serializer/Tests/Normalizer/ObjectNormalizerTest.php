@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
@@ -1590,6 +1591,21 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertEquals($object, $serializer->denormalize($data, CamelCaseDiscriminatorDummy::class));
         $this->assertEquals($object, $serializer->denormalize($data, CamelCaseDiscriminatorDummy::class, null, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDiscriminatorTypePropertyFromItsPhpName()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $serializer = new Serializer([new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter(), null, null, $discriminator)]);
+
+        $object = new CamelCaseDiscriminatorDummyTypeA();
+        $object->someValue = 'foo';
+
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.2: Denormalizing the "objectType" property of class "Symfony\Component\Serializer\Tests\Normalizer\CamelCaseDiscriminatorDummyTypeA" from its PHP name is deprecated and the key will be ignored in 9.0, use the "object_type" key instead.');
+
         $this->assertEquals($object, $serializer->denormalize(['objectType' => 'type_a', 'some_value' => 'foo'], CamelCaseDiscriminatorDummy::class));
     }
 
@@ -1628,10 +1644,40 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testNameConverterDoesNotDeprecateRawKeysThatAreNotDenormalized()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+
+        $result = $normalizer->denormalize(['some_camel_case_property' => 1, 'otherCamelCaseProperty' => 2, 'ignoredCamelCaseProperty' => 3, 'unknownCamelCaseProperty' => 4], NameConverterRawKeyDummy::class, null, ['groups' => ['a']]);
+
+        $this->assertSame(1, $result->someCamelCaseProperty);
+        $this->assertSame(0, $result->otherCamelCaseProperty);
+        $this->assertSame(0, $result->ignoredCamelCaseProperty);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNameConverterWithRawKeyIsDeprecated()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.2: Denormalizing the "someCamelCaseProperty" property of class "Symfony\Component\Serializer\Tests\Normalizer\NameConverterRawKeyDummy" from its PHP name is deprecated and the key will be ignored in 9.0, use the "some_camel_case_property" key instead.');
+
+        $result = $normalizer->denormalize(['someCamelCaseProperty' => 1], NameConverterRawKeyDummy::class, null, ['groups' => ['a']]);
+
+        $this->assertSame(1, $result->someCamelCaseProperty);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testNameConverterWithWrongCaseAndAllowExtraAttributesTrue()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.2: Denormalizing the "someCamelCaseProperty" property of class "Symfony\Component\Serializer\Tests\Normalizer\NameConverterTestDummy" from its PHP name is deprecated and the key will be ignored in 9.0, use the "some_camel_case_property" key instead.');
 
         $result = $normalizer->denormalize(
             ['someCamelCaseProperty' => 999],
@@ -2473,6 +2519,18 @@ class NameConverterTestDummy
         public readonly int $someCamelCaseProperty = 0,
     ) {
     }
+}
+
+class NameConverterRawKeyDummy
+{
+    #[Groups(['a'])]
+    public int $someCamelCaseProperty = 0;
+
+    #[Groups(['b'])]
+    public int $otherCamelCaseProperty = 0;
+
+    #[Ignore]
+    public int $ignoredCamelCaseProperty = 0;
 }
 
 class NameConverterTestDummyMultiple

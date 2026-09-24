@@ -278,6 +278,19 @@ class AbstractObjectNormalizerTest extends TestCase
         ], SerializedNameDuplicateRawKeyDummy::class, 'any', [AbstractObjectNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDenormalizeUsingRawPropertyNameInsteadOfSerializedNameIsDeprecated()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.2: Denormalizing the "subproject" property of class "Symfony\Component\Serializer\Tests\Normalizer\SerializedNameDuplicateRawKeyDummy" from its PHP name is deprecated and the key will be ignored in 9.0, use the "subproject_id" key instead.');
+
+        $object = $normalizer->denormalize(['subproject' => 'from raw key'], SerializedNameDuplicateRawKeyDummy::class, 'any');
+
+        $this->assertSame('from raw key', $object->subproject);
+    }
+
     public function testDenormalizeWithNestedAttributesInConstructor()
     {
         $normalizer = new AbstractObjectNormalizerWithMetadata();

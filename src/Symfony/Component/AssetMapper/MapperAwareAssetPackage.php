@@ -48,12 +48,13 @@ final class MapperAwareAssetPackage implements PackageInterface
 
     public function getUrl(string $path): string
     {
-        $publicPath = $this->assetMapper->getPublicPath($path);
+        // the import map renders public paths, which the mapper already resolved
+        $isPublicPath = null !== $this->publicPrefix && str_starts_with('/'.$path, $this->publicPrefix);
+        $publicPath = $isPublicPath ? null : $this->assetMapper->getPublicPath($path);
 
         // the content hash is the version, so the configured strategy must not add a second one.
-        // The import map renders public paths, which the mapper does not resolve again, hence the prefix test.
         // The package must be picked before the block below prepends the front controller.
-        $package = $publicPath || (null !== $this->publicPrefix && str_starts_with('/'.$path, $this->publicPrefix))
+        $package = $publicPath || $isPublicPath
             ? $this->innerPackageWithoutVersion ?? $this->innerPackage
             : $this->innerPackage;
 

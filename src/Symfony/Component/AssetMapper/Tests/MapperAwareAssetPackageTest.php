@@ -197,6 +197,27 @@ class MapperAwareAssetPackageTest extends TestCase
         $this->assertSame('/legacy.css?v1', $assetMapperPackage->getUrl('legacy.css'));
     }
 
+    public function testGetUrlDoesNotAskTheMapperAboutPublicPaths()
+    {
+        $assetMapper = $this->createMock(AssetMapperInterface::class);
+        $assetMapper->expects($this->once())
+            ->method('getPublicPath')
+            ->with('images/foo.png')
+            ->willReturn('/assets/images/foo.123456.png');
+
+        $assetMapperPackage = new MapperAwareAssetPackage(
+            new PathPackage('/', new StaticVersionStrategy('v1')),
+            $assetMapper,
+            null,
+            null,
+            new PathPackage('/', new EmptyVersionStrategy()),
+            '/assets/',
+        );
+
+        $this->assertSame('/assets/app.123456.js', $assetMapperPackage->getUrl('assets/app.123456.js'));
+        $this->assertSame('/assets/images/foo.123456.png', $assetMapperPackage->getUrl('images/foo.png'));
+    }
+
     public function testGetUrlSkipsTheVersionWithACustomPublicPrefix()
     {
         $assetMapperPackage = new MapperAwareAssetPackage(
@@ -227,6 +248,7 @@ class MapperAwareAssetPackageTest extends TestCase
 
         // the front controller is still added, and the version is still skipped
         $this->assertSame('/index.php/assets/images/foo.123456.png', $assetMapperPackage->getUrl('images/foo.png'));
+        $this->assertSame('/index.php/assets/app.123456.js', $assetMapperPackage->getUrl('assets/app.123456.js'));
     }
 
     public static function getUrlTests(): iterable

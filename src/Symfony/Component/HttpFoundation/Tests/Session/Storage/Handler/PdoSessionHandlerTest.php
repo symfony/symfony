@@ -58,6 +58,22 @@ class PdoSessionHandlerTest extends TestCase
         new PdoSessionHandler($pdo);
     }
 
+    public function testCannotBeSerialized()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot serialize '.PdoSessionHandler::class);
+
+        serialize(new PdoSessionHandler('sqlite::memory:'));
+    }
+
+    public function testCannotBeUnserialized()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot unserialize '.PdoSessionHandler::class);
+
+        (new PdoSessionHandler('sqlite::memory:'))->__unserialize([]);
+    }
+
     public function testInexistentTable()
     {
         $this->expectException(\RuntimeException::class);

@@ -164,6 +164,14 @@ final class ServiceAccountTokenProvider implements TokenProviderInterface
         return $this->token;
     }
 
+    public function invalidateToken(#[\SensitiveParameter] string $token): void
+    {
+        if ($this->token === $token) {
+            $this->token = null;
+            $this->expiresAt = 0;
+        }
+    }
+
     private function buildAssertion(int $now): string
     {
         $header = Base64UrlSafe::encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT'], \JSON_THROW_ON_ERROR));

@@ -102,4 +102,12 @@ final class ClientCredentialsTokenProvider implements TokenProviderInterface
 
         return $this->token;
     }
+
+    public function invalidateToken(#[\SensitiveParameter] string $token): void
+    {
+        if ($this->token === $token) {
+            $this->token = null;
+            $this->expiresAt = 0;
+        }
+    }
 }

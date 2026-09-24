@@ -24,6 +24,7 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * KMS backend powered by Google Cloud KMS over its REST API.
@@ -50,6 +51,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * On the decrypt path, HTTP 400 and 404 are masked as
  * {@see DecryptionFailedException} so an unknown key id cannot be
  * distinguished from a tampered ciphertext.
+ * A 401 invalidates the token and is retried once with a new token.
+ * Other authentication failures are reported as {@see RuntimeException}.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -151,18 +154,34 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
      */
     private function request(string $method, string $path, array $body, string $keyId, bool $treatClientErrorAsDecryptionFailure = false): array
     {
-        try {
-            $response = $this->client->request($method, $path, [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$this->tokens->getToken(),
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => $body,
-            ]);
-            $status = $response->getStatusCode();
-        } catch (TransportExceptionInterface $e) {
-            throw new RuntimeException('Failed to reach Google Cloud KMS.', 0, $e);
+        $token = $this->getToken();
+        $response = $this->send($method, $path, $body, $token);
+
+        if (401 === $response->getStatusCode()) {
+            $this->tokens->invalidateToken($token);
+
+            try {
+                $newToken = $this->getToken();
+            } catch (\Throwable $e) {
+                $response->cancel();
+
+                throw $e;
+            }
+
+            if ($newToken === $token) {
+                // retrying with the same token cannot succeed, and it must not stay cached for the next call
+                $this->tokens->invalidateToken($newToken);
+            } else {
+                $response->cancel();
+                $response = $this->send($method, $path, $body, $newToken);
+
+                if (401 === $response->getStatusCode()) {
+                    $this->tokens->invalidateToken($newToken);
+                }
+            }
         }
+
+        $status = $response->getStatusCode();
 
         if ($treatClientErrorAsDecryptionFailure && (400 === $status || 404 === $status)) {
             throw new DecryptionFailedException();
@@ -191,6 +210,33 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
         } catch (TransportExceptionInterface $e) {
             throw new RuntimeException(\sprintf('Failed to read the Google Cloud KMS response (HTTP %d) for "%s".', $status, $response->getInfo('url')), 0, $e);
         }
+    }
+
+    private function getToken(): string
+    {
+        try {
+            return $this->tokens->getToken();
+        } catch (TransportExceptionInterface $e) {
+            throw new RuntimeException('Failed to reach Google Cloud KMS.', 0, $e);
+        }
+    }
+
+    private function send(string $method, string $path, array $body, #[\SensitiveParameter] string $token): ResponseInterface
+    {
+        try {
+            $response = $this->client->request($method, $path, [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$token,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $body,
+            ]);
+            $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new RuntimeException('Failed to reach Google Cloud KMS.', 0, $e);
+        }
+
+        return $response;
     }
 
     private static function isResourceName(string $keyId): bool

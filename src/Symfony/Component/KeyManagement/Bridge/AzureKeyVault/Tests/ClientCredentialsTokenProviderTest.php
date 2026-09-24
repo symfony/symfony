@@ -60,6 +60,30 @@ class ClientCredentialsTokenProviderTest extends TestCase
         $this->assertSame(1, $calls);
     }
 
+    public function testOnlyTheMatchingCachedTokenIsInvalidated()
+    {
+        $calls = 0;
+        $client = new MockHttpClient(static function () use (&$calls): MockResponse {
+            return new MockResponse(json_encode(['access_token' => 'T'.++$calls, 'expires_in' => 3600]));
+        });
+
+        $provider = new ClientCredentialsTokenProvider($client, 't', 'c', 's');
+        $provider->invalidateToken('missing');
+        $this->assertSame(0, $calls);
+
+        $this->assertSame('T1', $provider->getToken());
+        $provider->invalidateToken('older');
+        $this->assertSame('T1', $provider->getToken());
+        $this->assertSame(1, $calls);
+
+        $provider->invalidateToken('T1');
+        $this->assertSame(1, $calls);
+        $this->assertSame('T2', $provider->getToken());
+        $provider->invalidateToken('T1');
+        $this->assertSame('T2', $provider->getToken());
+        $this->assertSame(2, $calls);
+    }
+
     public function testHttpErrorSurfacesAsRuntimeException()
     {
         $client = new MockHttpClient(

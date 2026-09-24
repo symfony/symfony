@@ -280,7 +280,7 @@ class Ulid extends AbstractUid implements TimeOrderedUidInterface
             $fromBase58 = true;
         }
 
-        if (16 === \strlen($ulid) && $format & self::FORMAT_BINARY || $fromBase58 && $format & self::FORMAT_BASE_58) {
+        if (16 === \strlen($ulid) && ($format & self::FORMAT_BINARY || $fromBase58 && $format & self::FORMAT_BASE_58)) {
             $ulid = self::binaryToBase32($ulid);
         } elseif (36 === \strlen($ulid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $ulid) && $format & self::FORMAT_RFC_4122) {
             $ulid = self::binaryToBase32(hex2bin(str_replace('-', '', $ulid)));

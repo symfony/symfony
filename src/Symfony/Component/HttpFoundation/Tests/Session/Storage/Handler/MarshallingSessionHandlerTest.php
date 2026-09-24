@@ -35,6 +35,26 @@ class MarshallingSessionHandlerTest extends TestCase
         $this->handler = $this->createMock(AbstractSessionHandler::class);
     }
 
+    public function testCannotBeSerialized()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot serialize '.MarshallingSessionHandler::class);
+
+        $this->handler->expects($this->never())->method($this->anything());
+
+        serialize(new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class)));
+    }
+
+    public function testCannotBeUnserialized()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot unserialize '.MarshallingSessionHandler::class);
+
+        $this->handler->expects($this->never())->method($this->anything());
+
+        (new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class)))->__unserialize([]);
+    }
+
     public function testOpen()
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));

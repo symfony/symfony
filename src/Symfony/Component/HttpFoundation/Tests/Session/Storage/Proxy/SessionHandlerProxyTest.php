@@ -185,17 +185,28 @@ class SessionHandlerProxyTest extends TestCase
     }
 
     #[DataProvider('provideNativeSessionStorageHandler')]
-    public function testNativeSessionStorageSaveHandlerName($handler)
+    public function testNativeSessionStorageSaveHandlerName($handlerType)
     {
+        switch ($handlerType) {
+            case 'strict':
+                $handler = new StrictSessionHandler(new \SessionHandler());
+                break;
+            case 'proxy':
+                $handler = new SessionHandlerProxy(new StrictSessionHandler(new \SessionHandler()));
+                break;
+            default:
+                $handler = new \SessionHandler();
+        }
+
         $this->assertSame('files', (new NativeSessionStorage([], $handler))->getSaveHandler()->getSaveHandlerName());
     }
 
     public static function provideNativeSessionStorageHandler()
     {
         return [
-            [new \SessionHandler()],
-            [new StrictSessionHandler(new \SessionHandler())],
-            [new SessionHandlerProxy(new StrictSessionHandler(new \SessionHandler()))],
+            ['native'],
+            ['strict'],
+            ['proxy'],
         ];
     }
 }

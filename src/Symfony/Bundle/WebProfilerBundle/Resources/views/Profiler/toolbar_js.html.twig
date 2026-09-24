@@ -320,10 +320,18 @@
                             };
 
                             var idx = requestStack.push(stackElement) - 1;
+                            var finished = false;
+                            /* The "Clear" link empties the list, after which idx points to another request or to none */
+                            var finish = function () {
+                                finished = true;
+                                if (stackElement === requestStack[idx]) {
+                                    finishAjaxRequest(idx);
+                                }
+                            };
                             startAjaxRequest(idx);
                             addEventListener(es, 'error', function () {
                                 stackElement.error = true;
-                                finishAjaxRequest(idx);
+                                finish();
                             });
                             addEventListener(es, 'open', function () {
                                 stackElement.statusCode = 200;
@@ -338,20 +346,23 @@
                             addEventListener(es, 'symfony:debug:error', function (event) {
                                 stackElement.error = true;
                                 stackElement.statusCode = event.data;
-                                finishAjaxRequest(idx);
+                                finish();
                             });
                             addEventListener(es, 'symfony:debug:finished', function () {
                                 stackElement.duration = new Date() - stackElement.start;
                                 stackElement.toolbarReplaceFinished = false;
                                 stackElement.toolbarReplace = true;
-                                finishAjaxRequest(idx);
+                                finish();
                             });
-                            /* close() dispatches no event: wrap it to mark the request as finished */
+                            /* close() dispatches no event: wrap it to mark the request as finished, unless an event already did */
                             var originalClose = es.close.bind(es);
                             es.close = function () {
-                                stackElement.duration = new Date() - stackElement.start;
-                                finishAjaxRequest(idx);
                                 originalClose();
+
+                                if (!finished) {
+                                    stackElement.duration = new Date() - stackElement.start;
+                                    finish();
+                                }
                             };
                         }
 

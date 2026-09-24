@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -70,16 +71,26 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
                 continue;
             }
 
-            $this->setCalledListeners($dispatcher->getCalledListeners($this->currentRequest), $name);
-            $this->setNotCalledListeners($dispatcher->getNotCalledListeners($this->currentRequest), $name);
+            $this->setCalledListeners(self::removeStubs($dispatcher->getCalledListeners($this->currentRequest)), $name);
+            $this->setNotCalledListeners(self::removeStubs($dispatcher->getNotCalledListeners($this->currentRequest)), $name);
             $this->setOrphanedEvents($dispatcher->getOrphanedEvents($this->currentRequest), $name);
         }
-
-        $this->data = $this->cloneVar($this->data);
     }
 
     public function getData(): array|Data
     {
+        if (\is_array($this->data)) {
+            foreach ($this->data as $name => $dispatcherData) {
+                foreach (['called_listeners', 'not_called_listeners'] as $key) {
+                    foreach ($dispatcherData[$key] ?? [] as $i => $listener) {
+                        $this->data[$name][$key][$i]['stub'] ??= new ClassStub($listener['pretty'].'()', $listener['callable'] ?? null);
+                    }
+                }
+            }
+
+            $this->data = $this->cloneVar($this->data);
+        }
+
         return $this->data;
     }
 
@@ -96,7 +107,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      */
     public function getCalledListeners(?string $dispatcher = null): array|Data
     {
-        return $this->data[$dispatcher ?? $this->defaultDispatcher]['called_listeners'] ?? [];
+        return $this->getData()[$dispatcher ?? $this->defaultDispatcher]['called_listeners'] ?? [];
     }
 
     /**
@@ -112,7 +123,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      */
     public function getNotCalledListeners(?string $dispatcher = null): array|Data
     {
-        return $this->data[$dispatcher ?? $this->defaultDispatcher]['not_called_listeners'] ?? [];
+        return $this->getData()[$dispatcher ?? $this->defaultDispatcher]['not_called_listeners'] ?? [];
     }
 
     /**
@@ -130,11 +141,25 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      */
     public function getOrphanedEvents(?string $dispatcher = null): array|Data
     {
-        return $this->data[$dispatcher ?? $this->defaultDispatcher]['orphaned_events'] ?? [];
+        return $this->getData()[$dispatcher ?? $this->defaultDispatcher]['orphaned_events'] ?? [];
     }
 
     public function getName(): string
     {
         return 'events';
+    }
+
+    /**
+     * Stubs are built back from the callables when the data is read, so that collecting doesn't load the classes of the listeners.
+     */
+    private static function removeStubs(array $listeners): array
+    {
+        foreach ($listeners as $i => $listener) {
+            if (isset($listener['callable'])) {
+                unset($listeners[$i]['stub']);
+            }
+        }
+
+        return $listeners;
     }
 }

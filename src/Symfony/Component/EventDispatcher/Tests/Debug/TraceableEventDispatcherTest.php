@@ -114,14 +114,14 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertArrayHasKey('stub', $listeners[0]);
         unset($listeners[0]['stub']);
         $this->assertEquals([], $tdispatcher->getCalledListeners());
-        $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5]], $listeners);
+        $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5, 'callable' => null]], $listeners);
 
         $tdispatcher->dispatch(new Event(), 'foo');
 
         $listeners = $tdispatcher->getCalledListeners();
         $this->assertArrayHasKey('stub', $listeners[0]);
         unset($listeners[0]['stub']);
-        $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5]], $listeners);
+        $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5, 'callable' => null]], $listeners);
         $this->assertEquals([], $tdispatcher->getNotCalledListeners());
     }
 
@@ -149,7 +149,7 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertArrayHasKey('stub', $listeners[0]);
         unset($listeners[0]['stub']);
         $this->assertEquals([], $tdispatcher->getCalledListeners());
-        $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5]], $listeners);
+        $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5, 'callable' => null]], $listeners);
     }
 
     public function testDispatchAfterReset()

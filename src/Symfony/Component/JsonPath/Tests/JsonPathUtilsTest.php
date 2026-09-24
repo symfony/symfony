@@ -139,6 +139,7 @@ class JsonPathUtilsTest extends TestCase
             $resource
         );
 
+        rewind($resource);
         $fullJson = stream_get_contents($resource);
         fclose($resource);
 
@@ -146,6 +147,25 @@ class JsonPathUtilsTest extends TestCase
         $this->assertEquals([
             new JsonPathToken(TokenType::Name, 'unknown'),
         ], $reduced['tokens']);
+    }
+
+    public function testDoesNotReduceSinglePropertyOfLongStream()
+    {
+        // the property is found in the first chunk the stream is read by, but the document is longer
+        $json = json_encode(['a' => 1, 'b' => str_repeat('x', 10000)]);
+        $resource = fopen('php://memory', 'r+');
+        fwrite($resource, $json);
+        rewind($resource);
+
+        $reduced = JsonPathUtils::findSmallestDeserializableStringAndPath(
+            JsonPathTokenizer::tokenize(new JsonPath('$.a')),
+            $resource
+        );
+
+        fclose($resource);
+
+        $this->assertSame($json, $reduced['json']);
+        $this->assertEquals([new JsonPathToken(TokenType::Name, 'a')], $reduced['tokens']);
     }
 
     public function testDoesNotReduceOnUnknownIndex()

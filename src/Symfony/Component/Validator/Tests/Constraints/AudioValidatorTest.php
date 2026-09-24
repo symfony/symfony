@@ -54,6 +54,20 @@ class AudioValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValidAudioWithFilenameStartingWithHyphen()
+    {
+        $filename = basename(tempnam(getcwd(), '-audio-'));
+        copy(__DIR__.'/Fixtures/test.mp3', $filename);
+
+        try {
+            $this->validate($filename, new Audio(maxDuration: 5));
+
+            $this->assertNoViolation();
+        } finally {
+            unlink($filename);
+        }
+    }
+
     public function testFileNotFound()
     {
         $constraint = new Audio(notFoundMessage: 'myMessage');

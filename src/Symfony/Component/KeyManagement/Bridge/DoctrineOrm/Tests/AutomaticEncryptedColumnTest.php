@@ -35,7 +35,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\ConfigureEncryptedColumns;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\Automatic\AutomaticRecord;
@@ -137,7 +137,9 @@ class AutomaticEncryptedColumnTest extends TestCase
         $this->store->forget();
         $scope = 'orm:'.hash('sha256', serialize([$metadata->getSchemaName(), $metadata->getTableName(), $metadata->getColumnName('first')]));
         $name = 'automatic_test_retained_scope';
-        (new EncryptedTypes(new StoredEnvelopeEncrypter($this->store), [$name => ['type' => 'string', 'key' => $scope]]))->register($this->connection);
+        $registry = $this->registry();
+        $encrypted = new EncryptedType($registry->get('string'), new StoredEnvelopeEncrypter($this->store), $scope, 'string');
+        $registry->has($name) ? $registry->override($name, $encrypted) : $registry->register($name, $encrypted);
 
         $written = $this->connection->fetchOne('SELECT first_value FROM automatic_record');
 
@@ -445,7 +447,8 @@ class AutomaticEncryptedColumnTest extends TestCase
         $registry = $this->registry();
         $name = 'automatic_test_explicit_zero';
         $envelopes = new StoredEnvelopeEncrypter($this->store);
-        (new EncryptedTypes($envelopes, [$name => ['type' => 'string', 'key' => '0']]))->register($this->connection);
+        $encrypted = new EncryptedType($registry->get('string'), $envelopes, '0', 'string');
+        $registry->has($name) ? $registry->override($name, $encrypted) : $registry->register($name, $encrypted);
         $type = $registry->get($name);
         $listener = new EncryptedColumnListener(['0' => ['string' => $name]], $envelopes);
         $manager = $this->manager([ExplicitRecord::class], null, null, $listener);

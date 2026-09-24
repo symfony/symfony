@@ -18,7 +18,6 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -31,18 +30,9 @@ final class UlidTypeTest extends TestCase
 
     private UlidType $type;
 
-    public static function setUpBeforeClass(): void
-    {
-        if (Type::hasType('ulid')) {
-            Type::overrideType('ulid', UlidType::class);
-        } else {
-            Type::addType('ulid', UlidType::class);
-        }
-    }
-
     protected function setUp(): void
     {
-        $this->type = Type::getType('ulid');
+        $this->type = new UlidType();
     }
 
     public function testUlidConvertsToDatabaseValue()

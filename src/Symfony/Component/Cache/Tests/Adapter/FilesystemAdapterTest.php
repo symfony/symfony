@@ -29,6 +29,26 @@ class FilesystemAdapterTest extends AdapterTestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
+    public function testConstructorCreatesTheDirectory()
+    {
+        $directory = sys_get_temp_dir().'/symfony-cache/'.__FUNCTION__;
+        (new Filesystem())->remove($directory);
+
+        new FilesystemAdapter('ns', 0, $directory);
+
+        $this->assertDirectoryExists($directory.'/ns');
+    }
+
+    public function testSaveWhenTheDirectoryWasRemoved()
+    {
+        $directory = sys_get_temp_dir().'/symfony-cache/'.__FUNCTION__;
+        $cache = new FilesystemAdapter('ns', 0, $directory);
+        (new Filesystem())->remove($directory);
+
+        $this->assertTrue($cache->save($cache->getItem('foo')->set('bar')));
+        $this->assertSame('bar', (new FilesystemAdapter('ns', 0, $directory))->getItem('foo')->get());
+    }
+
     protected function isPruned(CacheItemPoolInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');

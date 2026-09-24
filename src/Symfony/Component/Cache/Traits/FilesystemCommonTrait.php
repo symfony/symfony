@@ -38,7 +38,8 @@ trait FilesystemCommonTrait
         } else {
             $directory .= \DIRECTORY_SEPARATOR.'@';
         }
-        if (!is_dir($directory)) {
+        // realpath() is served by the realpath cache while is_dir() hits the filesystem
+        if (!realpath($directory)) {
             @mkdir($directory, 0o777, true);
         }
         $directory .= \DIRECTORY_SEPARATOR;

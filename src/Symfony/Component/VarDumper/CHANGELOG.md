@@ -6,6 +6,7 @@ CHANGELOG
 
  * Render dump toggles as `<button>` elements with `aria-expanded`, so they can be reached and operated with the keyboard
  * Add a `Ctrl/Cmd+Shift+ArrowDown`/`ArrowUp` shortcut to expand or collapse all children of the focused toggle
+ * Add `$srcContext` to `TraceStub` and `FrameStub` to set the number of source lines dumped around each frame, `-1` for none
 
 8.1
 ---

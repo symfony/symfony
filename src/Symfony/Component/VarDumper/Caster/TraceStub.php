@@ -26,6 +26,7 @@ class TraceStub extends Stub
         public int $sliceOffset = 0,
         public ?int $sliceLength = null,
         public int $numberingOffset = 0,
+        public ?int $srcContext = null,
     ) {
         $this->value = $trace;
     }

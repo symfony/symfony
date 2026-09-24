@@ -22,6 +22,7 @@ class FrameStub extends EnumStub
         array $frame,
         public bool $keepArgs = true,
         public bool $inTraceStub = false,
+        public ?int $srcContext = null,
     ) {
         parent::__construct($frame);
     }

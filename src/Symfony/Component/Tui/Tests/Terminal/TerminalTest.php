@@ -130,6 +130,72 @@ class TerminalTest extends TestCase
         }
     }
 
+    public function testNativeWindowsKeyRecordsPreserveModifiersRepeatsAndRelease()
+    {
+        $terminal = new Terminal();
+        $method = new \ReflectionMethod($terminal, 'nativeKeySequences');
+
+        $event = [
+            'keyDown' => true,
+            'repeatCount' => 2,
+            'virtualKeyCode' => 0x25,
+            'unicodeCodeUnit' => 0,
+            'text' => null,
+            'ctrl' => true,
+            'alt' => false,
+            'shift' => false,
+        ];
+
+        $this->assertSame(
+            ["\x1b[1;5:1D", "\x1b[1;5:2D"],
+            $method->invoke($terminal, $event),
+        );
+
+        $event['keyDown'] = false;
+        $event['repeatCount'] = 1;
+
+        $this->assertSame(["\x1b[1;5:3D"], $method->invoke($terminal, $event));
+    }
+
+    public function testNativeWindowsCtrlCharacterUsesKittyEncoding()
+    {
+        $terminal = new Terminal();
+        $method = new \ReflectionMethod($terminal, 'nativeKeySequences');
+
+        $this->assertSame(
+            ["\x1b[97;5:1u"],
+            $method->invoke($terminal, [
+                'keyDown' => true,
+                'repeatCount' => 1,
+                'virtualKeyCode' => 0x41,
+                'unicodeCodeUnit' => 1,
+                'text' => "\x01",
+                'ctrl' => true,
+                'alt' => false,
+                'shift' => false,
+            ]),
+        );
+    }
+
+    public function testNativeWindowsSurrogatePairIsReassembled()
+    {
+        $terminal = new Terminal();
+        $method = new \ReflectionMethod($terminal, 'nativeKeySequences');
+
+        $base = [
+            'keyDown' => true,
+            'repeatCount' => 1,
+            'virtualKeyCode' => 0,
+            'text' => null,
+            'ctrl' => false,
+            'alt' => false,
+            'shift' => false,
+        ];
+
+        $this->assertSame([], $method->invoke($terminal, $base + ['unicodeCodeUnit' => 0xD83D]));
+        $this->assertSame(['😀'], $method->invoke($terminal, $base + ['unicodeCodeUnit' => 0xDE00]));
+    }
+
     private function readPty($stream): string
     {
         // Linux reports EIO when the last PTY slave closes.

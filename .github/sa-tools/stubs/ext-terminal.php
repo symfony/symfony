@@ -43,6 +43,10 @@ final class Terminal
     {
     }
 
+    public function readEvent(?float $timeout = null): array|false
+    {
+    }
+
     public function readSecret(string $prompt = ''): string
     {
     }

@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=8.4.1",
-        "doctrine/dbal": "^4.3",
+        "doctrine/dbal": "^4.5",
         "psr/container": "^1.1|^2.0",
         "symfony/key-management": "^8.2",
         "symfony/uid": "^7.4|^8.0"

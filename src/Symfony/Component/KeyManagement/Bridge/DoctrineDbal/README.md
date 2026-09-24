@@ -14,16 +14,19 @@ are not covered by Symfony's
 [Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
 
 ```php
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\TypeRegistry;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 
-$type = new EncryptedType(
-    Type::getTypeRegistry()->get('string'),
-    $envelopeEncrypter,
-    'alias/app-key',
-);
+$registry = new TypeRegistry([
+    'app_user_email' => new EncryptedType(
+        new StringType(),
+        $envelopeEncrypter,
+        'alias/app-key',
+    ),
+]);
 
-Type::getTypeRegistry()->register('app_user_email', $type);
+$configuration->setTypeProvider($registry);
 ```
 
 The registered name is then usable anywhere DBAL accepts a type, so plain
@@ -68,50 +71,72 @@ that is missing from the registry and every read of the column would fail with
 `UnknownColumnType`. Declare the types where the application declares the rest
 of its Doctrine configuration instead.
 
-`doctrine.dbal.types` is not that place, and cannot be: it names a class that
-DoctrineBundle instantiates with no argument, while an `EncryptedType` takes an
-encrypter, which is a service. `EncryptedTypes` is what an application declares
-instead, one service per encrypter:
+`doctrine.dbal.types` cannot be that place: it names a class that DoctrineBundle
+builds with no argument, while an `EncryptedType` needs an encrypter, which is a
+service. Use the `doctrine.dbal.type` tag instead: the container builds the
+tagged service and gives it to the connection with its dependencies injected.
+One service per type:
 
 ```yaml
 services:
-    app.encrypted_types:
-        class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes
-        public: true
+    app.encrypted_type.user_email:
+        class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType
         arguments:
+            $parentType: !service { class: Doctrine\DBAL\Types\StringType }
             $envelopes: '@key_management.stored_envelope_encrypter'
-            $types:
-                app_user_email: { type: string, key: 'user.email' }
-                app_user_notes: { type: text, key: 'user.notes' }
+            $key: 'user.email'
+        tags:
+            - { name: doctrine.dbal.type, type_name: app_user_email }
+
+    app.encrypted_type.user_notes:
+        class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType
+        arguments:
+            $parentType: !service { class: Doctrine\DBAL\Types\TextType }
+            $envelopes: '@key_management.stored_envelope_encrypter'
+            $key: 'user.notes'
+        tags:
+            - { name: doctrine.dbal.type, type_name: app_user_notes }
 ```
 
-and calls once the container is built, which means booting:
+The parent type is declared inline because DoctrineBundle registers no service
+for the built-in types, and it needs none: a `StringType` holds no
+configuration. `EncryptedType` is not a stateful service either.
 
-```php
-// src/Kernel.php
-public function boot(): void
-{
-    parent::boot();
+When the parent type must be the instance the connection resolves, because the
+application redefined that name, ask the type registry the connection carries
+for it instead of building one:
 
-    $this->container->get('app.encrypted_types')->register();
-}
+```yaml
+services:
+    app.encrypted_type.user_email:
+        class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType
+        arguments:
+            $parentType: !service
+                class: Doctrine\DBAL\Types\Type
+                factory: ['@doctrine.dbal.default_connection.type_registry', 'get']
+                arguments: ['string']
+            $envelopes: '@key_management.stored_envelope_encrypter'
+            $key: 'user.email'
+        tags:
+            - { name: doctrine.dbal.type, type_name: app_user_email }
 ```
-
-Booting is early enough for every entry point at once, the front controller,
-the console with its schema tool and its migrations, and the test kernel, and
-it costs nothing: a DBAL connection only reaches the database on its first
-query. Registering later is what does not work. A connection cannot do it
-either, however tempting `doctrine.dbal.connection_factory` looks: a store-backed
-encrypter needs a connection, so asking a connection for the types closes a
-circle the container refuses to compile.
 
 Which encrypter a type is given is what decides the regime of the column, so an
-entity holding both is two services, one per encrypter, each registering its own
-names. Swapping one for another environment is then one argument.
+entity holding both is two services, each naming its own encrypter. Swapping
+one for another environment is then one argument.
 
-Calling `register()` twice is safe and is what a rebooted kernel does: the type
-registry is global and outlives the container, so a name already taken is
-replaced rather than refused.
+Declaring a type that takes dependencies, as an `EncryptedType` does, needs
+doctrine/dbal 4.5 and, for an ORM application, doctrine/orm 3.7. With an older
+doctrine/dbal, the bundle can only register the class in the global registry,
+which instantiates its types with no argument, so such a type cannot be
+declared that way. Nothing has to run at boot with either wiring: the registry
+resolves a type on first use, and a DBAL connection only reaches the database
+on its first query.
+
+A connection cannot declare the types itself, however tempting
+`doctrine.dbal.connection_factory` looks: a store-backed encrypter needs a
+connection, so asking a connection for the types closes a circle the container
+refuses to compile.
 
 Keeping the data keys in a table
 --------------------------------
@@ -138,8 +163,8 @@ names a scope instead of a master key, since that is what the encrypter reads it
 as:
 
 ```php
-Type::getTypeRegistry()->register('app_user_email', new EncryptedType(
-    Type::getTypeRegistry()->get('string'),
+$registry->register('app_user_email', new EncryptedType(
+    new StringType(),
     $encrypter,
     'user.email',
 ));
@@ -339,8 +364,8 @@ Requirements
 ------------
 
   * PHP >= 8.4.1
-  * Doctrine DBAL >= 4.3, which lifted the `final` constructor on `Type` that
-    the encrypted type needs
+  * Doctrine DBAL >= 4.5, which carries the type provider on the connection
+    configuration
   * An `EnvelopeEncrypterInterface` configured by the application (typically
     via the `key_management` configuration of `KeyManagementBundle`)
 

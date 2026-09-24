@@ -20,6 +20,7 @@ use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Tools\DsnParser;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
@@ -81,8 +82,17 @@ class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
     {
         $this->removeAssets();
 
+        if (method_exists(Table::class, 'editor')) {
+            $table = Table::editor()
+                ->setUnquotedName('app_table')
+                ->addColumn(Column::editor()->setUnquotedName('id')->setTypeName(Types::INTEGER)->create())
+                ->create();
+        } else {
+            $table = new Table('app_table', [new Column('id', Type::getType('integer'))]);
+        }
+
         $schemaManager = $this->driverConnection->createSchemaManager();
-        $schemaManager->createTable(new Table('app_table', [new Column('id', Type::getType('integer'))]));
+        $schemaManager->createTable($table);
         $schemaManager->createSequence(new Sequence('app_table_id'));
     }
 

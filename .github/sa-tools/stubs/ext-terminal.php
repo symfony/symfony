@@ -13,9 +13,28 @@ namespace Io\Terminal;
 
 // These definitions describe the part of ext-terminal 1.x that Console and TUI call, so that static analysis checks those calls instead of skipping them.
 
+enum ColorDepth
+{
+    case None;
+    case Standard;
+    case Extended;
+    case TrueColor;
+
+    public function bits(): int
+    {
+    }
+}
+
 final class Terminal
 {
     public static function create(): self
+    {
+    }
+
+    /**
+     * @param resource $stream
+     */
+    public static function fromStream($stream): self
     {
     }
 
@@ -28,6 +47,14 @@ final class Terminal
     }
 
     public function isTty(): bool
+    {
+    }
+
+    public function supportsAnsi(): bool
+    {
+    }
+
+    public function getColorDepth(): ColorDepth
     {
     }
 

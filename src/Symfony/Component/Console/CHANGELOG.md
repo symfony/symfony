@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Use the `prateekbhujel/php-terminal` extension 1.x for terminal dimensions and hidden input when it is installed
+ * Use the `prateekbhujel/php-terminal` extension 1.x for terminal dimensions, ANSI/color capabilities and hidden input when it is installed
  * Add `LockableTrait::setLockFactory()`, autowired with the lock factory of the resource named `console` when the app declares one
  * Allow `#[AsCommand]` to list `InputOption`s to add after the ones the parameters of the command declare
  * Register a class-level `#[AsCommand]` without `__invoke()` as the command grouping its method-level ones

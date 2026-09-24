@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Output;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Terminal;
 
 /**
  * StreamOutput writes the output to a given stream.
@@ -96,6 +97,10 @@ class StreamOutput extends Output
 
         // Follow https://force-color.org/
         if ('' !== (($_SERVER['FORCE_COLOR'] ?? getenv('FORCE_COLOR'))[0] ?? '')) {
+            return true;
+        }
+
+        if (Terminal::hasExtTerminal() && \Io\Terminal\Terminal::fromStream($this->stream)->supportsAnsi()) {
             return true;
         }
 

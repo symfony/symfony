@@ -35,6 +35,21 @@ class Terminal
             return self::$colorMode;
         }
 
+        if (self::hasExtTerminal()) {
+            $colorMode = match (\Io\Terminal\Terminal::create()->getColorDepth()->bits()) {
+                24 => AnsiColorMode::Ansi24,
+                8 => AnsiColorMode::Ansi8,
+                4 => AnsiColorMode::Ansi4,
+                default => null,
+            };
+
+            if (null !== $colorMode) {
+                self::setColorMode($colorMode);
+
+                return $colorMode;
+            }
+        }
+
         // Try with $COLORTERM first
         if (\is_string($colorterm = getenv('COLORTERM'))) {
             $colorterm = strtolower($colorterm);

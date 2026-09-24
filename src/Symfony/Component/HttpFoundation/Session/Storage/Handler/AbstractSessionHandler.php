@@ -28,6 +28,16 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
     private ?string $newSessionId = null;
     private string $igbinaryEmptyData;
 
+    public function __serialize(): array
+    {
+        throw new \BadMethodCallException('Cannot serialize '.static::class);
+    }
+
+    public function __unserialize(array $data): void
+    {
+        throw new \BadMethodCallException('Cannot unserialize '.static::class);
+    }
+
     public function open(string $savePath, string $sessionName): bool
     {
         $this->sessionName = $sessionName;

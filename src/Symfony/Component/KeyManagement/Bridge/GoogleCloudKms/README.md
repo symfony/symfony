@@ -51,6 +51,11 @@ For Application Default Credentials, the GCE/GKE/Cloud Run metadata
 server, Workload Identity Federation, or any other flow, implement
 `TokenProviderInterface` against your platform.
 
+Custom token providers implement `invalidateToken($token)` to discard a cached
+token only when it matches the rejected value. If Cloud KMS responds with HTTP
+401, the bridge obtains a new token and retries the request once if that token
+differs. HTTP 403 is reported directly without invalidating the token.
+
 DSN scheme
 ----------
 

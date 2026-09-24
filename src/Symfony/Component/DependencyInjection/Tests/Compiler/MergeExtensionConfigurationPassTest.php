@@ -222,6 +222,20 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertSame([['enabled' => false], ['value' => 'from parameter']], $container->getParameter('target.configs'));
     }
 
+    public function testExtensionAliasesDoNotTrackOverriddenEnvs()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new AliasingExtension());
+        $container->registerExtension(new FooExtension());
+        $container->loadFromExtension('aliasing', ['foo' => ['bar' => '%env(BAR)%', 'baz' => '%env(BAZ)%']]);
+        $container->loadFromExtension('aliasing', ['foo' => ['bar' => '%env(FOO)%']]);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->assertSame(['BAZ', 'FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        $this->assertSame(['BAZ' => 1, 'FOO' => 0], $container->getEnvCounters());
+    }
+
     public function testExtensionAliasesReportTheSourceOfAnUnknownParameter()
     {
         $container = new ContainerBuilder();
@@ -518,6 +532,7 @@ final class AliasingConfiguration implements ConfigurationInterface
                 ->variableNode('shorthand')->attribute('alias_of', 'target')->beforeNormalization()->ifString()->then(static fn ($v) => ['value' => $v])->end()->end()
                 ->variableNode('legacy')->attribute('alias_of', 'target')->setDeprecated('symfony/test', '1.0', 'The "%path%" configuration is deprecated, use "target" instead.')->end()
                 ->variableNode('notifier')->attribute('alias_of', 'notifier')->end()
+                ->variableNode('foo')->attribute('alias_of', 'foo')->end()
             ->end();
 
         return $treeBuilder;

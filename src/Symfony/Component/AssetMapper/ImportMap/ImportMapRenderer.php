@@ -74,7 +74,7 @@ class ImportMapRenderer
 
             $preload = $data['preload'] ?? false;
             if ('json' === $data['type']) {
-                $importMap[$importName] = 'data:application/javascript,'.str_replace('%', '%25', \sprintf(self::LOADER_JSON, addslashes($path)));
+                $importMap[$importName] = 'data:application/javascript,'.strtr(\sprintf(self::LOADER_JSON, addslashes($path)), ['%' => '%25', "'" => '%27']);
                 if ($preload) {
                     $webLinks[$path] = 'fetch';
                 }
@@ -88,7 +88,7 @@ class ImportMapRenderer
                 // importmap entry is a noop
                 $importMap[$importName] = 'data:application/javascript,';
             } else {
-                $importMap[$importName] = 'data:application/javascript,'.str_replace('%', '%25', \sprintf(self::LOADER_CSS, addslashes($path)));
+                $importMap[$importName] = 'data:application/javascript,'.strtr(\sprintf(self::LOADER_CSS, addslashes($path)), ['%' => '%25', "'" => '%27']);
             }
         }
 

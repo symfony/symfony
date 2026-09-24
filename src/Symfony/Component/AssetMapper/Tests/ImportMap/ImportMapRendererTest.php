@@ -46,6 +46,10 @@ class ImportMapRendererTest extends TestCase
                     'path' => '/assets/styles/app-nopreload-d1g35t.css',
                     'type' => 'css',
                 ],
+                'app_json' => [
+                    'path' => '/assets/data-d1g35t.json',
+                    'type' => 'json',
+                ],
                 'remote_js' => [
                     'path' => 'https://cdn.example.com/assets/remote-d1g35t.js',
                     'type' => 'js',
@@ -92,8 +96,12 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString('"app_css_preload": "data:application/javascript,', $html);
         $this->assertStringContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-preload-d1g35t.css">', $html);
         // non-preloaded CSS file
-        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,document.head.appendChild(Object.assign(document.createElement(\'link\'),{rel:\'stylesheet\',href:\'/subdirectory/assets/styles/app-nopreload-d1g35t.css\'}))', $html);
+        $this->assertStringContainsString('"app_css_no_preload": "data:application/javascript,document.head.appendChild(Object.assign(document.createElement(%27link%27),{rel:%27stylesheet%27,href:%27/subdirectory/assets/styles/app-nopreload-d1g35t.css%27}))', $html);
         $this->assertStringNotContainsString('<link rel="stylesheet" href="/subdirectory/assets/styles/app-nopreload-d1g35t.css">', $html);
+        // json file
+        $this->assertStringContainsString('"app_json": "data:application/javascript,export default (async()=\\u003Eawait(await fetch(%27/subdirectory/assets/data-d1g35t.json%27)).json())()"', $html);
+        // no quote may appear inside data: URLs, es-module-shims inlines them into single-quoted strings
+        $this->assertDoesNotMatchRegularExpression('/"data:application\\/javascript,[^"]*\'/', $html);
         // remote js
         $this->assertStringContainsString('"remote_js": "https://cdn.example.com/assets/remote-d1g35t.js"', $html);
         // both the key and value are prefixed with the subdirectory

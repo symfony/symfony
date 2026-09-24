@@ -65,9 +65,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             }
         }
 
-        if ($configAvailable) {
-            $this->forwardExtensionAliases($container);
-        }
+        $forwardingBags = $configAvailable ? $this->forwardExtensionAliases($container) : [];
 
         foreach ($container->getExtensions() as $name => $extension) {
             if (!$config = $container->getExtensionConfig($name)) {
@@ -81,6 +79,9 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 if ($configAvailable) {
                     BaseNode::setPlaceholderUniquePrefix($resolvingBag->getEnvPlaceholderUniquePrefix());
                 }
+            }
+            if (isset($forwardingBags[$name]) && $resolvingBag instanceof EnvPlaceholderParameterBag) {
+                $resolvingBag->mergeEnvPlaceholders($forwardingBags[$name]);
             }
 
             try {
@@ -127,9 +128,13 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
     /**
      * Moves the values of the nodes declared with NodeDefinition::aliasOf() to the configuration of the extension with that alias.
+     *
+     * @return array<string, EnvPlaceholderParameterBag> The bags that resolved the forwarded values, indexed by the alias of their extension
      */
-    private function forwardExtensionAliases(ContainerBuilder $container): void
+    private function forwardExtensionAliases(ContainerBuilder $container): array
     {
+        $forwardingBags = [];
+
         foreach ($container->getExtensions() as $name => $extension) {
             if (!$configs = $container->getExtensionConfig($name)) {
                 continue;
@@ -192,10 +197,17 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                         trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
                     }
 
+                    $alias = $container->getExtension($alias)->getAlias();
+                    $resolvingBag = $container->getParameterBag();
+                    if ($resolvingBag instanceof EnvPlaceholderParameterBag) {
+                        // the env vars of the value are tracked by the aliased extension, which ignores the ones of overridden values
+                        $resolvingBag = $forwardingBags[$alias] ??= new MergeExtensionConfigurationParameterBag($resolvingBag);
+                    }
+
                     try {
                         // the value is merged into another extension's configuration, which is resolved
                         // before that extension is loaded, so resolve it before normalizing it here
-                        $value = $container->getParameterBag()->resolveValue($config[$configKey]);
+                        $value = $resolvingBag->resolveValue($config[$configKey]);
                     } catch (ParameterNotFoundException $e) {
                         $e->setSourceExtensionName($name);
 
@@ -208,7 +220,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                         throw new InvalidArgumentException(\sprintf('The "%s.%s" configuration must be an array or null, "%s" given.', $name, $key, get_debug_type($value)));
                     }
 
-                    $forwarded[$container->getExtension($alias)->getAlias()][] = $value;
+                    $forwarded[$alias][] = $value;
                     unset($config[$configKey]);
                 }
 
@@ -227,6 +239,8 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 }
             }
         }
+
+        return $forwardingBags;
     }
 }
 

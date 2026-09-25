@@ -96,6 +96,17 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
      */
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
+        // when other adapters follow, the first one is read with $beta = 0 below, so its hits need recomputing only once expired
+        if (\INF !== $beta && 1 < $this->adapterCount && ($item = $this->adapters[0]->getItem($key))->isHit()) {
+            $itemMetadata = $item->getMetadata();
+
+            if (($itemMetadata[CacheItem::METADATA_EXPIRY] ?? \INF) > microtime(true)) {
+                $metadata = $itemMetadata;
+
+                return $item->get();
+            }
+        }
+
         $doSave = true;
         $callback = static function (CacheItem $item, bool &$save) use ($callback, &$doSave) {
             $value = $callback($item, $save);

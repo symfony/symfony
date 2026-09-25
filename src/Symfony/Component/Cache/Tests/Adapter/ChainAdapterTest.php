@@ -304,6 +304,58 @@ class ChainAdapterTest extends AdapterTestCase
         });
     }
 
+    public function testGetReturnsHitOfFirstAdapterWithItsMetadata()
+    {
+        $first = new ExternalAdapter();
+        $wrapper = "\xA9";
+        $first->save($first->getItem('foo')->set(new $wrapper('cached', [
+            CacheItem::METADATA_EXPIRY => time() + 1000,
+            CacheItem::METADATA_CTIME => 50,
+            CacheItem::METADATA_TAGS => ['bar' => 'bar'],
+        ])));
+
+        $cache = new ChainAdapter([$first, new ArrayAdapter()]);
+        $expectedMetadata = $cache->getItem('foo')->getMetadata();
+
+        $this->assertSame('cached', $cache->get('foo', function () {
+            $this->fail('Callback should not be called when the first adapter has the item');
+        }, null, $metadata));
+        $this->assertSame($expectedMetadata, $metadata);
+        $this->assertSame(['bar' => 'bar'], $metadata[CacheItem::METADATA_TAGS]);
+        $this->assertArrayHasKey(CacheItem::METADATA_CTIME, $metadata);
+    }
+
+    public function testGetRecomputesExpiredHitOfFirstAdapter()
+    {
+        $first = new ExternalAdapter();
+        $wrapper = "\xA9";
+        $first->save($first->getItem('foo')->set(new $wrapper('stale', [
+            CacheItem::METADATA_EXPIRY => time() - 1000,
+            CacheItem::METADATA_CTIME => 50,
+        ])));
+
+        $cache = new ChainAdapter([$first, new ArrayAdapter()]);
+
+        $this->assertSame('fresh', $cache->get('foo', static fn () => 'fresh'));
+        $this->assertSame('fresh', $cache->get('foo', function () {
+            $this->fail('Callback should not be called once the item is recomputed');
+        }));
+    }
+
+    public function testGetElectsHitForEarlyExpirationWithSingleAdapter()
+    {
+        $first = new ExternalAdapter();
+        $wrapper = "\xA9";
+        $first->save($first->getItem('foo')->set(new $wrapper('stale', [
+            CacheItem::METADATA_EXPIRY => time() + 1000,
+            CacheItem::METADATA_CTIME => 50,
+        ])));
+
+        $cache = new ChainAdapter([$first]);
+
+        $this->assertSame('fresh', $cache->get('foo', static fn () => 'fresh', \PHP_FLOAT_MAX));
+    }
+
     private function getPruneableMock(): AdapterInterface
     {
         $pruneable = $this->createMock(PrunableAdapter::class);

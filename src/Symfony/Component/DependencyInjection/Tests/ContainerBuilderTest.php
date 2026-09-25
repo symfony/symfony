@@ -1136,6 +1136,37 @@ class ContainerBuilderTest extends TestCase
         unset($_ENV['ANOTHER_DUMMY_ENV_VAR']);
     }
 
+    public function testResolveEnvValuesWithEmptyValueBeforeAnotherPlaceholder()
+    {
+        $_ENV['EMPTY_DUMMY_ENV_VAR'] = '';
+        $_ENV['INT_DUMMY_ENV_VAR'] = '123';
+
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', '%env(EMPTY_DUMMY_ENV_VAR)%%env(int:INT_DUMMY_ENV_VAR)%');
+
+        $this->assertSame(123, $container->resolveEnvPlaceholders('%foo%', true));
+
+        unset($_ENV['EMPTY_DUMMY_ENV_VAR'], $_ENV['INT_DUMMY_ENV_VAR']);
+    }
+
+    public function testResolveEnvPlaceholdersInStringWithManyPlaceholders()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $foo = $bag->get('env(FOO)');
+        $bar = $bag->get('env(json:BAR)');
+        $baz = $bag->get('env(BAZ)');
+        $container = new ContainerBuilder($bag);
+
+        // the lowercased placeholder of FOO is replaced because FOO is used as is, the uppercased one of BAZ is not
+        $value = \sprintf('<a>%s</a><b>%s %1$s</b><c>%s</c><d>%s</d>', $foo, $bar, strtolower($foo), strtoupper($baz));
+
+        $usedEnvs = [];
+        $this->assertSame(\sprintf('<a>%%env(FOO)%%</a><b>%%env(json:BAR)%% %%env(FOO)%%</b><c>%%env(FOO)%%</c><d>%s</d>', strtoupper($baz)), $container->resolveEnvPlaceholders($value, null, $usedEnvs));
+        $this->assertSame(['FOO' => 'FOO', 'json:BAR' => 'json:BAR'], $usedEnvs);
+        $this->assertSame(\sprintf('<a>{FOO}</a><b>{json:BAR} {FOO}</b><c>{FOO}</c><d>%s</d>', strtoupper($baz)), $container->resolveEnvPlaceholders($value, '{%s}'));
+        $this->assertSame(['FOO' => 2, 'json:BAR' => 2, 'BAZ' => 0], $container->getEnvCounters());
+    }
+
     public function testCompileWithResolveEnv()
     {
         putenv('DUMMY_ENV_VAR=du%%y');

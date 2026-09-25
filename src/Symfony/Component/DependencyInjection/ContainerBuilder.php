@@ -1609,6 +1609,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $completed = false;
         preg_match_all('/env_[a-f0-9]{16}_\w+_[a-f0-9]{32}/Ui', $value, $matches);
         $usedPlaceholders = array_flip($matches[0]);
+        $replacements = [];
         foreach ($envPlaceholders as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
                 if (isset($usedPlaceholders[$placeholder])) {
@@ -1624,7 +1625,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                         if (!\is_string($resolved) && !is_numeric($resolved)) {
                             throw new RuntimeException(\sprintf('A string value must be composed of strings and/or numbers, but found parameter "env(%s)" of type "%s" inside string value "%s".', $env, get_debug_type($resolved), $this->resolveEnvPlaceholders($value)));
                         }
-                        $value = str_ireplace($placeholder, $resolved, $value);
+                        if (true === $format) {
+                            // an empty value can leave another placeholder alone in the string, which is then replaced by its raw value
+                            $value = str_ireplace($placeholder, $resolved, $value);
+                        } else {
+                            $replacements[strtolower($placeholder)] = $resolved;
+                        }
                     }
                     $usedEnvs[$env] = $env;
                     $this->envCounters[$env] = isset($this->envCounters[$env]) ? 1 + $this->envCounters[$env] : 1;
@@ -1634,6 +1640,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     }
                 }
             }
+        }
+
+        if ($replacements) {
+            $value = preg_replace_callback('/'.implode('|', array_keys($replacements)).'/i', static fn ($m) => $replacements[strtolower($m[0])], $value);
         }
 
         return $value;

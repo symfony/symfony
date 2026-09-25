@@ -36,6 +36,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
     private static int $startTime;
     private static array $valuesCache = [];
+    private static bool $checkOpcache;
 
     /**
      * @param bool $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.
@@ -56,6 +57,12 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         $this->includeHandler = static function ($type, $msg, $file, $line) {
             throw new \ErrorException($msg, 0, $type, $file, $line);
         };
+        // Including a missing file is slow: files that OPcache doesn't hold are checked for existence first.
+        // Not when OPcache checks files on each include anyway, nor when it can't tell which files it holds.
+        self::$checkOpcache ??= self::isSupported()
+            && !\ini_get('opcache.restrict_api')
+            && !filter_var(\ini_get('opcache.file_cache_only'), \FILTER_VALIDATE_BOOL)
+            && (!filter_var(\ini_get('opcache.validate_timestamps'), \FILTER_VALIDATE_BOOL) || \ini_get('opcache.revalidate_freq'));
     }
 
     public static function isSupported(): bool
@@ -142,6 +149,9 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
                         if (isset(self::$valuesCache[$file])) {
                             [$expiresAt, $this->values[$id]] = self::$valuesCache[$file];
+                        } elseif (self::$checkOpcache && !opcache_is_script_cached($file) && !is_file($file)) {
+                            unset($missingIds[$k]);
+                            continue;
                         } elseif (\is_array($expiresAt = include $file)) {
                             if ($this->appendOnly) {
                                 self::$valuesCache[$file] = $expiresAt;
@@ -181,6 +191,8 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
             if (isset(self::$valuesCache[$file])) {
                 [$expiresAt, $value] = self::$valuesCache[$file];
+            } elseif (self::$checkOpcache && !opcache_is_script_cached($file) && !is_file($file)) {
+                return false;
             } elseif (\is_array($expiresAt = include $file)) {
                 if ($this->appendOnly) {
                     self::$valuesCache[$file] = $expiresAt;

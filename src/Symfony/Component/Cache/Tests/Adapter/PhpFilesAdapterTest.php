@@ -33,6 +33,26 @@ class PhpFilesAdapterTest extends AdapterTestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
+    public function testHitWhenOpcacheDoesNotHoldTheFile()
+    {
+        if (!PhpFilesAdapter::isSupported()) {
+            $this->markTestSkipped('OPcache is not enabled.');
+        }
+
+        $pool = $this->createCachePool();
+        $file = (new \ReflectionMethod($pool, 'getFile'))->invoke($pool, 'foo');
+
+        $pool->save($pool->getItem('foo')->set('bar'));
+        opcache_invalidate($file, true);
+        $this->assertFalse(opcache_is_script_cached($file));
+        $this->assertTrue($this->createCachePool()->hasItem('foo'));
+
+        $pool->save($pool->getItem('foo')->set('baz'));
+        opcache_invalidate($file, true);
+        $this->assertFalse(opcache_is_script_cached($file));
+        $this->assertSame('baz', $this->createCachePool()->getItem('foo')->get());
+    }
+
     protected function isPruned(CacheItemPoolInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');

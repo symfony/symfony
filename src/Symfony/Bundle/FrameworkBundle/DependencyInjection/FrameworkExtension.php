@@ -212,6 +212,11 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
+        if ($config['response']['serializer'] && $container->hasDefinition('serialize_controller_result_listener')) {
+            $container->getDefinition('serialize_controller_result_listener')
+                ->replaceArgument(0, new Reference($config['response']['serializer']));
+        }
+
         $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override'], $config['allowed_http_method_override']);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
@@ -603,6 +608,10 @@ class FrameworkExtension extends Extension
 
             $listener = $container->getDefinition('request.add_request_formats_listener');
             $listener->replaceArgument(0, $config['formats']);
+        }
+
+        if ($config['serializer']) {
+            $container->getDefinition('argument_resolver.request_payload')->replaceArgument(0, new Reference($config['serializer']));
         }
     }
 

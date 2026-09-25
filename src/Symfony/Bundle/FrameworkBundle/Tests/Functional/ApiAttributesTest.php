@@ -982,6 +982,25 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 415,
         ];
     }
+
+    #[RequiresMethod(ControllerAttributesListener::class, 'beforeController')]
+    #[DataProvider('configuredSerializersProvider')]
+    public function testMapRequestPayloadAndSerializeUseTheConfiguredSerializers(string $rootConfig, string $payload)
+    {
+        $client = self::createClient(['test_case' => 'ApiAttributesTest', 'root_config' => $rootConfig]);
+
+        $client->request('POST', '/map-request-payload-and-serialize-controller-result', server: ['CONTENT_TYPE' => 'application/json'], content: $payload);
+
+        $response = $client->getResponse();
+        self::assertSame(200, $response->getStatusCode());
+        self::assertJsonStringEqualsJsonString($payload, $response->getContent());
+    }
+
+    public static function configuredSerializersProvider(): iterable
+    {
+        yield 'default serializer' => ['config.yml', '{"id": 101, "name": "Laptop", "createdAt": "2021-12-31T12:34:56+00:00"}'];
+        yield 'named serializer' => ['named_serializer.yml', '{"id": 101, "name": "Laptop", "created_at": "2021-12-31T12:34:56+00:00"}'];
+    }
 }
 
 class WithMapQueryStringToNullableAttributeController
@@ -1085,6 +1104,15 @@ class WithSerializeAttributeController
     public function __invoke(): Product
     {
         return new Product(101, 'Laptop', new \DateTimeImmutable('2021-12-31T12:34:56+00:00'));
+    }
+}
+
+class WithMapRequestPayloadAndSerializeAttributesController
+{
+    #[Serialize]
+    public function __invoke(#[MapRequestPayload] Product $product): Product
+    {
+        return $product;
     }
 }
 

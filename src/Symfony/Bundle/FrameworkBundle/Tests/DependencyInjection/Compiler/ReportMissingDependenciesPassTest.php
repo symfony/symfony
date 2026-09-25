@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\SerializerBundle;
@@ -85,6 +86,18 @@ class ReportMissingDependenciesPassTest extends TestCase
         $this->assertStringContainsString('You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]"', $resolver->getErrors()[0]);
     }
 
+    public function testAResolverPointedAtAnotherSerializerIsLeftToTheContainer()
+    {
+        $container = $this->createContainer();
+        $resolver = $container->getDefinition('argument_resolver.request_payload')->replaceArgument(0, new Reference('app.serializer'));
+
+        new ReportMissingDependenciesPass()->process($container);
+
+        $this->assertFalse($resolver->hasTag('container.error'));
+        $this->assertTrue($resolver->hasTag('kernel.event_subscriber'));
+        $this->assertEquals([new Reference('app.serializer')], $resolver->getArguments());
+    }
+
     public function testTheContainerDropsTheUnwirableServicesBeforeAnythingCollectsThem()
     {
         // the bundles register their passes at the default priority, and SerializerBundle builds
@@ -112,7 +125,7 @@ class ReportMissingDependenciesPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('webhook.transport');
-        $container->register('argument_resolver.request_payload')->addTag('kernel.event_subscriber');
+        $container->register('argument_resolver.request_payload')->addArgument(new Reference('serializer'))->addTag('kernel.event_subscriber');
 
         return $container;
     }

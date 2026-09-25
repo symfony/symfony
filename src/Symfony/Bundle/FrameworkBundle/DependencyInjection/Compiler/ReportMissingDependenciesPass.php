@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Serializer\Serializer;
 
@@ -33,11 +34,22 @@ class ReportMissingDependenciesPass implements CompilerPassInterface
                 .(class_exists(ScopingHttpClient::class) ? 'enabled. Try setting "http_client.enabled" to true.' : 'installed. Try running "composer require symfony/http-client".'));
         }
 
-        if (!$container->has('serializer')) {
+        if ('serializer' === $this->serializerOf($container, 'argument_resolver.request_payload') && !$container->has('serializer')) {
             $this->reportMissing($container, 'argument_resolver.request_payload', 'You can neither use "#[MapRequestPayload]" nor "#[MapQueryString]" since the Serializer component is not '
                 .(class_exists(Serializer::class) ? 'enabled. Try setting "serializer.enabled" to true.' : 'installed. Try running "composer require symfony/serializer-pack".'))
                 ?->clearTag('kernel.event_subscriber');
         }
+    }
+
+    private function serializerOf(ContainerBuilder $container, string $id): ?string
+    {
+        if (!$container->hasDefinition($id)) {
+            return null;
+        }
+
+        $serializer = $container->getDefinition($id)->getArgument(0);
+
+        return $serializer instanceof Reference ? (string) $serializer : null;
     }
 
     private function reportMissing(ContainerBuilder $container, string $id, string $message): ?Definition

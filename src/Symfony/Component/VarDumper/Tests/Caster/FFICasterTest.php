@@ -233,7 +233,8 @@ class FFICasterTest extends TestCase
         $actualMessage = 'Hello World!';
         $actualLength = \strlen($actualMessage);
 
-        $string = \FFI::cdef()->new('char['.($actualLength + 1).']');
+        // the last byte is zeroed by FFI::new(), so that reading past the "\x01" doesn't depend on what follows the buffer in memory
+        $string = \FFI::cdef()->new('char['.($actualLength + 2).']');
         $pointer = \FFI::addr($string[0]);
         \FFI::memcpy($pointer, $actualMessage, $actualLength);
 
@@ -242,7 +243,7 @@ class FFICasterTest extends TestCase
 
         $this->assertDumpMatchesFormat(<<<PHP
             FFI\CData<char*> size 8 align 8 {
-              cdata: %A"$actualMessage%s"
+              cdata: "$actualMessage\\x01\\x00"
             }
             PHP,
             $pointer

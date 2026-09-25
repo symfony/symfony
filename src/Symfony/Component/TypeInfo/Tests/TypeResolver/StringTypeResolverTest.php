@@ -103,6 +103,9 @@ class StringTypeResolverTest extends TestCase
         yield [Type::arrayShape(['foo' => Type::bool()], extraKeyType: Type::int(), extraValueType: Type::string()), 'array{foo: bool, ...<int, string>}'];
         yield [Type::arrayShape(['foo' => Type::bool()], extraValueType: Type::int()), 'array{foo: bool, ...<int>}'];
         yield [Type::arrayShape(['foo' => Type::union(Type::bool(), Type::float(), Type::int(), Type::null(), Type::string()), 'bar' => Type::string()]), 'array{foo: scalar|null, bar: string}'];
+        yield [Type::arrayShape(['foo' => Type::int(), 'bar baz' => Type::string()]), "array{'foo': int, \"bar baz\": string}"];
+        yield [Type::arrayShape([0 => Type::int()]), "array{'0': int}"];
+        yield [Type::arrayShape([Type::int(), Type::string()]), 'array{int, string}'];
 
         // object shape
         yield [Type::object(), 'object{foo: true, bar: false}'];

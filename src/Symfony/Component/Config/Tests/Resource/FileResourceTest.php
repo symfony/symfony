@@ -65,6 +65,29 @@ class FileResourceTest extends TestCase
         $this->assertFalse($this->resource->isFresh($this->time - 86400), '->isFresh() returns false if the resource has been updated');
     }
 
+    public function testIsFreshWhenModifiedInSameSecondAfterBeingLoaded()
+    {
+        touch($this->file, $this->time - 10);
+        $resource = new FileResource($this->file);
+        touch($this->file, $time = $this->time + 20);
+
+        $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if the resource has been updated in the same second');
+        $this->assertTrue($resource->isFresh($time + 1), '->isFresh() returns true if the resource has not changed since the previous second');
+    }
+
+    public function testIsFreshComparesContentWhenModifiedInSameSecondAsLoaded()
+    {
+        touch($this->file, $time = $this->time + 20);
+        $resource = unserialize(serialize(new FileResource($this->file)));
+
+        $this->assertTrue($resource->isFresh($time), '->isFresh() returns true if the content has not changed since the resource was loaded');
+
+        file_put_contents($this->file, 'changed');
+        touch($this->file, $time);
+
+        $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if the content has changed in the same second');
+    }
+
     public function testIsFreshForDeletedResources()
     {
         unlink($this->file);

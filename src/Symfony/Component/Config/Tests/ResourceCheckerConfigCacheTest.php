@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Config\Tests\Fixtures\ResourceFailingOnUnserialize;
@@ -119,6 +120,38 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $cache->write('', [new ResourceStub()]);
 
         $this->assertFalse($cache->isFresh());
+    }
+
+    public function testIsNotFreshWhenResourceIsModifiedInSameSecondAfterBeingLoaded()
+    {
+        $resourceFile = tempnam(sys_get_temp_dir(), 'config_');
+        touch($resourceFile, time() - 10);
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [new SelfCheckingResourceChecker()]);
+        $cache->write('', [new FileResource($resourceFile)]);
+
+        try {
+            touch($resourceFile, $time = filemtime($this->cacheFile));
+            $this->assertFalse($cache->isFresh());
+
+            touch($this->cacheFile, $time + 1);
+            $this->assertTrue($cache->isFresh());
+        } finally {
+            unlink($resourceFile);
+        }
+    }
+
+    public function testIsFreshWhenResourceIsWrittenInSameSecondBeforeBeingLoaded()
+    {
+        $resourceFile = tempnam(sys_get_temp_dir(), 'config_');
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [new SelfCheckingResourceChecker()]);
+        $cache->write('', [new FileResource($resourceFile)]);
+
+        try {
+            touch($this->cacheFile, filemtime($resourceFile));
+            $this->assertTrue($cache->isFresh());
+        } finally {
+            unlink($resourceFile);
+        }
     }
 
     public function testCacheIsNotFreshWhenUnserializeFails()

@@ -40,6 +40,8 @@ class CrossCheckTest extends TestCase
         $tmp = tempnam(sys_get_temp_dir(), 'sf');
 
         copy(self::$fixturesPath.'/yaml/'.$fixture, $tmp);
+        // with an old mtime, FileResource doesn't record the content of $tmp, which differs between both loads
+        touch($tmp, time() - 10);
 
         $container1 = new ContainerBuilder();
         $loader1 = new YamlFileLoader($container1, new FileLocator());
@@ -47,6 +49,7 @@ class CrossCheckTest extends TestCase
 
         $dumper = new YamlDumper($container1);
         file_put_contents($tmp, $dumper->dump());
+        touch($tmp, time() - 10);
 
         $container2 = new ContainerBuilder();
         $loader2 = new YamlFileLoader($container2, new FileLocator());

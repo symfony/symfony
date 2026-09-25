@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-09-24T18:05:25Z
+
+> `VideoValidator` was introduced in 7.4 and `AudioValidator` in 8.2; should I split the commit to target different base branches?
+
+You can submit a distinct PR for `VideoValidator` on 7.4

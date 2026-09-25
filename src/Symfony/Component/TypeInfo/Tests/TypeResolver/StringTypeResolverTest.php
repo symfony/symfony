@@ -298,6 +298,12 @@ class StringTypeResolverTest extends TestCase
         $this->resolver->resolve('unknown');
     }
 
+    public function testCannotResolveUnknownConstant()
+    {
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve(DummyWithConstants::class.'::UNKNOWN');
+    }
+
     public function testCannotResolveKeyOfInvalidType()
     {
         $this->expectException(UnsupportedException::class);

@@ -175,6 +175,10 @@ final class StringTypeResolver implements TypeResolverInterface
                     }
                 }
 
+                if (!$types) {
+                    throw new \DomainException(\sprintf('No "%s" constant found in "%s".', $node->constExpr->name, $className));
+                }
+
                 return CollectionType::mergeCollectionValueTypes($types);
             }
 

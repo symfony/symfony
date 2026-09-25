@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
@@ -24,6 +25,7 @@ class CompiledAssetMapperConfigReader
     public function __construct(
         private readonly string $directory,
         private readonly bool $debug = false,
+        private readonly ?CacheItemPoolInterface $cache = null,
     ) {
         $this->filesystem = new Filesystem();
     }
@@ -42,7 +44,20 @@ class CompiledAssetMapperConfigReader
 
     public function loadConfig(string $filename): array
     {
-        return json_decode($this->filesystem->readFile(Path::join($this->directory, $filename)), true, 512, \JSON_THROW_ON_ERROR);
+        $path = Path::join($this->directory, $filename);
+
+        // modification times are in seconds: a file written during the current second could be written again without changing its key
+        if (!$this->cache || false === ($mtime = @filemtime($path)) || $mtime >= time()) {
+            return $this->decode($path);
+        }
+
+        $item = $this->cache->getItem(hash('xxh128', $path).'.'.filesize($path).'.'.$mtime);
+
+        if (!$item->isHit()) {
+            $this->cache->save($item->set($this->decode($path)));
+        }
+
+        return $item->get();
     }
 
     public function saveConfig(string $filename, array $data): string
@@ -60,5 +75,10 @@ class CompiledAssetMapperConfigReader
         if (is_file($path)) {
             $this->filesystem->remove($path);
         }
+    }
+
+    private function decode(string $path): array
+    {
+        return json_decode($this->filesystem->readFile($path), true, 512, \JSON_THROW_ON_ERROR);
     }
 }

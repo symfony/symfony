@@ -63,6 +63,22 @@ class AssetMapperBundleTest extends TestCase
         $this->assertInstanceOf(ArrayAdapter::class, $container->get('test.cache'));
     }
 
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testTheCompiledFilesAreCachedOnlyWhenDebugIsOff(bool $debug)
+    {
+        $manifest = $this->varDir.'/public/assets/manifest.json';
+        new Filesystem()->dumpFile($manifest, '{"app.js": "/assets/app-abc123.js"}');
+        touch($manifest, time() - 10);
+
+        $kernel = new TestAssetMapperKernel('test', $debug, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $this->assertSame($debug ? null : '/assets/app-abc123.js', $container->get('test.asset_mapper')->getPublicPath('app.js'));
+        $this->assertCount($debug ? 0 : 1, $container->get('test.cache')->getValues());
+    }
+
     public function testTheImportMapCannotBeUsedWithoutHttpClient()
     {
         $kernel = new TestAssetMapperKernel('test', true, $this->varDir, withHttpClient: false);
@@ -295,10 +311,14 @@ class TestAssetMapperKernel extends AbstractKernel
             ->set('assets._default_package', Package::class)
                 ->args([new Reference('assets.empty_version_strategy')])
             ->alias('test.asset_package', 'assets._default_package')->public()
+            ->alias('test.asset_mapper', 'asset_mapper')->public()
             ->alias('test.cache', 'cache.asset_mapper')->public()
-            ->alias('test.dev_server_subscriber', 'asset_mapper.dev_server_subscriber')->public()
             ->alias('test.importmap_manager', 'asset_mapper.importmap.manager')->public()
         ;
+
+        if ($this->debug) {
+            $services->alias('test.dev_server_subscriber', 'asset_mapper.dev_server_subscriber')->public();
+        }
 
         if ($this->withHttpClient) {
             $services->set('http_client', MockHttpClient::class);

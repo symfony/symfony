@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-09-25T12:09:20Z
+
+In the past, we treated such changes as new features rather than bug fixes. So it should likely target 8.2
+
+---------------------------------------------------------------------------
+
+by SulimanAbdulrazzaq at 2026-09-25T13:02:01Z
+
+Thanks. I retargeted the PR to 8.2 as a new feature and added a line to the 8.2 section of the Yaml CHANGELOG:
+
+```
+ * Add support for parsing a block scalar, optionally tagged, as the root node of a document
+```
+
+The trailing-content check now lives in a small private method, `parseRootBlockScalar()`, which also removes the two new PHPStan errors. The PHPStan diff reports no new errors against 8.2.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-25T15:38:23Z
+
+Thanks @SulimanAbdulrazzaq! I added support for an empty block scalar at the root, matching PyYAML, and removed the five yaml-test-suite cases this makes pass from the skip list.

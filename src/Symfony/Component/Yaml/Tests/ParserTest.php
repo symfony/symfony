@@ -170,6 +170,59 @@ class ParserTest extends TestCase
         $this->assertSameData(['foo' => [new TaggedValue('text', "a\nb")]], $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
+    #[DataProvider('getBlockScalarsAsRootNode')]
+    public function testBlockScalarAsRootNode(string $yaml, mixed $expected)
+    {
+        $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
+    }
+
+    public static function getBlockScalarsAsRootNode(): iterable
+    {
+        yield 'literal' => ["|\n  first line\n  second line\n", "first line\nsecond line\n"];
+        yield 'folded' => [">\n  folded\n  text\n", "folded text\n"];
+        yield 'tagged' => ["!text |\n  first line\n  second line\n", new TaggedValue('text', "first line\nsecond line\n")];
+        yield 'tagged with strip chomping' => ["!text |-\n  first line\n  second line\n", new TaggedValue('text', "first line\nsecond line")];
+        yield 'tagged with keep chomping' => ["!text |+\n  first line\n\n", new TaggedValue('text', "first line\n\n")];
+        yield 'tagged with indentation indicator' => ["!text |2\n    indented\n  line\n", new TaggedValue('text', "  indented\nline\n")];
+        yield 'binary' => ["!!binary |\n  SGVsbG8=\n", 'Hello'];
+        yield 'surrounded by comments' => ["# comment\n!text | # comment\n  first line\n# comment\n", new TaggedValue('text', "first line\n")];
+        yield 'indented comment-like content' => ["|\n  # not a comment\n", "# not a comment\n"];
+        yield 'empty literal' => ["|\n", ''];
+        yield 'empty literal at the end of the document' => ['|', ''];
+        yield 'empty literal followed by blank lines' => ["|\n\n  \n", ''];
+        yield 'empty literal with strip chomping' => ["|-\n\n", ''];
+        yield 'empty literal with keep chomping' => ["|+\n\n  \n", "\n\n"];
+        yield 'empty folded' => [">\n\n", ''];
+        yield 'empty folded with strip chomping' => [">-\n", ''];
+        yield 'empty folded with keep chomping' => [">+\n\n", "\n"];
+        yield 'empty tagged' => ["!text |\n", new TaggedValue('text', '')];
+        yield 'empty tagged with keep chomping' => ["!text >+\n\n", new TaggedValue('text', "\n")];
+        yield 'empty followed by comments' => ["# comment\n|+ # comment\n\n# comment\n\n", "\n"];
+    }
+
+    public function testBlockScalarAsRootNodeFollowedByContent()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unable to parse at line 3 (near "foo: bar").');
+
+        $this->parser->parse("!text |\n  first line\nfoo: bar\n", Yaml::PARSE_CUSTOM_TAGS);
+    }
+
+    public function testEmptyBlockScalarAsRootNodeFollowedByContent()
+    {
+        $this->expectException(ParseException::class);
+
+        $this->parser->parse("|\n# comment\nfoo: bar\n");
+    }
+
+    public function testInvalidBinaryBlockScalarAsRootNode()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('length must be a multiple of four (2 bytes given) at line 2');
+
+        $this->parser->parse("# comment\n!!binary |\n  QQ\n");
+    }
+
     #[DataProvider('getDataFormSpecifications')]
     public function testSpecifications($expected, $yaml, $comment)
     {

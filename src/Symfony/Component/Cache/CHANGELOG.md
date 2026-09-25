@@ -12,6 +12,7 @@ CHANGELOG
  * Support the `mongodb:` and `mongodb+srv:` DSN in `AbstractAdapter::createConnection()`
  * Implement `PruneableInterface` on `RedisTagAwareAdapter` to garbage-collect its tag Sets
  * Add `PdoTagAwareAdapter`
+ * Make `AbstractAdapter::createSystemCache()` skip APCu when OPcache is enabled and the cache directory is writable
 
 8.0
 ---

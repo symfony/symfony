@@ -320,7 +320,8 @@ class TranslationBundle extends AbstractBundle
             $nonExistingDirs[] = $defaultDir;
         }
 
-        return [$dirs, $transPaths, $nonExistingDirs];
+        // a directory can be listed more than once, e.g. by a component that ships a bundle, like the Validator
+        return [array_values(array_unique($dirs)), array_values(array_unique($transPaths)), array_values(array_unique($nonExistingDirs))];
     }
 
     private function buildResourceOptions(array $dirs, array $nonExistingDirs, ContainerBuilder $container): array

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Resource\ComposerResource;
@@ -23,6 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\IdentityTranslator;
@@ -157,6 +160,67 @@ class TranslationBundleTest extends TestCase
         }
     }
 
+    #[DataProvider('provideTranslationEdits')]
+    public function testEditingATranslationFileRefreshesTheCatalogueWithoutRebuildingTheContainer(bool $renameOver)
+    {
+        $projectDir = $this->createProjectDir();
+
+        try {
+            $cache = $this->dumpContainerResources($projectDir);
+            $this->assertSame('Hello', $this->translate($projectDir, 'hello'));
+
+            $file = $projectDir.'/translations/messages.en.yaml';
+            file_put_contents($renameOver ? $file.'~' : $file, "hello: Hello again\n");
+            if ($renameOver) {
+                rename($file.'~', $file);
+            }
+            // the catalogue was dumped in the same second
+            touch($file, time() + 10);
+
+            $this->assertTrue($cache->isFresh());
+            $this->assertSame('Hello again', $this->translate($projectDir, 'hello'));
+        } finally {
+            new Filesystem()->remove($projectDir);
+        }
+    }
+
+    public static function provideTranslationEdits(): iterable
+    {
+        yield 'in place' => [false];
+        // editors often save by renaming a temporary file over the edited one
+        yield 'renamed over' => [true];
+    }
+
+    #[DataProvider('provideTranslationFileListChanges')]
+    public function testAddingRemovingOrRenamingATranslationFileRebuildsTheContainer(string $change)
+    {
+        $projectDir = $this->createProjectDir();
+
+        try {
+            $cache = $this->dumpContainerResources($projectDir);
+            $dir = $projectDir.'/translations';
+
+            match ($change) {
+                'add' => file_put_contents($dir.'/messages.fr.yaml', "hello: Bonjour\n"),
+                'add in a subdirectory' => file_put_contents($dir.'/admin/messages.fr.yaml', "title: Administration\n"),
+                'remove from a subdirectory' => unlink($dir.'/admin/messages.en.yaml'),
+                'rename' => rename($dir.'/messages.en.yaml', $dir.'/messages.en_GB.yaml'),
+            };
+
+            $this->assertFalse($cache->isFresh());
+        } finally {
+            new Filesystem()->remove($projectDir);
+        }
+    }
+
+    public static function provideTranslationFileListChanges(): iterable
+    {
+        yield ['add'];
+        yield ['add in a subdirectory'];
+        yield ['remove from a subdirectory'];
+        yield ['rename'];
+    }
+
     public function testAnUnknownPathIsRejected()
     {
         $this->expectException(\UnexpectedValueException::class);
@@ -264,6 +328,40 @@ class TranslationBundleTest extends TestCase
         }
 
         return [];
+    }
+
+    private function createProjectDir(): string
+    {
+        $projectDir = sys_get_temp_dir().'/sf_translation_'.uniqid();
+        mkdir($projectDir.'/translations/admin', 0o777, true);
+        file_put_contents($projectDir.'/translations/messages.en.yaml', "hello: Hello\n");
+        file_put_contents($projectDir.'/translations/admin/messages.en.yaml', "title: Administration\n");
+
+        // the project was not touched in the second before the container is built
+        foreach (['/translations/admin/messages.en.yaml', '/translations/messages.en.yaml', '/translations/admin', '/translations'] as $path) {
+            touch($projectDir.$path, time() - 10);
+        }
+
+        return $projectDir;
+    }
+
+    private function dumpContainerResources(string $projectDir): ConfigCache
+    {
+        $container = $this->load(['default_path' => '%kernel.project_dir%/translations'], projectDir: $projectDir);
+
+        $cache = new ConfigCache($projectDir.'/var/container.php', true);
+        $cache->write('<?php return null;', $container->getResources());
+
+        return $cache;
+    }
+
+    private function translate(string $projectDir, string $id): string
+    {
+        $container = $this->load(['cache_dir' => $projectDir.'/var/translations', 'default_path' => '%kernel.project_dir%/translations'], merge: false, projectDir: $projectDir);
+        $container->register('config_cache_factory', ConfigCacheFactory::class)->setArguments([true]);
+        $container->compile();
+
+        return $container->get('translator')->trans($id);
     }
 
     /**

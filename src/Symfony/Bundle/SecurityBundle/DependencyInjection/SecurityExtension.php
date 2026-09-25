@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
+use Jose\Component\Core\Algorithm;
 use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
@@ -111,6 +112,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $loader->load('security_listeners.php');
         $loader->load('security_authenticator.php');
         $loader->load('security_authenticator_access_token.php');
+
+        if (!$container::willBeAvailable('web-token/jwt-library', Algorithm::class, ['symfony/security-bundle'])) {
+            foreach (['signature', 'encryption'] as $type) {
+                foreach ($container->findTaggedServiceIds('security.access_token_handler.oidc.'.$type.'_algorithm') as $id => $tags) {
+                    $container->removeDefinition($id);
+                }
+            }
+        }
 
         if ($container::willBeAvailable('symfony/twig-bridge', LogoutUrlExtension::class, ['symfony/security-bundle'])) {
             $loader->load('templating_twig.php');

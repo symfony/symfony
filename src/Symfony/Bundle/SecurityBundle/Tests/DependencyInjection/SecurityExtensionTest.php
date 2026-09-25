@@ -1710,6 +1710,33 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame(TestAuthenticator::class, (string) $authenticatorMap[TestAuthenticator::class]->getValues()[0], 'When programmatically authenticating a user, original authenticators must be used.');
     }
 
+    #[DataProvider('provideServicesOnlyNeededToAuthenticate')]
+    public function testServicesOnlyNeededToAuthenticateAreLazy(array $authenticator, string $serviceId)
+    {
+        $container = $this->getRawContainer();
+        $container->register('cache.app', \stdClass::class);
+        $container->register('app.token_provider', \stdClass::class);
+        $container->register('app.success_handler', \stdClass::class);
+        $container->register('app.failure_handler', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['memory' => null]],
+            'firewalls' => ['main' => $authenticator],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition($serviceId)->isLazy());
+    }
+
+    public static function provideServicesOnlyNeededToAuthenticate(): iterable
+    {
+        yield 'remember-me handler' => [['remember_me' => ['secret' => 'key']], 'security.authenticator.remember_me_handler.main'];
+        yield 'persistent remember-me handler' => [['remember_me' => ['secret' => 'key', 'token_provider' => 'app.token_provider']], 'security.authenticator.remember_me_handler.main'];
+        yield 'login link handler' => [['login_link' => ['check_route' => 'login_check', 'signature_properties' => ['id']]], 'security.authenticator.login_link_handler.main'];
+        yield 'custom success handler' => [['form_login' => ['success_handler' => 'app.success_handler']], 'security.authentication.success_handler.main.form_login'];
+        yield 'custom failure handler' => [['form_login' => ['failure_handler' => 'app.failure_handler']], 'security.authentication.failure_handler.main.form_login'];
+    }
+
     public function testOidcLoginAcceptsEnvironmentVariables()
     {
         // "provider_uri" carries a validator, so declaring it ->cannotBeEmpty() would make

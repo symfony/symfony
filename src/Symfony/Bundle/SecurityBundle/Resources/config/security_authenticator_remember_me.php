@@ -38,6 +38,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authenticator.signature_remember_me_handler', SignatureRememberMeHandler::class)
             ->abstract()
+            ->lazy()
             ->args([
                 abstract_arg('signature hasher'),
                 abstract_arg('user provider'),
@@ -49,6 +50,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authenticator.persistent_remember_me_handler', PersistentRememberMeHandler::class)
             ->abstract()
+            ->lazy()
             ->args([
                 abstract_arg('token provider'),
                 abstract_arg('user provider'),

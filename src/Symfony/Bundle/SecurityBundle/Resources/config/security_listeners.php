@@ -96,6 +96,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authentication.custom_success_handler', CustomAuthenticationSuccessHandler::class)
             ->abstract()
+            ->lazy()
             ->args([
                 abstract_arg('The custom success handler service'),
                 [], // Options
@@ -112,6 +113,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authentication.custom_failure_handler', CustomAuthenticationFailureHandler::class)
             ->abstract()
+            ->lazy()
             ->args([
                 abstract_arg('The custom failure handler service'),
                 [], // Options

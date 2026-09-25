@@ -47,6 +47,18 @@ class RememberMeTest extends AbstractWebTestCase
         $this->assertNull($client->getCookieJar()->get('REMEMBERME'));
     }
 
+    #[DataProvider('provideConfigs')]
+    public function testAnonymousRequestLeavesTheDependenciesOfAuthenticatorsAndVotersUninitialized(array $options)
+    {
+        $client = $this->createClient(array_merge_recursive(['root_config' => 'config.yml', 'test_case' => 'RememberMe'], $options));
+        $client->request('GET', '/profile');
+        $this->assertRedirect($client->getResponse(), '/login');
+
+        $container = self::getContainer();
+        $this->assertUninitializedLazyObject($container->get('security.authenticator.remember_me.default'), 'rememberMeHandler');
+        $this->assertUninitializedLazyObject($container->get('security.access.expression_voter'), 'expressionLanguage');
+    }
+
     public function testUserChangeClearsCookie()
     {
         $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'clear_on_change_config.yml']);
@@ -145,5 +157,12 @@ class RememberMeTest extends AbstractWebTestCase
         }
 
         return false;
+    }
+
+    private function assertUninitializedLazyObject(object $service, string $property): void
+    {
+        $dependency = (new \ReflectionProperty($service, $property))->getValue($service);
+
+        $this->assertTrue((new \ReflectionClass($dependency))->isUninitializedLazyObject($dependency), \sprintf('The "%s" property of "%s" is not an uninitialized lazy object.', $property, get_debug_type($service)));
     }
 }

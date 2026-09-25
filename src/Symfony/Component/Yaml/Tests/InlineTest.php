@@ -836,6 +836,22 @@ class InlineTest extends TestCase
         Inline::parse('{this, is not, supported}');
     }
 
+    public function testUnterminatedSequenceEndingWithTag()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "[!foo"');
+
+        Inline::parse('[!foo', Yaml::PARSE_CUSTOM_TAGS);
+    }
+
+    public function testUnterminatedMappingEndingWithTag()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "{foo: !bar"');
+
+        Inline::parse('{foo: !bar', Yaml::PARSE_CUSTOM_TAGS);
+    }
+
     public function testVeryLongQuotedStrings()
     {
         $longStringWithQuotes = str_repeat("x\r\n\\\"x\"x", 1000);
@@ -892,6 +908,14 @@ class InlineTest extends TestCase
             'null' => ['{null: "foo"}', ['null' => 'foo']],
             'float' => ['{0.25: "foo"}', ['0.25' => 'foo']],
         ];
+    }
+
+    public function testBuiltInTagWithoutValueAsMappingKey()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Implicit casting of incompatible mapping keys to strings is not supported. Quote your evaluable mapping keys instead');
+
+        Inline::parse('{!!str : foo}');
     }
 
     public function testTagWithoutValueInSequence()

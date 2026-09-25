@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-25T15:35:09Z
+
+Thanks @thomas-chauchefoin-tob! The cache key has been built this way since 6.4, so I retargeted there, and I moved the test to the Serializer component: HttpKernel's low-deps job runs with a Serializer that doesn't have the fix.

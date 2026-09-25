@@ -154,14 +154,15 @@ class AzureKeyVaultFactoryTest extends TestCase
 
             return str_contains($url, '/oauth2/')
                 ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
-                : new MockResponse(json_encode(['kid' => 'https://my-vault.vault.azure.net/keys/app/v1', 'value' => 'CipherFromAzure']));
+                : new MockResponse(json_encode(['kid' => 'https://my-vault.vault.azure.net:8443/keys/app/v1', 'value' => 'CipherFromAzure']));
         });
 
-        $kms = (new AzureKeyVaultFactory($client))->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t'));
-        $kms->encrypt('app', 'hello');
+        $kms = (new AzureKeyVaultFactory($client))->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net:8443?tenant=t'));
+        $ciphertext = $kms->encrypt('app', 'hello');
 
+        $this->assertSame('app/v1', $ciphertext->keyId);
         $this->assertCount(2, $urls);
         $this->assertStringStartsWith('https://login.microsoftonline.com/t/oauth2/', $urls[0]);
-        $this->assertStringStartsWith('https://my-vault.vault.azure.net/keys/app/encrypt', $urls[1]);
+        $this->assertStringStartsWith('https://my-vault.vault.azure.net:8443/keys/app/encrypt', $urls[1]);
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -439,6 +440,46 @@ class HttpKernelTest extends TestCase
         $kernel->terminateWithException(new \Exception('boo'), $request = Request::create('/'));
         $this->assertSame($request, $capturedRequest);
         $this->assertNull($requestStack->getCurrentRequest());
+    }
+
+    #[RunInSeparateProcess]
+    #[DataProvider('provideHeadersSent')]
+    public function testTerminateWithExceptionSendsHeadersUnlessAlreadySent(bool $headersSent)
+    {
+        require __DIR__.'/Fixtures/headers_sent.php';
+        $GLOBALS['headers_sent'] = $headersSent;
+
+        $response = new class('boo', 500) extends Response {
+            public bool $sendHeadersCalled = false;
+
+            public function sendHeaders(?int $statusCode = null): static
+            {
+                $this->sendHeadersCalled = true;
+
+                return $this;
+            }
+        };
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, static function (ExceptionEvent $event) use ($response) {
+            $event->setResponse($response);
+        });
+        $dispatcher->addListener(KernelEvents::TERMINATE, static function () use (&$terminated) {
+            $terminated = true;
+        });
+
+        ob_start();
+        $this->getHttpKernel($dispatcher)->terminateWithException(new \Exception('boo'), Request::create('/'));
+
+        $this->assertSame('boo', ob_get_clean());
+        $this->assertSame(!$headersSent, $response->sendHeadersCalled);
+        $this->assertTrue($terminated);
+    }
+
+    public static function provideHeadersSent(): iterable
+    {
+        yield 'headers not sent yet' => [false];
+        yield 'headers already sent' => [true];
     }
 
     public function testVerifyRequestStackPushPopDuringHandle()

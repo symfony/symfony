@@ -30,6 +30,8 @@ final class Terminal implements TerminalInterface
     private ?StdinBuffer $stdinBuffer = null;
 
     private string $initialSttyState = '';
+    private ?\Io\Terminal\Terminal $nativeTerminal = null;
+    private ?\Io\Terminal\ModeToken $nativeMode = null;
     private bool $kittyProtocolActive = false;
     private bool $started = false;
     private ?string $stdinCallbackId = null;
@@ -69,16 +71,18 @@ final class Terminal implements TerminalInterface
         $this->onKittyProtocolActivated = $onKittyProtocolActivated(...);
         $this->started = true;
 
-        // Save initial terminal state and enable raw mode
-        if ($this->hasSttyAvailable()) {
+        // Save initial terminal state and enable raw mode.
+        //
+        // Raw mode is equivalent to cfmakeraw(), matching Node.js setRawMode(true) used by the
+        // Pi reference implementation. It disables canonical mode, echo, signal interpretation,
+        // and extended input processing so that ALL key combinations (including Ctrl+C, Ctrl+Z,
+        // Alt+Backspace) are delivered as raw bytes to the application rather than being
+        // intercepted by the kernel.
+        if (null !== ($native = self::createNativeTerminal()) && false !== $mode = $native->enableRawMode()) {
+            $this->nativeTerminal = $native;
+            $this->nativeMode = $mode;
+        } elseif ($this->hasSttyAvailable()) {
             $this->initialSttyState = (string) shell_exec('stty -g');
-
-            // Enable raw mode, equivalent to cfmakeraw(), matching Node.js
-            // setRawMode(true) used by the Pi reference implementation.
-            // This disables canonical mode, echo, signal interpretation, and
-            // extended input processing so that ALL key combinations (including
-            // Ctrl+C, Ctrl+Z, Alt+Backspace) are delivered as raw bytes to the
-            // application rather than being intercepted by the kernel.
             shell_exec('stty raw -echo');
         }
 
@@ -157,7 +161,11 @@ final class Terminal implements TerminalInterface
         }
 
         // Restore terminal state
-        if ('' !== $this->initialSttyState) {
+        if (null !== $this->nativeTerminal) {
+            $this->nativeTerminal->restoreMode($this->nativeMode);
+            $this->nativeTerminal = null;
+            $this->nativeMode = null;
+        } elseif ('' !== $this->initialSttyState) {
             shell_exec('stty '.escapeshellarg(trim($this->initialSttyState)));
         }
 
@@ -240,10 +248,22 @@ final class Terminal implements TerminalInterface
     }
 
     /**
-     * Refresh terminal dimensions from stty.
+     * Refresh terminal dimensions.
+     *
+     * This runs on every SIGWINCH, so the native call matters: it replaces a fork and an exec
+     * of stty with an ioctl on each resize event.
      */
     private function refreshDimensions(): void
     {
+        $native = $this->nativeTerminal ?? self::createNativeTerminal();
+
+        if (null !== $native && false !== $size = $native->getSize()) {
+            $this->cachedColumns = $size->cols;
+            $this->cachedRows = $size->rows;
+
+            return;
+        }
+
         // Query terminal size directly using stty
         // shell_exec is required here because stty must operate on the
         // process's own tty; proc_open gives the child a pipe, not the tty.
@@ -299,6 +319,21 @@ final class Terminal implements TerminalInterface
                 ($this->onInput)("\x1b[200~".$content."\x1b[201~");
             }
         });
+    }
+
+    /**
+     * Returns a native terminal when ext-terminal is loaded in a version this component knows how to call.
+     *
+     * The extension promises its public signatures only within 1.x, so a future major is treated
+     * like a missing extension instead of being called blindly.
+     */
+    private static function createNativeTerminal(): ?\Io\Terminal\Terminal
+    {
+        if (\extension_loaded('terminal') && version_compare(phpversion('terminal'), '1.0.0', '>=') && version_compare(phpversion('terminal'), '2.0.0', '<') && class_exists(\Io\Terminal\Terminal::class, false)) {
+            return \Io\Terminal\Terminal::create();
+        }
+
+        return null;
     }
 
     /**

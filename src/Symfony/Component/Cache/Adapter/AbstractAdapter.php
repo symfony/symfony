@@ -36,6 +36,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Name
     protected const NS_SEPARATOR = ':';
 
     private static bool $apcuSupported;
+    private static array $writableDirectories = [];
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
@@ -98,7 +99,8 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Name
     /**
      * Returns the best possible adapter that your runtime supports.
      *
-     * Using ApcuAdapter makes system caches compatible with read-only filesystems.
+     * PhpFilesAdapter is used alone when OPcache is enabled and the directory is writable.
+     * Otherwise, ApcuAdapter is put in front of it when available, which makes system caches compatible with read-only filesystems.
      */
     public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, ?LoggerInterface $logger = null): AdapterInterface
     {
@@ -112,6 +114,10 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Name
         }
 
         if ('cli' === \PHP_SAPI && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOL)) {
+            return $opcache;
+        }
+
+        if (PhpFilesAdapter::isSupported() && (self::$writableDirectories[$directory] ??= is_writable($directory))) {
             return $opcache;
         }
 

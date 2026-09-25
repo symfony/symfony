@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 class LoggerDataCollectorTest extends TestCase
 {
@@ -216,6 +217,36 @@ class LoggerDataCollectorTest extends TestCase
             0,
             2,
         ];
+    }
+
+    #[DataProvider('provideDeprecations')]
+    public function testDeprecationTracesHaveNoSourceExcerpts(\ErrorException|SilencedErrorContext $deprecation)
+    {
+        $logger = $this->createStub(DebugLoggerInterface::class);
+        $logger->method('getLogs')->willReturn([
+            ['message' => 'deprecated', 'context' => ['exception' => $deprecation], 'priority' => 100, 'priorityName' => 'DEBUG'],
+            ['message' => 'warning', 'context' => ['exception' => new \ErrorException('warning', 0, \E_USER_WARNING, __FILE__, __LINE__)], 'priority' => 300, 'priorityName' => 'WARNING'],
+        ]);
+
+        $c = new LoggerDataCollector($logger);
+        $c->lateCollect();
+
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $traces = [];
+        foreach ($c->getLogs()->getValue() as $log) {
+            $traces[$log['message']] = $dumper->dump($log['context']['exception']['trace'], true);
+        }
+
+        $this->assertStringMatchesFormat("{\n  %sLoggerDataCollectorTest.php:%d\n%A}\n", $traces['deprecated']);
+        $this->assertStringNotContainsString('›', $traces['deprecated']);
+        $this->assertStringContainsString('›', $traces['warning']);
+    }
+
+    public static function provideDeprecations(): iterable
+    {
+        yield 'ErrorException' => [new \ErrorException('deprecated', 0, \E_USER_DEPRECATED, __FILE__, __LINE__)];
+        yield 'SilencedErrorContext' => [new SilencedErrorContext(\E_USER_DEPRECATED, __FILE__, __LINE__, [['file' => __FILE__, 'line' => __LINE__, 'function' => 'provideDeprecations', 'class' => self::class, 'type' => '::']])];
     }
 
     public function testWarningCount()

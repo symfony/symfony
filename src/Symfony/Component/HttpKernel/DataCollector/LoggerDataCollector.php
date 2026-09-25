@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\TraceStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
@@ -169,6 +171,23 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     public function getName(): string
     {
         return 'logger';
+    }
+
+    protected function getCasters(): array
+    {
+        // File and line are enough to locate a deprecation, source excerpts would be costly to extract and to store
+        $skipDeprecationSrc = static function (\ErrorException|SilencedErrorContext $e, array $a): array {
+            if (\in_array($e->getSeverity(), [\E_DEPRECATED, \E_USER_DEPRECATED], true) && ($a[Caster::PREFIX_VIRTUAL.'trace'] ?? null) instanceof TraceStub) {
+                $a[Caster::PREFIX_VIRTUAL.'trace']->srcContext = -1;
+            }
+
+            return $a;
+        };
+
+        return parent::getCasters() + [
+            \ErrorException::class => $skipDeprecationSrc,
+            SilencedErrorContext::class => $skipDeprecationSrc,
+        ];
     }
 
     private function getContainerDeprecationLogs(): array

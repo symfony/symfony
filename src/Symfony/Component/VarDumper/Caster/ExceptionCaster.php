@@ -147,7 +147,8 @@ class ExceptionCaster
                     'function' => $f['function'] ?? null,
                 ] + $frames[$i - 1],
                 false,
-                true
+                true,
+                $trace->srcContext,
             );
             $f = self::castFrameStub($frame, [], $frame, true);
             if (isset($f[$prefix.'src'])) {
@@ -194,11 +195,12 @@ class ExceptionCaster
         }
         $f = $frame->value;
         $prefix = Caster::PREFIX_VIRTUAL;
+        $srcContext = $frame->srcContext ?? self::$srcContext;
 
         if (isset($f['file'], $f['line'])) {
             $cacheKey = $f;
             unset($cacheKey['object'], $cacheKey['args']);
-            $cacheKey[] = self::$srcContext;
+            $cacheKey[] = $srcContext;
             $cacheKey = implode('-', $cacheKey);
 
             if (isset(self::$framesCache[$cacheKey])) {
@@ -215,7 +217,10 @@ class ExceptionCaster
                 $ellipsisTail = $ellipsis->attr['ellipsis-tail'] ?? 0;
                 $ellipsis = $ellipsis->attr['ellipsis'] ?? 0;
 
-                if (is_file($f['file']) && 0 <= self::$srcContext) {
+                if (!is_file($f['file'])) {
+                    $srcAttr .= '&separator=:';
+                } else {
+                    $templatePath = null;
                     if (!empty($f['class']) && is_subclass_of($f['class'], 'Twig\Template')) {
                         $template = null;
                         if (isset($f['object'])) {
@@ -231,23 +236,28 @@ class ExceptionCaster
                                 if (!method_exists($template, 'getSourceContext') || !is_file($templatePath = $template->getSourceContext()->getPath())) {
                                     $templatePath = null;
                                 }
-                                if ($templateSrc) {
-                                    $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, 'twig', $templatePath, $f);
+                                if (0 > $srcContext) {
+                                    $src = $templateInfo[$f['line']];
+                                    $srcKey = $templatePath ?: $template->getTemplateName();
+                                } elseif ($templateSrc) {
+                                    $src = self::extractSource($templateSrc, $templateInfo[$f['line']], $srcContext, 'twig', $templatePath, $f);
                                     $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
                                 }
                             }
                         }
                     }
-                    if ($srcKey == $f['file']) {
-                        $src = self::extractSource(file_get_contents($f['file']), $f['line'], self::$srcContext, 'php', $f['file'], $f);
+                    if ($srcKey == $f['file'] && 0 <= $srcContext) {
+                        $src = self::extractSource(file_get_contents($f['file']), $f['line'], $srcContext, 'php', $f['file'], $f);
                         $srcKey .= ':'.$f['line'];
                         if ($ellipsis) {
                             $ellipsis += 1 + \strlen($f['line']);
                         }
                     }
-                    $srcAttr .= \sprintf('&separator= &file=%s&line=%d', rawurlencode($f['file']), $f['line']);
-                } else {
-                    $srcAttr .= '&separator=:';
+                    if (0 > $srcContext) {
+                        $srcAttr .= \sprintf('&separator=:&file=%s&line=%d', rawurlencode($templatePath ?? $f['file']), $templatePath ? $src : $f['line']);
+                    } else {
+                        $srcAttr .= \sprintf('&separator= &file=%s&line=%d', rawurlencode($f['file']), $f['line']);
+                    }
                 }
                 $srcAttr .= $ellipsis ? '&ellipsis-type=path&ellipsis='.$ellipsis.'&ellipsis-tail='.$ellipsisTail : '';
                 self::$framesCache[$cacheKey] = $a[$prefix.'src'] = new EnumStub(["\0~$srcAttr\0$srcKey" => $src]);

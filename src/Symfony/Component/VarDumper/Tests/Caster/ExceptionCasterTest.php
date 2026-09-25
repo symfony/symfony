@@ -214,6 +214,46 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
+    public function testTraceStubSrcContext()
+    {
+        $e = $this->getTestException(1);
+        $nestingWrapper = new \stdClass();
+        $nestingWrapper->src = new TraceStub($e->getTrace());
+        $nestingWrapper->noSrc = new TraceStub($e->getTrace());
+        $nestingWrapper->noSrc->srcContext = -1;
+
+        $expectedDump = <<<'EODUMP'
+            {
+              +"src": {
+                %sExceptionCasterTest.php:%d {
+                  Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->testTraceStubSrcContext()
+                  › %A
+              }
+              +"noSrc": {
+                %sExceptionCasterTest.php:%d
+                %s:%d
+            %A
+            EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $nestingWrapper);
+    }
+
+    public function testHtmlDumpLinksFramesWithoutSrcContext()
+    {
+        $line = __LINE__ + 1;
+        $e = $this->getTestException(1);
+        ExceptionCaster::$srcContext = -1;
+
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('');
+        $dumper->setDumpBoundaries('', '');
+        $dumper->setDisplayOptions(['fileLinkFormat' => 'file://%f#L%l']);
+        $dump = $dumper->dump((new VarCloner())->cloneVar($e)->withRefHandles(false), true);
+
+        $this->assertStringContainsString('<a href="file://'.__FILE__.'#L'.$line.'" rel="noopener noreferrer"><span class="sf-dump-meta', $dump);
+        $this->assertStringNotContainsString('&#8250;', $dump);
+    }
+
     public function testShouldReturnTraceForConcreteTwigWithError()
     {
         require_once \dirname(__DIR__).'/Fixtures/Twig.php';
@@ -320,6 +360,55 @@ class ExceptionCasterTest extends TestCase
             EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $f);
+    }
+
+    public function testFrameWithTwigWithoutSrcContext()
+    {
+        require_once \dirname(__DIR__).'/Fixtures/Twig.php';
+
+        $f = [
+            new FrameStub([
+                'file' => \dirname(__DIR__).'/Fixtures/Twig.php',
+                'line' => 33,
+                'class' => '__TwigTemplate_VarDumperFixture_u75a09',
+            ], true, false, -1),
+            new FrameStub([
+                'file' => \dirname(__DIR__).'/Fixtures/Twig.php',
+                'line' => 34,
+                'class' => '__TwigTemplate_VarDumperFixture_u75a09',
+                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(null, __FILE__),
+            ], true, false, -1),
+        ];
+
+        $expectedDump = <<<'EODUMP'
+            array:2 [
+              0 => {
+                class: "__TwigTemplate_VarDumperFixture_u75a09"
+                src: {
+                  %sTwig.php:1
+                }
+              }
+              1 => {
+                class: "__TwigTemplate_VarDumperFixture_u75a09"
+                object: __TwigTemplate_VarDumperFixture_u75a09 {
+                %A
+                }
+                src: {
+                  %sExceptionCasterTest.php:2
+                }
+              }
+            ]
+            EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $f);
+
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('');
+        $dumper->setDumpBoundaries('', '');
+        $dumper->setDisplayOptions(['fileLinkFormat' => 'file://%f#L%l']);
+        $dump = $dumper->dump((new VarCloner())->cloneVar($f), true);
+
+        $this->assertStringContainsString('<a href="file://'.__FILE__.'#L2" rel="noopener noreferrer">', $dump);
     }
 
     public function testExcludeVerbosity()

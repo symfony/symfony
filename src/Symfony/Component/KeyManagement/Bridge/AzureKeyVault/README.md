@@ -27,15 +27,17 @@ $tokens = new ClientCredentialsTokenProvider(
     $_SERVER['AZURE_CLIENT_SECRET'],
 );
 
-$kms = new AzureKeyVault($client, $tokens);
+$kms = new AzureKeyVault($client, $tokens, 'https://my-vault.vault.azure.net/');
 
-// Use the key name; append `/<version>` to pin a specific version.
+// Use the key name for the latest version on writes, or append `/<version>` to select one.
 $ciphertext = $kms->encrypt('app-key', 'hello world');
 $plaintext  = $kms->decrypt($ciphertext);
 
 $dataKey = $kms->generateDataKey('app-key', 32);
 $result  = $dataKey->use(fn (string $dek): string => /* local AEAD encrypt */);
 ```
+
+The bridge checks that Azure's response names the requested key in the configured vault and records the version Azure used in each new ciphertext and wrapped data key. Keep older key versions enabled while their ciphertexts or wrapped data keys must remain readable.
 
 Authentication
 --------------
@@ -46,7 +48,7 @@ any Azure AD flow: the bundled `ClientCredentialsTokenProvider` covers the
 the token in memory until 60 seconds before its advertised expiration.
 Managed Identity, Workload Identity, federated credentials, on-behalf-of, ...
 are out of scope for the default provider; implement
-`TokenProviderInterface` against your platform's metadata endpoint.
+`TokenProviderInterface` for your authentication flow.
 
 Custom token providers implement `invalidateToken($token)` to discard a cached
 token only when it matches the rejected value. If Key Vault responds with HTTP
@@ -61,10 +63,10 @@ The bridge accepts two configurable algorithms:
   * `encryptAlgorithm` (default `RSA-OAEP-256`): used by `encrypt()`/`decrypt()`.
     `RSA-OAEP`, `RSA1_5` and the AEAD variants `A128GCM`/`A192GCM`/`A256GCM`
     are also accepted (the AEAD variants require a symmetric key, available
-    on Managed HSM).
+    on Managed HSM or Key Vault Premium in preview).
   * `wrapAlgorithm` (default `RSA-OAEP-256`): used by `generateDataKey()` and
-    `unwrapDataKey()`. Same algorithm set as above; on Managed HSM you can
-    use `A128KW` / `A192KW` / `A256KW` by setting it explicitly.
+    `unwrapDataKey()`. Same algorithm set as above; with a symmetric key you
+    can use `A128KW` / `A192KW` / `A256KW` by setting it explicitly.
 
 The DSN factory only accepts the algorithm names Azure Key Vault documents
 (`RSA-OAEP-256`, `RSA-OAEP`, `RSA1_5`, the `A*GCM`, `A*CBC`, `A*CBCPAD` and
@@ -80,13 +82,16 @@ DSN scheme
 ----------
 
 ```
-azure-keyvault://<clientId>:<clientSecret>@<vault-name>.vault.azure.net?tenant=<tenantId>[&algorithm=...&wrap_algorithm=...&api_version=...]
+azure-keyvault://<clientId>:<clientSecret>@<vault-name>.vault.azure.net?tenant=<tenantId>[&algorithm=...&wrap_algorithm=...&api_version=...&audience=...]
 ```
 
 The host is the full vault DNS (`<name>.vault.azure.net`,
 `<name>.managedhsm.azure.net` for Managed HSM, or the US-government
-`<name>.vault.usgovcloudapi.net`). The audience for token acquisition is
-inferred from the host. Examples:
+`<name>.vault.usgovcloudapi.net`). The factory selects a public-cloud Key Vault
+or Managed HSM audience from the host, which `audience` can override. It uses
+the public Microsoft Entra authority. For sovereign clouds, construct
+`AzureKeyVault` manually with a token provider configured for that cloud's
+audience and authority. Examples for the public cloud:
 
 ```
 azure-keyvault://CLIENT_ID:CLIENT_SECRET@my-vault.vault.azure.net?tenant=TENANT_ID

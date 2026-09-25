@@ -121,6 +121,40 @@ final class PhpAstExtractorTest extends TestCase
                 'concat-dupp' => 'prefixconcat-dupp',
                 'variable-assignation-concatenated' => 'prefixvariable-assignation-concatenated',
                 'concat-du' => 'prefixconcat-du',
+                'match-inline-draft' => 'prefixmatch-inline-draft',
+                'match-inline-default' => 'prefixmatch-inline-default',
+                'match-with-dynamic-arm' => 'prefixmatch-with-dynamic-arm',
+                'match-variable-draft' => 'prefixmatch-variable-draft',
+                'match-variable-published' => 'prefixmatch-variable-published',
+                'variable-default' => 'prefixvariable-default',
+                'variable-overridden' => 'prefixvariable-overridden',
+                'variable-chained' => 'prefixvariable-chained',
+                'variable-prefix-if' => 'prefixvariable-prefix-if',
+                'variable-prefix-else' => 'prefixvariable-prefix-else',
+                'variable-assigned-before-call' => 'prefixvariable-assigned-before-call',
+                'variable-used-by-closure' => 'prefixvariable-used-by-closure',
+                'variable-captured-by-arrow-function' => 'prefixvariable-captured-by-arrow-function',
+                'compound-if' => 'prefixcompound-if',
+                'compound-else' => 'prefixcompound-else',
+                'compound-coalesce-fallback' => 'prefixcompound-coalesce-fallback',
+                'self-referencing-if' => 'prefixself-referencing-if',
+                'self-referencing-else' => 'prefixself-referencing-else',
+                'interpolated-if' => 'prefixinterpolated-if',
+                'interpolated-else' => 'prefixinterpolated-else',
+                'interpolated-if-simple-syntax' => 'prefixinterpolated-if-simple-syntax',
+                'interpolated-else-simple-syntax' => 'prefixinterpolated-else-simple-syntax',
+                'interpolated-heredoc-if' => 'prefixinterpolated-heredoc-if',
+                'interpolated-heredoc-else' => 'prefixinterpolated-heredoc-else',
+                'switch-draft' => 'prefixswitch-draft',
+                'switch-published' => 'prefixswitch-published',
+                'switch-default' => 'prefixswitch-default',
+                'method-return-enum-draft' => 'prefixmethod-return-enum-draft',
+                'method-return-enum-published' => 'prefixmethod-return-enum-published',
+                'method-return-switch-draft' => 'prefixmethod-return-switch-draft',
+                'method-return-switch-default' => 'prefixmethod-return-switch-default',
+                'method-return-variable-draft' => 'prefixmethod-return-variable-draft',
+                'method-return-variable-published' => 'prefixmethod-return-variable-published',
+                'method-return-recursive' => 'prefixmethod-return-recursive',
             ],
             'not_messages' => [
                 'translatable other-domain-test-no-params-short-array' => 'prefixtranslatable other-domain-test-no-params-short-array',
@@ -168,6 +202,10 @@ final class PhpAstExtractorTest extends TestCase
             'ternary_domain_b' => [
                 'ternary-domain-key' => 'prefixternary-domain-key',
             ],
+            'variable_domain' => [
+                'variable-domain-key' => 'prefixvariable-domain-key',
+                'variable-named-domain-key' => 'prefixvariable-named-domain-key',
+            ],
             'validators' => [
                 'message-in-constraint-attribute' => 'prefixmessage-in-constraint-attribute',
                 // 'custom Isbn message from attribute' => 'prefixcustom Isbn message from attribute',
@@ -208,6 +246,11 @@ final class PhpAstExtractorTest extends TestCase
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
         $this->assertEquals(['sources' => [$filename.':77']], $catalogue->getMetadata('ternary-duplicate'));
         $this->assertEquals(['sources' => [$filename.':80']], $catalogue->getMetadata('concat-dup'));
+        $this->assertEquals(['sources' => [$filename.':91']], $catalogue->getMetadata('match-variable-draft'));
+        // called on an enum case, a typed property, a declared return type and a typed parameter
+        $this->assertEquals(['sources' => [$filename.':174', $filename.':177', $filename.':178', $filename.':186']], $catalogue->getMetadata('method-return-enum-draft'));
+        // called on a variable, from another method of the class and on a static return type
+        $this->assertEquals(['sources' => [$filename.':179', $filename.':180', $filename.':181']], $catalogue->getMetadata('method-return-variable-draft'));
     }
 
     public function testExtractionFromIndentedHeredocNowdoc()
@@ -244,6 +287,48 @@ final class PhpAstExtractorTest extends TestCase
         $extractor->extract(__DIR__.'/../Fixtures/extractor-ast-other-namespace/', $catalogue);
 
         $this->assertSame(['message from the Symfony class' => 'message from the Symfony class'], $catalogue->all('messages'));
+    }
+
+    public function testExtractionOfVariablesLimitations()
+    {
+        $extractor = new PhpAstExtractor([new TransMethodVisitor()]);
+        $catalogue = new MessageCatalogue('en');
+
+        $extractor->extract(__DIR__.'/../Fixtures/extractor-ast-limitations/variables.php', $catalogue);
+
+        $this->assertEquals([
+            'messages' => [
+                // every value assigned before the call is extracted, even when it is overwritten
+                'overwritten-value' => 'overwritten-value',
+                'overwriting-value' => 'overwriting-value',
+                // ".=" replaces the previous values, even when it is conditional
+                // 'conditionally-suffixed' => 'conditionally-suffixed',
+                'conditionally-suffixed-value' => 'conditionally-suffixed-value',
+                // assignments made after the call are ignored, even when a loop runs the call again
+                'loop-initial-value' => 'loop-initial-value',
+                // 'loop-next-iteration-value' => 'loop-next-iteration-value',
+                // assignments by reference are not tracked
+                // 'referenced-value' => 'referenced-value',
+                // 'closure-by-reference-value' => 'closure-by-reference-value',
+                // array items are not resolved
+                // 'array-item-draft' => 'array-item-draft',
+                // 'array-item-published' => 'array-item-published',
+                // 'foreach-item-first' => 'foreach-item-first',
+                // 'foreach-item-second' => 'foreach-item-second',
+                // 'destructured-value' => 'destructured-value',
+                // 'constant-array-item' => 'constant-array-item',
+                // static variables, parameter default values and property default values are not resolved
+                // 'static-variable-value' => 'static-variable-value',
+                // 'parameter-default-value' => 'parameter-default-value',
+                // 'property-value' => 'property-value',
+                // values returned by functions are not resolved, only the ones returned by methods
+                // 'function-return-value' => 'function-return-value',
+                // methods are found using reflection, so their class must be autoloadable
+                // 'not-autoloadable-method-return-value' => 'not-autoloadable-method-return-value',
+                // methods called on objects of unknown class (like untyped parameters) are not resolved
+                // 'method-return-variable-draft' => 'method-return-variable-draft',
+            ],
+        ], $catalogue->all());
     }
 
     public static function resourcesProvider(): array

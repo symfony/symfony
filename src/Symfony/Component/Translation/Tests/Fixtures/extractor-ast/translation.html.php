@@ -80,3 +80,109 @@ echo $view['translator']->trans('const-domain', [], PhpAstExtractorTest::OTHER_D
 <?php echo $view['translator']->trans(($amended ? 'concat-dup' : 'concat-du').($cancelled ? '' : 'p')); ?>
 <?php echo $view['translator']->trans($key = 'variable-assignation-'.'concatenated'); ?>
 <?php echo $view['translator']->trans($key = $amended ? 'variable-assignation-ternary-if' : 'variable-assignation-ternary-else', [], $domain = PhpAstExtractorTest::OTHER_DOMAIN); ?>
+<?php echo $view['translator']->trans(match ($status) { 'draft' => 'match-inline-draft', default => 'match-inline-default' }); ?>
+<?php echo $view['translator']->trans(match (true) { $amended => 'match-with-dynamic-arm', default => $customTitle }); ?>
+<?php
+$matchLabel = match ($status) {
+    'draft' => 'match-variable-draft',
+    'published', 'archived' => 'match-variable-published',
+    default => throw new \LogicException(),
+};
+echo $view['translator']->trans($matchLabel);
+
+$branchLabel = 'variable-default';
+if ($amended) {
+    $branchLabel = 'variable-overridden';
+}
+echo $view['translator']->trans($branchLabel);
+
+$chainedLabel = 'variable-chained';
+$copiedLabel = $chainedLabel;
+echo $view['translator']->trans($copiedLabel);
+
+$prefix = 'variable-prefix-';
+echo $view['translator']->trans($prefix.($amended ? 'if' : 'else'));
+
+$variableDomain = 'variable_domain';
+echo $view['translator']->trans('variable-domain-key', [], $variableDomain);
+echo $view['translator']->trans(domain: $variableDomain, id: 'variable-named-domain-key');
+
+$lateLabel = 'variable-assigned-before-call';
+echo $view['translator']->trans($lateLabel);
+$lateLabel = 'variable-assigned-after-call';
+
+$closureLabel = 'variable-used-by-closure';
+$notUsedLabel = 'variable-not-used-by-closure';
+$callback = function () use ($view, $closureLabel) {
+    echo $view['translator']->trans($closureLabel);
+    echo $view['translator']->trans($notUsedLabel);
+};
+
+$arrowLabel = 'variable-captured-by-arrow-function';
+$shadowedLabel = 'variable-shadowed-by-parameter';
+$callback = fn () => $view['translator']->trans($arrowLabel);
+$callback = fn ($shadowedLabel) => $view['translator']->trans($shadowedLabel);
+
+$scopedLabel = 'variable-from-another-scope';
+function translation_fixture_scope($translator)
+{
+    echo $translator->trans($scopedLabel);
+}
+?>
+<?php
+$suffixed = 'compound-';
+$suffixed .= $amended ? 'if' : 'else';
+echo $view['translator']->trans($suffixed);
+
+$fallbackLabel = $customTitle;
+$fallbackLabel ??= 'compound-coalesce-fallback';
+echo $view['translator']->trans($fallbackLabel);
+
+$numeric = 'compound-numeric';
+$numeric += 1;
+echo $view['translator']->trans($numeric);
+?>
+<?php
+$selfReferencing = 'self-referencing-';
+$selfReferencing = $selfReferencing.($amended ? 'if' : 'else');
+echo $view['translator']->trans($selfReferencing);
+
+$interpolatedSuffix = $amended ? 'if' : 'else';
+echo $view['translator']->trans("interpolated-{$interpolatedSuffix}");
+echo $view['translator']->trans("interpolated-$interpolatedSuffix-simple-syntax");
+echo $view['translator']->trans(<<<EOF
+    interpolated-heredoc-{$interpolatedSuffix}
+    EOF);
+echo $view['translator']->trans("interpolated-{$customTitle}");
+
+switch ($status) {
+    case 'draft':
+        $switchLabel = 'switch-draft';
+        break;
+    case 'published':
+    case 'archived':
+        $switchLabel = 'switch-published';
+        break;
+    default:
+        $switchLabel = 'switch-default';
+}
+echo $view['translator']->trans($switchLabel);
+
+use Symfony\Component\Translation\Tests\Fixtures\ReturnedMessages\Article;
+use Symfony\Component\Translation\Tests\Fixtures\ReturnedMessages\ArticleStatus;
+
+echo $view['translator']->trans(ArticleStatus::Draft->label());
+echo $view['translator']->trans(ArticleStatus::fromSwitch($status));
+$article = new Article(ArticleStatus::Draft);
+echo $view['translator']->trans($article->status->label());
+echo $view['translator']->trans($article->getStatus()?->label());
+echo $view['translator']->trans($article->getTitle());
+echo $view['translator']->trans($article->getSummary());
+echo $view['translator']->trans(Article::create()->getTitle());
+echo $view['translator']->trans($article->getRecursive(false));
+
+function article_status_label(ArticleStatus $status, $translator)
+{
+    return $translator->trans($status->label());
+}
+?>

@@ -27,9 +27,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 trait ContractsTrait
 {
-    use CacheTrait {
-        doGet as private contractsGet;
-    }
+    use CacheTrait;
 
     private \Closure $callbackWrapper;
     private array $computing = [];
@@ -65,6 +63,28 @@ trait ContractsTrait
             throw new InvalidArgumentException(\sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', static::class, $beta));
         }
 
+        $item = $pool->getItem($key);
+        $recompute = !$item->isHit() || \INF === $beta;
+        $metadata = $item->getMetadata();
+
+        if (!$recompute && $metadata) {
+            $expiry = $metadata[ItemInterface::METADATA_EXPIRY] ?? false;
+            $ctime = $metadata[ItemInterface::METADATA_CTIME] ?? false;
+
+            if ($recompute = $ctime && $expiry && $expiry <= ($now = microtime(true)) - $ctime / 1000 * $beta * log(random_int(1, \PHP_INT_MAX) / \PHP_INT_MAX)) {
+                // force applying defaultLifetime to expiry
+                $item->expiresAt(null);
+                ($this->logger ?? null)?->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [
+                    'key' => $key,
+                    'delta' => \sprintf('%.1f', $expiry - $now),
+                ]);
+            }
+        }
+
+        if (!$recompute) {
+            return $item->get();
+        }
+
         static $setMetadata;
 
         $setMetadata ??= \Closure::bind(
@@ -80,32 +100,35 @@ trait ContractsTrait
             CacheItem::class
         );
 
-        return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata, $key, $beta) {
-            // don't wrap nor save recursive calls
-            if (isset($this->computing[$key])) {
-                $value = $callback($item, $save);
-                $save = false;
+        $save = true;
 
-                return $value;
-            }
+        // don't wrap nor save recursive calls
+        if (isset($this->computing[$key])) {
+            return $item->set($callback($item, $save))->get();
+        }
 
-            $this->computing[$key] = $key;
-            $startTime = microtime(true);
+        $this->computing[$key] = $key;
+        $startTime = microtime(true);
 
-            if (!isset($this->callbackWrapper)) {
-                $this->setCallbackWrapper($this->setCallbackWrapper(null));
-            }
+        if (!isset($this->callbackWrapper)) {
+            $this->setCallbackWrapper($this->setCallbackWrapper(null));
+        }
 
-            try {
-                $value = ($this->callbackWrapper)($callback, $item, $save, $pool, static function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {
-                    $setMetadata($item, $startTime, $metadata);
-                }, $this->logger ?? null, $beta);
+        try {
+            $value = ($this->callbackWrapper)($callback, $item, $save, $pool, static function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {
                 $setMetadata($item, $startTime, $metadata);
+            }, $this->logger ?? null, $beta);
+            $setMetadata($item, $startTime, $metadata);
+        } finally {
+            unset($this->computing[$key]);
+        }
 
-                return $value;
-            } finally {
-                unset($this->computing[$key]);
-            }
-        }, $beta, $metadata, $this->logger ?? null);
+        $item->set($value);
+
+        if ($save) {
+            $pool->save($item);
+        }
+
+        return $item->get();
     }
 }

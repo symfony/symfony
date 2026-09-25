@@ -31,6 +31,8 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     /** @var iterable<EventDispatcherInterface> */
     private iterable $dispatchers;
     private ?Request $currentRequest = null;
+    // the default value is used by collectors unserialized from a profile, since only their data is serialized
+    private string $defaultDispatcher = 'event_dispatcher';
 
     /**
      * @param iterable<EventDispatcherInterface>|EventDispatcherInterface|null $dispatchers
@@ -38,8 +40,9 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     public function __construct(
         iterable|EventDispatcherInterface|null $dispatchers = null,
         private ?RequestStack $requestStack = null,
-        private string $defaultDispatcher = 'event_dispatcher',
+        string $defaultDispatcher = 'event_dispatcher',
     ) {
+        $this->defaultDispatcher = $defaultDispatcher;
         if ($dispatchers instanceof EventDispatcherInterface) {
             $dispatchers = [$this->defaultDispatcher => $dispatchers];
         }

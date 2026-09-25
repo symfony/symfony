@@ -18,6 +18,7 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
@@ -1569,6 +1570,30 @@ class ContainerBuilderTest extends TestCase
         }
 
         $this->assertEquals([$a, $b, $c], $resources, '->getResources() returns an array of resources read for the current configuration');
+    }
+
+    public function testVendorPathsAreTrackedByTheInstalledJsonFile()
+    {
+        $vendorFile = (new \ReflectionClass(PsrContainerInterface::class))->getFileName();
+        $vendorDir = \dirname($vendorFile, 4);
+        $installedJson = new FileResource($vendorDir.'/composer/installed.json');
+        $vendorRootFile = new FileResource($vendorDir.'/autoload.php');
+
+        $container = new ContainerBuilder();
+
+        foreach ([1, 2] as $round) {
+            $container->setResources([]);
+
+            $this->assertSame(PsrContainerInterface::class, $container->getReflectionClass(PsrContainerInterface::class)->name);
+            $this->assertTrue($container->fileExists($vendorFile));
+            $this->assertTrue($container->fileExists((string) $installedJson));
+            $this->assertTrue($container->fileExists(\dirname($vendorFile)));
+            $this->assertFalse($container->fileExists(\dirname($vendorFile).'/Missing'.$round.'.php'));
+            $this->assertTrue($container->fileExists((string) $vendorRootFile));
+            $container->addResource(new FileResource($vendorFile));
+
+            $this->assertEquals([$installedJson, $vendorRootFile], $container->getResources());
+        }
     }
 
     public function testExtension()

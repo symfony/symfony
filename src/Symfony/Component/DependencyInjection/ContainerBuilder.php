@@ -134,6 +134,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private array $pathsInVendor = [];
 
     /**
+     * @var array<string, string> the directory of each file checked by inVendors()
+     */
+    private array $fileDirs = [];
+
+    /**
      * @var array<string, ChildDefinition>
      */
     private array $autoconfiguredInstanceof = [];
@@ -1857,7 +1862,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private function inVendors(string $path): bool
     {
-        $path = is_file($path) ? \dirname($path) : $path;
+        if (isset($this->fileDirs[$path])) {
+            $path = $this->fileDirs[$path];
+        } elseif (is_file($path)) {
+            $path = $this->fileDirs[$path] = \dirname($path);
+        }
 
         if (isset($this->pathsInVendor[$path])) {
             return $this->pathsInVendor[$path];
@@ -1872,9 +1881,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         foreach ($this->vendors as $vendor) {
             if (\in_array($path[\strlen($vendor)] ?? '', ['/', \DIRECTORY_SEPARATOR], true) && str_starts_with($path, $vendor)) {
-                $this->pathsInVendor[$vendor.\DIRECTORY_SEPARATOR.'composer'] = false;
-                $this->addResource(new FileResource($vendor.\DIRECTORY_SEPARATOR.'composer'.\DIRECTORY_SEPARATOR.'installed.json'));
-                $this->pathsInVendor[$vendor.\DIRECTORY_SEPARATOR.'composer'] = true;
+                $installedJson = $vendor.\DIRECTORY_SEPARATOR.'composer'.\DIRECTORY_SEPARATOR.'installed.json';
+
+                if (!isset($this->resources[$installedJson])) {
+                    $this->pathsInVendor[$vendor.\DIRECTORY_SEPARATOR.'composer'] = false;
+                    $this->addResource(new FileResource($installedJson));
+                    $this->pathsInVendor[$vendor.\DIRECTORY_SEPARATOR.'composer'] = true;
+                }
 
                 return $this->pathsInVendor[$path] = true;
             }

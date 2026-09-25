@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation;
 use PhpParser\Parser;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Resource\ComposerResource;
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\Alias;
@@ -298,7 +299,7 @@ class TranslationBundle extends AbstractBundle
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
             $bundlePath = $parameterBag->unescapeValue($bundle['path']);
-            if ($container->fileExists($dir = $bundlePath.'/Resources/translations') || $container->fileExists($dir = $bundlePath.'/translations')) {
+            if (self::hasTranslationDir($container, $dir = $bundlePath.'/Resources/translations') || self::hasTranslationDir($container, $dir = $bundlePath.'/translations')) {
                 $dirs[] = $transPaths[] = $dir;
             } else {
                 $nonExistingDirs[] = $dir;
@@ -306,7 +307,7 @@ class TranslationBundle extends AbstractBundle
         }
 
         foreach ($config['paths'] as $dir) {
-            if (!$container->fileExists($dir)) {
+            if (!self::hasTranslationDir($container, $dir)) {
                 throw new \UnexpectedValueException(\sprintf('"%s" defined in translator.paths does not exist or is not a directory.', $dir));
             }
 
@@ -318,7 +319,7 @@ class TranslationBundle extends AbstractBundle
 
         if (null === $defaultDir) {
             // allow null
-        } elseif ($container->fileExists($defaultDir)) {
+        } elseif (self::hasTranslationDir($container, $defaultDir)) {
             $dirs[] = $defaultDir;
         } else {
             $nonExistingDirs[] = $defaultDir;
@@ -358,5 +359,19 @@ class TranslationBundle extends AbstractBundle
                 'scanned_directories' => $parameterBag->escapeValue(array_map(static fn ($dir) => str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir, $scannedDirectories)),
             ],
         ];
+    }
+
+    /**
+     * Tracks the list of files in a translation directory, but not their contents, which the translator tracks in its own cache.
+     */
+    private static function hasTranslationDir(ContainerBuilder $container, string $dir): bool
+    {
+        if (!is_dir($dir)) {
+            return $container->fileExists($dir);
+        }
+
+        $container->addResource(new GlobResource($dir, '', true));
+
+        return true;
     }
 }

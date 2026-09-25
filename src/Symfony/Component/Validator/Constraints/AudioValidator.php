@@ -90,6 +90,7 @@ class AudioValidator extends FileValidator
             '-show_entries', 'stream=index,codec_name,sample_rate,channels,bit_rate,duration',
             '-show_entries', 'format=format_name,duration,bit_rate',
             '-of', 'json',
+            '--',
             (string) $value,
         ]);
         $process->run();

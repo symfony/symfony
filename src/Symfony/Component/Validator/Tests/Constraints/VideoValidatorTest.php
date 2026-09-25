@@ -53,6 +53,20 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValidVideoWithFilenameStartingWithHyphen()
+    {
+        $filename = basename(tempnam(getcwd(), '-video-'));
+        copy(__DIR__.'/Fixtures/test.mp4', $filename);
+
+        try {
+            $this->validate($filename, new Video());
+
+            $this->assertNoViolation();
+        } finally {
+            unlink($filename);
+        }
+    }
+
     public function testFileNotFound()
     {
         $constraint = new Video(notFoundMessage: 'myMessage');

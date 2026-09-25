@@ -65,7 +65,7 @@ final class TypeContext
             return \sprintf('%s\\%s', $this->uses[$firstNamePart], implode('\\', $nameParts));
         }
 
-        if (null !== $this->namespace) {
+        if ($this->namespace) {
             return \sprintf('%s\\%s', $this->namespace, $name);
         }
 

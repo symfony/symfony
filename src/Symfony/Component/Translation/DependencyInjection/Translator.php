@@ -12,8 +12,10 @@
 namespace Symfony\Component\Translation\DependencyInjection;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
@@ -54,6 +56,11 @@ final class Translator extends BaseTranslator implements WarmableInterface
      * @var string[]
      */
     private array $scannedDirectories;
+
+    /**
+     * @var string[]
+     */
+    private array $vendors;
 
     /**
      * Constructor.
@@ -133,8 +140,16 @@ final class Translator extends BaseTranslator implements WarmableInterface
         parent::doLoadCatalogue($locale);
 
         foreach ($this->scannedDirectories as $directory) {
-            $resourceClass = file_exists($directory) ? DirectoryResource::class : FileExistenceResource::class;
-            $this->catalogues[$locale]->addResource(new $resourceClass($directory));
+            if (null !== $vendor = $this->findVendor($directory)) {
+                // the directories of packages only change when installing them, which updates installed.json
+                $resource = new FileResource($vendor.'/composer/installed.json');
+            } elseif (file_exists($directory)) {
+                $resource = new DirectoryResource($directory);
+            } else {
+                $resource = new FileExistenceResource($directory);
+            }
+
+            $this->catalogues[$locale]->addResource($resource);
         }
     }
 
@@ -171,5 +186,19 @@ final class Translator extends BaseTranslator implements WarmableInterface
                 $this->addResource($format, $file, $locale, $domain);
             }
         }
+    }
+
+    private function findVendor(string $directory): ?string
+    {
+        $this->vendors ??= (new ComposerResource())->getVendors();
+        $directory = realpath($directory) ?: $directory;
+
+        foreach ($this->vendors as $vendor) {
+            if (\in_array($directory[\strlen($vendor)] ?? '', ['/', \DIRECTORY_SEPARATOR], true) && str_starts_with($directory, $vendor)) {
+                return $vendor;
+            }
+        }
+
+        return null;
     }
 }

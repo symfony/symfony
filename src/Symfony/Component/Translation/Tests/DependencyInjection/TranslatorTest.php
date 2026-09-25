@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\DependencyInjection\Translator;
@@ -242,6 +243,51 @@ class TranslatorTest extends TestCase
         $this->assertSame('bar', $translator->trans('foo', [], 'ccc', 'fr'));
     }
 
+    public function testTheScannedDirectoriesOfVendorsAreTrackedThroughTheInstalledPackages()
+    {
+        $vendorDir = $this->createVendorDir();
+        mkdir($vendorDir.'/acme/translations', 0o777, true);
+
+        /** @var Translator $translator */
+        $translator = $this->getTranslator(new YamlFileLoader(), [
+            'resource_files' => [
+                'fr' => [
+                    __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+                ],
+            ],
+            'scanned_directories' => [__DIR__, $vendorDir.'/acme/translations', $vendorDir.'/acme/missing', '/tmp/I/sure/hope/this/does/not/exist'],
+        ], 'yml');
+
+        $resources = $translator->getCatalogue('fr')->getResources();
+
+        $this->assertEquals([
+            new DirectoryResource(__DIR__),
+            new FileResource($vendorDir.'/composer/installed.json'),
+            new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'),
+        ], \array_slice($resources, 1));
+    }
+
+    public function testUpdatingAPackageRefreshesTheCachedCatalogue()
+    {
+        $vendorDir = $this->createVendorDir();
+        $file = $vendorDir.'/acme/translations/messages.fr.yml';
+        $options = [
+            'cache_dir' => $this->tmpDir.'/cache',
+            'debug' => true,
+            'resource_files' => ['fr' => [$file]],
+            'scanned_directories' => [\dirname($file)],
+        ];
+
+        $this->extractPackage($file, "foo: before\n");
+        $this->assertSame('before', $this->getTranslator(new YamlFileLoader(), $options, 'yml')->trans('foo', [], 'messages', 'fr'));
+
+        $this->extractPackage($file, "foo: after\n");
+        // the catalogue was dumped in the same second
+        touch($vendorDir.'/composer/installed.json', time() + 1);
+
+        $this->assertSame('after', $this->getTranslator(new YamlFileLoader(), $options, 'yml')->trans('foo', [], 'messages', 'fr'));
+    }
+
     protected function getCatalogue($locale, $messages, $resources = [])
     {
         $catalogue = new MessageCatalogue($locale);
@@ -402,5 +448,29 @@ class TranslatorTest extends TestCase
             $options,
             $enabledLocales
         );
+    }
+
+    private function createVendorDir(): string
+    {
+        mkdir($this->tmpDir.'/vendor/composer', 0o777, true);
+        $vendorDir = realpath($this->tmpDir.'/vendor');
+        file_put_contents($vendorDir.'/composer/installed.json', '{"packages": []}');
+
+        // vendor directories are found through the classes of their autoloaders
+        $class = 'ComposerAutoloaderInit'.md5($vendorDir);
+        file_put_contents($vendorDir.'/composer/autoload_real.php', "<?php\n\nclass $class\n{\n}\n");
+        require $vendorDir.'/composer/autoload_real.php';
+
+        return $vendorDir;
+    }
+
+    private function extractPackage(string $file, string $contents): void
+    {
+        new Filesystem()->remove(\dirname($file, 2));
+        mkdir(\dirname($file), 0o777, true);
+        file_put_contents($file, $contents);
+
+        // the files of a package keep the modification time they have in its archive
+        touch($file, time() - 100);
     }
 }

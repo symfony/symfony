@@ -55,6 +55,7 @@ class VideoValidator extends FileValidator
             '-show_entries', 'stream=index,codec_type,codec_name,width,height',
             '-show_entries', 'format=format_name',
             '-of', 'json',
+            '--',
             (string) $value,
         ]);
         $process->run();

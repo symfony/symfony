@@ -22,10 +22,14 @@ use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\JoinColumnMapping;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * Extracts data using Doctrine ORM and ODM metadata.
@@ -105,9 +109,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                         }
                     }
 
-                    if (!$collectionKeyType = $this->getPhpType($typeOfField)) {
-                        return null;
-                    }
+                    $collectionKeyType = $this->getPhpType($typeOfField);
                 }
             }
 
@@ -116,7 +118,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 false,
                 Collection::class,
                 true,
-                new Type($collectionKeyType),
+                null !== $collectionKeyType ? new Type($collectionKeyType) : null,
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
             )];
         }
@@ -165,6 +167,12 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
                         case Types::DATEINTERVAL:
                             return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
+
+                        case UuidType::NAME:
+                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, Uuid::class)];
+
+                        case UlidType::NAME:
+                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, Ulid::class)];
                     }
 
                     break;
@@ -278,7 +286,9 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             Types::DATETIME_IMMUTABLE,
             Types::DATETIMETZ_IMMUTABLE,
             Types::TIME_IMMUTABLE,
-            Types::DATEINTERVAL => Type::BUILTIN_TYPE_OBJECT,
+            Types::DATEINTERVAL,
+            UuidType::NAME,
+            UlidType::NAME => Type::BUILTIN_TYPE_OBJECT,
             'array', // DBAL < 4
             'json_array', // DBAL < 3
             Types::SIMPLE_ARRAY => Type::BUILTIN_TYPE_ARRAY,

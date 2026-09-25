@@ -32,6 +32,8 @@ use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -68,6 +70,8 @@ class DoctrineExtractorTest extends TestCase
         $expected = [
             'id',
             'guid',
+            'uuid',
+            'ulid',
             'time',
             'timeImmutable',
             'dateInterval',
@@ -92,6 +96,7 @@ class DoctrineExtractorTest extends TestCase
             'indexedBaz',
             'indexedByDt',
             'indexedByCustomType',
+            'indexedByUuid',
             'indexedBuz',
             'dummyGeneratedValueList',
         ]);
@@ -159,6 +164,8 @@ class DoctrineExtractorTest extends TestCase
         return [
             ['id', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['guid', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['uuid', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Uuid::class)]],
+            ['ulid', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Ulid::class)]],
             ['bigint', $expectedBingIntType],
             ['time', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
             ['timeImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
@@ -220,7 +227,22 @@ class DoctrineExtractorTest extends TestCase
                 new Type(Type::BUILTIN_TYPE_OBJECT),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
-            ['indexedByCustomType', null],
+            ['indexedByCustomType', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                null,
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
+            ['indexedByUuid', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                new Type(Type::BUILTIN_TYPE_OBJECT),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
             ['indexedBuz', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
                 false,

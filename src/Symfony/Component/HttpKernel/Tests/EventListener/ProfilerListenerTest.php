@@ -12,10 +12,14 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -23,8 +27,10 @@ use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 
 class ProfilerListenerTest extends TestCase
 {
@@ -247,6 +253,26 @@ class ProfilerListenerTest extends TestCase
         $listener->onKernelTerminate(new TerminateEvent($kernel, $mainRequest, $response));
     }
 
+    #[RunInSeparateProcess]
+    public function testClientIsReleasedAfterTheOtherTerminateListenersAndBeforeProfilesAreSaved()
+    {
+        require __DIR__.'/../Fixtures/fastcgi_finish_request.php';
+
+        $this->handleAndTerminate(true);
+
+        $this->assertSame(['terminate listener', 'fastcgi_finish_request', 'lateCollect', 'write'], $GLOBALS['terminate_calls']);
+    }
+
+    #[RunInSeparateProcess]
+    public function testClientIsNotReleasedWhenThereIsNoProfileToSave()
+    {
+        require __DIR__.'/../Fixtures/fastcgi_finish_request.php';
+
+        $this->handleAndTerminate(false);
+
+        $this->assertSame(['terminate listener'], $GLOBALS['terminate_calls']);
+    }
+
     public function testExcludedPathsRejectInvalidRegularExpressions()
     {
         $this->expectException(\LogicException::class);
@@ -275,5 +301,47 @@ class ProfilerListenerTest extends TestCase
 
         $listener = new ProfilerListener($profiler, $requestStack, null, false, false, null, $excludedPaths, $excludedHttpCodes);
         $listener->onKernelResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, Kernel::MAIN_REQUEST, $response));
+    }
+
+    private function handleAndTerminate(bool $profilerEnabled): void
+    {
+        $GLOBALS['terminate_calls'] = [];
+
+        $storage = $this->createStub(ProfilerStorageInterface::class);
+        $storage->method('write')->willReturnCallback(static function (): bool {
+            $GLOBALS['terminate_calls'][] = 'write';
+
+            return true;
+        });
+
+        $profiler = new Profiler($storage, null, $profilerEnabled);
+        $profiler->add(new class extends DataCollector implements LateDataCollectorInterface {
+            public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
+            {
+            }
+
+            public function lateCollect(): void
+            {
+                $GLOBALS['terminate_calls'][] = 'lateCollect';
+            }
+
+            public function getName(): string
+            {
+                return 'late';
+            }
+        });
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = new Request();
+        $response = new Response();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::TERMINATE, static function () {
+            $GLOBALS['terminate_calls'][] = 'terminate listener';
+        });
+        $dispatcher->addSubscriber(new ProfilerListener($profiler, new RequestStack([$request])));
+
+        $dispatcher->dispatch(new ResponseEvent($kernel, $request, Kernel::MAIN_REQUEST, $response), KernelEvents::RESPONSE);
+        $dispatcher->dispatch(new TerminateEvent($kernel, $request, $response), KernelEvents::TERMINATE);
     }
 }

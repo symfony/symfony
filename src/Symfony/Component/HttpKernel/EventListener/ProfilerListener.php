@@ -145,6 +145,16 @@ class ProfilerListener implements EventSubscriberInterface
             }
         }
 
+        // In debug mode, the response is kept open during kernel.terminate so that late errors can be displayed,
+        // but the client doesn't have to wait for profiles to be saved
+        if (\count($this->profiles)) {
+            if (\function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            } elseif (\function_exists('litespeed_finish_request')) {
+                litespeed_finish_request();
+            }
+        }
+
         // save profiles
         foreach ($this->profiles as $request) {
             $this->profiler->saveProfile($this->profiles[$request]);

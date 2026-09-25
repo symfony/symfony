@@ -67,6 +67,7 @@ CHANGELOG
  * Add `framework.property_access.wildcard_reads` option to read every element of a collection through a `[*]` path
  * Instantiate on the console only the bundles that override the deprecated `Bundle::registerCommands()` method
  * Add `MessengerAssertionsTrait` to `KernelTestCase`, with `assertQueuedMessageCount()`, `getQueuedMessages()`, `getMessengerTransport()` and `consumeQueuedMessages()` for in-memory Messenger transports
+ * Don't use the secrets vault as an env var loader when its directory is in the project but does not exist at build time
 
 8.1
 ---

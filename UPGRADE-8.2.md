@@ -213,6 +213,7 @@ FrameworkBundle
    `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader` and
    `Routing\RedirectableCompiledUrlMatcher`, use their counterparts from the Routing component instead
  * Deprecate not setting the `framework.scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
+ * The secrets vault no longer loads env vars when its directory is in the project but does not exist when the container is built (`config/secrets/` by default). The env var of `framework.secret` is then not derived from `SYMFONY_DECRYPTION_SECRET` anymore when it is empty or not defined: define it, or create the vault. In non-debug environments, clear the cache after creating the first vault
 
 HttpClient
 ----------

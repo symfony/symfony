@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FindCommandBundl
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveSecretsLoaderWithoutVaultPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ReportMissingDependenciesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
@@ -241,6 +242,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterReverseContainerPass(true));
         $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new RemoveUnusedSessionMarshallingHandlerPass());
+        $container->addCompilerPass(new RemoveSecretsLoaderWithoutVaultPass());
         // must be registered after MonologBundle's LoggerChannelPass
         $container->addCompilerPass(new ErrorLoggerCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new VirtualRequestStackPass());

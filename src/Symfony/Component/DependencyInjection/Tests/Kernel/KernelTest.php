@@ -13,8 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
+use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 
 class KernelTest extends TestCase
 {
@@ -138,6 +140,21 @@ class KernelTest extends TestCase
         (new TestKernel($this->projectDir))->boot();
 
         $this->assertStringEqualsFile($containerDir.'/'.$class.'.php', $code);
+    }
+
+    public function testDumpContainerPreloadsEnvNotFoundException()
+    {
+        mkdir($this->projectDir.'/config', 0o777, true);
+        file_put_contents($this->projectDir.'/config/bundles.php', '<?php return '.var_export([ServicesBundle::class => ['all' => true]], true).';');
+
+        $kernel = new TestKernel($this->projectDir);
+        $kernel->boot();
+
+        $class = $kernel->getContainer()->getParameter('kernel.container_class');
+        $preloadFile = $kernel->getBuildDir().'/'.$class.'.preload.php';
+
+        $this->assertFileExists($preloadFile);
+        $this->assertStringContainsString(EnvNotFoundException::class, file_get_contents($preloadFile));
     }
 }
 

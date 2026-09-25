@@ -1,6 +1,6 @@
 <?php
 
-return \deepclone_from_array([
+return (\extension_loaded('deepclone') || !\class_exists('DateTime') || !\class_exists('DateTimeImmutable') || !\class_exists('DateTimeZone') || !\class_exists('DateInterval') || !\class_exists('DatePeriod') ? \deepclone_from_array([
     'classes' => ['DateTime', 'DateTimeImmutable', 'DateTimeZone', 'DateInterval', 'DatePeriod'],
     'objectMeta' => [
         [0, -1],
@@ -44,4 +44,4 @@ return \deepclone_from_array([
             ['start' => true, 'interval' => true],
         ],
     ],
-], null, true);
+], null, true) : \unserialize('a:5:{i:0;O:8:"DateTime":3:{s:4:"date";s:26:"1970-01-01 00:00:00.000000";s:13:"timezone_type";i:1;s:8:"timezone";s:6:"+00:00";}i:1;O:17:"DateTimeImmutable":3:{s:4:"date";s:26:"1970-01-01 00:00:00.000000";s:13:"timezone_type";i:1;s:8:"timezone";s:6:"+00:00";}i:2;O:12:"DateTimeZone":2:{s:13:"timezone_type";i:3;s:8:"timezone";s:12:"Europe/Paris";}i:3;O:12:"DateInterval":10:{s:1:"y";i:0;s:1:"m";i:0;s:1:"d";i:7;s:1:"h";i:0;s:1:"i";i:0;s:1:"s";i:0;s:1:"f";d:0;s:6:"invert";i:0;s:4:"days";i:7;s:11:"from_string";b:0;}i:4;O:10:"DatePeriod":7:{s:5:"start";O:17:"DateTimeImmutable":3:{s:4:"date";s:26:"2009-10-11 00:00:00.000000";s:13:"timezone_type";i:3;s:8:"timezone";s:12:"Europe/Paris";}s:7:"current";N;s:3:"end";N;s:8:"interval";O:12:"DateInterval":10:{s:1:"y";i:0;s:1:"m";i:0;s:1:"d";i:7;s:1:"h";i:0;s:1:"i";i:0;s:1:"s";i:0;s:1:"f";d:0;s:6:"invert";i:0;s:4:"days";i:7;s:11:"from_string";b:0;}s:11:"recurrences";i:5;s:18:"include_start_date";b:1;s:16:"include_end_date";b:0;}}'));

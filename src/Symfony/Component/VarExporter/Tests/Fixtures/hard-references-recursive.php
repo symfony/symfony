@@ -1,6 +1,6 @@
 <?php
 
-return \deepclone_from_array([
+return (\extension_loaded('deepclone') ? \deepclone_from_array([
     'classes' => '',
     'objectMeta' => 0,
     'prepared' => [-1],
@@ -11,4 +11,4 @@ return \deepclone_from_array([
     'refMasks' => [
         1 => [false],
     ],
-], null, true);
+], null, true) : \unserialize('a:1:{i:0;a:1:{i:0;R:2;}}'));

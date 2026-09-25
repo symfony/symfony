@@ -1,6 +1,6 @@
 <?php
 
-return \deepclone_from_array([
+return (\extension_loaded('deepclone') || !\class_exists('Symfony\\Component\\VarExporter\\Tests\\ArrayObject') || !\class_exists('ArrayObject') ? \deepclone_from_array([
     'classes' => ['Symfony\\Component\\VarExporter\\Tests\\ArrayObject', 'ArrayObject'],
     'objectMeta' => [
         [0, -3],
@@ -31,4 +31,4 @@ return \deepclone_from_array([
             ],
         ],
     ],
-], null, true);
+], null, true) : \unserialize('O:47:"Symfony\\Component\\VarExporter\\Tests\\ArrayObject":4:{i:0;i:0;i:1;a:2:{i:0;i:1;i:1;r:1;}i:2;a:1:{s:3:"foo";O:11:"ArrayObject":4:{i:0;i:0;i:1;a:0:{}i:2;a:0:{}i:3;N;}}i:3;N;}'));

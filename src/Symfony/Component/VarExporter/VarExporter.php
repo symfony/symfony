@@ -66,8 +66,62 @@ final class VarExporter
             }
         } elseif ('' !== $classes) {
             $foundClasses[$classes] = $classes;
+            $classes = [$classes];
+        } else {
+            $classes = [];
         }
 
-        return '\deepclone_from_array('.Exporter::export($data).', null, true)';
+        return self::addUnserializeFallback('\deepclone_from_array('.Exporter::export($data).', null, true)', $value, $data, $classes);
+    }
+
+    /**
+     * Rebuilds small values with unserialize() when the deepclone extension is not loaded, which is faster than its polyfill.
+     *
+     * OPcache resolves the extension_loaded() check at compile time and drops the other branch.
+     * Values whose classes are missing go to deepclone_from_array(), which reports them.
+     */
+    private static function addUnserializeFallback(string $code, mixed $value, array $data, array $classes): string
+    {
+        foreach ($classes as $class) {
+            if (':' === ($class[1] ?? null)) {
+                return $code;
+            }
+        }
+
+        $clean = true;
+        set_error_handler(static function () use (&$clean) {
+            $clean = false;
+
+            return true;
+        });
+
+        try {
+            $serialized = serialize($value);
+        } catch (\Throwable) {
+            return $code;
+        } finally {
+            restore_error_handler();
+        }
+
+        if (!$clean || 4096 < \strlen($serialized)) {
+            return $code;
+        }
+
+        $checks = [];
+        array_walk_recursive($data, static function ($v) use (&$checks) {
+            if ($v instanceof \UnitEnum) {
+                $checks[$v::class] = $v::class;
+            }
+        });
+        foreach ($classes as $class) {
+            $checks[$class] = $class;
+        }
+
+        $guard = '';
+        foreach ($checks as $class) {
+            $guard .= ' || !\class_exists('.Exporter::export($class).')';
+        }
+
+        return "(\\extension_loaded('deepclone'){$guard} ? {$code} : \\unserialize(".Exporter::export($serialized).'))';
     }
 }

@@ -328,6 +328,60 @@ class VarExporterTest extends TestCase
 
         $this->assertStringContainsString("['line1'.\"\\n\"\n                .'line2']", $exported);
     }
+
+    #[DataProvider('provideUnserializeFallback')]
+    public function testUnserializeFallbackRebuildsTheSameValue($value)
+    {
+        $code = VarExporter::export($value);
+
+        if (!str_starts_with($code, "(\\extension_loaded('deepclone')")) {
+            $this->assertStringStartsWith('\deepclone_from_array(', $code);
+
+            return;
+        }
+
+        $deepcloned = eval('return '.str_replace("\\extension_loaded('deepclone')", 'true', $code).';');
+        $unserialized = eval('return '.str_replace("\\extension_loaded('deepclone')", 'false', $code).';');
+
+        $this->assertDumpEquals($deepcloned, $unserialized);
+    }
+
+    public static function provideUnserializeFallback(): iterable
+    {
+        foreach (self::provideExport() as $args) {
+            if (!($args[2] ?? false)) {
+                yield $args[0] => [$args[1]];
+            }
+        }
+    }
+
+    public function testUnserializeFallbackThrowsOnMissingClass()
+    {
+        $code = VarExporter::export(new MyPrivateValue(123, 234));
+        $code = str_replace(['MyPrivateValue', "\\extension_loaded('deepclone')"], ['MyMissingValue', 'false'], $code);
+
+        $this->expectException(\DeepClone\ClassNotFoundException::class);
+        $this->expectExceptionMessage('Class "Symfony\Component\VarExporter\Tests\MyMissingValue" not found.');
+
+        eval('return '.$code.';');
+    }
+
+    public function testUnserializeFallbackThrowsOnMissingEnum()
+    {
+        $code = VarExporter::export((object) ['enum' => FooUnitEnum::Bar]);
+        $code = str_replace(['FooUnitEnum', "\\extension_loaded('deepclone')"], ['FooMissEnum', 'false'], $code);
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Class "Symfony\Component\VarExporter\Tests\Fixtures\FooMissEnum" not found');
+
+        eval('return '.$code.';');
+    }
+
+    public function testUnserializeFallbackIsLimitedToSmallValues()
+    {
+        $this->assertStringContainsString('\unserialize(', VarExporter::export((object) ['a' => str_repeat('-', 4000)]));
+        $this->assertStringNotContainsString('\unserialize(', VarExporter::export((object) ['a' => str_repeat('-', 4100)]));
+    }
 }
 
 class MyCloneable

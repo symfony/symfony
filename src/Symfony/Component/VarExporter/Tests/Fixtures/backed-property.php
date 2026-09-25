@@ -1,6 +1,6 @@
 <?php
 
-return \deepclone_from_array([
+return (\extension_loaded('deepclone') || !\class_exists('Symfony\\Component\\VarExporter\\Tests\\Fixtures\\BackedProperty') ? \deepclone_from_array([
     'classes' => 'Symfony\\Component\\VarExporter\\Tests\\Fixtures\\BackedProperty',
     'objectMeta' => 1,
     'prepared' => 0,
@@ -9,4 +9,4 @@ return \deepclone_from_array([
             'name' => ['name'],
         ],
     ],
-], null, true);
+], null, true) : \unserialize('O:59:"Symfony\\Component\\VarExporter\\Tests\\Fixtures\\BackedProperty":1:{s:4:"name";s:4:"name";}'));

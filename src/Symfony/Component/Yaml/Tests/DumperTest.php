@@ -530,8 +530,10 @@ class DumperTest extends TestCase
     public function testDumpingTaggedValueTopLevelMultiLine()
     {
         $data = new TaggedValue('text', "a\nb\n");
+        $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
-        $this->assertSame("!text |\n    a\n    b\n", $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertSame("!text |\n    a\n    b\n", $yaml);
+        $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function testDumpingTaggedValueSpecialCharsInTag()
@@ -857,6 +859,7 @@ class DumperTest extends TestCase
         $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
         $this->assertSame($expected, $yaml);
+        $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public static function getTopLevelTaggedMultiLineLiteralBlockData(): iterable

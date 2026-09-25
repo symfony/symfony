@@ -9,6 +9,7 @@ CHANGELOG
  * Add a `gitlab` output format to the `lint:yaml` command, producing a report in the GitLab Code Quality format
  * Add a `Schema` namespace with a `SchemaValidatorInterface` to validate data against a JSON Schema, a `SchemaResolverInterface` to determine the schema of a document, and their `SchemaValidator` and `FileHeaderSchemaResolver` implementations
  * Add JSON Schema validation to the `lint:yaml` command through the `--check-schema` option or a `# yaml-language-server: $schema=` / `# $schema=` file header
+ * Add support for parsing a block scalar, optionally tagged, as the root node of a document
 
 8.0
 ---

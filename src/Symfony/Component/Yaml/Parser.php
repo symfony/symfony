@@ -133,6 +133,8 @@ class Parser
         $this->lines = explode("\n", $value);
         $this->numberOfParsedLines = \count($this->lines);
         $this->locallySkippedLineNumbers = [];
+        // nested parsers inherit the total number of lines from their parent
+        $isRootNode = null === $this->totalNumberOfLines;
         $this->totalNumberOfLines ??= $this->numberOfParsedLines;
 
         if (!$this->moveToNextLine()) {
@@ -147,6 +149,10 @@ class Parser
             if (!$this->moveToNextLine()) {
                 return null;
             }
+        }
+
+        if ($isRootNode && self::preg_match('/^(?:'.self::TAG_PATTERN.' +)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', rtrim($this->currentLine), $matches) && ($this->isNextLineIndented() || !preg_grep('/^ *+[^ #]/', \array_slice($this->lines, $this->currentLineNb + 1)))) {
+            return $this->parseRootBlockScalar($matches, $flags);
         }
 
         // Resolves the tag and returns if end of the document
@@ -780,17 +786,7 @@ class Parser
         if (\in_array($value[0], ['!', '|', '>'], true) && self::preg_match('/^(?:'.self::TAG_PATTERN.' +)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
             $modifiers = $matches['modifiers'] ?? '';
 
-            $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), abs((int) $modifiers));
-
-            if ('' !== $matches['tag'] && '!' !== $matches['tag']) {
-                if ('!!binary' === $matches['tag']) {
-                    return Inline::evaluateBinaryScalar($data);
-                }
-
-                return new TaggedValue(substr($matches['tag'], 1), $data);
-            }
-
-            return $data;
+            return $this->resolveBlockScalarTag($matches['tag'], $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), abs((int) $modifiers)));
         }
 
         try {
@@ -977,6 +973,48 @@ class Parser
         }
 
         return $text;
+    }
+
+    /**
+     * Parses a block scalar, optionally tagged, that is the root node of the document.
+     */
+    private function parseRootBlockScalar(array $header, int $flags): mixed
+    {
+        Inline::initialize($flags, $this->getRealCurrentLineNb(), $this->filename);
+
+        for ($i = $this->currentLineNb + 1, $lineBreaks = ''; isset($this->lines[$i]) && '' === trim($this->lines[$i], ' '); ++$i) {
+            if (isset($this->lines[$i + 1])) {
+                $lineBreaks .= "\n";
+            }
+        }
+
+        if (isset($this->lines[$i]) && ' ' === $this->lines[$i][0]) {
+            $data = $this->parseValue(rtrim($this->currentLine), $flags, '');
+        } else {
+            // without content, the line breaks of the empty lines are only kept with the "+" chomping indicator
+            $data = $this->resolveBlockScalarTag($header['tag'], str_contains($header['modifiers'] ?? '', '+') ? $lineBreaks : '');
+        }
+
+        while ($this->moveToNextLine()) {
+            if (!$this->isCurrentLineEmpty()) {
+                throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+            }
+        }
+
+        return $data;
+    }
+
+    private function resolveBlockScalarTag(string $tag, string $data): mixed
+    {
+        if ('' !== $tag && '!' !== $tag) {
+            if ('!!binary' === $tag) {
+                return Inline::evaluateBinaryScalar($data);
+            }
+
+            return new TaggedValue(substr($tag, 1), $data);
+        }
+
+        return $data;
     }
 
     /**

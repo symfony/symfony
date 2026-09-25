@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 
 class WrappedListenerTest extends TestCase
 {
@@ -43,6 +44,38 @@ class WrappedListenerTest extends TestCase
             [\Closure::fromCallable(static function () {}), 'closure'],
             [[#[\Closure(name: FooListener::class)] static fn () => new FooListener(), 'listen'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
         ];
+    }
+
+    #[DataProvider('provideListenersWithCallable')]
+    public function testInfoHoldsTheCallableOfTheListener($listener, ?string $expected)
+    {
+        $wrappedListener = new WrappedListener($listener, null, new Stopwatch(), new EventDispatcher());
+
+        $this->assertSame($expected, $wrappedListener->getInfo('foo')['callable']);
+    }
+
+    public static function provideListenersWithCallable()
+    {
+        return [
+            [new FooListener(), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::__invoke'],
+            [[new FooListener(), 'listen'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
+            [['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
+            ['var_dump', 'var_dump'],
+            [[#[\Closure(name: 'foo_listener', class: FooListener::class)] static fn () => new FooListener(), 'listen'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
+            [static function () {}, null],
+        ];
+    }
+
+    public function testStubIsBuiltOnFirstUse()
+    {
+        $wrappedListener = new WrappedListener([#[\Closure(name: 'foo_listener', class: FooListener::class)] static fn () => new FooListener(), 'listen'], null, new Stopwatch(), new EventDispatcher());
+        $stub = $wrappedListener->getInfo('foo')['stub'];
+
+        $this->assertTrue(new \ReflectionClass(ClassStub::class)->isUninitializedLazyObject($stub));
+
+        $expected = new ClassStub('foo_listener::listen()', FooListener::class.'::listen');
+        $this->assertSame($expected->value, $stub->value);
+        $this->assertSame($expected->attr, $stub->attr);
     }
 
     public function testStopwatchEventIsStoppedWhenListenerThrows()

@@ -57,7 +57,7 @@ final class WrappedListener
                 $this->pretty = $this->name = $r->name;
             }
         } elseif (\is_string($listener)) {
-            $this->pretty = $this->name = $listener;
+            $this->pretty = $this->name = $this->callableRef = $listener;
         } else {
             $this->name = get_debug_type($listener);
             $this->pretty = $this->name.'::__invoke';
@@ -93,13 +93,19 @@ final class WrappedListener
 
     public function getInfo(string $eventName): array
     {
-        $this->stub ??= self::$hasClassStub ? new ClassStub($this->pretty.'()', $this->callableRef ?? $this->listener) : $this->pretty.'()';
+        if (!isset($this->stub)) {
+            $identifier = $this->pretty.'()';
+            $callable = $this->callableRef ?? $this->listener;
+            // Building the stub loads the class of the listener, so it's deferred until the stub is used
+            $this->stub = self::$hasClassStub ? new \ReflectionClass(ClassStub::class)->newLazyGhost(static fn (ClassStub $stub) => $stub->__construct($identifier, $callable)) : $identifier;
+        }
 
         return [
             'event' => $eventName,
             'priority' => $this->priority ??= $this->dispatcher?->getListenerPriority($eventName, $this->listener),
             'pretty' => $this->pretty,
             'stub' => $this->stub,
+            'callable' => $this->callableRef ?? null,
         ];
     }
 

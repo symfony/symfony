@@ -29,7 +29,8 @@
         "symfony/framework-bundle": "^7.4|^8.0",
         "symfony/http-foundation": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/stopwatch": "^7.4|^8.0"
+        "symfony/stopwatch": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0"
     },
     "conflict": {
         "symfony/dependency-injection": "<8.2",

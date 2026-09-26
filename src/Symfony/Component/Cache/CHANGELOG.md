@@ -13,6 +13,7 @@ CHANGELOG
  * Implement `PruneableInterface` on `RedisTagAwareAdapter` to garbage-collect its tag Sets
  * Add `PdoTagAwareAdapter`
  * Make `AbstractAdapter::createSystemCache()` skip APCu when OPcache is enabled and the cache directory is writable
+ * Set `ItemInterface::METADATA_SAVE_FAILED` in the `$metadata` argument of `get()` when the computed value could not be saved
 
 8.0
 ---

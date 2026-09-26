@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\LockRegistry;
 
 class LockRegistryTest extends TestCase
@@ -47,6 +48,36 @@ class LockRegistryTest extends TestCase
 
         $this->assertSame('bar', $pool->get('foo', static fn () => 'bar'));
         $this->assertSame([], $logger->messages);
+    }
+
+    public function testComputeReportsFailedSaves()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('LockRegistry is disabled on Windows');
+        }
+
+        $logger = new class extends AbstractLogger {
+            public array $messages = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->messages[] = $message;
+            }
+        };
+
+        $pool = new FilesystemAdapter('lock-registry', 0, sys_get_temp_dir().'/symfony-cache-lock-registry');
+        $pool->clear();
+        $pool->setLogger($logger);
+        $pool->setCallbackWrapper(LockRegistry::compute(...));
+
+        $value = static fn () => null;
+        $pool->get('foo', static fn () => $value, null, $metadata);
+        $this->assertTrue($metadata[CacheItem::METADATA_SAVE_FAILED]);
+
+        $pool->get('bar', static fn () => 'bar', null, $metadata);
+        $this->assertArrayNotHasKey(CacheItem::METADATA_SAVE_FAILED, $metadata);
+
+        $this->assertContains('Lock acquired, now computing item "{key}"', $logger->messages);
     }
 
     public function testWaitLoopEndsBeforeMaxExecutionTime()

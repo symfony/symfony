@@ -35,6 +35,8 @@ trait ContractsTrait
     /**
      * Wraps the callback passed to ->get() in a callable.
      *
+     * A wrapper that saves the item itself calls $setMetadata($item) before saving it, then $setMetadata($item, $saved) with the result of save(), and sets $save to false.
+     *
      * @return callable the previous callback wrapper
      */
     public function setCallbackWrapper(?callable $callbackWrapper): callable
@@ -100,8 +102,12 @@ trait ContractsTrait
         }
 
         try {
-            $value = ($this->callbackWrapper)($callback, $item, $save, $pool, static function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {
-                $setMetadata($item, $startTime, $metadata);
+            $value = ($this->callbackWrapper)($callback, $item, $save, $pool, static function (CacheItem $item, ?bool $saved = null) use ($setMetadata, $startTime, &$metadata) {
+                if (null === $saved) {
+                    $setMetadata($item, $startTime, $metadata);
+                } elseif (!$saved) {
+                    $metadata[CacheItem::METADATA_SAVE_FAILED] = true;
+                }
             }, $this->logger ?? null, $beta);
             $setMetadata($item, $startTime, $metadata);
         } finally {
@@ -110,8 +116,8 @@ trait ContractsTrait
 
         $item->set($value);
 
-        if ($save) {
-            $pool->save($item);
+        if ($save && !$pool->save($item)) {
+            $metadata[CacheItem::METADATA_SAVE_FAILED] = true;
         }
 
         return $item->get();

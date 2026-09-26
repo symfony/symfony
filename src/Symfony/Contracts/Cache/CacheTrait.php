@@ -51,8 +51,8 @@ trait CacheTrait
         if (!$item->isHit() || \INF === $beta || $metadata && self::electEarlyRecomputation($item, $metadata, $beta, $logger)) {
             $save = true;
             $item->set($callback($item, $save));
-            if ($save) {
-                $pool->save($item);
+            if ($save && !$pool->save($item)) {
+                $metadata[ItemInterface::METADATA_SAVE_FAILED] = true;
             }
         }
 

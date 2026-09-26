@@ -139,6 +139,31 @@ class CacheTraitTest extends TestCase
         $cache->get('key', static fn () => 'computed data', \PHP_FLOAT_MAX);
     }
 
+    public function testMetadataReportsFailedSaves()
+    {
+        $item = $this->createStub(CacheItemInterface::class);
+        $item->method('set')
+            ->willReturn($item);
+        $item->method('isHit')
+            ->willReturn(false);
+
+        $cache = $this->getMockBuilder(TestPool::class)
+            ->onlyMethods(['getItem', 'save'])
+            ->getMock();
+        $cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->willReturn($item);
+        $cache->expects($this->exactly(2))
+            ->method('save')
+            ->willReturn(false, true);
+
+        $cache->get('key', static fn () => 'computed data', null, $metadata);
+        $this->assertTrue($metadata[ItemInterface::METADATA_SAVE_FAILED]);
+
+        $cache->get('key', static fn () => 'computed data', null, $metadata);
+        $this->assertArrayNotHasKey(ItemInterface::METADATA_SAVE_FAILED, $metadata);
+    }
+
     public function testExceptionOnNegativeBeta()
     {
         $cache = new TestPool();

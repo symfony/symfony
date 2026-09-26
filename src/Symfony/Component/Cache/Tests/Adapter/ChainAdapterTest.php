@@ -12,11 +12,13 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
@@ -354,6 +356,22 @@ class ChainAdapterTest extends AdapterTestCase
         $cache = new ChainAdapter([$first]);
 
         $this->assertSame('fresh', $cache->get('foo', static fn () => 'fresh', \PHP_FLOAT_MAX));
+    }
+
+    public function testGetReportsFailedSavesOfLowerAdapters()
+    {
+        $failing = new class extends ArrayAdapter {
+            public function save(CacheItemInterface $item): bool
+            {
+                return false;
+            }
+        };
+        $cache = new ChainAdapter([new FilesystemTagAwareAdapter('a'), $failing]);
+        $cache->clear();
+
+        $this->assertSame('bar', $cache->get('foo', static fn () => 'bar', null, $metadata));
+        $this->assertTrue($metadata[CacheItem::METADATA_SAVE_FAILED]);
+        $this->assertArrayNotHasKey(CacheItem::METADATA_EXPIRY, (new FilesystemTagAwareAdapter('a'))->getItem('foo')->getMetadata());
     }
 
     private function getPruneableMock(): AdapterInterface

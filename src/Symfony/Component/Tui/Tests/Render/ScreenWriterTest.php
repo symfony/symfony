@@ -333,6 +333,24 @@ class ScreenWriterTest extends TestCase
         $this->assertStringContainsString('World', $output);
     }
 
+    public function testHeightChangeTriggersFullReRender()
+    {
+        $terminal = new VirtualTerminal(80, 24);
+        $writer = new ScreenWriter($terminal);
+
+        $writer->writeFrame(new ArrayLineBuffer(['Hello', 'World']));
+
+        $terminal->simulateResize(80, 20);
+        $terminal->clearOutput();
+
+        $writer->writeFrame(new ArrayLineBuffer(['Hello', 'World']));
+
+        $output = $terminal->getOutput();
+        $this->assertStringContainsString(self::CLEAR_SCREEN, $output);
+        $this->assertStringContainsString('Hello', $output);
+        $this->assertStringContainsString('World', $output);
+    }
+
     // --- Cursor position extraction ---
 
     public function testCursorMarkerIsDetectedAndStripped()
@@ -654,7 +672,7 @@ class ScreenWriterTest extends TestCase
     }
 
     #[DataProvider('provideShrinkingOverflowingContent')]
-    public function testShrinkingOverflowingContentKeepsTheViewportAtTheBottom(array $shrunk)
+    public function testShrinkingOverflowingContentKeepsCommittedHistoryOutOfTheViewport(array $shrunk, array $expectedViewport, bool $historyRebuilt, int $expectedClearLines)
     {
         $transcript = [];
         for ($i = 0; $i < 100; ++$i) {
@@ -677,9 +695,15 @@ class ScreenWriterTest extends TestCase
         $output = '';
         $writer->writeFrame(new ArrayLineBuffer([...$transcript, ...$shrunk]));
 
-        // The terminal shows the last 5 lines of the content, whatever the shrink removed
-        $this->assertSame(\array_slice([...$transcript, ...$shrunk], -5), array_map('rtrim', $screen->getLines()));
-        $this->assertStringNotContainsString("\x1b[3J", $output, 'Scrollback should be preserved');
+        $this->assertSame($expectedViewport, array_map('rtrim', $screen->getLines()));
+        if ($historyRebuilt) {
+            $this->assertStringContainsString(self::CLEAR_SCREEN, $output, 'A changed committed prefix requires rebuilding native history');
+            $this->assertSame(0, substr_count($output, self::CLEAR_LINE));
+        } else {
+            $this->assertStringNotContainsString("\x1b[2J", $output, 'Stable committed history should be preserved');
+            $this->assertStringNotContainsString("\x1b[3J", $output, 'Stable committed history should be preserved');
+            $this->assertSame($expectedClearLines, substr_count($output, self::CLEAR_LINE));
+        }
     }
 
     public function testShrinkingOverflowingContentDoesNotReadUnchangedPrefix()
@@ -716,10 +740,226 @@ class ScreenWriterTest extends TestCase
 
     public static function provideShrinkingOverflowingContent(): iterable
     {
-        yield 'one trailing line removed' => [['A', 'B', 'C', 'D', 'E', 'F']];
-        yield 'three trailing lines removed' => [['A', 'B', 'C', 'D']];
-        yield 'two leading lines removed' => [['C', 'D', 'E', 'F', 'G']];
-        yield 'all but one line removed' => [['A']];
+        yield 'one trailing line removed' => [['A', 'B', 'C', 'D', 'E', 'F'], ['C', 'D', 'E', 'F', ''], false, 1];
+        yield 'three trailing lines removed' => [['A', 'B', 'C', 'D'], ['C', 'D', '', '', ''], false, 3];
+        yield 'two committed lines removed' => [['C', 'D', 'E', 'F', 'G'], ['C', 'D', 'E', 'F', 'G'], true, 0];
+        yield 'all but one line removed' => [['A'], ['transcript 96', 'transcript 97', 'transcript 98', 'transcript 99', 'A'], true, 0];
+    }
+
+    #[DataProvider('overheightHistoryFrames')]
+    public function testOverheightUpdatesArchiveEachPrefixLineOnce(array $frames, array $expectedHistory, int $rows = 20)
+    {
+        $screen = new ScreenBuffer(100, $rows);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(100);
+        $terminal->method('getRows')->willReturn($rows);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+        $writer = new ScreenWriter($terminal);
+
+        foreach ($frames as $frame) {
+            $writer->writeFrame(new ArrayLineBuffer($frame));
+
+            $combinedRows = array_values(array_filter(
+                array_map(rtrim(...), [...$screen->getScrollback(), ...$screen->getLines()]),
+                static fn (string $line): bool => '' !== $line,
+            ));
+            $this->assertSame($frame, $combinedRows);
+        }
+
+        $this->assertSame($expectedHistory, array_map(rtrim(...), $screen->getScrollback()));
+    }
+
+    public function testTailOscillationAndFollowingOutputDoNotDuplicateBoundaryRows()
+    {
+        $screen = new ScreenBuffer(100, 20);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(100);
+        $terminal->method('getRows')->willReturn(20);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+        $writer = new ScreenWriter($terminal);
+        $transcript = array_map(static fn (int $i): string => \sprintf('Transcript line %02d', $i), range(1, 20));
+        $longFrame = [...$transcript, 'Status A', 'Status B', 'Status C', 'Status D'];
+        $shortFrame = [...$transcript, 'Status A', 'Status B', 'Status C'];
+
+        for ($cycle = 0; $cycle < 20; ++$cycle) {
+            foreach ([$longFrame, $shortFrame] as $frame) {
+                $writer->writeFrame(new ArrayLineBuffer($frame));
+                $combinedRows = array_values(array_filter(
+                    array_map(rtrim(...), [...$screen->getScrollback(), ...$screen->getLines()]),
+                    static fn (string $line): bool => '' !== $line,
+                ));
+                $this->assertSame($frame, $combinedRows);
+            }
+        }
+
+        $completion = 'Reproduction complete. Enter tmux copy mode and inspect the history.';
+        $screen->write("\r\n{$completion}\r\n");
+        $combinedRows = array_values(array_filter(
+            array_map(rtrim(...), [...$screen->getScrollback(), ...$screen->getLines()]),
+            static fn (string $line): bool => '' !== $line,
+        ));
+
+        $this->assertSame([...$shortFrame, $completion], $combinedRows);
+        $this->assertCount(1, array_keys($combinedRows, 'Transcript line 04', true));
+    }
+
+    public function testCursorInRetainedViewportStaysVisibleAfterTailShrink()
+    {
+        $screen = new ScreenBuffer(20, 5);
+        $output = '';
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static function (string $data) use ($screen, &$output): void {
+            $screen->write($data);
+            $output .= $data;
+        });
+        $terminal->method('showCursor')->willReturnCallback(static function () use (&$output): void {
+            $output .= self::SHOW_CURSOR;
+        });
+        $terminal->method('hideCursor')->willReturnCallback(static function () use (&$output): void {
+            $output .= self::HIDE_CURSOR;
+        });
+        $writer = new ScreenWriter($terminal);
+        $writer->writeFrame(new ArrayLineBuffer(array_map(static fn (int $i): string => 'Old '.$i, range(1, 100))));
+        $output = '';
+
+        $writer->writeFrame(new ArrayLineBuffer(['A', 'B', 'C', 'D'.AnsiUtils::cursorMarker(), 'E', 'F', 'G']));
+
+        $this->assertSame(['C', 'D', 'E', 'F', 'G'], array_map(rtrim(...), $screen->getLines()));
+        $this->assertStringContainsString(self::SHOW_CURSOR, $output);
+    }
+
+    public function testDeepTailShrinkPreservesPreExistingTerminalHistory()
+    {
+        $screen = new ScreenBuffer(20, 5);
+        $screen->write("shell-1\r\nshell-2\r\n");
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+        $writer = new ScreenWriter($terminal);
+        $writer->writeFrame(new ArrayLineBuffer(['A', 'B', 'C', 'D', 'E', 'F', 'G']));
+
+        $writer->writeFrame(new ArrayLineBuffer(['A', 'B', 'C']));
+        $writer->writeFrame(new ArrayLineBuffer(['A', 'B']));
+
+        $this->assertSame(['shell-1', 'shell-2', 'A', 'B'], array_map(rtrim(...), $screen->getScrollback()));
+        $this->assertSame(['', '', '', '', ''], array_map(rtrim(...), $screen->getLines()));
+
+        $writer->writeFrame(new ArrayLineBuffer(['A', 'B', 'C', 'D']));
+
+        $this->assertSame(['shell-1', 'shell-2', 'A', 'B'], array_map(rtrim(...), $screen->getScrollback()));
+        $this->assertSame(['C', 'D', '', '', ''], array_map(rtrim(...), $screen->getLines()));
+    }
+
+    public function testHeightGrowthRevealsPreviouslyHiddenCursor()
+    {
+        $rows = 3;
+        $output = '';
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturnCallback(static function () use (&$rows): int {
+            return $rows;
+        });
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static function (string $data) use (&$output): void {
+            $output .= $data;
+        });
+        $terminal->method('showCursor')->willReturnCallback(static function () use (&$output): void {
+            $output .= self::SHOW_CURSOR;
+        });
+        $terminal->method('hideCursor')->willReturnCallback(static function () use (&$output): void {
+            $output .= self::HIDE_CURSOR;
+        });
+        $frame = new ArrayLineBuffer(['A', 'B', 'C'.AnsiUtils::cursorMarker(), 'D', 'E', 'F']);
+        $writer = new ScreenWriter($terminal);
+        $writer->writeFrame($frame);
+        $output = '';
+        $rows = 6;
+
+        $writer->writeFrame($frame);
+
+        $this->assertStringContainsString(self::SHOW_CURSOR, $output);
+    }
+
+    public function testFirstOverflowPreservesExistingTerminalOutput()
+    {
+        $screen = new ScreenBuffer(100, 5);
+        $screen->write("shell-1\r\nshell-2\r\n");
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(100);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+        $writer = new ScreenWriter($terminal);
+
+        $writer->writeFrame(new ArrayLineBuffer(['A', 'B', 'C']));
+        $writer->writeFrame(new ArrayLineBuffer(['A', 'B', 'C', 'D', 'E', 'F']));
+
+        $this->assertSame(['B', 'C', 'D', 'E', 'F'], array_map(rtrim(...), $screen->getLines()));
+        $this->assertSame(['shell-1', 'shell-2', 'A'], array_map(rtrim(...), $screen->getScrollback()));
+    }
+
+    public function testAutocompleteShrinkUsesDifferentialUpdatesWithoutStaleRows()
+    {
+        $screen = new ScreenBuffer(40, 8);
+        $screen->write("shell-1\r\nshell-2\r\n");
+        $output = '';
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(40);
+        $terminal->method('getRows')->willReturn(8);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static function (string $data) use ($screen, &$output): void {
+            $screen->write($data);
+            $output .= $data;
+        });
+        $writer = new ScreenWriter($terminal);
+        $transcript = array_map(static fn (int $i): string => 'Transcript '.$i, range(1, 8));
+        $marker = AnsiUtils::cursorMarker();
+        $frames = [
+            [[...$transcript, 'editor-v1'.$marker, 'footer-v1'], ['shell-1', 'shell-2', 'Transcript 1', 'Transcript 2'], ['Transcript 3', 'Transcript 4', 'Transcript 5', 'Transcript 6', 'Transcript 7', 'Transcript 8', 'editor-v1', 'footer-v1'], 6],
+            [[...$transcript, 'editor-v2'.$marker, 'completion-1', 'completion-2', 'completion-3', 'footer-v2'], ['shell-1', 'shell-2', 'Transcript 1', 'Transcript 2', 'Transcript 3', 'Transcript 4', 'Transcript 5'], ['Transcript 6', 'Transcript 7', 'Transcript 8', 'editor-v2', 'completion-1', 'completion-2', 'completion-3', 'footer-v2'], 3],
+            [[...$transcript, 'editor-v3'.$marker, 'completion-1', 'footer-v3'], ['shell-1', 'shell-2', 'Transcript 1', 'Transcript 2', 'Transcript 3', 'Transcript 4', 'Transcript 5'], ['Transcript 6', 'Transcript 7', 'Transcript 8', 'editor-v3', 'completion-1', 'footer-v3', '', ''], 3],
+            [[...$transcript, 'editor-v4'.$marker, 'footer-v4'], ['shell-1', 'shell-2', 'Transcript 1', 'Transcript 2', 'Transcript 3', 'Transcript 4', 'Transcript 5'], ['Transcript 6', 'Transcript 7', 'Transcript 8', 'editor-v4', 'footer-v4', '', '', ''], 3],
+        ];
+
+        foreach ($frames as $index => [$frame, $expectedHistory, $expectedViewport, $expectedCursorRow]) {
+            $output = '';
+            $writer->writeFrame(new ArrayLineBuffer($frame));
+
+            $this->assertSame($expectedHistory, array_map(rtrim(...), $screen->getScrollback()));
+            $this->assertSame($expectedViewport, array_map(rtrim(...), $screen->getLines()));
+            $this->assertSame($expectedCursorRow, (new \ReflectionProperty($screen, 'cursorRow'))->getValue($screen));
+            $this->assertSame(9, (new \ReflectionProperty($screen, 'cursorCol'))->getValue($screen));
+            if ($index > 0) {
+                $this->assertLessThan(8, substr_count($output, self::CLEAR_LINE), 'Autocomplete updates must not repaint the entire viewport.');
+            }
+        }
+    }
+
+    public static function overheightHistoryFrames(): iterable
+    {
+        $frame = static function (int $transcriptCount, int $statusCount): array {
+            $transcript = array_map(static fn (int $i): string => \sprintf('Transcript line %02d', $i), range(1, $transcriptCount));
+            $status = $statusCount > 0 ? array_map(static fn (int $i): string => 'Status '.\chr(65 + $i), range(0, $statusCount - 1)) : [];
+
+            return [...$transcript, ...$status];
+        };
+        $history = array_map(static fn (int $i): string => \sprintf('Transcript line %02d', $i), range(1, 4));
+
+        yield 'repeated tail oscillation' => [array_merge(...array_fill(0, 20, [$frame(20, 4), $frame(20, 3)])), $history];
+        yield 'growth crossing the previous maximum' => [[$frame(20, 4), $frame(20, 3), $frame(20, 5)], [...$history, 'Transcript line 05']];
+        yield 'transcript growth mixed with tail changes' => [[$frame(20, 4), $frame(20, 3), $frame(21, 3), $frame(22, 3)], [...$history, 'Transcript line 05']];
+        yield 'shrink below terminal height before regrowth' => [[$frame(20, 4), $frame(10, 0), $frame(20, 3), $frame(20, 7)], [...$history, 'Transcript line 05', 'Transcript line 06', 'Transcript line 07']];
+        yield 'growth by more than one screen' => [[$frame(10, 0), $frame(50, 0)], array_map(static fn (int $i): string => \sprintf('Transcript line %02d', $i), range(1, 30))];
+        yield 'insertion into archived prefix' => [[['A', 'B', 'C', 'D', 'E', 'F'], ['X', 'A', 'B', 'C', 'D', 'E', 'F']], ['X', 'A'], 5];
+        yield 'truncate, replace, and regrow' => [[['A', 'B', 'C', 'D', 'E', 'F'], ['A', 'B', 'C', 'D', 'E'], ['X', 'B', 'C', 'D', 'E'], ['X', 'B', 'C', 'D', 'E', 'F']], ['X'], 5];
+        yield 'same-height edit between shrink and regrowth' => [[['A', 'B', 'C', 'D', 'E', 'F', 'G'], ['A', 'B', 'C', 'D', 'E', 'F'], ['A', 'B', 'C', 'D', 'E', 'F*'], ['A', 'B', 'C', 'D', 'E', 'F*', 'G']], ['A', 'B'], 5];
     }
 
     #[DataProvider('renderPathFrames')]

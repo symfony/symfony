@@ -1,0 +1,4 @@
+foo_url:
+    path: /foo-url/{clientId}
+    requirements:
+        client: '\d+'

@@ -316,6 +316,11 @@ RateLimiter
  * `CompoundLimiter::consume()` now stops consuming at the first limiter that rejects the request;
    list limiters from the most specific to the most global to spare shared quotas from rejected hits
 
+Routing
+-------
+
+ * Defining a requirement for a parameter that does not exist in a route is deprecated
+
 Scheduler
 ---------
 

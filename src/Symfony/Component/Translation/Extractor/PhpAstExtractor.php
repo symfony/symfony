@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Translation\Extractor;
 
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Extractor\Visitor\AbstractVisitor;
+use Symfony\Component\Translation\Extractor\Visitor\CallResolver;
+use Symfony\Component\Translation\Extractor\Visitor\VariableResolver;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
@@ -27,6 +30,11 @@ use Symfony\Component\Translation\MessageCatalogue;
 final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorInterface
 {
     private Parser $parser;
+
+    /**
+     * @var array<string, Node[]>
+     */
+    private array $parsedFiles = [];
 
     public function __construct(
         /**
@@ -44,26 +52,51 @@ final class PhpAstExtractor extends AbstractFileExtractor implements ExtractorIn
 
     public function extract(iterable|string $resource, MessageCatalogue $catalogue): void
     {
+        $this->parsedFiles = [];
+
         foreach ($this->extractFiles($resource) as $file) {
             $traverser = new NodeTraverser();
-
-            // This is needed to resolve namespaces in class methods/constants.
-            $nameResolver = new NodeVisitor\NameResolver();
-            $traverser->addVisitor($nameResolver);
 
             foreach ($this->visitors as $visitor) {
                 $visitor->initialize($catalogue, $file, $this->prefix);
                 $traverser->addVisitor($visitor);
             }
 
-            $nodes = $this->parser->parse(file_get_contents($file));
-            $traverser->traverse($nodes);
+            $traverser->traverse($this->parse((string) $file));
         }
+
+        $this->parsedFiles = [];
     }
 
     public function setPrefix(string $prefix): void
     {
         $this->prefix = $prefix;
+    }
+
+    /**
+     * @return Node[]
+     */
+    private function parse(string $file): array
+    {
+        return (new NodeTraverser(
+            // This is needed to resolve namespaces in class methods/constants.
+            new NodeVisitor\NameResolver(),
+            // This is needed to extract messages passed to translation methods as variables.
+            new VariableResolver(),
+            // This is needed to extract messages returned by methods.
+            new CallResolver($this->parseDeclaringFile(...)),
+        ))->traverse($this->parser->parse(file_get_contents($file)));
+    }
+
+    /**
+     * Parses files declaring the methods called by the extracted files; they are cached as they are often
+     * reused (e.g. enums), unlike the extracted files, which are only parsed once and would take up memory.
+     *
+     * @return Node[]
+     */
+    private function parseDeclaringFile(string $file): array
+    {
+        return $this->parsedFiles[$file] ??= $this->parse($file);
     }
 
     protected function canBeExtracted(string $file): bool

@@ -36,6 +36,8 @@ use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -68,6 +70,8 @@ class DoctrineExtractorTest extends TestCase
         $expected = [
             'id',
             'guid',
+            'uuid',
+            'ulid',
             'time',
             'timeImmutable',
             'dateInterval',
@@ -92,6 +96,7 @@ class DoctrineExtractorTest extends TestCase
             'indexedBaz',
             'indexedByDt',
             'indexedByCustomType',
+            'indexedByUuid',
             'indexedBuz',
             'dummyGeneratedValueList',
         ]);
@@ -183,6 +188,8 @@ class DoctrineExtractorTest extends TestCase
         return [
             ['id', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
             ['guid', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
+            ['uuid', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Uuid::class)]],
+            ['ulid', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Ulid::class)]],
             ['bigint', $expectedBingIntType],
             ['time', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
             ['timeImmutable', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
@@ -244,7 +251,22 @@ class DoctrineExtractorTest extends TestCase
                 new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT),
                 new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
-            ['indexedByCustomType', null],
+            ['indexedByCustomType', static fn () => [new LegacyType(
+                LegacyType::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                null,
+                new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
+            ['indexedByUuid', static fn () => [new LegacyType(
+                LegacyType::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT),
+                new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
             ['indexedBuz', static fn () => [new LegacyType(
                 LegacyType::BUILTIN_TYPE_OBJECT,
                 false,
@@ -325,6 +347,8 @@ class DoctrineExtractorTest extends TestCase
 
         yield ['id', Type::int()];
         yield ['guid', Type::string()];
+        yield ['uuid', Type::object(Uuid::class)];
+        yield ['ulid', Type::object(Ulid::class)];
         yield ['bigint', $expectedBigIntType];
         yield ['time', Type::object(\DateTime::class)];
         yield ['timeImmutable', Type::object(\DateTimeImmutable::class)];
@@ -344,7 +368,8 @@ class DoctrineExtractorTest extends TestCase
         yield ['customFoo', null];
         yield ['notMapped', null];
         yield ['indexedByDt', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::object())];
-        yield ['indexedByCustomType', null];
+        yield ['indexedByCustomType', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class))];
+        yield ['indexedByUuid', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::object())];
         yield ['indexedBuz', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::string())];
         yield ['dummyGeneratedValueList', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::int())];
         yield ['json', null];

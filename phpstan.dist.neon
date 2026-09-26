@@ -23,6 +23,10 @@ parameters:
     ignoreErrors:
         # Added in PHP 8.4
         - '#^Class BcMath\\Number not found\.$#'
+        # WorkflowTrait is meant to be used by the classes of applications, nothing in src/ uses it
+        -
+            identifier: trait.unused
+            path: src/Symfony/Component/Workflow/WorkflowTrait.php
         # DeferredBatchMessage::$acked aliases a bool that batch handlers flip during dispatch()
         -
             message: '#^If condition is always false\.$#'

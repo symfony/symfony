@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Workflow\Attribute;
 
-use Symfony\Component\Workflow\Exception\LogicException;
-
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
@@ -23,11 +21,13 @@ trait BuildEventNameTrait
     private static function buildEventName(string $keyword, string $argument, ?string $workflow = null, ?string $node = null): string
     {
         if (null === $workflow) {
-            if (null !== $node) {
-                throw new LogicException(\sprintf('The "%s" argument of "%s" cannot be used without a "workflow" argument.', $argument, self::class));
+            if (null === $node) {
+                return \sprintf('workflow.%s', $keyword);
             }
 
-            return \sprintf('workflow.%s', $keyword);
+            // The name of the workflow is resolved when the container is
+            // compiled, from the AsWorkflow attribute of the class of the listener
+            $workflow = AsWorkflow::NAME_PLACEHOLDER;
         }
 
         if (null === $node) {

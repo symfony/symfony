@@ -4,6 +4,10 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `#[AsWorkflow]`, `#[Place]` and `#[Transition]` attributes and the `WorkflowTrait` to define workflows and state machines in a class
+ * Allow omitting the `workflow` argument of the `As*Listener` attributes in a class using `#[AsWorkflow]`
+ * Add the `WorkflowType` enum
+ * Allow passing a string-backed enum case as the place of an `Arc`
  * Add `before` and `after` to the `#[As*Listener]` attributes, whose `$priority` is now nullable
  * Add `WorkflowBundle`, which provides the `workflow` configuration and the services previously provided by `FrameworkBundle` under `framework.workflows`
  * Allow prefixing entries with `!` in the `$eventsToDispatch` constructor argument of `Workflow` and `StateMachine` to permanently disable an event; e.g. `new Workflow(..., eventsToDispatch: ['!workflow.announce'])` fires every event except `workflow.announce`. The GuardEvent can never be suppressed; `!workflow.guard` throws an `InvalidArgumentException`. Mixing allow-list and block-list entries also throws an `InvalidArgumentException`.

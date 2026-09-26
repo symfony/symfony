@@ -14,7 +14,6 @@ namespace Symfony\Component\Workflow\Tests\Attribute;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Attribute;
-use Symfony\Component\Workflow\Exception\LogicException;
 
 class AsListenerTest extends TestCase
 {
@@ -67,36 +66,34 @@ class AsListenerTest extends TestCase
         $this->assertSame([\stdClass::class], $attribute->after);
     }
 
-    #[DataProvider('provideTransitionThrowException')]
-    public function testTransitionThrowException(string $class)
+    #[DataProvider('provideTransitionWithoutWorkflow')]
+    public function testTransitionWithoutWorkflowUsesAPlaceholder(string $class, string $keyword)
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(\sprintf('The "transition" argument of "%s" cannot be used without a "workflow" argument.', $class));
+        $attribute = new $class(transition: 'some');
 
-        new $class(transition: 'some');
+        $this->assertSame(\sprintf('workflow.%s.%s.some', Attribute\AsWorkflow::NAME_PLACEHOLDER, $keyword), $attribute->event);
     }
 
-    public static function provideTransitionThrowException(): iterable
+    public static function provideTransitionWithoutWorkflow(): iterable
     {
-        yield [Attribute\AsAnnounceListener::class];
-        yield [Attribute\AsCompletedListener::class];
-        yield [Attribute\AsGuardListener::class];
-        yield [Attribute\AsTransitionListener::class];
+        yield [Attribute\AsAnnounceListener::class, 'announce'];
+        yield [Attribute\AsCompletedListener::class, 'completed'];
+        yield [Attribute\AsGuardListener::class, 'guard'];
+        yield [Attribute\AsTransitionListener::class, 'transition'];
     }
 
-    #[DataProvider('providePlaceThrowException')]
-    public function testPlaceThrowException(string $class)
+    #[DataProvider('providePlaceWithoutWorkflow')]
+    public function testPlaceWithoutWorkflowUsesAPlaceholder(string $class, string $keyword)
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(\sprintf('The "place" argument of "%s" cannot be used without a "workflow" argument.', $class));
+        $attribute = new $class(place: 'some');
 
-        new $class(place: 'some');
+        $this->assertSame(\sprintf('workflow.%s.%s.some', Attribute\AsWorkflow::NAME_PLACEHOLDER, $keyword), $attribute->event);
     }
 
-    public static function providePlaceThrowException(): iterable
+    public static function providePlaceWithoutWorkflow(): iterable
     {
-        yield [Attribute\AsEnteredListener::class];
-        yield [Attribute\AsEnterListener::class];
-        yield [Attribute\AsLeaveListener::class];
+        yield [Attribute\AsEnteredListener::class, 'entered'];
+        yield [Attribute\AsEnterListener::class, 'enter'];
+        yield [Attribute\AsLeaveListener::class, 'leave'];
     }
 }

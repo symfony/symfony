@@ -12,6 +12,8 @@
 namespace Symfony\Component\KeyManagement\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -24,6 +26,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\KeyManagement\Base64UrlSafe;
 use Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\BlindIndexInterface;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory;
@@ -34,6 +37,8 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeySto
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKmsFactory;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKms;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKmsFactory;
 use Symfony\Component\KeyManagement\CompositeKms;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyStoreInterface;
@@ -126,6 +131,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield 'aws' => ['key_management.factory.aws_kms', ['class' => AwsKmsFactory::class, 'package' => 'symfony/aws-key-management', 'parent_packages' => $parents]];
         yield 'azure' => ['key_management.factory.azure_key_vault', ['class' => AzureKeyVaultFactory::class, 'package' => 'symfony/azure-keyvault-key-management', 'parent_packages' => $parents]];
         yield 'google cloud' => ['key_management.factory.google_cloud_kms', ['class' => GoogleCloudKmsFactory::class, 'package' => 'symfony/google-cloud-key-management', 'parent_packages' => $parents]];
+        yield 'kmip' => ['key_management.factory.kmip', ['class' => KmipKmsFactory::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => $parents]];
         yield 'blind index listener' => ['key_management.blind_index_listener', ['class' => BlindIndexListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => $parents]];
         yield 'envelope normalizer' => ['serializer.normalizer.key_management_envelope', ['class' => DenormalizerInterface::class]];
     }
@@ -789,16 +795,69 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('key_management.factory.aws_kms'));
     }
 
-    private function createContainerFromClosure(\Closure $closure, bool $debug = false): ContainerBuilder
+    public function testKmipClientsAreBuiltFromTheirDsn()
+    {
+        if (!class_exists(KmipKmsFactory::class)) {
+            $this->markTestSkipped('symfony/kmip-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', ['clients' => [
+                'default' => 'kmip://default.example?cert=/missing/cert&key=/missing/key&version=2.0',
+                'long' => 'kmip://long.example?cert=/missing/cert&key=/missing/key&version=1.4&iv_length=16',
+            ]]);
+            $container->setAlias('test.kmip.default', 'key_management.default')->setPublic(true);
+            $container->setAlias('test.kmip.long', 'key_management.long')->setPublic(true);
+        }, optimize: true);
+
+        foreach (['default' => 12, 'long' => 16] as $client => $ivLength) {
+            $kms = $container->get('test.kmip.'.$client);
+            $this->assertInstanceOf(KmipKms::class, $kms);
+            $cipher = (new \ReflectionProperty($kms, 'cipher'))->getValue($kms);
+            $this->assertSame($ivLength, (new \ReflectionProperty($cipher, 'ivLength'))->getValue($cipher));
+        }
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testBundleLoadsWithoutTheKmipBridge()
+    {
+        $loaders = spl_autoload_functions();
+        foreach ($loaders as $loader) {
+            spl_autoload_unregister($loader);
+        }
+        foreach ($loaders as $loader) {
+            spl_autoload_register(static function (string $class) use ($loader): void {
+                if (!str_starts_with($class, 'Symfony\\Component\\KeyManagement\\Bridge\\Kmip\\')) {
+                    $loader($class);
+                }
+            });
+        }
+
+        $this->assertFalse(class_exists(KmipKmsFactory::class));
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->setExtensionConfig('key_management', ['openssl://?keys[app]='.Base64UrlSafe::encode(random_bytes(32))]);
+            $container->setAlias('test.kms', 'key_management.default')->setPublic(true);
+        }, optimize: true);
+
+        $this->assertFalse($container->hasDefinition('key_management.factory.kmip'));
+        $kms = $container->get('test.kms');
+        $this->assertSame('working', $kms->decrypt($kms->encrypt('app', 'working')));
+    }
+
+    private function createContainerFromClosure(\Closure $closure, bool $debug = false, bool $optimize = false): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag(['kernel.debug' => $debug, 'kernel.project_dir' => __DIR__]));
         $bundle = new KeyManagementBundle();
         $bundle->build($container);
         $container->registerExtension($bundle->getContainerExtension());
         new ClosureLoader($container)->load($closure);
-        $container->getCompilerPassConfig()->setOptimizationPasses([]);
-        $container->getCompilerPassConfig()->setRemovingPasses([]);
-        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        if (!$optimize) {
+            $container->getCompilerPassConfig()->setOptimizationPasses([]);
+            $container->getCompilerPassConfig()->setRemovingPasses([]);
+            $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        }
         $container->compile();
 
         return $container;

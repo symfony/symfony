@@ -1,7 +1,7 @@
 {
     "name": "symfony/key-management",
     "type": "library",
-    "description": "Abstracts Key Management Systems (AWS KMS, Azure Key Vault, Google Cloud KMS, HashiCorp Vault Transit, ...) behind a single interface",
+    "description": "Abstracts Key Management Systems (AWS KMS, Azure Key Vault, Google Cloud KMS, HashiCorp Vault Transit, KMIP, ...) behind a single interface",
     "keywords": ["kms", "encryption", "key management", "secrets", "vault"],
     "homepage": "https://symfony.com",
     "license": "MIT",

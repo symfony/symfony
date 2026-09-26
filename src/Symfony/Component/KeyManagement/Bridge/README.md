@@ -3,10 +3,9 @@ KeyManagement bridges
 
 This directory hosts bridges that connect the KeyManagement component to
 specific backends. Each bridge is published as its own Composer package, named
-after the vendor it targets followed by the component name, e.g.
-`symfony/aws-key-management`, `symfony/hashicorp-vault-key-management`,
-`symfony/azure-keyvault-key-management`, ... and typed
-`symfony-key-management-bridge`.
+after the vendor or the protocol it targets followed by the component name,
+e.g. `symfony/aws-key-management`, `symfony/hashicorp-vault-key-management`,
+`symfony/kmip-key-management`, ... and typed `symfony-key-management-bridge`.
 
 A bridge typically contains:
 
@@ -14,7 +13,7 @@ A bridge typically contains:
    and optionally `Symfony\Component\KeyManagement\DataKeyGeneratorInterface` if the
    backend can produce envelope-encryption data keys.
  * A README describing the supported authentication and configuration.
- * Tests using mock HTTP clients or in-memory equivalents.
+ * Tests using mock HTTP clients, in-memory equivalents or a local protocol server.
 
 Bridges are encouraged to expose their constructor as the primary wiring
 point. Lazy instantiation, when needed, is delegated to the host framework

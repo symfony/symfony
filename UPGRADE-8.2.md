@@ -486,3 +486,8 @@ Validator
    ```
 
    In Symfony 8.2, the configured `mimeTypes` list is used as-is, while the `csv` extension is still enforced separately.
+
+Yaml
+----
+
+ * A custom tag on a block scalar requires the `Yaml::PARSE_CUSTOM_TAGS` flag, as on any other value; linting such files, Ansible `!vault |` values for example, needs the `--parse-tags` option of `lint:yaml`

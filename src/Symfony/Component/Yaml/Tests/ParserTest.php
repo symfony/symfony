@@ -223,6 +223,51 @@ class ParserTest extends TestCase
         $this->parser->parse("# comment\n!!binary |\n  QQ\n");
     }
 
+    #[DataProvider('getCustomTaggedBlockScalars')]
+    public function testCustomTagOnBlockScalarRequiresCustomTagsFlag(string $yaml, mixed $expected, int $line, string $header)
+    {
+        $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage(\sprintf('Tags support is not enabled. Enable the "Yaml::PARSE_CUSTOM_TAGS" flag to use "!foo" at line %d (near "%s").', $line, $header));
+
+        $this->parser->parse($yaml);
+    }
+
+    public static function getCustomTaggedBlockScalars(): iterable
+    {
+        yield 'mapping value' => ["first: a\nkey: !foo |\n  b\nlast: c", ['first' => 'a', 'key' => new TaggedValue('foo', "b\n"), 'last' => 'c'], 2, 'key: !foo |'];
+        yield 'folded mapping value' => ["key: !foo >-\n  b\n  c", ['key' => new TaggedValue('foo', 'b c')], 1, 'key: !foo >-'];
+        yield 'sequence item' => ["- a\n- !foo |\n  b\n- c", ['a', new TaggedValue('foo', "b\n"), 'c'], 2, '- !foo |'];
+        yield 'root node' => ["!foo |\n  b\n", new TaggedValue('foo', "b\n"), 1, '!foo |'];
+        yield 'empty root node' => ["# comment\n!foo |\n", new TaggedValue('foo', ''), 2, '!foo |'];
+    }
+
+    public function testCoreTagsOnBlockScalarsResolveLikeOnInlineScalars()
+    {
+        $this->assertSame(['key' => 42, 'last' => 'c'], $this->parser->parse("key: !!int |-\n  42\nlast: c"));
+        $this->assertSame(['key' => true, 'last' => 'c'], $this->parser->parse("key: !!bool |-\n  true\nlast: c"));
+        $this->assertSame(['key' => null, 'last' => 'c'], $this->parser->parse("key: !!null |-\n  ~\nlast: c"));
+        $this->assertSame(['key' => 1.5, 'last' => 'c'], $this->parser->parse("key: !!float |\n  1.5\nlast: c"));
+        $this->assertSame(42, $this->parser->parse("!!int |-\n  42\n"));
+    }
+
+    public function testInvalidCoreTagValueOnBlockScalar()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The value "abc" is not a valid "!!float" value');
+
+        $this->parser->parse("key: !!float |-\n  abc\n");
+    }
+
+    public function testUnsupportedBuiltInTagOnBlockScalar()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The built-in tag "!!set" is not implemented at line 1');
+
+        $this->parser->parse("key: !!set |\n  a\n", Yaml::PARSE_CUSTOM_TAGS);
+    }
+
     #[DataProvider('getDataFormSpecifications')]
     public function testSpecifications($expected, $yaml, $comment)
     {

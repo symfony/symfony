@@ -960,6 +960,22 @@ class Inline
         return base64_decode($parsedBinaryData, true);
     }
 
+    /**
+     * Resolves a scalar tagged with a built-in tag, such as the content of a tagged block scalar.
+     */
+    public static function evaluateTaggedScalar(string $tag, string $value): mixed
+    {
+        return match ($tag) {
+            '!!str' => $value,
+            '!!binary' => self::evaluateBinaryScalar($value),
+            '!!null' => self::resolveTaggedNull($value),
+            '!!bool' => self::resolveTaggedBool($value),
+            '!!int' => self::resolveTaggedInt($value),
+            '!!float' => self::resolveTaggedFloat($value),
+            default => throw new ParseException(\sprintf('The built-in tag "%s" is not implemented.', $tag), self::$parsedLineNumber + 1, $value, self::$parsedFilename),
+        };
+    }
+
     private static function isBinaryString(string $value): bool
     {
         return !preg_match('//u', $value) || preg_match('/[^\x00\x07-\x0d\x1B\x20-\xff]/', $value);

@@ -784,6 +784,7 @@ class Parser
         }
 
         if (\in_array($value[0], ['!', '|', '>'], true) && self::preg_match('/^(?:'.self::TAG_PATTERN.' +)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
+            $this->checkBlockScalarTag($matches['tag'], $flags);
             $modifiers = $matches['modifiers'] ?? '';
 
             return $this->resolveBlockScalarTag($matches['tag'], $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), abs((int) $modifiers)));
@@ -992,6 +993,7 @@ class Parser
             $data = $this->parseValue(rtrim($this->currentLine), $flags, '');
         } else {
             // without content, the line breaks of the empty lines are only kept with the "+" chomping indicator
+            $this->checkBlockScalarTag($header['tag'], $flags);
             $data = $this->resolveBlockScalarTag($header['tag'], str_contains($header['modifiers'] ?? '', '+') ? $lineBreaks : '');
         }
 
@@ -1004,14 +1006,17 @@ class Parser
         return $data;
     }
 
+    private function checkBlockScalarTag(string $tag, int $flags): void
+    {
+        if ('' !== $tag && '!' !== $tag[1] && !(Yaml::PARSE_CUSTOM_TAGS & $flags)) {
+            throw new ParseException(\sprintf('Tags support is not enabled. Enable the "Yaml::PARSE_CUSTOM_TAGS" flag to use "%s".', $tag), $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+        }
+    }
+
     private function resolveBlockScalarTag(string $tag, string $data): mixed
     {
         if ('' !== $tag && '!' !== $tag) {
-            if ('!!binary' === $tag) {
-                return Inline::evaluateBinaryScalar($data);
-            }
-
-            return new TaggedValue(substr($tag, 1), $data);
+            return '!' === $tag[1] ? Inline::evaluateTaggedScalar($tag, $data) : new TaggedValue(substr($tag, 1), $data);
         }
 
         return $data;

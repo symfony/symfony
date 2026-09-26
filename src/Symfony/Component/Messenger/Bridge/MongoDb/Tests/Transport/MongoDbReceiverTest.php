@@ -59,13 +59,26 @@ class MongoDbReceiverTest extends TestCase
         $this->assertSame([], $receiver->get());
     }
 
+    public function testItReturnsTheDecodedMessageToTheHandlerWhenTheChangeStreamWakesTheConnectionUp()
+    {
+        $serializer = new PhpSerializer();
+        $document = $this->createDocument($serializer->encode(new Envelope(new DummyMessage('Hi'))));
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('get')->willReturn($document);
+
+        $receiver = new MongoDbReceiver($connection, $serializer);
+
+        $this->assertCount(1, $receiver->get());
+    }
+
     public function testItRejectsTheMessageIfItCannotBeDecoded()
     {
         $document = $this->createDocument(['body' => 'foo']);
 
         $connection = $this->createMock(Connection::class);
         $connection->method('get')->willReturn($document);
-        $connection->expects($this->once())->method('reject')->with((string) $document->_id);
+        $connection->expects($this->once())->method('delete')->with((string) $document->_id);
 
         $serializer = $this->createStub(SerializerInterface::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
@@ -80,7 +93,7 @@ class MongoDbReceiverTest extends TestCase
     public function testAck()
     {
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('ack')->with('some_id');
+        $connection->expects($this->once())->method('delete')->with('some_id');
 
         $receiver = new MongoDbReceiver($connection, $this->createStub(SerializerInterface::class));
         $receiver->ack(new Envelope(new DummyMessage('Hi'), [new MongoDbReceivedStamp('some_id')]));
@@ -99,7 +112,7 @@ class MongoDbReceiverTest extends TestCase
     public function testReject()
     {
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('reject')->with('some_id');
+        $connection->expects($this->once())->method('delete')->with('some_id');
 
         $receiver = new MongoDbReceiver($connection, $this->createStub(SerializerInterface::class));
         $receiver->reject(new Envelope(new DummyMessage('Hi'), [new MongoDbReceivedStamp('some_id')]));

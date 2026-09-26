@@ -117,7 +117,8 @@ jobs:
         ports:
           - 5672:5672
       mongodb:
-        image: mongo # zizmor: ignore[unpinned-images]
+        # single-node (standalone) server for the non-stream integration tests
+        image: mongo:5.0
         ports:
           - 27017:27017
       couchbase:
@@ -175,6 +176,16 @@ jobs:
       - name: Init Kafka topics
         run: |
           docker exec kafka /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic test-topic --bootstrap-server kafka:9092
+
+      - name: Start MongoDB replica set
+        run: |
+          docker run -d --name mongodb-rs -p 27018:27017 mongo:8.0 --replSet rs0 --bind_ip_all
+          for i in {1..60}; do docker exec mongodb-rs mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep -q 1 && break; sleep 1; done
+          docker exec mongodb-rs mongosh --quiet --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "127.0.0.1:27017"}]})'
+          for i in {1..60}; do docker exec mongodb-rs mongosh --quiet --eval 'db.hello().isWritablePrimary' | grep -q true && exit 0; sleep 1; done
+          echo "::error::The MongoDB replica set did not elect a primary within 60 seconds"
+          docker logs mongodb-rs || true
+          exit 1
 
       - name: Install system dependencies
         run: |
@@ -281,6 +292,7 @@ jobs:
           MESSENGER_SQS_DSN: "sqs://localhost:4566/messages?sslmode=disable&poll_timeout=0.01"
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
           MONGODB_URI: 'mongodb://localhost:27017'
+          MONGODB_RS_URI: 'mongodb://localhost:27018'
           AWS_ENDPOINT_URL: "http://localhost:4566"
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost

@@ -29,6 +29,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
  * @internal
  *
  * @author Alessandro Lai <alessandro.lai85@gmail.com>
+ * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
 class Connection
 {
@@ -37,17 +38,30 @@ class Connection
         'collection_name' => 'messenger_messages',
         'queue_name' => 'default',
         'redeliver_timeout' => 3600,
+        'wait_time' => 1,
     ];
 
+    /** Upper bound for wait_time, in seconds: a huge value would starve delayed and redelivered messages. */
+    private const MAX_WAIT_TIME = 300;
+
     private string $uniqueId;
+
+    /**
+     * Whether change streams wake the consumer up. They are best effort: any
+     * failure disables them and the connection falls back to polling for good.
+     * A wait_time lower than or equal to 0 disables them up front.
+     */
+    private bool $useChangeStream;
 
     public function __construct(
         private readonly Collection $collection,
         private readonly string $queueName = 'default',
         private readonly int $redeliverTimeout = 3600,
         private readonly ?ClockInterface $clock = null,
+        private readonly int $waitTime = 1,
     ) {
         $this->uniqueId = 'consumer_'.bin2hex(random_bytes(16));
+        $this->useChangeStream = 0 < $this->waitTime;
     }
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], ?Client $client = null, ?ClockInterface $clock = null): self
@@ -57,7 +71,13 @@ class Connection
         $client ??= new Client($uri, [], self::driverInfo());
         $collection = $client->getCollection($configuration['database'], $configuration['collection_name']);
 
-        return new self($collection, $configuration['queue_name'], $configuration['redeliver_timeout'], $clock);
+        return new self(
+            $collection,
+            $configuration['queue_name'],
+            $configuration['redeliver_timeout'],
+            $clock,
+            $configuration['wait_time']
+        );
     }
 
     /**
@@ -85,7 +105,7 @@ class Connection
      * Query parameters that are not transport settings are kept and passed
      * to the MongoDB driver.
      *
-     * @return array{0: array{database: string, collection_name: string, queue_name: string, redeliver_timeout: int}, 1: string}
+     * @return array{0: array{database: string, collection_name: string, queue_name: string, redeliver_timeout: int, wait_time: int}, 1: string}
      */
     public static function buildConfiguration(#[\SensitiveParameter] string $dsn, array $options = []): array
     {
@@ -113,10 +133,13 @@ class Connection
             throw new InvalidArgumentException('The MongoDB Messenger transport requires a "database", provide it in the DSN path or as an option.');
         }
 
-        if (!is_numeric($configuration['redeliver_timeout'])) {
-            throw new InvalidArgumentException(\sprintf('The "redeliver_timeout" option must be an integer, "%s" given.', get_debug_type($configuration['redeliver_timeout'])));
+        $configuration['redeliver_timeout'] = self::integerOption($configuration, 'redeliver_timeout');
+        $configuration['wait_time'] = self::integerOption($configuration, 'wait_time');
+
+        // huge values would starve delayed and redelivered messages, which fire no stream event
+        if (self::MAX_WAIT_TIME < $configuration['wait_time']) {
+            throw new InvalidArgumentException(\sprintf('The "wait_time" option must be lower than or equal to %d seconds, "%d" given.', self::MAX_WAIT_TIME, $configuration['wait_time']));
         }
-        $configuration['redeliver_timeout'] = (int) $configuration['redeliver_timeout'];
 
         foreach (array_keys(self::DEFAULT_OPTIONS) as $option) {
             $dsn = self::removeUriOption($dsn, $option);
@@ -131,9 +154,26 @@ class Connection
     }
 
     /**
+     * Returns the next available message, claimed with an atomic lock.
+     *
+     * When nothing is claimable, the connection listens on the change stream
+     * for new inserts instead of returning immediately, so idle workers wake
+     * up as soon as a message is sent.
+     *
      * @throws TransportException
      */
     public function get(): ?BSONDocument
+    {
+        return $this->getAndLock() ?? $this->getFromStream();
+    }
+
+    /**
+     * Claims the oldest available message with an atomic findOneAndUpdate, or
+     * returns null when there is nothing to claim.
+     *
+     * @throws TransportException
+     */
+    private function getAndLock(): ?BSONDocument
     {
         $options = $this->getWriteOptions();
         $options['returnDocument'] = FindOneAndUpdate::RETURN_DOCUMENT_AFTER;
@@ -168,6 +208,82 @@ class Connection
     }
 
     /**
+     * Blocks on a change stream for the next insert and claims the oldest
+     * available message, or returns null when the wait budget is spent.
+     *
+     * A fresh change stream is opened for every call and closed right before
+     * the claim, so no cursor or session is left open on either side. Events are
+     * only a wake-up signal: the atomic getAndLock() claim stays the source of
+     * truth for message acquisition, and a claim that loses to another worker
+     * keeps listening for the next insert within the same wait budget instead
+     * of going back to sleep. Delayed and redeliverable messages never fire an
+     * event and are covered by the getAndLock() claim that runs first in get().
+     *
+     * @throws TransportException
+     */
+    private function getFromStream(): ?BSONDocument
+    {
+        if (!$this->useChangeStream) {
+            return null;
+        }
+
+        // keep listening until the budget is spent, so a lost claim does not send this worker to sleep
+        $endOfWait = hrtime()[0] + $this->waitTime;
+        $waitTime = $this->waitTime;
+
+        do {
+            try {
+                $changeStream = $this->collection->watch(
+                    [
+                        ['$match' => [
+                            'operationType' => 'insert',
+                            'fullDocument.queueName' => $this->queueName,
+                        ]],
+                        // events only wake the worker: strip the payload, keep the resume token _id
+                        ['$project' => ['_id' => 1]],
+                    ],
+                    [
+                        'maxAwaitTimeMS' => $waitTime * 1000,
+                        'typeMap' => ['root' => 'bson'],
+                    ]
+                );
+                // position the cursor on the initial batch, if any
+                $changeStream->rewind();
+
+                // no insert in the initial batch: wait for the next one within the budget
+                if (!$changeStream->valid()) {
+                    $changeStream->next();
+                }
+            } catch (MongoDriverException $exception) {
+                // an IllegalOperation 40573 naming replica sets means the server is a standalone mongod
+                if (40573 === $exception->getCode() && str_contains($exception->getMessage(), 'replica set')) {
+                    // a standalone mongod cannot run change streams: degrade permanently to polling
+                    $this->useChangeStream = false;
+                }
+
+                // otherwise fall back to polling for this call and retry the open on the next call
+                return null;
+            }
+
+            if (!$changeStream->valid()) {
+                // the stream was idle for the whole budget: no message was inserted
+                return null;
+            }
+
+            // release the cursor and its session before claiming
+            unset($changeStream);
+
+            if (null !== $document = $this->getAndLock()) {
+                return $document;
+            }
+
+            // another worker won the claim: keep listening with the budget left
+        } while (($waitTime = $endOfWait - hrtime()[0]) > 0);
+
+        return null;
+    }
+
+    /**
      * @param array<string, string> $headers
      * @param int                   $delay   The delay in milliseconds
      *
@@ -197,31 +313,13 @@ class Connection
     }
 
     /**
-     * @param string $id The ID of the message to ack; the corresponding document will be removed from the collection
+     * @param string $id The ID of the message to remove from the collection
      *
      * @return bool Returns true if the document has been deleted
      *
      * @throws TransportException
      */
-    public function ack(string $id): bool
-    {
-        try {
-            $deleteResult = $this->collection->deleteOne(['_id' => new ObjectId($id)], $this->getWriteOptions());
-        } catch (MongoDriverException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
-
-        return $deleteResult->getDeletedCount() > 0;
-    }
-
-    /**
-     * @param string $id The ID of the message to reject; the corresponding document will be removed from the collection
-     *
-     * @return bool Returns true if the document has been deleted
-     *
-     * @throws TransportException
-     */
-    public function reject(string $id): bool
+    public function delete(string $id): bool
     {
         try {
             $deleteResult = $this->collection->deleteOne(['_id' => new ObjectId($id)], $this->getWriteOptions());
@@ -356,6 +454,18 @@ class Connection
     private function now(): \DateTimeImmutable
     {
         return $this->clock?->now() ?? new \DateTimeImmutable();
+    }
+
+    /**
+     * Returns the requested option as an integer, or throws when it is not one.
+     */
+    private static function integerOption(array $configuration, string $name): int
+    {
+        if (false === $value = filter_var($configuration[$name], \FILTER_VALIDATE_INT)) {
+            throw new InvalidArgumentException(\sprintf('The "%s" option must be an integer, "%s" given.', $name, \is_string($configuration[$name]) ? $configuration[$name] : get_debug_type($configuration[$name])));
+        }
+
+        return $value;
     }
 
     private static function removeUriOption(string $uri, string $option): string

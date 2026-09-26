@@ -64,6 +64,44 @@ namespace MongoDB {
             public function insertOne($document, array $options = [])
             {
             }
+
+            public function watch($pipeline = [], array $options = [])
+            {
+                return new ChangeStream();
+            }
+        }
+    }
+
+    if (!class_exists(ChangeStream::class, \extension_loaded('mongodb'))) {
+        class ChangeStream implements \Iterator
+        {
+            public function current(): mixed
+            {
+            }
+
+            public function key(): mixed
+            {
+            }
+
+            public function next(): void
+            {
+            }
+
+            public function rewind(): void
+            {
+            }
+
+            public function valid(): bool
+            {
+            }
+
+            public function getCursorId(): int
+            {
+            }
+
+            public function getResumeToken(): mixed
+            {
+            }
         }
     }
 
@@ -177,6 +215,22 @@ namespace MongoDB\Driver\Exception {
     if (!class_exists(RuntimeException::class, \extension_loaded('mongodb'))) {
         class RuntimeException extends \RuntimeException implements Exception
         {
+        }
+    }
+
+    if (!class_exists(ServerException::class, \extension_loaded('mongodb'))) {
+        class ServerException extends RuntimeException
+        {
+        }
+    }
+
+    if (!class_exists(CommandException::class, \extension_loaded('mongodb'))) {
+        class CommandException extends ServerException
+        {
+            public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null)
+            {
+                parent::__construct($message, $code, $previous);
+            }
         }
     }
 }

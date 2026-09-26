@@ -33,6 +33,11 @@ class MongoDbTransportIntegrationTest extends TestCase
     private Client $client;
     private Connection $connection;
     private MongoDbTransport $transport;
+    private bool $isReplicaSet = false;
+
+    /** Cached across tests: the readiness probe and the replica set detection run once per process. */
+    private static ?bool $serverReachable = null;
+    private static bool $replicaSet = false;
 
     protected function setUp(): void
     {
@@ -47,13 +52,31 @@ class MongoDbTransportIntegrationTest extends TestCase
 
         $this->client = new Client(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017', ['serverSelectionTimeoutMS' => 3000]);
 
-        try {
-            $this->client->getDatabase(self::DATABASE)->command(['ping' => 1]);
-        } catch (\Throwable) {
+        if (null === self::$serverReachable) {
+            try {
+                $this->client->getDatabase(self::DATABASE)->command(['ping' => 1]);
+                $hello = $this->client->getDatabase('admin')->command(['hello' => 1])->toArray()[0];
+                self::$serverReachable = true;
+                self::$replicaSet = isset($hello['setName']) || isset($hello->setName);
+            } catch (\Throwable) {
+                self::$serverReachable = false;
+            }
+        }
+
+        $this->isReplicaSet = self::$replicaSet;
+
+        if (!self::$serverReachable) {
+            if (false !== getenv('MONGODB_URI')) {
+                self::fail('MongoDB server not found although MONGODB_URI was provided.');
+            }
+
             $this->markTestSkipped('MongoDB server not found.');
         }
 
-        $this->connection = Connection::fromDsn('mongodb://localhost/'.self::DATABASE, [], $this->client);
+        // the existing tests assert polling semantics: disable the change stream
+        // to keep them fast and deterministic (the stream path is covered by
+        // dedicated tests using explicitly stream-enabled connections)
+        $this->connection = Connection::fromDsn(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017', ['wait_time' => 0, 'database' => self::DATABASE], $this->client);
         $this->connection->deleteAll();
         $this->transport = new MongoDbTransport($this->connection, new PhpSerializer());
     }
@@ -110,7 +133,7 @@ class MongoDbTransportIntegrationTest extends TestCase
         $this->assertCount(1, $this->transport->get());
         $this->assertSame([], $this->transport->get());
 
-        $impatientConnection = Connection::fromDsn('mongodb://localhost/'.self::DATABASE, ['redeliver_timeout' => 0], $this->client);
+        $impatientConnection = Connection::fromDsn(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017', ['redeliver_timeout' => 0, 'database' => self::DATABASE], $this->client);
         $impatientTransport = new MongoDbTransport($impatientConnection, new PhpSerializer());
 
         usleep(2000);
@@ -152,5 +175,22 @@ class MongoDbTransportIntegrationTest extends TestCase
         }
 
         $this->assertContainsEquals(['availableAt' => 1, 'queueName' => 1, 'deliveredAt' => 1], $indexKeys);
+    }
+
+    public function testChangeStreamsFallBackToPollingOnAStandaloneServer()
+    {
+        if ($this->isReplicaSet) {
+            $this->markTestSkipped('A standalone server is required for this test.');
+        }
+
+        // nothing is claimable at first, so getFromStream() must attempt watch()
+        // and fall back to polling on a standalone server
+        $streaming = new MongoDbTransport(Connection::fromDsn(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017', ['wait_time' => 1, 'database' => self::DATABASE], $this->client), new PhpSerializer());
+        $this->assertSame([], $streaming->get());
+
+        $streaming->send(new Envelope(new DummyMessage('Hi')));
+        $envelopes = $streaming->get();
+        $this->assertCount(1, $envelopes);
+        $this->assertSame('Hi', $envelopes[0]->getMessage()->getMessage());
     }
 }

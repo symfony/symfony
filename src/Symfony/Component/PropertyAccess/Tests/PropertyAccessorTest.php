@@ -33,10 +33,12 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestCollectionWithCustomMutatorsOwner;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestIgnoreVoidAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyDynamicallyCreated;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyGetterOnObject;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyGetterOnObjectMagicGet;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestReadOnlyCollectionOwner;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularAndPluralProps;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
@@ -410,6 +412,57 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($author, 'magicCallProperty', 'Updated');
 
         $this->assertEquals('Updated', $author->__call('getMagicCallProperty', []));
+    }
+
+    public function testSetValuePopulatesReadOnlyCollectionWithoutAdder()
+    {
+        $object = new TestReadOnlyCollectionOwner();
+
+        $this->propertyAccessor->setValue($object, 'items', ['first', 'third']);
+
+        $this->assertEquals(['first', 'third'], iterator_to_array($object->getItems()));
+        $this->assertSame($object->getItems(), (new \ReflectionProperty($object, 'items'))->getValue($object));
+    }
+
+    public function testSetValueMergesReadOnlyCollectionWhenAlreadyPopulated()
+    {
+        $object = new TestReadOnlyCollectionOwner();
+        $object->getItems()->add('second');
+        $object->getItems()->add('fourth');
+
+        $this->propertyAccessor->setValue($object, 'items', ['first', 'second', 'third']);
+
+        $this->assertEqualsCanonicalizing(['first', 'second', 'third'], array_values(iterator_to_array($object->getItems())));
+        $this->assertSame($object->getItems(), (new \ReflectionProperty($object, 'items'))->getValue($object));
+    }
+
+    public function testIsWritableReturnsTrueForReadOnlyCollectionWithTypedProperty()
+    {
+        $object = new TestReadOnlyCollectionOwner();
+
+        $this->assertTrue($this->propertyAccessor->isWritable($object, 'items'));
+    }
+
+    public function testSetValuePopulatesCollectionWithCustomMutatorNames()
+    {
+        $object = new TestCollectionWithCustomMutatorsOwner();
+
+        $this->propertyAccessor->setValue($object, 'items', ['first', 'third']);
+
+        $this->assertEquals(['first', 'third'], iterator_to_array($object->getItems()));
+        $this->assertSame($object->getItems(), (new \ReflectionProperty($object, 'items'))->getValue($object));
+    }
+
+    public function testSetValueMergesCollectionWithCustomMutatorNames()
+    {
+        $object = new TestCollectionWithCustomMutatorsOwner();
+        $object->getItems()->push('second');
+        $object->getItems()->push('fourth');
+
+        $this->propertyAccessor->setValue($object, 'items', ['first', 'second', 'third']);
+
+        $this->assertEqualsCanonicalizing(['first', 'second', 'third'], array_values(iterator_to_array($object->getItems())));
+        $this->assertSame($object->getItems(), (new \ReflectionProperty($object, 'items'))->getValue($object));
     }
 
     public function testGetValueWhenArrayValueIsNull()

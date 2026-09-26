@@ -60,7 +60,7 @@ class UnusedTagsPassUtils
         $files = Finder::create()->files()->name('*.php')->path('DependencyInjection')->notPath('Tests')->in(\dirname(__DIR__, 5));
         foreach ($files as $file) {
             $contents = file_get_contents($file);
-            if (preg_match_all('{findTaggedServiceIds\(\'([^\']+)\'}', $contents, $matches)) {
+            if (preg_match_all('{findTaggedServiceIds\(\'([^\']+)\'[,)]}', $contents, $matches)) {
                 foreach ($matches[1] as $match) {
                     if ('my.tag' === $match) {
                         continue;

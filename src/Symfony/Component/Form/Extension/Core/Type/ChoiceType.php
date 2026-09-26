@@ -49,7 +49,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorTrait;
 
 class ChoiceType extends AbstractType
 {
@@ -266,6 +268,21 @@ class ChoiceType extends AbstractType
             $view->vars['placeholder_attr'] = $options['placeholder_attr'];
         }
 
+        if (false !== $options['sort_choices']) {
+            // Labels are sorted once translated, which is only possible here: the
+            // translation domain may be inherited from the parent view
+            $collator = new \Collator($this->translator?->getLocale() ?? \Locale::getDefault());
+            // Numbers are compared by their value, so "2" comes before "10"
+            $collator->setAttribute(\Collator::NUMERIC_COLLATION, \Collator::ON);
+
+            $compare = true === $options['sort_choices']
+                ? static fn (ChoiceGroupView|ChoiceView $a, ChoiceGroupView|ChoiceView $b, string $labelA, string $labelB): int => $collator->compare($labelA, $labelB)
+                : $options['sort_choices'](...);
+
+            $view->vars['preferred_choices'] = $this->sortChoiceViews($view->vars['preferred_choices'], $compare, $collator, $choiceTranslationDomain);
+            $view->vars['choices'] = $this->sortChoiceViews($view->vars['choices'], $compare, $collator, $choiceTranslationDomain);
+        }
+
         if ($options['multiple'] && !$options['expanded']) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
@@ -289,6 +306,25 @@ class ChoiceType extends AbstractType
 
             foreach ($view as $childView) {
                 $childView->vars['full_name'] = $childName;
+            }
+
+            if (false !== $options['sort_choices']) {
+                // Expanded choices are rendered from the children, which were
+                // added in the unsorted order: they must follow the sorted views
+                $children = $view->children;
+                $sorted = isset($children['placeholder']) ? ['placeholder' => $children['placeholder']] : [];
+
+                // Choice names are often integers, so both lists must not be merged
+                foreach ([$view->vars['preferred_choices'], $view->vars['choices']] as $choiceViews) {
+                    foreach ($this->getChoiceViewNames($choiceViews) as $name) {
+                        if (isset($children[$name])) {
+                            $sorted[$name] ??= $children[$name];
+                        }
+                    }
+                }
+
+                // Children not backed by a choice view keep their position at the end
+                $view->children = $sorted + $children;
             }
         }
     }
@@ -369,6 +405,7 @@ class ChoiceType extends AbstractType
             'separator' => '-------------------',
             'separator_html' => false,
             'duplicate_preferred_choices' => true,
+            'sort_choices' => false,
             'group_by' => null,
             'empty_data' => $emptyData,
             'placeholder' => $placeholderDefault,
@@ -387,6 +424,13 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
         $resolver->setNormalizer('choice_loader', $choiceLoaderNormalizer);
+        $resolver->setNormalizer('sort_choices', static function (Options $options, bool|callable $sortChoices) {
+            if (false !== $sortChoices && !\extension_loaded('intl')) {
+                throw new LogicException('The "sort_choices" option requires the "intl" PHP extension.');
+            }
+
+            return $sortChoices;
+        });
 
         $resolver->setAllowedTypes('choices', ['null', 'array', \Traversable::class]);
         $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);
@@ -404,9 +448,11 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('separator', ['string']);
         $resolver->setAllowedTypes('separator_html', ['bool']);
         $resolver->setAllowedTypes('duplicate_preferred_choices', 'bool');
+        $resolver->setAllowedTypes('sort_choices', ['bool', 'callable']);
         $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', PropertyPath::class, GroupBy::class]);
 
         $resolver->setInfo('choice_lazy', 'Load choices on demand. When set to true, only the selected choices are loaded and rendered.');
+        $resolver->setInfo('sort_choices', 'Sort the choices by their translated label: true for the alphabetical order of the current locale, or a callable comparing two choices (their views, translated labels and the collator of the locale).');
     }
 
     public function getBlockPrefix(): string
@@ -479,6 +525,82 @@ class ChoiceType extends AbstractType
             $options['choice_value'],
             $options['choice_filter']
         );
+    }
+
+    /**
+     * Sorts choice views by comparing them along with their translated label.
+     *
+     * @param array<array-key, ChoiceGroupView|ChoiceView>                                                    $choiceViews
+     * @param \Closure(ChoiceGroupView|ChoiceView, ChoiceGroupView|ChoiceView, string, string, \Collator):int $compare
+     *
+     * @return array<array-key, ChoiceGroupView|ChoiceView>
+     */
+    private function sortChoiceViews(array $choiceViews, \Closure $compare, \Collator $collator, string|false|null $translationDomain): array
+    {
+        // The empty choice acts as placeholder and stays on top
+        $sorted = [];
+        foreach ($choiceViews as $key => $choiceView) {
+            if ($choiceView instanceof ChoiceView && '' === $choiceView->value) {
+                $sorted[$key] = $choiceView;
+                unset($choiceViews[$key]);
+            }
+        }
+
+        $labels = [];
+        foreach ($choiceViews as $key => $choiceView) {
+            if ($choiceView instanceof ChoiceGroupView) {
+                // Cached views are shared between forms and must not be modified
+                $choiceViews[$key] = new ChoiceGroupView($choiceView->label, $this->sortChoiceViews($choiceView->choices, $compare, $collator, $translationDomain));
+                $labels[$key] = $this->translateLabel($choiceView->label, [], $translationDomain);
+            } else {
+                $labels[$key] = $this->translateLabel($choiceView->label, $choiceView->labelTranslationParameters, $translationDomain);
+            }
+        }
+
+        // Sorting is stable, choices compared as equal keep their original order
+        $keys = array_keys($choiceViews);
+        usort($keys, static fn (int|string $a, int|string $b): int => $compare($choiceViews[$a], $choiceViews[$b], $labels[$a], $labels[$b], $collator));
+
+        foreach ($keys as $key) {
+            $sorted[$key] = $choiceViews[$key];
+        }
+
+        return $sorted;
+    }
+
+    /**
+     * @param array<array-key, ChoiceGroupView|ChoiceView> $choiceViews
+     *
+     * @return iterable<array-key>
+     */
+    private function getChoiceViewNames(array $choiceViews): iterable
+    {
+        foreach ($choiceViews as $name => $choiceView) {
+            if ($choiceView instanceof ChoiceGroupView) {
+                yield from $this->getChoiceViewNames($choiceView->choices);
+            } else {
+                yield $name;
+            }
+        }
+    }
+
+    private function translateLabel(string|TranslatableInterface|false $label, array $parameters, string|false|null $translationDomain): string
+    {
+        if (false === $label) {
+            return '';
+        }
+
+        if ($label instanceof TranslatableInterface) {
+            return $label->trans($this->translator ?? new class implements TranslatorInterface {
+                use TranslatorTrait;
+            });
+        }
+
+        if (!$this->translator || false === $translationDomain) {
+            return $label;
+        }
+
+        return $this->translator->trans($label, $parameters, $translationDomain);
     }
 
     private function createChoiceListView(ChoiceListInterface $choiceList, array $options): ChoiceListView

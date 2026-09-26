@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0
  * Add `PolymorphicCollectionType` for collections whose entries do not all share the same type
  * Add `inputmode="numeric"` to `IntegerType` when the `grouping` option is enabled
+ * Add the `sort_choices` option to `ChoiceType` to sort the choices by their translated label, in the alphabetical order of the current locale or with a custom comparison callable
  * Add the `choice_help` option to `ChoiceType`
  * Add `$help` parameter to `ChoiceListFactoryInterface::createView()`
  * Add the `form_id` view variable, holding the id to render on the `<form>` element of a root form when a child uses `form_attr`

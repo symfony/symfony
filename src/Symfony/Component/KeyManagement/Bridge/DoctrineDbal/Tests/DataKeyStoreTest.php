@@ -18,10 +18,7 @@ use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\BinaryType;
-use Doctrine\DBAL\Types\BlobType;
-use Doctrine\DBAL\Types\StringType;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
@@ -380,16 +377,15 @@ class DataKeyStoreTest extends TestCase
         $columns = [];
         foreach (['id', 'scope', 'key_material', 'master_key_id', 'client'] as $name) {
             $column = $table->getColumn($name);
-            $type = method_exists($column, 'getTypeName') ? Type::getType($column->getTypeName()) : $column->getType();
-            $columns[$name] = [$type::class, $column->getLength()];
+            $columns[$name] = [$column->getTypeName(), $column->getLength()];
         }
 
         $this->assertSame([
-            'id' => [BinaryType::class, 16],
-            'scope' => [StringType::class, 191],
-            'key_material' => [BlobType::class, null],
-            'master_key_id' => [StringType::class, 255],
-            'client' => [StringType::class, 64],
+            'id' => [Types::BINARY, 16],
+            'scope' => [Types::STRING, 191],
+            'key_material' => [Types::BLOB, null],
+            'master_key_id' => [Types::STRING, 255],
+            'client' => [Types::STRING, 64],
         ], $columns);
         $this->assertCount(5, $table->getColumns(), 'the queries name these five columns and no other.');
     }
@@ -422,12 +418,7 @@ class DataKeyStoreTest extends TestCase
 
     public function testConfigureSchemaDoesNotOverwriteATableTheApplicationAlreadyDeclared()
     {
-        if (method_exists(Schema::class, 'edit')) {
-            $schema = (new Schema())->edit()->addTable(new Table(DataKeyStore::DEFAULT_TABLE))->create();
-        } else {
-            $schema = new Schema();
-            $schema->createTable(DataKeyStore::DEFAULT_TABLE);
-        }
+        $schema = (new Schema())->edit()->addTable(new Table(DataKeyStore::DEFAULT_TABLE))->create();
 
         $schema = $this->storeWithoutTable()->configureSchema($schema, static fn (): bool => true);
 

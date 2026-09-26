@@ -39,6 +39,9 @@ class Cookie
     protected ?string $expires = null;
     protected string $path;
     protected string $rawValue;
+    private bool $browserCompatible = false;
+    private ?int $maxAge = null;
+    private bool $hostOnly = false;
 
     /**
      * Sets a cookie.
@@ -52,6 +55,8 @@ class Cookie
      * @param bool            $httponly     The cookie httponly flag
      * @param bool            $encodedValue Whether the value is encoded or not
      * @param string|null     $samesite     The cookie samesite attribute
+     * @param int|null        $maxAge       The maximum lifetime of the cookie in seconds
+     * @param bool            $hostOnly     Whether the cookie is available only to the origin host
      */
     public function __construct(
         private string $name,
@@ -63,7 +68,12 @@ class Cookie
         private bool $httponly = true,
         bool $encodedValue = false,
         private ?string $samesite = null,
+        ?int $maxAge = null,
+        bool $hostOnly = false,
     ) {
+        $this->maxAge = $maxAge;
+        $this->hostOnly = $hostOnly;
+
         if ($encodedValue) {
             $this->rawValue = $value ?? '';
             $this->value = rawurldecode($this->rawValue);
@@ -72,6 +82,11 @@ class Cookie
             $this->rawValue = rawurlencode($this->value);
         }
         $this->path = $path ?: '/';
+
+        if (null !== $this->maxAge) {
+            $now = time();
+            $expires = 0 >= $this->maxAge ? $now - 1 : ($this->maxAge > \PHP_INT_MAX - $now ? \PHP_INT_MAX : $now + $this->maxAge);
+        }
 
         if (null !== $expires) {
             $timestampAsDateTime = \DateTimeImmutable::createFromFormat('U', $expires);
@@ -95,7 +110,11 @@ class Cookie
             $cookie .= '; expires='.str_replace('+0000', '', $dateTime->format(self::DATE_FORMATS[0]));
         }
 
-        if ('' !== $this->domain) {
+        if (null !== $this->maxAge) {
+            $cookie .= '; max-age='.$this->maxAge;
+        }
+
+        if ('' !== $this->domain && !$this->hostOnly) {
             $cookie .= '; domain='.$this->domain;
         }
 
@@ -125,75 +144,17 @@ class Cookie
      */
     public static function fromString(string $cookie, ?string $url = null): static
     {
-        $parts = explode(';', $cookie);
+        return self::createFromString($cookie, $url, false);
+    }
 
-        if (!str_contains($parts[0], '=')) {
-            throw new InvalidArgumentException(\sprintf('The cookie string "%s" is not valid.', $parts[0]));
-        }
-
-        [$name, $value] = explode('=', array_shift($parts), 2);
-
-        $values = [
-            'name' => trim($name),
-            'value' => trim($value),
-            'expires' => null,
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => false,
-            'passedRawValue' => true,
-            'samesite' => null,
-        ];
-
-        if (null !== $url) {
-            if (false === ($urlParts = parse_url($url)) || !isset($urlParts['host'])) {
-                throw new InvalidArgumentException(\sprintf('The URL "%s" is not valid.', $url));
-            }
-
-            $values['domain'] = $urlParts['host'];
-            $values['path'] = isset($urlParts['path']) ? substr($urlParts['path'], 0, strrpos($urlParts['path'], '/')) : '';
-        }
-
-        foreach ($parts as $part) {
-            $part = trim($part);
-
-            if ('secure' === strtolower($part)) {
-                // Ignore the secure flag if the original URI is not given or is not HTTPS
-                if (null === $url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
-                    continue;
-                }
-
-                $values['secure'] = true;
-
-                continue;
-            }
-
-            if ('httponly' === strtolower($part)) {
-                $values['httponly'] = true;
-
-                continue;
-            }
-
-            if (2 === \count($elements = explode('=', $part, 2))) {
-                if ('expires' === strtolower($elements[0])) {
-                    $elements[1] = self::parseDate($elements[1]);
-                }
-
-                $values[strtolower($elements[0])] = $elements[1];
-            }
-        }
-
-        return new static(
-            $values['name'],
-            $values['value'],
-            $values['expires'],
-            $values['path'],
-            $values['domain'],
-            $values['secure'],
-            $values['httponly'],
-            $values['passedRawValue'],
-            $values['samesite']
-        );
+    /**
+     * Creates a Cookie instance using browser-compatible Set-Cookie semantics.
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function fromStringBrowserCompatible(string $cookie, ?string $url = null): static
+    {
+        return self::createFromString($cookie, $url, true);
     }
 
     private static function parseDate(string $dateValue): ?string
@@ -250,6 +211,14 @@ class Cookie
     }
 
     /**
+     * Returns the maximum lifetime of the cookie in seconds.
+     */
+    public function getMaxAge(): ?int
+    {
+        return $this->maxAge;
+    }
+
+    /**
      * Gets the path of the cookie.
      */
     public function getPath(): string
@@ -263,6 +232,14 @@ class Cookie
     public function getDomain(): string
     {
         return $this->domain;
+    }
+
+    /**
+     * Returns whether the cookie is available only to the origin host.
+     */
+    public function isHostOnly(): bool
+    {
+        return $this->hostOnly;
     }
 
     /**
@@ -286,6 +263,10 @@ class Cookie
      */
     public function isExpired(): bool
     {
+        if ($this->browserCompatible) {
+            return null !== $this->expires && time() > $this->expires;
+        }
+
         return null !== $this->expires && 0 != $this->expires && $this->expires <= time();
     }
 
@@ -295,5 +276,196 @@ class Cookie
     public function getSameSite(): ?string
     {
         return $this->samesite;
+    }
+
+    private static function createFromString(string $cookie, ?string $url, bool $browserCompatible): static
+    {
+        $parts = explode(';', $cookie);
+
+        if (!str_contains($parts[0], '=')) {
+            throw new InvalidArgumentException(\sprintf('The cookie string "%s" is not valid.', $parts[0]));
+        }
+
+        [$name, $value] = explode('=', array_shift($parts), 2);
+
+        if ($browserCompatible) {
+            $name = trim($name, " \t");
+            $value = trim($value, " \t");
+        } else {
+            $name = trim($name);
+            $value = trim($value);
+        }
+
+        $values = [
+            'name' => $name,
+            'value' => $value,
+            'expires' => null,
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => false,
+            'passedRawValue' => true,
+            'samesite' => null,
+            'max-age' => null,
+            'hostOnly' => false,
+        ];
+
+        if (null !== $url) {
+            if (false === ($urlParts = parse_url($url)) || !isset($urlParts['host'])) {
+                throw new InvalidArgumentException(\sprintf('The URL "%s" is not valid.', $url));
+            }
+
+            $values['domain'] = $urlParts['host'];
+            $values['path'] = isset($urlParts['path']) ? substr($urlParts['path'], 0, strrpos($urlParts['path'], '/')) : '';
+        }
+
+        $hasDomainAttribute = false;
+        $hasPathAttribute = false;
+
+        foreach ($parts as $part) {
+            $part = $browserCompatible ? trim($part, " \t") : trim($part);
+
+            if ('secure' === strtolower($part)) {
+                // Ignore the secure flag if the original URI is not given or is not HTTPS
+                if (!$browserCompatible && (null === $url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme'])) {
+                    continue;
+                }
+
+                $values['secure'] = true;
+
+                continue;
+            }
+
+            if ('httponly' === strtolower($part)) {
+                $values['httponly'] = true;
+
+                continue;
+            }
+
+            if (2 === \count($elements = explode('=', $part, 2))) {
+                $attribute = strtolower($browserCompatible ? trim($elements[0], " \t") : $elements[0]);
+                if ($browserCompatible) {
+                    $elements[1] = trim($elements[1], " \t");
+                }
+                if ($browserCompatible && ('secure' === $attribute || 'httponly' === $attribute)) {
+                    if ($elements[1]) {
+                        $values[$attribute] = true;
+                    }
+
+                    continue;
+                }
+                if ('expires' === $attribute) {
+                    $elements[1] = $browserCompatible ? self::parseBrowserCompatibleExpires($elements[1]) : self::parseDate($elements[1]);
+                } elseif ($browserCompatible && 'max-age' === $attribute) {
+                    if (null === $maxAge = self::parseMaxAge($elements[1])) {
+                        continue;
+                    }
+
+                    $elements[1] = $maxAge;
+                }
+
+                $hasDomainAttribute = $hasDomainAttribute || 'domain' === $attribute;
+                $hasPathAttribute = $hasPathAttribute || 'path' === $attribute;
+                $values[$attribute] = $elements[1];
+            }
+        }
+
+        if ($browserCompatible) {
+            if ($hasDomainAttribute) {
+                $values['domain'] = strtolower(trim($values['domain'], " \t"));
+                if ('' !== $values['domain'] && str_ends_with($values['domain'], '.') && '' !== trim($values['domain'], '.')) {
+                    $values['domain'] = '';
+                } elseif ('' !== $values['domain'] && '.' !== $values['domain'] && str_starts_with($values['domain'], '.')) {
+                    $values['domain'] = substr($values['domain'], 1);
+                }
+            }
+
+            if (!$hasDomainAttribute || '' === $values['domain']) {
+                $values['hostOnly'] = true;
+                $values['domain'] = $urlParts['host'] ?? '';
+            }
+
+            if (!$hasPathAttribute || !str_starts_with($values['path'], '/')) {
+                $values['path'] = self::getDefaultPath($urlParts['path'] ?? '/');
+            }
+        }
+
+        $arguments = [
+            $values['name'],
+            $values['value'],
+            $values['expires'],
+            $values['path'],
+            $values['domain'],
+            $values['secure'],
+            $values['httponly'],
+            $values['passedRawValue'],
+            $values['samesite'],
+        ];
+        if ($browserCompatible) {
+            $arguments[] = $values['max-age'];
+            $arguments[] = $values['hostOnly'];
+        }
+
+        $cookie = new static(...$arguments);
+        $cookie->browserCompatible = $browserCompatible;
+
+        return $cookie;
+    }
+
+    private static function parseMaxAge(string $maxAge): ?int
+    {
+        if (!preg_match('/^[+-]?\d+$/D', $maxAge)) {
+            return null;
+        }
+
+        return self::parseNumericInteger($maxAge);
+    }
+
+    private static function parseBrowserCompatibleExpires(string $expires): ?string
+    {
+        if (!is_numeric($expires)) {
+            return self::parseDate($expires);
+        }
+
+        $expires = self::parseNumericInteger($expires);
+
+        return null === $expires ? null : (string) $expires;
+    }
+
+    private static function parseNumericInteger(string $value): ?int
+    {
+        if (!preg_match('/^[+-]?\d+$/D', $value)) {
+            $number = (float) $value;
+            if (!is_finite($number) || $number < \PHP_INT_MIN || $number > \PHP_INT_MAX) {
+                return null;
+            }
+
+            if (8 === \PHP_INT_SIZE && ($number <= (float) \PHP_INT_MIN || $number >= (float) \PHP_INT_MAX)) {
+                return null;
+            }
+
+            return (int) $number;
+        }
+
+        $negative = str_starts_with($value, '-');
+        $digits = ltrim($value, '+-');
+        $digits = ltrim($digits, '0');
+        $digits = '' === $digits ? '0' : $digits;
+        $limit = $negative ? substr((string) \PHP_INT_MIN, 1) : (string) \PHP_INT_MAX;
+
+        if (\strlen($digits) > \strlen($limit) || (\strlen($digits) === \strlen($limit) && 0 < strcmp($digits, $limit))) {
+            return null;
+        }
+
+        return (int) ($negative ? '-'.$digits : $digits);
+    }
+
+    private static function getDefaultPath(string $path): string
+    {
+        if (!str_starts_with($path, '/') || '/' === $path || false === $lastSlash = strrpos($path, '/')) {
+            return '/';
+        }
+
+        return 0 === $lastSlash ? '/' : substr($path, 0, $lastSlash);
     }
 }

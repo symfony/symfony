@@ -41,7 +41,23 @@
     },
     "conflict": {
         "symfony/dependency-injection": "<8.2",
-        "symfony/event-dispatcher": "<8.2"
+        "symfony/event-dispatcher": "<8.2",
+        "symfony/stimulus-bundle": "<3.5",
+        "symfony/ux-autocomplete": "<3.5",
+        "symfony/ux-chartjs": "<3.5",
+        "symfony/ux-cropperjs": "<3.5",
+        "symfony/ux-dropzone": "<3.5",
+        "symfony/ux-lazy-image": "<3.5",
+        "symfony/ux-live-component": "<3.5",
+        "symfony/ux-notify": "<3.5",
+        "symfony/ux-react": "<3.5",
+        "symfony/ux-svelte": "<3.5",
+        "symfony/ux-swup": "<3.5",
+        "symfony/ux-toggle-password": "<3.5",
+        "symfony/ux-translator": "<3.5",
+        "symfony/ux-turbo": "<3.5",
+        "symfony/ux-typed": "<3.5",
+        "symfony/ux-vue": "<3.5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\AssetMapper\\": "" },

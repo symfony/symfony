@@ -45,6 +45,7 @@ CHANGELOG
  * Allow the `audience` option of the `oidc` token handler to name several identifiers as a list, as the `oauth2` one does
  * Add the `client_secret_jwt` and `private_key_jwt` client authentication methods to the `oidc_login` authenticator, which authenticate the client at the token endpoint with a JWT assertion it signs itself (RFC 7523, OIDC Core 1.0 §9)
  * Dispatch `OidcAuthorizationRequestEvent` from the `oidc_login` authenticator through the firewall event dispatcher, so that a listener can tailor the `authorization_params` of each authorization request
+ * Add the `client_certificate` option to the `oidc_login` authenticator, which presents a certificate to the provider so that it authenticates the client on it (RFC 8705 §2, with the `tls_client_auth` or `self_signed_tls_client_auth` client authentication method), binds the tokens it issues to it (RFC 8705 §3), or both, the requests being made to the `mtls_endpoint_aliases` of the provider (RFC 8705 §5) whenever it is configured
 
 8.1
 ---

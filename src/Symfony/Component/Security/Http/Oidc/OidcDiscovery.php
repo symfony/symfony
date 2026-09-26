@@ -128,8 +128,16 @@ final class OidcDiscovery implements ResetInterface
             // not tell which URL served it, so store only when that URL is known
             $url = $response->getInfo('url');
             $url = \is_string($url) ? $url : '';
+            $aliases = \is_array($configuration['mtls_endpoint_aliases'] ?? null) ? $configuration['mtls_endpoint_aliases'] : [];
             foreach ($this->checkedEndpoints as $endpoint) {
                 self::checkEndpointScheme($configuration[$endpoint] ?? null, $endpoint, $url);
+
+                // an alias is checked like the endpoint it stands for, and only when it is
+                // announced: a provider publishing none serves its ordinary endpoints to
+                // every client, which the loop above has already checked
+                if (\array_key_exists($endpoint, $aliases)) {
+                    self::checkEndpointScheme($aliases[$endpoint], 'mtls_endpoint_aliases.'.$endpoint, $url);
+                }
             }
             $save = '' !== $url;
 
@@ -188,14 +196,43 @@ final class OidcDiscovery implements ResetInterface
      */
     public function getSecureEndpoint(string $endpoint): string
     {
-        $url = $this->getConfiguration()[$endpoint] ?? null;
+        return $this->secureUrl($this->getConfiguration()[$endpoint] ?? null, $endpoint);
+    }
 
+    /**
+     * Same, for a client that presents a certificate to the provider.
+     *
+     * A provider accepting client certificates serves a second set of endpoints, which it
+     * publishes under "mtls_endpoint_aliases" (RFC 8705, Section 5), and a client intending
+     * to do mutual TLS, to authenticate itself or only to acquire or use certificate-bound
+     * tokens, MUST use those. Only the requests the client makes itself are concerned, never
+     * the ones the browser is sent to. An endpoint the provider publishes no alias for is
+     * served at its ordinary URL, which is then the only one it has; an alias that is
+     * announced but unusable is reported under its own name rather than silently giving way
+     * to an endpoint that asks for no certificate.
+     *
+     * @throws AuthenticationException If the endpoint is not announced, or does not use HTTPS
+     */
+    public function getSecureMutualTlsEndpoint(string $endpoint): string
+    {
+        $configuration = $this->getConfiguration();
+        $aliases = \is_array($configuration['mtls_endpoint_aliases'] ?? null) ? $configuration['mtls_endpoint_aliases'] : [];
+
+        if (!\array_key_exists($endpoint, $aliases)) {
+            return $this->secureUrl($configuration[$endpoint] ?? null, $endpoint);
+        }
+
+        return $this->secureUrl($aliases[$endpoint], 'mtls_endpoint_aliases.'.$endpoint);
+    }
+
+    private function secureUrl(mixed $url, string $name): string
+    {
         if (!\is_string($url) || '' === $url) {
-            throw new AuthenticationException(\sprintf('The OIDC provider does not announce any "%s".', $endpoint));
+            throw new AuthenticationException(\sprintf('The OIDC provider does not announce any "%s".', $name));
         }
 
         if (!self::isSecureUrl($url)) {
-            throw new AuthenticationException(\sprintf('The "%s" announced by the OIDC provider must use HTTPS (got "%s"): the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS.', $endpoint, $url));
+            throw new AuthenticationException(\sprintf('The "%s" announced by the OIDC provider must use HTTPS (got "%s"): the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS.', $name, $url));
         }
 
         return $url;

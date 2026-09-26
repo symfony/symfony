@@ -24,6 +24,8 @@ use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -154,8 +156,8 @@ class OidcClientTest extends TestCase
     /**
      * The UserInfo endpoint is a protected resource.
      *
-     * It takes the access token as a bearer credential, so the client authentication has no
-     * say in that request.
+     * It takes the access token as a bearer credential, so a client authentication that
+     * credentials the token request has no say in this one.
      */
     public function testFetchUserInfoUsesTheAccessTokenAndNoClientAuthentication()
     {
@@ -328,6 +330,129 @@ class OidcClientTest extends TestCase
         $this->expectExceptionMessage('must use HTTPS');
 
         $client->refreshToken('refresh-123');
+    }
+
+    /**
+     * RFC 8705, Section 5: the endpoints accepting a client certificate are the ones
+     * announced under "mtls_endpoint_aliases", when the provider announces any.
+     *
+     * What sends the client there is carrying a certificate, not the method it authenticates
+     * with: Section 4 makes the two independent, and Section 5 names both reasons.
+     */
+    public function testTheTokenRequestIsMadeToTheMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new TlsClientAuth(), true);
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertSame('https://mtls.provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    public function testTheRefreshRequestIsMadeToTheMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-456']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new SelfSignedTlsClientAuth(), true);
+
+        $client->refreshToken('refresh-123');
+
+        $this->assertSame('https://mtls.provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    /**
+     * The other FAPI 2.0 combination: the client signs an assertion and still presents a
+     * certificate, only so that the provider binds the tokens it issues to it (Section 3).
+     *
+     * It is a client "intending to do mutual TLS" all the same, so Section 5 sends it to the
+     * aliases, which is what deriving them from the authentication method would not do.
+     */
+    public function testTheTokenRequestOfAnAssertionSigningClientIsMadeToTheMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new ClientSecretPost('test-client-secret'), true);
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertSame('https://mtls.provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    /**
+     * A provider that asked for a certificate binds the access token it issues to it, which
+     * RFC 8705, Section 3 has the resource server check.
+     *
+     * The UserInfo endpoint is such a resource server, and the provider serves it under the
+     * alias asking for the certificate: the bearer token alone gets the client nowhere. The
+     * certificate travels with the HTTP client, so nothing is added to the request here.
+     */
+    public function testFetchUserInfoIsMadeToTheMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['sub' => '123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new TlsClientAuth(), true);
+
+        $claims = $client->fetchUserInfo('access-token');
+
+        $this->assertSame('123', $claims['sub']);
+        $this->assertSame('https://mtls.provider.example.com/userinfo', $mockResponse->getRequestUrl());
+        $this->assertSame(['Authorization: Bearer access-token'], $mockResponse->getRequestOptions()['normalized_headers']['authorization']);
+    }
+
+    /**
+     * The aliases cover the endpoints the provider chose to isolate, and no others.
+     */
+    public function testFetchUserInfoIsMadeToTheAnnouncedEndpointWhenItHasNoMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['sub' => '123']);
+        $discovery = $this->createDiscovery([
+            'issuer' => 'https://provider.example.com',
+            'token_endpoint' => 'https://provider.example.com/token',
+            'userinfo_endpoint' => 'https://provider.example.com/userinfo',
+            'mtls_endpoint_aliases' => ['token_endpoint' => 'https://mtls.provider.example.com/token'],
+        ]);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $discovery, 'test-client-id', new TlsClientAuth(), true);
+
+        $client->fetchUserInfo('access-token');
+
+        $this->assertSame('https://provider.example.com/userinfo', $mockResponse->getRequestUrl());
+    }
+
+    /**
+     * A provider announcing aliases serves its ordinary endpoints all the same, to the
+     * clients that present no certificate.
+     */
+    public function testTheMtlsAliasesAreIgnoredByAClientPresentingNoCertificate()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new ClientSecretPost('test-client-secret'));
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertSame('https://provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    /**
+     * The certificate is the HTTP client's, so this class puts none on the request.
+     */
+    public function testNoClientCertificateIsAddedToTheRequest()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new TlsClientAuth(), true);
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertArrayNotHasKey('local_cert', array_filter($mockResponse->getRequestOptions(), static fn ($value): bool => null !== $value));
+    }
+
+    private function createMtlsDiscovery(): OidcDiscovery
+    {
+        return $this->createDiscovery([
+            'issuer' => 'https://provider.example.com',
+            'token_endpoint' => 'https://provider.example.com/token',
+            'userinfo_endpoint' => 'https://provider.example.com/userinfo',
+            'mtls_endpoint_aliases' => [
+                'token_endpoint' => 'https://mtls.provider.example.com/token',
+                'userinfo_endpoint' => 'https://mtls.provider.example.com/userinfo',
+            ],
+        ]);
     }
 
     private function createClient(?ClientAuthenticationInterface $clientAuthentication = null, ?OidcDiscovery $discovery = null): OidcClient

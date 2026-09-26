@@ -800,6 +800,174 @@ class OidcLoginFactoryTest extends TestCase
     }
 
     /**
+     * The two mutual-TLS methods hold nothing of their own.
+     *
+     * The certificate they authenticate with is the one of the firewall, so the one service
+     * of each is shared by every firewall using it, as the public client one is.
+     */
+    public function testTheTlsClientAuthMethodTakesNoParameter()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_certificate' => '/certs/client.pem',
+            'client_authentication' => ['tls_client_auth' => true],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.client_authentication.main'));
+        $this->assertSame('security.oauth2.client_authentication.tls_client_auth', (string) $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(3));
+    }
+
+    public function testTheSelfSignedTlsClientAuthMethodTakesNoParameter()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_certificate' => '/certs/self-signed.pem',
+            'client_authentication' => 'self_signed_tls_client_auth',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertSame('security.oauth2.client_authentication.self_signed_tls_client_auth', (string) $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(3));
+    }
+
+    /**
+     * The certificate is named by its path, which the HTTP client reads when it makes the
+     * request, so that no key material travels through the container.
+     *
+     * It is carried by an HTTP client of its own, not by the one the discovery document and
+     * the provider JWKS are read with: those are public, and a certificate sent to fetch them
+     * would tell a provider asking for one that this client holds it.
+     */
+    public function testTheClientCertificateIsCarriedByTheHttpClientOfTheOidcClientAlone()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_certificate' => [
+                'certificate' => '/certs/client.pem',
+                'key' => '/certs/client.key',
+                'passphrase' => 'my-passphrase',
+            ],
+            'client_authentication' => ['tls_client_auth' => true],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $httpClient = $container->getDefinition('security.authenticator.oidc_login.client.http_client.main');
+        $factory = $httpClient->getFactory();
+        $this->assertIsArray($factory);
+        $this->assertSame(['http_client', 'withOptions'], [(string) $factory[0], $factory[1]]);
+        $this->assertSame([
+            'local_cert' => '/certs/client.pem',
+            'local_pk' => '/certs/client.key',
+            'passphrase' => 'my-passphrase',
+        ], $httpClient->getArgument(0));
+
+        $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
+        $this->assertSame('security.authenticator.oidc_login.client.http_client.main', (string) $client->getArgument(0));
+        $this->assertTrue($client->getArgument(4));
+        $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
+    }
+
+    /**
+     * A PEM file holding both the certificate and its private key is all it takes.
+     */
+    public function testTheClientCertificateTakesThePathAlone()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_certificate' => '/certs/client.pem',
+            'client_authentication' => ['client_secret_post' => 'my-secret'],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertSame(['local_cert' => '/certs/client.pem'], $container->getDefinition('security.authenticator.oidc_login.client.http_client.main')->getArgument(0));
+    }
+
+    /**
+     * RFC 8705, Section 4: a client may present a certificate without authenticating with it,
+     * only so that the provider binds the tokens it issues to it.
+     *
+     * The other FAPI 2.0 combination is exactly that, an assertion beside a certificate.
+     */
+    public function testAClientMayPresentACertificateWithoutAuthenticatingWithIt()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_certificate' => '/certs/client.pem',
+            'client_authentication' => ['client_secret_basic' => 'my-secret'],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertTrue($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+    }
+
+    /**
+     * A client presenting no certificate makes every request with the HTTP client of the
+     * firewall, and is not sent to the endpoints of RFC 8705, Section 5.
+     */
+    public function testAClientWithoutACertificateKeepsTheHttpClientOfTheFirewall()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_post' => 'my-secret'],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.client.http_client.main'));
+        $this->assertFalse($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+    }
+
+    #[DataProvider('provideMutualTlsMethodsWithoutACertificate')]
+    public function testRejectsAMutualTlsMethodWithoutACertificate(array $clientAuthentication)
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('so "client_certificate" must be configured beside them');
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => $clientAuthentication,
+        ], $factory);
+    }
+
+    public static function provideMutualTlsMethodsWithoutACertificate(): iterable
+    {
+        yield 'tls_client_auth' => [['tls_client_auth' => true]];
+        yield 'self_signed_tls_client_auth' => [['self_signed_tls_client_auth' => true]];
+    }
+
+    /**
      * Each assertion method takes the algorithms it can be signed with and no other, so that
      * a shared secret never keys an asymmetric signature nor a private key a MAC.
      */
@@ -917,11 +1085,11 @@ class OidcLoginFactoryTest extends TestCase
      * injecting into the OIDC client.
      */
     #[DataProvider('provideClientAuthenticationShapes')]
-    public function testEveryAcceptedShapeOfTheClientAuthenticationNode(array|string $clientAuthentication, string $expectedServiceId)
+    public function testEveryAcceptedShapeOfTheClientAuthenticationNode(array|string $clientAuthentication, string $expectedServiceId, array $extraConfig = [])
     {
         $container = new ContainerBuilder();
 
-        $config = [
+        $config = $extraConfig + [
             'provider_uri' => 'https://provider.example.com',
             'client_id' => 'my-client-id',
             'client_authentication' => $clientAuthentication,
@@ -949,6 +1117,13 @@ class OidcLoginFactoryTest extends TestCase
         yield 'none as a mapping' => [['none' => true], 'security.oauth2.client_authentication.none'];
         yield 'none as a null mapping' => [['none' => null], 'security.oauth2.client_authentication.none'];
         yield 'none as a string' => ['none', 'security.oauth2.client_authentication.none'];
+        $withCertificate = ['client_certificate' => '/certs/client.pem'];
+
+        yield 'tls_client_auth as a mapping' => [['tls_client_auth' => true], 'security.oauth2.client_authentication.tls_client_auth', $withCertificate];
+        yield 'tls_client_auth as a null mapping' => [['tls_client_auth' => null], 'security.oauth2.client_authentication.tls_client_auth', $withCertificate];
+        yield 'tls_client_auth as a string' => ['tls_client_auth', 'security.oauth2.client_authentication.tls_client_auth', $withCertificate];
+        yield 'self_signed_tls_client_auth as a mapping' => [['self_signed_tls_client_auth' => true], 'security.oauth2.client_authentication.self_signed_tls_client_auth', $withCertificate];
+        yield 'self_signed_tls_client_auth as a string' => ['self_signed_tls_client_auth', 'security.oauth2.client_authentication.self_signed_tls_client_auth', $withCertificate];
         yield 'a service as a mapping' => [['id' => 'app.client_authentication'], 'app.client_authentication'];
         yield 'a service as a string' => ['app.client_authentication', 'app.client_authentication'];
     }

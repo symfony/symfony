@@ -25,6 +25,8 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 return static function (ContainerConfigurator $container) {
@@ -88,6 +90,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('OIDC discovery'),
                 abstract_arg('client ID'),
                 abstract_arg('client authentication'),
+                abstract_arg('whether a client certificate is presented to the provider'),
             ])
 
         // the only client authentication method that has nothing to configure, so that
@@ -123,6 +126,13 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('assertion lifetime'),
                 service('clock'),
             ])
+
+        // the two methods of RFC 8705, Section 2, which hold no credential either: the
+        // certificate is the one the HTTP client of the firewall presents, so a single
+        // service of each is shared, as the public client one is
+        ->set('security.oauth2.client_authentication.tls_client_auth', TlsClientAuth::class)
+
+        ->set('security.oauth2.client_authentication.self_signed_tls_client_auth', SelfSignedTlsClientAuth::class)
 
         // the private key of the "private_key_jwt" method, parsed from the JSON-encoded JWK
         // the firewall configures, as the "oidc" access token handler parses its own keyset

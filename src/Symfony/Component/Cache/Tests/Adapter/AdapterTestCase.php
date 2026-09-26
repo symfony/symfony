@@ -157,6 +157,23 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertEqualsWithDelta(9 + time(), $metadata[CacheItem::METADATA_EXPIRY], 1);
     }
 
+    public function testGetReportsFailedSaves()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        $cache->deleteItems(['foo', 'bar']);
+
+        $value = static fn () => null;
+        $this->assertSame($value, $cache->get('foo', static fn () => $value, null, $metadata));
+        $this->assertTrue($metadata[CacheItem::METADATA_SAVE_FAILED]);
+
+        $this->assertSame('bar', $cache->get('bar', static fn () => 'bar', null, $metadata));
+        $this->assertArrayNotHasKey(CacheItem::METADATA_SAVE_FAILED, $metadata);
+    }
+
     public function testDefaultLifeTime()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

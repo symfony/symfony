@@ -123,8 +123,12 @@ final class LockRegistry
                             $setMetadata($item);
                         }
 
-                        $pool->save($item->set($value));
+                        $saved = $pool->save($item->set($value));
                         $save = false;
+
+                        if ($setMetadata) {
+                            $setMetadata($item, $saved);
+                        }
                     }
 
                     return $value;

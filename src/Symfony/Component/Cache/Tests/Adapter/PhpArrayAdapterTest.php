@@ -43,6 +43,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         'testSaveDeferredOverwrite' => 'PhpArrayAdapter is read-only.',
         'testIsHitDeferred' => 'PhpArrayAdapter is read-only.',
         'testErrorsDontInvalidate' => 'PhpArrayAdapter is read-only.',
+        'testGetReportsFailedSaves' => 'PhpArrayAdapter is read-only.',
 
         'testExpiresAt' => 'PhpArrayAdapter does not support expiration.',
         'testExpiresAtWithNull' => 'PhpArrayAdapter does not support expiration.',

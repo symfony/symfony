@@ -12,10 +12,10 @@
 namespace Symfony\Component\Scheduler\Generator;
 
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Scheduler\Exception\RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class Checkpoint implements CheckpointInterface
 {
@@ -82,23 +82,19 @@ final class Checkpoint implements CheckpointInterface
         $this->from ??= $time;
         $from = $this->from;
 
-        if (!$this->cache instanceof CacheItemPoolInterface) {
-            $this->cache?->get($this->name, static function (CacheItemInterface $item) use ($time, $index, $from) {
-                $item->expiresAfter(self::CACHE_EXPIRY);
-
-                return [$time, $index, $from];
-            }, \INF);
-
+        if (!$this->cache) {
             return;
         }
 
-        $item = $this->cache->getItem($this->name);
-        $item->set([$time, $index, $from]);
-        $item->expiresAfter(self::CACHE_EXPIRY);
+        $this->cache->get($this->name, static function (CacheItemInterface $item) use ($time, $index, $from) {
+            $item->expiresAfter(self::CACHE_EXPIRY);
 
-        // Cache pools report backend failures only through the return value of save(). Going on would
-        // load the default state on every tick and skip all runs, or dispatch runs again after a restart.
-        if (!$this->cache->save($item)) {
+            return [$time, $index, $from];
+        }, \INF, $metadata);
+
+        // Cache pools report backend failures only through the metadata of get().
+        // Going on would load the default state on every tick and skip all runs, or dispatch runs again after a restart.
+        if (isset($metadata[ItemInterface::METADATA_SAVE_FAILED])) {
             throw new RuntimeException(\sprintf('Failed to save the "%s" scheduler checkpoint, the cache backend may be unavailable.', $this->name));
         }
     }

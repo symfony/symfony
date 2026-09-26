@@ -38,6 +38,13 @@ interface ItemInterface extends CacheItemInterface
     public const METADATA_TAGS = 'tags';
 
     /**
+     * References the failure to save the value computed by CacheInterface::get().
+     *
+     * Set to true in the $metadata argument of CacheInterface::get() only, never in getMetadata().
+     */
+    public const METADATA_SAVE_FAILED = 'save_failed';
+
+    /**
      * Reserved characters that cannot be used in a key or tag.
      */
     public const RESERVED_CHARACTERS = '{}()/\@:';

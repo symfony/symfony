@@ -72,6 +72,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
             static function ($sourceItem, $item, $defaultLifetime, $sourceMetadata = null) {
                 $sourceItem->isTaggable = false;
                 $sourceMetadata ??= $sourceItem->metadata;
+                unset($sourceMetadata[CacheItem::METADATA_SAVE_FAILED]);
 
                 $item->value = $sourceItem->value;
                 $item->isHit = $sourceItem->isHit;

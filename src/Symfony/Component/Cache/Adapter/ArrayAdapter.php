@@ -91,8 +91,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
         if (\INF === $beta || !$item->isHit()) {
             $save = true;
             $item->set($callback($item, $save));
-            if ($save) {
-                $this->save($item);
+            if ($save && !$this->save($item)) {
+                $metadata[CacheItem::METADATA_SAVE_FAILED] = true;
             }
         }
 

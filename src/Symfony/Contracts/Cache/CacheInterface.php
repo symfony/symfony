@@ -38,7 +38,7 @@ interface CacheInterface
      *                              The default (or providing null) is implementation dependent but should
      *                              typically be 1.0, which should provide optimal stampede protection.
      *                              See https://en.wikipedia.org/wiki/Cache_stampede#Probabilistic_early_expiration
-     * @param array      &$metadata The metadata of the cached item {@see ItemInterface::getMetadata()}
+     * @param array      &$metadata The metadata of the cached item {@see ItemInterface::getMetadata()}, plus {@see ItemInterface::METADATA_SAVE_FAILED} when the computed value could not be saved
      *
      * @return T
      *

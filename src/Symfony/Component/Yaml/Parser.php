@@ -24,7 +24,7 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
 class Parser
 {
     public const TAG_PATTERN = '(?P<tag>![\w!.\/:-]+)';
-    public const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
+    public const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments>[ \t]+#.*)?';
     public const REFERENCE_PATTERN = '#^&(?P<ref>[^ ]++) *+(?P<value>.*)#u';
     public const DEFAULT_MAX_NESTING_LEVEL = 128;
     public const DEFAULT_MAX_ALIASES_FOR_COLLECTIONS = 128;
@@ -217,7 +217,7 @@ class Parser
                         $subTag,
                         $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags)
                     );
-                } elseif (self::preg_match('/^'.self::TAG_PATTERN.' +'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $values['value'])) {
+                } elseif (self::preg_match('/^'.self::TAG_PATTERN.'[ \t]+'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $values['value'])) {
                     $data[] = $this->parseValue($values['value'], $flags, $context);
                 } else {
                     if (
@@ -790,7 +790,7 @@ class Parser
             return $this->refs[$value];
         }
 
-        if (\in_array($value[0], ['!', '|', '>'], true) && self::preg_match('/^(?:'.self::TAG_PATTERN.' +)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
+        if (\in_array($value[0], ['!', '|', '>'], true) && self::preg_match('/^(?:'.self::TAG_PATTERN.'[ \t]+)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
             $modifiers = $matches['modifiers'] ?? '';
 
             $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), abs((int) $modifiers));
@@ -898,9 +898,12 @@ class Parser
 
         $isCurrentLineBlank = $this->isCurrentLineBlank();
         $blockLines = [];
+        $longestBlankLine = 0;
 
         // leading blank lines are consumed before determining indentation
         while ($notEOF && $isCurrentLineBlank && (!$indentation || \strlen($this->currentLine) <= $indentation)) {
+            $longestBlankLine = max($longestBlankLine, \strlen($this->currentLine));
+
             // newline only if not EOF
             if ($notEOF = $this->moveToNextLine()) {
                 $blockLines[] = '';
@@ -914,6 +917,11 @@ class Parser
 
             for ($i = 0; $i < $currentLineLength && ' ' === $this->currentLine[$i]; ++$i) {
                 ++$indentation;
+            }
+
+            // a comment less indented than the leading empty lines is not content, the indentation is then the one of the longest empty line
+            if ($indentation < $longestBlankLine && $this->isCurrentLineComment()) {
+                $indentation = $longestBlankLine;
             }
         }
 
@@ -967,7 +975,7 @@ class Parser
                 if ('' === $blockLines[$i]) {
                     $text .= "\n";
                     $previousLineBlank = true;
-                } elseif (' ' === $blockLines[$i][0]) {
+                } elseif (' ' === $blockLines[$i][0] || "\t" === $blockLines[$i][0]) {
                     $text .= (null === $previousLineIndented ? '' : "\n").$blockLines[$i];
                     $previousLineIndented = true;
                     $previousLineBlank = false;
@@ -1097,7 +1105,7 @@ class Parser
      */
     private function isNextLineInBlockScalar(string $value): bool
     {
-        if (!isset($this->lines[$this->currentLineNb + 1]) || !self::preg_match('/: +(?:'.self::TAG_PATTERN.' +)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value)) {
+        if (!isset($this->lines[$this->currentLineNb + 1]) || !self::preg_match('/:[ \t]+(?:'.self::TAG_PATTERN.'[ \t]+)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value)) {
             return false;
         }
 

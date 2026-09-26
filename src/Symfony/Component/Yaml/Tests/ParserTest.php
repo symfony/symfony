@@ -163,6 +163,15 @@ class ParserTest extends TestCase
         $this->assertSameData($expected, $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
+    public function testCoreTagsOnBlockScalars()
+    {
+        $this->assertSame(['key' => "a\nb\n", 'last' => 'c'], $this->parser->parse("key: !!str |\n  a\n  b\nlast: c"));
+        $this->assertSame(['key' => "a b\n", 'last' => 'c'], $this->parser->parse("key: !!str >\n  a\n  b\nlast: c"));
+        $this->assertSame(["a\nb", 'c'], $this->parser->parse("- !!str |-\n  a\n  b\n- c"));
+        $this->assertSame(['key' => 1.5, 'last' => 'c'], $this->parser->parse("key: !!float |\n  1.5\nlast: c"));
+        $this->assertSame(['key' => 'Hello', 'last' => 'c'], $this->parser->parse("key: !!binary |\n  SGVsbG8=\nlast: c"));
+    }
+
     public function testTaggedBlockScalarInNestedList()
     {
         $yml = <<<'YAML'

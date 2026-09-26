@@ -796,11 +796,12 @@ class Parser
             $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), abs((int) $modifiers));
 
             if ('' !== $matches['tag'] && '!' !== $matches['tag']) {
-                if ('!!binary' === $matches['tag']) {
-                    return Inline::evaluateBinaryScalar($data);
-                }
-
-                return new TaggedValue(substr($matches['tag'], 1), $data);
+                return match ($matches['tag']) {
+                    '!!binary' => Inline::evaluateBinaryScalar($data),
+                    '!!str' => $data,
+                    '!!float' => (float) $data,
+                    default => new TaggedValue(substr($matches['tag'], 1), $data),
+                };
             }
 
             return $data;

@@ -133,7 +133,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
         try {
             // replace normal spaces so that the formatter can read them
-            $result = @$formatter->parse(str_replace(' ', "\xc2\xa0", $value), $type, $position);
+            $result = @$formatter->parse($parsedValue = str_replace(' ', "\xc2\xa0", $value), $type, $position);
         } catch (\IntlException $e) {
             throw new TransformationFailedException($e->getMessage(), 0, $e);
         }
@@ -144,6 +144,12 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
         if (self::FRACTIONAL == $this->type) {
             $result /= 100;
+        }
+
+        if (\PHP_VERSION_ID >= 80511 || (\PHP_VERSION_ID >= 80426 && \PHP_VERSION_ID < 80500)) {
+            // NumberFormatter::parse() returns a position in bytes as of PHP 8.4.26 and 8.5.11;
+            // spaces were replaced by two-byte non-breaking spaces, which keeps the position in characters valid in $value
+            $position = mb_strlen(substr($parsedValue, 0, $position), 'UTF-8');
         }
 
         if (\function_exists('mb_detect_encoding') && false !== $encoding = mb_detect_encoding($value, null, true)) {

@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Twig\Loader\FilesystemLoader;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -29,10 +30,11 @@ class ExtensionPass implements CompilerPassInterface
         $templatePaths = $templateIterator->getArgument(1);
         $loader = $container->getDefinition('twig.loader.native_filesystem');
 
+        // these directories ship with the bridge, false tells the loader not to check them on each request
         if ($container->has('mailer')) {
             $emailPath = $viewDir.'/Email';
-            $loader->addMethodCall('addPath', [$emailPath, 'email']);
-            $loader->addMethodCall('addPath', [$emailPath, '!email']);
+            $loader->addMethodCall('addPath', [$emailPath, 'email', false]);
+            $loader->addMethodCall('addPath', [$emailPath, '!email', false]);
             $templatePaths[$emailPath] = 'email';
         }
 
@@ -40,7 +42,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
 
             $coreThemePath = $viewDir.'/Form';
-            $loader->addMethodCall('addPath', [$coreThemePath]);
+            $loader->addMethodCall('addPath', [$coreThemePath, FilesystemLoader::MAIN_NAMESPACE, false]);
             $templatePaths[$coreThemePath] = null;
         }
 

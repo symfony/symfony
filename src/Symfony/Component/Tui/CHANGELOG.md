@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `Tui::getWidgetRect()` to know where a widget was drawn, so pointer events can be placed
  * Add `CollapsibleWidget` for collapsible detail/summary panels
  * Add `AbstractWidget::off()` to remove listeners registered with `AbstractWidget::on()`
  * Add `AnsiUtils::walkCells()` to iterate the cells and escape sequences of a rendered line

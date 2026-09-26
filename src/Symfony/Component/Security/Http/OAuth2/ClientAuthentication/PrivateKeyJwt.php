@@ -24,6 +24,7 @@ use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\Algorithm\SignatureAlgorithm;
 use Jose\Component\Signature\JWSBuilder;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 /**
  * Authenticates the client with an assertion signed by its private key.
@@ -61,17 +62,20 @@ final class PrivateKeyJwt extends AbstractClientAssertion
     ];
 
     /**
-     * @param JWK             $signingKey The private key of the client, whose public half is registered at the provider
-     * @param string          $algorithm  The JWA name of the signature algorithm, which must be one the provider lists
-     *                                    in the "token_endpoint_auth_signing_alg_values_supported" of its metadata
-     * @param int             $lifetime   How long the assertion is valid, in seconds
-     * @param ?ClockInterface $clock      The clock the assertion is dated with
+     * @param JWK             $signingKey     The private key of the client, whose public half is registered at the provider
+     * @param string          $algorithm      The JWA name of the signature algorithm, which must be one the provider lists
+     *                                        in the "token_endpoint_auth_signing_alg_values_supported" of its metadata
+     * @param int             $lifetime       How long the assertion is valid, in seconds
+     * @param ?ClockInterface $clock          The clock the assertion is dated with
+     * @param ?OidcDiscovery  $issuerAudience The provider whose issuer identifier the assertion names as its audience,
+     *                                        or null to name the endpoint the request is made to
      */
     public function __construct(
         JWK $signingKey,
         string $algorithm = 'RS256',
         int $lifetime = 60,
         ?ClockInterface $clock = null,
+        ?OidcDiscovery $issuerAudience = null,
     ) {
         if (!class_exists(JWSBuilder::class)) {
             throw new \LogicException('You cannot authenticate an OAuth2 client with the "private_key_jwt" method since the "web-token/jwt-library" package is not installed. Try running "composer require web-token/jwt-library".');
@@ -83,7 +87,7 @@ final class PrivateKeyJwt extends AbstractClientAssertion
             throw new \InvalidArgumentException('The "private_key_jwt" client assertion must be signed with the private key of the client, and the given JWK has no "d" parameter: it is the public key. Register that public key at the provider, and sign with the private one.');
         }
 
-        parent::__construct($signingKey, $signatureAlgorithm, $lifetime, $clock);
+        parent::__construct($signingKey, $signatureAlgorithm, $lifetime, $clock, $issuerAudience);
     }
 
     public function getMethod(): string

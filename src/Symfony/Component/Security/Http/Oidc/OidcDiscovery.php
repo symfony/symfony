@@ -202,6 +202,27 @@ final class OidcDiscovery implements ResetInterface
     }
 
     /**
+     * Returns the issuer identifier the provider announces, the one a client assertion may
+     * name as its audience.
+     *
+     * It is the value the document itself carries, rather than the configured one, because
+     * the two are compared ignoring a trailing slash: what a provider verifies an audience
+     * against is what it announces, down to that slash.
+     *
+     * @throws AuthenticationException If the discovery document cannot be fetched, or announces no issuer
+     */
+    public function getIssuer(): string
+    {
+        $issuer = $this->getConfiguration()['issuer'] ?? null;
+
+        if (!\is_string($issuer) || '' === $issuer) {
+            throw new AuthenticationException('The OIDC provider does not announce any "issuer".');
+        }
+
+        return $issuer;
+    }
+
+    /**
      * Tells whether the given URL provides the transport security the OIDC flow relies on.
      *
      * The authorization code, the PKCE verifier and the tokens it is exchanged for are only

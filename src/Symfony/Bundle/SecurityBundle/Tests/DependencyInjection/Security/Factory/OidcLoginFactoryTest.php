@@ -780,6 +780,84 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame(self::SIGNING_KEY, $signingKey->getArgument(0));
     }
 
+    /**
+     * An assertion names the issuer, which is the only value draft-ietf-oauth-rfc7523bis accepts.
+     *
+     * The discovery of the firewall is what answers it, rather than the configured
+     * "provider_uri", because the two are compared ignoring a trailing slash and what a
+     * provider verifies an audience against is the spelling it announces itself.
+     */
+    #[DataProvider('provideAssertionMethods')]
+    public function testAnAssertionNamesTheIssuerAsItsAudienceByDefault(array $method)
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => $method,
+        ];
+
+        // When
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        // Then
+        $this->assertEquals(
+            new Reference('security.authenticator.oidc_login.discovery.main'),
+            $container->getDefinition('security.authenticator.oidc_login.client_authentication.main')->getArgument(4),
+        );
+    }
+
+    /**
+     * The endpoint stays reachable for a provider that refuses the issuer.
+     *
+     * OIDC Core 1.0, Section 9 let one expect it, so a deployment facing such a provider is not
+     * left without a way to authenticate its client.
+     */
+    #[DataProvider('provideAssertionMethods')]
+    public function testAnAssertionNamesTheTokenEndpointWhenAskedTo(array $method)
+    {
+        // Given
+        $method[array_key_first($method)]['audience'] = 'token_endpoint';
+        $container = new ContainerBuilder();
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => $method,
+        ];
+
+        // When
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        // Then
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client_authentication.main')->getArgument(4));
+    }
+
+    public static function provideAssertionMethods(): iterable
+    {
+        yield 'private_key_jwt' => [['private_key_jwt' => ['key' => self::SIGNING_KEY]]];
+        yield 'client_secret_jwt' => [['client_secret_jwt' => ['secret' => 'a-client-secret-of-thirty-two-by']]];
+    }
+
+    public function testAnAssertionRefusesAnAudienceThatIsNeitherOfTheTwo()
+    {
+        // Given
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['private_key_jwt' => ['key' => self::SIGNING_KEY, 'audience' => 'https://provider.example.com/other']],
+        ];
+
+        // Then
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The value "https://provider.example.com/other" is not allowed for path "oidc-login.client_authentication.private_key_jwt.audience". Permissible values: "issuer", "token_endpoint"');
+
+        // When
+        $this->processConfig($config, new OidcLoginFactory());
+    }
+
     public function testThePrivateKeyJwtMethodTakesTheKeyAlone()
     {
         $container = new ContainerBuilder();

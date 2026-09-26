@@ -18,13 +18,14 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 /**
  * Authenticates the client with a JWT it signs itself, the assertion of RFC 7523, Section 2.2.
  *
  * Nothing secret is then sent to the provider: the request carries a short-lived assertion
- * naming the client as both its issuer and its subject, and the token endpoint as its
- * audience, so that an assertion captured at one provider cannot be replayed at another.
+ * naming the client as both its issuer and its subject, and the provider as its audience,
+ * so that an assertion captured at one provider cannot be replayed at another.
  * What signs it is what tells the two methods built on this apart, {@see PrivateKeyJwt}
  * holding a key the provider only knows the public half of, {@see ClientSecretJwt} the
  * shared secret itself.
@@ -49,20 +50,42 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
      */
     public const ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
 
+    /**
+     * The explicit type of a client authentication JWT.
+     *
+     * draft-ietf-oauth-rfc7523bis adds to Section 3.2 of RFC 7523 that "client authentication
+     * JWTs SHOULD be explicitly typed by using the typ header parameter value
+     * client-authentication+jwt", and registers the "application/client-authentication+jwt"
+     * media type for it. The "application/" prefix is omitted in the header, as RFC 8725,
+     * Section 3.11 recommends for explicit typing.
+     *
+     * Explicit typing keeps one kind of JWT from being taken for another (RFC 8725,
+     * Section 3.11), and the draft gives it a second meaning of its own: it "serves as a
+     * signal to distinguish between tokens produced in accordance with specifications
+     * published prior to these updates and those incorporating them", and "enables clients to
+     * signal their compliance with the requirements herein".
+     */
+    public const EXPLICIT_TYPE = 'client-authentication+jwt';
+
     private readonly ClockInterface $clock;
 
     /**
-     * @param JWK       $signingKey The key the assertion is signed with
-     * @param Algorithm $algorithm  The algorithm it is signed with, which the subclass picked from
-     *                              the ones its method allows, see {@see createAlgorithm()}
-     * @param int       $lifetime   How long the assertion is valid, in seconds; it is built for one
-     *                              request and sent right away, so it is short by design
+     * @param JWK            $signingKey     The key the assertion is signed with
+     * @param Algorithm      $algorithm      The algorithm it is signed with, which the subclass picked from
+     *                                       the ones its method allows, see {@see createAlgorithm()}
+     * @param int            $lifetime       How long the assertion is valid, in seconds; it is built for one
+     *                                       request and sent right away, so it is short by design
+     * @param ?OidcDiscovery $issuerAudience The provider whose issuer identifier the assertion names as its
+     *                                       audience, which is then also typed {@see EXPLICIT_TYPE}, or null to
+     *                                       name the endpoint the request is made to and leave it untyped,
+     *                                       see {@see createAssertion()}
      */
     protected function __construct(
         private readonly JWK $signingKey,
         private readonly Algorithm $algorithm,
         private readonly int $lifetime,
         ?ClockInterface $clock,
+        private readonly ?OidcDiscovery $issuerAudience = null,
     ) {
         if (0 >= $lifetime) {
             throw new \InvalidArgumentException(\sprintf('The lifetime of an OAuth2 client assertion must be a positive number of seconds, got %d.', $lifetime));
@@ -119,13 +142,28 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
      * Builds the assertion of RFC 7523, Section 3.
      *
      * The client is both the issuer and the subject, as Section 3, items 1 and 2 require
-     * from a client authenticating itself, and the audience is the token endpoint the
-     * request is about to be made to, which OIDC Core 1.0, Section 9 recommends over the
-     * other identifier of the provider Section 3, item 3 allows.
+     * from a client authenticating itself. The audience is the issuer identifier of the
+     * provider when one was given to the constructor, which draft-ietf-oauth-rfc7523bis makes
+     * the sole accepted value and FAPI 2.0 Security Profile, Section 5.2.2 already requires,
+     * because an assertion made for one endpoint of a provider is otherwise an assertion for
+     * every other endpoint of that same provider. Without one it is the endpoint the request
+     * is about to be made to, the value Section 3, item 3 and OIDC Core 1.0, Section 9 allowed
+     * a provider to expect: nothing here can resolve an issuer on its own, so this is where the
+     * default of an application lives rather than here.
      *
      * The "kid" header is set whenever the key carries one, so that a provider holding
      * several public keys for the client knows which one verifies the signature without
      * trying them all, as OIDC Core 1.0, Section 10.1 asks of a rotating client.
+     *
+     * The assertion is explicitly typed when, and only when, it names the issuer, because that
+     * is what the type says of it. draft-ietf-oauth-rfc7523bis makes the type the signal of a
+     * token "produced in accordance" with it, by which a client signals "their compliance with
+     * the requirements herein", and its central requirement is the audience: the same draft has
+     * the issuer identifier as the sole value and writes that "the token endpoint URL of the
+     * authorization server MUST NOT be used as an audience value". An assertion naming the
+     * endpoint is therefore not one the draft would recognise, and typing it would claim a
+     * compliance it does not have. Nothing is lost by leaving it untyped, the draft asking
+     * servers not to reject an untyped assertion.
      */
     private function createAssertion(string $clientId, string $tokenEndpoint): string
     {
@@ -134,13 +172,16 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
         $claims = [
             'iss' => $clientId,
             'sub' => $clientId,
-            'aud' => $tokenEndpoint,
+            'aud' => $this->issuerAudience?->getIssuer() ?? $tokenEndpoint,
             'jti' => bin2hex(random_bytes(16)),
             'iat' => $now,
             'exp' => $now + $this->lifetime,
         ];
 
         $header = ['alg' => $this->algorithm->name()];
+        if (null !== $this->issuerAudience) {
+            $header['typ'] = self::EXPLICIT_TYPE;
+        }
         if ($this->signingKey->has('kid') && \is_string($kid = $this->signingKey->get('kid'))) {
             $header['kid'] = $kid;
         }

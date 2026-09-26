@@ -113,6 +113,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('signature algorithm'),
                 abstract_arg('assertion lifetime'),
                 service('clock'),
+                abstract_arg('the discovery naming the audience, or null for the token endpoint'),
             ])
 
         ->set('security.oauth2.client_authentication.private_key_jwt', PrivateKeyJwt::class)
@@ -122,6 +123,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('signature algorithm'),
                 abstract_arg('assertion lifetime'),
                 service('clock'),
+                abstract_arg('the discovery naming the audience, or null for the token endpoint'),
             ])
 
         // the private key of the "private_key_jwt" method, parsed from the JSON-encoded JWK

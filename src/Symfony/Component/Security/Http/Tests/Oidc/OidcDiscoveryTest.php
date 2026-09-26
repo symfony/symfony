@@ -51,6 +51,50 @@ class OidcDiscoveryTest extends TestCase
         $this->assertSame(1, $requests);
     }
 
+    public function testGetIssuerReturnsTheAnnouncedIssuer()
+    {
+        // Given
+        $discovery = new OidcDiscovery(new MockHttpClient(new JsonMockResponse(self::CONFIGURATION)), new ArrayAdapter(), self::URL, self::ISSUER);
+
+        // When
+        $issuer = $discovery->getIssuer();
+
+        // Then
+        $this->assertSame(self::ISSUER, $issuer);
+    }
+
+    /**
+     * The announced spelling and not the configured one.
+     *
+     * A trailing slash is ignored when the two are compared, so an assertion naming the
+     * configured issuer would not be the audience a provider announcing the other spelling
+     * verifies against.
+     */
+    public function testGetIssuerKeepsTheTrailingSlashTheProviderAnnounces()
+    {
+        // Given
+        $discovery = new OidcDiscovery(new MockHttpClient(new JsonMockResponse(['issuer' => self::ISSUER.'/'])), new ArrayAdapter(), self::URL, self::ISSUER);
+
+        // When
+        $issuer = $discovery->getIssuer();
+
+        // Then
+        $this->assertSame(self::ISSUER.'/', $issuer);
+    }
+
+    public function testGetIssuerRejectsADocumentAnnouncingNone()
+    {
+        // Given
+        $discovery = new OidcDiscovery(new MockHttpClient(new JsonMockResponse(['token_endpoint' => 'https://provider.example.com/token'])), new ArrayAdapter(), self::URL);
+
+        // Then
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The OIDC provider does not announce any "issuer".');
+
+        // When
+        $discovery->getIssuer();
+    }
+
     public function testGetConfigurationRejectsIssuerMismatch()
     {
         $httpClient = new MockHttpClient(new JsonMockResponse(['issuer' => 'https://attacker.example.com']));

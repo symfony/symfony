@@ -18,6 +18,7 @@ use Jose\Component\Signature\Algorithm\HS512;
 use Jose\Component\Signature\Algorithm\MacAlgorithm;
 use Jose\Component\Signature\JWSBuilder;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 /**
  * Authenticates the client with an assertion signed with its secret.
@@ -51,17 +52,20 @@ final class ClientSecretJwt extends AbstractClientAssertion
      * exercised once on the key instead, so that a secret it refuses fails on the service
      * rather than on the first token request made with it.
      *
-     * @param string          $clientSecret The secret shared with the provider, used as the HMAC key
-     * @param string          $algorithm    The JWA name of the MAC algorithm, which must be one the provider lists
-     *                                      in the "token_endpoint_auth_signing_alg_values_supported" of its metadata
-     * @param int             $lifetime     How long the assertion is valid, in seconds
-     * @param ?ClockInterface $clock        The clock the assertion is dated with
+     * @param string          $clientSecret   The secret shared with the provider, used as the HMAC key
+     * @param string          $algorithm      The JWA name of the MAC algorithm, which must be one the provider lists
+     *                                        in the "token_endpoint_auth_signing_alg_values_supported" of its metadata
+     * @param int             $lifetime       How long the assertion is valid, in seconds
+     * @param ?ClockInterface $clock          The clock the assertion is dated with
+     * @param ?OidcDiscovery  $issuerAudience The provider whose issuer identifier the assertion names as its audience,
+     *                                        or null to name the endpoint the request is made to
      */
     public function __construct(
         #[\SensitiveParameter] string $clientSecret,
         string $algorithm = 'HS256',
         int $lifetime = 60,
         ?ClockInterface $clock = null,
+        ?OidcDiscovery $issuerAudience = null,
     ) {
         if (!class_exists(JWSBuilder::class)) {
             throw new \LogicException('You cannot authenticate an OAuth2 client with the "client_secret_jwt" method since the "web-token/jwt-library" package is not installed. Try running "composer require web-token/jwt-library".');
@@ -76,7 +80,7 @@ final class ClientSecretJwt extends AbstractClientAssertion
             throw new \InvalidArgumentException(\sprintf('The OAuth2 client secret cannot key a "client_secret_jwt" assertion signed with "%s", which rejected it: "%s" Ask the provider for a longer secret, or authenticate the client with "PrivateKeyJwt".', $algorithm, $e->getMessage()), previous: $e);
         }
 
-        parent::__construct($signingKey, $macAlgorithm, $lifetime, $clock);
+        parent::__construct($signingKey, $macAlgorithm, $lifetime, $clock, $issuerAudience);
     }
 
     public function getMethod(): string

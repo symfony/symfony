@@ -66,6 +66,25 @@ class EventDataCollectorTest extends TestCase
         $this->assertSame($this->dump($stub), $this->dump($c->getCalledListeners('event_dispatcher')[0]['stub']));
     }
 
+    public function testGettersOfTheDefaultDispatcherWorkAfterUnserialize()
+    {
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $dispatcher->addListener('called', static function () {});
+        $dispatcher->addListener('not_called', static function () {});
+        $dispatcher->dispatch(new \stdClass(), 'called');
+        $dispatcher->dispatch(new \stdClass(), 'orphaned');
+
+        $collector = new EventDataCollector($dispatcher);
+        $collector->collect(new Request(), new Response());
+        $collector->lateCollect();
+
+        $collector = unserialize(serialize($collector));
+
+        $this->assertCount(1, $collector->getCalledListeners());
+        $this->assertCount(1, $collector->getNotCalledListeners());
+        $this->assertCount(1, $collector->getOrphanedEvents());
+    }
+
     private function collect(): EventDataCollector
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());

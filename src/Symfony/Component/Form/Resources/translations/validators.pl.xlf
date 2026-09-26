@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>
-                <target state="needs-review-translation">Dolna granica nie może być większa niż górna granica.</target>
+                <target>Dolna granica nie może być większa niż górna granica.</target>
             </trans-unit>
         </body>
     </file>

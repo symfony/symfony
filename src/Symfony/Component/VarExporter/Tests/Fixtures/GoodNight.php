@@ -28,6 +28,6 @@ class GoodNight
     {
         $this->good = 'night';
 
-        return ['good', 'foo', "\0*\0foo", "\0".__CLASS__."\0bar"];
+        return ['good', "\0*\0foo", "\0".__CLASS__."\0bar"];
     }
 }

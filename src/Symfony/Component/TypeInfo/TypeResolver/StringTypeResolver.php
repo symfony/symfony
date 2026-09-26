@@ -113,10 +113,18 @@ final class StringTypeResolver implements TypeResolverInterface
         if ($node instanceof ArrayShapeNode) {
             $shape = [];
             foreach ($node->items as $item) {
-                $shape[(string) $item->keyName] = [
+                $shapeItem = [
                     'type' => $this->getTypeFromNode($item->valueType, $typeContext),
                     'optional' => $item->optional,
                 ];
+
+                if (null === $item->keyName) {
+                    $shape[] = $shapeItem;
+
+                    continue;
+                }
+
+                $shape[$item->keyName instanceof ConstExprStringNode ? $item->keyName->value : (string) $item->keyName] = $shapeItem;
             }
 
             return Type::arrayShape(
@@ -149,7 +157,13 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof ConstTypeNode) {
             if ($node->constExpr instanceof ConstFetchNode) {
-                $className = match (strtolower($node->constExpr->className)) {
+                $classKeyword = strtolower($node->constExpr->className);
+
+                if (null === $typeContext && \in_array($classKeyword, ['self', 'static', 'parent'], true)) {
+                    throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, $classKeyword));
+                }
+
+                $className = match ($classKeyword) {
                     'self' => $typeContext->getDeclaringClass(),
                     'static' => $typeContext->getCalledClass(),
                     'parent' => $typeContext->getParentClass(),
@@ -175,6 +189,10 @@ final class StringTypeResolver implements TypeResolverInterface
                     if (preg_match('/^'.str_replace('\*', '.*', preg_quote($node->constExpr->name, '/')).'$/', $const->getName())) {
                         $types[] = Type::fromValue($const->getValue());
                     }
+                }
+
+                if (!$types) {
+                    throw new \DomainException(\sprintf('No "%s" constant found in "%s".', $node->constExpr->name, $className));
                 }
 
                 return CollectionType::mergeCollectionValueTypes($types);

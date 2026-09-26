@@ -647,6 +647,27 @@ class ParserTest extends TestCase
         $this->assertSame(['a' => "a\n b\n\nc\n"], $this->parser->parse("a: >\n  a\n   b\n\n  c\n"));
     }
 
+    public function testTabLedLinesAreMoreIndentedInFoldedBlocks()
+    {
+        $this->assertSame(['k' => "\t\nregular\n"], $this->parser->parse("k: >\n  \t\n  regular\n"));
+        $this->assertSame(['k' => "first \n\n\t second\n\nthird\n"], $this->parser->parse("k: >\n  first \n  \n  \t second\n\n  third\n"));
+    }
+
+    public function testTabsInBlockScalarHeaders()
+    {
+        $this->assertSame(['k' => "first\n"], $this->parser->parse("k: >\t# header\n  first\n"));
+        $this->assertSameData(['k' => new TaggedValue('text', "first second\n")], $this->parser->parse("k: !text\t>\n  first\n  second\n", Yaml::PARSE_CUSTOM_TAGS));
+        $this->assertSameData([new TaggedValue('text', "first\n"), 'b'], $this->parser->parse("- !text\t|\n  first\n- b\n", Yaml::PARSE_CUSTOM_TAGS));
+        $this->assertSameData([['a' => new TaggedValue('text', "\n")], 'b'], $this->parser->parse("- a: !text\t|+\n\n- b\n", Yaml::PARSE_CUSTOM_TAGS));
+    }
+
+    public function testEmptyBlockScalarFollowedByLessIndentedComment()
+    {
+        $this->assertSame(['k' => "\n", 'next' => 1], $this->parser->parse("k: |+\n   \n  # comment\nnext: 1\n"));
+        $this->assertSame(['k' => ''], $this->parser->parse("k: >\n   \n  # comment\n"));
+        $this->assertSame(["\n\n# detected\n"], $this->parser->parse("- >\n \n  \n  # detected\n"));
+    }
+
     public function testObjectSupportEnabled()
     {
         $input = <<<'EOF'

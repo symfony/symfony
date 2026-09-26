@@ -418,6 +418,20 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }
 
+    public function testReverseTransformDisallowsOneTrailingExtraCharacterAfterSpaces()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('The number contains unrecognized characters: "f"');
+        // Since we test against other locales, we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('ru');
+
+        $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
+
+        $transformer->reverseTransform('12 345,678f');
+    }
+
     public function testTransformForHtml5Format()
     {
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP, true);

@@ -150,6 +150,25 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
             'nested',
         ];
 
+        yield 'a .git file (worktree or submodule) marks the repository root' => [
+            [
+                '.gitignore' => 'worktree/',
+            ],
+            [
+                '.git/',
+                'worktree/',
+                'worktree/.git',
+                'worktree/a.txt',
+            ],
+            [
+                '.git',
+                'worktree',
+                'worktree/.git',
+                'worktree/a.txt',
+            ],
+            'worktree',
+        ];
+
         yield 'simple file at root' => [
             [
                 '.gitignore' => '/a.txt',
@@ -507,7 +526,7 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
 
     private function removeDirectory(string $dir): void
     {
-        foreach ((new Finder())->in($dir)->ignoreDotFiles(false)->depth('< 1') as $file) {
+        foreach ((new Finder())->in($dir)->ignoreDotFiles(false)->ignoreVCS(false)->depth('< 1') as $file) {
             $path = $file->getRealPath();
 
             if ($file->isDir()) {

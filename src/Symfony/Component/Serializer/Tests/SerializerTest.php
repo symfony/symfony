@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -1823,6 +1824,40 @@ class SerializerTest extends TestCase
             self::assertFalse($capturedFromTypeError[0]->canUseMessageForUser());
             self::assertSame(['unknown'], $capturedFromTypeError[0]->getExpectedTypes());
         }
+    }
+
+    public function testCollectDenormalizationErrorsDoNotAffectCacheKey()
+    {
+        $nameConverter = new class implements NameConverterInterface {
+            public array $cacheKeys = [];
+
+            public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
+            {
+                return $propertyName;
+            }
+
+            public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
+            {
+                $this->cacheKeys[] = $context['cache_key'];
+
+                return $propertyName;
+            }
+        };
+
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, $nameConverter, null, new ReflectionExtractor())], ['json' => new JsonEncoder()]);
+
+        try {
+            $serializer->deserialize('[{"value": "foo"}, {"value": "bar"}]', DummyNullableInt::class.'[]', 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+                AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY => ['deserialization_path'],
+            ]);
+            $this->fail();
+        } catch (PartialDenormalizationException $e) {
+            $this->assertCount(2, $e->getNotNormalizableValueErrors());
+        }
+
+        $this->assertCount(2, $nameConverter->cacheKeys);
+        $this->assertSame($nameConverter->cacheKeys[0], $nameConverter->cacheKeys[1]);
     }
 
     public function testGroupsOnClassSerialization()

@@ -21,11 +21,15 @@ use Doctrine\ORM\Mapping\FieldMapping;
 use Doctrine\ORM\Mapping\JoinColumnMapping;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * Extracts data using Doctrine ORM and ODM metadata.
@@ -104,13 +108,11 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                         }
                     }
 
-                    if (!$collectionKeyType = $this->getTypeIdentifier($typeOfField)) {
-                        return null;
-                    }
+                    $collectionKeyType = $this->getTypeIdentifier($typeOfField);
                 }
             }
 
-            return Type::collection(Type::object(Collection::class), Type::object($class), Type::builtin($collectionKeyType));
+            return Type::collection(Type::object(Collection::class), Type::object($class), null !== $collectionKeyType ? Type::builtin($collectionKeyType) : null);
         }
 
         if ($metadata instanceof ClassMetadata && isset($metadata->embeddedClasses[$property])) {
@@ -146,6 +148,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 Types::DATE_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, 'vardatetime', Types::TIME_MUTABLE => $nullable ? Type::nullable(Type::object(\DateTime::class)) : Type::object(\DateTime::class),
                 Types::DATE_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE, Types::TIME_IMMUTABLE => $nullable ? Type::nullable(Type::object(\DateTimeImmutable::class)) : Type::object(\DateTimeImmutable::class),
                 Types::DATEINTERVAL => $nullable ? Type::nullable(Type::object(\DateInterval::class)) : Type::object(\DateInterval::class),
+                UuidType::NAME => $nullable ? Type::nullable(Type::object(Uuid::class)) : Type::object(Uuid::class),
+                UlidType::NAME => $nullable ? Type::nullable(Type::object(Ulid::class)) : Type::object(Ulid::class),
                 default => $builtinType,
             },
             TypeIdentifier::ARRAY => match ($typeOfField) {
@@ -238,7 +242,9 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             Types::DATETIME_IMMUTABLE,
             Types::DATETIMETZ_IMMUTABLE,
             Types::TIME_IMMUTABLE,
-            Types::DATEINTERVAL => TypeIdentifier::OBJECT,
+            Types::DATEINTERVAL,
+            UuidType::NAME,
+            UlidType::NAME => TypeIdentifier::OBJECT,
             Types::SIMPLE_ARRAY => TypeIdentifier::ARRAY,
             default => null,
         };

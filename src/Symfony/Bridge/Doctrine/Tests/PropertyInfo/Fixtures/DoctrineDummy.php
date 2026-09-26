@@ -48,6 +48,12 @@ class DoctrineDummy
     #[Column(type: 'guid')]
     protected $guid;
 
+    #[Column(type: 'uuid')]
+    protected $uuid;
+
+    #[Column(type: 'ulid')]
+    protected $ulid;
+
     #[Column(type: 'time')]
     private $time;
 
@@ -85,6 +91,9 @@ class DoctrineDummy
 
     #[OneToMany(targetEntity: DoctrineRelation::class, mappedBy: 'customType', indexBy: 'customType')]
     private $indexedByCustomType;
+
+    #[OneToMany(targetEntity: DoctrineRelation::class, mappedBy: 'uuidField', indexBy: 'uuidField')]
+    private $indexedByUuid;
 
     #[OneToMany(targetEntity: DoctrineRelation::class, mappedBy: 'buzField', indexBy: 'buzField')]
     protected $indexedBuz;

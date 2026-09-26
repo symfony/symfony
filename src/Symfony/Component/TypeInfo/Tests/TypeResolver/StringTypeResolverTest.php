@@ -103,6 +103,9 @@ class StringTypeResolverTest extends TestCase
         yield [Type::arrayShape(['foo' => Type::bool()], extraKeyType: Type::int(), extraValueType: Type::string()), 'array{foo: bool, ...<int, string>}'];
         yield [Type::arrayShape(['foo' => Type::bool()], extraValueType: Type::int()), 'array{foo: bool, ...<int>}'];
         yield [Type::arrayShape(['foo' => Type::union(Type::bool(), Type::float(), Type::int(), Type::null(), Type::string()), 'bar' => Type::string()]), 'array{foo: scalar|null, bar: string}'];
+        yield [Type::arrayShape(['foo' => Type::int(), 'bar baz' => Type::string()]), "array{'foo': int, \"bar baz\": string}"];
+        yield [Type::arrayShape([0 => Type::int()]), "array{'0': int}"];
+        yield [Type::arrayShape([Type::int(), Type::string()]), 'array{int, string}'];
 
         // object
         yield [Type::object(), 'object'];
@@ -127,6 +130,8 @@ class StringTypeResolverTest extends TestCase
         yield [Type::string(), DummyWithConstants::class.'::DUMMY_STRING_*'];
         yield [Type::string(), DummyWithConstants::class.'::DUMMY_STRING_A'];
         yield [Type::string(), 'DummyWithConstants::DUMMY_STRING_A', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
+        yield [Type::string(), 'self::DUMMY_STRING_A', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
+        yield [Type::int(), 'static::DUMMY_INT_*', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
         yield [Type::int(), DummyWithConstants::class.'::DUMMY_INT_*'];
         yield [Type::int(), DummyWithConstants::class.'::DUMMY_INT_A'];
         yield [Type::float(), DummyWithConstants::class.'::DUMMY_FLOAT_*'];
@@ -275,10 +280,35 @@ class StringTypeResolverTest extends TestCase
         $this->resolver->resolve('parent');
     }
 
+    #[DataProvider('classKeywordConstantDataProvider')]
+    public function testCannotResolveClassKeywordConstantWithoutTypeContext(string $type, string $keyword)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, $keyword));
+
+        $this->resolver->resolve($type);
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: string}>
+     */
+    public static function classKeywordConstantDataProvider(): iterable
+    {
+        yield ['self::FOO', 'self'];
+        yield ['static::FOO_*', 'static'];
+        yield ['parent::FOO', 'parent'];
+    }
+
     public function testCannotResolveUnknownIdentifier()
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve('unknown');
+    }
+
+    public function testCannotResolveUnknownConstant()
+    {
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve(DummyWithConstants::class.'::UNKNOWN');
     }
 
     public function testCannotResolveKeyOfInvalidType()

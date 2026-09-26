@@ -20,21 +20,24 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  * constraints allow it. "A before B" and "B after A" describe the same edge and yield the same
  * order. References to items that are not in the seed are ignored: the package declaring them may
  * simply not be installed. An item referencing itself is ignored too.
+ * Callers can give the two kinds of constraints the names that fit their domain, like "within" and "around" for decorators.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 final class BeforeAfterSorter
 {
     /**
-     * @param list<string>                                                      $seed        Items in the order they would have without any constraint
-     * @param array<string, array{before?: list<string>, after?: list<string>}> $constraints
-     * @param array<string, list<string>>                                       $aliases     Alternative names, each designating the items it stands for; a name that is not listed here designates the item bearing it
+     * @param list<string>                               $seed        Items in the order they would have without any constraint
+     * @param array<string, array<string, list<string>>> $constraints Items mapped to the items they go before and after, listed under the $before and $after keys
+     * @param array<string, list<string>>                $aliases     Alternative names, each designating the items it stands for; a name that is not listed here designates the item bearing it
+     * @param string                                     $before      The name of the constraints listing the items an item goes before
+     * @param string                                     $after       The name of the constraints listing the items an item goes after
      *
      * @return list<string>
      *
      * @throws InvalidArgumentException when the constraints are cyclic
      */
-    public static function sort(array $seed, array $constraints, array $aliases = []): array
+    public static function sort(array $seed, array $constraints, array $aliases = [], string $before = 'before', string $after = 'after'): array
     {
         if (!$constraints) {
             return $seed;
@@ -47,14 +50,14 @@ final class BeforeAfterSorter
                 continue;
             }
 
-            foreach (['before', 'after'] as $direction) {
+            foreach ([$before, $after] as $direction) {
                 foreach ($constraint[$direction] ?? [] as $target) {
                     foreach ($aliases[$target] ?? [$target] as $targetItem) {
                         if ($targetItem === $item || !isset($predecessors[$targetItem])) {
                             continue;
                         }
 
-                        if ('before' === $direction) {
+                        if ($before === $direction) {
                             $predecessors[$targetItem][] = $item;
                         } else {
                             $predecessors[$item][] = $targetItem;
@@ -68,7 +71,7 @@ final class BeforeAfterSorter
         $states = [];
 
         foreach ($seed as $item) {
-            self::visit($item, $predecessors, $states, $sorted, []);
+            self::visit($item, $predecessors, $states, $sorted, [], $before, $after);
         }
 
         return $sorted;
@@ -81,15 +84,17 @@ final class BeforeAfterSorter
      * priority, and a constraint that would need it to cross a priority is an error. An item without priority
      * is free: its constraints place it, and it adopts the priority its place requires, 0 when that fits.
      *
-     * @param array<string, int|null>                                           $priorities  Items in their default order, mapped to their declared priority, null when none was declared
-     * @param array<string, array{before?: list<string>, after?: list<string>}> $constraints
-     * @param array<string, list<string>>                                       $aliases     See sort()
+     * @param array<string, int|null>                    $priorities  Items in their default order, mapped to their declared priority, null when none was declared
+     * @param array<string, array<string, list<string>>> $constraints See sort()
+     * @param array<string, list<string>>                $aliases     See sort()
+     * @param string                                     $before      See sort()
+     * @param string                                     $after       See sort()
      *
      * @return array<string, int> The items in their final order, mapped to their effective priority
      *
      * @throws InvalidArgumentException when the constraints are cyclic or contradict an explicit priority
      */
-    public static function sortWithPriorities(array $priorities, array $constraints, array $aliases = []): array
+    public static function sortWithPriorities(array $priorities, array $constraints, array $aliases = [], string $before = 'before', string $after = 'after'): array
     {
         $seed = array_keys($priorities);
         $indexes = array_flip($seed);
@@ -100,9 +105,9 @@ final class BeforeAfterSorter
         }
 
         // detects cycles before the bounds below are computed, so that a cycle is reported as such
-        self::sort($seed, $constraints, $aliases);
+        self::sort($seed, $constraints, $aliases, $before, $after);
 
-        // every edge is "$before runs before $after"; a declared priority must already agree with it
+        // every edge is [$first, $second] with $first going before $second; a declared priority must already agree with it
         $edges = [];
 
         foreach ($constraints as $item => $constraint) {
@@ -110,14 +115,14 @@ final class BeforeAfterSorter
                 continue;
             }
 
-            foreach (['before', 'after'] as $direction) {
+            foreach ([$before, $after] as $direction) {
                 foreach ($constraint[$direction] ?? [] as $target) {
                     foreach ($aliases[$target] ?? [$target] as $targetItem) {
                         if ($targetItem === $item || !isset($indexes[$targetItem])) {
                             continue;
                         }
 
-                        $edges[] = 'before' === $direction ? [$item, $targetItem] : [$targetItem, $item];
+                        $edges[] = $before === $direction ? [$item, $targetItem] : [$targetItem, $item];
 
                         if (null === $priority = $priorities[$item] ?? null) {
                             continue;
@@ -127,12 +132,12 @@ final class BeforeAfterSorter
                             continue;
                         }
 
-                        if ('before' === $direction && $priority < $targetPriority) {
-                            throw new InvalidArgumentException(\sprintf('The priority of "%s" (%d) contradicts its "before" constraint on "%s" (%d): raise it to %d or more, remove it, or drop the constraint.', $item, $priority, $targetItem, $targetPriority, $targetPriority));
+                        if ($before === $direction && $priority < $targetPriority) {
+                            throw new InvalidArgumentException(\sprintf('The priority of "%s" (%d) contradicts its "%s" constraint on "%s" (%d): raise it to %d or more, remove it, or drop the constraint.', $item, $priority, $before, $targetItem, $targetPriority, $targetPriority));
                         }
 
-                        if ('after' === $direction && $priority > $targetPriority) {
-                            throw new InvalidArgumentException(\sprintf('The priority of "%s" (%d) contradicts its "after" constraint on "%s" (%d): lower it to %d or less, remove it, or drop the constraint.', $item, $priority, $targetItem, $targetPriority, $targetPriority));
+                        if ($after === $direction && $priority > $targetPriority) {
+                            throw new InvalidArgumentException(\sprintf('The priority of "%s" (%d) contradicts its "%s" constraint on "%s" (%d): lower it to %d or less, remove it, or drop the constraint.', $item, $priority, $after, $targetItem, $targetPriority, $targetPriority));
                         }
                     }
                 }
@@ -153,16 +158,16 @@ final class BeforeAfterSorter
         do {
             $settled = true;
 
-            foreach ($edges as [$before, $after]) {
-                if (isset($lows[$before]) && ($low = $priorities[$after] ?? $lows[$after]) > $lows[$before]) {
-                    $lows[$before] = $low;
-                    $lowsFrom[$before] = $after;
+            foreach ($edges as [$first, $second]) {
+                if (isset($lows[$first]) && ($low = $priorities[$second] ?? $lows[$second]) > $lows[$first]) {
+                    $lows[$first] = $low;
+                    $lowsFrom[$first] = $second;
                     $settled = false;
                 }
 
-                if (isset($highs[$after]) && ($high = $priorities[$before] ?? $highs[$before]) < $highs[$after]) {
-                    $highs[$after] = $high;
-                    $highsFrom[$after] = $before;
+                if (isset($highs[$second]) && ($high = $priorities[$first] ?? $highs[$first]) < $highs[$second]) {
+                    $highs[$second] = $high;
+                    $highsFrom[$second] = $first;
                     $settled = false;
                 }
             }
@@ -174,7 +179,7 @@ final class BeforeAfterSorter
             if (null !== $priority) {
                 $resolved[$item] = $priority;
             } elseif ($lows[$item] > $highs[$item]) {
-                throw new InvalidArgumentException(\sprintf('The "before"/"after" constraints on "%s" cannot be satisfied: it would need a priority of at least %d to run before "%s" and at most %d to run after "%s".', $item, $lows[$item], $lowsFrom[$item], $highs[$item], $highsFrom[$item]));
+                throw new InvalidArgumentException(\sprintf('The "%s"/"%s" constraints on "%s" cannot be satisfied: it would need a priority of at least %d to run '.$before.' "%s" and at most %d to run '.$after.' "%s".', $before, $after, $item, $lows[$item], $lowsFrom[$item], $highs[$item], $highsFrom[$item]));
             } else {
                 $resolved[$item] = min($highs[$item], max($lows[$item], 0));
             }
@@ -182,12 +187,12 @@ final class BeforeAfterSorter
 
         // with every item in the bucket its constraints allow, the sort only reorders inside buckets
         usort($seed, static fn ($a, $b) => $resolved[$b] <=> $resolved[$a] ?: $indexes[$a] <=> $indexes[$b]);
-        $sorted = self::sort($seed, $constraints, $aliases);
+        $sorted = self::sort($seed, $constraints, $aliases, $before, $after);
 
         $previous = null;
         foreach ($sorted as $item) {
             if (null !== $previous && $resolved[$item] > $resolved[$previous]) {
-                throw new InvalidArgumentException(\sprintf('The "before"/"after" constraints put "%s" (priority %d) ahead of "%s" (priority %d), which their priorities do not allow.', $previous, $resolved[$previous], $item, $resolved[$item]));
+                throw new InvalidArgumentException(\sprintf('The "%s"/"%s" constraints put "%s" (priority %d) ahead of "%s" (priority %d), which their priorities do not allow.', $before, $after, $previous, $resolved[$previous], $item, $resolved[$item]));
             }
 
             $previous = $item;
@@ -202,7 +207,7 @@ final class BeforeAfterSorter
      * @param list<string>                $sorted
      * @param list<string>                $path
      */
-    private static function visit(string $item, array $predecessors, array &$states, array &$sorted, array $path): void
+    private static function visit(string $item, array $predecessors, array &$states, array &$sorted, array $path, string $before, string $after): void
     {
         if (2 === ($states[$item] ?? 0)) {
             return;
@@ -212,14 +217,14 @@ final class BeforeAfterSorter
             $cycle = \array_slice($path, array_search($item, $path, true));
             $cycle[] = $item;
 
-            throw new InvalidArgumentException(\sprintf('Cycle detected in the "before"/"after" constraints: "%s".', implode('" -> "', $cycle)));
+            throw new InvalidArgumentException(\sprintf('Cycle detected in the "%s"/"%s" constraints: "%s".', $before, $after, implode('" -> "', $cycle)));
         }
 
         $states[$item] = 1;
         $path[] = $item;
 
         foreach ($predecessors[$item] as $predecessor) {
-            self::visit($predecessor, $predecessors, $states, $sorted, $path);
+            self::visit($predecessor, $predecessors, $states, $sorted, $path, $before, $after);
         }
 
         $states[$item] = 2;

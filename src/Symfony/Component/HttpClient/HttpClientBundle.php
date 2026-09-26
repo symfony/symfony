@@ -336,6 +336,7 @@ class HttpClientBundle extends AbstractBundle
             $container
                 ->register($name.'.uri_template', UriTemplateHttpClient::class)
                 ->setDecoratedService($name, null, 10)
+                ->addTag('container.decoration_order', ['around' => $name.'.scoping'])
                 ->setArguments([
                     new Reference('.inner'),
                     new Reference('http_client.uri_template_expander', ContainerInterface::NULL_ON_INVALID_REFERENCE),
@@ -635,6 +636,7 @@ class HttpClientBundle extends AbstractBundle
 
         if ($options['base_uris']) {
             $definition->addMethodCall('withOptions', [['base_uri' => $options['base_uris']]], true);
+            $definition->addTag('container.decoration_order', ['around' => $name.'.scoping']);
         }
     }
 }

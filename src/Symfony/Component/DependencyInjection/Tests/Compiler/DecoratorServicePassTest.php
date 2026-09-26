@@ -391,9 +391,181 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['prop' => new Reference('bar.inner')], $container->getDefinition('bar')->getProperties());
     }
 
+    public function testWithinReordersDecoratorsSharingAPriority()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('a')->setDecoratedService('foo');
+        $container->register('b')->setDecoratedService('foo')->addTag('container.decoration_order', ['within' => ['a'], 'priority' => 0]);
+
+        $this->process($container);
+
+        $this->assertSame(['a', 'b'], $this->getDecorationChain($container, 'foo'));
+    }
+
+    public function testAroundReordersDecoratorsSharingAPriority()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('a')->setDecoratedService('foo')->addTag('container.decoration_order', ['around' => 'c', 'priority' => 0]);
+        $container->register('b')->setDecoratedService('foo');
+        $container->register('c')->setDecoratedService('foo');
+
+        $this->process($container);
+
+        $this->assertSame(['b', 'a', 'c'], $this->getDecorationChain($container, 'foo'));
+    }
+
+    public function testADecoratorWithoutPriorityIsPlacedByItsConstraints()
+    {
+        $container = new ContainerBuilder();
+        $container->register('http_client');
+        $container->register('retryable')->setDecoratedService('http_client', null, 10);
+        $container->register('traceable')->setDecoratedService('http_client', null, 5);
+        $container->register('uri_template')->setDecoratedService('http_client')->addTag('container.decoration_order', ['around' => ['retryable'], 'within' => ['traceable'], 'priority' => null]);
+
+        $this->process($container);
+
+        $this->assertSame(['traceable', 'uri_template', 'retryable'], $this->getDecorationChain($container, 'http_client'));
+        $this->assertSame(5, $container->getDefinition('uri_template')->decorationPriority);
+    }
+
+    public function testAPriorityDeclaredInTheTagIsAClaim()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('a')->setDecoratedService('foo', null, 10);
+        $container->register('b')->setDecoratedService('foo', null, 5)->addTag('container.decoration_order', ['within' => ['a'], 'priority' => 5]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "within"/"around" constraints on the decorators of "foo": the priority of "b" (5) contradicts its "within" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.');
+
+        $this->process($container);
+    }
+
+    public function testTheDecorationPriorityIsAClaimWhenTheTagDeclaresNone()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('a')->setDecoratedService('foo', null, 10);
+        $container->register('b')->setDecoratedService('foo', null, 7)->addTag('container.decoration_order', ['within' => ['a']]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "within"/"around" constraints on the decorators of "foo": the priority of "b" (7) contradicts its "within" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.');
+
+        $this->process($container);
+    }
+
+    public function testTheDecorationPriorityOfADecoratorWithoutConstraintsIsAClaim()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('a')->setDecoratedService('foo');
+        $container->register('b')->setDecoratedService('foo', null, 10)->addTag('container.decoration_order', ['around' => ['a'], 'priority' => 10]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "within"/"around" constraints on the decorators of "foo": the priority of "b" (10) contradicts its "around" constraint on "a" (0): lower it to 0 or less, remove it, or drop the constraint.');
+
+        $this->process($container);
+    }
+
+    public function testCyclesAreReported()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('a')->setDecoratedService('foo')->addTag('container.decoration_order', ['within' => ['b']]);
+        $container->register('b')->setDecoratedService('foo')->addTag('container.decoration_order', ['within' => ['a']]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "within"/"around" constraints on the decorators of "foo": cycle detected in the "within"/"around" constraints: "a" -> "b" -> "a".');
+
+        $this->process($container);
+    }
+
+    public function testTargetsThatDoNotDecorateTheSameServiceAreIgnored()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('bar');
+        $container->register('a')->setDecoratedService('foo');
+        $container->register('b')->setDecoratedService('foo')->addTag('container.decoration_order', ['within' => ['c', 'missing']]);
+        $container->register('c')->setDecoratedService('bar');
+
+        $this->process($container);
+
+        $this->assertSame(['b', 'a'], $this->getDecorationChain($container, 'foo'));
+        $this->assertSame(['c'], $this->getDecorationChain($container, 'bar'));
+    }
+
+    public function testDecoratorsCanBeTargetedByClass()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('a.class', 'App\\A');
+        $container->register('foo');
+        $container->register('a', '%a.class%')->setDecoratedService('foo');
+        $container->register('b', 'App\\B')->setDecoratedService('foo')->addTag('container.decoration_order', ['within' => ['App\\A']]);
+
+        $this->process($container);
+
+        $this->assertSame(['a', 'b'], $this->getDecorationChain($container, 'foo'));
+    }
+
+    public function testDecoratorsCanBeTargetedByTheirAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('generated_logging')->setDecoratedService('foo')->addTag('container.decoration_order', ['around' => ['caching']]);
+        $container->register('generated_caching')->setDecoratedService('foo')->addTag('container.decoration_order', ['alias' => 'caching']);
+
+        $this->process($container);
+
+        $this->assertSame(['generated_logging', 'generated_caching'], $this->getDecorationChain($container, 'foo'));
+    }
+
+    public function testADecoratedDecoratorCanBeReordered()
+    {
+        $container = new ContainerBuilder();
+        $fooDefinition = $container->register('foo');
+        $container->register('a')->setDecoratedService('foo');
+        $container->register('c')->setDecoratedService('a');
+        $container->register('b')->setDecoratedService('foo')->addTag('container.decoration_order', ['within' => ['a']]);
+
+        $this->process($container);
+
+        $this->assertSame('a', (string) $container->getAlias('foo'));
+        $this->assertSame('c', (string) $container->getAlias('a'));
+        $this->assertSame('b', (string) $container->getAlias('a.inner'));
+        $this->assertSame($fooDefinition, $container->getDefinition('b.inner'));
+    }
+
+    public function testTheOrderTagIsRemoved()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('a')->setDecoratedService('foo')->addTag('container.decoration_order', ['within' => ['b']]);
+        $container->register('b')->addTag('container.decoration_order', ['within' => ['a']]);
+
+        $this->process($container);
+
+        $this->assertFalse($container->getDefinition('a')->hasTag('container.decoration_order'));
+        $this->assertFalse($container->getDefinition('b')->hasTag('container.decoration_order'));
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new DecoratorServicePass();
         $pass->process($container);
+    }
+
+    private function getDecorationChain(ContainerBuilder $container, string $id): array
+    {
+        $chain = [];
+
+        while ($container->hasAlias($id)) {
+            $chain[] = $id = (string) $container->getAlias($id);
+            $id .= '.inner';
+        }
+
+        return $chain;
     }
 }

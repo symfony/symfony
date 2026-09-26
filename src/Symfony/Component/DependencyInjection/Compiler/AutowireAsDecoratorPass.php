@@ -48,7 +48,8 @@ final class AutowireAsDecoratorPass implements CompilerPassInterface
 
         if (1 === \count($decoratorAttributes) && !$tagDecoratorAttributes) {
             $attribute = $decoratorAttributes[0]->newInstance();
-            $definition->setDecoratedService($attribute->decorates, null, $attribute->priority, $attribute->onInvalid);
+            $definition->setDecoratedService($attribute->decorates, null, $attribute->priority ?? 0, $attribute->onInvalid);
+            self::setOrderConstraints($definition, $attribute);
 
             return;
         }
@@ -57,7 +58,8 @@ final class AutowireAsDecoratorPass implements CompilerPassInterface
             $attribute = $attribute->newInstance();
 
             $clonedDefinition = clone $definition;
-            $clonedDefinition->setDecoratedService($attribute->decorates, null, $attribute->priority, $attribute->onInvalid);
+            $clonedDefinition->setDecoratedService($attribute->decorates, null, $attribute->priority ?? 0, $attribute->onInvalid);
+            self::setOrderConstraints($clonedDefinition, $attribute, $id);
             $container->setDefinition(\sprintf('.decorator.%s.%s', $attribute->decorates, $id), $clonedDefinition);
         }
 
@@ -67,7 +69,7 @@ final class AutowireAsDecoratorPass implements CompilerPassInterface
             $clonedDefinition = clone $definition;
             $tagAttributes = [
                 'decorates_tag' => $attribute->tag,
-                'priority' => $attribute->priority,
+                'priority' => $attribute->priority ?? 0,
             ];
 
             if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $attribute->onInvalid) {
@@ -75,9 +77,30 @@ final class AutowireAsDecoratorPass implements CompilerPassInterface
             }
 
             $clonedDefinition->addResourceTag('container.tag_decorator', $tagAttributes);
+            self::setOrderConstraints($clonedDefinition, $attribute, $id);
             $container->setDefinition(\sprintf('.tag_decorator.%s.%s', $attribute->tag, $id), $clonedDefinition);
         }
 
         $container->removeDefinition($id);
+    }
+
+    private static function setOrderConstraints(Definition $definition, AsDecorator|AsTagDecorator $attribute, ?string $alias = null): void
+    {
+        $definition->clearTag('container.decoration_order');
+
+        $constraints = array_filter(['within' => (array) $attribute->within, 'around' => (array) $attribute->around]);
+
+        if ($constraints && null === $attribute->priority) {
+            $constraints['priority'] = null;
+        }
+
+        // decorators generated from this definition can be targeted by its id
+        if (null !== $alias) {
+            $constraints['alias'] = $alias;
+        }
+
+        if ($constraints) {
+            $definition->addTag('container.decoration_order', $constraints);
+        }
     }
 }

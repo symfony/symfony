@@ -69,6 +69,7 @@ return static function (ContainerConfigurator $container) {
         // "oidc_login" firewall factory fills in; they stay empty when no firewall uses one
         ->set('security.oidc_login.callback_uris', [])
         ->set('security.oidc_login.start_paths', [])
+        ->set('security.oidc_login.backchannel_logout_paths', [])
     ;
 
     $container->services()
@@ -294,6 +295,8 @@ return static function (ContainerConfigurator $container) {
                 'security.oidc_login.callback_uris',
                 '%security.oidc_login.start_paths%',
                 'security.oidc_login.start_paths',
+                '%security.oidc_login.backchannel_logout_paths%',
+                'security.oidc_login.backchannel_logout_paths',
             ])
             ->tag('routing.route_loader')
 

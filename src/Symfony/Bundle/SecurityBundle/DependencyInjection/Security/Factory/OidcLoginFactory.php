@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -263,6 +264,22 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->defaultValue('/')
                 ->info('Path or route to redirect to after OIDC logout.')
             ->end()
+            ->arrayNode('backchannel_logout')
+                ->canBeEnabled()
+                ->info('Enable Back-Channel Logout 1.0: the provider pushes a logout token to this application when one of its sessions ends, and the login that session opened here is refused on the next request the browser makes, without the end-user going through any of it. Register the URL of the "path" below with the provider as the "backchannel_logout_uri" of this client, and ask it for the "sid" claim ("backchannel_logout_session_required"), which is what names the session that ended.')
+                ->children()
+                    ->scalarNode('path')
+                        ->cannotBeEmpty()
+                        ->defaultValue('/oidc/backchannel-logout')
+                        ->info('The path where the provider posts its logout tokens. A route accepting POST is declared for it by the "security.authenticator.oidc_login.route_loader" service, as one is for "check_path"; leave the path outside of any access_control rule, as the request comes from the provider and carries no session of the end-user.')
+                    ->end()
+                    ->scalarNode('cache')
+                        ->cannotBeEmpty()
+                        ->defaultValue('cache.app')
+                        ->info('The id of the PSR-6 pool remembering which provider sessions a logout token ended, so that the logins they opened are refused on their next request. It has to be shared by every server of the application, as a logout token reaches any of them and the session it names was opened by another; name your own pool when "cache.app" is local to one server.')
+                    ->end()
+                ->end()
+            ->end()
         ;
 
         // the two rules a public client cannot bend, checked here for the methods this
@@ -271,6 +288,10 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
         // its method once built, so the same two rules are checked again by the
         // constructor of OidcLoginAuthenticator, which is what catches that case
         $node
+            ->validate()
+                ->ifTrue(static fn ($v): bool => $v['backchannel_logout']['enabled'] && !$v['id_token_signature']['required'])
+                ->thenInvalid('The OIDC "backchannel_logout" option cannot be enabled while "id_token_signature.required" is false: a logout token arrives from whoever reaches the endpoint, with no token endpoint request and no TLS verification behind it, so its signature is the only thing making it the provider\'s.')
+            ->end()
             ->validate()
                 ->ifTrue(static fn ($v): bool => isset($v['client_authentication']['none']) && !$v['pkce']['enabled'])
                 ->thenInvalid('The OIDC "pkce.enabled" option cannot be false for a public client, declared by "client_authentication.none": a public client sends no secret, so PKCE is the only thing binding the authorization code to it.')
@@ -443,6 +464,44 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->replaceArgument(2, $config['post_logout_redirect_path'])
                 ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName])
             ;
+        }
+
+        if ($config['backchannel_logout']['enabled']) {
+            $endedSessionsId = 'security.authenticator.oidc_login.ended_sessions.'.$firewallName;
+            $container
+                ->setDefinition($endedSessionsId, new ChildDefinition('security.authenticator.oidc_login.ended_sessions'))
+                ->replaceArgument(0, new Reference($config['backchannel_logout']['cache']))
+                ->replaceArgument(1, $firewallName)
+            ;
+
+            $logoutTokenId = 'security.authenticator.oidc_login.logout_token.'.$firewallName;
+            $container
+                ->setDefinition($logoutTokenId, new ChildDefinition('security.authenticator.oidc_login.logout_token'))
+                ->replaceArgument(1, $config['allowed_time_drift'])
+            ;
+
+            $container
+                ->setDefinition('security.authenticator.oidc_login.backchannel_logout.'.$firewallName, new ChildDefinition('security.authenticator.oidc_login.backchannel_logout'))
+                // never null: the configuration refuses the two options together
+                ->replaceArgument(0, $signatureVerifier)
+                ->replaceArgument(1, new Reference($logoutTokenId))
+                ->replaceArgument(2, new Reference($discoveryId))
+                ->replaceArgument(3, $config['client_id'])
+                ->replaceArgument(4, new Reference($endedSessionsId))
+            ;
+
+            $container
+                ->setDefinition('security.authenticator.oidc_login.backchannel_logout_listener.'.$firewallName, new ChildDefinition('security.authenticator.oidc_login.backchannel_logout_listener'))
+                ->replaceArgument(0, new Reference($endedSessionsId))
+                ->addTag('kernel.event_listener', ['dispatcher' => 'security.event_dispatcher.'.$firewallName, 'event' => CheckRefreshedUserEvent::class])
+            ;
+
+            $logoutControllerLocator = $container->getDefinition('security.authenticator.oidc_login.backchannel_logout_controller')->getArgument(0);
+            $logoutControllerLocator->setValues([$firewallName => new Reference('security.authenticator.oidc_login.backchannel_logout.'.$firewallName)] + $logoutControllerLocator->getValues());
+
+            $logoutPaths = $container->hasParameter('security.oidc_login.backchannel_logout_paths') ? (array) $container->getParameter('security.oidc_login.backchannel_logout_paths') : [];
+            $logoutPaths[$firewallName] = $config['backchannel_logout']['path'];
+            $container->setParameter('security.oidc_login.backchannel_logout_paths', $logoutPaths);
         }
 
         $callbackUris = $container->hasParameter('security.oidc_login.callback_uris') ? (array) $container->getParameter('security.oidc_login.callback_uris') : [];

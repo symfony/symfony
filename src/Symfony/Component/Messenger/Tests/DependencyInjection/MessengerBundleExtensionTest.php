@@ -546,8 +546,19 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertSame('messenger.transport.symfony_serializer', (string) $container->getAlias('messenger.default_serializer'));
 
         $serializerTransportDefinition = $container->getDefinition('messenger.transport.symfony_serializer');
+        $this->assertEquals(new Reference('serializer'), $serializerTransportDefinition->getArgument(0));
         $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));
         $this->assertSame(['enable_max_depth' => true], $serializerTransportDefinition->getArgument(2));
+    }
+
+    public function testMessengerTransportSerializerConfiguration()
+    {
+        $container = $this->createContainerFromFile('messenger_transport_serializer');
+
+        $serializerTransportDefinition = $container->getDefinition('messenger.transport.symfony_serializer');
+        $this->assertEquals(new Reference('serializer.api'), $serializerTransportDefinition->getArgument(0));
+        $this->assertSame('json', $serializerTransportDefinition->getArgument(1));
+        $this->assertSame([], $serializerTransportDefinition->getArgument(2));
     }
 
     public function testMessengerWithAddBusNameStampMiddleware()

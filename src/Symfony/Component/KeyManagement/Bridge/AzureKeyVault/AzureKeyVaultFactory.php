@@ -27,10 +27,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * The host is the full vault DNS name (`<name>.vault.azure.net`,
  * `<name>.managedhsm.azure.net` for Managed HSM, or the equivalent in a
- * sovereign cloud). The audience for token acquisition is inferred from the
- * host suffix and falls back to the standard `https://vault.azure.net/.default`
- * scope; pass `audience` explicitly to target a sovereign cloud (US gov,
- * China, ...) or to override the heuristic.
+ * sovereign cloud). The factory selects a public-cloud audience from the host
+ * suffix and uses the public Microsoft Entra authority. The `audience` option
+ * overrides the scope; sovereign clouds also require a different authority,
+ * so wire {@see AzureKeyVault} manually with a suitable token provider.
  *
  * Users that need Managed Identity, Workload Identity, or any other Azure AD
  * flow should wire {@see AzureKeyVault} manually with a custom
@@ -115,6 +115,7 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
         return new AzureKeyVault(
             $client,
             new ClientCredentialsTokenProvider($client, $tenantId, $dsn->user, $dsn->password, $audience),
+            $baseUri,
             self::algorithmOption($dsn, 'algorithm'),
             self::algorithmOption($dsn, 'wrap_algorithm'),
             $dsn->getOption('api_version', '7.4'),

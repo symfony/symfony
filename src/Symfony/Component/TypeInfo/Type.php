@@ -90,6 +90,18 @@ abstract class Type implements \Stringable
     }
 
     /**
+     * Maps the type (and its wrapped/composed parts) bottom-up with a $mapper.
+     *
+     * @param-immediately-invoked-callable $mapper
+     *
+     * @param callable(self): self $mapper
+     */
+    public function map(callable $mapper): self
+    {
+        return $mapper($this);
+    }
+
+    /**
      * Traverses the whole type tree.
      *
      * @return iterable<self>

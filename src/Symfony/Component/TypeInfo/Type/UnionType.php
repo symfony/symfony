@@ -100,6 +100,24 @@ class UnionType extends Type implements CompositeTypeInterface
         return false;
     }
 
+    /**
+     * @param-immediately-invoked-callable $mapper
+     */
+    public function map(callable $mapper): Type
+    {
+        $types = array_map(static fn (Type $t): Type => $t->map($mapper), $this->types);
+
+        if ($types === $this->types) {
+            return $mapper($this);
+        }
+
+        // flatten mapped unions first, so that duplicates inside them are removed as well (e.g. "?int|int" must become "?int")
+        $types = array_merge(...array_map(static fn (Type $t): array => $t instanceof self ? $t->getTypes() : [$t], $types));
+        $types = array_values(array_unique($types));
+
+        return $mapper(1 === \count($types) ? $types[0] : Type::union(...$types));
+    }
+
     public function __toString(): string
     {
         $string = '';

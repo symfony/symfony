@@ -73,6 +73,21 @@ final class GenericType extends Type implements WrappingTypeInterface
         return $this->getWrappedType()->isSatisfiedBy($specification);
     }
 
+    /**
+     * @param-immediately-invoked-callable $mapper
+     */
+    public function map(callable $mapper): Type
+    {
+        $type = $this->type->map($mapper);
+        $variableTypes = array_map(static fn (Type $t): Type => $t->map($mapper), $this->variableTypes);
+
+        if ($type === $this->type && $variableTypes === $this->variableTypes) {
+            return $mapper($this);
+        }
+
+        return $mapper(new self($type, ...$variableTypes));
+    }
+
     public function __toString(): string
     {
         $typeString = (string) $this->type;

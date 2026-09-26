@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `TypeInfoBundle`, which provides the `type_info` configuration and the services previously provided by `FrameworkBundle` under `framework.type_info`
  * Add support for `@template-covariant` and its vendor prefixed synonyms
+ * Add `Type::map()` to map a type and its parts bottom-up
 
 8.1
 ---

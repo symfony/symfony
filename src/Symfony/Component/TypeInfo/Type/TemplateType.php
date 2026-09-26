@@ -62,6 +62,16 @@ final class TemplateType extends Type implements WrappingTypeInterface
         return $this->getWrappedType()->isSatisfiedBy($specification);
     }
 
+    /**
+     * @param-immediately-invoked-callable $mapper
+     */
+    public function map(callable $mapper): Type
+    {
+        $bound = $this->bound->map($mapper);
+
+        return $mapper($bound === $this->bound ? $this : new self($this->name, $bound));
+    }
+
     public function __toString(): string
     {
         return $this->name;

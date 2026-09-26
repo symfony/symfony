@@ -67,9 +67,9 @@ class FileResourceTest extends TestCase
 
     public function testIsFreshWhenModifiedInSameSecondAfterBeingLoaded()
     {
-        touch($this->file, $this->time - 10);
+        $this->touch($this->time - 10);
         $resource = new FileResource($this->file);
-        touch($this->file, $time = $this->time + 20);
+        $this->touch($time = $this->time + 20);
 
         $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if the resource has been updated in the same second');
         $this->assertTrue($resource->isFresh($time + 1), '->isFresh() returns true if the resource has not changed since the previous second');
@@ -77,13 +77,13 @@ class FileResourceTest extends TestCase
 
     public function testIsFreshComparesContentWhenModifiedInSameSecondAsLoaded()
     {
-        touch($this->file, $time = $this->time + 20);
+        $this->touch($time = $this->time + 20);
         $resource = unserialize(serialize(new FileResource($this->file)));
 
         $this->assertTrue($resource->isFresh($time), '->isFresh() returns true if the content has not changed since the resource was loaded');
 
         file_put_contents($this->file, 'changed');
-        touch($this->file, $time);
+        $this->touch($time);
 
         $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if the content has changed in the same second');
     }
@@ -100,5 +100,12 @@ class FileResourceTest extends TestCase
         unserialize(serialize($this->resource));
 
         $this->assertSame(realpath($this->file), $this->resource->getResource());
+    }
+
+    private function touch(int $time): void
+    {
+        touch($this->file, $time);
+        // touch() clears the stat cache only as of PHP 8.4.5
+        clearstatcache();
     }
 }

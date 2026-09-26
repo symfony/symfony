@@ -464,7 +464,7 @@ class GlobResourceTest extends TestCase
             touch($dir.$path, $mtime);
         }
 
-        return realpath($dir);
+        return str_replace('\\', '/', realpath($dir));
     }
 
     private function unserializedResource(string $dir, string $pattern = '', bool $recursive = true, array $excludedPrefixes = []): GlobResource

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -170,6 +171,21 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         }
 
         return $this->startAuthorizationRequest($request, $forcedParams);
+    }
+
+    /**
+     * A fresh authentication is what the two recency attributes ask for, and the only thing
+     * this entry point knows how to ask the provider for by itself.
+     *
+     * An application whose provider is asked for more than freshness, an authentication context
+     * class among it, decorates this entry point: it answers for the attributes naming what it
+     * asks for, and adds the parameters that ask for it from a listener of
+     * {@see OidcAuthorizationRequestEvent}, which is dispatched on this path and reads the denied
+     * attribute off {@see SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE}.
+     */
+    public function supportsAttribute(string $attribute): bool
+    {
+        return \in_array($attribute, [AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY], true);
     }
 
     /**

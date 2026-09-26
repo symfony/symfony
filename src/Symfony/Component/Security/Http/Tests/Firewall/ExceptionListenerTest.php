@@ -288,6 +288,7 @@ class ExceptionListenerTest extends TestCase
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->method('supportsAttribute')->willReturn(true);
         $entryPoint->expects($this->once())
             ->method('startReAuthentication')
             ->with($this->anything(), $this->isInstanceOf(TokenInterface::class))
@@ -306,6 +307,7 @@ class ExceptionListenerTest extends TestCase
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->method('supportsAttribute')->willReturn(true);
         $entryPoint->expects($this->once())
             ->method('startReAuthentication')
             ->willReturn(new Response('Confirm your password', 200));
@@ -323,6 +325,7 @@ class ExceptionListenerTest extends TestCase
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->method('supportsAttribute')->willReturn(true);
         $entryPoint->expects($this->once())
             ->method('startReAuthentication')
             ->willReturnCallback(function (Request $request): Response {
@@ -347,6 +350,7 @@ class ExceptionListenerTest extends TestCase
         // that only implements AuthenticationEntryPointInterface is never picked up,
         // which is what stops a plain login page from looping
         $entryPoint = $this->createMock(ReAuthenticatingEntryPoint::class);
+        $entryPoint->method('supportsAttribute')->willReturn(true);
         $entryPoint->expects($this->once())
             ->method('startReAuthentication')
             ->willReturn(new Response('Confirm your password', 200));
@@ -379,6 +383,11 @@ class ExceptionListenerTest extends TestCase
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->method('supportsAttribute')->willReturnCallback(function (string $attribute): bool {
+            $this->assertSame('ROLE_ADMIN', $attribute);
+
+            return false;
+        });
         $entryPoint->expects($this->never())->method('startReAuthentication');
 
         $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
@@ -386,6 +395,41 @@ class ExceptionListenerTest extends TestCase
 
         $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
         $this->assertFalse($event->getRequest()->attributes->has(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+    }
+
+    /**
+     * What a fresh authentication is worth is the entry point's to answer.
+     *
+     * An application whose provider can be asked for more than freshness names its own
+     * attribute, and the firewall starts the entry point that says it acts on it.
+     */
+    public function testReAuthenticationStartsForAnyAttributeTheEntryPointActsOn()
+    {
+        // Given
+        $exception = new AccessDeniedException();
+        $exception->setAttributes(['IS_AUTHENTICATED_IN_CONTEXT:phr']);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->method('supportsAttribute')->willReturnCallback(function (string $attribute): bool {
+            $this->assertSame('IS_AUTHENTICATED_IN_CONTEXT:phr', $attribute);
+
+            return true;
+        });
+        $entryPoint->expects($this->once())
+            ->method('startReAuthentication')
+            ->willReturnCallback(function (Request $request): Response {
+                $this->assertSame('IS_AUTHENTICATED_IN_CONTEXT:phr', $request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+
+                return new Response('Use your passkey', 200);
+            });
+
+        // When
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        // Then
+        $this->assertSame('Use your passkey', $event->getResponse()->getContent());
     }
 
     public function testReAuthenticationEntryPointIsNotStartedWhenAnotherAttributeMayHaveFailed()

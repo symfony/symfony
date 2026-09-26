@@ -28,14 +28,14 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
  *     `transit/datakey/plaintext`);
  *   - generate the DEK locally with `random_bytes()` and round-trip it through
  *     the KMS using `wrapKey/unwrapKey` (Azure Key Vault, GCP Cloud KMS) or
- *     plain `encrypt` (this is what {@see Local\SodiumKms} does);
+ *     plain `encrypt` (this is what {@see Local\SodiumKms} and {@see Bridge\Kmip\KmipKms} do);
  *   - decline support and not implement this interface, in which case callers
  *     detect the capability with `instanceof`.
  *
- * Supported `$length` values vary by bridge (HashiCorp Vault Transit only
- * accepts 16/32/64 bytes; AWS KMS, Azure Key Vault, Google Cloud KMS and the
- * local backends accept any value of at least 16 bytes). The intersection
- * that round-trips through every shipped bridge is `{16, 32, 64}`.
+ * Supported `$length` values vary by bridge.
+ * HashiCorp Vault Transit accepts only 16, 32 or 64 bytes.
+ * AWS KMS, Azure Key Vault, Google Cloud KMS, KMIP and the local backends accept lengths of at least 16 bytes, subject to their payload limits.
+ * The lengths supported by every shipped bridge are `{16, 32, 64}`.
  * {@see EnvelopeEncrypter} sticks to the `SelfContainedFormat` defaults (32 bytes
  * for V1) so users only hit bridge-specific limits when they call
  * `generateDataKey()` themselves with a custom length.
@@ -65,7 +65,8 @@ interface DataKeyGeneratorInterface
      * @param string $aad Must match the AAD supplied at wrap time
      *
      * @throws KeyNotFoundException      If the wrapped ciphertext's key is unknown
-     * @throws DecryptionFailedException If unwrapping fails (tampering, wrong key, AAD mismatch)
+     * @throws DecryptionFailedException If the backend identifies tampering, a wrong key, or an AAD mismatch
+     * @throws RuntimeException          If the backend reports an operational or ambiguous failure that it cannot identify as a ciphertext failure
      */
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey;
 }

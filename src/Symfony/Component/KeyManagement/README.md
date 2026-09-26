@@ -1,12 +1,13 @@
 KeyManagement Component
 =======================
 
-The KeyManagement component provides a unified abstraction over Key Management
-Systems such as AWS KMS, Azure Key Vault, Google Cloud KMS and HashiCorp Vault
-Transit. It exposes a small high-level API for encrypting/decrypting payloads,
-generating data keys for envelope encryption, and is designed so that the
-secret material never leaves the underlying KMS. A client made of several
-providers keeps every ciphertext readable when one of them is lost.
+The KeyManagement component provides a unified abstraction over key management
+systems such as AWS KMS, Azure Key Vault, Google Cloud KMS, HashiCorp Vault
+Transit and KMIP servers. It exposes a small high-level API for encrypting and
+decrypting payloads and generating data keys for envelope encryption. Remote
+KMS bridges keep the master key at the server while envelope encryption uses a
+locally available data key. A client made of several providers keeps every
+ciphertext readable when one of them is lost.
 
 **This Component is experimental**.
 [Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
@@ -30,7 +31,8 @@ use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 // The component also ships `OpenSslKms` (AES-256-GCM, no ext-sodium
 // requirement) and `SealedBoxKms` (asymmetric). Cloud and Flysystem
 // backends ship as separate bridges (symfony/aws-key-management,
-// symfony/hashicorp-vault-key-management, symfony/flysystem-key-management, ...).
+// symfony/hashicorp-vault-key-management, symfony/kmip-key-management,
+// symfony/flysystem-key-management, ...).
 $kms = new SodiumKms(new InMemoryKeyLoader([
     'app-key' => sodium_crypto_aead_xchacha20poly1305_ietf_keygen(),
 ]));

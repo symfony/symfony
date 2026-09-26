@@ -25,6 +25,10 @@ use Symfony\Component\KeyManagement\Base64UrlSafe;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipEncryptionSchemeInterface;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKms;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipRequestClientInterface;
+use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\DataCollector\KeyManagementDataCollector;
 use Symfony\Component\KeyManagement\Debug\TraceableKms;
 use Symfony\Component\KeyManagement\DependencyInjection\KeyManagementPass;
@@ -145,6 +149,20 @@ class KeyManagementBundleTest extends TestCase
         $this->assertContains(KeyManagementPass::class, $this->buildPasses());
     }
 
+    public function testCustomKmipEncryptionSchemeIsAutoconfiguredAndSelectedByDsn()
+    {
+        if (!interface_exists(KmipEncryptionSchemeInterface::class)) {
+            $this->markTestSkipped('symfony/kmip-key-management is not installed.');
+        }
+
+        $kernel = new TestKeyManagementKernel('kmip_custom', false, $this->varDir);
+        $kernel->boot();
+
+        $kms = $kernel->getContainer()->get('test.kms');
+        $this->assertInstanceOf(KmipKms::class, $kms);
+        $this->assertInstanceOf(TestKmipEncryptionScheme::class, (new \ReflectionProperty(KmipKms::class, 'encryptionScheme'))->getValue($kms));
+    }
+
     public function testTheFlysystemStoragesPassIsRegisteredWhenTheBridgeIsInstalled()
     {
         if (!class_exists(RegisterFlysystemStoragesPass::class)) {
@@ -204,6 +222,11 @@ class TestKeyManagementKernel extends AbstractKernel
             ->alias('test.envelope_encrypter', 'key_management.envelope_encrypter.default')->public()
         ;
 
+        if ('kmip_custom' === $this->environment) {
+            $config = ['clients' => 'kmip://localhost?cert=/missing/cert&key=/missing/key&version=2.0&cipher=test/custom'];
+            $services->set('test.kmip_encryption_scheme', TestKmipEncryptionScheme::class)->autoconfigure();
+        }
+
         if ('redundant' === $this->environment) {
             $config = [
                 'clients' => [
@@ -235,5 +258,25 @@ class TestKeyManagementKernel extends AbstractKernel
         }
 
         $container->extension('key_management', $config);
+    }
+}
+
+if (interface_exists(KmipEncryptionSchemeInterface::class)) {
+    class TestKmipEncryptionScheme implements KmipEncryptionSchemeInterface
+    {
+        public function name(): string
+        {
+            return 'test/custom';
+        }
+
+        public function encrypt(KmipRequestClientInterface $client, string $keyId, string $plaintext, string $aad): Ciphertext
+        {
+            throw new \LogicException('This scheme is only used to test service wiring.');
+        }
+
+        public function decrypt(KmipRequestClientInterface $client, Ciphertext $ciphertext, string $aad): string
+        {
+            throw new \LogicException('This scheme is only used to test service wiring.');
+        }
     }
 }

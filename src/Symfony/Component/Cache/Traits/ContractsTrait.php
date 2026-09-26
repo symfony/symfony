@@ -64,24 +64,9 @@ trait ContractsTrait
         }
 
         $item = $pool->getItem($key);
-        $recompute = !$item->isHit() || \INF === $beta;
         $metadata = $item->getMetadata();
 
-        if (!$recompute && $metadata) {
-            $expiry = $metadata[ItemInterface::METADATA_EXPIRY] ?? false;
-            $ctime = $metadata[ItemInterface::METADATA_CTIME] ?? false;
-
-            if ($recompute = $ctime && $expiry && $expiry <= ($now = microtime(true)) - $ctime / 1000 * $beta * log(random_int(1, \PHP_INT_MAX) / \PHP_INT_MAX)) {
-                // force applying defaultLifetime to expiry
-                $item->expiresAt(null);
-                ($this->logger ?? null)?->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [
-                    'key' => $key,
-                    'delta' => \sprintf('%.1f', $expiry - $now),
-                ]);
-            }
-        }
-
-        if (!$recompute) {
+        if ($item->isHit() && \INF !== $beta && (!$metadata || !self::electEarlyRecomputation($item, $metadata, $beta, $this->logger ?? null))) {
             return $item->get();
         }
 

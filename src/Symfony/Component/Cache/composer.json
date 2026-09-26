@@ -24,7 +24,7 @@
         "php": ">=8.4.1",
         "psr/cache": "^2.0|^3.0",
         "psr/log": "^1.1|^2|^3",
-        "symfony/cache-contracts": "^3.6",
+        "symfony/cache-contracts": "^3.8",
         "symfony/service-contracts": "^2.5|^3",
         "symfony/var-exporter": "^8.1"
     },

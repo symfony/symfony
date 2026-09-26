@@ -58,6 +58,9 @@ class PdoSessionHandlerTest extends TestCase
         new PdoSessionHandler($pdo);
     }
 
+    /**
+     * @requires PHP 7.4
+     */
     public function testCannotBeSerialized()
     {
         $this->expectException(\BadMethodCallException::class);

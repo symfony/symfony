@@ -34,6 +34,9 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertInstanceOf(\SessionUpdateTimestampHandlerInterface::class, $this->dualHandler);
     }
 
+    /**
+     * @requires PHP 7.4
+     */
     public function testCannotBeSerialized()
     {
         $this->expectException(\BadMethodCallException::class);

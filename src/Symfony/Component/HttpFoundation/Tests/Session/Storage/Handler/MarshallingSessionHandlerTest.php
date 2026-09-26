@@ -38,6 +38,9 @@ class MarshallingSessionHandlerTest extends TestCase
         $this->handler = $this->createMock(AbstractSessionHandler::class);
     }
 
+    /**
+     * @requires PHP 7.4
+     */
     public function testCannotBeSerialized()
     {
         $this->expectException(\BadMethodCallException::class);

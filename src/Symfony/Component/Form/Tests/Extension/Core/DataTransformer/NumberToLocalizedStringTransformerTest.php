@@ -628,6 +628,20 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }
 
+    public function testReverseTransformDisallowsOneTrailingExtraCharacterMultibyte()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('The number contains unrecognized characters: "f"');
+        // Since we test against other locales, we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('ru');
+
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform("12\xc2\xa0345,67f");
+    }
+
     public function testReverseTransformBigInt()
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);

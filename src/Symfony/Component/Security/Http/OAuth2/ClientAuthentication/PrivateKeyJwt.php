@@ -12,18 +12,9 @@
 namespace Symfony\Component\Security\Http\OAuth2\ClientAuthentication;
 
 use Jose\Component\Core\JWK;
-use Jose\Component\Signature\Algorithm\ES256;
-use Jose\Component\Signature\Algorithm\ES384;
-use Jose\Component\Signature\Algorithm\ES512;
-use Jose\Component\Signature\Algorithm\PS256;
-use Jose\Component\Signature\Algorithm\PS384;
-use Jose\Component\Signature\Algorithm\PS512;
-use Jose\Component\Signature\Algorithm\RS256;
-use Jose\Component\Signature\Algorithm\RS384;
-use Jose\Component\Signature\Algorithm\RS512;
-use Jose\Component\Signature\Algorithm\SignatureAlgorithm;
 use Jose\Component\Signature\JWSBuilder;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Security\Http\OAuth2\JwsAlgorithms;
 
 /**
  * Authenticates the client with an assertion signed by its private key.
@@ -39,27 +30,6 @@ use Psr\Clock\ClockInterface;
  */
 final class PrivateKeyJwt extends AbstractClientAssertion
 {
-    /**
-     * The asymmetric signature algorithms the OIDC signature verifier accepts on the way in.
-     *
-     * They are the ones {@see \Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier}
-     * supports. No MAC algorithm is among them, so a client secret can never be passed off as
-     * the private key this method is built on.
-     *
-     * @var array<string, class-string<SignatureAlgorithm>>
-     */
-    private const SIGNATURE_ALGORITHMS = [
-        'RS256' => RS256::class,
-        'RS384' => RS384::class,
-        'RS512' => RS512::class,
-        'ES256' => ES256::class,
-        'ES384' => ES384::class,
-        'ES512' => ES512::class,
-        'PS256' => PS256::class,
-        'PS384' => PS384::class,
-        'PS512' => PS512::class,
-    ];
-
     /**
      * @param JWK             $signingKey The private key of the client, whose public half is registered at the provider
      * @param string          $algorithm  The JWA name of the signature algorithm, which must be one the provider lists
@@ -77,7 +47,7 @@ final class PrivateKeyJwt extends AbstractClientAssertion
             throw new \LogicException('You cannot authenticate an OAuth2 client with the "private_key_jwt" method since the "web-token/jwt-library" package is not installed. Try running "composer require web-token/jwt-library".');
         }
 
-        $signatureAlgorithm = self::createAlgorithm($algorithm, self::SIGNATURE_ALGORITHMS, 'private_key_jwt');
+        $signatureAlgorithm = self::createAlgorithm($algorithm, JwsAlgorithms::ASYMMETRIC, 'private_key_jwt');
 
         if (!$signingKey->has('d')) {
             throw new \InvalidArgumentException('The "private_key_jwt" client assertion must be signed with the private key of the client, and the given JWK has no "d" parameter: it is the public key. Register that public key at the provider, and sign with the private one.');

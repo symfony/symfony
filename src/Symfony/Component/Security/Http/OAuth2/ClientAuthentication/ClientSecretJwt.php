@@ -12,12 +12,9 @@
 namespace Symfony\Component\Security\Http\OAuth2\ClientAuthentication;
 
 use Jose\Component\Core\JWK;
-use Jose\Component\Signature\Algorithm\HS256;
-use Jose\Component\Signature\Algorithm\HS384;
-use Jose\Component\Signature\Algorithm\HS512;
-use Jose\Component\Signature\Algorithm\MacAlgorithm;
 use Jose\Component\Signature\JWSBuilder;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Security\Http\OAuth2\JwsAlgorithms;
 
 /**
  * Authenticates the client with an assertion signed with its secret.
@@ -34,15 +31,6 @@ use Psr\Clock\ClockInterface;
  */
 final class ClientSecretJwt extends AbstractClientAssertion
 {
-    /**
-     * @var array<string, class-string<MacAlgorithm>>
-     */
-    private const MAC_ALGORITHMS = [
-        'HS256' => HS256::class,
-        'HS384' => HS384::class,
-        'HS512' => HS512::class,
-    ];
-
     /**
      * The secret is not measured here.
      *
@@ -67,7 +55,7 @@ final class ClientSecretJwt extends AbstractClientAssertion
             throw new \LogicException('You cannot authenticate an OAuth2 client with the "client_secret_jwt" method since the "web-token/jwt-library" package is not installed. Try running "composer require web-token/jwt-library".');
         }
 
-        $macAlgorithm = self::createAlgorithm($algorithm, self::MAC_ALGORITHMS, 'client_secret_jwt');
+        $macAlgorithm = self::createAlgorithm($algorithm, JwsAlgorithms::MAC, 'client_secret_jwt');
         $signingKey = new JWK(['kty' => 'oct', 'k' => rtrim(strtr(base64_encode($clientSecret), '+/', '-_'), '=')]);
 
         try {

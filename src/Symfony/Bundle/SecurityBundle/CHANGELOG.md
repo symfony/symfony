@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `dpop` option to the `oidc_login` authenticator, binding what the provider issues to a key the client holds (RFC 9449); a provider that answers with a token it did not bind is refused rather than used unbound
  * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session
  * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which now takes the logout URL generator there
  * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service used when `IS_AUTHENTICATED_RECENTLY` is denied

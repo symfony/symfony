@@ -1323,6 +1323,129 @@ class OidcLoginFactoryTest extends TestCase
         ], $factory);
     }
 
+    /**
+     * The proof factory reaches both the client, which signs the requests it makes, and the
+     * authenticator, which names the key in the authorization request.
+     */
+    public function testTheDpopProofFactoryIsBuiltFromTheConfiguration()
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+            'dpop' => ['key' => self::SIGNING_KEY, 'algorithm' => 'ES256'],
+        ];
+
+        // When
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        // Then
+        $proofFactory = $container->getDefinition('security.authenticator.oidc_login.dpop.main');
+        $this->assertSame('security.oauth2.dpop.proof_factory', $proofFactory->getParent());
+        $this->assertSame('ES256', $proofFactory->getArgument(1));
+        $this->assertSame(self::SIGNING_KEY, $proofFactory->getArgument(0)->getArgument(0));
+
+        $reference = new Reference('security.authenticator.oidc_login.dpop.main');
+        // the authenticator signs the "dpop_jkt" of the authorization request with the key
+        $this->assertEquals($reference, $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
+
+        // the client asks for a token of the DPoP type, which is what holds the proof factory
+        $accessTokenType = $container->getDefinition('security.authenticator.oidc_login.access_token_type.main');
+        $this->assertSame('security.oauth2.access_token_type.dpop', $accessTokenType->getParent());
+        $this->assertEquals($reference, $accessTokenType->getArgument(0));
+        $this->assertEquals(
+            new Reference('security.authenticator.oidc_login.access_token_type.main'),
+            $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4),
+        );
+    }
+
+    /**
+     * A firewall that binds nothing to a key asks for the bearer token the client defaults to.
+     */
+    public function testNoAccessTokenTypeIsWiredWithoutDpop()
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+        ];
+
+        // When
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        // Then
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.access_token_type.main'));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+    }
+
+    public function testTheDpopNodeTakesTheKeyAlone()
+    {
+        // Given
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+            'dpop' => self::SIGNING_KEY,
+        ];
+
+        // When
+        $finalized = $this->processConfig($config, new OidcLoginFactory());
+
+        // Then
+        $this->assertSame(self::SIGNING_KEY, $finalized['dpop']['key']);
+        $this->assertSame('ES256', $finalized['dpop']['algorithm']);
+    }
+
+    /**
+     * Nothing is bound to a key unless the firewall says so.
+     */
+    public function testNothingIsWiredForDpopByDefault()
+    {
+        // Given
+        $container = new ContainerBuilder();
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+        ];
+
+        // When
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        // Then
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.dpop.main'));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
+    }
+
+    /**
+     * RFC 9449, Section 4.2 excludes symmetric algorithms.
+     */
+    public function testTheDpopNodeRefusesAMacAlgorithm()
+    {
+        // Given
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => ['client_secret_basic' => 'a-secret'],
+            'dpop' => ['key' => self::SIGNING_KEY, 'algorithm' => 'HS256'],
+        ];
+
+        // Then
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The value "HS256" is not allowed for path "oidc-login.dpop.algorithm".');
+
+        // When
+        $this->processConfig($config, new OidcLoginFactory());
+    }
+
     private function processConfig(array $config, OidcLoginFactory $factory): array
     {
         $nodeDefinition = new ArrayNodeDefinition('oidc-login');

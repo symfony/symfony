@@ -34,6 +34,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Symfony\Component\Security\Http\EntryPoint\ReAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Event\OidcAuthorizationRequestEvent;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\OAuth2\Dpop\DpopProofFactory;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -93,6 +94,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         private readonly ?OidcSignatureVerifier $signatureVerifier = null,
         ?ClockInterface $clock = null,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly ?DpopProofFactory $dpopProofFactory = null,
     ) {
         if (null === $clock && !class_exists(Clock::class)) {
             throw new \LogicException(\sprintf('The "symfony/clock" component is required to build "%s" without a clock. Try running "composer require symfony/clock", or pass any PSR-20 clock to the constructor.', self::class));
@@ -212,6 +214,14 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
 
         if (null !== ($this->options['max_age'] ?? null)) {
             $params['max_age'] = (string) $this->options['max_age'];
+        }
+
+        // RFC 9449, Section 10.1: the code is bound to the key before it exists, so that a
+        // code stolen from the redirect cannot be exchanged by whoever does not hold it. The
+        // thumbprint names the key without carrying it, which is what lets it travel here,
+        // in a front channel.
+        if (null !== $this->dpopProofFactory) {
+            $params['dpop_jkt'] = $this->dpopProofFactory->getKeyThumbprint();
         }
 
         $extraParams = $this->authorizationParams;

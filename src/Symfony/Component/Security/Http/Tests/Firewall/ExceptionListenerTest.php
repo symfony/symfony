@@ -25,13 +25,21 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
@@ -281,10 +289,27 @@ class ExceptionListenerTest extends TestCase
         return $tokenStorage;
     }
 
+    private function decide(array $attributes, NestingVoter ...$voters): AccessDeniedException
+    {
+        $decisionManager = new AccessDecisionManager([new AuthenticatedVoter(new AuthenticationTrustResolver()), new RoleVoter(), ...$voters]);
+
+        foreach ($voters as $voter) {
+            $voter->decisionManager = $decisionManager;
+        }
+
+        $accessDecision = new AccessDecision();
+        $accessDecision->isGranted = $decisionManager->decide($this->createTokenStorageWithAToken()->getToken(), $attributes, null, $accessDecision, true);
+
+        $exception = new AccessDeniedException($accessDecision->getMessage());
+        $exception->setAttributes($attributes);
+        $exception->setAccessDecision($accessDecision);
+
+        return $exception;
+    }
+
     public function testReAuthenticationEntryPointStartsOnAStaleAuthentication()
     {
-        $exception = new AccessDeniedException();
-        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+        $exception = $this->decide([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
@@ -301,8 +326,7 @@ class ExceptionListenerTest extends TestCase
 
     public function testReAuthenticationEntryPointStartsWhenAVeryRecentAuthenticationIsRequired()
     {
-        $exception = new AccessDeniedException();
-        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]);
+        $exception = $this->decide([AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]);
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
@@ -318,8 +342,7 @@ class ExceptionListenerTest extends TestCase
 
     public function testTheDeniedAttributeIsNamedOnTheRequestStartingTheReAuthentication()
     {
-        $exception = new AccessDeniedException();
-        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]);
+        $exception = $this->decide([AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY]);
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
@@ -339,8 +362,7 @@ class ExceptionListenerTest extends TestCase
 
     public function testTheFirewallEntryPointIsUsedWhenItCanReAuthenticate()
     {
-        $exception = new AccessDeniedException();
-        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+        $exception = $this->decide([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
         $event = $this->createEvent($exception);
 
         // an entry point implementing both contracts needs no extra configuration; one
@@ -359,8 +381,7 @@ class ExceptionListenerTest extends TestCase
 
     public function testAPlainFirewallEntryPointIsNotUsedToReAuthenticate()
     {
-        $exception = new AccessDeniedException();
-        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+        $exception = $this->decide([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(AuthenticationEntryPointInterface::class);
@@ -374,8 +395,7 @@ class ExceptionListenerTest extends TestCase
 
     public function testReAuthenticationEntryPointIsNotStartedForAnUnrelatedDenial()
     {
-        $exception = new AccessDeniedException();
-        $exception->setAttributes(['ROLE_ADMIN']);
+        $exception = $this->decide(['ROLE_ADMIN']);
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
@@ -388,12 +408,95 @@ class ExceptionListenerTest extends TestCase
         $this->assertFalse($event->getRequest()->attributes->has(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
     }
 
+    public function testAnAttributeOfTheApplicationStartsTheReAuthenticationWhenItsVoterSaysSo()
+    {
+        $event = $this->createEvent($this->decide(['IS_PASSKEY'], new NestingVoter('IS_PASSKEY', static function (AccessDecisionManagerInterface $decisionManager, TokenInterface $token, Vote $vote): bool {
+            $vote->extraData[AuthenticatedVoter::RE_AUTHENTICATION] = 'IS_PASSKEY';
+
+            return false;
+        })));
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->once())
+            ->method('startReAuthentication')
+            ->willReturnCallback(function (Request $request): Response {
+                $this->assertSame('IS_PASSKEY', $request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+
+                return new Response('Use your passkey', 200);
+            });
+
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertSame('Use your passkey', $event->getResponse()->getContent());
+    }
+
+    public function testAVoterCheckingARoleFirstStillStartsTheReAuthentication()
+    {
+        $event = $this->createEvent($this->decide(['IS_PASSKEY'], new NestingVoter('IS_PASSKEY', static function (AccessDecisionManagerInterface $decisionManager, TokenInterface $token, Vote $vote): bool {
+            if ($decisionManager->decide($token, ['ROLE_ADMIN'])) {
+                return true;
+            }
+
+            $vote->extraData[AuthenticatedVoter::RE_AUTHENTICATION] = 'IS_PASSKEY';
+
+            return false;
+        })));
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->once())
+            ->method('startReAuthentication')
+            ->willReturn(new Response('Use your passkey', 200));
+
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertSame('Use your passkey', $event->getResponse()->getContent());
+    }
+
+    public function testAFlagFromACheckNestedInAVoterDoesNotStartTheReAuthentication()
+    {
+        $event = $this->createEvent($this->decide(['CAN_DELETE_ACCOUNT'], new NestingVoter('CAN_DELETE_ACCOUNT', static function (AccessDecisionManagerInterface $decisionManager, TokenInterface $token): bool {
+            $decisionManager->decide($token, [AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+
+            return false;
+        })));
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->never())->method('startReAuthentication');
+
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
+    }
+
+    public function testReAuthenticationEntryPointIsNotStartedWithoutTheDecision()
+    {
+        $exception = new AccessDeniedException();
+        $exception->setAttributes([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->never())->method('startReAuthentication');
+
+        $listener = $this->createExceptionListener($this->createTokenStorageWithAToken(), $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertInstanceOf(AccessDeniedHttpException::class, $event->getThrowable());
+    }
+
     public function testReAuthenticationEntryPointIsNotStartedWhenAnotherAttributeMayHaveFailed()
     {
         // an access_control rule is decided on all of its roles at once, so this denial
         // does not say which attribute failed and re-authenticating may not help
+        $accessDecision = new AccessDecision();
+        $accessDecision->votes[] = $vote = new Vote();
+        $vote->result = VoterInterface::ACCESS_DENIED;
+        $vote->extraData[AuthenticatedVoter::RE_AUTHENTICATION] = AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY;
         $exception = new AccessDeniedException();
         $exception->setAttributes(['ROLE_ADMIN', AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]);
+        $exception->setAccessDecision($accessDecision);
         $event = $this->createEvent($exception);
 
         $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
@@ -408,4 +511,28 @@ class ExceptionListenerTest extends TestCase
 
 interface ReAuthenticatingEntryPoint extends AuthenticationEntryPointInterface, ReAuthenticationEntryPointInterface
 {
+}
+
+/**
+ * A voter of the application, which can check other attributes through the decision manager deciding its own.
+ */
+final class NestingVoter extends Voter
+{
+    public AccessDecisionManagerInterface $decisionManager;
+
+    public function __construct(
+        private string $attribute,
+        private \Closure $vote,
+    ) {
+    }
+
+    protected function supports(string $attribute, mixed $subject): bool
+    {
+        return $this->attribute === $attribute;
+    }
+
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
+    {
+        return ($this->vote)($this->decisionManager, $token, $vote);
+    }
 }

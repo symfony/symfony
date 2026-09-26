@@ -231,6 +231,32 @@ class AuthenticatedVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, ['IS_AUTHENTICATED_VERY_RECENTLY']));
     }
 
+    #[DataProvider('provideDenialsAReAuthenticationCanCure')]
+    public function testADenialSaysWhetherAReAuthenticationCanCureIt(string $authenticated, string $attribute, ?string $curedAttribute)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900, 60));
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->getToken($authenticated), null, [$attribute], $vote = new Vote()));
+        $this->assertSame($curedAttribute, $vote->extraData[AuthenticatedVoter::RE_AUTHENTICATION] ?? null);
+    }
+
+    public static function provideDenialsAReAuthenticationCanCure()
+    {
+        yield 'recently' => ['fully', AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY];
+        yield 'very recently' => ['fully', AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY, AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY];
+        yield 'fully' => ['remembered', AuthenticatedVoter::IS_AUTHENTICATED_FULLY, null];
+        yield 'impersonator' => ['fully', AuthenticatedVoter::IS_IMPERSONATOR, null];
+    }
+
+    public function testAGrantSaysNothingAboutReAuthentication()
+    {
+        $token = $this->getToken('fully');
+        $token->setAuthenticationProofs([AuthenticationMethod::UNSPECIFIED => time()]);
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, (new AuthenticatedVoter(new AuthenticationTrustResolver(900)))->vote($token, null, [AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY], $vote = new Vote()));
+        $this->assertArrayNotHasKey(AuthenticatedVoter::RE_AUTHENTICATION, $vote->extraData);
+    }
+
     public function testVeryRecentlyAuthenticatedVoteReasons()
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900, 60));

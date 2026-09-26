@@ -7,6 +7,7 @@ CHANGELOG
  * Add `AuthenticationTrustResolver::isAuthenticatedRecently()`, the extension point `IS_AUTHENTICATED_RECENTLY` is decided on; not implementing it in a custom trust resolver is deprecated
  * Add the `IS_AUTHENTICATED_VERY_RECENTLY` attribute, a stricter bar than `IS_AUTHENTICATED_RECENTLY` decided by `AuthenticationTrustResolver::isAuthenticatedVeryRecently()`, and the `is_very_recently_authenticated()` expression function; not implementing the method in a custom trust resolver is deprecated
  * Add the `IS_AUTHENTICATED_RECENTLY` attribute, granted while the last interactive authentication is within the configured lifetime
+ * Add `AuthenticatedVoter::RE_AUTHENTICATION`, the key of `Vote::$extraData` a voter sets to the attribute it denied when a fresh authentication could grant it
  * Add `TokenInterface::getAuthenticationProofs()` and `setAuthenticationProofs()`, the authentication methods the user proved mapped to the time of the last proof of each, implemented by `AbstractToken`; not implementing them in a custom token is deprecated
  * Add `AuthenticationMethod`, the RFC 8176 names of the methods a token can hold a proof of, which key that map
  * Deprecate passing more than one Security attribute to `AccessDecisionManager::decide()`, the `$allowMultipleAttributes` argument will be removed in 9.0

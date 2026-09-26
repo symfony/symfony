@@ -12,9 +12,12 @@
 namespace Symfony\Component\Scheduler\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Scheduler\Exception\LogicException;
+use Symfony\Component\Scheduler\Exception\RuntimeException;
 use Symfony\Component\Scheduler\Generator\Checkpoint;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Generator\MessageGenerator;
@@ -245,6 +248,109 @@ class MessageGeneratorTest extends TestCase
         // The "second" message at 22:12:30 was never yielded. It must be picked up now
         // instead of being silently dropped to the next interval at 22:13:00.
         $this->assertSame([$second], iterator_to_array($scheduler2->getMessages(), false));
+    }
+
+    /**
+     * @testWith ["readonly"]
+     *           ["dead"]
+     */
+    public function testNothingIsDispatchedWhileStateCannotBeSaved(string $failure)
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
+        $cache = new class extends ArrayAdapter {
+            public ?string $failure = null;
+
+            public function getItem(mixed $key): CacheItem
+            {
+                return 'dead' === $this->failure ? (new ArrayAdapter())->getItem($key) : parent::getItem($key);
+            }
+
+            public function save(CacheItemInterface $item): bool
+            {
+                return null === $this->failure && parent::save($item);
+            }
+        };
+        $message = (object) ['id' => 'message'];
+        $createGenerator = static fn () => new MessageGenerator((new Schedule())->add(RecurringMessage::every('1 minute', $message))->stateful($cache), 'dummy', $clock);
+
+        $generator = $createGenerator();
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+        $clock->sleep(60.5);
+        $this->assertSame([$message], iterator_to_array($generator->getMessages(), false));
+
+        // readonly: the cache still serves the last saved state, dead: it cannot be read either
+        $cache->failure = $failure;
+
+        // The worker dies and gets restarted over and over while the cache cannot save the state
+        for ($i = 0; $i < 3; ++$i) {
+            $clock->sleep(60);
+            $dispatched = [];
+            try {
+                foreach ($generator->getMessages() as $dispatchedMessage) {
+                    $dispatched[] = $dispatchedMessage;
+                }
+                $this->fail('The generator must fail while the state cannot be saved.');
+            } catch (RuntimeException) {
+                $this->assertSame([], $dispatched);
+            }
+            $generator = $createGenerator();
+        }
+
+        // Once the state can be saved again, the missed runs are dispatched once
+        $cache->failure = null;
+        $this->assertSame([$message, $message, $message], iterator_to_array($generator->getMessages(), false));
+        $clock->sleep(60);
+        $this->assertSame([$message], iterator_to_array($generator->getMessages(), false));
+    }
+
+    public function testRunIsDispatchedAgainWhenStateCannotBeSavedAfterDispatching()
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
+        $cache = new class extends ArrayAdapter {
+            /** @var list<bool> */
+            public array $saveResults = [];
+
+            public function save(CacheItemInterface $item): bool
+            {
+                return (array_shift($this->saveResults) ?? true) && parent::save($item);
+            }
+        };
+        $message = (object) ['id' => 'message'];
+        $createGenerator = static fn () => new MessageGenerator((new Schedule())->add(RecurringMessage::every('1 minute', $message))->stateful($cache), 'dummy', $clock);
+        $dispatched = [];
+        $consumeUntilFailure = function (MessageGenerator $generator) use (&$dispatched) {
+            try {
+                foreach ($generator->getMessages() as $dispatchedMessage) {
+                    $dispatched[] = $dispatchedMessage;
+                }
+                $this->fail('The generator must fail when the state cannot be saved.');
+            } catch (RuntimeException) {
+            }
+        };
+
+        $generator = $createGenerator();
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+        $clock->sleep(60.5);
+
+        // The save in acquire() succeeds, the one after the dispatched message fails: the run
+        // was dispatched but not recorded
+        $cache->saveResults = [true, false];
+        $consumeUntilFailure($generator);
+        $this->assertSame([$message], $dispatched);
+
+        // A flapping cache lets the restarted worker load the outdated state and dispatch the
+        // run again before failing again
+        $cache->saveResults = [true, false];
+        $consumeUntilFailure($createGenerator());
+        $this->assertSame([$message, $message], $dispatched);
+
+        // A cache that keeps failing stops the restarted workers before they dispatch anything
+        for ($i = 0; $i < 3; ++$i) {
+            $cache->saveResults = [false];
+            $consumeUntilFailure($createGenerator());
+            $this->assertSame([$message, $message], $dispatched);
+            $clock->sleep(60);
+        }
     }
 
     public function testThrowsWhenTriggerDoesNotMoveTheRunDateForward()

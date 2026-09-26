@@ -44,6 +44,19 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         $this->assertEquals(['foo' => new PropertyMetadata('foo', Type::int())], $metadata);
     }
 
+    public function testReplaceGenericsInArrayShape()
+    {
+        $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
+            'foo' => new PropertyMetadata('foo', Type::arrayShape(['items' => Type::list(Type::template('T')), 'total' => ['type' => Type::int(), 'optional' => true]], false, Type::string(), Type::template('T'))),
+        ]), new TypeContextFactory(new StringTypeResolver()));
+
+        $metadata = $loader->load(DummyWithGenerics::class, context: ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::bool())]);
+
+        $this->assertEquals([
+            'foo' => new PropertyMetadata('foo', Type::arrayShape(['items' => Type::list(Type::bool()), 'total' => ['type' => Type::int(), 'optional' => true]], false, Type::string(), Type::bool())),
+        ], $metadata);
+    }
+
     /**
      * @param array<string, PropertyMetadata> $propertiesMetadata
      */

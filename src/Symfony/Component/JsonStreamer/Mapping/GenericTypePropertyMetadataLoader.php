@@ -16,6 +16,7 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
@@ -135,6 +136,13 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
                 $this->replaceVariableTypes($type->getWrappedType(), $variableTypes),
                 ...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getVariableTypes()),
             );
+        }
+
+        if ($type instanceof ObjectShapeType) {
+            return new ObjectShapeType(array_map(
+                fn (array $item): array => ['type' => $this->replaceVariableTypes($item['type'], $variableTypes)] + $item,
+                $type->getShape(),
+            ));
         }
 
         return $type;

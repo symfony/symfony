@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Tests\Mapping;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
@@ -22,6 +23,20 @@ use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 class GenericTypePropertyMetadataLoaderTest extends TestCase
 {
+    #[RequiresMethod(Type::class, 'objectShape')]
+    public function testReplaceGenericsInObjectShape()
+    {
+        $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
+            'foo' => new PropertyMetadata('foo', Type::objectShape(['item' => Type::template('T'), 'total' => ['type' => Type::int(), 'optional' => true]])),
+        ]), new TypeContextFactory(new StringTypeResolver()));
+
+        $metadata = $loader->load(DummyWithGenerics::class, context: ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::bool())]);
+
+        $this->assertEquals([
+            'foo' => new PropertyMetadata('foo', Type::objectShape(['item' => Type::bool(), 'total' => ['type' => Type::int(), 'optional' => true]])),
+        ], $metadata);
+    }
+
     public function testReplaceGenerics()
     {
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([

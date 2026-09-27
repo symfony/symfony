@@ -95,6 +95,17 @@ class UnionType extends Type implements CompositeTypeInterface
         return false;
     }
 
+    public function accepts(mixed $value): bool
+    {
+        foreach ($this->types as $type) {
+            if ($type->accepts($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function __toString(): string
     {
         $string = '';

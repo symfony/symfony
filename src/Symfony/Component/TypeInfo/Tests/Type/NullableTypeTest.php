@@ -49,5 +49,6 @@ class NullableTypeTest extends TestCase
         $this->assertFalse($type->accepts('string'));
         $this->assertTrue($type->accepts(123));
         $this->assertTrue($type->accepts(null));
+        $this->assertFalse((new NullableType(Type::list(Type::int())))->accepts(['a']));
     }
 }

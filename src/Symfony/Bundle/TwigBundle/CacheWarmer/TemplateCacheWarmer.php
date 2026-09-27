@@ -60,9 +60,16 @@ final class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscrib
         }
 
         try {
+            $loader = $this->twig->getLoader();
+            $cacheKeys = [];
+
             foreach ($this->iterator as $template) {
                 try {
-                    $this->twig->load($template);
+                    // a template listed under several names is compiled once, even when its compilation fails
+                    if (!isset($cacheKeys[$cacheKey = $loader->getCacheKey($template)])) {
+                        $cacheKeys[$cacheKey] = true;
+                        $this->twig->load($template);
+                    }
                 } catch (Error) {
                     /*
                      * Problem during compilation, give up for this template (e.g. syntax errors).

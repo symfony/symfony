@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -54,6 +55,24 @@ class ConstraintValidatorTest extends TestCase
         date_default_timezone_set($defaultTimezone);
 
         return $data;
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testPrettyDateFollowsTheDefaultLocale()
+    {
+        $validator = new TestFormatValueConstraintValidator();
+        $date = new \DateTimeImmutable('2020-03-15T10:30:00Z');
+        $defaultLocale = \Locale::getDefault();
+
+        try {
+            \Locale::setDefault('fr');
+            $this->assertStringStartsWith('15 mars 2020', $validator->formatValueProxy($date, ConstraintValidator::PRETTY_DATE));
+
+            \Locale::setDefault('en');
+            $this->assertStringStartsWith('Mar 15, 2020', $validator->formatValueProxy($date, ConstraintValidator::PRETTY_DATE));
+        } finally {
+            \Locale::setDefault($defaultLocale);
+        }
     }
 }
 

@@ -50,6 +50,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     private array $promotedPropertyDocBlocks = [];
 
     /**
+     * @var array<string, DocBlock|false>
+     */
+    private array $constructorDocBlocks = [];
+
+    /**
      * @var Context[]
      */
     private array $contexts = [];
@@ -160,22 +165,21 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
     private function getDocBlockFromConstructor(string $class, string $property): ?DocBlock
     {
-        try {
-            $reflectionClass = new \ReflectionClass($class);
-        } catch (\ReflectionException) {
-            return null;
-        }
-        if (!$reflectionConstructor = $reflectionClass->getConstructor()) {
-            return null;
+        if (!isset($this->constructorDocBlocks[$class])) {
+            try {
+                $reflectionConstructor = (new \ReflectionClass($class))->getConstructor();
+            } catch (\ReflectionException) {
+                return null;
+            }
+
+            try {
+                $this->constructorDocBlocks[$class] = $reflectionConstructor ? $this->docBlockFactory->create($reflectionConstructor, $this->createFromReflector($reflectionConstructor->getDeclaringClass())) : false;
+            } catch (\InvalidArgumentException) {
+                $this->constructorDocBlocks[$class] = false;
+            }
         }
 
-        try {
-            $docBlock = $this->docBlockFactory->create($reflectionConstructor, $this->contextFactory->createFromReflector($reflectionConstructor));
-
-            return $this->filterDocBlockParams($docBlock, $property);
-        } catch (\InvalidArgumentException) {
-            return null;
-        }
+        return $this->constructorDocBlocks[$class] ? $this->filterDocBlockParams($this->constructorDocBlocks[$class], $property) : null;
     }
 
     private function filterDocBlockParams(DocBlock $docBlock, string $allowedParam): DocBlock

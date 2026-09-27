@@ -52,6 +52,8 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
     /** @var array<string, array{PhpDocNode|null, int|null, string|null, string|null}> */
     private array $docBlocks = [];
+    /** @var array<string, array{PhpDocNode, string}|false> */
+    private array $constructorDocBlocks = [];
     private array $mutatorPrefixes;
     private array $accessorPrefixes;
     private array $arrayMutatorPrefixes;
@@ -308,24 +310,36 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
     private function getDocBlockFromConstructor(string &$class, string $property): ?ParamTagValueNode
     {
+        if (!$constructorDocBlock = $this->getConstructorDocBlock($class)) {
+            return null;
+        }
+        [$phpDocNode, $class] = $constructorDocBlock;
+
+        return $this->filterDocBlockParams($phpDocNode, $property);
+    }
+
+    /**
+     * @return array{PhpDocNode, string}|null
+     */
+    private function getConstructorDocBlock(string $class): ?array
+    {
+        if (isset($this->constructorDocBlocks[$class])) {
+            return $this->constructorDocBlocks[$class] ?: null;
+        }
+
         try {
-            $reflectionClass = new \ReflectionClass($class);
+            $reflectionConstructor = (new \ReflectionClass($class))->getConstructor();
         } catch (\ReflectionException) {
             return null;
         }
 
-        if (null === $reflectionConstructor = $reflectionClass->getConstructor()) {
+        if (!$rawDocNode = $reflectionConstructor?->getDocComment()) {
+            $this->constructorDocBlocks[$class] = false;
+
             return null;
         }
 
-        if (!$rawDocNode = $reflectionConstructor->getDocComment()) {
-            return null;
-        }
-        $class = $reflectionConstructor->class;
-
-        $phpDocNode = $this->getPhpDocNode($rawDocNode);
-
-        return $this->filterDocBlockParams($phpDocNode, $property);
+        return $this->constructorDocBlocks[$class] = [$this->getPhpDocNode($rawDocNode), $reflectionConstructor->class];
     }
 
     private function filterDocBlockParams(PhpDocNode $docNode, string $allowedParam): ?ParamTagValueNode
@@ -398,8 +412,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
         $constructorPhpDocNode = null;
         if ($reflectionProperty->isPromoted()) {
-            $constructorRawDocNode = (new \ReflectionMethod($class, '__construct'))->getDocComment();
-            $constructorPhpDocNode = $constructorRawDocNode ? $this->getPhpDocNode($constructorRawDocNode) : null;
+            $constructorPhpDocNode = $this->getConstructorDocBlock($class)[0] ?? null;
         }
 
         $source = self::PROPERTY;

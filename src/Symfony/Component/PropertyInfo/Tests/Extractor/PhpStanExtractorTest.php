@@ -377,6 +377,26 @@ class PhpStanExtractorTest extends TestCase
         yield [DummyWithTemplateAndParentInDifferentNs::class, 'items', Type::list(Type::template('T', Type::object(DummyInDifferentNs::class)))];
     }
 
+    public function testExtractConstructorTypesOfSeveralClassesWithOneExtractor()
+    {
+        $cases = [
+            [ConstructorDummy::class, 'timezone', Type::object(\DateTimeZone::class)],
+            [ConstructorDummy::class, 'date', Type::int()],
+            [ConstructorDummy::class, 'dateTime', null],
+            [ConstructorDummyWithoutDocBlock::class, 'date', null],
+            ...self::constructorTypesOfParentClassProvider(),
+            [ConstructorDummy::class, 'dateObject', Type::object(\DateTimeInterface::class)],
+        ];
+
+        foreach ([...$cases, ...$cases] as [$class, $property, $type]) {
+            $this->assertEquals($type, $this->extractor->getTypeFromConstructor($class, $property), $class.'::'.$property);
+        }
+
+        foreach (self::providePromotedPropertyDocBlockTestCases() as [$class, $property, , , $type]) {
+            $this->assertEquals($type, $this->extractor->getType($class, $property), $class.'::'.$property);
+        }
+    }
+
     #[DataProvider('unionTypesProvider')]
     public function testExtractorUnionTypes(string $property, ?Type $type)
     {

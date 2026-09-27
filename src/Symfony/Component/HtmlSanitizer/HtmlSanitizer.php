@@ -69,8 +69,17 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
         // Remove NULL character and HTML entities for null byte
         $input = str_replace(\chr(0), '�', $input);
 
+        if ('' === trim($input)) {
+            return '';
+        }
+
+        // Plain text needs no parsing, only the normalization of line breaks that the parser would do
+        if (W3CReference::CONTEXT_BODY === $element && $this->parser instanceof NativeParser && !str_contains($input, '<') && !str_contains($input, '&')) {
+            return StringSanitizer::encodeHtmlEntities(str_replace(["\r\n", "\r"], "\n", $input));
+        }
+
         // Parse as HTML
-        if ('' === trim($input) || !$parsed = $this->parser->parse($input, $element)) {
+        if (!$parsed = $this->parser->parse($input, $element)) {
             return '';
         }
 

@@ -89,6 +89,18 @@ class HtmlSanitizerAllTest extends TestCase
                 'Lorem & Ipsum',
                 'Lorem &amp; Ipsum',
             ],
+            [
+                'Lorem "ipsum" \'dolor\' > sit = amet + consectetur @ adipiscing `elit` ＜＞＋＝＠｀',
+                'Lorem &#34;ipsum&#34; &#039;dolor&#039; &gt; sit &#61; amet &#43; consectetur &#64; adipiscing &#96;elit&#96; &#xFF1C;&#xFF1E;&#xFF0B;&#xFF1D;&#xFF20;&#xFF40;',
+            ],
+            [
+                "Lorem\r\nipsum\rdolor\nsit\r\n",
+                "Lorem\nipsum\ndolor\nsit\n",
+            ],
+            [
+                " \r\n\t",
+                '',
+            ],
 
             // Unknown tag
             [

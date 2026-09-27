@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Symfony\Component\HtmlSanitizer\Parser\NativeParser;
+use Symfony\Component\HtmlSanitizer\Parser\ParserInterface;
 use Symfony\Component\HtmlSanitizer\Visitor\AttributeSanitizer\AttributeSanitizerInterface;
 
 class HtmlSanitizerCustomTest extends TestCase
@@ -68,6 +70,32 @@ class HtmlSanitizerCustomTest extends TestCase
     {
         $this->assertSame('Null byte�', $this->sanitize(new HtmlSanitizerConfig(), "Null byte\0"));
         $this->assertSame('Null byte�', $this->sanitize(new HtmlSanitizerConfig(), 'Null byte&#0;'));
+    }
+
+    public function testSanitizeInvalidUtf8()
+    {
+        $this->assertSame('', $this->sanitize(new HtmlSanitizerConfig(), "Invalid \xFF byte"));
+        $this->assertSame('', $this->sanitize((new HtmlSanitizerConfig())->withMaxInputLength(7), 'Hello é'));
+    }
+
+    public function testSanitizePlainTextForOtherContexts()
+    {
+        $sanitizer = new HtmlSanitizer((new HtmlSanitizerConfig())->allowElement('pre'));
+
+        $this->assertSame('', $sanitizer->sanitizeFor('head', 'Hello world'));
+        $this->assertSame('Hello world', $sanitizer->sanitizeFor('pre', "\nHello world"));
+    }
+
+    public function testSanitizePlainTextWithCustomParser()
+    {
+        $parser = new class implements ParserInterface {
+            public function parse(string $html, string $context = 'body'): ?\Dom\Node
+            {
+                return (new NativeParser())->parse(strtoupper($html), $context);
+            }
+        };
+
+        $this->assertSame('HELLO WORLD', (new HtmlSanitizer(new HtmlSanitizerConfig(), $parser))->sanitize('Hello world'));
     }
 
     public function testSanitizeDefaultBody()

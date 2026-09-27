@@ -618,6 +618,33 @@ class HtmlSanitizerAllTest extends TestCase
         ];
     }
 
+    #[DataProvider('provideSanitizeForContext')]
+    public function testSanitizeForContext(string $context, string $input, string $expected, ?string $legacyExpected = null)
+    {
+        if (\PHP_VERSION_ID < 80400) {
+            $expected = $legacyExpected ?? $expected;
+        }
+
+        $this->assertSame($expected, $this->createSanitizer()->sanitizeFor($context, $input));
+    }
+
+    public static function provideSanitizeForContext(): iterable
+    {
+        return [
+            ['caption', '<b>Lorem</b> ipsum<td>dolor</td>', '<b>Lorem</b> ipsumdolor', '<b>Lorem</b> ipsum<td>dolor</td>'],
+            ['col', '<b>Lorem</b> ipsum', '<b>Lorem</b> ipsum'],
+            ['colgroup', '<col span="2" />Lorem ipsum', '<col span="2" />', '<col span="2" />Lorem ipsum'],
+            ['image', '<b>Lorem</b> ipsum', '<b>Lorem</b> ipsum'],
+            ['plaintext', '<b>Lorem</b> ipsum', '&lt;b&gt;Lorem&lt;/b&gt; ipsum', '<b>Lorem</b> ipsum'],
+            ['tbody', '<tr><td>Lorem ipsum</td></tr>', '<tr><td>Lorem ipsum</td></tr>'],
+            ['td', '<b>Lorem</b> ipsum<td>dolor</td>', '<b>Lorem</b> ipsumdolor', '<b>Lorem</b> ipsum<td>dolor</td>'],
+            ['tfoot', '<tr><td>Lorem ipsum</td></tr>', '<tr><td>Lorem ipsum</td></tr>'],
+            ['th', '<b>Lorem</b> ipsum', '<b>Lorem</b> ipsum'],
+            ['thead', '<tr><th>Lorem ipsum</th></tr>', '<tr><th>Lorem ipsum</th></tr>'],
+            ['tr', '<td>Lorem</td><th>ipsum</th>', '<td>Lorem</td><th>ipsum</th>'],
+        ];
+    }
+
     public function testIFrameDefaultsAreSafe()
     {
         $sanitizer = new HtmlSanitizer((new HtmlSanitizerConfig())

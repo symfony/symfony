@@ -27,6 +27,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsTargetedValueResolver as AsTargetedConsoleValueResolver;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -499,6 +500,11 @@ class FrameworkExtension extends Extension
     private function registerDebugConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         $loader->load('debug_prod.php');
+
+        if ($container->hasParameter('kernel.runtime_mode.web') && \is_string($webMode = $container->getParameterBag()->resolveValue('%kernel.runtime_mode.web%'))) {
+            // read the env var only when a console event needs it, not on every web request
+            $container->getDefinition('debug.debug_handlers_listener')->replaceArgument(1, new EnvClosureArgument($webMode));
+        }
 
         $debug = $container->getParameter('kernel.debug');
 

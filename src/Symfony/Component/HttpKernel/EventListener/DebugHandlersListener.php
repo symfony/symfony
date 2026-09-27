@@ -32,14 +32,15 @@ class DebugHandlersListener implements EventSubscriberInterface
 {
     private string|object|null $earlyHandler;
     private ?\Closure $exceptionHandler;
-    private bool $webMode;
+    private bool|\Closure $webMode;
     private bool $firstCall = true;
     private bool $hasTerminatedWithException = false;
 
     /**
-     * @param callable|null $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
+     * @param callable|null                $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
+     * @param bool|(\Closure(): bool)|null $webMode          A closure is called only when a console event needs the value
      */
-    public function __construct(?callable $exceptionHandler = null, ?bool $webMode = null)
+    public function __construct(?callable $exceptionHandler = null, bool|\Closure|null $webMode = null)
     {
         $handler = set_exception_handler('var_dump');
         $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
@@ -54,7 +55,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      */
     public function configure(?object $event = null): void
     {
-        if ($event instanceof ConsoleEvent && $this->webMode) {
+        if ($event instanceof ConsoleEvent && ($this->webMode instanceof \Closure ? ($this->webMode)() : $this->webMode)) {
             return;
         }
         if (!$event instanceof KernelEvent ? !$this->firstCall : !$event->isMainRequest()) {

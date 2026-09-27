@@ -145,4 +145,64 @@ class DebugHandlersListenerTest extends TestCase
 
         $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
     }
+
+    public function testConsoleEventIsIgnoredInWebMode()
+    {
+        $listener = new DebugHandlersListener(null, true);
+
+        $eHandler = $this->configureWithErrorHandler($listener, $this->createConsoleEvent());
+
+        $this->assertNull($eHandler->setExceptionHandler('var_dump'));
+    }
+
+    public function testWebModeClosureIsOnlyCalledForConsoleEvents()
+    {
+        $calls = 0;
+        $listener = new DebugHandlersListener(null, static function () use (&$calls) {
+            ++$calls;
+
+            return true;
+        });
+
+        $this->configureWithErrorHandler($listener, new KernelEvent($this->createStub(HttpKernelInterface::class), Request::create('/'), HttpKernelInterface::MAIN_REQUEST));
+        $this->assertSame(0, $calls);
+
+        $eHandler = $this->configureWithErrorHandler($listener, $this->createConsoleEvent());
+        $this->assertSame(1, $calls);
+        $this->assertNull($eHandler->setExceptionHandler('var_dump'));
+    }
+
+    public function testConsoleEventIsHandledWhenWebModeClosureReturnsFalse()
+    {
+        $listener = new DebugHandlersListener(null, static fn () => false);
+
+        $eHandler = $this->configureWithErrorHandler($listener, $this->createConsoleEvent());
+
+        $this->assertInstanceOf(\Closure::class, $eHandler->setExceptionHandler('var_dump'));
+    }
+
+    private function createConsoleEvent(): ConsoleEvent
+    {
+        $app = $this->createStub(Application::class);
+        $app->method('getHelperSet')->willReturn(new HelperSet());
+        $command = new Command('test');
+        $command->setApplication($app);
+
+        return new ConsoleEvent($command, new ArgvInput(), new ConsoleOutput());
+    }
+
+    private function configureWithErrorHandler(DebugHandlersListener $listener, object $event): ErrorHandler
+    {
+        $eHandler = new ErrorHandler();
+        set_error_handler([$eHandler, 'handleError']);
+        set_exception_handler([$eHandler, 'handleException']);
+        try {
+            $listener->configure($event);
+        } finally {
+            restore_exception_handler();
+            restore_error_handler();
+        }
+
+        return $eHandler;
+    }
 }

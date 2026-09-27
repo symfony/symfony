@@ -145,7 +145,7 @@ final class DomVisitor
             if ('#text' === $child->nodeName) {
                 // Add text directly for performance
                 $cursor->node->addChild(new TextNode($cursor->node, $child instanceof \Dom\Node ? ($child->textContent ?? '') : $child->nodeValue));
-            } elseif (!$child instanceof \Dom\Text && !$child instanceof \Dom\ProcessingInstruction && !$child instanceof \DOMText && !$child instanceof \DOMProcessingInstruction) {
+            } elseif ($child instanceof \Dom\Element || $child instanceof \DOMElement) {
                 // Otherwise continue the visit recursively
                 // Ignore comments for security reasons (interpreted differently by browsers)
                 // Ignore processing instructions (treated as comments)

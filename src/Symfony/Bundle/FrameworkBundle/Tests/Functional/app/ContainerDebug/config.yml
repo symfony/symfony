@@ -33,6 +33,11 @@ services:
             - '%env(REAL)%'
             - '%env(int:key:2:json:JSON)%'
             - '%env(float:key:2:json:JSON)%'
+    env_closure:
+        class: stdClass
+        arguments:
+            - !env_closure '%env(REAL)%'
+            - !env_closure ['%env(UNKNOWN)%', 'foo', true]
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ContainerExcluded:
         tags: ['container.excluded']
 

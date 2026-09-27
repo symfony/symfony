@@ -23,6 +23,8 @@
       <argument type="service" id=".definition_2"/>
     </argument>
     <argument type="abstract">placeholder</argument>
+    <argument type="env_closure">%env(FOO)%</argument>
+    <argument type="env_closure" stringable="true" default="baz">%env(BAR)%</argument>
   </definition>
   <definition id="definition_without_class" class="" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file=""/>
   <definition id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">

@@ -76,6 +76,16 @@
             {
                 "type": "abstract",
                 "text": "placeholder"
+            },
+            {
+                "type": "env_closure",
+                "value": "%env(FOO)%"
+            },
+            {
+                "type": "env_closure",
+                "value": "%env(BAR)%",
+                "default": "baz",
+                "stringable": true
             }
         ],
         "file": null,

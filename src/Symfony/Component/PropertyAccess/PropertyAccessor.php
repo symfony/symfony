@@ -97,17 +97,13 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): mixed
     {
-        $zval = [
-            self::VALUE => $objectOrArray,
-        ];
-
         if (\is_object($objectOrArray) && (false === strpbrk((string) $propertyPath, '.[?') || $objectOrArray instanceof \stdClass && property_exists($objectOrArray, $propertyPath))) {
-            return $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
+            return $this->readProperty($objectOrArray, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
         }
 
         $propertyPath = $this->getPropertyPath($propertyPath);
 
-        $propertyValues = $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices, true);
+        $propertyValues = $this->readPropertiesUntil([self::VALUE => $objectOrArray], $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices, true);
 
         return $propertyValues[\count($propertyValues) - 1][self::VALUE];
     }
@@ -226,7 +222,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // handle stdClass with properties with a dot in the name
             if ($objectOrArray instanceof \stdClass && str_contains($propertyPath, '.') && property_exists($objectOrArray, $propertyPath)) {
-                $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty);
+                $this->readProperty($objectOrArray, $propertyPath, $this->ignoreInvalidProperty);
             } else {
                 $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices, true);
             }
@@ -252,7 +248,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // handle stdClass with properties with a dot in the name
             if ($objectOrArray instanceof \stdClass && str_contains($propertyPath, '.') && property_exists($objectOrArray, $propertyPath)) {
-                $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty);
+                $this->readProperty($objectOrArray, $propertyPath, $this->ignoreInvalidProperty);
 
                 return true;
             }
@@ -341,7 +337,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             } elseif ($isNullSafe && !\is_object($zval[self::VALUE])) {
                 $zval[self::VALUE] = null;
             } else {
-                $zval = $this->readProperty($zval, $property, $this->ignoreInvalidProperty, $isNullSafe);
+                $zval = $this->readProperty($zval[self::VALUE], $property, $this->ignoreInvalidProperty, $isNullSafe, isset($zval[self::REF]));
             }
 
             // the final value of the path must not be validated
@@ -444,16 +440,15 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException If $ignoreInvalidProperty is false and the property does not exist or is not public
      */
-    private function readProperty(array $zval, string $property, bool $ignoreInvalidProperty = false, bool $isNullSafe = false): array
+    private function readProperty(mixed $object, string $property, bool $ignoreInvalidProperty = false, bool $isNullSafe = false, bool $byRef = false): array
     {
-        if (!\is_object($zval[self::VALUE])) {
+        if (!\is_object($object)) {
             throw new NoSuchPropertyException(\sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%1$s]" instead.', $property));
         }
 
         $result = self::RESULT_PROTO;
-        $object = $zval[self::VALUE];
         $class = $object::class;
-        $access = $this->getReadInfo($class, $property);
+        $access = $this->readPropertyCache[$class][$property] ?? $this->getReadInfo($class, $property);
 
         if (null !== $access) {
             $name = $access->getName();
@@ -494,7 +489,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                     $result[self::VALUE] = $object->$name;
 
-                    if (isset($zval[self::REF]) && $access->canBeReference()) {
+                    if ($byRef && $access->canBeReference()) {
                         $result[self::REF] = &$object->$name;
                     }
                 }
@@ -511,7 +506,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         } elseif (property_exists($object, $property) && \array_key_exists($property, (array) $object)) {
             $result[self::VALUE] = $object->$property;
-            if (isset($zval[self::REF])) {
+            if ($byRef) {
                 $result[self::REF] = &$object->$property;
             }
         } elseif ($isNullSafe) {
@@ -521,7 +516,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         // Objects are always passed around by reference
-        if (isset($zval[self::REF]) && \is_object($result[self::VALUE])) {
+        if ($byRef && \is_object($result[self::VALUE])) {
             $result[self::REF] = $result[self::VALUE];
         }
 
@@ -533,17 +528,15 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getReadInfo(string $class, string $property): ?PropertyReadInfo
     {
-        $key = str_replace('\\', '.', $class).'..'.$property;
-
         // don't use isset() here, the cached value can be null
-        if (\array_key_exists($key, $this->readPropertyCache)) {
-            return $this->readPropertyCache[$key];
+        if (\array_key_exists($property, $this->readPropertyCache[$class] ?? [])) {
+            return $this->readPropertyCache[$class][$property];
         }
 
         if ($this->cacheItemPool) {
-            $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_READ.rawurlencode($key));
+            $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_READ.rawurlencode(str_replace('\\', '.', $class).'..'.$property));
             if ($item->isHit()) {
-                return $this->readPropertyCache[$key] = $item->get();
+                return $this->readPropertyCache[$class][$property] = $item->get();
             }
         }
 
@@ -557,7 +550,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $this->cacheItemPool->save($item->set($accessor));
         }
 
-        return $this->readPropertyCache[$key] = $accessor;
+        return $this->readPropertyCache[$class][$property] = $accessor;
     }
 
     /**
@@ -629,7 +622,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function writeCollection(array $zval, string $property, iterable $collection, PropertyWriteInfo $addMethod, PropertyWriteInfo $removeMethod): void
     {
         // At this point the add and remove methods have been found
-        $previousValue = $this->readProperty($zval, $property);
+        $previousValue = $this->readProperty($zval[self::VALUE], $property, false, false, isset($zval[self::REF]));
         $previousValue = $previousValue[self::VALUE];
 
         $removeMethodName = $removeMethod->getName();

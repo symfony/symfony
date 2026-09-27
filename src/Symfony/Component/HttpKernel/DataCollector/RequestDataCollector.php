@@ -36,6 +36,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     private \SplObjectStorage $controllers;
     private array $sessionUsages = [];
+    private ?Request $request = null;
 
     public function __construct(
         private ?RequestStack $requestStack = null,
@@ -130,7 +131,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         $this->data['content'] = $content;
 
-        $this->data['curlCommand'] = $this->computeCurlCommand($request, $content);
+        // the cURL command is computed by lateCollect()
+        $this->request = $request;
 
         foreach ($this->data as $key => $value) {
             if (!\is_array($value)) {
@@ -176,6 +178,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function lateCollect(): void
     {
+        if (null !== $this->request) {
+            $this->data['curlCommand'] = $this->computeCurlCommand($this->request, $this->data['content']);
+            $this->request = null;
+        }
+
         $this->data = $this->cloneVar($this->data);
     }
 
@@ -184,6 +191,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         parent::reset();
         $this->controllers = new \SplObjectStorage();
         $this->sessionUsages = [];
+        $this->request = null;
     }
 
     public function getMethod(): string

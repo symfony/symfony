@@ -51,6 +51,7 @@ class AssetMapperTestAppKernel extends Kernel
                 'assets' => null,
                 'asset_mapper' => $assetMapper,
                 'test' => true,
+                'profiler' => ['enabled' => 'profiler' === $this->getEnvironment()],
             ]);
 
             $container->setAlias('public.assets.packages', new Alias('assets.packages', true));
@@ -63,5 +64,10 @@ class AssetMapperTestAppKernel extends Kernel
         $container->register('pre_assets_compile_listener', PreAssetsCompileListener::class)
             ->setPublic(true)
             ->addTag('kernel.event_listener', ['event' => PreAssetsCompileEvent::class]);
+
+        if ('profiler' === $this->getEnvironment()) {
+            $container->register('instantiation_counting_data_collector', InstantiationCountingDataCollector::class)
+                ->addTag('data_collector');
+        }
     }
 }

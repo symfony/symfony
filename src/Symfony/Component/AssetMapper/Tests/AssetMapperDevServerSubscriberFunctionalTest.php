@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\AssetMapper\Tests\Fixtures\InstantiationCountingDataCollector;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
@@ -35,6 +36,22 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $this->assertSame('"b3445cb7a86a0795a7af7f2004498aef"', $response->headers->get('ETag'));
         $this->assertSame('immutable, max-age=604800, public', $response->headers->get('Cache-Control'));
         $this->assertTrue($response->headers->has('X-Assets-Dev'));
+    }
+
+    public function testGettingAssetDoesNotBuildTheProfiler()
+    {
+        InstantiationCountingDataCollector::$instances = 0;
+        $client = static::createClient(['environment' => 'profiler']);
+
+        $client->request('GET', '/assets/file1-s0Rct6h.css');
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertFalse($client->getResponse()->headers->has('X-Debug-Token'));
+        $this->assertSame(0, InstantiationCountingDataCollector::$instances);
+
+        $client->request('GET', '/assets/unknown.css');
+        $this->assertSame(404, $client->getResponse()->getStatusCode());
+        $this->assertTrue($client->getResponse()->headers->has('X-Debug-Token'));
+        $this->assertSame(1, InstantiationCountingDataCollector::$instances);
     }
 
     public function testGettingAssetWithNonAsciiFilenameWorks()

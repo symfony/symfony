@@ -17,6 +17,7 @@ use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
@@ -187,6 +188,20 @@ class WebProfilerExtensionTest extends TestCase
                 'listenerEnabled' => true,
             ],
         ];
+    }
+
+    public function testToolbarListenerDoesNotBuildTwig()
+    {
+        $extension = new WebProfilerExtension();
+        $extension->load([['toolbar' => true]], $this->container);
+        $this->container->removeDefinition('web_profiler.controller.exception');
+
+        eval('?>'.(new PhpDumper($this->getCompiledContainer()))->dump(['class' => 'WebProfilerExtensionTestLazyTwigContainer']));
+        $container = new \WebProfilerExtensionTestLazyTwigContainer();
+        $container->set('kernel', $this->kernel);
+        $container->get('web_profiler.debug_toolbar');
+
+        $this->assertFalse($container->initialized('twig'));
     }
 
     private function getCompiledContainer()

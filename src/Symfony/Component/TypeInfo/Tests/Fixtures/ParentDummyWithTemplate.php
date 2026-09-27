@@ -13,6 +13,8 @@ namespace Symfony\Component\TypeInfo\Tests\Fixtures;
 
 /**
  * @template T of object
+ *
+ * @phpstan-type ParentInt = int
  */
 abstract class ParentDummyWithTemplate
 {

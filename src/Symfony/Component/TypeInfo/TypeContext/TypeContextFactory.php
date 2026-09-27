@@ -92,11 +92,12 @@ final class TypeContextFactory
         }
 
         $typeContext = $this->createBaseTypeContext($classReflection->getName(), $classReflection);
+        $classDocNode = $this->getPhpDocNode($classReflection);
 
         $templates = match (true) {
-            $reflection instanceof \ReflectionFunctionAbstract => $this->collectTemplates($reflection, $typeContext) + $this->collectTemplates($classReflection, $typeContext),
-            $reflection instanceof \ReflectionParameter => $this->collectTemplates($reflection->getDeclaringFunction(), $typeContext) + $this->collectTemplates($classReflection, $typeContext),
-            default => $this->collectTemplates($classReflection, $typeContext),
+            $reflection instanceof \ReflectionFunctionAbstract => $this->collectTemplates($this->getPhpDocNode($reflection), $typeContext) + $this->collectTemplates($classDocNode, $typeContext),
+            $reflection instanceof \ReflectionParameter => $this->collectTemplates($this->getPhpDocNode($reflection->getDeclaringFunction()), $typeContext) + $this->collectTemplates($classDocNode, $typeContext),
+            default => $this->collectTemplates($classDocNode, $typeContext),
         };
 
         $typeContext = new TypeContext(
@@ -113,7 +114,7 @@ final class TypeContextFactory
             $typeContext->namespace,
             $typeContext->uses,
             $typeContext->templates,
-            $this->collectTypeAliases($classReflection, $typeContext),
+            $this->collectTypeAliases($classDocNode, $typeContext),
         );
     }
 
@@ -124,13 +125,15 @@ final class TypeContextFactory
 
         $calledClassTypeContext = $this->createBaseTypeContext($calledClassNameReflection->getName(), $calledClassNameReflection);
         $typeContext = $this->createBaseTypeContext($calledClassNameReflection->getName(), $declaringClassReflection);
+        $declaringClassDocNode = $this->getPhpDocNode($declaringClassReflection);
+        $calledClassDocNode = $calledClassName === $declaringClassName ? $declaringClassDocNode : $this->getPhpDocNode($calledClassNameReflection);
 
         $typeContext = new TypeContext(
             $typeContext->calledClassName,
             $typeContext->declaringClassName,
             $typeContext->namespace,
             $typeContext->uses,
-            $this->collectTemplates($calledClassNameReflection, $calledClassTypeContext) + $this->collectTemplates($declaringClassReflection, $typeContext),
+            $this->collectTemplates($calledClassDocNode, $calledClassTypeContext) + $this->collectTemplates($declaringClassDocNode, $typeContext),
         );
 
         return new TypeContext(
@@ -139,7 +142,7 @@ final class TypeContextFactory
             $typeContext->namespace,
             $typeContext->uses,
             $typeContext->templates,
-            $this->collectTypeAliases($declaringClassReflection, $typeContext),
+            $this->collectTypeAliases($declaringClassDocNode, $typeContext),
         );
     }
 
@@ -239,17 +242,11 @@ final class TypeContextFactory
     /**
      * @return array<string, Type>
      */
-    private function collectTemplates(\ReflectionClass|\ReflectionFunctionAbstract $reflection, TypeContext $typeContext): array
+    private function collectTemplates(?PhpDocNode $docNode, TypeContext $typeContext): array
     {
-        if (!$this->stringTypeResolver || !class_exists(PhpDocParser::class)) {
+        if (!$docNode) {
             return [];
         }
-
-        if (!$rawDocNode = $reflection->getDocComment()) {
-            return [];
-        }
-
-        $docNode = $this->getPhpDocNode($rawDocNode);
 
         $templateTags = [
             '@template',
@@ -285,7 +282,7 @@ final class TypeContextFactory
     /**
      * @return array<string, Type>
      */
-    private function collectTypeAliases(\ReflectionClass $reflection, TypeContext $typeContext): array
+    private function collectTypeAliases(?PhpDocNode $docNode, TypeContext $typeContext): array
     {
         if (!$this->stringTypeResolver || !class_exists(PhpDocParser::class)) {
             return [];
@@ -293,14 +290,14 @@ final class TypeContextFactory
 
         $extraAliases = array_map($this->stringTypeResolver->resolve(...), $this->extraTypeAliases);
 
-        if (!$rawDocNode = $reflection->getDocComment()) {
+        if (!$docNode) {
             return $extraAliases;
         }
 
         $aliases = [];
         $resolvedAliases = [];
 
-        foreach ($this->getPhpDocNode($rawDocNode)->getTagsByName('@psalm-import-type') + $this->getPhpDocNode($rawDocNode)->getTagsByName('@phpstan-import-type') as $tag) {
+        foreach ($docNode->getTagsByName('@psalm-import-type') + $docNode->getTagsByName('@phpstan-import-type') as $tag) {
             if (!$tag->value instanceof TypeAliasImportTagValueNode) {
                 continue;
             }
@@ -320,7 +317,7 @@ final class TypeContextFactory
             $resolvedAliases[$tag->value->importedAs ?? $tag->value->importedAlias] = $typeAlias;
         }
 
-        foreach ($this->getPhpDocNode($rawDocNode)->getTagsByName('@psalm-type') + $this->getPhpDocNode($rawDocNode)->getTagsByName('@phpstan-type') as $tag) {
+        foreach ($docNode->getTagsByName('@psalm-type') + $docNode->getTagsByName('@phpstan-type') as $tag) {
             if (!$tag->value instanceof TypeAliasTagValueNode) {
                 continue;
             }
@@ -379,8 +376,12 @@ final class TypeContextFactory
         return $resolved;
     }
 
-    private function getPhpDocNode(string $rawDocNode): PhpDocNode
+    private function getPhpDocNode(\ReflectionClass|\ReflectionFunctionAbstract $reflection): ?PhpDocNode
     {
+        if (!$this->stringTypeResolver || !class_exists(PhpDocParser::class) || !$rawDocNode = $reflection->getDocComment()) {
+            return null;
+        }
+
         if (class_exists(ParserConfig::class)) {
             $this->phpstanLexer ??= new Lexer($config = new ParserConfig([]));
             $this->phpstanParser ??= new PhpDocParser($config, new TypeParser($config, new ConstExprParser($config)), new ConstExprParser($config));

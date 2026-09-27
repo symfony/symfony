@@ -12,12 +12,10 @@
 namespace Symfony\Component\AssetMapper\Factory;
 
 use Symfony\Component\AssetMapper\MappedAsset;
-use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Config\Resource\ResourceInterface;
-use Symfony\Component\Config\ResourceCheckerConfigCache;
+use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -25,6 +23,11 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class CachedMappedAssetFactory implements MappedAssetFactoryInterface
 {
+    /**
+     * @var array<string, MappedAsset>
+     */
+    private array $mappedAssets = [];
+
     public function __construct(
         private readonly MappedAssetFactoryInterface $innerFactory,
         private readonly string $cacheDir,
@@ -34,17 +37,33 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
 
     public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
     {
+        return $this->mappedAssets[$logicalPath.':'.$sourcePath] ??= $this->loadMappedAsset($logicalPath, $sourcePath);
+    }
+
+    public function reset(): void
+    {
+        $this->mappedAssets = [];
+
+        if (\is_callable([$this->innerFactory, 'reset'])) {
+            $this->innerFactory->reset();
+        }
+    }
+
+    private function loadMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
+    {
         $cachePath = $this->getCacheFilePath($logicalPath, $sourcePath);
+        $filesystem = new Filesystem();
 
         if ($this->debug) {
             clearstatcache();
-            $configCache = new ResourceCheckerConfigCache($cachePath, [new NonCachingSelfCheckingResourceChecker()]);
-        } else {
-            $configCache = new ConfigCache($cachePath, false);
         }
 
-        if ($configCache->isFresh()) {
-            return unserialize((new Filesystem())->readFile($cachePath), ['allowed_classes' => true]);
+        if (is_file($cachePath)) {
+            [$resources, $mappedAsset] = unserialize($filesystem->readFile($cachePath), ['allowed_classes' => true]);
+
+            if (!$this->debug || $this->isFresh(filemtime($cachePath), $resources)) {
+                return $mappedAsset;
+            }
         }
 
         $mappedAsset = $this->innerFactory->createMappedAsset($logicalPath, $sourcePath);
@@ -53,26 +72,32 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
             return null;
         }
 
-        $resources = $this->collectResourcesFromAsset($mappedAsset);
-        $configCache->write(serialize($mappedAsset), $resources);
+        $filesystem->dumpFile($cachePath, serialize([$this->collectResourcesFromAsset($mappedAsset), $mappedAsset]));
 
         return $mappedAsset;
     }
 
-    public function reset(): void
-    {
-        if (\is_callable([$this->innerFactory, 'reset'])) {
-            $this->innerFactory->reset();
-        }
-    }
-
     private function getCacheFilePath(string $logicalPath, string $sourcePath): string
     {
-        return $this->cacheDir.'/'.hash('xxh128', $logicalPath.':'.$sourcePath).'.php';
+        return $this->cacheDir.'/'.hash('xxh128', $logicalPath.':'.$sourcePath).'.ser';
     }
 
     /**
-     * @return ResourceInterface[]
+     * @param SelfCheckingResourceInterface[] $resources
+     */
+    private function isFresh(int $timestamp, array $resources): bool
+    {
+        foreach ($resources as $resource) {
+            if (!$resource->isFresh($timestamp)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return SelfCheckingResourceInterface[]
      */
     private function collectResourcesFromAsset(MappedAsset $mappedAsset): array
     {

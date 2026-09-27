@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\AssetMapper\Tests\Factory;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactoryInterface;
 use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 use Symfony\Component\AssetMapper\MappedAsset;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\Config\Resource\FileExistenceResource;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Filesystem\Filesystem;
 
 class CachedMappedAssetFactoryTest extends TestCase
@@ -56,8 +53,9 @@ class CachedMappedAssetFactoryTest extends TestCase
 
         $this->assertSame($mappedAsset, $cachedFactory->createMappedAsset('file1.css', '/anything/file1.css'));
 
-        // check that calling again does not trigger the inner call
+        // check that calling again after a reset does not trigger the inner call
         // and, the objects will be equal, but not identical
+        $cachedFactory->reset();
         $secondActualAsset = $cachedFactory->createMappedAsset('file1.css', '/anything/file1.css');
         $this->assertNotSame($mappedAsset, $secondActualAsset);
         $this->assertSame('file1.css', $secondActualAsset->logicalPath);
@@ -68,7 +66,7 @@ class CachedMappedAssetFactoryTest extends TestCase
     {
         $sourcePath = __DIR__.'/../Fixtures/dir1/file1.css';
         $mappedAsset = new MappedAsset('file1.css', $sourcePath, content: 'cached content');
-        $this->saveConfigCache($mappedAsset);
+        $this->warmUpCache($mappedAsset);
 
         $factory = $this->createMock(MappedAssetFactoryInterface::class);
         $cachedFactory = new CachedMappedAssetFactory(
@@ -85,90 +83,128 @@ class CachedMappedAssetFactoryTest extends TestCase
         $this->assertSame($mappedAsset->content, $actualAsset->content);
     }
 
+    public function testCachedAssetIsLoadedOnceUntilReset()
+    {
+        $sourcePath = __DIR__.'/../Fixtures/dir1/file1.css';
+        $this->warmUpCache(new MappedAsset('file1.css', $sourcePath, content: 'cached content'));
+
+        $factory = $this->createMock(MappedAssetFactoryInterface::class);
+        $factory->expects($this->never())
+            ->method('createMappedAsset');
+        $cachedFactory = new CachedMappedAssetFactory($factory, $this->cacheDir, true);
+
+        $actualAsset = $cachedFactory->createMappedAsset('file1.css', $sourcePath);
+        $this->assertSame($actualAsset, $cachedFactory->createMappedAsset('file1.css', $sourcePath));
+
+        $cachedFactory->reset();
+        $this->assertNotSame($actualAsset, $cachedFactory->createMappedAsset('file1.css', $sourcePath));
+    }
+
     public function testAssetCacheFreshnessIsNotMemoizedInDebugMode()
     {
         $sourcePath = $this->cacheDir.'/externally_built.css';
         file_put_contents($sourcePath, 'old content');
-
-        $mappedAsset = new MappedAsset('externally_built.css', $sourcePath, content: 'cached content');
-        $this->saveConfigCache($mappedAsset);
-
-        // Start with a fresh asset cache so ConfigCache memoizes a positive freshness result.
-        $cachePath = $this->getConfigCachePath($mappedAsset);
-        $cacheTimestamp = time() - 10;
-        $sourceTimestamp = $cacheTimestamp - 10;
-        $newSourceTimestamp = $cacheTimestamp + 1;
-        touch($sourcePath, $sourceTimestamp);
-        touch($cachePath, $cacheTimestamp);
-        clearstatcache();
-
-        $configCache = new ConfigCache($cachePath, true);
-        $this->assertTrue($configCache->isFresh());
-
-        // Simulate an external build tool updating a dependency while the PHP process keeps running.
-        file_put_contents($sourcePath, 'new content');
-        touch($sourcePath, $newSourceTimestamp);
-        clearstatcache();
-
-        // AssetMapper should recheck the dependency instead of reusing ConfigCache's memoized answer.
-        $rebuiltAsset = new MappedAsset('externally_built.css', $sourcePath, content: 'rebuilt content');
+        touch($sourcePath, time() - 10);
 
         $factory = $this->createMock(MappedAssetFactoryInterface::class);
-        $factory->expects($this->once())
+        $factory->expects($this->exactly(2))
             ->method('createMappedAsset')
             ->with('externally_built.css', $sourcePath)
-            ->willReturn($rebuiltAsset);
+            ->willReturnOnConsecutiveCalls(
+                new MappedAsset('externally_built.css', $sourcePath, content: 'cached content'),
+                new MappedAsset('externally_built.css', $sourcePath, content: 'rebuilt content'),
+            );
 
         $cachedFactory = new CachedMappedAssetFactory(
             $factory,
             $this->cacheDir,
             true
         );
+        $this->assertSame('cached content', $cachedFactory->createMappedAsset('externally_built.css', $sourcePath)->content);
 
-        $actualAsset = $cachedFactory->createMappedAsset('externally_built.css', $sourcePath);
-        $this->assertSame($rebuiltAsset->content, $actualAsset->content);
+        // Simulate an external build tool updating a dependency while the PHP process keeps running.
+        file_put_contents($sourcePath, 'new content');
+        touch($sourcePath, time() + 10);
+
+        // AssetMapper should recheck the dependency on the next request instead of reusing the asset it loaded before.
+        $cachedFactory->reset();
+        $this->assertSame('rebuilt content', $cachedFactory->createMappedAsset('externally_built.css', $sourcePath)->content);
     }
 
-    public function testAssetConfigCacheResourceContainsDependencies()
+    #[DataProvider('provideResourceChanges')]
+    public function testAssetIsRebuiltWhenOneOfItsResourcesChanges(\Closure $change)
     {
-        $sourcePath = realpath(__DIR__.'/../Fixtures/dir1/file1.css');
-        $mappedAsset = new MappedAsset('file1.css', $sourcePath, content: 'cached content');
+        $dir = $this->cacheDir.'/assets';
+        foreach (['file1.css', 'file3.css', 'file4.js', 'file6.js', 'built.css', 'dir/file.txt'] as $file) {
+            $this->filesystem->dumpFile($dir.'/'.$file, $file);
+            touch($dir.'/'.$file, time() - 10);
+        }
+        touch($dir.'/dir', time() - 10);
 
-        $dependentOnContentAsset = new MappedAsset('file3.css', realpath(__DIR__.'/../Fixtures/dir2/file3.css'));
-        $deeplyNestedAsset = new MappedAsset('file4.js', realpath(__DIR__.'/../Fixtures/dir2/file4.js'));
-
-        $file6Asset = new MappedAsset('file6.js', realpath(__DIR__.'/../Fixtures/dir2/subdir/file6.js'));
-        $deeplyNestedAsset->addJavaScriptImport(new JavaScriptImport('file6', assetLogicalPath: $file6Asset->logicalPath, assetSourcePath: $file6Asset->sourcePath));
-
+        $mappedAsset = new MappedAsset('file1.css', $dir.'/file1.css', content: 'cached content');
+        $dependentOnContentAsset = new MappedAsset('file3.css', $dir.'/file3.css');
+        $deeplyNestedAsset = new MappedAsset('file4.js', $dir.'/file4.js');
+        $deeplyNestedAsset->addJavaScriptImport(new JavaScriptImport('file6', assetLogicalPath: 'file6.js', assetSourcePath: $dir.'/file6.js'));
         $dependentOnContentAsset->addDependency($deeplyNestedAsset);
         $mappedAsset->addDependency($dependentOnContentAsset);
-
-        // just adding any file as an example
-        $mappedAsset->addFileDependency(__DIR__.'/../Fixtures/importmap.php');
-        $mappedAsset->addFileDependency(__DIR__.'/../Fixtures/dir3');
+        $mappedAsset->addFileDependency($dir.'/built.css');
+        $mappedAsset->addFileDependency($dir.'/dir');
+        $this->warmUpCache($mappedAsset);
 
         $factory = $this->createMock(MappedAssetFactoryInterface::class);
         $factory->expects($this->once())
             ->method('createMappedAsset')
             ->willReturn($mappedAsset);
 
-        $cachedFactory = new CachedMappedAssetFactory(
-            $factory,
-            $this->cacheDir,
-            true
-        );
-        $cachedFactory->createMappedAsset('file1.css', $sourcePath);
+        $change($dir);
 
-        $configCacheMetadata = $this->loadConfigCacheMetadataFor($mappedAsset);
-        $this->assertCount(6, $configCacheMetadata);
-        $this->assertInstanceOf(FileResource::class, $configCacheMetadata[0]);
-        $this->assertInstanceOf(DirectoryResource::class, $configCacheMetadata[1]);
-        $this->assertInstanceOf(FileResource::class, $configCacheMetadata[2]);
-        $this->assertSame(realpath(__DIR__.'/../Fixtures/importmap.php'), $configCacheMetadata[0]->getResource());
-        $this->assertSame($mappedAsset->sourcePath, $configCacheMetadata[2]->getResource());
-        $this->assertSame($dependentOnContentAsset->sourcePath, $configCacheMetadata[3]->getResource());
-        $this->assertSame($deeplyNestedAsset->sourcePath, $configCacheMetadata[4]->getResource());
-        $this->assertInstanceOf(FileExistenceResource::class, $configCacheMetadata[5]);
+        (new CachedMappedAssetFactory($factory, $this->cacheDir, true))->createMappedAsset('file1.css', $dir.'/file1.css');
+    }
+
+    public static function provideResourceChanges(): iterable
+    {
+        yield 'source file' => [static fn (string $dir) => touch($dir.'/file1.css', time() + 10)];
+        yield 'file dependency' => [static fn (string $dir) => touch($dir.'/built.css', time() + 10)];
+        yield 'file added to a directory dependency' => [static fn (string $dir) => touch($dir.'/dir/new.txt', time() + 10)];
+        yield 'dependency' => [static fn (string $dir) => touch($dir.'/file3.css', time() + 10)];
+        yield 'dependency of a dependency' => [static fn (string $dir) => touch($dir.'/file4.js', time() + 10)];
+        yield 'removed JavaScript import' => [static fn (string $dir) => unlink($dir.'/file6.js')];
+    }
+
+    public function testAssetIsRebuiltWhenItsSourceChangesInTheSecondTheCacheWasWritten()
+    {
+        $sourcePath = $this->cacheDir.'/source.css';
+        file_put_contents($sourcePath, 'content');
+        $mappedAsset = new MappedAsset('source.css', $sourcePath, content: 'cached content');
+        $this->warmUpCache($mappedAsset);
+
+        [$cacheFile] = array_values(array_diff(glob($this->cacheDir.'/*'), [$sourcePath]));
+        file_put_contents($sourcePath, 'new content');
+        touch($sourcePath, filemtime($cacheFile));
+
+        $factory = $this->createMock(MappedAssetFactoryInterface::class);
+        $factory->expects($this->once())
+            ->method('createMappedAsset')
+            ->willReturn($mappedAsset);
+
+        (new CachedMappedAssetFactory($factory, $this->cacheDir, true))->createMappedAsset('source.css', $sourcePath);
+    }
+
+    public function testCachedAssetIsNotCheckedForFreshnessWhenNotInDebugMode()
+    {
+        $sourcePath = $this->cacheDir.'/source.css';
+        file_put_contents($sourcePath, 'content');
+        touch($sourcePath, time() - 10);
+        $this->warmUpCache(new MappedAsset('source.css', $sourcePath, content: 'cached content'), false);
+
+        touch($sourcePath, time() + 10);
+
+        $factory = $this->createMock(MappedAssetFactoryInterface::class);
+        $factory->expects($this->never())
+            ->method('createMappedAsset');
+
+        $actualAsset = (new CachedMappedAssetFactory($factory, $this->cacheDir, false))->createMappedAsset('source.css', $sourcePath);
+        $this->assertSame('cached content', $actualAsset->content);
     }
 
     public function testResetIsForwardedToTheInnerFactory()
@@ -206,21 +242,11 @@ class CachedMappedAssetFactoryTest extends TestCase
         (new CachedMappedAssetFactory($innerFactory, $this->cacheDir, true))->reset();
     }
 
-    private function loadConfigCacheMetadataFor(MappedAsset $mappedAsset): array
+    private function warmUpCache(MappedAsset $mappedAsset, bool $debug = true): void
     {
-        $cachedPath = $this->getConfigCachePath($mappedAsset).'.meta';
+        $factory = $this->createStub(MappedAssetFactoryInterface::class);
+        $factory->method('createMappedAsset')->willReturn($mappedAsset);
 
-        return unserialize($this->filesystem->readFile($cachedPath));
-    }
-
-    private function saveConfigCache(MappedAsset $mappedAsset): void
-    {
-        $configCache = new ConfigCache($this->getConfigCachePath($mappedAsset), true);
-        $configCache->write(serialize($mappedAsset), [new FileResource($mappedAsset->sourcePath)]);
-    }
-
-    private function getConfigCachePath(MappedAsset $mappedAsset): string
-    {
-        return $this->cacheDir.'/'.hash('xxh128', $mappedAsset->logicalPath.':'.$mappedAsset->sourcePath).'.php';
+        (new CachedMappedAssetFactory($factory, $this->cacheDir, $debug))->createMappedAsset($mappedAsset->logicalPath, $mappedAsset->sourcePath);
     }
 }

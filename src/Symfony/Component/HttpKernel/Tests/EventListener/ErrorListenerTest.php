@@ -275,6 +275,32 @@ class ErrorListenerTest extends TestCase
         ];
     }
 
+    public function testLogMessagesNameAnonymousClasses()
+    {
+        $message = \sprintf('Cannot use "%s".', (new class extends \ArrayObject {})::class);
+        $exception = new class($message) extends \RuntimeException {};
+        $handlingException = new class($message) extends \LogicException {};
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $kernel->method('handle')->willThrowException($handlingException);
+
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger);
+        $event = new ExceptionEvent($kernel, new Request(), HttpKernelInterface::MAIN_REQUEST, $exception);
+        $l->logKernelException($event);
+
+        try {
+            $l->onKernelException($event);
+            $this->fail('LogicException expected');
+        } catch (\LogicException $e) {
+            $this->assertSame($handlingException, $e);
+        }
+
+        $this->assertSame([
+            \sprintf('Uncaught PHP Exception RuntimeException@anonymous: "Cannot use "ArrayObject@anonymous"." at ErrorListenerTest.php line %d', $exception->getLine()),
+            \sprintf('Exception thrown when handling an exception (LogicException@anonymous: Cannot use "ArrayObject@anonymous". at ErrorListenerTest.php line %d)', $handlingException->getLine()),
+        ], $logger->getLogsForLevel('critical'));
+    }
+
     public function testSubRequestFormat()
     {
         $listener = new ErrorListener('foo', new NullLogger());

@@ -30,7 +30,6 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
-use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Exception\LogicException as TypeInfoLogicException;
@@ -187,9 +186,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $normalizedData = [];
         $stack = [];
+        $attributeContexts = [];
         $attributes = $this->getAttributes($data, $format, $context);
         $class = ($this->objectClassResolver)($data);
-        $classMetadata = $this->classMetadataFactory?->getMetadataFor($class);
         $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($class)->getAttributesMetadata();
         if (isset($context[self::MAX_DEPTH_HANDLER])) {
             $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER];
@@ -199,17 +198,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         } else {
             $maxDepthHandler = null;
         }
+        $maxDepthEnabled = null !== $attributesMetadata && ($context[self::ENABLE_MAX_DEPTH] ?? $this->defaultContext[self::ENABLE_MAX_DEPTH] ?? false);
+        $typeProperty = $this->classDiscriminatorResolver?->getMappingForMappedObject($data)?->getTypeProperty();
 
         foreach ($attributes as $attribute) {
             $maxDepthReached = false;
-            if (null !== $attributesMetadata && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
+            if ($maxDepthEnabled && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$maxDepthHandler) {
                 continue;
             }
 
             $attributeContext = $this->getAttributeNormalizationContext($data, $attribute, $context);
 
             try {
-                $attributeValue = $attribute === $this->classDiscriminatorResolver?->getMappingForMappedObject($data)?->getTypeProperty()
+                $attributeValue = $attribute === $typeProperty
                     ? $this->classDiscriminatorResolver?->getTypeForMappedObject($data)
                     : $this->getAttributeValue($data, $attribute, $format, $attributeContext);
             } catch (UninitializedPropertyException $e) {
@@ -224,14 +225,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $stack[$attribute] = $this->applyCallbacks($attributeValue, $data, $attribute, $format, $attributeContext);
+            $attributeContexts[$attribute] = $attributeContext;
         }
 
+        $groups = null !== $attributesMetadata ? $this->getGroups($context) : [];
+
         foreach ($stack as $attribute => $attributeValue) {
-            $attributeContext = $this->getAttributeNormalizationContext($data, $attribute, $context);
+            // with max depth, the contexts of the first loop miss the depth counters of the attributes that follow them
+            $attributeContext = $maxDepthEnabled ? $this->getAttributeNormalizationContext($data, $attribute, $context) : $attributeContexts[$attribute];
 
             if (!$this->serializer instanceof NormalizerInterface) {
                 if (null === $attributeValue || \is_scalar($attributeValue)) {
-                    $normalizedData = $this->updateData($normalizedData, $attribute, $attributeValue, $class, $format, $context, $attributeContext, $attributesMetadata, $classMetadata);
+                    $this->updateData($normalizedData, $attribute, $attributeValue, $class, $format, $context, $attributeContext, $attributesMetadata, $groups);
                     continue;
                 }
                 throw new LogicException(\sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer.', $attribute));
@@ -239,7 +244,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $childContext = $this->createChildContext($attributeContext, $attribute, $format);
 
-            $normalizedData = $this->updateData($normalizedData, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $context, $attributeContext, $attributesMetadata, $classMetadata);
+            $this->updateData($normalizedData, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $context, $attributeContext, $attributesMetadata, $groups);
         }
 
         $preserveEmptyObjects = $context[self::PRESERVE_EMPTY_OBJECTS] ?? $this->defaultContext[self::PRESERVE_EMPTY_OBJECTS] ?? false;
@@ -1049,39 +1054,39 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Sets an attribute and apply the name converter if necessary.
      */
-    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context, array $attributeContext, ?array $attributesMetadata, ?ClassMetadataInterface $classMetadata): array
+    private function updateData(array &$data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context, array $attributeContext, ?array $attributesMetadata, array $groups): void
     {
         if (null === $attributeValue && ($attributeContext[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
-            return $data;
+            return;
         }
 
         // resolve the serialized names and paths with the groups of the top-level context, not the
         // ones a per-attribute #[Context] may override: when denormalizing, the name has to be
         // resolved before the attribute is known, so only the top-level groups can apply there,
         // and the name would not round trip otherwise
-        if (null !== $classMetadata && null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath($this->getGroups($context))) {
+        if (null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath($groups)) {
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
             if ($propertyAccessor->isReadable($data, $serializedPath) && null !== $propertyAccessor->getValue($data, $serializedPath)) {
                 throw new LogicException(\sprintf('The element you are trying to set is already populated: "%s".', (string) $serializedPath));
             }
             $propertyAccessor->setValue($data, $serializedPath, $attributeValue);
 
-            return $data;
+            return;
         }
 
         if ($this->nameConverter) {
             $nameContext = $attributeContext;
-            if (\array_key_exists(self::GROUPS, $context)) {
-                $nameContext[self::GROUPS] = $context[self::GROUPS];
-            } else {
-                unset($nameContext[self::GROUPS]);
+            if ($nameContext !== $context) {
+                if (\array_key_exists(self::GROUPS, $context)) {
+                    $nameContext[self::GROUPS] = $context[self::GROUPS];
+                } else {
+                    unset($nameContext[self::GROUPS]);
+                }
             }
             $attribute = $this->nameConverter->normalize($attribute, $class, $format, $nameContext);
         }
 
         $data[$attribute] = $attributeValue;
-
-        return $data;
     }
 
     /**
@@ -1091,9 +1096,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
     {
-        if (!($context[self::ENABLE_MAX_DEPTH] ?? $this->defaultContext[self::ENABLE_MAX_DEPTH] ?? false)
-            || !isset($attributesMetadata[$attribute]) || null === $maxDepth = $attributesMetadata[$attribute]?->getMaxDepth()
-        ) {
+        if (!isset($attributesMetadata[$attribute]) || null === $maxDepth = $attributesMetadata[$attribute]?->getMaxDepth()) {
             return false;
         }
 

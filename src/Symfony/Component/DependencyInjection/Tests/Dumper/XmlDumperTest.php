@@ -114,6 +114,30 @@ class XmlDumperTest extends TestCase
 ", $dumper->dump());
     }
 
+    public function testDumpEncodesSpecialChars()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addTag('foo', ['cr' => "a\rb", 'invalid' => "a\xFFb", 'quotes' => 'a\'b"c', 'whitespace' => "a\tb\nc", 'utf8' => 'é'])
+            ->addArgument('a\'b"c')
+            ->addArgument("a\rb")
+            ->addArgument('0x1F')
+            ->addArgument('0b01')
+            ->addArgument('0B01');
+
+        $this->assertStringContainsString(<<<XML
+                <service id="foo" class="Foo">
+                  <tag name="foo" cr="a&#13;b" invalid="a\u{FFFD}b" quotes="a'b&quot;c" whitespace="a\tb
+            c" utf8="é"/>
+                  <argument>a'b"c</argument>
+                  <argument>a&#13;b</argument>
+                  <argument type="string">0x1F</argument>
+                  <argument type="string">0b01</argument>
+                  <argument>0B01</argument>
+                </service>
+            XML, (new XmlDumper($container))->dump());
+    }
+
     #[DataProvider('provideDecoratedServicesData')]
     public function testDumpDecoratedServices($expectedXmlDump, $container)
     {

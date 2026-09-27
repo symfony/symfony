@@ -130,7 +130,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'impersonator_user' => $impersonatorUser,
                 'impersonation_exit_path' => null,
                 'token' => $token,
-                'token_class' => $this->hasVarDumper ? new ClassStub($token::class) : $token::class,
+                'token_class' => $token::class,
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUserIdentifier(),
                 'roles' => $assignedRoles,
@@ -142,35 +142,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         // collect voters and access decision manager information
         if ($this->accessDecisionManager instanceof TraceableAccessDecisionManager) {
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
-            $this->data['voters'] = [];
-
-            foreach ($this->accessDecisionManager->getVoters() as $voter) {
-                if ($voter instanceof TraceableVoter) {
-                    $voter = $voter->getDecoratedVoter();
-                }
-
-                $this->data['voters'][] = $this->hasVarDumper ? new ClassStub($voter::class) : $voter::class;
-            }
-
-            // collect voter details
-            $decisionLog = $this->accessDecisionManager->getDecisionLog();
-
-            foreach ($decisionLog as $key => $log) {
-                $decisionLog[$key]['voter_details'] = [];
-                foreach ($log['voterDetails'] as $voterDetail) {
-                    $voterClass = $voterDetail['voter']::class;
-                    $classData = $this->hasVarDumper ? new ClassStub($voterClass) : $voterClass;
-                    $decisionLog[$key]['voter_details'][] = [
-                        'class' => $classData,
-                        'attributes' => $voterDetail['attributes'], // Only displayed for unanimous strategy
-                        'vote' => $voterDetail['vote'],
-                        'reasons' => $voterDetail['reasons'] ?? [],
-                    ];
-                }
-                unset($decisionLog[$key]['voterDetails']);
-            }
-
-            $this->data['access_decision_log'] = $decisionLog;
+            $this->data['voters'] = $this->accessDecisionManager->getVoters();
+            $this->data['access_decision_log'] = $this->accessDecisionManager->getDecisionLog();
         } else {
             $this->data['access_decision_log'] = [];
             $this->data['voter_strategy'] = 'unknown';
@@ -238,9 +211,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 $response->headers->clearCookie($authCookieName);
             }
         }
-        if ($this->roleHierarchy) {
-            $this->data['roles_diagram'] = $this->mermaidDumper->dump($this->roleHierarchy);
-        }
     }
 
     public function reset(): void
@@ -251,6 +221,43 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     public function lateCollect(): void
     {
+        if ($this->data instanceof Data) {
+            return;
+        }
+
+        if ($this->hasVarDumper && isset($this->data['token_class'])) {
+            $this->data['token_class'] = new ClassStub($this->data['token_class']);
+        }
+
+        $voters = [];
+        foreach ($this->data['voters'] ?? [] as $voter) {
+            if ($voter instanceof TraceableVoter) {
+                $voter = $voter->getDecoratedVoter();
+            }
+
+            $voters[] = $this->hasVarDumper ? new ClassStub($voter::class) : $voter::class;
+        }
+        $this->data['voters'] = $voters;
+
+        foreach ($this->data['access_decision_log'] ?? [] as $key => $log) {
+            $this->data['access_decision_log'][$key]['voter_details'] = [];
+            foreach ($log['voterDetails'] as $voterDetail) {
+                $voterClass = $voterDetail['voter']::class;
+                $classData = $this->hasVarDumper ? new ClassStub($voterClass) : $voterClass;
+                $this->data['access_decision_log'][$key]['voter_details'][] = [
+                    'class' => $classData,
+                    'attributes' => $voterDetail['attributes'], // Only displayed for unanimous strategy
+                    'vote' => $voterDetail['vote'],
+                    'reasons' => $voterDetail['reasons'] ?? [],
+                ];
+            }
+            unset($this->data['access_decision_log'][$key]['voterDetails']);
+        }
+
+        if ($this->roleHierarchy) {
+            $this->data['roles_diagram'] = $this->mermaidDumper->dump($this->roleHierarchy);
+        }
+
         $this->data = $this->cloneVar($this->data);
     }
 

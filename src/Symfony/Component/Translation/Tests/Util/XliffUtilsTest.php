@@ -105,6 +105,7 @@ class XliffUtilsTest extends TestCase
 
             $phar = new Phar($workspace.'/translation.phar');
             $phar->addFile($componentDir.'/Util/XliffUtils.php', 'Util/XliffUtils.php');
+            $phar->addFile($componentDir.'/Resources/schemas/xliff-core-1.2-subset.xsd', 'Resources/schemas/xliff-core-1.2-subset.xsd');
             $phar->addFile($componentDir.'/Resources/schemas/xliff-core-1.2-transitional.xsd', 'Resources/schemas/xliff-core-1.2-transitional.xsd');
             $phar->addFile($componentDir.'/Resources/schemas/xml.xsd', 'Resources/schemas/xml.xsd');
             $phar->setStub('<?php __HALT_COMPILER();');
@@ -112,7 +113,8 @@ class XliffUtilsTest extends TestCase
 
             require 'phar://'.$workspace.'/translation.phar/Util/XliffUtils.php';
 
-            $xliff = '<?xml version="1.0"?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file source-language="en" datatype="plaintext" original="file.ext"><body><trans-unit id="1"><source>foo</source><target>bar</target></trans-unit></body></file></xliff>';
+            // the subset schema does not allow xml:lang, so that the full schema and the xml.xsd file it imports are used
+            $xliff = '<?xml version="1.0"?><xliff version="1.2" xml:lang="en" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file source-language="en" datatype="plaintext" original="file.ext"><body><trans-unit id="1"><source>foo</source><target>bar</target></trans-unit></body></file></xliff>';
 
             $validateAndCountTempFiles = function () use ($xliff) {
                 $dom = new DOMDocument();
@@ -167,6 +169,71 @@ class XliffUtilsTest extends TestCase
             @rmdir($tmpDir);
             @rmdir($workspace);
         }
+    }
+
+    #[DataProvider('provideValidDocuments')]
+    public function testValidateSchemaAcceptsValidDocuments(string $body, string $header = '')
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML(self::createXliff($body, $header));
+
+        $this->assertSame([], XliffUtils::validateSchema($dom));
+    }
+
+    public static function provideValidDocuments(): iterable
+    {
+        yield 'common elements' => [
+            '<trans-unit id="a" resname="foo"><source>foo</source><target state="translated">bar</target><note priority="1" from="dev">baz</note></trans-unit>',
+            '<tool tool-id="symfony" tool-name="Symfony"/><note>qux</note><prop-group><prop prop-type="key">value</prop></prop-group>',
+        ];
+        yield 'groups and inline elements' => [
+            '<group id="g"><trans-unit id="a" approved="yes"><source>foo <g id="1">bar</g></source><target state="x-reviewed">bar</target></trans-unit></group>',
+        ];
+        yield 'xml attributes' => ['<trans-unit id="a" xml:space="preserve"><source xml:lang="en">foo</source><target xml:lang="fr">bar</target></trans-unit>'];
+        yield 'alternative translations' => ['<trans-unit id="a"><source>foo</source><target>bar</target><alt-trans><target>baz</target></alt-trans></trans-unit>'];
+    }
+
+    #[DataProvider('provideInvalidDocuments')]
+    public function testValidateSchemaReportsInvalidDocuments(string $expectedError, string $body, string $header = '', string $fileAttributes = 'datatype="plaintext"')
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML(self::createXliff($body, $header, $fileAttributes));
+        $errors = XliffUtils::validateSchema($dom);
+
+        $this->assertCount(1, $errors);
+        $this->assertStringContainsString($expectedError, $errors[0]['message']);
+    }
+
+    public static function provideInvalidDocuments(): iterable
+    {
+        $unit = '<trans-unit id="a"><source>foo</source><target>bar</target></trans-unit>';
+
+        yield 'duplicate unit ids' => ['K_unit_id', $unit.$unit];
+        yield 'duplicate tool ids' => ['K_tool-id', $unit, '<tool tool-id="foo" tool-name="Foo"/><tool tool-id="foo" tool-name="Bar"/>'];
+        yield 'unknown tool' => ['KR_file_tool-id', $unit, '', 'datatype="plaintext" tool-id="foo"'];
+        yield 'unknown phase' => ['KR_phase-name', '<trans-unit id="a" phase-name="foo"><source>foo</source></trans-unit>'];
+        yield 'invalid state' => ['AttrType_state', '<trans-unit id="a"><source>foo</source><target state="done">bar</target></trans-unit>'];
+        yield 'invalid priority' => ['AttrType_priority', '<trans-unit id="a"><source>foo</source><note priority="11">bar</note></trans-unit>'];
+        yield 'invalid datatype' => ['AttrType_datatype', $unit, '', 'datatype="foo"'];
+        yield 'xsi:type' => ['xsi:type', '<trans-unit id="a"><source xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="xsd:string">foo</source></trans-unit>'];
+    }
+
+    public function testValidateSchemaReportsPendingLibxmlErrors()
+    {
+        $internalErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
+        try {
+            $dom = new \DOMDocument();
+            $dom->loadXML('<?xml version="1.0"?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file></xliff>');
+
+            $errors = XliffUtils::validateSchema($dom);
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($internalErrors);
+        }
+
+        $this->assertStringContainsString('Opening and ending tag mismatch', $errors[0]['message']);
     }
 
     /**
@@ -243,5 +310,10 @@ class XliffUtilsTest extends TestCase
         }
 
         $this->assertSame([], $networkLoads, 'XliffUtils::validateSchema() must not resolve external entities over the network.');
+    }
+
+    private static function createXliff(string $body, string $header = '', string $fileAttributes = 'datatype="plaintext"'): string
+    {
+        return '<?xml version="1.0"?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file source-language="en" target-language="fr" original="file.ext" '.$fileAttributes.'>'.($header ? '<header>'.$header.'</header>' : '').'<body>'.$body.'</body></file></xliff>';
     }
 }

@@ -54,6 +54,48 @@ class TemplateIteratorTest extends TestCase
         );
     }
 
+    public function testGetIteratorListsReachableFormThemes()
+    {
+        $formThemesPath = __DIR__.'/Fixtures/templates/FormThemes/Form';
+        $iterator = new TemplateIterator($this->createStub(Kernel::class), [$formThemesPath => null], __DIR__.'/Fixtures/templates/FormThemes/templates', [], $formThemesPath, ['form_div_layout.html.twig', 'configured_layout.html.twig']);
+
+        $sorted = iterator_to_array($iterator);
+        sort($sorted);
+        $this->assertSame(
+            [
+                'configured_layout.html.twig',
+                'form.html.twig',
+                'form_div_layout.html.twig',
+                'grandparent_layout.html.twig',
+                'named_layout.html.twig',
+                'parent_layout.html.twig',
+            ],
+            $sorted
+        );
+    }
+
+    public function testGetIteratorListsAllFormThemesWithoutFormThemesPath()
+    {
+        $formThemesPath = __DIR__.'/Fixtures/templates/FormThemes/Form';
+        $iterator = new TemplateIterator($this->createStub(Kernel::class), [$formThemesPath => null], __DIR__.'/Fixtures/templates/FormThemes/templates', [], null, ['form_div_layout.html.twig', 'configured_layout.html.twig']);
+
+        $sorted = iterator_to_array($iterator);
+        sort($sorted);
+        $this->assertSame(
+            [
+                'configured_layout.html.twig',
+                'form.html.twig',
+                'form_div_layout.html.twig',
+                'grandparent_layout.html.twig',
+                'named_layout.html.twig',
+                'parent_layout.html.twig',
+                'unused_layout.html.twig',
+                'unused_parent_layout.html.twig',
+            ],
+            $sorted
+        );
+    }
+
     private function createKernelMock(): Kernel
     {
         $bundle = $this->createStub(BundleInterface::class);

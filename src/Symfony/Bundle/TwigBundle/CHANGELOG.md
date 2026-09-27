@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `Controller\TemplateController`, which `FrameworkBundle` used to provide
+ * Warm up only the form themes of `TwigBridge` that are listed in `form_themes`, named in templates, or used or extended by those
 
 8.1
 ---

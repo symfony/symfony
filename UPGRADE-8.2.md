@@ -459,6 +459,13 @@ TwigBridge
    `form_start` block renders no id until that block is updated
  * Deprecate the `render_hinclude()` Twig function; use `render_esi()` or `render()`, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
 
+TwigBundle
+----------
+
+ * The cache warmer compiles only the form themes of `TwigBridge` that are listed in `twig.form_themes`, named in templates, or used or extended by those.
+   A theme picked at runtime, through a variable in a `form_theme` tag or through `FormRenderer::setTheme()`, is compiled on first use.
+   When the cache directory is read-only, name such a theme in one of your templates, e.g. in a comment, to have it warmed up
+
 Uid
 ---
 

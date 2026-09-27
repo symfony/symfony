@@ -90,7 +90,7 @@ return static function (ContainerConfigurator $container) {
             ->call('setEnabledLocales', [param('kernel.enabled_locales')])
 
         ->set('twig.template_iterator', TemplateIterator::class)
-            ->args([service('kernel'), abstract_arg('Twig paths'), param('twig.default_path'), abstract_arg('File name pattern')])
+            ->args([service('kernel'), abstract_arg('Twig paths'), param('twig.default_path'), abstract_arg('File name pattern'), null, param('twig.form.resources')])
 
         ->set('twig.template_cache.runtime_cache', FilesystemCache::class)
             ->args([param('kernel.cache_dir').'/twig'])

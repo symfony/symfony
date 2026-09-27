@@ -356,7 +356,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $nestedAttributes = $this->getNestedAttributes($mappedClass, $context);
         $nestedData = $originalNestedData = [];
-        $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()->enableExceptionOnInvalidIndex()->getPropertyAccessor();
+        $propertyAccessor = $nestedAttributes ? PropertyAccess::createPropertyAccessorBuilder()->enableExceptionOnInvalidIndex()->getPropertyAccessor() : null;
         foreach ($nestedAttributes as $property => $serializedPath) {
             try {
                 $value = $propertyAccessor->getValue($normalizedData, $serializedPath);

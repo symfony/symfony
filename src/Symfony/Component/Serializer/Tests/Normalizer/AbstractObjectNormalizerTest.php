@@ -1013,6 +1013,22 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals(new DummyWithSelfConstructorPromotedParameter('A', new DummyWithSelfConstructorPromotedParameter('B')), $serializer->denormalize($normalized, DummyWithSelfConstructorPromotedParameter::class));
     }
 
+    public function testDenormalizeSelfConstructorPromotedParameterDeclaredByParentClass()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new ReflectionExtractor()]))]);
+
+        $expected = new DummyWithSelfConstructorPromotedParameterChild('A', new DummyWithSelfConstructorPromotedParameter('B'));
+        $this->assertEquals($expected, $serializer->denormalize(['name' => 'A', 'partner' => ['name' => 'B']], DummyWithSelfConstructorPromotedParameterChild::class));
+    }
+
+    public function testDenormalizeParentConstructorParameterDeclaredByParentClass()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new ReflectionExtractor()]))]);
+
+        $expected = new DummyWithParentConstructorParameterChild('A', new DummyWithSelfConstructorPromotedParameter('B'));
+        $this->assertEquals($expected, $serializer->denormalize(['name' => 'A', 'origin' => ['name' => 'B']], DummyWithParentConstructorParameterChild::class));
+    }
+
     public function testDenormalizeUsesConstructorUnionTypeWhenExtractorIsLessPrecise()
     {
         $extractor = new class implements PropertyTypeExtractorInterface {
@@ -2601,6 +2617,24 @@ class DummyWithSelfConstructorPromotedParameter
         public readonly ?self $partner = null,
     ) {
     }
+}
+
+class DummyWithSelfConstructorPromotedParameterChild extends DummyWithSelfConstructorPromotedParameter
+{
+}
+
+class DummyWithParentConstructorParameter extends DummyWithSelfConstructorPromotedParameter
+{
+    public function __construct(
+        string $name,
+        public readonly ?parent $origin = null,
+    ) {
+        parent::__construct($name);
+    }
+}
+
+class DummyWithParentConstructorParameterChild extends DummyWithParentConstructorParameter
+{
 }
 
 class DummyWithIntOrString

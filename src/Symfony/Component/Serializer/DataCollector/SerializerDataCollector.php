@@ -148,30 +148,22 @@ class SerializerDataCollector extends DataCollector implements LateDataCollector
 
     public function collectNormalization(string $traceId, string $normalizer, float $time, string $name): void
     {
-        $method = 'normalize';
-
-        $this->collected[$traceId]['normalization'][] = compact('normalizer', 'method', 'time', 'name');
+        $this->collectNestedCall($this->collected[$traceId]['normalization'], $normalizer, 'normalize', $time);
     }
 
     public function collectDenormalization(string $traceId, string $normalizer, float $time, string $name): void
     {
-        $method = 'denormalize';
-
-        $this->collected[$traceId]['normalization'][] = compact('normalizer', 'method', 'time', 'name');
+        $this->collectNestedCall($this->collected[$traceId]['normalization'], $normalizer, 'denormalize', $time);
     }
 
     public function collectEncoding(string $traceId, string $encoder, float $time, string $name): void
     {
-        $method = 'encode';
-
-        $this->collected[$traceId]['encoding'][] = compact('encoder', 'method', 'time', 'name');
+        $this->collectNestedCall($this->collected[$traceId]['encoding'], $encoder, 'encode', $time);
     }
 
     public function collectDecoding(string $traceId, string $encoder, float $time, string $name): void
     {
-        $method = 'decode';
-
-        $this->collected[$traceId]['encoding'][] = compact('encoder', 'method', 'time', 'name');
+        $this->collectNestedCall($this->collected[$traceId]['encoding'], $encoder, 'decode', $time);
     }
 
     public function lateCollect(): void
@@ -197,33 +189,11 @@ class SerializerDataCollector extends DataCollector implements LateDataCollector
             ];
 
             if (isset($collected['normalization'])) {
-                $mainNormalization = array_pop($collected['normalization']);
-
-                $data['normalizer'] = ['time' => $mainNormalization['time']] + $this->getMethodLocation($mainNormalization['normalizer'], $mainNormalization['method']);
-
-                foreach ($collected['normalization'] as $normalization) {
-                    if (!isset($data['normalization'][$normalization['normalizer']])) {
-                        $data['normalization'][$normalization['normalizer']] = ['time' => 0, 'calls' => 0] + $this->getMethodLocation($normalization['normalizer'], $normalization['method']);
-                    }
-
-                    ++$data['normalization'][$normalization['normalizer']]['calls'];
-                    $data['normalization'][$normalization['normalizer']]['time'] += $normalization['time'];
-                }
+                [$data['normalizer'], $data['normalization']] = $this->getNestedCalls($collected['normalization']);
             }
 
             if (isset($collected['encoding'])) {
-                $mainEncoding = array_pop($collected['encoding']);
-
-                $data['encoder'] = ['time' => $mainEncoding['time']] + $this->getMethodLocation($mainEncoding['encoder'], $mainEncoding['method']);
-
-                foreach ($collected['encoding'] as $encoding) {
-                    if (!isset($data['encoding'][$encoding['encoder']])) {
-                        $data['encoding'][$encoding['encoder']] = ['time' => 0, 'calls' => 0] + $this->getMethodLocation($encoding['encoder'], $encoding['method']);
-                    }
-
-                    ++$data['encoding'][$encoding['encoder']]['calls'];
-                    $data['encoding'][$encoding['encoder']]['time'] += $encoding['time'];
-                }
+                [$data['encoder'], $data['encoding']] = $this->getNestedCalls($collected['encoding']);
             }
 
             $this->data[$collected['method']][] = $data;
@@ -244,6 +214,39 @@ class SerializerDataCollector extends DataCollector implements LateDataCollector
         }
 
         return $this->dataGroupedByName;
+    }
+
+    /**
+     * Aggregates the calls per class, except the last one.
+     *
+     * Nested calls end before the call that wraps them, so the last call is the outermost one.
+     *
+     * @param-out array $calls
+     */
+    private function collectNestedCall(?array &$calls, string $class, string $method, float $time): void
+    {
+        if (isset($calls['last'])) {
+            [$lastClass, $lastMethod, $lastTime] = $calls['last'];
+            $nested = &$calls['nested'][$lastClass];
+            $nested ??= ['time' => 0, 'calls' => 0, 'method' => $lastMethod];
+            $nested['time'] += $lastTime;
+            ++$nested['calls'];
+        }
+
+        $calls['last'] = [$class, $method, $time];
+    }
+
+    private function getNestedCalls(array $calls): array
+    {
+        [$class, $method, $time] = $calls['last'];
+        $main = ['time' => $time] + $this->getMethodLocation($class, $method);
+        $nested = [];
+
+        foreach ($calls['nested'] ?? [] as $class => $call) {
+            $nested[$class] = ['time' => $call['time'], 'calls' => $call['calls']] + $this->getMethodLocation($class, $call['method']);
+        }
+
+        return [$main, $nested];
     }
 
     private function getMethodLocation(string $class, string $method): array

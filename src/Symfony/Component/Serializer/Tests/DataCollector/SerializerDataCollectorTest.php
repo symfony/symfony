@@ -13,10 +13,15 @@ namespace Symfony\Component\Serializer\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
+use Symfony\Component\Serializer\Debug\TraceableEncoder;
+use Symfony\Component\Serializer\Debug\TraceableNormalizer;
+use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class SerializerDataCollectorTest extends TestCase
 {
@@ -246,6 +251,75 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertArrayHasKey('line', $collectedData['decode'][0]['encoding'][CsvEncoder::class]);
     }
 
+    public function testCollectNestedCallsPerClass()
+    {
+        $dataCollector = new SerializerDataCollector();
+
+        $caller = ['name' => 'Foo.php', 'file' => 'src/Foo.php', 'line' => 123];
+
+        $dataCollector->collectNormalization('traceIdOne', DateTimeNormalizer::class, 1.0, 'default');
+        $dataCollector->collectNormalization('traceIdOne', BackedEnumNormalizer::class, 2.0, 'default');
+        $dataCollector->collectNormalization('traceIdOne', DateTimeNormalizer::class, 4.0, 'default');
+        $dataCollector->collectNormalization('traceIdOne', ObjectNormalizer::class, 8.0, 'default');
+        $dataCollector->collectEncoding('traceIdOne', JsonEncoder::class, 16.0, 'default');
+        $dataCollector->collectSerialize('traceIdOne', 'data', 'json', [], 32.0, $caller, 'default');
+
+        $dataCollector->collectDenormalization('traceIdTwo', DateTimeNormalizer::class, 1.0, 'default');
+        $dataCollector->collectDenormalization('traceIdTwo', ObjectNormalizer::class, 2.0, 'default');
+        $dataCollector->collectDenormalization('traceIdTwo', ObjectNormalizer::class, 4.0, 'default');
+        $dataCollector->collectDecoding('traceIdTwo', JsonEncoder::class, 8.0, 'default');
+        $dataCollector->collectDecoding('traceIdTwo', CsvEncoder::class, 16.0, 'default');
+        $dataCollector->collectDeserialize('traceIdTwo', 'data', 'type', 'json', [], 32.0, $caller, 'default');
+
+        $dataCollector->lateCollect();
+        $collectedData = $dataCollector->getData();
+
+        $this->assertSame(['time' => 8.0] + $this->getMethodLocation(ObjectNormalizer::class, 'normalize'), $collectedData['serialize'][0]['normalizer']);
+        $this->assertSame([
+            DateTimeNormalizer::class => ['time' => 5.0, 'calls' => 2] + $this->getMethodLocation(DateTimeNormalizer::class, 'normalize'),
+            BackedEnumNormalizer::class => ['time' => 2.0, 'calls' => 1] + $this->getMethodLocation(BackedEnumNormalizer::class, 'normalize'),
+        ], $collectedData['serialize'][0]['normalization']);
+        $this->assertSame(['time' => 16.0] + $this->getMethodLocation(JsonEncoder::class, 'encode'), $collectedData['serialize'][0]['encoder']);
+        $this->assertSame([], $collectedData['serialize'][0]['encoding']);
+
+        $this->assertSame(['time' => 4.0] + $this->getMethodLocation(ObjectNormalizer::class, 'denormalize'), $collectedData['deserialize'][0]['normalizer']);
+        $this->assertSame([
+            DateTimeNormalizer::class => ['time' => 1.0, 'calls' => 1] + $this->getMethodLocation(DateTimeNormalizer::class, 'denormalize'),
+            ObjectNormalizer::class => ['time' => 2.0, 'calls' => 1] + $this->getMethodLocation(ObjectNormalizer::class, 'denormalize'),
+        ], $collectedData['deserialize'][0]['normalization']);
+        $this->assertSame(['time' => 16.0] + $this->getMethodLocation(CsvEncoder::class, 'decode'), $collectedData['deserialize'][0]['encoder']);
+        $this->assertSame([
+            JsonEncoder::class => ['time' => 8.0, 'calls' => 1] + $this->getMethodLocation(JsonEncoder::class, 'decode'),
+        ], $collectedData['deserialize'][0]['encoding']);
+    }
+
+    public function testCollectTracedSerialize()
+    {
+        $dataCollector = new SerializerDataCollector();
+        $serializer = new TraceableSerializer(new Serializer(
+            [new TraceableNormalizer(new DateTimeNormalizer(), $dataCollector), new TraceableNormalizer(new ObjectNormalizer(), $dataCollector)],
+            [new TraceableEncoder(new JsonEncoder(), $dataCollector)],
+        ), $dataCollector);
+
+        $date = new \DateTimeImmutable('2026-09-27 12:00:00 UTC');
+        $data = (object) ['date' => $date, 'child' => (object) ['date' => $date]];
+
+        $this->assertSame('{"date":"2026-09-27T12:00:00+00:00","child":{"date":"2026-09-27T12:00:00+00:00"}}', $serializer->serialize($data, 'json', ['foo' => 'bar']));
+
+        $dataCollector->lateCollect();
+
+        $this->assertSame(1, $dataCollector->getHandledCount());
+
+        $collected = $dataCollector->getData()['serialize'][0];
+
+        $this->assertSame('stdClass', $collected['dataType']);
+        $this->assertSame(['foo' => 'bar'], $collected['context']->getValue(true));
+        $this->assertSame('ObjectNormalizer', $collected['normalizer']['class']);
+        $this->assertSame([DateTimeNormalizer::class => 2, ObjectNormalizer::class => 1], array_map(static fn (array $n) => $n['calls'], $collected['normalization']));
+        $this->assertSame('JsonEncoder', $collected['encoder']['class']);
+        $this->assertSame([], $collected['encoding']);
+    }
+
     public function testCountHandled()
     {
         $dataCollector = new SerializerDataCollector();
@@ -394,6 +468,15 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertSame('ObjectNormalizer', $collectedData['denormalize'][0]['normalizer']['class']);
         $this->assertSame('api', $collectedData['decode'][0]['name']);
         $this->assertSame('JsonEncoder', $collectedData['decode'][0]['encoder']['class']);
+    }
+
+    private function getMethodLocation(string $class, string $method): array
+    {
+        return [
+            'class' => new \ReflectionClass($class)->getShortName(),
+            'file' => new \ReflectionClass($class)->getFileName(),
+            'line' => new \ReflectionMethod($class, $method)->getStartLine(),
+        ];
     }
 
     /**

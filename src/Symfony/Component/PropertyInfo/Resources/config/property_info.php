@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\PropertyInfo\CacheWarmer\PropertyInfoCacheWarmer;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
@@ -43,9 +45,17 @@ return static function (ContainerConfigurator $container) {
             ->private()
             ->tag('cache.pool')
 
+        ->set('property_info.cache.adapter', PhpArrayAdapter::class)
+            ->factory([PhpArrayAdapter::class, 'create'])
+            ->args(['%kernel.build_dir%/property_info.php', service('cache.property_info')])
+
         ->set('property_info.cache', PropertyInfoCacheExtractor::class)
             ->decorate('property_info')
-            ->args([service('property_info.cache.inner'), service('cache.property_info')])
+            ->args([service('property_info.cache.inner'), service('property_info.cache.adapter')])
+
+        ->set('property_info.cache_warmer', PropertyInfoCacheWarmer::class)
+            ->args([service('property_info.cache.inner'), [], '%kernel.build_dir%/property_info.php'])
+            ->tag('kernel.cache_warmer')
 
         // Extractor
         ->set('property_info.reflection_extractor', ReflectionExtractor::class)

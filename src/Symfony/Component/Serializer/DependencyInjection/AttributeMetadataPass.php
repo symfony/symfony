@@ -60,6 +60,10 @@ final class AttributeMetadataPass implements CompilerPassInterface
         $loader = $container->getDefinition('serializer.mapping.attribute_loader')
             ->setArgument(2, $discriminatorMapTypes);
 
+        if ($container->hasDefinition('property_info.cache_warmer')) {
+            $this->addClassesToPropertyInfoCacheWarmer($container, array_keys($taggedClasses + $discriminatorMapTypes));
+        }
+
         if (!$taggedClasses) {
             return;
         }
@@ -106,5 +110,23 @@ final class AttributeMetadataPass implements CompilerPassInterface
         if (!is_a($source->name, $target->name, true)) {
             throw new MappingException(\sprintf('Class "%s" cannot add a discriminator map type for "%s" because it is not a subtype of it.', $source->name, $target->name));
         }
+    }
+
+    /**
+     * @param class-string[] $classes
+     */
+    private function addClassesToPropertyInfoCacheWarmer(ContainerBuilder $container, array $classes): void
+    {
+        if ($container->hasDefinition('serializer.mapping.chain_loader')) {
+            // the classes mapped by files, collected per loader
+            foreach ($container->getDefinition('serializer.mapping.chain_loader')->getArgument(1) as $mappedClasses) {
+                $classes = array_merge($classes, array_keys($mappedClasses));
+            }
+        }
+
+        $warmer = $container->getDefinition('property_info.cache_warmer');
+        $classes = array_unique(array_merge($warmer->getArgument(1), $classes));
+        sort($classes);
+        $warmer->replaceArgument(1, $classes);
     }
 }

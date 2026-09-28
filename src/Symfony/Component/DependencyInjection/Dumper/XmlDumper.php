@@ -454,7 +454,7 @@ class XmlDumper extends Dumper
                     $value = $value->getText();
                 } elseif (\in_array($value, ['null', 'true', 'false'], true)) {
                     $xmlAttr .= ' type="string"';
-                } elseif (\is_string($value) && (is_numeric($value) || preg_match('/^0b[01]*$/', $value) || preg_match('/^0x[0-9a-f]++$/i', $value))) {
+                } elseif (\is_string($value) && (is_numeric($value) || (str_starts_with($value, '0') && (preg_match('/^0b[01]*$/', $value) || preg_match('/^0x[0-9a-f]++$/i', $value))))) {
                     $xmlAttr .= ' type="string"';
                 }
 
@@ -469,6 +469,10 @@ class XmlDumper extends Dumper
 
     private function encode(string $value, int $flags = \ENT_COMPAT): string
     {
+        if (!preg_match('/[^\t\n\x20-\x7E]|[&<>"]/', $value)) {
+            return $value;
+        }
+
         return str_replace("\r", '&#13;', htmlspecialchars($value, \ENT_XML1 | \ENT_SUBSTITUTE | $flags, 'UTF-8'));
     }
 

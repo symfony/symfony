@@ -17,19 +17,25 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
+use Symfony\Bundle\SecurityBundle\EventListener\VoteListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -43,7 +49,6 @@ use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
-use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -143,6 +148,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), mermaidDumper: $mermaidDumper);
         $collector->collect(new Request(), new Response());
+        $collector->lateCollect();
 
         $this->assertTrue($collector->isEnabled());
         $this->assertFalse($collector->isAuthenticated());
@@ -393,12 +399,13 @@ class SecurityDataCollectorTest extends TestCase
         $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
 
         $dataCollector->collect(new Request(), new Response());
+        $dataCollector->lateCollect();
 
-        $actualDecisionLog = $dataCollector->getAccessDecisionLog();
+        $actualDecisionLog = $dataCollector->getAccessDecisionLog()->getValue(true);
 
         $expectedDecisionLog = [[
             'attributes' => ['view'],
-            'object' => new \stdClass(),
+            'object' => [],
             'result' => true,
             'voter_details' => [
                 ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN, 'reasons' => []],
@@ -408,7 +415,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $this->assertEquals($actualDecisionLog, $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
 
-        $actualVoterClasses = array_map(static fn (ClassStub $classStub): string => (string) $classStub, $dataCollector->getVoters());
+        $actualVoterClasses = $dataCollector->getVoters()->getValue(true);
 
         $expectedVoterClasses = [
             $voter1::class,
@@ -479,13 +486,14 @@ class SecurityDataCollectorTest extends TestCase
         $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
 
         $dataCollector->collect(new Request(), new Response());
+        $dataCollector->lateCollect();
 
-        $actualDecisionLog = $dataCollector->getAccessDecisionLog();
+        $actualDecisionLog = $dataCollector->getAccessDecisionLog()->getValue(true);
 
         $expectedDecisionLog = [
             [
                 'attributes' => ['view', 'edit'],
-                'object' => new \stdClass(),
+                'object' => [],
                 'result' => false,
                 'voter_details' => [
                     ['class' => $voter1::class, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED, 'reasons' => []],
@@ -496,7 +504,7 @@ class SecurityDataCollectorTest extends TestCase
             ],
             [
                 'attributes' => ['update'],
-                'object' => new \stdClass(),
+                'object' => [],
                 'result' => true,
                 'voter_details' => [
                     ['class' => $voter1::class, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED, 'reasons' => []],
@@ -507,7 +515,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $this->assertEquals($actualDecisionLog, $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
 
-        $actualVoterClasses = array_map(static fn (ClassStub $classStub): string => (string) $classStub, $dataCollector->getVoters());
+        $actualVoterClasses = $dataCollector->getVoters()->getValue(true);
 
         $expectedVoterClasses = [
             $voter1::class,
@@ -549,8 +557,51 @@ class SecurityDataCollectorTest extends TestCase
         $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
 
         $dataCollector->collect(new Request(), new Response());
+        $dataCollector->lateCollect();
 
-        $this->assertSame([], $dataCollector->getVoters());
+        $this->assertSame([], $dataCollector->getVoters()->getValue());
+    }
+
+    public function testLateCollectReportsTheDecisionsMadeBeforeCollect()
+    {
+        $dispatcher = new EventDispatcher();
+        $accessDecisionManager = new TraceableAccessDecisionManager(new AccessDecisionManager([
+            new TraceableVoter(new RoleVoter(), $dispatcher),
+            new TraceableVoter(new AuthenticatedVoter(new AuthenticationTrustResolver()), $dispatcher),
+        ]));
+        $dispatcher->addSubscriber(new VoteListener($accessDecisionManager));
+        $token = new UsernamePasswordToken(new InMemoryUser('jane', 'password'), 'main', ['ROLE_USER']);
+
+        $accessDecisionManager->decide($token, ['ROLE_USER']);
+
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager);
+        $dataCollector->collect(new Request(), new Response());
+
+        $accessDecisionManager->decide($token, ['IS_AUTHENTICATED']);
+
+        $dataCollector->lateCollect();
+
+        $decisionLog = $dataCollector->getAccessDecisionLog()->getValue(true);
+        $this->assertCount(1, $decisionLog);
+        $this->assertSame(['ROLE_USER'], $decisionLog[0]['attributes']);
+        $this->assertSame([RoleVoter::class], array_column($decisionLog[0]['voter_details'], 'class'));
+        $this->assertSame([RoleVoter::class], $dataCollector->getVoters()->getValue(true));
+    }
+
+    public function testLateCollectAfterUnserialize()
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('jane', 'password', ['ROLE_ADMIN']), 'main', ['ROLE_ADMIN']));
+
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
+        $collector->collect(new Request(), new Response());
+        $collector->lateCollect();
+
+        $collector = unserialize(serialize($collector));
+        $collector->lateCollect();
+
+        $this->assertSame(UsernamePasswordToken::class, $collector->getTokenClass()->getValue());
+        $this->assertStringContainsString('ROLE_ADMIN', $collector->getRolesDiagram());
     }
 
     public static function provideRoles(): array

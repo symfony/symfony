@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 final class MetadataAwareNameConverter implements NameConverterInterface
 {
     /**
-     * @var array<string, array<string, string|null>>
+     * @var array<string, array<string, string|false>>
      */
     private array $normalizeCache = [];
 
@@ -47,12 +47,9 @@ final class MetadataAwareNameConverter implements NameConverterInterface
             return $this->normalizeFallback($propertyName, $class, $format, $context);
         }
 
-        $cacheKey = $this->getCacheKey($class, $context);
-        if (!\array_key_exists($cacheKey, $this->normalizeCache) || !\array_key_exists($propertyName, $this->normalizeCache[$cacheKey])) {
-            $this->normalizeCache[$cacheKey][$propertyName] = $this->getCacheValueForNormalization($propertyName, $class, $context);
-        }
+        $name = $this->normalizeCache[$this->getCacheKey($class, $context)][$propertyName] ??= $this->getCacheValueForNormalization($propertyName, $class, $context) ?? false;
 
-        return $this->normalizeCache[$cacheKey][$propertyName] ?? $this->normalizeFallback($propertyName, $class, $format, $context);
+        return false !== $name ? $name : $this->normalizeFallback($propertyName, $class, $format, $context);
     }
 
     public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string

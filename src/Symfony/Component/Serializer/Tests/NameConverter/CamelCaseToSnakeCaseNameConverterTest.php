@@ -55,6 +55,33 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
         ];
     }
 
+    public function testNormalizeOnlyTheGivenAttributes()
+    {
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter(['fooBar']);
+        $otherNameConverter = new CamelCaseToSnakeCaseNameConverter(['barBaz']);
+
+        $this->assertSame('foo_bar', $nameConverter->normalize('fooBar'));
+        $this->assertSame('barBaz', $nameConverter->normalize('barBaz'));
+        $this->assertSame('fooBar', $otherNameConverter->normalize('fooBar'));
+        $this->assertSame('bar_baz', $otherNameConverter->normalize('barBaz'));
+
+        $this->assertSame('foo_bar', $nameConverter->normalize('fooBar'));
+        $this->assertSame('barBaz', $nameConverter->normalize('barBaz'));
+    }
+
+    public function testNormalizeKeepsConvertingAfterManyNames()
+    {
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('name'.$i.'_foo', $nameConverter->normalize('name'.$i.'Foo'));
+        }
+
+        $this->assertLessThanOrEqual(1001, \count((new \ReflectionProperty($nameConverter, 'normalizeCache'))->getValue($nameConverter)));
+        $this->assertSame('foo_bar', $nameConverter->normalize('fooBar'));
+        $this->assertSame('name1_foo', $nameConverter->normalize('name1Foo'));
+    }
+
     public function testDenormalizeWithContext()
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, true);

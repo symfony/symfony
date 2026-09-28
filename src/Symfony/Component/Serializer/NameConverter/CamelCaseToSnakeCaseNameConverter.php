@@ -27,6 +27,11 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     public const REQUIRE_SNAKE_CASE_PROPERTIES = 'require_snake_case_properties';
 
     /**
+     * @var array<string, string>
+     */
+    private array $normalizeCache = [];
+
+    /**
      * @param string[]|null $attributes     The list of attributes to rename or null for all attributes
      * @param bool          $lowerCamelCase Use lowerCamelCase style
      */
@@ -42,11 +47,18 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
      */
     public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
-        if (null === $this->attributes || \in_array($propertyName, $this->attributes, true)) {
-            return strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)));
+        if (isset($this->normalizeCache[$propertyName])) {
+            return $this->normalizeCache[$propertyName];
         }
 
-        return $propertyName;
+        if (1000 < \count($this->normalizeCache)) {
+            // stop memory leak if there are many keys: denormalizing also calls this method with the keys of the input
+            $this->normalizeCache = \array_slice($this->normalizeCache, 500, null, true);
+        }
+
+        return $this->normalizeCache[$propertyName] = null === $this->attributes || \in_array($propertyName, $this->attributes, true)
+            ? strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)))
+            : $propertyName;
     }
 
     /**

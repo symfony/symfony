@@ -64,6 +64,22 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->normalize($propertyName, SerializedNameDummy::class));
     }
 
+    public function testNormalizeCallsTheFallbackEachTime()
+    {
+        $fallback = $this->createStub(NameConverterInterface::class);
+        $fallback
+            ->method('normalize')
+            ->willReturnCallback(static fn ($propertyName, $class, $format) => $propertyName.'_'.$format)
+        ;
+
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()), $fallback);
+
+        $this->assertSame('baz', $nameConverter->normalize('foo', SerializedNameDummy::class, 'json'));
+        $this->assertSame('baz', $nameConverter->normalize('foo', SerializedNameDummy::class, 'xml'));
+        $this->assertSame('quux_json', $nameConverter->normalize('quux', SerializedNameDummy::class, 'json'));
+        $this->assertSame('quux_xml', $nameConverter->normalize('quux', SerializedNameDummy::class, 'xml'));
+    }
+
     #[DataProvider('attributeProvider')]
     public function testDenormalize(string|int $expected, string|int $propertyName)
     {

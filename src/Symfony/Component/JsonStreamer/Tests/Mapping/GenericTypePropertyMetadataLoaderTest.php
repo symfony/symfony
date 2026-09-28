@@ -57,6 +57,21 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         ], $metadata);
     }
 
+    public function testReplaceGenericsWithMixedInUnion()
+    {
+        $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
+            'nullable' => new PropertyMetadata('nullable', Type::nullable(Type::template('T'))),
+            'union' => new PropertyMetadata('union', Type::union(Type::template('T'), Type::string())),
+        ]), new TypeContextFactory(new StringTypeResolver()));
+
+        $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::mixed())]);
+
+        $this->assertEquals([
+            'nullable' => new PropertyMetadata('nullable', Type::mixed()),
+            'union' => new PropertyMetadata('union', Type::mixed()),
+        ], $metadata);
+    }
+
     /**
      * @param array<string, PropertyMetadata> $propertiesMetadata
      */

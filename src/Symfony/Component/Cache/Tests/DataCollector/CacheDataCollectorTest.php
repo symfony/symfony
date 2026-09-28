@@ -166,6 +166,26 @@ class CacheDataCollectorTest extends TestCase
         $this->assertInstanceOf(Data::class, $collector->getCalls());
     }
 
+    public function testLateCollectAfterCollect()
+    {
+        $adapter = new TraceableAdapter(new NullAdapter());
+
+        $collector = new CacheDataCollector();
+        $collector->addInstance(self::INSTANCE_NAME, $adapter);
+
+        $adapter->get('foo', static fn () => 123);
+        $collector->collect(new Request(), new Response());
+        $adapter->get('bar', static fn () => 234);
+        $collector->lateCollect();
+
+        $stats = $collector->getStatistics();
+        $this->assertSame(2, $stats[self::INSTANCE_NAME]['calls'], 'calls');
+        $this->assertSame(2, $stats[self::INSTANCE_NAME]['misses'], 'misses');
+        $this->assertSame(2, $collector->getTotals()['calls']);
+        $this->assertInstanceOf(Data::class, $calls = $collector->getCalls());
+        $this->assertCount(2, $calls[self::INSTANCE_NAME]);
+    }
+
     private function getCacheDataCollectorStatisticsFromEvents(array $traceableAdapterEvents)
     {
         $traceableAdapterMock = $this->createStub(TraceableAdapter::class);

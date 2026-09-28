@@ -138,7 +138,7 @@ final class StringTypeResolver implements TypeResolverInterface
         if ($node instanceof ObjectShapeNode) {
             $shape = [];
             foreach ($node->items as $item) {
-                $shape[(string) $item->keyName] = [
+                $shape[$item->keyName instanceof ConstExprStringNode ? $item->keyName->value : (string) $item->keyName] = [
                     'type' => $this->getTypeFromNode($item->valueType, $typeContext),
                     'optional' => $item->optional,
                 ];

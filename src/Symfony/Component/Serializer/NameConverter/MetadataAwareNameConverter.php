@@ -177,7 +177,7 @@ final class MetadataAwareNameConverter implements NameConverterInterface
 
     private function getCacheKey(string $class, array $context): string
     {
-        if (isset($context['cache_key'])) {
+        if ($context['cache_key'] ?? false) {
             return $class.'-'.$context['cache_key'];
         }
 

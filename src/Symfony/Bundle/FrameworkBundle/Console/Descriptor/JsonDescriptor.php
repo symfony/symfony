@@ -16,6 +16,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
@@ -461,6 +462,18 @@ class JsonDescriptor extends Descriptor
             $data = ['type' => 'lazy_proxy', 'id' => (string) $reference];
             if ($interfaces) {
                 $data['interfaces'] = $interfaces;
+            }
+
+            return $data;
+        }
+
+        if ($value instanceof EnvClosureArgument) {
+            $data = ['type' => 'env_closure', 'value' => $value->getValue()];
+            if (null !== $default = $value->getDefault()) {
+                $data['default'] = $default;
+            }
+            if ($value->isStringable()) {
+                $data['stringable'] = true;
             }
 
             return $data;

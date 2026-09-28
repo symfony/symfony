@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
@@ -233,6 +234,8 @@ class ObjectsProvider
                 ->addArgument(new AbstractArgument('placeholder'))
                 ->addArgument(new LazyProxyArgument(new Reference('.definition_2')))
                 ->addArgument(new LazyProxyArgument(new Reference('.definition_2'), ['Full\\Qualified\\Interface1', 'Full\\Qualified\\Interface2']))
+                ->addArgument(new EnvClosureArgument('%env(FOO)%'))
+                ->addArgument(new EnvClosureArgument('%env(BAR)%', 'baz', true))
                 ->setFactory(['Full\\Qualified\\FactoryClass', 'get']),
             '.definition_2' => $definition2
                 ->setPublic(false)

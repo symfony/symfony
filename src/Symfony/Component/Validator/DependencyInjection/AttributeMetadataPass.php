@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MappingException;
 
 /**
@@ -25,6 +26,8 @@ final class AttributeMetadataPass implements CompilerPassInterface
         if (!$container->hasDefinition('validator.builder')) {
             return;
         }
+
+        $this->tagClassesWithConstraintsOnNonPublicMembers($container);
 
         $resolve = $container->getParameterBag()->resolveValue(...);
         $mappedClasses = [];
@@ -92,5 +95,44 @@ final class AttributeMetadataPass implements CompilerPassInterface
         $classes = array_unique(array_merge($warmer->getArgument(1), $classes));
         sort($classes);
         $warmer->replaceArgument(1, $classes);
+    }
+
+    /**
+     * Tags the classes that have constraint attributes on non-public members only.
+     *
+     * Attribute autoconfiguration looks at public members only, while the attribute loader reads all of them.
+     */
+    private function tagClassesWithConstraintsOnNonPublicMembers(ContainerBuilder $container): void
+    {
+        $autoconfigurators = $container->getAttributeAutoconfigurators();
+
+        if (!isset($autoconfigurators[Constraint::class])) {
+            return;
+        }
+
+        foreach ($container->getDefinitions() as $definition) {
+            if ($definition->hasTag('validator.attribute_metadata')
+                || !$definition->isAutoconfigured()
+                || ($definition->isAbstract() && !$definition->hasTag('container.excluded'))
+                || $definition->hasTag('container.ignore_attributes')
+                || !$class = $container->getReflectionClass($definition->getClass(), false)
+            ) {
+                continue;
+            }
+
+            foreach ($class->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE) as $member) {
+                if (!$member->isStatic() && $member->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+                    $definition->addTag('validator.attribute_metadata');
+                    continue 2;
+                }
+            }
+
+            foreach ($class->getMethods(\ReflectionMethod::IS_PROTECTED | \ReflectionMethod::IS_PRIVATE) as $member) {
+                if (!$member->isConstructor() && !$member->isDestructor() && $member->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+                    $definition->addTag('validator.attribute_metadata');
+                    continue 2;
+                }
+            }
+        }
     }
 }

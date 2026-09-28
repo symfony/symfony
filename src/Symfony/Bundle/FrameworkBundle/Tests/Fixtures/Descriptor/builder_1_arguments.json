@@ -85,6 +85,16 @@
                         "Full\\Qualified\\Interface1",
                         "Full\\Qualified\\Interface2"
                     ]
+                },
+                {
+                    "type": "env_closure",
+                    "value": "%env(FOO)%"
+                },
+                {
+                    "type": "env_closure",
+                    "value": "%env(BAR)%",
+                    "default": "baz",
+                    "stringable": true
                 }
             ],
             "file": null,

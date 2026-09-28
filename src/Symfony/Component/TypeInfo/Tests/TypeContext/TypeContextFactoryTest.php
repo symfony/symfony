@@ -261,7 +261,7 @@ class TypeContextFactoryTest extends TestCase
 
     public function testCollectTypeAliasesOfClassFromReflection()
     {
-        $typeAliases = ['CustomInt' => Type::int(), 'PsalmCustomInt' => Type::int()];
+        $typeAliases = ['CustomInt' => Type::int(), 'PsalmCustomInt' => Type::int(), 'QuotedKeysArray' => Type::arrayShape(["it's" => Type::int(), 'quoted key' => Type::int()])];
 
         $this->assertEquals($typeAliases, $this->typeContextFactory->createFromReflection(new \ReflectionClass(DummyWithPhpDoc::class))->typeAliases);
         $this->assertEquals($typeAliases, $this->typeContextFactory->createFromReflection(new \ReflectionProperty(DummyWithPhpDoc::class, 'aliasedInt'))->typeAliases);

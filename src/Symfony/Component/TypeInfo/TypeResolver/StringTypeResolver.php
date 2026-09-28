@@ -76,7 +76,7 @@ final class StringTypeResolver implements TypeResolverInterface
             $this->parser = $parser ?? new TypeParser($config = new ParserConfig([]), new ConstExprParser($config));
         } else {
             $this->lexer = $lexer ?? new Lexer();
-            $this->parser = $parser ?? new TypeParser(new ConstExprParser());
+            $this->parser = $parser ?? new TypeParser(new ConstExprParser(true, true), true);
         }
     }
 
@@ -138,7 +138,7 @@ final class StringTypeResolver implements TypeResolverInterface
         if ($node instanceof ObjectShapeNode) {
             $shape = [];
             foreach ($node->items as $item) {
-                $shape[(string) $item->keyName] = [
+                $shape[$item->keyName instanceof ConstExprStringNode ? $item->keyName->value : (string) $item->keyName] = [
                     'type' => $this->getTypeFromNode($item->valueType, $typeContext),
                     'optional' => $item->optional,
                 ];
@@ -198,14 +198,14 @@ final class StringTypeResolver implements TypeResolverInterface
                 return CollectionType::mergeCollectionValueTypes($types);
             }
 
-            return match ($node->constExpr::class) {
-                ConstExprArrayNode::class => Type::array(),
-                ConstExprFalseNode::class => Type::false(),
-                ConstExprFloatNode::class => Type::float(),
-                ConstExprIntegerNode::class => Type::int(),
-                ConstExprNullNode::class => Type::null(),
-                ConstExprStringNode::class => Type::string(),
-                ConstExprTrueNode::class => Type::true(),
+            return match (true) {
+                $node->constExpr instanceof ConstExprArrayNode => Type::array(),
+                $node->constExpr instanceof ConstExprFalseNode => Type::false(),
+                $node->constExpr instanceof ConstExprFloatNode => Type::float(),
+                $node->constExpr instanceof ConstExprIntegerNode => Type::int(),
+                $node->constExpr instanceof ConstExprNullNode => Type::null(),
+                $node->constExpr instanceof ConstExprStringNode => Type::string(),
+                $node->constExpr instanceof ConstExprTrueNode => Type::true(),
                 default => throw new \DomainException(\sprintf('Unhandled "%s" constant expression.', $node->constExpr::class)),
             };
         }

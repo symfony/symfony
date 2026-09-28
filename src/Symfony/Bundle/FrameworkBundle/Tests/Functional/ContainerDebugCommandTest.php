@@ -247,6 +247,21 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('You have requested a non-existent parameter ".unknown".', $tester->getDisplay());
     }
 
+    public function testDescribeServiceWithEnvClosureArguments()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', 'name' => 'env_closure'], ['decorated' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('Env closure (%env(REAL)%)', $tester->getDisplay());
+        $this->assertStringContainsString('Stringable env closure (%env(UNKNOWN)%, default: foo)', $tester->getDisplay());
+    }
+
     public function testDescribeEnvVars()
     {
         $_SERVER['SYMFONY_DOTENV_VARS'] = 'APP_FOO,APP_BAR,APP_BAZ';

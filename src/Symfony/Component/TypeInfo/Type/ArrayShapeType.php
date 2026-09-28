@@ -125,7 +125,7 @@ final class ArrayShapeType extends CollectionType
         $items = [];
 
         foreach ($this->shape as $key => $value) {
-            $itemKey = \is_int($key) ? (string) $key : \sprintf("'%s'", $key);
+            $itemKey = \is_int($key) ? (string) $key : \sprintf("'%s'", addcslashes($key, "'\\"));
             if ($value['optional'] ?? false) {
                 $itemKey = \sprintf('%s?', $itemKey);
             }

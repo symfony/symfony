@@ -40,6 +40,11 @@ services:
             - '%env(REAL)%'
             - '%env(REAL)%'
             - '%env(APP_BAZ)%'
+    env_closure:
+        class: stdClass
+        arguments:
+            - !env_closure '%env(REAL)%'
+            - !env_closure ['%env(UNKNOWN)%', 'foo', true]
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ContainerExcluded:
         tags: ['container.excluded']
 

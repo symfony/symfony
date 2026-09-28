@@ -13,9 +13,11 @@ namespace Symfony\Component\JsonStreamer\Mapping;
 
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
@@ -126,6 +128,14 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
             return Type::intersection(...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes()));
         }
 
+        if ($type instanceof ArrayShapeType) {
+            return new ArrayShapeType(
+                array_map(fn (array $item): array => ['type' => $this->replaceVariableTypes($item['type'], $variableTypes)] + $item, $type->getShape()),
+                $type->getExtraKeyType() ? $this->replaceVariableTypes($type->getExtraKeyType(), $variableTypes) : null,
+                $type->getExtraValueType() ? $this->replaceVariableTypes($type->getExtraValueType(), $variableTypes) : null,
+            );
+        }
+
         if ($type instanceof CollectionType) {
             return new CollectionType($this->replaceVariableTypes($type->getWrappedType(), $variableTypes), $type->isList());
         }
@@ -135,6 +145,10 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
                 $this->replaceVariableTypes($type->getWrappedType(), $variableTypes),
                 ...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getVariableTypes()),
             );
+        }
+
+        if ($type instanceof ObjectShapeType) {
+            return new ObjectShapeType(array_map(fn (array $item): array => ['type' => $this->replaceVariableTypes($item['type'], $variableTypes)] + $item, $type->getShape()));
         }
 
         return $type;

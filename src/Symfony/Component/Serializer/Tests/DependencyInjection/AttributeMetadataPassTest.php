@@ -12,9 +12,16 @@
 namespace Symfony\Component\Serializer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMapType;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Serializer\Exception\MappingException;
+use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 
@@ -233,6 +240,82 @@ class AttributeMetadataPassTest extends TestCase
         ];
         $this->assertSame($expectedClasses, $container->getDefinition('property_info.cache_warmer')->getArgument(1));
     }
+
+    public function testProcessDiscoversAttributesOnNonPublicMembers()
+    {
+        $container = $this->createContainerWithAutoconfiguredAttributes();
+
+        foreach ([_AttrMeta_PublicProperty::class, _AttrMeta_PrivateProperty::class, _AttrMeta_PrivatePromotedProperty::class, _AttrMeta_ProtectedMethod::class, _AttrMeta_NoAttribute::class, _AttrMeta_DiscriminatorChildWithPrivateProperty::class] as $class) {
+            $container->register($class, $class)->setAutoconfigured(true);
+        }
+        $container->register('not_autoconfigured', _AttrMeta_NotAutoconfigured::class);
+        $container->register('ignored', _AttrMeta_IgnoredAttributes::class)
+            ->setAutoconfigured(true)
+            ->addTag('container.ignore_attributes');
+
+        $this->processPasses($container);
+
+        $expectedClasses = [
+            _AttrMeta_DiscriminatorChildWithPrivateProperty::class => [_AttrMeta_DiscriminatorChildWithPrivateProperty::class],
+            _AttrMeta_PrivatePromotedProperty::class => [_AttrMeta_PrivatePromotedProperty::class],
+            _AttrMeta_PrivateProperty::class => [_AttrMeta_PrivateProperty::class],
+            _AttrMeta_ProtectedMethod::class => [_AttrMeta_ProtectedMethod::class],
+            _AttrMeta_PublicProperty::class => [_AttrMeta_PublicProperty::class],
+        ];
+        $this->assertSame($expectedClasses, $container->getDefinition('serializer.mapping.attribute_loader')->getArgument(1));
+    }
+
+    public function testNonPublicMembersAreLoadedWhenAttributesAreDiscoveredAtCompileTimeOnly()
+    {
+        $container = $this->createContainerWithAutoconfiguredAttributes();
+        $container->register('dto', _AttrMeta_PrivatePromotedProperty::class)->setAutoconfigured(true);
+
+        $this->processPasses($container);
+
+        $loader = new AttributeLoader(false, $container->getDefinition('serializer.mapping.attribute_loader')->getArgument(1));
+        $metadata = new ClassMetadata(_AttrMeta_PrivatePromotedProperty::class);
+
+        $this->assertTrue($loader->loadClassMetadata($metadata));
+        $this->assertSame(['read'], $metadata->getAttributesMetadata()['id']->getGroups());
+        $this->assertSame('identifier', $metadata->getAttributesMetadata()['id']->getSerializedName());
+    }
+
+    public function testNonPublicMembersAreIgnoredWhenAttributesAreNotAutoconfigured()
+    {
+        $container = new ContainerBuilder();
+        $container->register('serializer.mapping.attribute_loader', AttributeLoader::class)
+            ->setArguments([true, []]);
+        $container->register('dto', _AttrMeta_PrivateProperty::class)->setAutoconfigured(true);
+
+        $this->processPasses($container);
+
+        $this->assertSame([true, [], []], $container->getDefinition('serializer.mapping.attribute_loader')->getArguments());
+    }
+
+    private function createContainerWithAutoconfiguredAttributes(): ContainerBuilder
+    {
+        $container = new ContainerBuilder();
+        $container->register('serializer.mapping.attribute_loader', AttributeLoader::class)
+            ->setArguments([false, []]);
+
+        $configurator = static function (ChildDefinition $definition, object $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflector) {
+            $definition->addTag('serializer.attribute_metadata');
+        };
+        $container->registerAttributeForAutoconfiguration(Groups::class, $configurator);
+        $container->registerAttributeForAutoconfiguration(SerializedName::class, $configurator);
+        $container->registerAttributeForAutoconfiguration(DiscriminatorMapType::class, static function (ChildDefinition $definition, DiscriminatorMapType $attribute) {
+            $definition->addTag('serializer.attribute_metadata', ['for' => $attribute->class, 'type' => $attribute->type, 'discriminator_map_type' => true]);
+        });
+
+        return $container;
+    }
+
+    private function processPasses(ContainerBuilder $container): void
+    {
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new AttributeMetadataPass())->process($container);
+    }
 }
 
 class _AttrMeta_Source
@@ -268,4 +351,59 @@ class _AttrMeta_DiscriminatorChild extends _AttrMeta_DiscriminatorParent
 
 class _AttrMeta_SecondDiscriminatorChild extends _AttrMeta_DiscriminatorParent
 {
+}
+
+class _AttrMeta_PublicProperty
+{
+    #[Groups(['read'])]
+    public string $name;
+}
+
+class _AttrMeta_PrivateProperty
+{
+    #[Groups(['read'])]
+    private string $name;
+}
+
+class _AttrMeta_PrivatePromotedProperty
+{
+    public function __construct(
+        #[Groups(['read'])]
+        #[SerializedName('identifier')]
+        private int $id,
+    ) {
+    }
+}
+
+class _AttrMeta_ProtectedMethod
+{
+    #[Groups(['read'])]
+    protected function getName(): string
+    {
+        return '';
+    }
+}
+
+class _AttrMeta_NoAttribute
+{
+    private string $name;
+}
+
+class _AttrMeta_NotAutoconfigured
+{
+    #[Groups(['read'])]
+    private string $name;
+}
+
+class _AttrMeta_IgnoredAttributes
+{
+    #[Groups(['read'])]
+    private string $name;
+}
+
+#[DiscriminatorMapType('private', _AttrMeta_DiscriminatorParent::class)]
+class _AttrMeta_DiscriminatorChildWithPrivateProperty extends _AttrMeta_DiscriminatorParent
+{
+    #[Groups(['read'])]
+    private string $name;
 }

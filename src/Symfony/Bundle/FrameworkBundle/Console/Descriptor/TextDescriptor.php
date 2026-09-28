@@ -18,6 +18,7 @@ use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -428,6 +429,8 @@ class TextDescriptor extends Descriptor
                     $argumentsInformation[] = \sprintf('Service locator (%d element(s))', \count($argument->getValues()));
                 } elseif ($argument instanceof LazyProxyArgument) {
                     $argumentsInformation[] = self::formatLazyProxyArgument($argument);
+                } elseif ($argument instanceof EnvClosureArgument) {
+                    $argumentsInformation[] = \sprintf('%s (%s%s)', $argument->isStringable() ? 'Stringable env closure' : 'Env closure', $argument->getValue(), null !== $argument->getDefault() ? ', default: '.$this->formatParameter($argument->getDefault()) : '');
                 } elseif ($argument instanceof Definition) {
                     $argumentsInformation[] = 'Inlined Service';
                 } elseif ($argument instanceof \UnitEnum) {

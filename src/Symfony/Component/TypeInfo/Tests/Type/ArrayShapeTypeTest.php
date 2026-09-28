@@ -146,6 +146,12 @@ class ArrayShapeTypeTest extends TestCase
         ]);
         $this->assertSame("array{'bar'?: string, 'foo': bool}", (string) $type);
 
+        $type = new ArrayShapeType([
+            "it's" => ['type' => Type::bool()],
+            'a\\' => ['type' => Type::int()],
+        ]);
+        $this->assertSame("array{'a\\\\': int, 'it\\'s': bool}", (string) $type);
+
         $type = new ArrayShapeType(
             shape: ['foo' => ['type' => Type::bool()]],
             extraKeyType: Type::arrayKey(),

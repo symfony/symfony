@@ -29,5 +29,7 @@
                    Abstract argument (placeholder)                                                                              
                    Lazy Proxy for Service(.definition_2)                                                                        
                    Lazy Proxy for Service(.definition_2) implementing "Full\Qualified\Interface1", "Full\Qualified\Interface2"  
+                   Env closure (%env(FOO)%)                                                                                     
+                   Stringable env closure (%env(BAR)%, default: baz)                                                            
   Usages           alias_1                                                                                                      
  ---------------- -------------------------------------------------------------------------------------------------------------

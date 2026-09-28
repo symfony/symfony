@@ -109,8 +109,8 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
                     if ($value instanceof Definition && ($value->getBindings() || $value->getInstanceofConditionals())) {
                         $this->unprocessed[] = [$value->getBindings(), $value->getInstanceofConditionals()];
                     }
-                    parent::processValue($clone = clone $value, $isRoot);
-                    $this->resolved[$value] = (array) $clone === (array) $value ? $value : $clone;
+                    $resolved = parent::processValue($clone = clone $value, $isRoot);
+                    $this->resolved[$value] = $resolved === $clone && (array) $clone === (array) $value ? $value : $resolved;
                 }
 
                 return $this->resolved[$value];

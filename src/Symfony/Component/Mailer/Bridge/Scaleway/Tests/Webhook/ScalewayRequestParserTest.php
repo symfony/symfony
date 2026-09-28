@@ -26,6 +26,8 @@ use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 #[Group('time-sensitive')]
 class ScalewayRequestParserTest extends AbstractRequestParserTestCase
 {
+    private const TOPIC_ARN = 'arn:scw:sns:fr-par:project-8c8bfa06:mailer-events';
+
     public static function getStaleClockOffsets(): iterable
     {
         yield 'too old' => [28801];
@@ -69,6 +71,11 @@ class ScalewayRequestParserTest extends AbstractRequestParserTestCase
         );
     }
 
+    protected function getSecret(): string
+    {
+        return self::TOPIC_ARN;
+    }
+
     protected function createRequest(string $payload): Request
     {
         ClockMock::withClockMock(1768473001);
@@ -76,7 +83,7 @@ class ScalewayRequestParserTest extends AbstractRequestParserTestCase
         $envelope = [
             'Type' => 'Notification',
             'MessageId' => '9ae5c56c-6c9c-42e5-b0b1-0fe0f8bbdbf7',
-            'TopicArn' => 'arn:scw:sns:fr-par:project-8c8bfa06:mailer-events',
+            'TopicArn' => self::TOPIC_ARN,
             'Message' => $payload,
             'Timestamp' => '2026-01-15T10:30:01.000Z',
             'SignatureVersion' => '2',

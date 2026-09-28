@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Mailer\Bridge\Scaleway\RemoteEvent\ScalewayPayloadConverter;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\RemoteEvent\Event\Mailer\AbstractMailerEvent;
 use Symfony\Component\RemoteEvent\Exception\ParseException;
@@ -67,6 +68,10 @@ final class ScalewayRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
+
         try {
             $payload = $request->toArray();
         } catch (JsonException) {
@@ -77,6 +82,10 @@ final class ScalewayRequestParser extends AbstractRequestParser
             if (!\is_string($payload[$key] ?? null)) {
                 throw new RejectWebhookException(406, 'Payload is malformed.');
             }
+        }
+
+        if (!hash_equals($secret, $payload['TopicArn'])) {
+            throw new RejectWebhookException(406, 'Topic ARN does not match the expected value.');
         }
 
         if (!$timestamp = \DateTimeImmutable::createFromFormat(self::TIMESTAMP_FORMAT, $payload['Timestamp'], new \DateTimeZone('UTC'))) {

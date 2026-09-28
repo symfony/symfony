@@ -20,9 +20,20 @@ where:
 Webhook
 -------
 
-Scaleway delivers email events through [Scaleway Topics and Events][topics-and-events],
-which signs each message instead of sharing a secret. That's why the `secret`
-option is not needed for this provider.
+Scaleway delivers email events through [Scaleway Topics and Events][topics-and-events], which signs each message instead of sharing a secret.
+That signature proves that Scaleway sent the message, not that it was published to your topic.
+This is why the webhook `secret` option is required and must hold the ARN of your topic, as sent in the `TopicArn` field of its messages:
+
+```yaml
+framework:
+    webhook:
+        routing:
+            scaleway:
+                service: mailer.webhook.request_parser.scaleway
+                secret: '%env(SCALEWAY_TOPIC_ARN)%'
+```
+
+Messages published to any other topic are rejected before the bridge makes any request.
 
 The bridge verifies the signature with the certificate referenced by the
 `SigningCertURL` field of the message, after checking that the Scaleway

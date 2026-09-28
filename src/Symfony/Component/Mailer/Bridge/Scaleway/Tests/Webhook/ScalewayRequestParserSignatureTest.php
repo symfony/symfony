@@ -21,6 +21,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Scaleway\RemoteEvent\ScalewayPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Scaleway\Webhook\ScalewayRequestParser;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\RemoteEvent\Event\Mailer\MailerDeliveryEvent;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -29,6 +30,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[Group('time-sensitive')]
 class ScalewayRequestParserSignatureTest extends TestCase
 {
+    private const TOPIC_ARN = 'arn:scw:sns:fr-par:project-8c8bfa06:mailer-events';
+
     public static function getMalformedTimestamps(): iterable
     {
         yield 'no milliseconds' => ['2026-01-15T10:30:01Z'];
@@ -45,7 +48,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
 
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('Payload is malformed.');
-        $parser->parse($this->createRequest($envelope), '');
+        $parser->parse($this->createRequest($envelope), self::TOPIC_ARN);
     }
 
     public function testRejectsTamperedPayload()
@@ -56,7 +59,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
 
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('Signature is invalid.');
-        $parser->parse($this->createRequest($envelope), '');
+        $parser->parse($this->createRequest($envelope), self::TOPIC_ARN);
     }
 
     #[DataProvider('provideNonStringSignedFields')]
@@ -68,7 +71,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
 
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('Payload is malformed.');
-        $parser->parse($this->createRequest($envelope), '');
+        $parser->parse($this->createRequest($envelope), self::TOPIC_ARN);
     }
 
     public static function provideNonStringSignedFields(): iterable
@@ -87,7 +90,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
 
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('Signature is invalid.');
-        $parser->parse($this->createRequest($envelope), '');
+        $parser->parse($this->createRequest($envelope), self::TOPIC_ARN);
     }
 
     #[DataProvider('provideForeignSigningCertUrls')]
@@ -98,7 +101,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
 
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('The signing certificate URL must point to Scaleway over HTTPS.');
-        $parser->parse($this->createRequest($envelope), '');
+        $parser->parse($this->createRequest($envelope), self::TOPIC_ARN);
     }
 
     public static function provideForeignSigningCertUrls(): iterable
@@ -120,7 +123,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
         $envelope = $this->createSignedEnvelope(certUrl: 'https://messaging.s3.nl-ams.scw.cloud/nl-ams/sns/sns_certificate_123.crt');
         $parser = $this->createParser($this->createCertClient());
 
-        $this->assertInstanceOf(MailerDeliveryEvent::class, $parser->parse($this->createRequest($envelope), ''));
+        $this->assertInstanceOf(MailerDeliveryEvent::class, $parser->parse($this->createRequest($envelope), self::TOPIC_ARN));
     }
 
     public function testRejectsUnsupportedSignatureVersion()
@@ -131,7 +134,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
 
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('Unsupported signature version "3".');
-        $parser->parse($this->createRequest($envelope), '');
+        $parser->parse($this->createRequest($envelope), self::TOPIC_ARN);
     }
 
     public function testAcceptsSha1Signature()
@@ -139,7 +142,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
         $envelope = $this->createSignedEnvelope(signatureVersion: '1');
         $parser = $this->createParser($this->createCertClient());
 
-        $event = $parser->parse($this->createRequest($envelope), '');
+        $event = $parser->parse($this->createRequest($envelope), self::TOPIC_ARN);
 
         $this->assertInstanceOf(MailerDeliveryEvent::class, $event);
         $this->assertSame(MailerDeliveryEvent::DELIVERED, $event->getName());
@@ -156,9 +159,36 @@ class ScalewayRequestParserSignatureTest extends TestCase
         $parser = $this->createParser($client);
         $envelope = $this->createSignedEnvelope(type: 'SubscriptionConfirmation');
 
-        $this->assertNull($parser->parse($this->createRequest($envelope), ''));
+        $this->assertNull($parser->parse($this->createRequest($envelope), self::TOPIC_ARN));
         $this->assertCount(2, $requests);
         $this->assertSame(['GET', 'https://messaging.s3.fr-par.scw.cloud/subscribe?token=abc'], $requests[1]);
+    }
+
+    public static function provideMessageTypes(): iterable
+    {
+        yield 'Notification' => ['Notification'];
+        yield 'SubscriptionConfirmation' => ['SubscriptionConfirmation'];
+        yield 'UnsubscribeConfirmation' => ['UnsubscribeConfirmation'];
+    }
+
+    #[DataProvider('provideMessageTypes')]
+    public function testRejectsUnexpectedTopicWithoutMakingARequest(string $type)
+    {
+        $envelope = $this->createSignedEnvelope(type: $type, topicArn: 'arn:scw:sns:fr-par:attacker:mailer-events');
+        $parser = $this->createParser(new MockHttpClient(static fn () => throw new \LogicException('No request should be made.')));
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Topic ARN does not match the expected value.');
+        $parser->parse($this->createRequest($envelope), self::TOPIC_ARN);
+    }
+
+    public function testRequiresANonEmptySecret()
+    {
+        $parser = $this->createParser(new MockHttpClient(static fn () => throw new \LogicException('No request should be made.')));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+        $parser->parse($this->createRequest($this->createSignedEnvelope(type: 'SubscriptionConfirmation')), '');
     }
 
     public function testIgnoresUnsubscribeConfirmation()
@@ -166,7 +196,7 @@ class ScalewayRequestParserSignatureTest extends TestCase
         $envelope = $this->createSignedEnvelope(type: 'UnsubscribeConfirmation');
         $parser = $this->createParser($this->createCertClient());
 
-        $this->assertNull($parser->parse($this->createRequest($envelope), ''));
+        $this->assertNull($parser->parse($this->createRequest($envelope), self::TOPIC_ARN));
     }
 
     public function testCertificateIsCached()
@@ -179,8 +209,8 @@ class ScalewayRequestParserSignatureTest extends TestCase
         });
         $parser = $this->createParser($client, new ArrayAdapter());
 
-        $this->assertInstanceOf(MailerDeliveryEvent::class, $parser->parse($this->createRequest($this->createSignedEnvelope()), ''));
-        $this->assertInstanceOf(MailerDeliveryEvent::class, $parser->parse($this->createRequest($this->createSignedEnvelope()), ''));
+        $this->assertInstanceOf(MailerDeliveryEvent::class, $parser->parse($this->createRequest($this->createSignedEnvelope()), self::TOPIC_ARN));
+        $this->assertInstanceOf(MailerDeliveryEvent::class, $parser->parse($this->createRequest($this->createSignedEnvelope()), self::TOPIC_ARN));
         $this->assertSame(1, $fetchCount);
     }
 
@@ -197,11 +227,11 @@ class ScalewayRequestParserSignatureTest extends TestCase
         $parser = $this->createParser($client, $cache);
 
         // prime the cache with the old certificate
-        $parser->parse($this->createRequest($this->createSignedEnvelope(key: __DIR__.'/Fixtures/signing2.key')), '');
+        $parser->parse($this->createRequest($this->createSignedEnvelope(key: __DIR__.'/Fixtures/signing2.key')), self::TOPIC_ARN);
 
         // the certificate has been rotated: the cached one no longer matches the signature
         $servedCert = __DIR__.'/Fixtures/signing.crt';
-        $event = $parser->parse($this->createRequest($this->createSignedEnvelope()), '');
+        $event = $parser->parse($this->createRequest($this->createSignedEnvelope()), self::TOPIC_ARN);
 
         $this->assertInstanceOf(MailerDeliveryEvent::class, $event);
         $this->assertSame(2, $fetchCount);
@@ -217,12 +247,12 @@ class ScalewayRequestParserSignatureTest extends TestCase
         return new MockHttpClient(static fn () => new MockResponse(file_get_contents(__DIR__.'/Fixtures/signing.crt')));
     }
 
-    private function createSignedEnvelope(string $type = 'Notification', string $key = __DIR__.'/Fixtures/signing.key', string $certUrl = 'https://messaging.s3.fr-par.scw.cloud/certs/cert-11111111.pem', string $signatureVersion = '2', string $timestamp = '2026-01-15T10:30:01.000Z'): array
+    private function createSignedEnvelope(string $type = 'Notification', string $key = __DIR__.'/Fixtures/signing.key', string $certUrl = 'https://messaging.s3.fr-par.scw.cloud/certs/cert-11111111.pem', string $signatureVersion = '2', string $timestamp = '2026-01-15T10:30:01.000Z', string $topicArn = self::TOPIC_ARN): array
     {
         $envelope = [
             'Type' => $type,
             'MessageId' => '9ae5c56c-6c9c-42e5-b0b1-0fe0f8bbdbf7',
-            'TopicArn' => 'arn:scw:sns:fr-par:project-8c8bfa06:mailer-events',
+            'TopicArn' => $topicArn,
             'Message' => json_encode(['type' => 'email_delivered', 'id' => 'af5c1aac-cf1b-4d4d-9e46-e6d0cd40b81c', 'email_id' => 'd4fbec9d-eed9-44d5-af47-c1126467a5ca', 'created_at' => '2026-01-15T10:30:00Z', 'email_to' => 'recipient@example.com']),
             'Timestamp' => $timestamp,
             'SignatureVersion' => $signatureVersion,

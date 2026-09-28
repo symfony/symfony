@@ -693,4 +693,13 @@ class HtmlSanitizerAllTest extends TestCase
         $sanitizer = new HtmlSanitizer($config);
         self::assertSame('<foo><div><p><a>Hello</a></p></div></foo>', $sanitizer->sanitize('<foo data-attr="value"><div class="foo"><p><a target="_blank">Hello<span> World</span></a></p></div></foo>'));
     }
+
+    public function testAllowByDefaultSkipsComments()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->defaultAction(HtmlSanitizerAction::Allow);
+
+        $sanitizer = new HtmlSanitizer($config);
+        self::assertSame('a<p>b</p>d', $sanitizer->sanitize('a<!-- secret --><p>b<?php echo 1 ?></p><![CDATA[c]]>d'));
+    }
 }

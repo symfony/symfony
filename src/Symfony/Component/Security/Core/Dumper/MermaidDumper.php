@@ -22,6 +22,14 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 class MermaidDumper
 {
     /**
+     * Ids that break the diagram: the Mermaid keywords, and the properties every JavaScript object has, since the layout engine stores nodes in plain objects keyed by id.
+     */
+    private const RESERVED_IDS = [
+        'call', 'class', 'classDef', 'click', 'end', 'flowchart', 'graph', 'href', 'interpolate', 'linkStyle', 'style', 'subgraph', '_blank', '_parent', '_self', '_top',
+        '__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__', '__proto__', 'constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', 'toString', 'valueOf',
+    ];
+
+    /**
      * Dumps the role hierarchy as a Mermaid flowchart.
      *
      * @param RoleHierarchyInterface $roleHierarchy The role hierarchy to dump
@@ -37,14 +45,15 @@ class MermaidDumper
 
         $output = ["graph {$direction->value}"];
         $allRoles = $this->getAllRoles($hierarchy);
+        $ids = $this->getNodeIds($allRoles);
 
         foreach ($allRoles as $role) {
-            $output[] = '    '.$this->dumpNode($role);
+            $output[] = '    '.$this->dumpNode($role, $ids[$role]);
         }
 
         foreach ($hierarchy as $parentRole => $childRoles) {
             foreach ($childRoles as $childRole) {
-                $output[] = "    {$this->normalizeRoleName($parentRole)} --> {$this->normalizeRoleName($childRole)}";
+                $output[] = "    {$ids[$parentRole]} --> {$ids[$childRole]}";
             }
         }
 
@@ -79,13 +88,54 @@ class MermaidDumper
     }
 
     /**
-     * Node IDs only allow a limited set of characters, so roles whose name
-     * is changed by the normalization (e.g. "ROLE_ADMIN-TEST") need an explicit label.
+     * Gives each role a node id that no other role uses.
+     *
+     * When several roles normalize to the same id, the role whose name is that id keeps it, or else the first of them by name.
+     * The other roles get the first free numbered suffix in the order of their names, so the ids do not depend on the order of the hierarchy.
+     * A reserved id is kept by no role.
+     *
+     * @param string[] $roles
+     *
+     * @return array<string, string>
      */
-    private function dumpNode(string $role): string
+    private function getNodeIds(array $roles): array
     {
-        $id = $this->normalizeRoleName($role);
+        $rolesById = [];
+        foreach ($roles as $role) {
+            $rolesById[$this->normalizeRoleName($role)][] = (string) $role;
+        }
 
+        $ids = [];
+        foreach ($rolesById as $id => $sameIdRoles) {
+            $id = (string) $id;
+            sort($sameIdRoles, \SORT_STRING);
+
+            if (!\in_array($id, self::RESERVED_IDS, true)) {
+                $ids[\in_array($id, $sameIdRoles, true) ? $id : $sameIdRoles[0]] = $id;
+            }
+
+            $i = 0;
+            foreach ($sameIdRoles as $role) {
+                if (isset($ids[$role])) {
+                    continue;
+                }
+
+                do {
+                    $suffixedId = $id.'_'.++$i;
+                } while (isset($rolesById[$suffixedId]));
+
+                $ids[$role] = $suffixedId;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * A role whose node id is not its name (e.g. "ROLE_ADMIN-TEST") needs an explicit label.
+     */
+    private function dumpNode(string $role, string $id): string
+    {
         if ($id === $role) {
             return $id;
         }

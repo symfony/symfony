@@ -115,7 +115,6 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
         return new AzureKeyVault(
             $client,
             new ClientCredentialsTokenProvider($client, $tenantId, $dsn->user, $dsn->password, $audience),
-            $baseUri,
             self::algorithmOption($dsn, 'algorithm'),
             self::algorithmOption($dsn, 'wrap_algorithm'),
             $dsn->getOption('api_version', '7.4'),

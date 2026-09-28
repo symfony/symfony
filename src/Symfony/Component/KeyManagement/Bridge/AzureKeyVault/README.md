@@ -27,7 +27,7 @@ $tokens = new ClientCredentialsTokenProvider(
     $_SERVER['AZURE_CLIENT_SECRET'],
 );
 
-$kms = new AzureKeyVault($client, $tokens, 'https://my-vault.vault.azure.net/');
+$kms = new AzureKeyVault($client, $tokens);
 
 // Use the key name for the latest version on writes, or append `/<version>` to select one.
 $ciphertext = $kms->encrypt('app-key', 'hello world');
@@ -37,7 +37,7 @@ $dataKey = $kms->generateDataKey('app-key', 32);
 $result  = $dataKey->use(fn (string $dek): string => /* local AEAD encrypt */);
 ```
 
-The bridge checks that Azure's response names the requested key in the configured vault and records the version Azure used in each new ciphertext and wrapped data key. Keep older key versions enabled while their ciphertexts or wrapped data keys must remain readable.
+The bridge checks that Azure's response names the requested key and records the version Azure used in each new ciphertext and wrapped data key. Keep older key versions enabled while their ciphertexts or wrapped data keys must remain readable.
 
 Authentication
 --------------

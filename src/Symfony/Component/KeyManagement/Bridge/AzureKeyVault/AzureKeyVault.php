@@ -31,10 +31,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * KMS backend powered by Azure Key Vault (and Managed HSM) over its REST API.
  *
  * Crypto operations stay server-side: the master key never leaves the vault.
- * The caller passes a {@see HttpClientInterface} that routes relative requests
- * to the vault or Managed HSM, a {@see TokenProviderInterface} for its audience,
- * and the endpoint's HTTPS origin (e.g. `https://my-vault.vault.azure.net/`).
- * The origin is used to validate the versioned `kid` returned by writes.
+ * The caller passes a {@see HttpClientInterface} scoped to the vault or Managed HSM
+ * base URI (e.g. `https://my-vault.vault.azure.net/`) and a {@see TokenProviderInterface}
+ * for its audience.
  *
  * Algorithm matrix:
  *   - RSA keys: `RSA-OAEP-256` (default), `RSA-OAEP`, `RSA1_5`. Suited to
@@ -70,22 +69,13 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
     // See https://learn.microsoft.com/azure/key-vault/general/about-keys-secrets-certificates#object-identifiers
     private const string KEY_ID_PATTERN = '~\A([0-9A-Za-z-]{1,127})(?:/(?1))?\z~';
 
-    private readonly string $vaultOrigin;
-
     public function __construct(
         private readonly HttpClientInterface $client,
         private readonly TokenProviderInterface $tokens,
-        string $vaultBaseUri,
         private readonly string $encryptAlgorithm = 'RSA-OAEP-256',
         private readonly string $wrapAlgorithm = 'RSA-OAEP-256',
         private readonly string $apiVersion = '7.4',
     ) {
-        $parts = parse_url($vaultBaseUri);
-        if (false === $parts || 'https' !== strtolower($parts['scheme'] ?? '') || !isset($parts['host']) || !\in_array($parts['path'] ?? '', ['', '/'], true) || isset($parts['user']) || isset($parts['pass']) || isset($parts['query']) || isset($parts['fragment'])) {
-            throw new InvalidArgumentException('The Azure Key Vault base URI must be an HTTPS origin.');
-        }
-
-        $this->vaultOrigin = self::origin($parts['host'], $parts['port'] ?? null);
     }
 
     public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
@@ -219,11 +209,6 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
         return 1 === preg_match(self::KEY_ID_PATTERN, $keyId);
     }
 
-    private static function origin(string $host, ?int $port): string
-    {
-        return 'https://'.strtolower($host).(null !== $port && 443 !== $port ? ':'.$port : '');
-    }
-
     private function resolvedKeyId(array $data, string $requestedKeyId): string
     {
         $parts = isset($data['kid']) && \is_string($data['kid']) ? parse_url($data['kid']) : false;
@@ -231,10 +216,9 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             throw new RuntimeException('Azure Key Vault returned a malformed key identifier.');
         }
 
-        $origin = self::origin($parts['host'], $parts['port'] ?? null);
         $path = $parts['path'] ?? '';
         $keyId = substr($path, 6);
-        if ($origin !== $this->vaultOrigin || 0 !== strncasecmp($path, '/keys/', 6) || !str_contains($keyId, '/') || !self::isKeyId($keyId)) {
+        if (0 !== strncasecmp($path, '/keys/', 6) || !str_contains($keyId, '/') || !self::isKeyId($keyId)) {
             throw new RuntimeException('Azure Key Vault returned an unexpected key identifier.');
         }
 

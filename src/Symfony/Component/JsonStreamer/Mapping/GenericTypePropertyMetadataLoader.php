@@ -13,6 +13,7 @@ namespace Symfony\Component\JsonStreamer\Mapping;
 
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
@@ -124,6 +125,14 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
 
         if ($type instanceof IntersectionType) {
             return Type::intersection(...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes()));
+        }
+
+        if ($type instanceof ArrayShapeType) {
+            return new ArrayShapeType(
+                array_map(fn (array $item): array => ['type' => $this->replaceVariableTypes($item['type'], $variableTypes)] + $item, $type->getShape()),
+                $type->getExtraKeyType() ? $this->replaceVariableTypes($type->getExtraKeyType(), $variableTypes) : null,
+                $type->getExtraValueType() ? $this->replaceVariableTypes($type->getExtraValueType(), $variableTypes) : null,
+            );
         }
 
         if ($type instanceof CollectionType) {

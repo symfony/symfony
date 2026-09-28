@@ -536,6 +536,27 @@ class JsonStreamWriterTest extends TestCase
         (string) $writer->write(\INF, Type::int());
     }
 
+    #[DataProvider('throwWhenEncodeErrorWithSpecialCharactersInTypeDataProvider')]
+    public function testThrowWhenEncodeErrorWithSpecialCharactersInType(string $key, string $expectedMessage)
+    {
+        $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
+
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        (string) $writer->write([$key => \INF], Type::arrayShape([$key => Type::float()]));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: string}>
+     */
+    public static function throwWhenEncodeErrorWithSpecialCharactersInTypeDataProvider(): iterable
+    {
+        yield ['a"b', 'Cannot encode "array{\'a"b\': float}" to JSON: Inf and NaN cannot be JSON encoded.'];
+        yield ['{$e->getLine()}', 'Cannot encode "array{\'{$e->getLine()}\': float}" to JSON: Inf and NaN cannot be JSON encoded.'];
+        yield ["a'b\\c", 'Cannot encode "array{\'a\\\'b\\\\c\': float}" to JSON: Inf and NaN cannot be JSON encoded.'];
+    }
+
     public function testCreateStreamWriterFile()
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);

@@ -30,6 +30,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
         }
         yield "]";
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithList>\" to JSON: {$e->getMessage()}.", 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException(\sprintf('Cannot encode "%s" to JSON: %s.', 'list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithList>', $e->getMessage()), 0, $e);
     }
 };

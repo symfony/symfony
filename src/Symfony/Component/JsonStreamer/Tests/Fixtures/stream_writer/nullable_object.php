@@ -19,6 +19,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
             throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value.', \get_debug_type($data)));
         }
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes|null\" to JSON: {$e->getMessage()}.", 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException(\sprintf('Cannot encode "%s" to JSON: %s.', 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes|null', $e->getMessage()), 0, $e);
     }
 };

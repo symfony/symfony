@@ -7,6 +7,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
     try {
         yield \json_encode($data, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 512);
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"list<null>\" to JSON: {$e->getMessage()}.", 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException(\sprintf('Cannot encode "%s" to JSON: %s.', 'list<null>', $e->getMessage()), 0, $e);
     }
 };

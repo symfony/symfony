@@ -20,6 +20,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
         }
         yield "}";
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"iterable<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy>\" to JSON: {$e->getMessage()}.", 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException(\sprintf('Cannot encode "%s" to JSON: %s.', 'iterable<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy>', $e->getMessage()), 0, $e);
     }
 };

@@ -23,6 +23,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
     try {
         yield from $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyDict']($data, 0);
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyDict\" to JSON: {$e->getMessage()}.", 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException(\sprintf('Cannot encode "%s" to JSON: %s.', 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyDict', $e->getMessage()), 0, $e);
     }
 };

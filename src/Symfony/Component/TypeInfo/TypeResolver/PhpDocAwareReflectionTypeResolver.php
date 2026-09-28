@@ -52,7 +52,7 @@ final class PhpDocAwareReflectionTypeResolver implements TypeResolverInterface
         } else {
             $this->lexer = $lexer ?? new Lexer();
             $this->phpDocParser = $phpDocParser ?? new PhpDocParser(
-                new TypeParser($constExprParser = new ConstExprParser()),
+                new TypeParser($constExprParser = new ConstExprParser(true, true), true),
                 $constExprParser,
             );
         }

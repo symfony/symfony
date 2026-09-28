@@ -13,6 +13,7 @@ namespace Symfony\Component\TypeInfo\Tests\Fixtures;
 
 /**
  * @phpstan-type CustomInt = int
+ * @phpstan-type QuotedKeysArray = array{'it\'s': int, 'quoted key': int}
  * @psalm-type PsalmCustomInt = int
  */
 final class DummyWithPhpDoc
@@ -26,6 +27,21 @@ final class DummyWithPhpDoc
      * @var CustomInt
      */
     public mixed $aliasedInt;
+
+    /**
+     * @var array{'it\'s': int, 'quoted key': int}
+     */
+    public mixed $arrayShapeWithQuotedKeys;
+
+    /**
+     * @var QuotedKeysArray
+     */
+    public mixed $aliasedArrayShapeWithQuotedKeys;
+
+    /**
+     * @var 'literal'
+     */
+    public mixed $literal;
 
     /**
      * @param bool $promoted

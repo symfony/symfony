@@ -439,6 +439,23 @@ class PhpDumperTest extends TestCase
         $this->assertTrue(method_exists($class, 'getBar2Service'));
     }
 
+    public function testDeprecatedAliasWithUnsupportedCharacters()
+    {
+        $class = 'Symfony_DI_PhpDumper_Test_Deprecated_Alias_With_Unsupported_Characters';
+        $container = new ContainerBuilder();
+        $container->register('foo*/target', \stdClass::class)->setPublic(true);
+        $container->setAlias('foo*/alias', 'foo*/target')->setPublic(true)->setDeprecated('foo/bar', '1.0', '');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $code = $dumper->dump(['class' => $class]);
+
+        $this->assertStringContainsString("     * Gets the public 'foo* /alias' alias.\n     *\n     * @return object The \"foo* /target\" service.\n     */\n", $code);
+
+        eval('?>'.$code);
+
+        $this->assertTrue((new $class())->has('foo*/alias'));
+    }
+
     public function testConflictingServiceIds()
     {
         $class = 'Symfony_DI_PhpDumper_Test_Conflicting_Service_Ids';

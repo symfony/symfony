@@ -61,7 +61,7 @@ class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
     }
 
     /**
-     * Gets the public 'foo oh-no' shared service.
+     * Gets the public 'foo* /oh-no' shared service.
      *
      * @return \FooClass
      */

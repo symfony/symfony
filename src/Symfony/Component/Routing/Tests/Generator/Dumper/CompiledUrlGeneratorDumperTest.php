@@ -71,6 +71,20 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
     }
 
+    public function testDumpWithUnsupportedCharactersInRouteNames()
+    {
+        $routeName = "route'with/special-char";
+        $aliasName = "alias'with/special-char";
+        $this->routeCollection->add($routeName, new Route('/route'));
+        $this->routeCollection->addAlias($aliasName, $routeName);
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
+        $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'));
+
+        $this->assertSame('/app.php/route', $projectUrlGenerator->generate($routeName));
+        $this->assertSame('/app.php/route', $projectUrlGenerator->generate($aliasName));
+    }
+
     public function testDumpWithSimpleLocalizedRoutes()
     {
         $this->routeCollection->add('test', new Route('/foo'));

@@ -987,40 +987,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function replaceTemplateTypes(Type $type, array $templateTypes): Type
     {
-        if ($type instanceof TemplateType) {
-            return $templateTypes[$type->getName()] ?? $type;
-        }
-
-        if ($type instanceof NullableType) {
-            return Type::nullable($this->replaceTemplateTypes($type->getWrappedType(), $templateTypes));
-        }
-
-        if ($type instanceof UnionType) {
-            $types = array_map(fn (Type $t): Type => $this->replaceTemplateTypes($t, $templateTypes), $type->getTypes());
-
-            foreach ($types as $t) {
-                // a union with "mixed" is "mixed", and creating such a union is not allowed
-                if ($t instanceof BuiltinType && TypeIdentifier::MIXED === $t->getTypeIdentifier()) {
-                    return $t;
-                }
-            }
-
-            return Type::union(...$types);
-        }
-
-        if ($type instanceof IntersectionType) {
-            return Type::intersection(...array_map(fn (Type $t): Type => $this->replaceTemplateTypes($t, $templateTypes), $type->getTypes()));
-        }
-
-        if ($type instanceof CollectionType) {
-            return new CollectionType($this->replaceTemplateTypes($type->getWrappedType(), $templateTypes), $type->isList());
-        }
-
-        if ($type instanceof GenericType) {
-            return Type::generic($type->getWrappedType(), ...array_map(fn (Type $t): Type => $this->replaceTemplateTypes($t, $templateTypes), $type->getVariableTypes()));
-        }
-
-        return $type;
+        return $type->map(static fn (Type $t): Type => $t instanceof TemplateType ? ($templateTypes[$t->getName()] ?? $t) : $t);
     }
 
     private function getType(string $currentClass, string $attribute): ?Type

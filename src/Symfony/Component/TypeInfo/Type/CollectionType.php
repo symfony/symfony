@@ -216,6 +216,16 @@ class CollectionType extends Type implements WrappingTypeInterface
         return true;
     }
 
+    /**
+     * @param-immediately-invoked-callable $mapper
+     */
+    public function map(callable $mapper): Type
+    {
+        $type = $this->type->map($mapper);
+
+        return $mapper($type === $this->type ? $this : new self($type, $this->isList));
+    }
+
     public function __toString(): string
     {
         if ($this->isList && $this->type->isIdentifiedBy(TypeIdentifier::ARRAY)) {

@@ -12,12 +12,22 @@
 namespace Symfony\Component\HttpClient\Recorder\Store;
 
 use Symfony\Component\HttpClient\Har\HarFile;
+use Symfony\Component\Lock\LockFactory;
 
 /**
  * @psalm-import-type HarData from HarFile
  */
 final class FilesystemStore implements StoreInterface
 {
+    /**
+     * @param string|null $lockDirectory Where lock files are created when no lock factory is given, defaults to the system temporary directory
+     */
+    public function __construct(
+        private ?LockFactory $lockFactory = null,
+        private ?string $lockDirectory = null,
+    ) {
+    }
+
     public function update(string $name, callable $mutate): void
     {
         if (!self::isAbsolutePath($name)) {
@@ -30,23 +40,50 @@ final class FilesystemStore implements StoreInterface
             throw new \RuntimeException(\sprintf('Unable to create the "%s" directory.', $dir));
         }
 
-        // the lock lives outside the fixture directory, so that it never ends up committed next to the records
-        $lockFile = sys_get_temp_dir().'/sf_har_'.hash('xxh128', $name).'.lock';
+        $key = 'sf_har_'.hash('xxh128', $name);
 
-        if (false === $lock = @fopen($lockFile, 'c')) {
+        if ($this->lockFactory) {
+            $lock = $this->lockFactory->createLock($key);
+            $lock->acquire(true);
+
+            try {
+                $this->mutate($name, $mutate);
+            } finally {
+                $lock->release();
+            }
+
+            return;
+        }
+
+        // the lock lives outside the fixture directory, so that it never ends up committed next to the records
+        $lockDir = $this->lockDirectory ?? sys_get_temp_dir();
+
+        if (!is_dir($lockDir) && !@mkdir($lockDir, 0o777, true) && !is_dir($lockDir)) {
+            throw new \RuntimeException(\sprintf('Unable to create the "%s" directory.', $lockDir));
+        }
+
+        if (false === $lock = @fopen($lockDir.'/'.$key.'.lock', 'c')) {
             throw new \RuntimeException(\sprintf('Unable to open the lock file for "%s".', $name));
         }
 
         try {
             flock($lock, \LOCK_EX);
 
-            $har = $this->load($name);
-            $mutate($har);
-            $this->save($name, $har);
+            $this->mutate($name, $mutate);
         } finally {
             flock($lock, \LOCK_UN);
             fclose($lock);
         }
+    }
+
+    /**
+     * @param callable(HarFile):void $mutate
+     */
+    private function mutate(string $name, callable $mutate): void
+    {
+        $har = $this->load($name);
+        $mutate($har);
+        $this->save($name, $har);
     }
 
     private function load(string $name): HarFile

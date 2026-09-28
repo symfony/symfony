@@ -15,9 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Target;
-use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -131,7 +132,7 @@ class HttpClientBundleTest extends TestCase
         $definition = $container->getDefinition('http_client.recorder');
         $this->assertSame(RecorderHttpClient::class, $definition->getClass());
 
-        $this->assertSame(['http_client.transport', null, \PHP_INT_MAX - 1], $definition->getDecoratedService());
+        $this->assertSame(['http_client.transport', null, 100], $definition->getDecoratedService());
 
         $arguments = $definition->getArguments();
         $this->assertCount(6, $arguments);
@@ -144,6 +145,11 @@ class HttpClientBundleTest extends TestCase
         // the recorder gets the same default options as the transport
         $this->assertSame($container->getDefinition('http_client.transport')->getArgument(0), $arguments[5]);
         $this->assertSame('bar', $arguments[5]['headers']['X-Foo'] ?? null);
+
+        $storeArguments = $container->getDefinition('http_client.recorder.store')->getArguments();
+        $this->assertSame('lock.factory', (string) $storeArguments[0]);
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $storeArguments[0]->getInvalidBehavior());
+        $this->assertSame('%kernel.share_dir%/http_client/recorder', $storeArguments[1]);
 
         $this->assertTrue($container->hasAlias(RecorderConfigurationInterface::class));
         $this->assertSame([['X-Custom-Secret'], ['sig'], ['pin']], $container->getDefinition('http_client.recorder.redactor')->getArguments());

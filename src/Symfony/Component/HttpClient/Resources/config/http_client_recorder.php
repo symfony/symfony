@@ -24,6 +24,10 @@ use Symfony\Component\HttpClient\RecorderHttpClient;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('http_client.recorder.store', FilesystemStore::class)
+            ->args([
+                service('lock.factory')->nullOnInvalid(),
+                param('kernel.share_dir').'/http_client/recorder',
+            ])
 
         ->set('http_client.recorder.configuration', class_exists(HttpRecorder::class) ? HttpRecorder::class : RecorderConfiguration::class)
         ->alias(RecorderConfigurationInterface::class, 'http_client.recorder.configuration')

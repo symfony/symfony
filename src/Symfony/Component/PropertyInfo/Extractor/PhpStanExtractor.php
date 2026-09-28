@@ -88,7 +88,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             $this->phpDocParser = new PhpDocParser($parserConfig, new TypeParser($parserConfig, new ConstExprParser($parserConfig)), new ConstExprParser($parserConfig));
             $this->lexer = new Lexer($parserConfig);
         } else {
-            $this->phpDocParser = new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
+            $this->phpDocParser = new PhpDocParser(new TypeParser($constExprParser = new ConstExprParser(true, true), true), $constExprParser);
             $this->lexer = new Lexer();
         }
         $this->stringTypeResolver = new StringTypeResolver();

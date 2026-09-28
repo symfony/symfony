@@ -35,6 +35,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * @var array<class-string<self>, bool>
      */
     private static array $initializeOverrideCache = [];
+    private static ?\IntlDateFormatter $dateFormatter = null;
+    private static ?string $dateFormatterLocale = null;
 
     protected ExecutionContextInterface $context;
 
@@ -103,9 +105,12 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     {
         if (($format & self::PRETTY_DATE) && $value instanceof \DateTimeInterface) {
             if (class_exists(\IntlDateFormatter::class)) {
-                $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
+                if (self::$dateFormatterLocale !== $locale = \Locale::getDefault()) {
+                    self::$dateFormatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
+                    self::$dateFormatterLocale = $locale;
+                }
 
-                return $formatter->format(new \DateTimeImmutable(
+                return self::$dateFormatter->format(new \DateTimeImmutable(
                     ($value->format('y') > 0 ? '+' : '').$value->format('Y-m-d H:i:s.u'),
                     new \DateTimeZone('UTC')
                 ));

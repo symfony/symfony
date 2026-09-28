@@ -16,6 +16,8 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
+use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
@@ -438,6 +440,53 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $derived = $cache->withSubNamespace('derived');
         $this->assertTrue($derived->getItem('foo')->isHit());
+    }
+
+    public function testClearWithSubNamespaceContainingSql()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        if (!$cache instanceof PdoAdapter && !$cache instanceof DoctrineDbalAdapter) {
+            $this->markTestSkipped('Only SQL adapters are tested.');
+        }
+        $cache->clear();
+
+        $derived = $cache->withSubNamespace("derived' OR 1=1 -- ");
+        $other = $cache->withSubNamespace('other');
+        $derived->save($derived->getItem('foo')->set('Foo'));
+        $other->save($other->getItem('foo')->set('Bar'));
+
+        $this->assertTrue($derived->clear());
+        $this->assertFalse($derived->getItem('foo')->isHit());
+        $this->assertTrue($other->getItem('foo')->isHit());
+    }
+
+    public function testClearWithSubNamespaceContainingLikeWildcards()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        if (!$cache instanceof PdoAdapter && !$cache instanceof DoctrineDbalAdapter) {
+            $this->markTestSkipped('Only SQL adapters are tested.');
+        }
+
+        foreach (['a%' => 'abc', 'a_' => 'ab', 'a!b' => 'ab', 'a!_' => 'a!x'] as $namespace => $otherNamespace) {
+            $cache->clear();
+
+            $derived = $cache->withSubNamespace($namespace);
+            $other = $cache->withSubNamespace($otherNamespace);
+            $derived->save($derived->getItem('foo')->set('Foo'));
+            $other->save($other->getItem('foo')->set('Bar'));
+
+            $this->assertTrue($derived->clear());
+            $this->assertFalse($derived->getItem('foo')->isHit(), \sprintf('Clearing "%s" left its own item.', $namespace));
+            $this->assertTrue($other->getItem('foo')->isHit(), \sprintf('Clearing "%s" deleted the item of "%s".', $namespace, $otherNamespace));
+        }
     }
 }
 

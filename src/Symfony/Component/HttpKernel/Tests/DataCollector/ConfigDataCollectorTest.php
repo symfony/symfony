@@ -27,6 +27,7 @@ class ConfigDataCollectorTest extends TestCase
         $c = new ConfigDataCollector();
         $c->setKernel($kernel);
         $c->collect(new Request(), new Response());
+        $c->lateCollect();
 
         $this->assertSame('test', $c->getEnv());
         $this->assertTrue($c->isDebug());
@@ -55,6 +56,7 @@ class ConfigDataCollectorTest extends TestCase
     {
         $c = new ConfigDataCollector();
         $c->collect(new Request(), new Response());
+        $c->lateCollect();
 
         $this->assertSame('n/a', $c->getEnv());
         $this->assertSame('n/a', $c->isDebug());
@@ -77,6 +79,40 @@ class ConfigDataCollectorTest extends TestCase
         $eol = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE)->format('F Y');
         $this->assertSame($eom, $c->getSymfonyEom());
         $this->assertSame($eol, $c->getSymfonyEol());
+    }
+
+    public function testCollectKeepsRequestStateUntilLateCollect()
+    {
+        $response = new Response();
+        $response->headers->set('X-Debug-Token', 'abc123');
+        $timezone = date_default_timezone_get();
+
+        $c = new ConfigDataCollector();
+        $c->collect(new Request(), $response);
+
+        date_default_timezone_set('Asia/Tokyo' === $timezone ? 'Europe/Paris' : 'Asia/Tokyo');
+        try {
+            $c->lateCollect();
+        } finally {
+            date_default_timezone_set($timezone);
+        }
+
+        $this->assertSame('abc123', $c->getToken());
+        $this->assertSame($timezone, $c->getPhpTimezone());
+    }
+
+    public function testLateCollectAfterUnserialize()
+    {
+        $c = new ConfigDataCollector();
+        $c->setKernel(new KernelForTest('test', true));
+        $c->collect(new Request(), new Response());
+        $c->lateCollect();
+
+        $c = unserialize(serialize($c));
+        $c->lateCollect();
+
+        $this->assertSame('test', $c->getEnv());
+        $this->assertSame(\PHP_INT_SIZE * 8, $c->getPhpArchitecture());
     }
 }
 

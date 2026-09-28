@@ -39,13 +39,25 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
+        $this->data = [
+            'token' => $response->headers->get('X-Debug-Token'),
+            'php_intl_locale' => class_exists(\Locale::class, false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a',
+            'php_timezone' => date_default_timezone_get(),
+        ];
+    }
+
+    public function lateCollect(): void
+    {
+        if ($this->data instanceof Data) {
+            return;
+        }
+
         $eom = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE);
         $eol = \DateTimeImmutable::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_LIFE);
 
         $xdebugMode = getenv('XDEBUG_MODE') ?: \ini_get('xdebug.mode');
 
-        $this->data = [
-            'token' => $response->headers->get('X-Debug-Token'),
+        $this->data += [
             'symfony_version' => class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('symfony/http-kernel') ?? InstalledVersions::getPrettyVersion('symfony/symfony') : Kernel::MAJOR_VERSION.'.'.Kernel::MINOR_VERSION,
             'symfony_minor_version' => \sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION),
             'symfony_lts' => 4 === Kernel::MINOR_VERSION,
@@ -56,8 +68,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'debug' => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
             'php_version' => \PHP_VERSION,
             'php_architecture' => \PHP_INT_SIZE * 8,
-            'php_intl_locale' => class_exists(\Locale::class, false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a',
-            'php_timezone' => date_default_timezone_get(),
             'xdebug_enabled' => \extension_loaded('xdebug'),
             'xdebug_status' => \extension_loaded('xdebug') ? ($xdebugMode && 'off' !== $xdebugMode ? 'Enabled ('.$xdebugMode.')' : 'Not enabled') : 'Not installed',
             'apcu_enabled' => \extension_loaded('apcu') && filter_var(\ini_get('apc.enabled'), \FILTER_VALIDATE_BOOL),
@@ -79,10 +89,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             $this->data['php_version'] = $matches[1];
             $this->data['php_version_extra'] = $matches[2];
         }
-    }
 
-    public function lateCollect(): void
-    {
         $this->data = $this->cloneVar($this->data);
     }
 

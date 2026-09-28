@@ -677,6 +677,25 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame(['value1' => 'foo', 'value2' => 'baz'], $object->getPublicAccessor());
     }
 
+    public function testSetValueUpdatesArrayPropertiesInPlace()
+    {
+        $object = new class {
+            public array $items = ['a' => 1];
+            public int $setterCalls = 0;
+
+            public function setItems(array $items): void
+            {
+                ++$this->setterCalls;
+                $this->items = $items;
+            }
+        };
+
+        $this->propertyAccessor->setValue($object, 'items[b]', 2);
+
+        $this->assertSame(['a' => 1, 'b' => 2], $object->items);
+        $this->assertSame(0, $object->setterCalls);
+    }
+
     public function testCacheReadAccess()
     {
         $obj = new TestClass('foo');
@@ -703,6 +722,42 @@ class PropertyAccessorTest extends TestCase
 
         $this->assertSame('bar', $propertyAccessor->getValue($obj, 'foo'));
         $this->assertSame('bar', $propertyAccessor->getValue($obj, 'foo'));
+    }
+
+    public function testReadInfoIsCachedPerClass()
+    {
+        $getter = new class {
+            public function getFoo()
+            {
+                return 'getter';
+            }
+        };
+        $property = new class {
+            public $foo = 'property';
+        };
+
+        $cache = new ArrayAdapter();
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, $cache);
+
+        $this->assertSame('getter', $propertyAccessor->getValue($getter, 'foo'));
+        $this->assertSame('property', $propertyAccessor->getValue($property, 'foo'));
+        $this->assertSame('getter', $propertyAccessor->getValue($getter, 'foo'));
+
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, $cache);
+
+        $this->assertSame('property', $propertyAccessor->getValue($property, 'foo'));
+        $this->assertSame('getter', $propertyAccessor->getValue($getter, 'foo'));
+    }
+
+    public function testNullSafePathOnScalarIsNotReadable()
+    {
+        $object = (object) ['property' => 'Bernhard'];
+
+        $this->assertFalse($this->propertyAccessor->isReadable($object, 'property?.lastName'));
+
+        $this->expectException(NoSuchPropertyException::class);
+
+        $this->propertyAccessor->getValue($object, 'property?.lastName');
     }
 
     public function testAttributeWithSpecialChars()

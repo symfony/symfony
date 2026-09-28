@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -1012,6 +1013,35 @@ class AbstractObjectNormalizerTest extends TestCase
 
         $this->assertEquals(new DummyWithStringObject(new DummyString()), $actual);
         $this->assertEquals('', $actual->value->value);
+    }
+
+    public function testDebugTraceIdDoesNotChangeContextCacheKey()
+    {
+        $normalizer = new class extends AbstractObjectNormalizerDummy {
+            public int $extractAttributesCalls = 0;
+
+            protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
+            {
+                ++$this->extractAttributesCalls;
+
+                return array_keys((array) $object);
+            }
+
+            protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
+            {
+                return $object->{$attribute};
+            }
+        };
+
+        $serializer = new Serializer([$normalizer]);
+
+        $dummy = new Dummy();
+        $dummy->foo = 'foo';
+
+        $serializer->normalize($dummy, null, [TraceableSerializer::DEBUG_TRACE_ID => 'first']);
+        $serializer->normalize($dummy, null, [TraceableSerializer::DEBUG_TRACE_ID => 'second']);
+
+        $this->assertSame(1, $normalizer->extractAttributesCalls);
     }
 
     public function testProvidingContextCacheKeyGeneratesSameChildContextCacheKey()

@@ -49,6 +49,16 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         parent::testTimeoutOnDestruct();
     }
 
+    public function testQueryPairs()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/?a=a', [
+            'query' => [['b' => 'b'], ['b' => 'c']],
+        ]);
+
+        $this->assertSame('/?a=a&b=b&b=c', $response->toArray()['REQUEST_URI']);
+    }
+
     public function testTrailersAreExposedOnceTheResponseIsComplete()
     {
         TestSocketServer::start('trailers/server.php', 8061);

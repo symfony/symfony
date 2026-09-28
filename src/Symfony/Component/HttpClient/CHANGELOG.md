@@ -13,6 +13,7 @@ CHANGELOG
  * Add `HttpClientDataCollector::getTotalTime()`, the sum of the durations of all requests, in seconds
  * Add the `trailers` response info
  * Add support for the `on_trailers` request option to `GuzzleHttpHandler`
+ * Allow passing the `query` and `body` options as lists of single-entry arrays to repeat a field, e.g. `[['tag' => 'a'], ['tag' => 'b']]` for `tag=a&tag=b`
 
 8.1
 ---

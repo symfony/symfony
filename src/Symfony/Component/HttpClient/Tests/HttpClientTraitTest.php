@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttpClientTrait;
+use Symfony\Component\HttpClient\Tests\Fixtures\QueryValueEnum;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HttpClientTraitTest extends TestCase
@@ -50,6 +51,9 @@ class HttpClientTraitTest extends TestCase
         yield ['http://example.com/', 'http://example.com/', ['a' => null]];
         yield ['http://example.com/?b=', 'http://example.com/', ['b' => '']];
         yield ['http://example.com/?b=', 'http://example.com/', ['a' => null, 'b' => '']];
+        yield ['http://example.com/?a=3&a=4&b=b', '.', [['a' => 3], ['a' => 4]]];
+        yield ['http://example.com/?c=3&c=4&a=1&b=b', '.?c=0', [['c' => 3], ['c' => 4]]];
+        yield ['http://example.com/?b=b', 'http://example.com/?a=0&a=1&b=b', [['a' => null]]];
     }
 
     public function testPrepareRequestWithBodyIsArray()
@@ -120,6 +124,60 @@ class HttpClientTraitTest extends TestCase
         $expected = str_replace("\n", "\r\n", $expected);
 
         $this->assertSame($expected, $result);
+    }
+
+    public function testNormalizeBodyWithPairs()
+    {
+        $headers = [];
+        $body = self::normalizeBody([['a' => 'b c'], ['a' => QueryValueEnum::Destination], ['d' => null], ['e[]' => 1]], $headers);
+
+        $this->assertSame('a=b+c&a=des+tination&e%5B%5D=1', $body);
+        $this->assertSame(['Content-Type: application/x-www-form-urlencoded'], $headers['content-type']);
+    }
+
+    public function testNormalizeBodyMultipartWithPairs()
+    {
+        $file = fopen('php://memory', 'r+');
+        stream_context_set_option($file, 'http', 'filename', 'test.txt');
+        fwrite($file, 'foobarbaz');
+        rewind($file);
+
+        $headers = [
+            'content-type' => ['Content-Type: multipart/form-data; boundary=ABCDEF'],
+        ];
+
+        $body = self::normalizeBody([['foo' => 'bar'], ['foo' => $file]], $headers);
+
+        $result = '';
+        while ('' !== $data = $body(self::$CHUNK_SIZE)) {
+            $result .= $data;
+        }
+
+        $expected = <<<'EOF'
+            --ABCDEF
+            Content-Disposition: form-data; name="foo"
+
+            bar
+            --ABCDEF
+            Content-Disposition: form-data; name="foo"; filename="test.txt"
+            Content-Type: application/octet-stream
+
+            foobarbaz
+            --ABCDEF--
+
+            EOF;
+        $expected = str_replace("\n", "\r\n", $expected);
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function testNormalizeBodyWithInvalidPairs()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid value for option "body": item #1 of the list must be an array with a single name => value entry where value is a scalar, a Stringable, a BackedEnum, a stream or null.');
+
+        $headers = [];
+        self::normalizeBody([['a' => 'b'], ['c' => ['d']]], $headers);
     }
 
     #[RequiresPhpExtension('openssl')]
@@ -295,8 +353,51 @@ b'])]
         yield [[null, null, 'bar', '?a[b[c]=d', null], 'bar?a[b[c]=d', []];
         yield [[null, null, 'bar', '?a[b][c]=dd', null], 'bar?a[b][c]=d&e[f]=g', ['a' => ['b' => ['c' => 'dd']], 'e[f]' => null]];
         yield [[null, null, 'bar', '?a=b&a[b%20c]=d&e%3Df=%E2%9C%93', null], 'bar?a=b', ['a' => ['b c' => 'd'], 'e=f' => '✓']];
+        yield [[null, null, 'bar', '?a[b]=2', null], 'bar', ['a[b]' => 1, 'a' => ['b' => 2]]];
+        yield [[null, null, 'bar', '?a=b&a=c&d=1&e[]=f&e[]=g', null], 'bar', [['a' => 'b'], ['a' => 'c'], ['d' => true], ['e[]' => 'f'], ['e[]' => 'g']]];
+        yield [[null, null, 'bar', '?a=c&a=d&b=b&e=f', null], 'bar?a=a&a=b&b=b&c=c', [['a' => 'c'], ['c' => null], ['a' => 'd'], ['e' => 'f']]];
+        yield [[null, null, 'bar', '?a=1&a=3&b=2', null], 'bar', [['a' => 1], ['b' => 2], ['a' => 3]]];
+        yield [[null, null, 'bar', '?1=a&1=b', null], 'bar?1=c', [['1' => 'a'], [1 => 'b']]];
+        yield [[null, null, 'bar', '?a=b%20c&a=%E2%9C%93&d%3De=f%26g', null], 'bar', [['a' => 'b c'], ['a' => '✓'], ['d=e' => 'f&g']]];
         // IDNA 2008 compliance
         yield [['https:', '//xn--fuball-cta.test', null, null, null], 'https://fußball.test'];
+    }
+
+    public function testParseUrlWithStringableQueryPair()
+    {
+        $value = new class {
+            public function __toString(): string
+            {
+                return 'b c';
+            }
+        };
+
+        $this->assertSame('?a=b%20c&a=d', self::parseUrl('http://example.com', [['a' => $value], ['a' => 'd']])['query']);
+    }
+
+    public function testParseUrlWithBackedEnumQueryPair()
+    {
+        $this->assertSame('?a=des%20tination&a=d', self::parseUrl('http://example.com', [['a' => QueryValueEnum::Destination], ['a' => 'd']])['query']);
+        $this->assertSame('?a=des%20tination', self::parseUrl('http://example.com', ['a' => QueryValueEnum::Destination])['query']);
+    }
+
+    #[DataProvider('provideInvalidQueryPairs')]
+    public function testParseUrlWithInvalidQueryPairs(array $query)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid value for option "query": item #1 of the list must be an array with a single name => value entry');
+
+        self::parseUrl('http://example.com', $query);
+    }
+
+    public static function provideInvalidQueryPairs(): iterable
+    {
+        yield [[['a' => 'b'], 'c']];
+        yield [[['a' => 'b'], []]];
+        yield [[['a' => 'b'], ['c' => 'd', 'e' => 'f']]];
+        yield [[['a' => 'b'], ['c', 'd']]];
+        yield [[['a' => 'b'], ['c' => ['d']]]];
+        yield [[['a' => 'b'], ['c' => new \stdClass()]]];
     }
 
     #[DataProvider('provideRemoveDotSegments')]

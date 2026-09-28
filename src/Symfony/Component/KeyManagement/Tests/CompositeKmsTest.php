@@ -78,7 +78,7 @@ class CompositeKmsTest extends TestCase
         $this->assertSame(['encrypt' => 1], $this->gcp->calls);
     }
 
-    public function testACiphertextIsReadThroughTheNextMemberWhenTheFirstIsDown()
+    public function testACiphertextFallsBackPastUnavailableMembers()
     {
         $kms = $this->kms();
         $ciphertext = $kms->encrypt('app', 'secret');
@@ -282,7 +282,7 @@ class CompositeKmsTest extends TestCase
         $this->assertSame(['generateDataKey' => 1], $rogue->calls);
     }
 
-    public function testACompositeCannotReadThroughAnotherComposite()
+    public function testADirectCompositeMemberIsRejectedOnRead()
     {
         $nested = new CompositeKms(self::locator(['good' => new InMemoryKms('good')]), ['good' => null]);
         $writer = new CompositeKms(self::locator(['nested' => new InMemoryKms('nested')]), ['nested' => null]);
@@ -294,7 +294,7 @@ class CompositeKmsTest extends TestCase
     }
 
     #[DataProvider('provideSelfMemberDecorators')]
-    public function testACompositeCannotReadThroughItself(string $decorator)
+    public function testASelfMemberIsRejectedOnReadWhenDirectOrTraceable(string $decorator)
     {
         $clients = new class implements ContainerInterface {
             public CompositeKms $self;
@@ -445,6 +445,9 @@ class CompositeKmsTest extends TestCase
         $this->aws->down = true;
 
         $this->assertSame($plaintext, $kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key));
+        $this->assertSame(['generateDataKey' => 1, 'unwrapDataKey' => 1], $this->aws->calls);
+        $this->assertSame(['encrypt' => 1, 'decrypt' => 1], $this->azure->calls);
+        $this->assertSame(['encrypt' => 1], $this->gcp->calls);
     }
 
     public function testTheMintedDataKeyIsConsumed()
@@ -524,11 +527,13 @@ class CompositeKmsTest extends TestCase
     {
         $kms = new CompositeKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), ['aws' => null, 'azure' => null]);
 
-        $ciphertext = $kms->encrypt('app', 'secret');
+        $first = $kms->encrypt('app', 'secret');
+        $second = $kms->encrypt('other', 'another secret');
         $survivor = new CompositeKms(self::locator(['azure' => $this->azure, 'gcp' => $this->gcp]), ['azure' => null, 'gcp' => null]);
 
-        $this->assertSame('secret', $survivor->decrypt($ciphertext));
-        $this->assertSame('app', $this->azure->keyIds[0]);
+        $this->assertSame('secret', $survivor->decrypt($first));
+        $this->assertSame('another secret', $survivor->decrypt($second));
+        $this->assertSame(['app', 'other'], $this->azure->keyIds);
     }
 
     public function testAMemberNameHasToFitInTheCiphertext()
@@ -549,7 +554,7 @@ class CompositeKmsTest extends TestCase
     }
 
     #[DataProvider('provideMalformedBlobs')]
-    public function testABlobThatDoesNotParseIsAnUnreadableCiphertext(string $blob)
+    public function testMalformedBlobsAreUnreadable(string $blob)
     {
         $this->expectException(DecryptionFailedException::class);
 
@@ -599,7 +604,7 @@ class CompositeKmsTest extends TestCase
     }
 
     #[RequiresPhpExtension('openssl')]
-    public function testAStoreIsRewrappedUnderNewMembersThroughTheCommand()
+    public function testAStoreIsRewrappedUnderAReplacementMemberThroughTheCommand()
     {
         $aws = new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32)]));
         $azure = new OpenSslKms(new InMemoryKeyLoader(['backup' => random_bytes(32)]));
@@ -822,7 +827,7 @@ class CompositeKmsTest extends TestCase
         return new ServiceLocator($factories);
     }
 
-    public function testAMemberIsPassedOverWhateverItThrows()
+    public function testMemberExceptionsArePassedOver()
     {
         foreach ([new \DomainException('down.'), new \Exception('down.'), new \InvalidArgumentException('down.'), new LogicException('down.')] as $failure) {
             $first = new SwitchableKms(new InMemoryKms(), $failure);

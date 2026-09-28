@@ -641,12 +641,17 @@ class ScreenWriterTest extends TestCase
         $writer = new ScreenWriter($terminal);
 
         $writer->writeLines([...$transcript, 'A', 'B', 'C', 'D', 'E', 'F', 'G']);
+        $scrollback = $screen->getScrollback();
         $output = '';
         $writer->writeLines([...$transcript, ...$shrunk]);
 
         // The terminal shows the last 5 lines of the content, whatever the shrink removed
         $this->assertSame(\array_slice([...$transcript, ...$shrunk], -5), array_map('rtrim', $screen->getLines()));
+        $this->assertSame($scrollback, $screen->getScrollback());
         $this->assertStringNotContainsString("\x1b[3J", $output, 'Scrollback should be preserved');
+        $this->assertStringNotContainsString("\x1b[2J", $output, 'Some terminals move a cleared screen into the scrollback');
+        $this->assertStringStartsWith(self::SYNC_START.self::HIDE_CURSOR, $output);
+        $this->assertStringEndsWith(self::SYNC_END, $output);
     }
 
     public static function provideShrinkingOverflowingContent(): iterable
@@ -655,6 +660,35 @@ class ScreenWriterTest extends TestCase
         yield 'three trailing lines removed' => [['A', 'B', 'C', 'D']];
         yield 'two leading lines removed' => [['C', 'D', 'E', 'F', 'G']];
         yield 'all but one line removed' => [['A']];
+    }
+
+    #[DataProvider('provideOverflowingContentShrunkBelowTheScreenHeight')]
+    public function testShrinkingOverflowingContentBelowTheScreenHeightKeepsTheRemainingLinesOnScreen(array $shrunk, array $next)
+    {
+        $screen = new ScreenBuffer(20, 5);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+
+        $writer = new ScreenWriter($terminal);
+        $writer->writeLines(['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6']);
+        $writer->writeLines($shrunk);
+
+        $this->assertSame(array_pad($shrunk, 5, ''), array_map(rtrim(...), $screen->getLines()));
+
+        $writer->writeLines($next);
+
+        $this->assertSame(array_pad($next, 5, ''), array_map(rtrim(...), $screen->getLines()));
+        $this->assertSame(['L0', 'L1'], array_map(rtrim(...), $screen->getScrollback()));
+    }
+
+    public static function provideOverflowingContentShrunkBelowTheScreenHeight(): iterable
+    {
+        yield 'three lines left, then one appended' => [['L0', 'L1', 'L2'], ['L0', 'L1', 'L2', 'L3']];
+        yield 'one line left, then edited' => [['L0'], ['L0x']];
+        yield 'nothing left, then two lines' => [[], ['M0', 'M1']];
     }
 
     #[DataProvider('renderPathFrames')]

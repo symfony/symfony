@@ -272,6 +272,8 @@ final class ScreenWriter
      * Redraws the bottom of the content over the whole screen.
      *
      * The scrollback is kept, so the lines that scrolled out stay reachable.
+     * Rows are erased one by one instead of clearing the screen, because tmux moves a cleared screen into the scrollback (its default scroll-on-clear option).
+     * The cursor never goes below the last row, so nothing scrolls either.
      *
      * @param string[]                                   $newLines
      * @param array{row: int, col: int, shape: int}|null $cursorPos
@@ -279,9 +281,15 @@ final class ScreenWriter
     private function redrawViewport(array $newLines, ?array $cursorPos, int $rows): void
     {
         $lineCount = \count($newLines);
+        $visibleLines = \array_slice($newLines, max(0, $lineCount - $rows), $rows);
 
-        $buffer = "\x1b[?2026h\x1b[?25l\x1b[2J\x1b[H"; // Begin synchronized output with the cursor hidden, clear screen and home
-        $buffer .= implode("\r\n", \array_slice($newLines, max(0, $lineCount - $rows), $rows));
+        $buffer = "\x1b[?2026h\x1b[?25l\x1b[H\x1b[2K"; // Begin synchronized output with the cursor hidden, home and erase the first row
+        $buffer .= implode("\r\n\x1b[2K", array_pad($visibleLines, $rows, ''));
+
+        // Back to the last line of the content
+        if (0 < $up = $rows - max(1, \count($visibleLines))) {
+            $buffer .= "\x1b[{$up}A";
+        }
 
         $this->terminal->write($buffer);
         $this->cursorRow = max(0, $lineCount - 1);

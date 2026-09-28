@@ -23,6 +23,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithImportedOnlyTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAliasImport;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithMixedTemplates;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpDoc;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanCovariantTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmCovariantTemplates;
@@ -35,6 +36,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliasImportedFromInvalidClassName;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUses;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUsesWindowsLineEndings;
+use Symfony\Component\TypeInfo\Tests\Fixtures\ParentDummyWithTemplate;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
@@ -190,6 +192,14 @@ class TypeContextFactoryTest extends TestCase
         ], $this->typeContextFactory->createFromReflection(new \ReflectionClass(DummyWithTemplateAndParentInDifferentNs::class))->templates);
     }
 
+    public function testCollectTemplatesOfCalledClassAndTypeAliasesOfDeclaringClass()
+    {
+        $typeContext = $this->typeContextFactory->createFromClassName(DummyWithTemplateAndParent::class, ParentDummyWithTemplate::class);
+
+        $this->assertEquals(['T' => Type::object(DummyInDifferentNs::class)], $typeContext->templates);
+        $this->assertEquals(['ParentInt' => Type::int()], $typeContext->typeAliases);
+    }
+
     public function testDoNotCollectTemplatesWhenToStringTypeResolver()
     {
         $typeContextFactory = new TypeContextFactory();
@@ -247,6 +257,16 @@ class TypeContextFactoryTest extends TestCase
 
         yield [['CustomInt' => Type::int()], DummyWithImportedOnlyTypeAliases::class];
         yield [['AliasWithTemplate' => Type::template('T')], DummyWithTemplateTypeAlias::class];
+    }
+
+    public function testCollectTypeAliasesOfClassFromReflection()
+    {
+        $typeAliases = ['CustomInt' => Type::int(), 'PsalmCustomInt' => Type::int()];
+
+        $this->assertEquals($typeAliases, $this->typeContextFactory->createFromReflection(new \ReflectionClass(DummyWithPhpDoc::class))->typeAliases);
+        $this->assertEquals($typeAliases, $this->typeContextFactory->createFromReflection(new \ReflectionProperty(DummyWithPhpDoc::class, 'aliasedInt'))->typeAliases);
+        $this->assertEquals($typeAliases, $this->typeContextFactory->createFromReflection(new \ReflectionMethod(DummyWithPhpDoc::class, 'getNextDummy'))->typeAliases);
+        $this->assertEquals($typeAliases, $this->typeContextFactory->createFromReflection(new \ReflectionParameter([DummyWithPhpDoc::class, 'getNextDummy'], 'dummy'))->typeAliases);
     }
 
     public function testCollectTypeAliasesWithExtraTypeAliases()

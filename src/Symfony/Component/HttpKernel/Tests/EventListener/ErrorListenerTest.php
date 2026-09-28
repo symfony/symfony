@@ -28,6 +28,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -257,6 +258,25 @@ class ErrorListenerTest extends TestCase
         $l->onKernelException($event);
 
         $this->assertEquals(new Response('foo', 401), $event->getResponse());
+    }
+
+    #[DataProvider('provideLogLevelsForGivenStatusCode')]
+    public function testLogLevelFollowsGivenStatusCode(\Throwable $exception, string $expectedLogLevel, array $exceptionsMapping = [])
+    {
+        $logger = new TestLogger();
+        $l = new ErrorListener('not used', $logger, false, $exceptionsMapping);
+        $l->logKernelException(new ExceptionEvent(new TestKernel(), new Request(), HttpKernelInterface::MAIN_REQUEST, $exception));
+
+        $this->assertCount(1, $logger->getLogsForLevel($expectedLogLevel));
+    }
+
+    public static function provideLogLevelsForGivenStatusCode(): iterable
+    {
+        yield 'client error from config' => [new \RuntimeException(), LogLevel::ERROR, [\RuntimeException::class => ['log_level' => null, 'status_code' => 404]]];
+        yield 'client error from attribute' => [new WithGeneralAttribute(), LogLevel::ERROR];
+        yield 'server error from config' => [new NotFoundHttpException(), LogLevel::CRITICAL, [NotFoundHttpException::class => ['log_level' => null, 'status_code' => 503]]];
+        yield 'log level from attribute' => [new WarningWithLogLevelAttribute(), LogLevel::WARNING, [WarningWithLogLevelAttribute::class => ['log_level' => null, 'status_code' => 503]]];
+        yield 'log level from config' => [new WithGeneralAttribute(), LogLevel::NOTICE, [WithGeneralAttribute::class => ['log_level' => LogLevel::NOTICE, 'status_code' => null]]];
     }
 
     public static function provider()

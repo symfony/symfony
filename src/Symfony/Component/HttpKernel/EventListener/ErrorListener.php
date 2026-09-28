@@ -47,8 +47,7 @@ class ErrorListener implements EventSubscriberInterface
 
     public function logKernelException(ExceptionEvent $event): void
     {
-        $throwable = $event->getThrowable();
-        $logLevel = $this->resolveLogLevel($throwable);
+        $originalThrowable = $throwable = $event->getThrowable();
         $logChannel = $this->resolveLogChannel($throwable);
 
         foreach ($this->exceptionsMapping as $class => $config) {
@@ -69,6 +68,7 @@ class ErrorListener implements EventSubscriberInterface
             $event->setThrowable($throwable);
         }
 
+        $logLevel = $this->resolveLogLevel($originalThrowable, $throwable);
         $e = FlattenException::createFromThrowable($throwable);
 
         $this->logException($throwable, \sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), basename($e->getFile()), $e->getLine()), $logLevel, $logChannel);
@@ -180,7 +180,7 @@ class ErrorListener implements EventSubscriberInterface
     /**
      * Resolves the level to be used when logging the exception.
      */
-    private function resolveLogLevel(\Throwable $throwable): string
+    private function resolveLogLevel(\Throwable $throwable, ?\Throwable $convertedThrowable = null): string
     {
         foreach ($this->exceptionsMapping as $class => $config) {
             if ($throwable instanceof $class && $config['log_level']) {
@@ -191,6 +191,8 @@ class ErrorListener implements EventSubscriberInterface
         if ($withLogLevel = $this->getInheritedAttribute($throwable::class, WithLogLevel::class)) {
             return $withLogLevel->level;
         }
+
+        $throwable = $convertedThrowable ?? $throwable;
 
         if (!$throwable instanceof HttpExceptionInterface || $throwable->getStatusCode() >= 500) {
             return LogLevel::CRITICAL;

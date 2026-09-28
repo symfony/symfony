@@ -52,6 +52,11 @@ final class TypeContextFactory
      */
     private array $typeContextCache = [];
 
+    /**
+     * @var array<class-string, true>
+     */
+    private array $collectingTypeAliases = [];
+
     private ?Lexer $phpstanLexer = null;
     private ?PhpDocParser $phpstanParser = null;
 
@@ -290,7 +295,17 @@ final class TypeContextFactory
                 throw new LogicException(\sprintf('Type alias "%s" is not imported from a valid class name.', $tag->value->importedAlias));
             }
 
-            $importedFromContext = $this->createFromClassName($importedFromType->getClassName());
+            if (isset($this->collectingTypeAliases[$importedFromType->getClassName()])) {
+                throw new LogicException(\sprintf('Cannot import "%s" type alias from "%s" as it is recursive.', $tag->value->importedAlias, $importedFromType->getClassName()));
+            }
+
+            $this->collectingTypeAliases[$typeContext->declaringClassName] = true;
+
+            try {
+                $importedFromContext = $this->createFromClassName($importedFromType->getClassName());
+            } finally {
+                unset($this->collectingTypeAliases[$typeContext->declaringClassName]);
+            }
 
             $typeAlias = $importedFromContext->typeAliases[$tag->value->importedAlias] ?? null;
             if (!$typeAlias) {

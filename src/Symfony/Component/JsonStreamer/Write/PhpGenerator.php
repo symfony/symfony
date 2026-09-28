@@ -64,11 +64,12 @@ final class PhpGenerator
             .$this->flushYieldBuffer($context);
 
         $context['indentation_level'] = 0;
+        $docType = str_replace('*/', '*\/', (string) $dataModel->getType());
 
         return $this->line('<?php', $context)
             .$this->line('', $context)
             .$this->line('/**', $context)
-            .$this->line(' * @param '.$dataModel->getType().' $data', $context)
+            .$this->line(' * @param '.$docType.' $data', $context)
             .$this->line(' */', $context)
             .$this->line('return static function (mixed $data, \\'.ContainerInterface::class.' $valueTransformers, array $options): \\Traversable {', $context)
             .implode('', $generators)

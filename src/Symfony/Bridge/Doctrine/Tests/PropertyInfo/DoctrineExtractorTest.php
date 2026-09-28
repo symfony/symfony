@@ -31,9 +31,9 @@ use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Uid\Ulid;
-use Symfony\Component\Uid\Uuid;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -55,7 +55,7 @@ class DoctrineExtractorTest extends TestCase
             }
         }
 
-        DoctrineTestHelper::registerTypes($config, ['foo' => DoctrineFooType::class]);
+        DoctrineTestHelper::registerTypes($config, ['foo' => DoctrineFooType::class, 'uuid' => UuidType::class, 'ulid' => UlidType::class]);
 
         $eventManager = new EventManager();
         $entityManager = new EntityManager(DriverManager::getConnection(['driver' => 'pdo_sqlite'], $config, $eventManager), $config, $eventManager);
@@ -164,8 +164,8 @@ class DoctrineExtractorTest extends TestCase
         return [
             ['id', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['guid', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['uuid', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Uuid::class)]],
-            ['ulid', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Ulid::class)]],
+            ['uuid', null],
+            ['ulid', null],
             ['bigint', $expectedBingIntType],
             ['time', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
             ['timeImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],

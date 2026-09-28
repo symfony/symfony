@@ -22,14 +22,18 @@ class EnvClosureArgument implements ArgumentInterface
 {
     use ArgumentTrait;
 
+    private mixed $default = null;
+
     public function __construct(
         private string $value,
-        private mixed $default = null,
+        mixed $default = null,
         private bool $stringable = false,
     ) {
         if ($stringable && !\is_string($default ?? '')) {
             throw new InvalidArgumentException('The default value of a stringable EnvClosureArgument must be a string or null.');
         }
+
+        $this->default = $default;
     }
 
     public function getValue(): string

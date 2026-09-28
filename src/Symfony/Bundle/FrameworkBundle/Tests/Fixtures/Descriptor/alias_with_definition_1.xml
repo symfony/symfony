@@ -22,6 +22,8 @@
     <argument type="service" id=".definition_2"/>
   </argument>
   <argument type="abstract">placeholder</argument>
+  <argument type="env_closure">%env(FOO)%</argument>
+  <argument type="env_closure" stringable="true" default="baz">%env(BAR)%</argument>
   <usages>
     <usage>alias_1</usage>
   </usages>

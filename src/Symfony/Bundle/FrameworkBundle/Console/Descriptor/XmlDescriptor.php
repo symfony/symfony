@@ -15,6 +15,7 @@ use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -449,6 +450,15 @@ class XmlDescriptor extends Descriptor
                 foreach ($this->getArgumentNodes($argument->getValues(), $dom, $container) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);
                 }
+            } elseif ($argument instanceof EnvClosureArgument) {
+                $argumentXML->setAttribute('type', 'env_closure');
+                if ($argument->isStringable()) {
+                    $argumentXML->setAttribute('stringable', 'true');
+                }
+                if (null !== $default = $argument->getDefault()) {
+                    $argumentXML->setAttribute('default', $this->formatParameter($default));
+                }
+                $argumentXML->appendChild(new \DOMText($argument->getValue()));
             } elseif ($argument instanceof Definition) {
                 $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, $container)->childNodes->item(0), true));
             } elseif ($argument instanceof AbstractArgument) {

@@ -119,7 +119,6 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('asset public prefix'),
                 abstract_arg('extensions map'),
                 service('cache.asset_mapper')->nullOnInvalid(),
-                service('profiler')->nullOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
 

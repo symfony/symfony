@@ -18,7 +18,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('web_profiler.debug_toolbar', WebDebugToolbarListener::class)
             ->args([
-                service('twig'),
+                lazy_proxy('twig'),
                 param('web_profiler.debug_toolbar.intercept_redirects'),
                 param('web_profiler.debug_toolbar.mode'),
                 service('router')->ignoreOnInvalid(),

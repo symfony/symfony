@@ -32,7 +32,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('profiler_listener', ProfilerListener::class)
             ->args([
-                service('profiler'),
+                service('.lazy_profiler'),
                 service('request_stack'),
                 null,
                 param('profiler_listener.only_exceptions'),

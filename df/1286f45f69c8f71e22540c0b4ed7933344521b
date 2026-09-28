@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-09-24T18:58:35Z
+
+[`Validation::createCallable()`](https://github.com/symfony/symfony/blob/69e66e32171baf8d3ccb11e6d5b50583860d622b/src/Symfony/Component/Validator/Validation.php#L31) is variadic, the following is equivalent:
+```php
+$title = $value |> Validation::createCallable(
+    new NotBlank(),
+    new Length(min: 4, max: 255),
+);
+```
+
+The new syntax you are presenting is interesting, but is it worth adding a new method to the API?
+
+---------------------------------------------------------------------------
+
+by rela589n at 2026-09-26T12:07:12Z
+
+> [Validation::createCallable()](https://github.com/symfony/symfony/blob/69e66e32171baf8d3ccb11e6d5b50583860d622b/src/Symfony/Component/Validator/Validation.php#L31) is variadic, the following is equivalent:
+>
+> ```php
+> $title = $value |> Validation::createCallable(
+>    new NotBlank(),
+>    new Length(min: 4, max: 255),
+> );
+> ```
+
+It's not. This snippet causes both constraints to execute at once.
+On the other hand, the `|>` operator won't proceed unless `new NotBlank()`  succeeds:
+
+```php
+$title = $value
+  |> new NotBlank() // throws
+  |> new Length(min: 4, max: 255);
+```
+
+It makes no difference for the valid values, but for the invalid `''` it issues two messages:
+- "This value should not be blank."
+- "This value is too short. It should have 4 characters or more."
+
+It is necessary to apply `new Sequentially()` there to make `NotBlank` trigger first:
+
+```php
+$title = $value |> Validation::createCallable(new Sequentially([
+    new NotBlank(),
+    new Length(min: 4, max: 255),
+]));
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2026-09-28T12:41:26Z
+
+-1 for that. This works for simple constraints where the constraint validator is stateless. But it breaks as soon as we have configurable services as constraint validators.
+
+The broken cases cover 3 things:
+- constraint validators that require injecting some dependencies
+- constraint validator that take some configuration. For instance, `EmailValidator` allows configuring a default validation mode project-wide. The callable API added here ignores it, as it creates its own validator
+- any customization of the validator service (for instance wrapping it in a TraceableValidator to integrate it in the web profiler) is lost as it creates its own validator.

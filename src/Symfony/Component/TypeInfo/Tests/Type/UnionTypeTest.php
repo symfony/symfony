@@ -93,5 +93,7 @@ class UnionTypeTest extends TestCase
         $this->assertFalse($type->accepts('string'));
         $this->assertTrue($type->accepts(123));
         $this->assertTrue($type->accepts(false));
+        $this->assertFalse((new UnionType(Type::list(Type::int()), Type::string()))->accepts(['a']));
+        $this->assertFalse((new UnionType(Type::arrayShape(['a' => Type::int()]), Type::string()))->accepts(['a' => 'x']));
     }
 }

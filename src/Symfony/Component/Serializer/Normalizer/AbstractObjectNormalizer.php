@@ -899,6 +899,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         unset($context[self::OBJECT_TO_POPULATE]);
         unset($context['cache_key']); // avoid artificially different keys
         unset($context['not_normalizable_value_exceptions']); // grows with every collected error
+        unset($context['debug_trace_id']); // unique per call when the serializer is traced
 
         try {
             return hash('xxh128', $format.serialize([

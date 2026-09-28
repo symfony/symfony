@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T17:43:35Z
+
+I reworked this to remove the uid mapping of #66338 instead: even with the bridge's own types, claiming `Uuid` breaks properties typed with a narrower class like `UuidV7`, where a v4 input now throws a `TypeError` from the constructor instead of a `NotNormalizableValueException`. No release has the mapping yet, so removing it costs nothing. Thanks for the quick PR @lazerg!

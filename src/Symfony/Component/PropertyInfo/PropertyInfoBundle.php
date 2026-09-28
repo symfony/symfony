@@ -102,6 +102,8 @@ class PropertyInfoBundle extends AbstractBundle
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('property_info.cache');
+            $container->removeDefinition('property_info.cache.adapter');
+            $container->removeDefinition('property_info.cache_warmer');
         }
     }
 }

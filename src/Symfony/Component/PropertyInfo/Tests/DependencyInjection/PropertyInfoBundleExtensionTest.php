@@ -50,8 +50,10 @@ class PropertyInfoBundleExtensionTest extends TestCase
         $container = $this->createContainerFromFile('property_info');
 
         $this->assertTrue($container->hasDefinition('property_info.cache'));
-        $this->assertEquals(new Reference('cache.property_info'), $container->getDefinition('property_info.cache')->getArgument(1));
+        $this->assertEquals(new Reference('property_info.cache.adapter'), $container->getDefinition('property_info.cache')->getArgument(1));
+        $this->assertEquals(new Reference('cache.property_info'), $container->getDefinition('property_info.cache.adapter')->getArgument(1));
         $this->assertSame('cache.system', $container->getDefinition('cache.property_info')->getParent());
+        $this->assertTrue($container->getDefinition('property_info.cache_warmer')->hasTag('kernel.cache_warmer'));
     }
 
     public function testPropertyInfoCacheDisabledInDebug()
@@ -59,6 +61,8 @@ class PropertyInfoBundleExtensionTest extends TestCase
         $container = $this->createContainerFromFile('property_info', true);
 
         $this->assertFalse($container->hasDefinition('property_info.cache'));
+        $this->assertFalse($container->hasDefinition('property_info.cache.adapter'));
+        $this->assertFalse($container->hasDefinition('property_info.cache_warmer'));
     }
 
     private function createContainerFromFile(string $file, bool $debug = false): ContainerBuilder

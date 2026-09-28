@@ -42,6 +42,10 @@ final class AttributeMetadataPass implements CompilerPassInterface
             }
         }
 
+        if ($container->hasDefinition('property_info.cache_warmer')) {
+            $this->addClassesToPropertyInfoCacheWarmer($container, array_keys($mappedClasses));
+        }
+
         if (!$mappedClasses) {
             return;
         }
@@ -68,5 +72,25 @@ final class AttributeMetadataPass implements CompilerPassInterface
                 throw new MappingException(\sprintf('The method "%s" on "%s" is not present on "%s".', $m->name, $source->name, $target->name));
             }
         }
+    }
+
+    /**
+     * @param class-string[] $classes
+     */
+    private function addClassesToPropertyInfoCacheWarmer(ContainerBuilder $container, array $classes): void
+    {
+        foreach ($container->getDefinition('validator.builder')->getMethodCalls() as [$method, $arguments]) {
+            if ('addMappedClasses' === $method) {
+                // the classes mapped by files, collected per file
+                foreach ($arguments[0] as $mappedClasses) {
+                    $classes = array_merge($classes, array_keys($mappedClasses));
+                }
+            }
+        }
+
+        $warmer = $container->getDefinition('property_info.cache_warmer');
+        $classes = array_unique(array_merge($warmer->getArgument(1), $classes));
+        sort($classes);
+        $warmer->replaceArgument(1, $classes);
     }
 }

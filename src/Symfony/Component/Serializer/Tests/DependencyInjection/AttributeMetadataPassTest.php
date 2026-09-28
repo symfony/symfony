@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 
 class AttributeMetadataPassTest extends TestCase
 {
@@ -202,6 +203,35 @@ class AttributeMetadataPassTest extends TestCase
         $this->expectException(MappingException::class);
         $this->expectExceptionMessage(\sprintf('Discriminator map type "child" for "%s" is already mapped to "%s".', _AttrMeta_DiscriminatorParent::class, _AttrMeta_DiscriminatorChild::class));
         (new AttributeMetadataPass())->process($container);
+    }
+
+    public function testProcessPassesMappedClassesToThePropertyInfoCacheWarmer()
+    {
+        $container = new ContainerBuilder();
+        $container->register('serializer.mapping.attribute_loader', AttributeLoader::class)
+            ->setArguments([false, []]);
+        $container->register('serializer.mapping.chain_loader', LoaderChain::class)
+            ->setArguments([[], [1 => ['App\Entity\FromFile' => 0, 'App\Entity\User' => 1]]]);
+        $container->register('property_info.cache_warmer')
+            ->setArguments([null, ['App\Entity\Order'], 'property_info.php']);
+
+        $container->register('service1', 'App\Entity\User')
+            ->addTag('serializer.attribute_metadata');
+        $container->register('service2', 'App\Entity\Product')
+            ->addTag('serializer.attribute_metadata');
+        $container->register('service.source', _AttrMeta_DiscriminatorChild::class)
+            ->addTag('serializer.attribute_metadata', ['for' => _AttrMeta_DiscriminatorParent::class, 'type' => 'child', 'discriminator_map_type' => true]);
+
+        (new AttributeMetadataPass())->process($container);
+
+        $expectedClasses = [
+            'App\Entity\FromFile',
+            'App\Entity\Order',
+            'App\Entity\Product',
+            'App\Entity\User',
+            _AttrMeta_DiscriminatorParent::class,
+        ];
+        $this->assertSame($expectedClasses, $container->getDefinition('property_info.cache_warmer')->getArgument(1));
     }
 }
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
@@ -62,6 +63,20 @@ class PropertyInfoBundleTest extends TestCase
         $propertyInfo = $container->get('test.property_info');
         $this->assertInstanceOf(PropertyInfoCacheExtractor::class, $propertyInfo);
         $this->assertEquals(Type::string(), $propertyInfo->getType(PropertyInfoBundleSubject::class, 'foo'));
+    }
+
+    public function testThePropertyInfoOfTheGivenClassesIsReadFromTheBuild()
+    {
+        $kernel = new TestPropertyInfoKernel('cached', false, $this->varDir, true);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $container->get('test.cache_warmer')->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
+        $this->assertFileExists($kernel->getBuildDir().'/property_info.php');
+
+        $propertyInfo = $container->get('test.property_info');
+        $this->assertEquals(Type::string(), $propertyInfo->getType(PropertyInfoBundleSubject::class, 'foo'));
+        $this->assertSame([], $container->get('test.cache')->getValues());
     }
 
     public function testTaggedExtractorsAreCollectedThroughAutoconfiguration()
@@ -127,7 +142,20 @@ class TestPropertyInfoKernel extends AbstractKernel
             $services
                 ->set('cache.system', ArrayAdapter::class)
                 ->alias('test.cache', 'cache.property_info')->public()
+                ->alias('test.cache_warmer', 'property_info.cache_warmer')->public()
             ;
         }
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new class implements CompilerPassInterface {
+            public function process(ContainerBuilder $container): void
+            {
+                if ($container->hasDefinition('property_info.cache_warmer')) {
+                    $container->getDefinition('property_info.cache_warmer')->replaceArgument(1, [PropertyInfoBundleSubject::class]);
+                }
+            }
+        });
     }
 }

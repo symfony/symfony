@@ -105,6 +105,30 @@ class AttributeMetadataPassTest extends TestCase
         $this->expectException(MappingException::class);
         (new AttributeMetadataPass())->process($container);
     }
+
+    public function testProcessPassesMappedClassesToThePropertyInfoCacheWarmer()
+    {
+        $container = new ContainerBuilder();
+        $container->register('validator.builder')
+            ->addMethodCall('addMappedClasses', [['validation.yaml' => ['App\Entity\FromFile' => 0, 'App\Entity\User' => 1]]]);
+        $container->register('property_info.cache_warmer')
+            ->setArguments([null, ['App\Entity\Order'], 'property_info.php']);
+
+        $container->register('service1', 'App\Entity\User')
+            ->addTag('validator.attribute_metadata');
+        $container->register('service2', 'App\Entity\Product')
+            ->addTag('validator.attribute_metadata');
+
+        (new AttributeMetadataPass())->process($container);
+
+        $expectedClasses = [
+            'App\Entity\FromFile',
+            'App\Entity\Order',
+            'App\Entity\Product',
+            'App\Entity\User',
+        ];
+        $this->assertSame($expectedClasses, $container->getDefinition('property_info.cache_warmer')->getArgument(1));
+    }
 }
 
 class _AttrMeta_Source

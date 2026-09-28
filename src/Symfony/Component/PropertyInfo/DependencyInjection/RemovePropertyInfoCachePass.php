@@ -28,6 +28,8 @@ class RemovePropertyInfoCachePass implements CompilerPassInterface
         if (!$container->hasDefinition('cache.system')) {
             $container->removeDefinition('cache.property_info');
             $container->removeDefinition('property_info.cache');
+            $container->removeDefinition('property_info.cache.adapter');
+            $container->removeDefinition('property_info.cache_warmer');
         }
     }
 }

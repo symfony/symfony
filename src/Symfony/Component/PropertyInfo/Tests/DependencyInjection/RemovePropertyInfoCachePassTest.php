@@ -12,8 +12,10 @@
 namespace Symfony\Component\PropertyInfo\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\PropertyInfo\CacheWarmer\PropertyInfoCacheWarmer;
 use Symfony\Component\PropertyInfo\DependencyInjection\RemovePropertyInfoCachePass;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 
@@ -28,6 +30,8 @@ class RemovePropertyInfoCachePassTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('cache.property_info'));
         $this->assertTrue($container->hasDefinition('property_info.cache'));
+        $this->assertTrue($container->hasDefinition('property_info.cache.adapter'));
+        $this->assertTrue($container->hasDefinition('property_info.cache_warmer'));
     }
 
     public function testTheCachingExtractorIsRemovedWhenTheSystemPoolIsMissing()
@@ -38,6 +42,8 @@ class RemovePropertyInfoCachePassTest extends TestCase
 
         $this->assertFalse($container->hasDefinition('cache.property_info'));
         $this->assertFalse($container->hasDefinition('property_info.cache'));
+        $this->assertFalse($container->hasDefinition('property_info.cache.adapter'));
+        $this->assertFalse($container->hasDefinition('property_info.cache_warmer'));
     }
 
     private function createContainer(): ContainerBuilder
@@ -45,6 +51,8 @@ class RemovePropertyInfoCachePassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setDefinition('cache.property_info', new ChildDefinition('cache.system'));
         $container->register('property_info.cache', PropertyInfoCacheExtractor::class);
+        $container->register('property_info.cache.adapter', PhpArrayAdapter::class);
+        $container->register('property_info.cache_warmer', PropertyInfoCacheWarmer::class);
 
         return $container;
     }

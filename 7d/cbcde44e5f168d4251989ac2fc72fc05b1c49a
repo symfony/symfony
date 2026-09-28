@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-28T17:48:10Z
+
+Hi,
+
+Indeed the bug is real. But the key sets are indexed by the issuer the provider announces which is the value an attacker controls. A provider can impersonate a peer by announcing that peer's issuer in its own discovery document.
+
+The right check is the one from [OIDC Discovery §4.3](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfigurationValidation): the announced issuer must match the issuer the discovery URL was built from.
+
+---------------------------------------------------------------------------
+
+by thomas-chauchefoin-tob at 2026-09-28T17:53:52Z
+
+> Indeed the bug is real. But the key sets are indexed by the issuer the provider announces which is the value an attacker controls. A provider can impersonate a peer by announcing that peer's issuer in its own discovery document.
+
+The risk here is more that it could confuse two key sets and accept A-issued tokens with the B key. If the OpenID configuration document is attacker-controlled, it's already game over.
+
+> The right check is the one from [OIDC Discovery §4.3](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfigurationValidation): the announced issuer must match the issuer the discovery URL was built from.
+
+I initially had it in the patch but I saw that some IdPs don't follow it (https://login.microsoftonline.com/microsoft.com/.well-known/openid-configuration). Or we could add it behind an optional parameter, disabled by default?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T18:34:36Z
+
+Thank you both. I pushed an update: with a single discovery endpoint, nothing changes anymore (same key set, same cache entry, the announced issuer isn't checked), so Entra's `common` metadata, a missing `issuer` or a trailing slash keep working on 7.4.
+With several endpoints, keys are bound to the issuer each document announces, and an issuer announced by two documents is refused. That closes the case @Spomky described without §4.3: the provider that holds A's key also serves A's document, so both cases need the same attacker IMHO.
+A §4.3 check behind an option would be a new feature: PR welcome on 8.2 :)
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-28T18:37:39Z
+
+Suggestion : discard §4.3 regarding derivation from the URL as it really breaks things. We keep the allowlist and add duplicate detection. That is what closes the loophole: for B to impersonate A, B must announce A's sender.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T18:50:22Z
+
+Agreed @Spomky, that's what the PR does now :)

@@ -158,6 +158,10 @@ class AttributeMetadata implements AttributeMetadataInterface
 
     public function getNormalizationContextForGroups(array $groups): array
     {
+        if (!$this->normalizationContexts) {
+            return [];
+        }
+
         $contexts = [];
         foreach ($groups as $group) {
             $contexts[] = $this->normalizationContexts[$group] ?? [];
@@ -184,6 +188,10 @@ class AttributeMetadata implements AttributeMetadataInterface
 
     public function getDenormalizationContextForGroups(array $groups): array
     {
+        if (!$this->denormalizationContexts) {
+            return [];
+        }
+
         $contexts = [];
         foreach ($groups as $group) {
             $contexts[] = $this->denormalizationContexts[$group] ?? [];

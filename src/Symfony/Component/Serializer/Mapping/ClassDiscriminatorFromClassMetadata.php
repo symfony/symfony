@@ -36,14 +36,6 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
 
     public function getMappingForMappedObject(object|string $object): ?ClassDiscriminatorMapping
     {
-        if ($this->classMetadataFactory->hasMetadataFor($object)) {
-            $metadata = $this->classMetadataFactory->getMetadataFor($object);
-
-            if (null !== $metadata->getClassDiscriminatorMapping()) {
-                return $metadata->getClassDiscriminatorMapping();
-            }
-        }
-
         $cacheKey = \is_object($object) ? $object::class : $object;
         if (!\array_key_exists($cacheKey, $this->mappingForMappedObjectCache)) {
             $this->mappingForMappedObjectCache[$cacheKey] = $this->resolveMappingForMappedObject($object);
@@ -63,6 +55,10 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
 
     private function resolveMappingForMappedObject(object|string $object): ?ClassDiscriminatorMapping
     {
+        if ($this->classMetadataFactory->hasMetadataFor($object) && null !== $mapping = $this->classMetadataFactory->getMetadataFor($object)->getClassDiscriminatorMapping()) {
+            return $mapping;
+        }
+
         $reflectionClass = new \ReflectionClass($object);
         if ($parentClass = $reflectionClass->getParentClass()) {
             if (null !== ($parentMapping = $this->getMappingForMappedObject($parentClass->getName()))) {

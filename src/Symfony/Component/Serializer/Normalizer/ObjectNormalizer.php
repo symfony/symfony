@@ -116,11 +116,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
     protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
     {
-        $mapping = $this->classDiscriminatorResolver?->getMappingForMappedObject($object);
-
-        return $attribute === $mapping?->getTypeProperty()
-            ? $mapping
-            : $this->propertyAccessor->getValue($object, $attribute);
+        return $this->propertyAccessor->getValue($object, $attribute);
     }
 
     protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void

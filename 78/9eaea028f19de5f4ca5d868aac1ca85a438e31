@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-22T18:47:47Z
+
+Thanks @gazi04. Dropping the `needs-review-translation` markers is exactly what #66088 asks for, but a few of the rewordings make the audio strings read differently from the video ones right above them:
+
+```
+135  Fajli i videos është i korruptuar.
+161  Skedari i audios është i dëmtuar.
+
+136  Videoja përmban disa rrjedha. Lejohet vetëm një rrjedhë.
+162  Audio përmban rryma (streams) të shumëfishta. Vetëm një rrymë është e lejuar.
+
+137  Kodeku videos është i pambështetur „{{ codec }}“.
+163  Kodek i pambështetur i audios „{{ codec }}“.
+```
+
+Same for "fajl", which the catalog uses in 18 units while this PR brings "skedar" into the three audio ones, and for "shumë", which becomes "tepër" in four audio strings while 32 others keep it.
+
+If "skedar" reads better, a separate PR changing it everywhere would be very welcome. Here I'd rather keep the existing wording so both blocks stay in sync. WDYT?
+
+---------------------------------------------------------------------------
+
+by gazi04 at 2026-09-23T08:27:07Z
+
+Hi @nicolas-grekas . I also noticed that the other translations, that didn't have the `needs-review-translation`, that they are different and to be honest I also thought that maybe I should improve them also but before I do anything else I thought that it would be better to tell someone like you or to create an issue.
+
+So I'm going to improve all the translations and I'm going to commit it as soon as possible, p.s I'm very grateful to contribute in this project :)

@@ -42,7 +42,7 @@ class RecorderSubscriberTest extends TestCase
     }
 
     #[DataProvider('provideResolveRecordPathCases')]
-    public function testResolveRecordPath(?string $record, string $testDir, string $shortClassName, string $methodName, string $defaultDirectory, string $expected): void
+    public function testResolveRecordPath(?string $record, string $testDir, string $shortClassName, string $methodName, string $defaultDirectory, string $expected)
     {
         $result = RecorderSubscriber::resolveRecordPath($record, $testDir, $shortClassName, $methodName, $defaultDirectory);
         $this->assertSame($expected, $result);
@@ -62,12 +62,12 @@ class RecorderSubscriberTest extends TestCase
     }
 
     #[DataProvider('provideIsAbsolutePathCases')]
-    public function testIsAbsolutePath(string $path, bool $expected): void
+    public function testIsAbsolutePath(string $path, bool $expected)
     {
         $this->assertSame($expected, RecorderSubscriber::isAbsolutePath($path));
     }
 
-    public function testShouldTruncateOnlyOncePerPath(): void
+    public function testShouldTruncateOnlyOncePerPath()
     {
         $subscriber = new RecorderSubscriber(new AttributeReader(), '/records/');
 

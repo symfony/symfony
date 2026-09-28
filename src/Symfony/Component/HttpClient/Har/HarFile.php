@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Har;
 
 use Composer\InstalledVersions;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\HttpClient\Exception\HarEntryNotFoundException;
 use Symfony\Component\HttpClient\Recorder\Matcher\MatcherInterface;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -130,7 +131,7 @@ final class HarFile
     {
         /** @psalm-var HarEntry $entry */
         $entry = [
-            'startedDateTime' => (new \DateTimeImmutable())->format('Y-m-d\TH:i:s.v\Z'),
+            'startedDateTime' => (class_exists(Clock::class) ? Clock::get()->now() : new \DateTimeImmutable())->format('Y-m-d\TH:i:s.v\Z'),
             'time' => 0,
             'request' => [
                 'method' => $method,

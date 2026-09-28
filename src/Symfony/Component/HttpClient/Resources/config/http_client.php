@@ -87,7 +87,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('http_client.uri_template', UriTemplateHttpClient::class)
-            ->decorate('http_client', null, 7) // Between TraceableHttpClient (5) and RetryableHttpClient (10)
+            ->decorate('http_client', null, 7) // Between TraceableHttpClient (5), RetryableHttpClient (10) and RecorderHttpClient (100)
             ->args([
                 service('.inner'),
                 service('http_client.uri_template_expander')->nullOnInvalid(),

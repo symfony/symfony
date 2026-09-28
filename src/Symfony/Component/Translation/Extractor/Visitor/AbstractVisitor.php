@@ -24,12 +24,15 @@ abstract class AbstractVisitor
     private MessageCatalogue $catalogue;
     private \SplFileInfo $file;
     private string $messagePrefix;
+    /** @var \WeakMap<Node\Expr, list<string>> */
+    private \WeakMap $resolvedValues;
 
     public function initialize(MessageCatalogue $catalogue, \SplFileInfo $file, string $messagePrefix): void
     {
         $this->catalogue = $catalogue;
         $this->file = $file;
         $this->messagePrefix = $messagePrefix;
+        $this->resolvedValues = new \WeakMap();
     }
 
     protected function addMessageToCatalogue(string $message, ?string $domain, int $line): void
@@ -109,15 +112,13 @@ abstract class AbstractVisitor
         }
 
         if ($node instanceof Node\Expr\BinaryOp\Concat) {
-            $values = [];
-            foreach ($this->getStringValues($node->left) as $left) {
-                foreach ($this->getStringValues($node->right) as $right) {
-                    if (self::MAX_STRING_VALUES <= \count($values)) {
-                        return [];
-                    }
+            return $this->concatenate($this->getStringValues($node->left), $this->getStringValues($node->right));
+        }
 
-                    $values[] = $left.$right;
-                }
+        if ($node instanceof Node\Scalar\InterpolatedString) {
+            $values = [''];
+            foreach ($node->parts as $part) {
+                $values = $this->concatenate($values, $part instanceof Node\InterpolatedStringPart ? [$part->value] : $this->getStringValues($part));
             }
 
             return $values;
@@ -138,8 +139,40 @@ abstract class AbstractVisitor
             ];
         }
 
+        if ($node instanceof Node\Expr\Match_) {
+            $values = [];
+            foreach ($node->arms as $arm) {
+                $values[] = $this->getStringValues($arm->body);
+            }
+
+            return array_merge(...$values);
+        }
+
         if ($node instanceof Node\Expr\Assign) {
             return $this->getStringValues($node->expr);
+        }
+
+        if ($node instanceof Node\Expr\Variable || $node instanceof Node\Expr\CallLike) {
+            // values are cached, as the same variables and methods can be reached many times while resolving a message
+            if (null !== $values = $this->resolvedValues[$node] ?? null) {
+                return $values;
+            }
+
+            // an empty list is cached first to stop methods calling themselves
+            $this->resolvedValues[$node] = [];
+
+            if ($node instanceof Node\Expr\Variable) {
+                $expressions = $node->getAttribute(VariableResolver::ASSIGNED_VALUES, []);
+            } else {
+                $expressions = ($getReturnedValues = $node->getAttribute(CallResolver::RETURNED_VALUES)) ? $getReturnedValues() : [];
+            }
+
+            $values = [];
+            foreach ($expressions as $expression) {
+                $values[] = $this->getStringValues($expression);
+            }
+
+            return $this->resolvedValues[$node] = array_values(array_unique(array_merge(...$values)));
         }
 
         if ($node instanceof Node\Expr\ClassConstFetch) {
@@ -154,5 +187,27 @@ abstract class AbstractVisitor
         }
 
         return [];
+    }
+
+    /**
+     * @param list<string> $lefts
+     * @param list<string> $rights
+     *
+     * @return list<string> All the combinations of the values, or none when there are too many
+     */
+    private function concatenate(array $lefts, array $rights): array
+    {
+        $values = [];
+        foreach ($lefts as $left) {
+            foreach ($rights as $right) {
+                if (self::MAX_STRING_VALUES <= \count($values)) {
+                    return [];
+                }
+
+                $values[] = $left.$right;
+            }
+        }
+
+        return $values;
     }
 }

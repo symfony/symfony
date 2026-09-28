@@ -2570,7 +2570,7 @@ class FrameworkExtension extends Extension
         unset($options['retry_failed']);
         $defaultUriTemplateVars = $options['vars'] ?? [];
         unset($options['vars']);
-        $container->getDefinition('http_client.transport')->setArguments([$options, $config['max_host_connections'] ?? 6]);
+        $container->getDefinition('http_client.transport')->setArguments([$options, $config['max_host_connections'] ?? 6, 0]);
 
         if (!class_exists(PingWebhookMessageHandler::class)) {
             $container->removeDefinition('http_client.messenger.ping_webhook_handler');

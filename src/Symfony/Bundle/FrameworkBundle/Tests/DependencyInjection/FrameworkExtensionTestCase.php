@@ -2160,7 +2160,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'resolve' => [],
             'extra' => [],
         ];
-        $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client.transport')->getArguments());
+        $this->assertSame([$defaultOptions, 4, 0], $container->getDefinition('http_client.transport')->getArguments());
 
         $this->assertTrue($container->getDefinition('http_client')->hasTag('kernel.reset'));
 

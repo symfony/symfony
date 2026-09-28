@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T18:38:13Z
+
+Thank you @thomas-chauchefoin-tob. I pushed a change to also escape `%` and `!` (and `[` on SQL Server) in the LIKE pattern: without it, clearing `a%` still deleted the items of `abc`.

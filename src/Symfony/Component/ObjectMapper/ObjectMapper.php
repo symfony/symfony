@@ -38,6 +38,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
      */
     private ?\WeakMap $objectMap = null;
 
+    /**
+     * Lazy ghosts created by this mapper whose constructor has not run yet.
+     */
+    private ?\WeakMap $pendingConstruction = null;
+
     public function __construct(
         private readonly ObjectMapperMetadataFactoryInterface $metadataFactory = new ReflectionObjectMapperMetadataFactory(),
         private readonly ?PropertyAccessorInterface $propertyAccessor = null,
@@ -49,13 +54,19 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
     public function map(object $source, object|string|null $target = null): object
     {
+        $constructTarget = false;
+        if (\is_object($target) && isset($this->pendingConstruction[$target])) {
+            unset($this->pendingConstruction[$target]);
+            $constructTarget = true;
+        }
+
         if ($this->objectMap) {
-            return $this->doMap($source, $target, $this->objectMap);
+            return $this->doMap($source, $target, $this->objectMap, $constructTarget);
         }
 
         $this->objectMap = new \WeakMap();
         try {
-            return $this->doMap($source, $target, $this->objectMap);
+            return $this->doMap($source, $target, $this->objectMap, $constructTarget);
         } finally {
             $this->objectMap = null;
         }
@@ -369,10 +380,16 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     $this->objectMap = $objectMap;
                     try {
                         // the ghost has not run a constructor yet, unlike a caller-supplied target
-                        $objectMap[$value] = $mapper === $this
-                            ? $this->doMap($value, $target, $objectMap, true)
-                            : $mapper->map($value, $target);
+                        if ($mapper === $this) {
+                            $objectMap[$value] = $this->doMap($value, $target, $objectMap, true);
+                        } else {
+                            // the decorator calls back into map(), which must still construct the ghost
+                            $this->pendingConstruction ??= new \WeakMap();
+                            $this->pendingConstruction[$target] = true;
+                            $objectMap[$value] = $mapper->map($value, $target);
+                        }
                     } finally {
+                        unset($this->pendingConstruction[$target]);
                         $this->objectMap = $previousMap;
                     }
                 });
@@ -582,6 +599,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     {
         $clone = clone $this;
         $clone->objectMapper = $objectMapper;
+        $clone->pendingConstruction = null;
 
         return $clone;
     }

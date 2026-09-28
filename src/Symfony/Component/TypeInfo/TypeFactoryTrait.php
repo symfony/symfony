@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo;
 
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
@@ -342,6 +343,10 @@ trait TypeFactoryTrait
         }
 
         if (1 === \count($unionTypes)) {
+            if ($unionTypes[0] instanceof BuiltinType && $unionTypes[0]->getTypeIdentifier()->isStandalone()) {
+                throw new InvalidArgumentException(\sprintf('Cannot create union with "%s" standalone type.', $unionTypes[0]));
+            }
+
             return self::nullable($unionTypes[0]);
         }
 

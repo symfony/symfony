@@ -1681,6 +1681,27 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame('slug-of-bar', $mapped->inner->slug);
     }
 
+    public function testNestedTargetIsConstructedWithDecoratedMapper()
+    {
+        $mapper = new class(new ObjectMapper()) implements ObjectMapperInterface {
+            public function __construct(private ObjectMapperInterface $mapper)
+            {
+                $this->mapper = $mapper->withObjectMapper($this);
+            }
+
+            public function map(object $source, object|string|null $target = null): object
+            {
+                return $this->mapper->map($source, $target);
+            }
+        };
+
+        $mapped = $mapper->map(new Outer(new Inner('bar')));
+
+        $this->assertInstanceOf(InnerMapped::class, $mapped->inner);
+        $this->assertSame('bar', $mapped->inner->name);
+        $this->assertSame('slug-of-bar', $mapped->inner->slug);
+    }
+
     public function testSameNameTargetPropertyMappingIsHonoredWhenSourceCarriesMetadata()
     {
         // Lead carries a class-level #[Map] to an unrelated view, so ObjectMapper reads metadata from

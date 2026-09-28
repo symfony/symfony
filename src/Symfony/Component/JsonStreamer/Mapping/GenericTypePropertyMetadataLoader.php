@@ -14,6 +14,7 @@ namespace Symfony\Component\JsonStreamer\Mapping;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
@@ -22,6 +23,7 @@ use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Enhances properties metadata based on properties' generic type.
@@ -121,7 +123,16 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
         }
 
         if ($type instanceof UnionType) {
-            return Type::union(...array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes()));
+            $types = array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes());
+
+            foreach ($types as $t) {
+                // a union with "mixed" is "mixed", and creating such a union is not allowed
+                if ($t instanceof BuiltinType && TypeIdentifier::MIXED === $t->getTypeIdentifier()) {
+                    return $t;
+                }
+            }
+
+            return Type::union(...$types);
         }
 
         if ($type instanceof IntersectionType) {

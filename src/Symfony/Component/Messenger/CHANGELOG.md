@@ -29,6 +29,7 @@ CHANGELOG
  * Add `$retryStrategy`, `$failureSender`, `$eventDispatcher` and `$logger` arguments to `SyncTransport`
  * Add `$retryStrategyLocator`, `$failureSenderLocator`, `$eventDispatcher` and `$logger` arguments to `SyncTransportFactory`
  * Add `SyncMessageFailedEvent` and `SyncMessageRetryingEvent`, dispatched by the sync transport
+ * Add the `messenger.serializer.symfony_serializer.service` option
 
 8.1
 ---

@@ -27,6 +27,7 @@ class ConfigurationTest extends TestCase
             'serializer' => [
                 'default_serializer' => 'messenger.transport.native_php_serializer',
                 'symfony_serializer' => [
+                    'service' => null,
                     'format' => 'json',
                     'context' => [],
                 ],

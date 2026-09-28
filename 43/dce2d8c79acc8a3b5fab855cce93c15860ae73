@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T17:59:56Z
+
+Thank you @thomas-chauchefoin-tob. I switched to `* /` to match #66416.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T18:58:55Z
+
+Same here: now `*\/` to match #64822 and #66416.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T19:03:25Z
+
+Rebased, and switched to `*\/` to match #64822 (and DI, since 5431b682394).

@@ -469,6 +469,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringStartsWith("curl \\\n  --compressed", $curlCommand);
@@ -482,6 +483,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringContainsString('--request POST', $curlCommand);
@@ -495,6 +497,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringContainsString('--head', $curlCommand);
@@ -509,6 +512,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringContainsString("--header 'Accept: application/json'", $curlCommand);
@@ -522,6 +526,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringContainsString('--cookie', $curlCommand);
@@ -543,6 +548,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringContainsString("--header 'X-Shell: a`id`b \$(id) & echo'", $curlCommand);
@@ -556,6 +562,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $this->assertStringNotContainsString('--cookie', $c->getCurlCommand());
     }
@@ -566,6 +573,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringContainsString('--request PUT', $curlCommand);
@@ -578,6 +586,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertSame(1, substr_count($curlCommand, 'foo=bar'));
@@ -590,9 +599,35 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringNotContainsString('--data-raw', $curlCommand);
+    }
+
+    public function testCurlCommandHidesPassword()
+    {
+        $request = Request::create('http://test.com/login', 'POST', ['_password' => ' _password@123'], [], [], [], '_password=%20_password%40123');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+        $c->lateCollect();
+
+        $this->assertStringContainsString("--data-raw '_password=******'", $c->getCurlCommand());
+    }
+
+    public function testCurlCommandIsComputedForTheRequestOfEachProfile()
+    {
+        $c = new RequestDataCollector();
+        $c->collect(Request::create('http://test.com/sub'), $this->createResponse());
+        $subRequestCollector = clone $c;
+        $c->collect(Request::create('http://test.com/main'), $this->createResponse());
+
+        $subRequestCollector->lateCollect();
+        $c->lateCollect();
+
+        $this->assertStringContainsString("--url 'http://test.com/sub'", $subRequestCollector->getCurlCommand());
+        $this->assertStringContainsString("--url 'http://test.com/main'", $c->getCurlCommand());
     }
 
     public function testCurlCommandIsEmptyStringWhenNotCollected()

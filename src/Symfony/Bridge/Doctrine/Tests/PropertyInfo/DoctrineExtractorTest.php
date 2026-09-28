@@ -34,10 +34,10 @@ use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\Uid\Ulid;
-use Symfony\Component\Uid\Uuid;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -55,7 +55,7 @@ class DoctrineExtractorTest extends TestCase
             $config->setLazyGhostObjectEnabled(true);
         }
 
-        DoctrineTestHelper::registerTypes($config, ['foo' => DoctrineFooType::class]);
+        DoctrineTestHelper::registerTypes($config, ['foo' => DoctrineFooType::class, 'uuid' => UuidType::class, 'ulid' => UlidType::class]);
 
         $eventManager = new EventManager();
         $entityManager = new EntityManager(DriverManager::getConnection(['driver' => 'pdo_sqlite'], $config, $eventManager), $config, $eventManager);
@@ -188,8 +188,8 @@ class DoctrineExtractorTest extends TestCase
         return [
             ['id', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_INT)]],
             ['guid', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
-            ['uuid', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Uuid::class)]],
-            ['ulid', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Ulid::class)]],
+            ['uuid', null],
+            ['ulid', null],
             ['bigint', $expectedBingIntType],
             ['time', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
             ['timeImmutable', static fn () => [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
@@ -347,8 +347,8 @@ class DoctrineExtractorTest extends TestCase
 
         yield ['id', Type::int()];
         yield ['guid', Type::string()];
-        yield ['uuid', Type::object(Uuid::class)];
-        yield ['ulid', Type::object(Ulid::class)];
+        yield ['uuid', null];
+        yield ['ulid', null];
         yield ['bigint', $expectedBigIntType];
         yield ['time', Type::object(\DateTime::class)];
         yield ['timeImmutable', Type::object(\DateTimeImmutable::class)];

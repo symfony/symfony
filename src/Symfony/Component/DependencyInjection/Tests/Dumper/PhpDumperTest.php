@@ -435,6 +435,23 @@ class PhpDumperTest extends TestCase
         $this->assertTrue(method_exists($class, 'getBar2Service'));
     }
 
+    public function testDeprecatedAliasWithUnsupportedCharacters()
+    {
+        $class = 'Symfony_DI_PhpDumper_Test_Deprecated_Alias_With_Unsupported_Characters';
+        $container = new ContainerBuilder();
+        $container->register('foo*/target', \stdClass::class)->setPublic(true);
+        $container->setAlias('foo*/alias', 'foo*/target')->setPublic(true)->setDeprecated('foo/bar', '1.0', '');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $code = $dumper->dump(['class' => $class]);
+
+        $this->assertStringContainsString("     * Gets the public 'foo*\\/alias' alias.\n     *\n     * @return object The \"foo*\\/target\" service.\n     */\n", $code);
+
+        eval('?>'.$code);
+
+        $this->assertTrue((new $class())->has('foo*/alias'));
+    }
+
     public function testConflictingServiceIds()
     {
         $class = 'Symfony_DI_PhpDumper_Test_Conflicting_Service_Ids';
@@ -1837,6 +1854,25 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
+    public function testCircularWitherWithBackslashesInServiceIdIsShared()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a\\\\b', PhpDumperTest_CircularWither::class)
+            ->setPublic(true)
+            ->addMethodCall('withB', [new Reference('c')], true);
+        $container->register('c', PhpDumperTest_CircularSetterB::class)
+            ->setPublic(true)
+            ->addMethodCall('setA', [new Reference('a\\\\b')]);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Circular_Wither_Backslashes']));
+
+        $dumpedContainer = new $class();
+
+        $this->assertSame($dumpedContainer->get('a\\\\b'), $dumpedContainer->get('a\\\\b'));
+    }
+
     public function testCloningLazyGhostWithDependency()
     {
         $container = new ContainerBuilder();
@@ -2940,6 +2976,19 @@ class PhpDumperTest_CircularSetterB
     public function setA(object $a): void
     {
         $this->a = $a;
+    }
+}
+
+class PhpDumperTest_CircularWither
+{
+    public ?object $b = null;
+
+    public function withB(object $b): static
+    {
+        $new = clone $this;
+        $new->b = $b;
+
+        return $new;
     }
 }
 

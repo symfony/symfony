@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\Tests\TypeResolver;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
+use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
@@ -242,9 +243,20 @@ class StringTypeResolverTest extends TestCase
 
     public function testResolveWithExtraTypeAlias()
     {
-        $resolver = new StringTypeResolver(null, null, ['CustomAlias' => 'int']);
+        $resolver = new StringTypeResolver(null, null, ['CustomAlias' => 'int', 'CustomPair' => 'array{0: CustomAlias, 1: CustomAlias}']);
 
         $this->assertEquals(Type::int(), $resolver->resolve('CustomAlias'));
+        $this->assertEquals(Type::arrayShape([Type::int(), Type::int()]), $resolver->resolve('CustomPair'));
+    }
+
+    public function testThrowWhenResolvingRecursiveExtraTypeAlias()
+    {
+        $resolver = new StringTypeResolver(null, null, ['Foo' => 'list<Foo>']);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot resolve "Foo" type alias as it is recursive.');
+
+        $resolver->resolve('Foo');
     }
 
     public function testCannotResolveNonStringType()

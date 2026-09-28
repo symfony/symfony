@@ -464,6 +464,40 @@ class OidcTokenHandlerTest extends TestCase
 
         $this->assertInstanceOf(UserBadge::class, $userBadge);
         $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
+        $this->assertTrue($cache->hasItem('oidc_config'));
+    }
+
+    public function testSingleDiscoveryEndpointDoesNotBindKeysToTheAnnouncedIssuer()
+    {
+        // multi-tenant metadata announces a templated issuer that no token carries
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://login.example.com/{tenantid}/v2.0', 'jwks_uri' => 'https://login.example.com/common/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://login.example.com/tenant1/v2.0', 'https://login.example.com/tenant2/v2.0'],
+            'sub',
+            null,
+            new Clock(),
+            0,
+            true,
+        );
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_config');
+
+        $userBadge = $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode([
+            'iat' => time(),
+            'nbf' => time(),
+            'exp' => time() + 3600,
+            'iss' => 'https://login.example.com/tenant2/v2.0',
+            'aud' => self::AUDIENCE,
+            'sub' => 'user-from-tenant2',
+        ]), self::getJWK()));
+
+        $this->assertSame('user-from-tenant2', $userBadge->getUserIdentifier());
     }
 
     public function testDiscoveryRejectsAnOversizedJwks()
@@ -529,7 +563,7 @@ class OidcTokenHandlerTest extends TestCase
 
         $httpClient1 = new MockHttpClient(static function ($method, $url) {
             if (str_contains($url, 'openid-configuration')) {
-                return new JsonMockResponse(['jwks_uri' => 'https://provider1.example.com/.well-known/jwks.json']);
+                return new JsonMockResponse(['issuer' => 'https://provider1.example.com', 'jwks_uri' => 'https://provider1.example.com/.well-known/jwks.json']);
             }
 
             return new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]);
@@ -537,7 +571,7 @@ class OidcTokenHandlerTest extends TestCase
 
         $httpClient2 = new MockHttpClient(static function ($method, $url) {
             if (str_contains($url, 'openid-configuration')) {
-                return new JsonMockResponse(['jwks_uri' => 'https://provider2.example.com/.well-known/jwks.json']);
+                return new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider2.example.com/.well-known/jwks.json']);
             }
 
             return new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]]);
@@ -549,7 +583,7 @@ class OidcTokenHandlerTest extends TestCase
             new AlgorithmManager([new ES256()]),
             null,
             self::AUDIENCE,
-            ['https://www.example.com'],
+            ['https://provider1.example.com', 'https://provider2.example.com'],
             'sub',
             null,
             new Clock(),
@@ -562,7 +596,7 @@ class OidcTokenHandlerTest extends TestCase
             'iat' => $time,
             'nbf' => $time,
             'exp' => $time + 3600,
-            'iss' => 'https://www.example.com',
+            'iss' => 'https://provider1.example.com',
             'aud' => self::AUDIENCE,
             'sub' => 'user-from-provider1',
             'email' => 'user1@example.com',
@@ -577,7 +611,7 @@ class OidcTokenHandlerTest extends TestCase
             'iat' => $time,
             'nbf' => $time,
             'exp' => $time + 3600,
-            'iss' => 'https://www.example.com',
+            'iss' => 'https://provider2.example.com',
             'aud' => self::AUDIENCE,
             'sub' => 'user-from-provider2',
             'email' => 'user2@example.com',
@@ -588,7 +622,120 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertInstanceOf(UserBadge::class, $userBadge2);
         $this->assertSame('user-from-provider2', $userBadge2->getUserIdentifier());
 
-        $this->assertTrue($cache->hasItem('oidc_config'));
+        $this->assertTrue($cache->hasItem('oidc_config.issuer_keysets'));
+    }
+
+    public function testDiscoveryKeysAreBoundToIssuers()
+    {
+        $httpClient1 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider1.example.com', 'jwks_uri' => 'https://provider1.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+        $httpClient2 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider2.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://provider1.example.com', 'https://provider2.example.com'],
+            'sub',
+            null,
+            new Clock(),
+            0,
+            true,
+        );
+        $handler->enableDiscovery(new ArrayAdapter(), [$httpClient1, $httpClient2], 'oidc_config');
+
+        $this->expectException(BadCredentialsException::class);
+        $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode([
+            'iat' => time(),
+            'nbf' => time(),
+            'exp' => time() + 3600,
+            'iss' => 'https://provider2.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'user-from-provider2',
+        ]), self::getJWK()));
+    }
+
+    public function testDiscoveryRejectsAnIssuerAnnouncedByTwoProviders()
+    {
+        $httpClient1 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider1.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+        $httpClient2 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider2.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://provider1.example.com', 'https://provider2.example.com'],
+            'sub',
+            null,
+            new Clock(),
+            0,
+            true,
+        );
+        $handler->enableDiscovery(new ArrayAdapter(), [$httpClient1, $httpClient2], 'oidc_config');
+
+        try {
+            $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode([
+                'iat' => time(),
+                'nbf' => time(),
+                'exp' => time() + 3600,
+                'iss' => 'https://provider2.example.com',
+                'aud' => self::AUDIENCE,
+                'sub' => 'user-from-provider2',
+            ]), self::getJWK()));
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertSame('The OIDC issuer "https://provider2.example.com" is announced by more than one discovery document.', $e->getPrevious()?->getMessage());
+        }
+    }
+
+    public function testDiscoveryRejectsAnIssuerThatIsNotAllowed()
+    {
+        $httpClient1 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider1.example.com', 'jwks_uri' => 'https://provider1.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+        $httpClient2 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider3.example.com', 'jwks_uri' => 'https://provider2.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://provider1.example.com', 'https://provider2.example.com'],
+            'sub',
+            null,
+            new Clock(),
+            0,
+            true,
+        );
+        $handler->enableDiscovery(new ArrayAdapter(), [$httpClient1, $httpClient2], 'oidc_config');
+
+        try {
+            $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode([
+                'iat' => time(),
+                'nbf' => time(),
+                'exp' => time() + 3600,
+                'iss' => 'https://provider1.example.com',
+                'aud' => self::AUDIENCE,
+                'sub' => 'user-from-provider1',
+            ]), self::getJWK()));
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertSame('The OIDC provider announced the issuer "https://provider3.example.com", which is not allowed.', $e->getPrevious()?->getMessage());
+        }
     }
 
     public function testDiscoveryDocumentsOfEveryClientAreRequestedBeforeTheirJwks()
@@ -602,14 +749,14 @@ class OidcTokenHandlerTest extends TestCase
                 $requestedUrls[] = $url;
 
                 if (str_contains($url, 'openid-configuration')) {
-                    return new JsonMockResponse(['jwks_uri' => \sprintf('https://provider%d.example.com/jwks.json', $provider)]);
+                    return new JsonMockResponse(['issuer' => \sprintf('https://provider%d.example.com', $provider), 'jwks_uri' => \sprintf('https://provider%d.example.com/jwks.json', $provider)]);
                 }
 
                 return new JsonMockResponse(['keys' => [array_merge((1 === $provider ? self::getJWK() : self::getSecondJWK())->all(), ['use' => 'sig'])]]);
             }, \sprintf('https://provider%d.example.com/', $provider));
         }
 
-        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com'], 'sub', null, new Clock(), 0, true);
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://provider1.example.com', 'https://provider2.example.com'], 'sub', null, new Clock(), 0, true);
         $handler->enableDiscovery(new ArrayAdapter(), $httpClients, 'oidc_config');
 
         $time = time();
@@ -617,7 +764,7 @@ class OidcTokenHandlerTest extends TestCase
             'iat' => $time,
             'nbf' => $time,
             'exp' => $time + 3600,
-            'iss' => 'https://www.example.com',
+            'iss' => 'https://provider1.example.com',
             'aud' => self::AUDIENCE,
             'sub' => 'user-from-provider1',
         ]), self::getJWK()));

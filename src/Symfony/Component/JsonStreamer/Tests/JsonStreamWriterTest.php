@@ -36,6 +36,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSpecialCharacterNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
@@ -171,6 +172,18 @@ class JsonStreamWriterTest extends TestCase
             new \ArrayObject([new ClassicDummy(), new ClassicDummy()]),
             Type::iterable(Type::object(ClassicDummy::class), Type::int()),
         );
+    }
+
+    public function testWriteObjectWithQuotedStreamedNameAndValueTransformerId()
+    {
+        $this->assertWritten('{"it\'s \\\\\' quoted":1,"transformed":"20"}', new DummyWithQuotes(), Type::object(DummyWithQuotes::class), ['scale' => 1], ["double'it" => new DoubleIntAndCastToStringValueTransformer()]);
+    }
+
+    public function testWriteTypeWithUnsupportedCharacters()
+    {
+        $type = Type::arrayShape(['foo*/bar' => Type::int()]);
+
+        $this->assertWritten('{"foo*/bar":1}', ['foo*/bar' => 1], $type);
     }
 
     public function testWriteNestedCollection()
@@ -585,6 +598,27 @@ class JsonStreamWriterTest extends TestCase
         $this->expectExceptionMessage('Cannot encode "int" to JSON: Inf and NaN cannot be JSON encoded.');
 
         (string) $writer->write(\INF, Type::int());
+    }
+
+    #[DataProvider('throwWhenEncodeErrorWithSpecialCharactersInTypeDataProvider')]
+    public function testThrowWhenEncodeErrorWithSpecialCharactersInType(string $key, string $expectedMessage)
+    {
+        $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
+
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        (string) $writer->write([$key => \INF], Type::arrayShape([$key => Type::float()]));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: string}>
+     */
+    public static function throwWhenEncodeErrorWithSpecialCharactersInTypeDataProvider(): iterable
+    {
+        yield ['a"b', 'Cannot encode "array{\'a"b\': float}" to JSON: Inf and NaN cannot be JSON encoded.'];
+        yield ['{$e->getLine()}', 'Cannot encode "array{\'{$e->getLine()}\': float}" to JSON: Inf and NaN cannot be JSON encoded.'];
+        yield ["a'b\\c", 'Cannot encode "array{\'a\\\'b\\\\c\': float}" to JSON: Inf and NaN cannot be JSON encoded.'];
     }
 
     public function testCreateStreamWriterFile()

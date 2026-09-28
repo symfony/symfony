@@ -129,6 +129,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
 
     /**
      * @param HttpClientInterface|HttpClientInterface[] $client
+     * @param string                                    $oidcConfigurationCacheKey   Base cache key; with several clients, issuer-indexed key sets are cached below its ".issuer_keysets" suffix
      * @param bool                                      $enforceKeyUsageVerification When true (default, strict), only JWKs whose `use` is "sig" or whose
      *                                                                               `key_ops` contains "sign"/"verify" are accepted for signature verification.
      *                                                                               When false (lax), JWKs missing both `use` and `key_ops` are also accepted;
@@ -140,7 +141,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
     {
         $this->discoveryCache = $cache;
         $this->discoveryClients = \is_array($client) ? $client : [$client];
-        $this->oidcConfigurationCacheKey = $oidcConfigurationCacheKey;
+        $this->oidcConfigurationCacheKey = 1 < \count($this->discoveryClients) ? $oidcConfigurationCacheKey.'.issuer_keysets' : $oidcConfigurationCacheKey;
         $this->enforceKeyUsageVerification = $enforceKeyUsageVerification;
 
         // the discovery documents get their own cache entries: $oidcConfigurationCacheKey
@@ -167,7 +168,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         if ($this->discoveryClients) {
             $keys = $this->discoveryCache->get($this->oidcConfigurationCacheKey, [$this, 'computeDiscoveryKeys']);
 
-            $jwkset = JWKSet::createFromKeyData(['keys' => $keys]);
+            $jwkset = 1 < \count($this->discoveryClients) ? $keys : JWKSet::createFromKeyData(['keys' => $keys]);
         }
 
         try {
@@ -199,8 +200,12 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
     /**
      * Computes the JWKS and sets the cache item TTL from provider headers.
      *
+     * With several providers, keys are indexed by the issuer each provider announces, so that a token can only be verified with the keys of its own issuer.
+     *
      * The cache entry lifetime is automatically adjusted based on the lowest TTL
      * advertised by the providers (via "Cache-Control: max-age" or "Expires" headers).
+     *
+     * @return list<array<string, mixed>>|array<string, list<array<string, mixed>>>
      *
      * @internal this method is public to enable async offline cache population
      */
@@ -213,6 +218,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         try {
             $discoveredKeys = [];
             $minTtl = null;
+            $bindKeysToIssuers = 1 < \count($this->discoveries);
             $jwkSetResponses = [];
 
             // the ".well-known" requests are sent first, so that they travel concurrently:
@@ -222,14 +228,30 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
             }
 
             foreach ($this->discoveries as $i => $discovery) {
+                $configuration = $discovery->getConfiguration();
+                $issuer = '';
+
+                if ($bindKeysToIssuers) {
+                    $issuer = $configuration['issuer'] ?? null;
+
+                    if (!\is_string($issuer) || !\in_array($issuer, $this->issuers, true)) {
+                        throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which is not allowed.', \is_string($issuer) ? $issuer : get_debug_type($issuer)));
+                    }
+
+                    // a provider claiming the issuer of another one would get its keys trusted for that issuer
+                    if (isset($jwkSetResponses[$issuer])) {
+                        throw new \RuntimeException(\sprintf('The OIDC issuer "%s" is announced by more than one discovery document.', $issuer));
+                    }
+                }
+
                 // the scheme was checked against the URL that served the document before
                 // the configuration was cached, so only the announcement is enforced here
-                $jwksUri = self::checkDiscoveredEndpoint($discovery->getConfiguration()['jwks_uri'] ?? null, 'jwks_uri', null);
+                $jwksUri = self::checkDiscoveredEndpoint($configuration['jwks_uri'] ?? null, 'jwks_uri', null);
 
-                $jwkSetResponses[] = $this->discoveryClients[$i]->request('GET', $jwksUri, ['max_redirects' => 0]);
+                $jwkSetResponses[$issuer] = $this->discoveryClients[$i]->request('GET', $jwksUri, ['max_redirects' => 0]);
             }
 
-            foreach ($jwkSetResponses as $response) {
+            foreach ($jwkSetResponses as $issuer => $response) {
                 [$keys, $currentTtl] = OidcJwks::fromResponse($response, $this->enforceKeyUsageVerification);
 
                 // Apply the lowest TTL found to ensure all keys in the set are still valid
@@ -237,16 +259,14 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
                     $minTtl = $currentTtl;
                 }
 
-                foreach ($keys as $key) {
-                    $discoveredKeys[] = $key;
-                }
+                $discoveredKeys[$issuer] = $keys;
             }
 
             if (0 < ($minTtl ?? -1)) {
                 $item->expiresAfter(min($minTtl, OidcJwks::MAX_TTL));
             }
 
-            return $discoveredKeys;
+            return $bindKeysToIssuers ? $discoveredKeys : $discoveredKeys[''] ?? [];
         } catch (\Exception $e) {
             $logger?->error('An error occurred while requesting OIDC certs.', [
                 'error' => $e->getMessage(),
@@ -257,12 +277,22 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         }
     }
 
-    private function loadAndVerifyJws(string $accessToken, JWKSet $jwkset): array
+    private function loadAndVerifyJws(string $accessToken, array|JWKSet $jwkset): array
     {
         // Decode the token
         $jwsVerifier = new JWSVerifier($this->signatureAlgorithm);
         $serializerManager = new JWSSerializerManager([new JwsCompactSerializer()]);
         $jws = $serializerManager->unserialize($accessToken);
+
+        $claims = json_decode($jws->getPayload(), true);
+        if (\is_array($jwkset)) {
+            $issuer = \is_array($claims) ? ($claims['iss'] ?? null) : null;
+            if (!\is_string($issuer) || !\is_array($jwkset[$issuer] ?? null)) {
+                throw new InvalidSignatureException();
+            }
+
+            $jwkset = JWKSet::createFromKeyData(['keys' => $jwkset[$issuer]]);
+        }
 
         // Verify the signature
         if (method_exists($jwsVerifier, 'verify')) { // web-token/jwt-library >= 4.3
@@ -287,7 +317,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         // if this check fails, an InvalidHeaderException is thrown
         $headerCheckerManager->check($jws, 0, $mandatoryHeaders);
 
-        return json_decode($jws->getPayload(), true);
+        return $claims;
     }
 
     private function verifyClaims(array $claims): array

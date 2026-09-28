@@ -71,18 +71,19 @@ final class PhpGenerator
             .$this->flushYieldBuffer($context);
 
         $context['indentation_level'] = 0;
+        $docType = str_replace('*/', '*\/', (string) $dataModel->getType());
 
         return $this->line('<?php', $context)
             .$this->line('', $context)
             .$this->line('/**', $context)
-            .$this->line(' * @param '.$dataModel->getType().' $data', $context)
+            .$this->line(' * @param '.$docType.' $data', $context)
             .$this->line(' */', $context)
             .$this->line('return static function (mixed $data, \\'.ContainerInterface::class.' $transformers, array $options): \\Traversable {', $context)
             .implode('', $generators)
             .$this->line('    try {', $context)
             .$yields
             .$this->line('    } catch (\\JsonException $e) {', $context)
-            .$this->line(\sprintf('        throw new \\%s("Cannot encode \\"%s\\" to JSON: {$e->getMessage()}.", 0, $e);', NotEncodableValueException::class, addcslashes($dataModel->getType(), '\\')), $context)
+            .$this->line('        throw new \\'.NotEncodableValueException::class.'(\\sprintf(\'Cannot encode "%s" to JSON: %s.\', '.var_export((string) $dataModel->getType(), true).', $e->getMessage()), 0, $e);', $context)
             .$this->line('    }', $context)
             .$this->line('};', $context);
     }

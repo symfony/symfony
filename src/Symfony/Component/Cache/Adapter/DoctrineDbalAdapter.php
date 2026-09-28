@@ -222,13 +222,16 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     {
         if ('' === $namespace) {
             $sql = $this->conn->getDatabasePlatform()->getTruncateTableSQL($this->table);
+            $params = [];
         } else {
-            $namespace = str_replace('_', '!_', $namespace);
-            $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE '$namespace%' ESCAPE '!'";
+            // SQL Server also treats [ as a wildcard, while Oracle rejects an escape character followed by it
+            $namespace = preg_replace('sqlsrv' === $this->getPlatformName() ? '/[!%_[]/' : '/[!%_]/', '!$0', $namespace);
+            $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE ? ESCAPE '!'";
+            $params = [$namespace.'%'];
         }
 
         try {
-            $this->conn->executeStatement($sql);
+            $this->conn->executeStatement($sql, $params);
         } catch (TableNotFoundException) {
         }
 

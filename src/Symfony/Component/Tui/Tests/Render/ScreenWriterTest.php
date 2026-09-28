@@ -674,12 +674,17 @@ class ScreenWriterTest extends TestCase
         $writer = new ScreenWriter($terminal);
 
         $writer->writeFrame(new ArrayLineBuffer([...$transcript, 'A', 'B', 'C', 'D', 'E', 'F', 'G']));
+        $scrollback = $screen->getScrollback();
         $output = '';
         $writer->writeFrame(new ArrayLineBuffer([...$transcript, ...$shrunk]));
 
         // The terminal shows the last 5 lines of the content, whatever the shrink removed
         $this->assertSame(\array_slice([...$transcript, ...$shrunk], -5), array_map('rtrim', $screen->getLines()));
+        $this->assertSame($scrollback, $screen->getScrollback());
         $this->assertStringNotContainsString("\x1b[3J", $output, 'Scrollback should be preserved');
+        $this->assertStringNotContainsString("\x1b[2J", $output, 'Some terminals move a cleared screen into the scrollback');
+        $this->assertStringStartsWith(self::SYNC_START.self::HIDE_CURSOR, $output);
+        $this->assertStringEndsWith(self::SYNC_END, $output);
     }
 
     public function testShrinkingOverflowingContentDoesNotReadUnchangedPrefix()
@@ -720,6 +725,35 @@ class ScreenWriterTest extends TestCase
         yield 'three trailing lines removed' => [['A', 'B', 'C', 'D']];
         yield 'two leading lines removed' => [['C', 'D', 'E', 'F', 'G']];
         yield 'all but one line removed' => [['A']];
+    }
+
+    #[DataProvider('provideOverflowingContentShrunkBelowTheScreenHeight')]
+    public function testShrinkingOverflowingContentBelowTheScreenHeightKeepsTheRemainingLinesOnScreen(array $shrunk, array $next)
+    {
+        $screen = new ScreenBuffer(20, 5);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+
+        $writer = new ScreenWriter($terminal);
+        $writer->writeFrame(new ArrayLineBuffer(['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6']));
+        $writer->writeFrame(new ArrayLineBuffer($shrunk));
+
+        $this->assertSame(array_pad($shrunk, 5, ''), array_map(rtrim(...), $screen->getLines()));
+
+        $writer->writeFrame(new ArrayLineBuffer($next));
+
+        $this->assertSame(array_pad($next, 5, ''), array_map(rtrim(...), $screen->getLines()));
+        $this->assertSame(['L0', 'L1'], array_map(rtrim(...), $screen->getScrollback()));
+    }
+
+    public static function provideOverflowingContentShrunkBelowTheScreenHeight(): iterable
+    {
+        yield 'three lines left, then one appended' => [['L0', 'L1', 'L2'], ['L0', 'L1', 'L2', 'L3']];
+        yield 'one line left, then edited' => [['L0'], ['L0x']];
+        yield 'nothing left, then two lines' => [[], ['M0', 'M1']];
     }
 
     #[DataProvider('renderPathFrames')]
@@ -830,5 +864,115 @@ class ScreenWriterTest extends TestCase
             $lines(0, 5),
             $lines(6, 10),
         ];
+
+        yield 'shrunk and regrown repeatedly' => [
+            [$lines(0, 6), $lines(0, 5), $lines(0, 6), $lines(0, 5), $lines(0, 6)],
+            $lines(0, 1),
+            $lines(2, 6),
+        ];
+
+        yield 'regrown past the lines already in the scrollback' => [
+            [$lines(0, 8), $lines(0, 6), $lines(0, 10)],
+            $lines(0, 5),
+            $lines(6, 10),
+        ];
+
+        yield 'grown further after regrowing' => [
+            [$lines(0, 6), $lines(0, 5), $lines(0, 6), $lines(0, 7)],
+            $lines(0, 2),
+            $lines(3, 7),
+        ];
+
+        yield 'shrunk after regrowing past the lines already in the scrollback' => [
+            [$lines(0, 8), $lines(0, 6), $lines(0, 10), $lines(0, 9)],
+            $lines(0, 5),
+            $lines(5, 9),
+        ];
+
+        yield 'shrunk after growing while overflowing' => [
+            [$lines(0, 6), $lines(0, 8), $lines(0, 7)],
+            $lines(0, 3),
+            $lines(3, 7),
+        ];
+
+        yield 'regrown after shrinking below the screen height' => [
+            [$lines(0, 6), $lines(0, 2), $lines(0, 6)],
+            $lines(0, 1),
+            $lines(2, 6),
+        ];
+
+        yield 'regrown one line at a time after shrinking below the screen height' => [
+            [$lines(0, 6), $lines(0, 2), $lines(0, 3), $lines(0, 4), $lines(0, 5), $lines(0, 6)],
+            $lines(0, 1),
+            $lines(2, 6),
+        ];
+
+        yield 'line edited after coming back from the scrollback, then regrown' => [
+            [$lines(0, 6), $lines(0, 5), ['L0', 'L1x', ...$lines(2, 6)]],
+            ['L0', 'L1', 'L1x'],
+            $lines(2, 6),
+        ];
+
+        yield 'lines removed from the scrollback, then others appended' => [
+            [$lines(0, 8), $lines(0, 1), ['L0', 'L1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8']],
+            [...$lines(0, 3), 'M2', 'M3'],
+            ['M4', 'M5', 'M6', 'M7', 'M8'],
+        ];
+
+        yield 'line edited above the viewport while shrinking' => [
+            [$lines(0, 8), ['L0x', ...$lines(1, 7)]],
+            [...$lines(0, 3), 'L0x', 'L1', 'L2'],
+            $lines(3, 7),
+        ];
+    }
+
+    public function testGrowingContentAfterAResetScrollsTheLinesLeavingTheViewportIntoTheScrollback()
+    {
+        $screen = new ScreenBuffer(20, 5);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+
+        $writer = new ScreenWriter($terminal);
+        $writer->writeFrame(new ArrayLineBuffer(['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8']));
+        $writer->writeFrame(new ArrayLineBuffer(['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6']));
+        $writer->reset();
+        $writer->writeFrame(new ArrayLineBuffer(['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6']));
+        $writer->writeFrame(new ArrayLineBuffer(['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8']));
+
+        $this->assertSame(['L0', 'L1', 'L2', 'L3'], array_map(rtrim(...), $screen->getScrollback()));
+        $this->assertSame(['L4', 'L5', 'L6', 'L7', 'L8'], array_map(rtrim(...), $screen->getLines()));
+    }
+
+    #[DataProvider('provideOverflowingContentChanges')]
+    public function testChangingOverflowingContentOnlyWritesTheChangedLines(bool $virtual, array $frames, string $written)
+    {
+        $output = '';
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn($virtual);
+        $terminal->method('write')->willReturnCallback(static function (string $data) use (&$output): void {
+            $output .= $data;
+        });
+
+        $writer = new ScreenWriter($terminal);
+        foreach ($frames as $frame) {
+            $output = '';
+            $writer->writeFrame(new ArrayLineBuffer($frame));
+        }
+
+        $this->assertSame($written, preg_replace('/\x1b\[[0-9;?]*[A-Za-z]|[\r\n]/', '', $output));
+    }
+
+    public static function provideOverflowingContentChanges(): iterable
+    {
+        $lines = ['L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'];
+
+        yield 'grown' => [false, [$lines, [...$lines, 'L7']], 'L7'];
+        yield 'grown on a virtual terminal' => [true, [$lines, [...$lines, 'L7']], 'L7'];
+        yield 'last line edited after shrinking' => [false, [$lines, \array_slice($lines, 0, 6), ['L0', 'L1', 'L2', 'L3', 'L4', 'L5x']], 'L5x'];
     }
 }

@@ -279,13 +279,20 @@ trait PdoTrait
             } else {
                 $sql = "TRUNCATE TABLE $this->table";
             }
+            $params = [];
         } else {
-            $namespace = str_replace('_', '!_', $namespace);
-            $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE '$namespace%' ESCAPE '!'";
+            // SQL Server also treats [ as a wildcard, while Oracle rejects an escape character followed by it
+            $namespace = preg_replace('sqlsrv' === $this->getDriver() ? '/[!%_[]/' : '/[!%_]/', '!$0', $namespace);
+            $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE ? ESCAPE '!'";
+            $params = [$namespace.'%'];
         }
 
         try {
-            $conn->exec($sql);
+            if ($params) {
+                $conn->prepare($sql)->execute($params);
+            } else {
+                $conn->exec($sql);
+            }
         } catch (\PDOException) {
         }
 

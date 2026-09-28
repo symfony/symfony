@@ -114,11 +114,11 @@ class CompiledUrlGeneratorDumper extends GeneratorDumper
     {
         $routes = '';
         foreach ($this->getCompiledRoutes() as $name => $properties) {
-            $routes .= \sprintf("\n    '%s' => %s,", $name, CompiledUrlMatcherDumper::export($properties));
+            $routes .= \sprintf("\n    %s => %s,", CompiledUrlMatcherDumper::export($name), CompiledUrlMatcherDumper::export($properties));
         }
 
         foreach ($this->getCompiledAliases() as $alias => $properties) {
-            $routes .= \sprintf("\n    '%s' => %s,", $alias, CompiledUrlMatcherDumper::export($properties));
+            $routes .= \sprintf("\n    %s => %s,", CompiledUrlMatcherDumper::export($alias), CompiledUrlMatcherDumper::export($properties));
         }
 
         return $routes;

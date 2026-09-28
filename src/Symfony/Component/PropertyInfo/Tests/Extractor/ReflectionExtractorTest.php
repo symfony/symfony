@@ -59,6 +59,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\WithAccessors\DivergingTypes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\WithAccessors\InvalidMapping;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\WithAccessors\JustAdderAndRemover;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\WithAccessors\JustGetterOrSetter;
+use Symfony\Component\String\Inflector\InflectorInterface;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -697,6 +698,28 @@ class ReflectionExtractorTest extends TestCase
             [SnakeCaseDummy::class, 'snake_method', false, true, PropertyWriteInfo::TYPE_METHOD, 'setSnake_method', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [SnakeCaseDummy::class, 'snake_readonly', false, false, PropertyWriteInfo::TYPE_NONE, null, null, null, null, null],
         ];
+    }
+
+    public function testGetWriteInfoWithCustomInflector()
+    {
+        $inflector = new class implements InflectorInterface {
+            public function singularize(string $plural): array
+            {
+                return ['Baz'];
+            }
+
+            public function pluralize(string $singular): array
+            {
+                return [$singular];
+            }
+        };
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC, $inflector);
+
+        $writeInfo = $extractor->getWriteInfo(Php71Dummy::class, 'qux');
+
+        $this->assertSame(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, $writeInfo->getType());
+        $this->assertSame('addBaz', $writeInfo->getAdderInfo()->getName());
+        $this->assertSame('removeBaz', $writeInfo->getRemoverInfo()->getName());
     }
 
     public function testDisabledAdderAndRemoverReturnsError()

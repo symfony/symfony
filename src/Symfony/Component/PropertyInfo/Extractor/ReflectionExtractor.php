@@ -84,10 +84,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
     private array $arrayMutatorPrefixes;
     private int $methodReflectionFlags;
     private int $propertyReflectionFlags;
-    private InflectorInterface $inflector;
+    private ?InflectorInterface $inflector {
+        get => $this->inflector ??= new EnglishInflector();
+    }
     private array $arrayMutatorPrefixesFirst;
     private array $arrayMutatorPrefixesLast;
-    private TypeResolverInterface $typeResolver;
+    private TypeResolverInterface $typeResolver {
+        get => $this->typeResolver ??= self::createTypeResolver();
+    }
     /** @var array<string, WithAccessors|null> */
     private array $accessorsAttributes = [];
     /** @var array<string, array<string, string>> */
@@ -112,15 +116,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         $this->arrayMutatorPrefixes = $arrayMutatorPrefixes ?? self::$defaultArrayMutatorPrefixes;
         $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
-        $this->inflector = $inflector ?? new EnglishInflector();
-
-        $typeContextFactory = new TypeContextFactory();
-        $this->typeResolver = TypeResolver::create([
-            \ReflectionType::class => $reflectionTypeResolver = new ReflectionTypeResolver(),
-            \ReflectionParameter::class => new ReflectionParameterTypeResolver($reflectionTypeResolver, $typeContextFactory),
-            \ReflectionProperty::class => new ReflectionPropertyTypeResolver($reflectionTypeResolver, $typeContextFactory),
-            \ReflectionFunctionAbstract::class => new ReflectionReturnTypeResolver($reflectionTypeResolver, $typeContextFactory),
-        ]);
+        $this->inflector = $inflector;
 
         $nonArrayMutatorPrefixes = array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes);
         $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, $nonArrayMutatorPrefixes);
@@ -1134,5 +1130,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         }
 
         return null;
+    }
+
+    private static function createTypeResolver(): TypeResolverInterface
+    {
+        $typeContextFactory = new TypeContextFactory();
+
+        return TypeResolver::create([
+            \ReflectionType::class => $reflectionTypeResolver = new ReflectionTypeResolver(),
+            \ReflectionParameter::class => new ReflectionParameterTypeResolver($reflectionTypeResolver, $typeContextFactory),
+            \ReflectionProperty::class => new ReflectionPropertyTypeResolver($reflectionTypeResolver, $typeContextFactory),
+            \ReflectionFunctionAbstract::class => new ReflectionReturnTypeResolver($reflectionTypeResolver, $typeContextFactory),
+        ]);
     }
 }

@@ -224,7 +224,7 @@ class DoctrineExtractorTest extends TestCase
                 false,
                 Collection::class,
                 true,
-                new Type(Type::BUILTIN_TYPE_OBJECT),
+                null,
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
             ['indexedByCustomType', [new Type(
@@ -240,7 +240,7 @@ class DoctrineExtractorTest extends TestCase
                 false,
                 Collection::class,
                 true,
-                new Type(Type::BUILTIN_TYPE_OBJECT),
+                null,
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
             ['indexedBuz', [new Type(

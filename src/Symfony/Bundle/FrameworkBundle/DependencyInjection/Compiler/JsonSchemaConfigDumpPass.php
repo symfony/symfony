@@ -11,16 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\JsonSchemaDumper;
-use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\DependencyInjection\Kernel\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -28,12 +22,9 @@ use Symfony\Component\Yaml\Yaml;
  */
 class JsonSchemaConfigDumpPass implements CompilerPassInterface
 {
-    /**
-     * @param array<class-string, array<string, bool>> $bundlesDefinition
-     */
     public function __construct(
         private string $schemaFile,
-        private array $bundlesDefinition,
+        private ExtensionConfigTrees $configTrees,
     ) {
     }
 
@@ -47,55 +38,17 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
         $allAliases = [];
         $envAliases = [];
 
-        $registeredExtensions = $container->getExtensions();
-        foreach ($this->bundlesDefinition as $bundle => $envs) {
-            if (!is_subclass_of($bundle, BundleInterface::class)) {
-                continue;
-            }
+        foreach ($this->configTrees->get($container) as [$alias, , $tree, $envs]) {
+            $trees[$alias] = $tree;
 
-            if (!$extension = new $bundle()->getContainerExtension()) {
-                continue;
+            if (null === $envs || ($envs['all'] ?? false)) {
+                $allAliases[] = $alias;
             }
-
-            $extensionAlias = $extension->getAlias();
-            if (isset($registeredExtensions[$extensionAlias])) {
-                $extension = $registeredExtensions[$extensionAlias];
-                unset($registeredExtensions[$extensionAlias]);
-            }
-
-            if (!$configuration = $this->getConfiguration($extension, $container)) {
-                continue;
-            }
-
-            $tree = $configuration->getConfigTreeBuilder()->buildTree();
-            if ($tree instanceof ArrayNode && !$tree instanceof PrototypedArrayNode && !$tree->getChildren()) {
-                continue;
-            }
-
-            $trees[$extensionAlias] = $tree;
-
-            if ($envs['all'] ?? false) {
-                $allAliases[] = $extensionAlias;
-            }
-            foreach ($envs as $env => $active) {
+            foreach ($envs ?? [] as $env => $active) {
                 if ($active && 'all' !== $env) {
-                    $envAliases[$env][] = $extensionAlias;
+                    $envAliases[$env][] = $alias;
                 }
             }
-        }
-
-        foreach ($registeredExtensions as $alias => $extension) {
-            if (!$configuration = $this->getConfiguration($extension, $container)) {
-                continue;
-            }
-
-            $tree = $configuration->getConfigTreeBuilder()->buildTree();
-            if ($tree instanceof ArrayNode && !$tree instanceof PrototypedArrayNode && !$tree->getChildren()) {
-                continue;
-            }
-
-            $trees[$alias] = $tree;
-            $allAliases[] = $alias;
         }
 
         $generator = new JsonSchemaDumper([['$ref' => '#/$defs/types/param']], static fn (string $alias): ?string => isset($trees[$alias]) ? '#/$defs/nodes/'.$alias : null);
@@ -155,14 +108,5 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
 
             $container->addResource(new FileResource($this->schemaFile));
         }
-    }
-
-    private function getConfiguration(ExtensionInterface $extension, ContainerBuilder $container): ?ConfigurationInterface
-    {
-        return match (true) {
-            $extension instanceof ConfigurationInterface => $extension,
-            $extension instanceof ConfigurationExtensionInterface => $extension->getConfiguration([], $container),
-            default => null,
-        };
     }
 }

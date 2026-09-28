@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ExtensionConfigTrees;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\AssetMapper\AssetMapperBundle;
@@ -67,9 +68,9 @@ class JsonSchemaConfigDumpPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $pass = new JsonSchemaConfigDumpPass($this->tempDir.'/schema.json', [
+        $pass = new JsonSchemaConfigDumpPass($this->tempDir.'/schema.json', new ExtensionConfigTrees([
             JsonSchemaTestBundle::class => ['all' => true],
-        ]);
+        ]));
         $pass->process($container);
 
         $schemaFile = $this->tempDir.'/schema.json';
@@ -91,9 +92,9 @@ class JsonSchemaConfigDumpPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $pass = new JsonSchemaConfigDumpPass($this->tempDir.'/schema_env.json', [
+        $pass = new JsonSchemaConfigDumpPass($this->tempDir.'/schema_env.json', new ExtensionConfigTrees([
             JsonSchemaTestBundle::class => ['dev' => true, 'test' => true],
-        ]);
+        ]));
         $pass->process($container);
 
         $schema = json_decode(file_get_contents($this->tempDir.'/schema_env.json'), true);
@@ -108,10 +109,10 @@ class JsonSchemaConfigDumpPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $pass = new JsonSchemaConfigDumpPass($this->tempDir.'/schema_mixed.json', [
+        $pass = new JsonSchemaConfigDumpPass($this->tempDir.'/schema_mixed.json', new ExtensionConfigTrees([
             JsonSchemaTestBundle::class => ['all' => true],
             JsonSchemaDevBundle::class => ['dev' => true],
-        ]);
+        ]));
         $pass->process($container);
 
         $schema = json_decode(file_get_contents($this->tempDir.'/schema_mixed.json'), true);
@@ -134,10 +135,10 @@ class JsonSchemaConfigDumpPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $pass = new JsonSchemaConfigDumpPass($this->tempDir.'/schema_nested.json', [
+        $pass = new JsonSchemaConfigDumpPass($this->tempDir.'/schema_nested.json', new ExtensionConfigTrees([
             JsonSchemaTestBundle::class => ['all' => true],
             JsonSchemaDevBundle::class => ['dev' => true, 'test' => true],
-        ]);
+        ]));
         $pass->process($container);
 
         $schema = json_decode(file_get_contents($this->tempDir.'/schema_nested.json'), true);
@@ -154,7 +155,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
 
-        (new JsonSchemaConfigDumpPass($schemaFile, [FrameworkBundle::class => ['all' => true], AssetMapperBundle::class => ['all' => true]]))->process($container);
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([FrameworkBundle::class => ['all' => true], AssetMapperBundle::class => ['all' => true]])))->process($container);
 
         // The asset-mapper recipe configures "paths" as a list, which a
         // normalization closure turns into a map keyed by path.
@@ -176,7 +177,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
 
-        (new JsonSchemaConfigDumpPass($schemaFile, [SerializerBundle::class => ['all' => true]]))->process($container);
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([SerializerBundle::class => ['all' => true]])))->process($container);
 
         // A list here would configure a context entry named "0" instead of "enable_max_depth".
         $config = Yaml::parse(<<<YAML
@@ -192,9 +193,9 @@ class JsonSchemaConfigDumpPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $pass = new JsonSchemaConfigDumpPass($this->readOnlyDir.'/schema.json', [
+        $pass = new JsonSchemaConfigDumpPass($this->readOnlyDir.'/schema.json', new ExtensionConfigTrees([
             JsonSchemaTestBundle::class => ['all' => true],
-        ]);
+        ]));
         $pass->process($container);
 
         $this->assertFileDoesNotExist($this->readOnlyDir.'/schema.json');

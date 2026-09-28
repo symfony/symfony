@@ -11,17 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\ArrayShapeGenerator;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\DependencyInjection\Kernel\BundleInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AppReference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Routing\Loader\Configurator\RoutesReference;
@@ -91,7 +85,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
 
     public function __construct(
         private string $referenceFile,
-        private array $bundlesDefinition,
+        private ExtensionConfigTrees $configTrees,
     ) {
     }
 
@@ -105,49 +99,21 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         $trees = [];
 
         $anyEnvExtensions = [];
-        $registeredExtensions = $container->getExtensions();
-        foreach ($this->bundlesDefinition as $bundle => $envs) {
-            if (!is_subclass_of($bundle, BundleInterface::class)) {
-                continue;
-            }
-            if (!$extension = (new $bundle())->getContainerExtension()) {
-                continue;
-            }
+        foreach ($this->configTrees->get($container) as [$alias, $extension, $tree, $envs]) {
+            $anyEnvExtensions[$alias] = $extension;
+            $trees[$alias] = $tree;
 
-            $extensionAlias = $extension->getAlias();
-            if (isset($registeredExtensions[$extensionAlias])) {
-                $extension = $registeredExtensions[$extensionAlias];
-                unset($registeredExtensions[$extensionAlias]);
-            }
-
-            if (!$configuration = $this->getConfiguration($extension, $container)) {
+            if (null === $envs) {
                 continue;
             }
-            $tree = $configuration->getConfigTreeBuilder()->buildTree();
-            if ($tree instanceof ArrayNode && !$tree instanceof PrototypedArrayNode && !$tree->getChildren()) {
-                continue;
-            }
-            $anyEnvExtensions[$extensionAlias] = $extension;
-            $trees[$extensionAlias] = $tree;
 
             foreach ($knownEnvs as $env) {
                 if ($envs[$env] ?? $envs['all'] ?? false) {
                     $extensionsPerEnv[$env][] = $extension;
                 } else {
-                    unset($anyEnvExtensions[$extensionAlias]);
+                    unset($anyEnvExtensions[$alias]);
                 }
             }
-        }
-        foreach ($registeredExtensions as $alias => $extension) {
-            if (!$configuration = $this->getConfiguration($extension, $container)) {
-                continue;
-            }
-            $tree = $configuration->getConfigTreeBuilder()->buildTree();
-            if ($tree instanceof ArrayNode && !$tree instanceof PrototypedArrayNode && !$tree->getChildren()) {
-                continue;
-            }
-            $anyEnvExtensions[$alias] = $extension;
-            $trees[$alias] = $tree;
         }
         krsort($extensionsPerEnv);
 
@@ -166,13 +132,13 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         if (false === $i = strrpos($phpdoc = $appTypes, "\n *     ...<string, ExtensionType|array{")) {
             throw new \LogicException(\sprintf('Cannot insert config shape in "%s".', AppReference::class));
         }
-        $appTypes = substr_replace($phpdoc, $this->getShapeForExtensions($anyEnvExtensions, $container), $i, 0);
+        $appTypes = substr_replace($phpdoc, $this->getShapeForExtensions($anyEnvExtensions), $i, 0);
         $i += \strlen($appTypes) - \strlen($phpdoc);
 
         foreach ($extensionsPerEnv as $env => $extensions) {
             $appTypes = substr_replace($appTypes, strtr(self::WHEN_ENV_APP_TEMPLATE, [
                 '{ENV}' => $env,
-                '{SHAPE}' => $this->getShapeForExtensions($extensions, $container, '    '),
+                '{SHAPE}' => $this->getShapeForExtensions($extensions, '    '),
             ]), $i, 0);
         }
         $appParam = $r->getMethod('config')->getDocComment();
@@ -220,23 +186,12 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         return preg_replace('#\W#', '', $output);
     }
 
-    private function getConfiguration(ExtensionInterface $extension, ContainerBuilder $container): ?ConfigurationInterface
-    {
-        return match (true) {
-            $extension instanceof ConfigurationInterface => $extension,
-            $extension instanceof ConfigurationExtensionInterface => $extension->getConfiguration([], $container),
-            default => null,
-        };
-    }
-
-    private function getShapeForExtensions(array $extensions, ContainerBuilder $container, string $indent = ''): string
+    private function getShapeForExtensions(array $extensions, string $indent = ''): string
     {
         $shape = '';
         foreach ($extensions as $extension) {
-            if ($this->getConfiguration($extension, $container)) {
-                $type = $this->camelCase($extension->getAlias()).'Config';
-                $shape .= \sprintf("\n *     %s%s?: %s,", $indent, $extension->getAlias(), $type);
-            }
+            $type = $this->camelCase($extension->getAlias()).'Config';
+            $shape .= \sprintf("\n *     %s%s?: %s,", $indent, $extension->getAlias(), $type);
         }
 
         return $shape;

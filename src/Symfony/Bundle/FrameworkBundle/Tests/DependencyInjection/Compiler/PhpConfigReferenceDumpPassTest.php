@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ExtensionConfigTrees;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -61,9 +62,9 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('.container.known_envs', ['test', 'dev']);
 
-        $pass = new PhpConfigReferenceDumpPass($this->tempDir.'/reference.php', [
+        $pass = new PhpConfigReferenceDumpPass($this->tempDir.'/reference.php', new ExtensionConfigTrees([
             TestBundle::class => ['all' => true],
-        ]);
+        ]));
         $pass->process($container);
 
         $referenceFile = $this->tempDir.'/reference.php';
@@ -81,9 +82,9 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('.container.known_envs', ['dev', 'prod', 'test']);
 
-        $pass = new PhpConfigReferenceDumpPass($this->readOnlyDir.'/reference.php', [
+        $pass = new PhpConfigReferenceDumpPass($this->readOnlyDir.'/reference.php', new ExtensionConfigTrees([
             TestBundle::class => ['all' => true],
-        ]);
+        ]));
 
         $pass->process($container);
         $this->assertFileDoesNotExist($this->readOnlyDir.'/reference.php');
@@ -100,10 +101,10 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         $container->registerExtension(new EmptyConfigExtension());
         $container->registerExtension(new PrototypedConfigExtension());
 
-        $pass = new PhpConfigReferenceDumpPass($this->tempDir.'/reference.php', [
+        $pass = new PhpConfigReferenceDumpPass($this->tempDir.'/reference.php', new ExtensionConfigTrees([
             TestBundle::class => ['all' => true],
             EmptyConfigBundle::class => ['all' => true],
-        ]);
+        ]));
         $pass->process($container);
 
         if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
@@ -122,9 +123,9 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('.container.known_envs', ['test', 'dev']);
 
-        $pass = new PhpConfigReferenceDumpPass($this->tempDir.'/reference.php', [
+        $pass = new PhpConfigReferenceDumpPass($this->tempDir.'/reference.php', new ExtensionConfigTrees([
             $invalidClass => ['dev' => true],
-        ]);
+        ]));
         $pass->process($container);
 
         $referenceFile = $this->tempDir.'/reference.php';

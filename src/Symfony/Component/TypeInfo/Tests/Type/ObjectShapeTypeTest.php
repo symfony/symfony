@@ -162,5 +162,11 @@ class ObjectShapeTypeTest extends TestCase
             'bar' => ['type' => Type::string(), 'optional' => true],
         ]);
         $this->assertSame("object{'bar'?: string, 'foo': bool}", (string) $type);
+
+        $type = new ObjectShapeType([
+            "it's" => ['type' => Type::bool()],
+            'a\\' => ['type' => Type::int()],
+        ]);
+        $this->assertSame("object{'a\\\\': int, 'it\\'s': bool}", (string) $type);
     }
 }

@@ -14,7 +14,6 @@ namespace Symfony\Component\KeyManagement;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\KeyManagement\Debug\TraceableKms;
-use Symfony\Component\KeyManagement\Exception\CompositeKmsReentryException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
@@ -71,11 +70,6 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
 {
     private const int VERSION = 1;
 
-    private bool $runningMain = false;
-
-    /** @var \WeakMap<\Fiber, true> */
-    private \WeakMap $runningFibers;
-
     /**
      * @param ContainerInterface         $clients KMS clients, indexed by name
      * @param array<string, string|null> $members Master key each member wraps under, indexed by member name, null for the key id given to each call; the first member mints the data keys and is asked first to read
@@ -88,8 +82,6 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
         private readonly ?LoggerInterface $logger = null,
         private readonly array $retired = [],
     ) {
-        $this->runningFibers = new \WeakMap();
-
         if (!$members) {
             throw new InvalidArgumentException('A composite KMS client needs at least one member.');
         }
@@ -128,17 +120,12 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
 
     public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
     {
-        $context = $this->enterOperation();
-        try {
-            $wrappings = [];
-            foreach ($this->members as $name => $memberKeyId) {
-                $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad, $deterministic);
-            }
-
-            return new Ciphertext(self::frame($wrappings), $keyId);
-        } finally {
-            $this->leaveOperation($context);
+        $wrappings = [];
+        foreach ($this->members as $name => $memberKeyId) {
+            $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad, $deterministic);
         }
+
+        return new Ciphertext(self::frame($wrappings), $keyId);
     }
 
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
@@ -155,24 +142,19 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
      */
     public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
     {
-        $context = $this->enterOperation();
-        try {
-            $first = array_key_first($this->members);
-            $dataKey = $this->member($first)->generateDataKey($this->members[$first] ?? $keyId, $length, $aad);
+        $first = array_key_first($this->members);
+        $dataKey = $this->member($first)->generateDataKey($this->members[$first] ?? $keyId, $length, $aad);
 
-            return $dataKey->use(function (#[\SensitiveParameter] string $plaintext) use ($dataKey, $first, $keyId, $aad): DataKey {
-                $wrappings = [$first => $dataKey->wrapped];
-                foreach ($this->members as $name => $memberKeyId) {
-                    if ($name !== $first) {
-                        $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad);
-                    }
+        return $dataKey->use(function (#[\SensitiveParameter] string $plaintext) use ($dataKey, $first, $keyId, $aad): DataKey {
+            $wrappings = [$first => $dataKey->wrapped];
+            foreach ($this->members as $name => $memberKeyId) {
+                if ($name !== $first) {
+                    $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad);
                 }
+            }
 
-                return new DataKey($plaintext, new Ciphertext(self::frame($wrappings), $keyId));
-            });
-        } finally {
-            $this->leaveOperation($context);
-        }
+            return new DataKey($plaintext, new Ciphertext(self::frame($wrappings), $keyId));
+        });
     }
 
     /**
@@ -202,7 +184,6 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
      * outside those lists is passed over, as is one from a client that is not registered anymore.
      * A member that fails is passed over too, with a word to the logger since the caller will
      * never hear of it, and its failure is the one reported when none of them answers.
-     * A recursive call to a composite stops the read even when another member could answer.
      *
      * A ciphertext that is not a composite frame is handed whole to every member, each treating
      * it as its own, as the class docblock says.
@@ -215,83 +196,41 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
      */
     private function readThroughAny(Ciphertext $ciphertext, \Closure $read): mixed
     {
-        $context = $this->enterOperation();
-        try {
-            $readers = $this->members + array_fill_keys($this->retired, null);
-            if (null === $wrappings = self::parse($ciphertext)) {
-                $wrappings = array_fill_keys(array_keys($readers), $ciphertext);
-                $minter = null;
-            } else {
-                $minter = array_key_first($wrappings);
-                $wrappings = array_intersect_key($wrappings, $readers);
-
-                if (!$wrappings) {
-                    throw new DecryptionFailedException();
-                }
-            }
-
-            $rank = array_flip(array_keys($readers));
-            uksort($wrappings, static fn (string $a, string $b): int => ($rank[$a] ?? \PHP_INT_MAX) <=> ($rank[$b] ?? \PHP_INT_MAX));
-
-            $failure = null;
-            $unregistered = [];
-            foreach ($wrappings as $name => $wrapping) {
-                if (!$this->clients->has($name)) {
-                    $unregistered[] = $name;
-                    continue;
-                }
-
-                $member = $this->member($name);
-
-                try {
-                    return $read($member, $wrapping, null === $minter || $name === $minter);
-                } catch (\Exception $e) {
-                    if ($e instanceof CompositeKmsReentryException) {
-                        throw $e;
-                    }
-
-                    $this->logger?->warning('The KMS client "{client}" failed to read a wrapping, the next member is asked.', ['client' => $name, 'exception' => $e]);
-                    $failure ??= $e;
-                }
-            }
-
-            throw $failure ?? new LogicException(\sprintf('None of the KMS clients that wrapped the ciphertext ("%s") is registered on the composite client.', implode('", "', $unregistered)));
-        } finally {
-            $this->leaveOperation($context);
-        }
-    }
-
-    /**
-     * Prevents reentry within one execution context while allowing independent fibers.
-     * An opaque decorator that calls back from a new fiber cannot be identified here.
-     */
-    private function enterOperation(): ?\Fiber
-    {
-        $fiber = \Fiber::getCurrent();
-        if (null === $fiber) {
-            if ($this->runningMain) {
-                throw new CompositeKmsReentryException();
-            }
-
-            $this->runningMain = true;
+        $readers = $this->members + array_fill_keys($this->retired, null);
+        if (null === $wrappings = self::parse($ciphertext)) {
+            $wrappings = array_fill_keys(array_keys($readers), $ciphertext);
+            $minter = null;
         } else {
-            if (isset($this->runningFibers[$fiber])) {
-                throw new CompositeKmsReentryException();
+            $minter = array_key_first($wrappings);
+            $wrappings = array_intersect_key($wrappings, $readers);
+
+            if (!$wrappings) {
+                throw new DecryptionFailedException();
+            }
+        }
+
+        $rank = array_flip(array_keys($readers));
+        uksort($wrappings, static fn (string $a, string $b): int => ($rank[$a] ?? \PHP_INT_MAX) <=> ($rank[$b] ?? \PHP_INT_MAX));
+
+        $failure = null;
+        $unregistered = [];
+        foreach ($wrappings as $name => $wrapping) {
+            if (!$this->clients->has($name)) {
+                $unregistered[] = $name;
+                continue;
             }
 
-            $this->runningFibers[$fiber] = true;
+            $member = $this->member($name);
+
+            try {
+                return $read($member, $wrapping, null === $minter || $name === $minter);
+            } catch (\Exception $e) {
+                $this->logger?->warning('The KMS client "{client}" failed to read a wrapping, the next member is asked.', ['client' => $name, 'exception' => $e]);
+                $failure ??= $e;
+            }
         }
 
-        return $fiber;
-    }
-
-    private function leaveOperation(?\Fiber $fiber): void
-    {
-        if (null === $fiber) {
-            $this->runningMain = false;
-        } else {
-            unset($this->runningFibers[$fiber]);
-        }
+        throw $failure ?? new LogicException(\sprintf('None of the KMS clients that wrapped the ciphertext ("%s") is registered on the composite client.', implode('", "', $unregistered)));
     }
 
     /**

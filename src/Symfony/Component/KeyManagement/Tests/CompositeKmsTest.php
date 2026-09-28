@@ -294,7 +294,7 @@ class CompositeKmsTest extends TestCase
     }
 
     #[DataProvider('provideSelfMemberDecorators')]
-    public function testACompositeCannotReadThroughItself(string $decorator, string $message)
+    public function testACompositeCannotReadThroughItself(string $decorator)
     {
         $clients = new class implements ContainerInterface {
             public CompositeKms $self;
@@ -309,7 +309,6 @@ class CompositeKmsTest extends TestCase
 
                 return match ($this->decorator) {
                     'traceable' => TraceableKms::wrap($this->self, new KeyManagementDataCollector(), 'self'),
-                    'switchable' => new SwitchableKms($this->self),
                     'real' => new InMemoryKms('self'),
                     default => $this->self,
                 };
@@ -329,108 +328,25 @@ class CompositeKmsTest extends TestCase
             $clients->self->decrypt($ciphertext);
             $this->fail('The composite must not read through itself.');
         } catch (LogicException $e) {
-            $this->assertSame($message, $e->getMessage());
+            $this->assertSame('A composite KMS client cannot be a member of another composite client.', $e->getMessage());
         }
 
         $this->assertSame(1, $clients->reads);
         $clients->decorator = 'real';
         $clients->reads = 0;
-        $this->assertSame('secret', $clients->self->decrypt($ciphertext), 'a failed recursive read must not block later reads.');
+        $this->assertSame('secret', $clients->self->decrypt($ciphertext), 'a rejected composite member must not block later reads.');
     }
 
     public static function provideSelfMemberDecorators(): iterable
     {
-        yield 'direct' => ['direct', 'A composite KMS client cannot be a member of another composite client.'];
-        yield 'traceable' => ['traceable', 'A composite KMS client cannot be a member of another composite client.'];
-        yield 'custom decorator' => ['switchable', 'A composite KMS client cannot be re-entered while one of its operations is running.'];
+        yield 'direct' => ['direct'];
+        yield 'traceable' => ['traceable'];
     }
 
-    #[DataProvider('provideReadOperations')]
-    public function testARecursiveMemberCannotBeSkippedWhenAnotherMemberCanRead(string $operation)
-    {
-        $good = new SwitchableKms(new InMemoryKms('good'));
-        $writer = new CompositeKms(self::locator(['self' => new InMemoryKms('self'), 'good' => $good]), ['self' => null, 'good' => null]);
-        $ciphertext = 'decrypt' === $operation ? $writer->encrypt('app', 'secret') : $writer->generateDataKey('app')->wrapped;
-        $clients = new class($good) implements ContainerInterface {
-            public CompositeKms $self;
-
-            public function __construct(private readonly SwitchableKms $good)
-            {
-            }
-
-            public function get(string $id)
-            {
-                return 'self' === $id ? new SwitchableKms($this->self) : $this->good;
-            }
-
-            public function has(string $id): bool
-            {
-                return 'self' === $id || 'good' === $id;
-            }
-        };
-        $reader = new CompositeKms($clients, ['self' => null, 'good' => null]);
-        $clients->self = $reader;
-
-        try {
-            if ('decrypt' === $operation) {
-                $reader->decrypt($ciphertext);
-            } else {
-                $reader->unwrapDataKey($ciphertext);
-            }
-            $this->fail('Reentry must stop the read before another member answers.');
-        } catch (LogicException $e) {
-            $this->assertSame('A composite KMS client cannot be re-entered while one of its operations is running.', $e->getMessage());
-        }
-
-        $this->assertSame(['encrypt' => 1], $good->calls);
-    }
-
-    public static function provideReadOperations(): iterable
-    {
-        yield 'decrypt' => ['decrypt'];
-        yield 'unwrap data key' => ['unwrapDataKey'];
-    }
-
-    public function testIndependentFibersCanReadThroughTheSameComposite()
-    {
-        $clients = new class implements ContainerInterface {
-            public bool $suspend = false;
-
-            public function get(string $id)
-            {
-                if ($this->suspend) {
-                    \Fiber::suspend();
-                }
-
-                return new InMemoryKms('member');
-            }
-
-            public function has(string $id): bool
-            {
-                return 'member' === $id;
-            }
-        };
-        $kms = new CompositeKms($clients, ['member' => null]);
-        $ciphertext = $kms->encrypt('app', 'secret');
-        $clients->suspend = true;
-        $first = new \Fiber(static fn (): string => $kms->decrypt($ciphertext));
-        $second = new \Fiber(static fn (): string => $kms->decrypt($ciphertext));
-
-        $first->start();
-        $second->start();
-
-        $first->resume();
-        $second->resume();
-
-        $this->assertSame('secret', $first->getReturn());
-        $this->assertSame('secret', $second->getReturn());
-    }
-
-    #[DataProvider('provideSchedulerContexts')]
-    public function testASchedulerCanResumeAnotherReaderDuringAMemberCall(bool $outerInFiber)
+    public function testAnIndependentReadCanRunDuringAMemberCall()
     {
         $member = new class(new InMemoryKms('member')) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
-            public ?\Fiber $waiting = null;
+            public ?\Closure $onDecrypt = null;
 
             public function __construct(private InMemoryKms $inner)
             {
@@ -443,10 +359,10 @@ class CompositeKmsTest extends TestCase
 
             public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
             {
-                if (null !== $this->waiting) {
-                    $waiting = $this->waiting;
-                    $this->waiting = null;
-                    $waiting->resume();
+                if (null !== $this->onDecrypt) {
+                    $onDecrypt = $this->onDecrypt;
+                    $this->onDecrypt = null;
+                    $onDecrypt();
                 }
 
                 return $this->inner->decrypt($ciphertext, $aad);
@@ -463,80 +379,15 @@ class CompositeKmsTest extends TestCase
             }
         };
         $kms = new CompositeKms(self::locator(['member' => $member]), ['member' => null]);
-        $ciphertext = $kms->encrypt('app', 'secret');
-        $waiting = new \Fiber(static function () use ($kms, $ciphertext): string {
-            \Fiber::suspend();
-
-            return $kms->decrypt($ciphertext);
-        });
-        $waiting->start();
-        $member->waiting = $waiting;
-
-        if ($outerInFiber) {
-            $outer = new \Fiber(static fn (): string => $kms->decrypt($ciphertext));
-            $outer->start();
-            $this->assertSame('secret', $outer->getReturn());
-        } else {
-            $this->assertSame('secret', $kms->decrypt($ciphertext));
-        }
-
-        $this->assertSame('secret', $waiting->getReturn());
-    }
-
-    public static function provideSchedulerContexts(): iterable
-    {
-        yield 'main context' => [false];
-        yield 'fiber context' => [true];
-    }
-
-    #[DataProvider('provideWriteOperations')]
-    public function testACompositeCannotWriteThroughItselfBehindACustomDecorator(string $operation)
-    {
-        $clients = new class implements ContainerInterface {
-            public CompositeKms $self;
-            public int $resolutions = 0;
-            public bool $recursive = true;
-
-            public function get(string $id)
-            {
-                if (!$this->recursive) {
-                    return new InMemoryKms('self');
-                }
-
-                if (1 < ++$this->resolutions) {
-                    throw new \RuntimeException('Recursive write.');
-                }
-
-                return new SwitchableKms($this->self);
-            }
-
-            public function has(string $id): bool
-            {
-                return 'self' === $id;
-            }
+        $first = $kms->encrypt('app', 'first');
+        $second = $kms->encrypt('app', 'second');
+        $independent = null;
+        $member->onDecrypt = static function () use ($kms, $second, &$independent): void {
+            $independent = $kms->decrypt($second);
         };
-        $clients->self = new CompositeKms($clients, ['self' => null]);
 
-        try {
-            if ('encrypt' === $operation) {
-                $clients->self->encrypt('app', 'secret');
-            } else {
-                $clients->self->generateDataKey('app');
-            }
-            $this->fail('The composite must not write through itself.');
-        } catch (LogicException $e) {
-            $this->assertSame('A composite KMS client cannot be re-entered while one of its operations is running.', $e->getMessage());
-        }
-
-        $this->assertSame(1, $clients->resolutions);
-        $clients->recursive = false;
-        $this->assertSame('secret', $clients->self->decrypt($clients->self->encrypt('app', 'secret')));
-    }
-
-    public static function provideWriteOperations(): iterable
-    {
-        yield 'encrypt' => ['encrypt'];
-        yield 'generate data key' => ['generateDataKey'];
+        $this->assertSame('first', $kms->decrypt($first));
+        $this->assertSame('second', $independent);
     }
 
     public function testAMemberThatCannotWrapFailsTheWrite()
@@ -868,15 +719,6 @@ class CompositeKmsTest extends TestCase
 
         $this->assertSame($plaintext, $kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key));
         $this->assertSame(['encrypt' => 1, 'decrypt' => 1], $azure->calls, 'the other members read their wrapping back with decrypt(), which is what wrote it.');
-    }
-
-    public function testAFirstMemberWithSeparateOperationsCannotUnwrapWhatEncryptWrote()
-    {
-        $first = self::twoOperations(new InMemoryKms('first'));
-        $kms = new CompositeKms(self::locator(['first' => $first]), ['first' => null]);
-
-        $this->expectException(DecryptionFailedException::class);
-        $kms->unwrapDataKey($kms->encrypt('app', 'key material'));
     }
 
     public function testTheDataKeyReadThroughAnyMemberRefersToTheCompositeCiphertext()

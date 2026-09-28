@@ -263,8 +263,7 @@ once meanwhile, which in a Symfony application makes their encrypters available
 through `#[Target('old')]` and `#[Target('new')]`.
 
 **Rows referring to a stored data key.** Nothing to do on the Doctrine side.
-Declare the new client next to the old one. For a target whose `encrypt()`
-output can be unwrapped as a data key, move the data keys over with
+Declare the new client next to the old one, move the data keys over with
 `key-management:rewrap-data-keys --from=old --to=new --key-id=...`, then point
 the store at the new client so the keys it creates afterwards are wrapped there.
 No payload is read or rewritten, the references stay what they were, and the old
@@ -283,14 +282,6 @@ without asking it to wrap new ones. Rewrap stored keys before removing the old
 name from `retired`; direct ciphertexts and self-contained envelopes are not
 visited by the command and need separate migration. A retired member remains
 a full decryption path and needs the same protection as an active member.
-
-The rewrap command currently writes data keys with the target client's
-`encrypt()` method. Its result must be readable by `unwrapDataKey()` before
-the old wrapping is discarded. Do not use it with a target that needs a
-separate data-key wrapping operation, such as Azure Key Vault's `wrapkey`.
-In a composite, the first active member mints data keys with `generateDataKey()`,
-but rewrapping calls `encrypt()` on every member. The first member must also
-be able to unwrap what its `encrypt()` writes.
 
 **Rows carrying their own wrapped data key.** Each one is wrapped by the master
 key of the provider that wrote it, so moving to another provider means rewriting

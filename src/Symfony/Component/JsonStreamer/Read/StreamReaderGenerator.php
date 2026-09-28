@@ -128,7 +128,7 @@ final class StreamReaderGenerator
                     'accessor' => static function (string $accessor) use ($propertyMetadata): string {
                         foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                             if (\is_string($valueTransformer)) {
-                                $accessor = "\$valueTransformers->get('$valueTransformer')->transform($accessor, \$options)";
+                                $accessor = '$valueTransformers->get('.var_export($valueTransformer, true).")->transform($accessor, \$options)";
 
                                 continue;
                             }

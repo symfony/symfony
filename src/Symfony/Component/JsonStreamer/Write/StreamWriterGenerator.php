@@ -124,7 +124,7 @@ final class StreamWriterGenerator
 
                 foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                     if (\is_string($valueTransformer)) {
-                        $valueTransformerServiceAccessor = "\$valueTransformers->get('$valueTransformer')";
+                        $valueTransformerServiceAccessor = '$valueTransformers->get('.var_export($valueTransformer, true).')';
                         $propertyAccessor = "{$valueTransformerServiceAccessor}->transform($propertyAccessor, ['_current_object' => $accessor] + \$options)";
 
                         continue;

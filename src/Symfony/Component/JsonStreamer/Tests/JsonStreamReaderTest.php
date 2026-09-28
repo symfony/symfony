@@ -23,6 +23,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithIterable;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DivideStringAndCastToIntValueTransformer;
@@ -92,6 +93,25 @@ class JsonStreamReaderTest extends TestCase
             $this->assertIsIterable($read);
             $this->assertSame([true, false], iterator_to_array($read));
         }, '[true, false]', Type::iterable(Type::bool(), Type::int()));
+    }
+
+    public function testReadArrayShapeWithQuotedKey()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+        $type = Type::arrayShape(["it's" => Type::int(), "a\\'b" => Type::int()]);
+
+        $this->assertRead($reader, ["it's" => 1, "a\\'b" => 2], '{"it\'s": 1, "a\\\\\'b": 2}', $type);
+    }
+
+    public function testReadObjectWithQuotedStreamedNameAndValueTransformerId()
+    {
+        $reader = JsonStreamReader::create(["divide'it" => new DivideStringAndCastToIntValueTransformer()], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithQuotes::class, $read);
+            $this->assertSame(5, $read->name);
+            $this->assertSame(10, $read->transformed);
+        }, '{"it\'s \\\\\' quoted": 5, "transformed": "20"}', Type::object(DummyWithQuotes::class), ['scale' => 1]);
     }
 
     public function testReadObject()

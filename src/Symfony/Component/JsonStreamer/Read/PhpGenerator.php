@@ -48,12 +48,13 @@ final class PhpGenerator
         $providers = $this->generateProviders($dataModel, $decodeFromStream, $context);
 
         $context['indentation_level'] = 0;
+        $docType = str_replace('*/', '*\/', (string) $dataModel->getType());
 
         if ($decodeFromStream) {
             return $this->line('<?php', $context)
                 .$this->line('', $context)
                 .$this->line('/**', $context)
-                .$this->line(' * @return '.$dataModel->getType(), $context)
+                .$this->line(' * @return '.$docType, $context)
                 .$this->line(' */', $context)
                 .$this->line('return static function (mixed $stream, \\'.ContainerInterface::class.' $valueTransformers, \\'.LazyInstantiator::class.' $instantiator, array $options): mixed {', $context)
                 .$providers
@@ -66,7 +67,7 @@ final class PhpGenerator
         return $this->line('<?php', $context)
             .$this->line('', $context)
             .$this->line('/**', $context)
-            .$this->line(' * @return '.$dataModel->getType(), $context)
+            .$this->line(' * @return '.$docType, $context)
             .$this->line(' */', $context)
             .$this->line('return static function (string|\\Stringable $string, \\'.ContainerInterface::class.' $valueTransformers, \\'.Instantiator::class.' $instantiator, array $options): mixed {', $context)
             .$providers

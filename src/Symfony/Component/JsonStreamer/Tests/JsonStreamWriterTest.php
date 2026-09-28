@@ -164,6 +164,13 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"it\'s \\\\\' quoted":1,"transformed":"20"}', new DummyWithQuotes(), Type::object(DummyWithQuotes::class), ['scale' => 1], ["double'it" => new DoubleIntAndCastToStringValueTransformer()]);
     }
 
+    public function testWriteTypeWithUnsupportedCharacters()
+    {
+        $type = Type::arrayShape(['foo*/bar' => Type::int()]);
+
+        $this->assertWritten('{"foo*/bar":1}', ['foo*/bar' => 1], $type);
+    }
+
     public function testWriteNestedCollection()
     {
         $dummyWithArray1 = new DummyWithArray();

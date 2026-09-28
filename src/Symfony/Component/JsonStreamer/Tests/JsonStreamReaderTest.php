@@ -114,6 +114,14 @@ class JsonStreamReaderTest extends TestCase
         }, '{"it\'s \\\\\' quoted": 5, "transformed": "20"}', Type::object(DummyWithQuotes::class), ['scale' => 1]);
     }
 
+    public function testReadTypeWithUnsupportedCharacters()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+        $type = Type::arrayShape(['foo*/bar' => Type::int()]);
+
+        $this->assertRead($reader, ['foo*/bar' => 1], '{"foo*/bar": 1}', $type);
+    }
+
     public function testReadObject()
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);

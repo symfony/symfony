@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-09-21T13:10:01Z
+
+> Ironically, wildcards weren't suported by the diagram
+
+Is it something we can backport as bugfix to an older version?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-09-21T14:20:02Z
+
+@GromNaN you are right. Fixed in #66199 for the 8.1 branch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T16:16:00Z
+
+I rebased (the wildcard part landed in #66199) and applied @stof's comments: no more `|raw`, and the observer is disconnected once the diagram is rendered.

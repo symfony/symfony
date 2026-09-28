@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Clazz;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithPropertyDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithVarTagsDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback;
@@ -46,6 +47,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PseudoTypesDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
@@ -527,6 +529,26 @@ class PhpDocExtractorTest extends TestCase
     {
         yield ['date'];
         yield ['objectsArray'];
+    }
+
+    public function testExtractConstructorTypesOfSeveralClassesWithOneExtractor()
+    {
+        $cases = [
+            [ConstructorDummy::class, 'timezone', Type::object(\DateTimeZone::class)],
+            [ConstructorDummy::class, 'date', Type::int()],
+            [ConstructorDummy::class, 'dateTime', null],
+            [ConstructorDummyWithoutDocBlock::class, 'date', null],
+            [Dummy::class, 'rootDummyItem', Type::nullable(Type::object(RootDummyItem::class))],
+            [ConstructorDummy::class, 'dateObject', Type::object(\DateTimeInterface::class)],
+        ];
+
+        foreach ([...$cases, ...$cases] as [$class, $property, $type]) {
+            $this->assertEquals($type, $this->extractor->getTypeFromConstructor($class, $property), $class.'::'.$property);
+        }
+
+        foreach (self::providePromotedPropertyDocBlockTestCases() as [$class, $property, , , $type]) {
+            $this->assertEquals($type, $this->extractor->getType($class, $property), $class.'::'.$property);
+        }
     }
 
     #[DataProvider('pseudoTypeProvider')]

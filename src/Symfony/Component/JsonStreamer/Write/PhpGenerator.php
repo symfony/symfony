@@ -123,7 +123,7 @@ final class PhpGenerator
             --$context['indentation_level'];
 
             $generators = [
-                $node->getIdentifier() => $this->line('$generators[\''.$node->getIdentifier().'\'] = static function ($data, $depth) use ($valueTransformers, $options, &$generators) {', $context)
+                $node->getIdentifier() => $this->line('$generators['.var_export($node->getIdentifier(), true).'] = static function ($data, $depth) use ($valueTransformers, $options, &$generators) {', $context)
                     .$this->line('    if ($depth >= '.self::MAX_DEPTH.') {', $context)
                     .$this->line('        throw new \\'.NotEncodableValueException::class.'(\'Maximum stack depth exceeded\');', $context)
                     .$this->line('    }', $context)
@@ -251,7 +251,7 @@ final class PhpGenerator
                 $depthArgument = ($context['generating_generator'] ?? false) ? '$depth + 1' : (string) $context['depth'];
 
                 return $this->flushYieldBuffer($context)
-                    .$this->line('yield from $generators[\''.$dataModelNode->getIdentifier().'\']('.$accessor.', '.$depthArgument.');', $context);
+                    .$this->line('yield from $generators['.var_export($dataModelNode->getIdentifier(), true).']('.$accessor.', '.$depthArgument.');', $context);
             }
 
             ++$context['depth'];

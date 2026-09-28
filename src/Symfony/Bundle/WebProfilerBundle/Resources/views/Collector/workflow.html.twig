@@ -141,7 +141,7 @@
 
             {% for name, data in collector.workflows %}
                 window.showNodeDetails{{ collector.hash(name) }} = function (node) {
-                    const map = {{ data.listeners|json_encode|raw }};
+                    const map = {{ data.listeners|json_encode(constant('JSON_HEX_TAG'))|raw }};
                     showNodeDetails(node, map);
                 };
             {% endfor %}
@@ -255,7 +255,7 @@
                     <div class="tab-content">
                         <h3>Definition</h3>
                         <pre class="sf-mermaid">
-                            {{ data.dump|raw }}
+                            {{ data.dump }}
                             {% for nodeId, events in data.listeners %}
                                 click {{ nodeId }} showNodeDetails{{ collector.hash(name) }}
                             {% endfor %}

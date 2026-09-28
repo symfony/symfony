@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T17:59:54Z
+
+Thank you @thomas-chauchefoin-tob. I applied @GromNaN's comments, used the same `* /` replacement in service docblocks, and rewrote the DI test without `expectDeprecation()`, which doesn't exist on PHPUnit 13 once merged up.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T18:58:52Z
+
+Following #64822, I switched to `*\/`: that's what Config already uses in its generated docblocks, and it keeps the ids readable like `* /` did. /cc @GromNaN

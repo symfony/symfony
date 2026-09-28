@@ -106,7 +106,7 @@ final class ObjectShapeType extends Type
         $items = [];
 
         foreach ($this->shape as $key => $value) {
-            $itemKey = \sprintf("'%s'", $key);
+            $itemKey = \sprintf("'%s'", addcslashes($key, "'\\"));
             if ($value['optional'] ?? false) {
                 $itemKey = \sprintf('%s?', $itemKey);
             }

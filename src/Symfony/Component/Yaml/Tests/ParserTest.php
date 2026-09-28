@@ -242,6 +242,10 @@ class ParserTest extends TestCase
         yield 'on the document start marker line' => ["--- |\n  first line\n  second line\n", "first line\nsecond line\n"];
         yield 'tagged on the document start marker line' => ["--- !text >-\n  folded\n  text\n", new TaggedValue('text', 'folded text')];
         yield 'with an anchor on the document start marker line' => ["--- &anchor |\n  first line\n", "first line\n"];
+        yield 'tab after the document start marker' => ["---\t>\n  folded\n  text\n", "folded text\n"];
+        yield 'anchor before tag on the document start marker line' => ["--- &anchor !text |\n  first line\n", new TaggedValue('text', "first line\n")];
+        yield 'tag before anchor on the document start marker line' => ["--- !text &anchor |\n  first line\n", new TaggedValue('text', "first line\n")];
+        yield 'CRLF line endings' => ["--- >\r\n  folded\r\n  text\r\n", "folded text\n"];
     }
 
     public function testBlockScalarAsRootNodeFollowedByContent()

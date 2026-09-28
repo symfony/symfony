@@ -54,6 +54,8 @@ class HttpOptions
     }
 
     /**
+     * @param array<string, mixed>|list<array<string, scalar|\Stringable|\BackedEnum|null>> $query
+     *
      * @return $this
      */
     public function setQuery(array $query): static

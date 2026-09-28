@@ -39,6 +39,14 @@ class ScopingHttpClientTest extends TestCase
         $this->assertSame('http://example.com/foo?f=g&a=b', $client->request('GET', '/foo?f=g')->getInfo('url'));
     }
 
+    public function testQueryPairs()
+    {
+        $mockClient = new MockHttpClient();
+        $client = new ScopingHttpClient($mockClient, ['.*' => ['base_uri' => 'http://example.com', 'query' => ['a' => 'b']]], '.*');
+
+        $this->assertSame('http://example.com/foo?tag=c&tag=d&a=b', $client->request('GET', '/foo', ['query' => [['tag' => 'c'], ['tag' => 'd']]])->getInfo('url'));
+    }
+
     #[DataProvider('provideMatchingUrls')]
     public function testMatchingUrls(string $regexp, string $url, array $options)
     {

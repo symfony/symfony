@@ -342,7 +342,7 @@ trait HttpClientTrait
             static $cookie;
 
             $streams = [];
-            array_walk_recursive($body, $caster = static function (&$v) use (&$caster, &$streams, &$cookie) {
+            $caster = static function (&$v) use (&$caster, &$streams, &$cookie) {
                 if (\is_resource($v) || $v instanceof StreamableInterface) {
                     $cookie = hash('xxh128', $cookie ??= random_bytes(8), true);
                     $k = substr(strtr(base64_encode($cookie), '+/', '-_'), 0, -2);
@@ -358,10 +358,15 @@ trait HttpClientTrait
                         $v = [];
                     }
                 }
-            });
+            };
+
+            if (null === $pairs = self::encodePairs($body, 'body', \PHP_QUERY_RFC1738, $caster)) {
+                array_walk_recursive($body, $caster);
+                $pairs = http_build_query($body, '', '&');
+            }
             $caster = null;
 
-            if ('' === $body = http_build_query($body, '', '&')) {
+            if ('' === $body = $pairs) {
                 return '';
             }
 
@@ -747,6 +752,47 @@ trait HttpClientTrait
     }
 
     /**
+     * Encodes a list of single-entry arrays, which allows repeating names.
+     *
+     * [['a' => 'b'], ['a' => 'c']] is encoded as "a=b&a=c". Entries with a null value are skipped.
+     *
+     * @return string|null Null when $values is not such a list
+     */
+    private static function encodePairs(array $values, string $option, int $encoding, ?\Closure $streamCaster = null): ?string
+    {
+        if (!$values || !array_is_list($values) || !\is_array($values[0])) {
+            return null;
+        }
+
+        $encoded = [];
+
+        foreach ($values as $i => $pair) {
+            if (!\is_array($pair) || 1 !== \count($pair)) {
+                throw new InvalidArgumentException(\sprintf('Invalid value for option "%s": item #%d of the list must be an array with a single name => value entry where value is a scalar, a Stringable, a BackedEnum%s or null.', $option, $i, $streamCaster ? ', a stream' : ''));
+            }
+
+            $v = reset($pair);
+            $k = (string) key($pair);
+
+            if ($streamCaster && (\is_resource($v) || $v instanceof StreamableInterface)) {
+                $streamCaster($v);
+            } elseif ($v instanceof \BackedEnum) {
+                $v = $v->value;
+            } elseif ($v instanceof \Stringable) {
+                $v = (string) $v;
+            } elseif (null !== $v && !\is_scalar($v)) {
+                throw new InvalidArgumentException(\sprintf('Invalid value for option "%s": item #%d of the list must be an array with a single name => value entry where value is a scalar, a Stringable, a BackedEnum%s or null.', $option, $i, $streamCaster ? ', a stream' : ''));
+            }
+
+            if (null !== $v) {
+                $encoded[] = http_build_query([$k => $v], '', '&', $encoding);
+            }
+        }
+
+        return implode('&', $encoded);
+    }
+
+    /**
      * Merges and encodes a query array with a query string.
      *
      * @throws InvalidArgumentException When an invalid query-string value is passed
@@ -768,15 +814,24 @@ trait HttpClientTrait
             }
         }
 
-        if ($replace) {
-            foreach ($queryArray as $k => $v) {
-                if (null === $v) {
-                    unset($query[$k]);
+        if ($isPairList = null !== $queryString = self::encodePairs($queryArray, 'query', \PHP_QUERY_RFC3986)) {
+            foreach ($replace ? $queryArray : [] as $pair) {
+                if (null === reset($pair)) {
+                    unset($query[key($pair)]);
                 }
             }
+        } else {
+            if ($replace) {
+                foreach ($queryArray as $k => $v) {
+                    if (null === $v) {
+                        unset($query[$k]);
+                    }
+                }
+            }
+
+            $queryString = http_build_query($queryArray, '', '&', \PHP_QUERY_RFC3986);
         }
 
-        $queryString = http_build_query($queryArray, '', '&', \PHP_QUERY_RFC3986);
         $queryArray = [];
 
         if ($queryString) {
@@ -798,7 +853,8 @@ trait HttpClientTrait
             }
 
             foreach (explode('&', $queryString) as $v) {
-                $queryArray[rawurldecode(explode('=', $v, 2)[0])] = $v;
+                $k = rawurldecode(explode('=', $v, 2)[0]);
+                $queryArray[$k] = ($isPairList && isset($queryArray[$k]) ? $queryArray[$k].'&' : '').$v;
             }
         }
 

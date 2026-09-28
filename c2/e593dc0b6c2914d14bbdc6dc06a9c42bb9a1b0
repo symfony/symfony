@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-09-28T09:04:28Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by dylan-rumble at 2026-09-28T09:09:11Z
+
+Temporary workaround for Api Platform users:
+```yaml
+# services.yaml
+services:
+    # Replaces API Platform's pass-through decorator of the object mapper. It registers itself as the
+    # inner mapper's `objectMapper`, which makes Symfony initialize nested lazy ghosts via
+    # `map($source, $ghost)` - mapping into an existing object, so the target constructor (and defaults
+    # such as `new UuidV7()`) never runs. Undecorated, Symfony takes its own constructing path.
+    api_platform.object_mapper.relation: '@object_mapper'
+```
+
+---------------------------------------------------------------------------
+
+by dylan-rumble at 2026-09-28T09:12:38Z
+
+The Psalm failure is not new. The two `InvalidReturnStatement` errors in `ObjectMapper::map()` (it returns `object` where the interface declares the template `T`) already exist on 7.4, at the same two `return $this->doMap(...)` lines.
+
+The job builds a baseline from 7.4, and Psalm matches baseline entries by the text of the code. This PR adds `$constructTarget` to those two lines, so the old entries no longer match and are reported again. I reproduced this locally with the same baseline steps. I left the code as it is rather than changing it only to satisfy the baseline.

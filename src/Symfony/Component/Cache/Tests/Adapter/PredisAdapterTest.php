@@ -138,4 +138,15 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
 
         $this->assertSame(1, $redis->acl('DELUSER', 'predis'));
     }
+
+    public function testClearWithGlobCharactersInConnectionPrefix()
+    {
+        $redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379]), ['prefix' => 'prefix[ab]\\*?']);
+        $cache = new RedisAdapter($redis, __FUNCTION__);
+
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $cache->clear();
+
+        $this->assertFalse($cache->hasItem('foo'));
+    }
 }

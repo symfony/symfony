@@ -449,7 +449,7 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
         $code = $dumper->dump(['class' => $class]);
 
-        $this->assertStringContainsString("     * Gets the public 'foo* /alias' alias.\n     *\n     * @return object The \"foo* /target\" service.\n     */\n", $code);
+        $this->assertStringContainsString("     * Gets the public 'foo*\\/alias' alias.\n     *\n     * @return object The \"foo*\\/target\" service.\n     */\n", $code);
 
         eval('?>'.$code);
 

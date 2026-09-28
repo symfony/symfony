@@ -93,20 +93,6 @@ abstract class Constraint
     }
 
     /**
-     * Validates the value and returns it.
-     *
-     * @template T
-     *
-     * @param T $value
-     *
-     * @return T - the $value
-     */
-    public function __invoke(mixed $value): mixed
-    {
-        return Validation::createCallable($this)($value);
-    }
-
-    /**
      * Sets the value of a lazily initialized option.
      *
      * Corresponding properties are added to the object on first access. Hence

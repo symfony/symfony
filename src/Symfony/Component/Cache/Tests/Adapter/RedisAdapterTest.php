@@ -149,4 +149,16 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
         $this->assertSame(1, $redis->acl('DELUSER', 'alice'));
     }
+
+    public function testClearWithGlobCharactersInConnectionPrefix()
+    {
+        $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+        $redis->setOption(\Redis::OPT_PREFIX, 'prefix[ab]\\*?');
+        $cache = new RedisAdapter($redis, __FUNCTION__);
+
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $cache->clear();
+
+        $this->assertFalse($cache->hasItem('foo'));
+    }
 }

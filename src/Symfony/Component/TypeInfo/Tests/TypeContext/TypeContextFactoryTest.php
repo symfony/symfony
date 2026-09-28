@@ -21,6 +21,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithImportedOnlyTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAliasImport;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithMutuallyImportedTypeAliasesA;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithRecursiveTypeAliases;
@@ -299,5 +300,13 @@ class TypeContextFactoryTest extends TestCase
         $this->expectExceptionMessage('Cannot resolve "Bar" type alias.');
 
         $this->typeContextFactory->createFromClassName(DummyWithRecursiveTypeAliases::class)->typeAliases;
+    }
+
+    public function testThrowWhenImportingTypeAliasesCyclically()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot import "Foo" type alias from "%s" as it is recursive.', DummyWithMutuallyImportedTypeAliasesA::class));
+
+        $this->typeContextFactory->createFromClassName(DummyWithMutuallyImportedTypeAliasesA::class);
     }
 }

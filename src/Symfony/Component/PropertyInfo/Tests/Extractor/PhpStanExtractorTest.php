@@ -36,6 +36,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\PromotedPropertiesWi
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\LiteralDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
@@ -468,6 +469,11 @@ class PhpStanExtractorTest extends TestCase
         yield ['a', Type::int()];
         yield ['b', Type::nullable(Type::int())];
         yield ['c', Type::int()];
+    }
+
+    public function testExtractorLiteralType()
+    {
+        $this->assertEquals(Type::arrayShape(['quoted key' => Type::string()]), $this->extractor->getType(LiteralDummy::class, 'shape'));
     }
 
     #[DataProvider('php80TypesProvider')]

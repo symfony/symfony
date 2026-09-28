@@ -33,6 +33,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSpecialCharacterNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
@@ -163,6 +164,18 @@ class JsonStreamWriterTest extends TestCase
             new \ArrayObject([new ClassicDummy(), new ClassicDummy()]),
             Type::iterable(Type::object(ClassicDummy::class), Type::int()),
         );
+    }
+
+    public function testWriteObjectWithQuotedStreamedNameAndValueTransformerId()
+    {
+        $this->assertWritten('{"it\'s \\\\\' quoted":1,"transformed":"20"}', new DummyWithQuotes(), Type::object(DummyWithQuotes::class), ['scale' => 1], ["double'it" => new DoubleIntAndCastToStringValueTransformer()]);
+    }
+
+    public function testWriteTypeWithUnsupportedCharacters()
+    {
+        $type = Type::arrayShape(['foo*/bar' => Type::int()]);
+
+        $this->assertWritten('{"foo*/bar":1}', ['foo*/bar' => 1], $type);
     }
 
     public function testWriteNestedCollection()

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A subset of xliff-core-1.2-transitional.xsd that covers the most common XLIFF 1.2 files and compiles ten times faster.
+
+  Every document that is valid against this subset must be valid against the full schema too: XliffUtils validates documents against the full schema only when this subset rejects them, and reports the errors of the full schema.
+
+  To keep that property, each declaration must restrict the one of the same name in the full schema:
+  - allow child elements and text only where the full schema allows them;
+  - declare every attribute that the full schema requires, give each attribute a type that accepts no value that the full schema rejects, and add no wildcards;
+  - keep the types of elements anonymous, so that xsi:type cannot replace them;
+  - copy the identity constraints of the full schema that apply to the elements allowed here.
+-->
+<xsd:schema xmlns:xlf="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:oasis:names:tc:xliff:document:1.2">
+  <xsd:simpleType name="XTend">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="x-[^\s]+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="stateValueList">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="final"/>
+      <xsd:enumeration value="needs-adaptation"/>
+      <xsd:enumeration value="needs-l10n"/>
+      <xsd:enumeration value="needs-review-adaptation"/>
+      <xsd:enumeration value="needs-review-l10n"/>
+      <xsd:enumeration value="needs-review-translation"/>
+      <xsd:enumeration value="needs-translation"/>
+      <xsd:enumeration value="new"/>
+      <xsd:enumeration value="signed-off"/>
+      <xsd:enumeration value="translated"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="priorityValueList">
+    <xsd:restriction base="xsd:positiveInteger">
+      <xsd:enumeration value="1"/>
+      <xsd:enumeration value="2"/>
+      <xsd:enumeration value="3"/>
+      <xsd:enumeration value="4"/>
+      <xsd:enumeration value="5"/>
+      <xsd:enumeration value="6"/>
+      <xsd:enumeration value="7"/>
+      <xsd:enumeration value="8"/>
+      <xsd:enumeration value="9"/>
+      <xsd:enumeration value="10"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="AttrType_state">
+    <xsd:union memberTypes="xlf:stateValueList xlf:XTend"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="AttrType_priority">
+    <xsd:union memberTypes="xlf:priorityValueList"/>
+  </xsd:simpleType>
+  <xsd:element name="xliff">
+    <xsd:complexType>
+      <xsd:sequence maxOccurs="unbounded">
+        <xsd:element ref="xlf:file"/>
+      </xsd:sequence>
+      <xsd:attribute name="version" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="1.2"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="file">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element minOccurs="0" ref="xlf:header"/>
+        <xsd:element ref="xlf:body"/>
+      </xsd:sequence>
+      <xsd:attribute name="original" type="xsd:string" use="required"/>
+      <xsd:attribute name="source-language" type="xsd:language" use="required"/>
+      <xsd:attribute name="datatype" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="plaintext"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="target-language" type="xsd:language" use="optional"/>
+    </xsd:complexType>
+    <xsd:key name="K_unit_id">
+      <xsd:selector xpath=".//xlf:trans-unit|.//xlf:bin-unit"/>
+      <xsd:field xpath="@id"/>
+    </xsd:key>
+    <xsd:key name="K_tool-id">
+      <xsd:selector xpath="xlf:header/xlf:tool"/>
+      <xsd:field xpath="@tool-id"/>
+    </xsd:key>
+  </xsd:element>
+  <xsd:element name="header">
+    <xsd:complexType>
+      <xsd:choice maxOccurs="unbounded" minOccurs="0">
+        <xsd:element ref="xlf:prop-group"/>
+        <xsd:element ref="xlf:note"/>
+        <xsd:element ref="xlf:tool"/>
+      </xsd:choice>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="tool">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="tool-id" type="xsd:string" use="required"/>
+          <xsd:attribute name="tool-name" type="xsd:string" use="required"/>
+          <xsd:attribute name="tool-version" type="xsd:string" use="optional"/>
+          <xsd:attribute name="tool-company" type="xsd:string" use="optional"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="prop-group">
+    <xsd:complexType>
+      <xsd:sequence maxOccurs="unbounded">
+        <xsd:element ref="xlf:prop"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="prop">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="prop-type" type="xsd:string" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="note">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="priority" type="xlf:AttrType_priority" use="optional"/>
+          <xsd:attribute name="from" type="xsd:string" use="optional"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="body">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:trans-unit"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="trans-unit">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="xlf:source"/>
+        <xsd:element minOccurs="0" ref="xlf:target"/>
+        <xsd:element maxOccurs="unbounded" minOccurs="0" ref="xlf:note"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:string" use="required"/>
+      <xsd:attribute name="resname" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="source">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string"/>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="target">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="state" type="xlf:AttrType_state" use="optional"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

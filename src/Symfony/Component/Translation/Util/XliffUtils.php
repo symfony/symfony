@@ -60,9 +60,16 @@ class XliffUtils
     {
         $xliffVersion = static::getVersionNumber($dom);
         $internalErrors = libxml_use_internal_errors(true);
+        $pendingErrors = libxml_get_errors();
 
-        if (!@$dom->schemaValidateSource(self::getSchema($xliffVersion))) {
-            return self::getXmlErrors($internalErrors);
+        // the subset compiles ten times faster than the full XLIFF 1.2 schema, and the documents it accepts are valid against the full schema too
+        if ('1.2' !== $xliffVersion || !@$dom->schemaValidateSource(file_get_contents(__DIR__.'/../Resources/schemas/xliff-core-1.2-subset.xsd'))) {
+            $schema = self::getSchema($xliffVersion);
+            libxml_clear_errors();
+
+            if (!@$dom->schemaValidateSource($schema)) {
+                return self::getXmlErrors($internalErrors, $pendingErrors);
+            }
         }
 
         $dom->normalizeDocument();
@@ -157,10 +164,10 @@ class XliffUtils
     /**
      * Returns the XML errors of the internal XML parser.
      */
-    private static function getXmlErrors(bool $internalErrors): array
+    private static function getXmlErrors(bool $internalErrors, array $pendingErrors): array
     {
         $errors = [];
-        foreach (libxml_get_errors() as $error) {
+        foreach ([...$pendingErrors, ...libxml_get_errors()] as $error) {
             $errors[] = [
                 'level' => \LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 'code' => $error->code,

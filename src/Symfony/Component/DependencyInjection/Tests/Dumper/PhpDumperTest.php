@@ -1834,6 +1834,25 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
+    public function testCircularWitherWithBackslashesInServiceIdIsShared()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a\\\\b', PhpDumperTest_CircularWither::class)
+            ->setPublic(true)
+            ->addMethodCall('withB', [new Reference('c')], true);
+        $container->register('c', PhpDumperTest_CircularSetterB::class)
+            ->setPublic(true)
+            ->addMethodCall('setA', [new Reference('a\\\\b')]);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Circular_Wither_Backslashes']));
+
+        $dumpedContainer = new $class();
+
+        $this->assertSame($dumpedContainer->get('a\\\\b'), $dumpedContainer->get('a\\\\b'));
+    }
+
     public function testCloningLazyGhostWithDependency()
     {
         $container = new ContainerBuilder();
@@ -2756,6 +2775,19 @@ class PhpDumperTest_CircularSetterB
     public function setA(object $a): void
     {
         $this->a = $a;
+    }
+}
+
+class PhpDumperTest_CircularWither
+{
+    public ?object $b = null;
+
+    public function withB(object $b): static
+    {
+        $new = clone $this;
+        $new->b = $b;
+
+        return $new;
     }
 }
 

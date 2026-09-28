@@ -807,7 +807,7 @@ class PhpDumper extends Dumper
 
             if ($call[2] ?? false) {
                 if (null !== $sharedNonLazyId && $lastWitherIndex === $k && 'instance' === $variableName) {
-                    $witherAssignation = \sprintf('$container->%s[\'%s\'] = ', $definition->isPublic() ? 'services' : 'privates', $sharedNonLazyId);
+                    $witherAssignation = \sprintf('$container->%s[%s] = ', $definition->isPublic() ? 'services' : 'privates', $this->doExport($sharedNonLazyId));
                     $this->sharesBeforeSetup = true;
                 }
                 $witherAssignation .= \sprintf('$%s = ', $variableName);

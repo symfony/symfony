@@ -12,9 +12,16 @@
 namespace Symfony\Component\Validator\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Validator\Exception\MappingException;
+use Symfony\Component\Validator\Validation;
 
 class AttributeMetadataPassTest extends TestCase
 {
@@ -105,6 +112,80 @@ class AttributeMetadataPassTest extends TestCase
         $this->expectException(MappingException::class);
         (new AttributeMetadataPass())->process($container);
     }
+
+    public function testProcessDiscoversConstraintsOnNonPublicMembers()
+    {
+        $container = $this->createContainerWithAutoconfiguredConstraints();
+
+        foreach ([_AttrMeta_PublicProperty::class, _AttrMeta_PrivateProperty::class, _AttrMeta_PrivatePromotedProperty::class, _AttrMeta_PrivateCallback::class, _AttrMeta_NoConstraint::class] as $class) {
+            $container->register($class, $class)->setAutoconfigured(true);
+        }
+        $container->register('not_autoconfigured', _AttrMeta_NotAutoconfigured::class);
+        $container->register('ignored', _AttrMeta_IgnoredAttributes::class)
+            ->setAutoconfigured(true)
+            ->addTag('container.ignore_attributes');
+
+        $this->processPasses($container);
+
+        $methodCalls = $container->getDefinition('validator.builder')->getMethodCalls();
+        $this->assertSame('addAttributeMappings', $methodCalls[0][0]);
+
+        $expectedClasses = [
+            _AttrMeta_PrivateCallback::class => [_AttrMeta_PrivateCallback::class],
+            _AttrMeta_PrivatePromotedProperty::class => [_AttrMeta_PrivatePromotedProperty::class],
+            _AttrMeta_PrivateProperty::class => [_AttrMeta_PrivateProperty::class],
+            _AttrMeta_PublicProperty::class => [_AttrMeta_PublicProperty::class],
+        ];
+        $this->assertSame([$expectedClasses], $methodCalls[0][1]);
+    }
+
+    public function testNonPublicMembersAreValidatedWhenConstraintsAreDiscoveredAtCompileTimeOnly()
+    {
+        $container = $this->createContainerWithAutoconfiguredConstraints();
+        $container->register('dto', _AttrMeta_PrivatePromotedProperty::class)->setAutoconfigured(true);
+
+        $this->processPasses($container);
+
+        $builder = Validation::createValidatorBuilder();
+        foreach ($container->getDefinition('validator.builder')->getMethodCalls() as [$method, $arguments]) {
+            $builder->$method(...$arguments);
+        }
+
+        $this->assertCount(1, $builder->getValidator()->validate(new _AttrMeta_PrivatePromotedProperty('')));
+    }
+
+    public function testNonPublicMembersAreIgnoredWhenConstraintsAreNotAutoconfigured()
+    {
+        $container = new ContainerBuilder();
+        $container->register('validator.builder');
+        $container->register('dto', _AttrMeta_PrivateProperty::class)->setAutoconfigured(true);
+
+        $this->processPasses($container);
+
+        $this->assertSame([], $container->getDefinition('validator.builder')->getMethodCalls());
+    }
+
+    private function createContainerWithAutoconfiguredConstraints(): ContainerBuilder
+    {
+        if (!method_exists(ContainerBuilder::class, 'getAttributeAutoconfigurators')) {
+            $this->markTestSkipped('Autoconfiguring these attributes requires symfony/dependency-injection 7.3 or higher.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register('validator.builder');
+        $container->registerAttributeForAutoconfiguration(Constraint::class, static function (ChildDefinition $definition, Constraint $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflector) {
+            $definition->addTag('validator.attribute_metadata');
+        });
+
+        return $container;
+    }
+
+    private function processPasses(ContainerBuilder $container): void
+    {
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new AttributeMetadataPass())->process($container);
+    }
 }
 
 class _AttrMeta_Source
@@ -128,4 +209,50 @@ class _AttrMeta_Target
 class _AttrMeta_BadSource
 {
     public string $extra;
+}
+
+class _AttrMeta_PublicProperty
+{
+    #[Assert\NotBlank]
+    public string $name = '';
+}
+
+class _AttrMeta_PrivateProperty
+{
+    #[Assert\NotBlank]
+    private string $name = '';
+}
+
+class _AttrMeta_PrivatePromotedProperty
+{
+    public function __construct(
+        #[Assert\NotBlank]
+        private string $name,
+    ) {
+    }
+}
+
+class _AttrMeta_PrivateCallback
+{
+    #[Assert\Callback]
+    private function validate(ExecutionContextInterface $context): void
+    {
+    }
+}
+
+class _AttrMeta_NoConstraint
+{
+    private string $name = '';
+}
+
+class _AttrMeta_NotAutoconfigured
+{
+    #[Assert\NotBlank]
+    private string $name = '';
+}
+
+class _AttrMeta_IgnoredAttributes
+{
+    #[Assert\NotBlank]
+    private string $name = '';
 }

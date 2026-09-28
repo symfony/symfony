@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\BigIntType;
+use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\AssociationMapping;
@@ -134,12 +135,15 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
+            $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
+
+            if (null !== $uidClass = $this->getUidClass($typeOfField)) {
+                return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $uidClass)];
+            }
 
             if (!$builtinType = $this->getPhpType($typeOfField)) {
                 return null;
             }
-
-            $nullable = $metadata instanceof ClassMetadata && $metadata->isNullable($property);
 
             // DBAL 4 has a special fallback strategy for BINGINT (int -> string)
             if (Types::BIGINT === $typeOfField && !method_exists(BigIntType::class, 'getName')) {
@@ -172,12 +176,6 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
                         case Types::DATEINTERVAL:
                             return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
-
-                        case UuidType::NAME:
-                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, Uuid::class)];
-
-                        case UlidType::NAME:
-                            return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, Ulid::class)];
                     }
 
                     break;
@@ -291,12 +289,25 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             Types::DATETIME_IMMUTABLE,
             Types::DATETIMETZ_IMMUTABLE,
             Types::TIME_IMMUTABLE,
-            Types::DATEINTERVAL,
-            UuidType::NAME,
-            UlidType::NAME => Type::BUILTIN_TYPE_OBJECT,
+            Types::DATEINTERVAL => Type::BUILTIN_TYPE_OBJECT,
             'array', // DBAL < 4
             'json_array', // DBAL < 3
             Types::SIMPLE_ARRAY => Type::BUILTIN_TYPE_ARRAY,
+            default => null,
+        };
+    }
+
+    private function getUidClass(string $typeOfField): ?string
+    {
+        if (!DBALType::hasType($typeOfField)) {
+            return null;
+        }
+
+        $type = DBALType::getType($typeOfField);
+
+        return match (true) {
+            $type instanceof UuidType => Uuid::class,
+            $type instanceof UlidType => Ulid::class,
             default => null,
         };
     }

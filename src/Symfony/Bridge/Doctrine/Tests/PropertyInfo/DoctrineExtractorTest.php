@@ -14,8 +14,10 @@ namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Types\BigIntType;
+use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\ORMSetup;
@@ -31,6 +33,8 @@ use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumInt;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\EnumString;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -40,7 +44,10 @@ use Symfony\Component\Uid\Uuid;
  */
 class DoctrineExtractorTest extends TestCase
 {
-    private function createExtractor(): DoctrineExtractor
+    /**
+     * @param array<string, class-string<DBALType>> $types
+     */
+    private function createExtractor(array $types = []): DoctrineExtractor
     {
         $config = ORMSetup::createConfiguration(true);
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Tests/Fixtures' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'], true));
@@ -55,7 +62,11 @@ class DoctrineExtractorTest extends TestCase
             }
         }
 
-        DoctrineTestHelper::registerTypes($config, ['foo' => DoctrineFooType::class]);
+        DoctrineTestHelper::registerTypes($config, $types + [
+            'foo' => DoctrineFooType::class,
+            'uuid' => UuidType::class,
+            'ulid' => UlidType::class,
+        ]);
 
         $eventManager = new EventManager();
         $entityManager = new EntityManager(DriverManager::getConnection(['driver' => 'pdo_sqlite'], $config, $eventManager), $config, $eventManager);
@@ -150,6 +161,23 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumStringArray', []));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, EnumInt::class))], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumIntArray', []));
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom', []));
+    }
+
+    public function testUuidNotExtractedWhenRegisteredTypeIsNotSymfonysUuidType()
+    {
+        $extractor = $this->createExtractor(['uuid' => NonUuidStubType::class]);
+
+        $this->assertNull($extractor->getTypes(DoctrineDummy::class, 'uuid'));
+    }
+
+    public function testUuidExtractedWhenSymfonysUuidTypeIsRegisteredUnderCustomName()
+    {
+        $extractor = $this->createExtractor(['aliased_uuid' => UuidType::class]);
+
+        $this->assertEquals(
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, Uuid::class)],
+            $extractor->getTypes(DoctrineRelation::class, 'aliasedUuid')
+        );
     }
 
     public static function typesProvider(): array
@@ -280,5 +308,13 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'id'));
         $this->assertNull($extractor->isWritable(DoctrineGeneratedValue::class, 'foo'));
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
+    }
+}
+
+final class NonUuidStubType extends DBALType
+{
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    {
+        return $platform->getStringTypeDeclarationSQL($column);
     }
 }

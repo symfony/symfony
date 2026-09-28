@@ -45,6 +45,9 @@ class DoctrineRelation
     #[Column(type: 'uuid')]
     private $uuidField;
 
+    #[Column(type: 'aliased_uuid')]
+    private $aliasedUuid;
+
     #[Column(type: 'guid', name: 'different_than_field')]
     #[ManyToOne(targetEntity: DoctrineDummy::class, inversedBy: 'indexedBuz')]
     protected $buzField;

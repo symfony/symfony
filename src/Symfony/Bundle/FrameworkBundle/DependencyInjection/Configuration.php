@@ -140,6 +140,7 @@ class Configuration implements ConfigurationInterface
         $this->addExtensionAliasSections($rootNode);
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
+        $this->addResponseSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
         $this->addExceptionsSection($rootNode);
         $this->addRobotsIndexSection($rootNode);
@@ -520,6 +521,28 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->prototype('scalar')->end()
                             ->end()
+                        ->end()
+                        ->scalarNode('serializer')
+                            ->info('Service id of the serializer that maps request payloads and query strings to controller arguments with #[MapRequestPayload] and #[MapQueryString], e.g. "serializer.api" for the named serializer "api".')
+                            ->defaultNull()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addResponseSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('response')
+                    ->info('Response configuration')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('serializer')
+                            ->info('Service id of the serializer that serializes the values returned by controllers with #[Serialize], e.g. "serializer.api" for the named serializer "api".')
+                            ->defaultNull()
                         ->end()
                     ->end()
                 ->end()

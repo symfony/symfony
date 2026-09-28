@@ -1,0 +1,12 @@
+imports:
+    - { resource: config.yml }
+
+framework:
+    serializer:
+        named_serializers:
+            api:
+                name_converter: serializer.name_converter.camel_case_to_snake_case
+    request:
+        serializer: serializer.api
+    response:
+        serializer: serializer.api

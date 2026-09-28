@@ -190,7 +190,7 @@ class ErrorListener implements EventSubscriberInterface
             return LogLevel::CRITICAL;
         }
 
-        return LogLevel::ERROR;
+        return LogLevel::WARNING;
     }
 
     private function resolveLogChannel(\Throwable $throwable): ?string

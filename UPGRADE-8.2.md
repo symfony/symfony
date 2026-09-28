@@ -240,6 +240,12 @@ HttpKernel
    with `schemes: ['https']` was still acted upon when requested over plain HTTP with GET or HEAD.
    Only scheme redirects are affected; a trailing-slash redirect still goes through the controller
  * Deprecate the `HIncludeFragmentRenderer` class, use the `EsiFragmentRenderer` or `InlineFragmentRenderer`, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
+ * `ErrorListener` logs exceptions whose HTTP status code is below 500 (client errors), including the ones given a
+   status code by `framework.exceptions` or `#[WithHttpStatus]`, at the `warning` level instead of `error`. They no
+   longer activate a `fingers_crossed` handler whose `action_level` is `error`, as in the Monolog recipe, and the logger
+   that HttpKernel registers when no other is installed no longer outputs them by default. Lower the `action_level` to
+   `warning`, set the `log_level` of `framework.exceptions` or use the `#[WithLogLevel]` attribute on the exception
+   class to keep the previous behavior
  * `Kernel::boot()` now iterates over the `$bundles` property instead of calling `getBundles()`, so that the
    bundles that have nothing to do at boot time are not instantiated
 

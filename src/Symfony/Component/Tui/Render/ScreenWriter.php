@@ -43,6 +43,8 @@ final class ScreenWriter
     private int $cursorRow = 0;
     private int $hardwareCursorRow = 0;
     private int $maxLinesRendered = 0;
+    /** Number of leading lines whose current content already reached the scrollback */
+    private int $scrollbackLineCount = 0;
     private bool $showHardwareCursor = true;
     private int $scrollOffset = 0;
 
@@ -186,6 +188,9 @@ final class ScreenWriter
             return;
         }
 
+        // Changed lines have to reach the scrollback again when they scroll out
+        $this->scrollbackLineCount = min($this->scrollbackLineCount, $firstChanged);
+
         // Overflowing content that shrinks moves every visible line up, which
         // cannot be expressed by erasing the trailing ones.
         if (!$this->terminal->isVirtual() && \count($this->previousLines) > $rows && $lineCount < \count($this->previousLines)) {
@@ -205,6 +210,13 @@ final class ScreenWriter
 
         if ($firstChanged < $viewportTop) {
             $this->fullRender($lines, $cursorPos, true);
+
+            return;
+        }
+
+        // Growing past the bottom of the screen scrolls its top lines out, and some of them are already in the scrollback
+        if (!$this->terminal->isVirtual() && $viewportTop < $this->scrollbackLineCount && $lineCount > $viewportTop + $rows) {
+            $this->redrawViewport($lines, $cursorPos, $rows);
 
             return;
         }
@@ -261,6 +273,7 @@ final class ScreenWriter
         } else {
             $this->maxLinesRendered = max($this->maxLinesRendered, \count($newLines));
         }
+        $this->scrollbackLineCount = max(0, \count($newLines) - $this->terminal->getRows());
 
         $this->positionHardwareCursor($cursorPos, \count($newLines));
         $this->terminal->write("\x1b[?2026l"); // Publish the content and the restored cursor together
@@ -273,7 +286,7 @@ final class ScreenWriter
      *
      * The scrollback is kept, so the lines that scrolled out stay reachable.
      * Rows are erased one by one instead of clearing the screen, because tmux moves a cleared screen into the scrollback (its default scroll-on-clear option).
-     * The cursor never goes below the last row, so nothing scrolls either.
+     * Lines already in the scrollback are painted in place and only the next ones scroll there, so that none reaches it twice.
      *
      * @param string[]                                   $newLines
      * @param array{row: int, col: int, shape: int}|null $cursorPos
@@ -281,13 +294,13 @@ final class ScreenWriter
     private function redrawViewport(array $newLines, ?array $cursorPos, int $rows): void
     {
         $lineCount = \count($newLines);
-        $visibleLines = \array_slice($newLines, max(0, $lineCount - $rows), $rows);
+        $lines = \array_slice($newLines, min(max(0, $lineCount - $rows), $this->scrollbackLineCount));
 
         $buffer = "\x1b[?2026h\x1b[?25l\x1b[H\x1b[2K"; // Begin synchronized output with the cursor hidden, home and erase the first row
-        $buffer .= implode("\r\n\x1b[2K", array_pad($visibleLines, $rows, ''));
+        $buffer .= implode("\r\n\x1b[2K", array_pad($lines, $rows, ''));
 
         // Back to the last line of the content
-        if (0 < $up = $rows - max(1, \count($visibleLines))) {
+        if (0 < $up = $rows - max(1, \count($lines))) {
             $buffer .= "\x1b[{$up}A";
         }
 
@@ -295,6 +308,7 @@ final class ScreenWriter
         $this->cursorRow = max(0, $lineCount - 1);
         $this->hardwareCursorRow = $this->cursorRow;
         $this->maxLinesRendered = $lineCount;
+        $this->scrollbackLineCount = max($this->scrollbackLineCount, $lineCount - $rows);
 
         $this->positionHardwareCursor($cursorPos, $lineCount);
         $this->terminal->write("\x1b[?2026l");
@@ -463,6 +477,7 @@ final class ScreenWriter
         $this->cursorRow = max(0, \count($newLines) - 1);
         $this->hardwareCursorRow = $finalCursorRow;
         $this->maxLinesRendered = max($this->maxLinesRendered, \count($newLines));
+        $this->scrollbackLineCount = max($this->scrollbackLineCount, $this->maxLinesRendered - $this->terminal->getRows());
 
         $this->positionHardwareCursor($cursorPos, \count($newLines));
         $this->terminal->write("\x1b[?2026l"); // Publish the content and the restored cursor together

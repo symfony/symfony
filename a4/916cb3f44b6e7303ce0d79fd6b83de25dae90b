@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T17:50:47Z
+
+Thank you @thomas-chauchefoin-tob. I pushed two changes: an empty secret now throws, like the other parsers that require one, and the test covers the three message types (the check could be dropped for notifications without any test failing).

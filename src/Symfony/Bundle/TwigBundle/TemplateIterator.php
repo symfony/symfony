@@ -28,15 +28,19 @@ class TemplateIterator implements \IteratorAggregate
     private \Traversable $templates;
 
     /**
-     * @param array       $paths        Additional Twig paths to warm
-     * @param string|null $defaultPath  The directory where global templates can be stored
-     * @param string[]    $namePatterns Pattern of file names
+     * @param array       $paths          Additional Twig paths to warm
+     * @param string|null $defaultPath    The directory where global templates can be stored
+     * @param string[]    $namePatterns   Pattern of file names
+     * @param string|null $formThemesPath A directory of form themes to warm only when they are default ones or when a warmed template names them
+     * @param string[]    $formThemes     The default form themes
      */
     public function __construct(
         private KernelInterface $kernel,
         private array $paths = [],
         private ?string $defaultPath = null,
         private array $namePatterns = [],
+        private ?string $formThemesPath = null,
+        private array $formThemes = [],
     ) {
     }
 
@@ -69,16 +73,22 @@ class TemplateIterator implements \IteratorAggregate
         }
 
         foreach ($this->paths as $dir => $namespace) {
-            $templates[] = $this->findTemplatesInDirectory($dir, $namespace);
+            if ($dir !== $this->formThemesPath) {
+                $templates[] = $this->findTemplatesInDirectory($dir, $namespace);
+            }
         }
 
-        return $this->templates = new \ArrayIterator(array_unique(array_merge([], ...$templates)));
+        if (null !== $this->formThemesPath) {
+            $templates[] = $this->findReachableFormThemes(array_keys(array_merge([], ...$templates)));
+        }
+
+        return $this->templates = new \ArrayIterator(array_unique(array_merge([], ...array_map(array_values(...), $templates))));
     }
 
     /**
      * Find templates in the given directory.
      *
-     * @return string[]
+     * @return array<string, string> Template names, keyed by file path
      */
     private function findTemplatesInDirectory(string $dir, ?string $namespace = null, array $excludeDirs = []): array
     {
@@ -88,9 +98,37 @@ class TemplateIterator implements \IteratorAggregate
 
         $templates = [];
         foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs)->name($this->namePatterns) as $file) {
-            $templates[] = (null !== $namespace ? '@'.$namespace.'/' : '').str_replace('\\', '/', $file->getRelativePathname());
+            $templates[$file->getPathname()] = (null !== $namespace ? '@'.$namespace.'/' : '').str_replace('\\', '/', $file->getRelativePathname());
         }
 
         return $templates;
+    }
+
+    /**
+     * Finds the form themes that are default ones or that the given templates name, and the ones these form themes name in turn.
+     *
+     * @param string[] $files The paths of the templates
+     *
+     * @return array<string, string> Form theme names, keyed by file path
+     */
+    private function findReachableFormThemes(array $files): array
+    {
+        $formThemes = array_flip($this->findTemplatesInDirectory($this->formThemesPath));
+        $reachedThemes = array_intersect_key($formThemes, array_flip($this->formThemes));
+        $formThemes = array_diff_key($formThemes, $reachedThemes);
+        $files = array_merge($files, array_values($reachedThemes));
+
+        while ($formThemes && $files) {
+            $code = file_get_contents(array_pop($files));
+
+            foreach ($formThemes as $name => $file) {
+                if (str_contains($code, $name)) {
+                    $reachedThemes[$name] = $files[] = $file;
+                    unset($formThemes[$name]);
+                }
+            }
+        }
+
+        return array_flip($reachedThemes);
     }
 }

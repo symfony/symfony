@@ -42,6 +42,7 @@ class ExtensionPass implements CompilerPassInterface
             $coreThemePath = $viewDir.'/Form';
             $loader->addMethodCall('addPath', [$coreThemePath]);
             $templatePaths[$coreThemePath] = null;
+            $templateIterator->replaceArgument(4, $coreThemePath);
         }
 
         $templateIterator->replaceArgument(1, $templatePaths);

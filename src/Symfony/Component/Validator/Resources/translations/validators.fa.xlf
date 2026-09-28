@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>این یک آدرس رایانامه (ایمیل) معتبر نمی‌باشد.</target>
+                <target>این مقدار یک آدرس رایانامه (ایمیل) معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>فایل بیش از اندازه بزرگ است({{ size }} {{ suffix }}). بیشینه (حداکثر) اندازه مجاز برابر با {{ limit }} {{ suffix }} می‌باشد.</target>
+                <target>فایل بیش از اندازه بزرگ است({{ size }} {{ suffix }}). بیشینه اندازه مجاز برابر با {{ limit }} {{ suffix }} می‌باشد.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
@@ -108,7 +108,7 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>این مقدار شامل یک URL معتبر نمی‌باشد.</target>
+                <target>این مقدار یک URL معتبر نمی‌باشد</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>فایل بیش از اندازه بزرگ است. بیشینه (حداکثر) اندازه مجاز {{ limit }} {{ suffix }} است.</target>
+                <target>فایل بیش از اندازه بزرگ است. بیشینه اندازه مجاز {{ limit }} {{ suffix }} است.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>بارگذاری فایل با شکست مواجه گردید.</target>
+                <target>بارگذاری فایل امکان‌پذیر نبود.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -144,7 +144,7 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>این مقدار یک محل (locale) معتبر نمی‌باشد.</target>
+                <target>این مقدار یک locale معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
@@ -188,7 +188,7 @@
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
-                <target>هیچ فایلی بارگذاری نشد.</target>
+                <target>هیچ فایلی بارگذاری نشده است.</target>
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target>این مقدار یک شماره شبای معتبر نمی‌باشد.</target>
+                <target>این مقدار یک شماره IBAN معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>میزبان (Host) شناسایی نشد.</target>
+                <target> Host شناسایی نشد.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده است. لطفاً از یک رمزعبور دیگر استفاده کنید.</target>
+                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده است و نباید از آن استفاده شود. لطفاً از یک رمزعبور دیگر استفاده کنید.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>

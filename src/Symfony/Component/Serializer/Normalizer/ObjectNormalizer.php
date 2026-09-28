@@ -41,6 +41,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
     private static $reflectionCache = [];
     private static $isReadableCache = [];
     private static $isWritableCache = [];
+    private static array $constructorParametersCache = [];
 
     protected PropertyAccessorInterface $propertyAccessor;
     protected $propertyInfoExtractor;
@@ -156,7 +157,11 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
             return self::$isWritableCache[$cacheKey];
         }
 
-        if (str_contains($attribute, '.') || str_contains($attribute, '[') || $this->propertyInfoExtractor->isWritable($class, $attribute, $context)) {
+        // constructor parameters can be set when instantiating, even when property info reports them as not writable
+        if (str_contains($attribute, '.') || str_contains($attribute, '[')
+            || (($context['enable_constructor_extraction'] ?? true) && $this->isConstructorParameter($class, $attribute))
+            || $this->propertyInfoExtractor->isWritable($class, $attribute, $context)
+        ) {
             return self::$isWritableCache[$cacheKey] = true;
         }
 
@@ -180,5 +185,18 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
             && !$method->getAttributes(Ignore::class)
             && !$method->getNumberOfRequiredParameters()
             && !\in_array((string) $method->getReturnType(), ['void', 'never'], true);
+    }
+
+    private function isConstructorParameter(string $class, string $attribute): bool
+    {
+        if (!isset(self::$constructorParametersCache[$class])) {
+            self::$constructorParametersCache[$class] = [];
+
+            foreach ((self::$reflectionCache[$class] ??= new \ReflectionClass($class))->getConstructor()?->getParameters() ?? [] as $parameter) {
+                self::$constructorParametersCache[$class][$parameter->name] = true;
+            }
+        }
+
+        return isset(self::$constructorParametersCache[$class][$attribute]);
     }
 }

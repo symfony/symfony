@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -1832,6 +1833,35 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame('FOO', $denormalized->foo);
         $this->assertSame('hidden', $denormalized->hidden);
     }
+
+    public function testDenormalizeReadonlyConstructorParameters()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(['foo' => 'FOO', 'bar' => 'BAR'], ReadonlyConstructorDummy::class, null, ['allow_extra_attributes' => false]);
+
+        $this->assertSame('FOO', $denormalized->foo);
+        $this->assertSame('BAR', $denormalized->bar);
+    }
+
+    public function testDenormalizeReadonlyConstructorParametersWithConstructorExtractionDisabled()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->expectException(MissingConstructorArgumentsException::class);
+
+        $normalizer->denormalize(['foo' => 'FOO', 'bar' => 'BAR'], ReadonlyConstructorDummy::class, null, ['enable_constructor_extraction' => false]);
+    }
+
+    public function testDenormalizeReadonlyPropertyNotInTheConstructorOfTheChildClass()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->expectException(ExtraAttributesException::class);
+        $this->expectExceptionMessage('Extra attributes are not allowed ("foo" is unknown).');
+
+        $normalizer->denormalize(['foo' => 'FOO', 'baz' => 'BAZ'], ReadonlyConstructorChildDummy::class, null, ['allow_extra_attributes' => false]);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy
@@ -2678,4 +2708,25 @@ class DiscriminatorWithIgnoredAttribute
 class DiscriminatorWithoutIgnoredAttribute
 {
     public string $bar = 'bar';
+}
+
+class ReadonlyConstructorDummy
+{
+    public readonly string $bar;
+
+    public function __construct(
+        public readonly string $foo,
+        string $bar = 'bar',
+    ) {
+        $this->bar = $bar;
+    }
+}
+
+class ReadonlyConstructorChildDummy extends ReadonlyConstructorDummy
+{
+    public function __construct(
+        public readonly string $baz,
+    ) {
+        parent::__construct('parent');
+    }
 }

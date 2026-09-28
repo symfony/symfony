@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T08:29:00Z
+
+I pushed a few changes: an assignment that always runs now replaces the previous values of the variable instead of adding to them (so `$key = 'foo'; $key = $other;` doesn't extract `foo` anymore, and reusing a variable doesn't attach the second call to the first key), `parent::` calls from classes that can't be autoloaded are skipped instead of throwing, and resolving the classes a variable may hold is memoized (it was exponential with variables copied in branches).
+
+One question remains: method resolution doesn't care about the extracted paths, so extracting `Security/Http` finds "An authentication exception occurred." from `AuthenticationException::getMessageKey()` in Security/Core. In an app, that means vendor-owned messages land in the app's catalogue with the `__` prefix and then override the vendor translations. Should we resolve only methods declared in files under the extracted paths? WDYT?
+
+---------------------------------------------------------------------------
+
+by guillaume-sainthillier at 2026-09-28T08:36:44Z
+
+Thanks for the fixes! Agreed on the vendor question: pushed 89c068b311f, which reads method bodies only from files under the paths given to `extract()`. Types are still resolved through reflection, so `$vendorObject->getStatus()->label()` keeps working when `label()` is in the app. Extracting `Security/Http` alone no longer finds Core's message.
+
+The method cases moved to their own fixture directory and test, and the limitations fixture documents the new rule. One trade-off: `translation:extract` calls `extract()` once per code path, so a PHP template under `templates/` won't resolve methods of classes living in `src/`. That looked acceptable to me, since PHP templates are rare.
+
+_🤖 Addressed by [Claude Code](https://claude.com/claude-code)_

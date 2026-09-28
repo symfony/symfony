@@ -307,6 +307,15 @@ Messenger
    Note that a message sent to a transport is no longer handled in process, so `RedispatchMessageHandler`
    returns `null` for it instead of the result of the handler
 
+Mime
+----
+
+ * Add argument `$encoding` to `DataPart::fromPath()`
+ * `FormDataPart` keeps the encoding of parts created with an explicit `$encoding` instead of forcing `8bit`.
+   Messages normalized to JSON by the Serializer before the upgrade carry the encoding of every part, so a
+   part coming from such a message is no longer forced to `8bit` in a form: consume the queues of transports
+   using the Serializer before upgrading
+
 Notifier
 --------
 

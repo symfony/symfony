@@ -18,6 +18,11 @@ use Symfony\Component\Mime\Part\TextPart;
 /**
  * Implements RFC 7578.
  *
+ * Parts use the "8bit" Content-Transfer-Encoding, unless they were created
+ * with an explicit encoding. Keeping that encoding is a deliberate deviation
+ * from RFC 7578, which deprecates the Content-Transfer-Encoding header
+ * (section 4.7), as an opt-in escape hatch for receivers that require it.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class FormDataPart extends AbstractMultipartPart
@@ -89,15 +94,11 @@ final class FormDataPart extends AbstractMultipartPart
 
     private function configurePart(string $name, TextPart $part): TextPart
     {
-        static $r;
-
-        $r ??= new \ReflectionProperty(TextPart::class, 'encoding');
-
+        // parts created without an explicit encoding use "8bit" with the form-data disposition
         $part->setDisposition('form-data');
         $part->setName($name);
         // HTTP does not support \r\n in header values
         $part->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
-        $r->setValue($part, '8bit');
 
         return $part;
     }

@@ -131,6 +131,25 @@ class DataPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
+    public function testFromPathWithEncoding()
+    {
+        $p = DataPart::fromPath($file = __DIR__.'/../Fixtures/mimetypes/test.gif', null, null, '8bit');
+        $content = file_get_contents($file);
+        $this->assertSame($content, $p->bodyToString());
+        $this->assertEquals(new Headers(
+            new ParameterizedHeader('Content-Type', 'image/gif', ['name' => 'test.gif']),
+            new UnstructuredHeader('Content-Transfer-Encoding', '8bit'),
+            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'test.gif', 'filename' => 'test.gif'])
+        ), $p->getPreparedHeaders());
+    }
+
+    public function testFromPathWithInvalidEncoding()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('("foo" given)');
+        DataPart::fromPath(__DIR__.'/../Fixtures/mimetypes/test.gif', null, null, 'foo');
+    }
+
     public function testFromPathWithNotAFile()
     {
         $this->expectException(InvalidArgumentException::class);

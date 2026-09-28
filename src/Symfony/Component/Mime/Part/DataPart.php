@@ -44,9 +44,14 @@ class DataPart extends TextPart
         $this->setDisposition('attachment');
     }
 
-    public static function fromPath(string $path, ?string $name = null, ?string $contentType = null): self
+    /**
+     * @param string|null $encoding The Content-Transfer-Encoding of the part, "base64" or "8bit" in a FormDataPart when null
+     */
+    public static function fromPath(string $path, ?string $name = null, ?string $contentType = null/* , ?string $encoding = null */): self
     {
-        return new self(new File($path), $name, $contentType);
+        $encoding = 3 < \func_num_args() ? func_get_arg(3) : null;
+
+        return new self(new File($path), $name, $contentType, $encoding);
     }
 
     /**

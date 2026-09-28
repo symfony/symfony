@@ -21,8 +21,6 @@ class FormDataPartTest extends TestCase
 {
     public function testConstructor()
     {
-        $r = new \ReflectionProperty(TextPart::class, 'encoding');
-
         $b = new TextPart('content');
         $c = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
         $f = new FormDataPart([
@@ -39,11 +37,9 @@ class FormDataPartTest extends TestCase
         $b->setDisposition('form-data');
         $b->setName('bar');
         $b->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
-        $r->setValue($b, '8bit');
         $c->setDisposition('form-data');
         $c->setName('baz');
         $c->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
-        $r->setValue($c, '8bit');
         $this->assertEquals([$t, $b, $c], $f->getParts());
     }
 
@@ -252,5 +248,107 @@ class FormDataPartTest extends TestCase
         $this->expectExceptionMessage('The value of the form field "foo" can only be a string, an array, or an instance of TextPart, "stdClass" given.');
 
         $dataPart->getParts();
+    }
+
+    public function testExplicitEncodingIsKept()
+    {
+        $f = new FormDataPart([
+            'file' => new DataPart('Hello World', 'hello.txt', 'text/plain', 'base64'),
+            'text' => new TextPart("\u{e9}t\u{e9}", 'utf-8', 'plain', 'quoted-printable'),
+            'default' => new DataPart('Hello World', 'default.txt', 'text/plain'),
+            'field' => 'value',
+        ]);
+
+        $boundary = $f->getPreparedHeaders()->getHeaderParameter('Content-Type', 'boundary');
+        $expected = <<<EOF
+            --$boundary\r
+            Content-Type: text/plain\r
+            Content-Transfer-Encoding: base64\r
+            Content-Disposition: form-data; name="file"; filename="hello.txt"\r
+            \r
+            SGVsbG8gV29ybGQ=\r
+            --$boundary\r
+            Content-Type: text/plain; charset=utf-8\r
+            Content-Transfer-Encoding: quoted-printable\r
+            Content-Disposition: form-data; name="text"\r
+            \r
+            =C3=A9t=C3=A9\r
+            --$boundary\r
+            Content-Type: text/plain\r
+            Content-Transfer-Encoding: 8bit\r
+            Content-Disposition: form-data; name="default"; filename="default.txt"\r
+            \r
+            Hello World\r
+            --$boundary\r
+            Content-Type: text/plain; charset=utf-8\r
+            Content-Transfer-Encoding: 8bit\r
+            Content-Disposition: form-data; name="field"\r
+            \r
+            value\r
+            --$boundary--\r
+
+            EOF;
+
+        $this->assertSame($expected, $f->bodyToString());
+        // rendering twice must not change the outcome
+        $this->assertSame($expected, $f->bodyToString());
+    }
+
+    public function testFromPathWithExplicitEncodingIsKept()
+    {
+        $f = new FormDataPart(['file' => DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif', null, null, 'base64')]);
+
+        [$part] = $f->getParts();
+        $this->assertSame('base64', $part->getPreparedHeaders()->getHeaderBody('Content-Transfer-Encoding'));
+        $this->assertSame(base64_encode(file_get_contents($file)), str_replace("\r\n", '', implode('', iterator_to_array($part->bodyToIterable(), false))));
+    }
+
+    public function testBinaryEncodingIsKept()
+    {
+        $f = new FormDataPart(['file' => new DataPart("\xFF\x00raw", 'raw.bin', 'application/octet-stream', 'binary')]);
+
+        [$part] = $f->getParts();
+        $this->assertSame('binary', $part->getPreparedHeaders()->getHeaderBody('Content-Transfer-Encoding'));
+        $this->assertSame("\xFF\x00raw", $part->bodyToString());
+    }
+
+    public function testDefaultEncodingIsRestoredOutsideTheForm()
+    {
+        $part = new DataPart('Hello World', 'hello.txt', 'text/plain');
+        (new FormDataPart(['file' => $part]))->getParts();
+
+        $this->assertSame('8bit', $part->getPreparedHeaders()->getHeaderBody('Content-Transfer-Encoding'));
+
+        $part->setDisposition('attachment');
+
+        $this->assertSame('base64', $part->getPreparedHeaders()->getHeaderBody('Content-Transfer-Encoding'));
+    }
+
+    public function testExplicitEncodingSurvivesSerialization()
+    {
+        // "base64" is also the default encoding of a DataPart, only the explicit one is kept in a form
+        $f = new FormDataPart([
+            'explicit' => unserialize(serialize(new DataPart('Hello World', 'explicit.txt', 'text/plain', 'base64'))),
+            'default' => unserialize(serialize(new DataPart('Hello World', 'default.txt', 'text/plain'))),
+        ]);
+
+        [$explicit, $default] = $f->getParts();
+        $this->assertSame('base64', $explicit->getPreparedHeaders()->getHeaderBody('Content-Transfer-Encoding'));
+        $this->assertSame('SGVsbG8gV29ybGQ=', $explicit->bodyToString());
+        $this->assertSame('8bit', $default->getPreparedHeaders()->getHeaderBody('Content-Transfer-Encoding'));
+        $this->assertSame('Hello World', $default->bodyToString());
+    }
+
+    public function testPayloadSerializedBeforeSymfony82IsStillForcedTo8bit()
+    {
+        // payloads serialized before Symfony 8.2 have no "explicitEncoding" key
+        $data = (new DataPart('Hello World', 'hello.txt', 'text/plain', 'base64'))->__serialize();
+        unset($data['_parent']['explicitEncoding']);
+        $part = (new \ReflectionClass(DataPart::class))->newInstanceWithoutConstructor();
+        $part->__unserialize($data);
+
+        $f = new FormDataPart(['file' => $part]);
+
+        $this->assertSame('8bit', $f->getParts()[0]->getPreparedHeaders()->getHeaderBody('Content-Transfer-Encoding'));
     }
 }

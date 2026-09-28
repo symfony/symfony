@@ -264,7 +264,7 @@ class MessageTest extends TestCase
                                     "subtype": "plain",
                                     "disposition": null,
                                     "name": null,
-                                    "encoding": "quoted-printable",%A
+                                    "encoding": null,%A
                                     "headers": [],
                                     "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\TextPart"
                                 },
@@ -274,7 +274,7 @@ class MessageTest extends TestCase
                                     "subtype": "html",
                                     "disposition": null,
                                     "name": null,
-                                    "encoding": "quoted-printable",%A
+                                    "encoding": null,%A
                                     "headers": [],
                                     "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\TextPart"
                                 }
@@ -290,7 +290,7 @@ class MessageTest extends TestCase
                             "subtype": "octet-stream",
                             "disposition": "attachment",
                             "name": "text.txt",
-                            "encoding": "base64",%A
+                            "encoding": null,%A
                             "headers": [],
                             "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart"
                         }

@@ -86,7 +86,7 @@ abstract class Type implements \Stringable
     }
 
     /**
-     * Traverses the whole type tree.
+     * Traverses the type and its direct composed or wrapped parts.
      *
      * @return iterable<self>
      */

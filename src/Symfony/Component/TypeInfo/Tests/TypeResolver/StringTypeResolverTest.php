@@ -106,6 +106,7 @@ class StringTypeResolverTest extends TestCase
         yield [Type::arrayShape(['foo' => Type::int(), 'bar baz' => Type::string()]), "array{'foo': int, \"bar baz\": string}"];
         yield [Type::arrayShape([0 => Type::int()]), "array{'0': int}"];
         yield [Type::arrayShape([Type::int(), Type::string()]), 'array{int, string}'];
+        yield [Type::arrayShape(["it's" => Type::int()]), "array{'it\\'s': int}"];
 
         // object
         yield [Type::object(), 'object'];

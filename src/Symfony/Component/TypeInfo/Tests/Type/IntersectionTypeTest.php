@@ -94,5 +94,6 @@ class IntersectionTypeTest extends TestCase
         $this->assertFalse($type->accepts('string'));
         $this->assertFalse($type->accepts($countable));
         $this->assertTrue($type->accepts($traversableAndCountable));
+        $this->assertFalse((new IntersectionType(Type::collection(Type::object(\ArrayIterator::class), Type::int()), Type::object(\Countable::class)))->accepts(new \ArrayIterator(['a'])));
     }
 }

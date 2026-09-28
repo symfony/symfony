@@ -375,7 +375,7 @@ final class TypeContextFactory
             $this->phpstanParser ??= new PhpDocParser($config, new TypeParser($config, new ConstExprParser($config)), new ConstExprParser($config));
         } else {
             $this->phpstanLexer ??= new Lexer();
-            $this->phpstanParser ??= new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
+            $this->phpstanParser ??= new PhpDocParser(new TypeParser($constExprParser = new ConstExprParser(true, true), true), $constExprParser);
         }
 
         return $this->phpstanParser->parse(new TokenIterator($this->phpstanLexer->tokenize($rawDocNode)));

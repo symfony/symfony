@@ -2849,7 +2849,7 @@ class FrameworkExtension extends Extension
         unset($options['retry_failed']);
         $defaultUriTemplateVars = $options['vars'] ?? [];
         unset($options['vars']);
-        $container->getDefinition('http_client.transport')->setArguments([$options, $config['max_host_connections'] ?? 6]);
+        $container->getDefinition('http_client.transport')->setArguments([$options, $config['max_host_connections'] ?? 6, 0]);
 
         if (!$hasPsr18 = ContainerBuilder::willBeAvailable('psr/http-client', ClientInterface::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
             $container->removeDefinition('psr18.http_client');

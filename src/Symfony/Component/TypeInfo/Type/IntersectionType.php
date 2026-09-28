@@ -78,6 +78,17 @@ final class IntersectionType extends Type implements CompositeTypeInterface
         return true;
     }
 
+    public function accepts(mixed $value): bool
+    {
+        foreach ($this->types as $type) {
+            if (!$type->accepts($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function __toString(): string
     {
         $string = '';

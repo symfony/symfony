@@ -172,9 +172,9 @@ class DoctrineExtractorTest extends TestCase
         yield ['simpleArray', Type::list(Type::string())];
         yield ['customFoo', null];
         yield ['notMapped', null];
-        yield ['indexedByDt', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::object())];
+        yield ['indexedByDt', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class))];
         yield ['indexedByCustomType', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class))];
-        yield ['indexedByUuid', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::object())];
+        yield ['indexedByUuid', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class))];
         yield ['indexedBuz', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::string())];
         yield ['dummyGeneratedValueList', Type::collection(Type::object(Collection::class), Type::object(DoctrineRelation::class), Type::int())];
         yield ['json', null];

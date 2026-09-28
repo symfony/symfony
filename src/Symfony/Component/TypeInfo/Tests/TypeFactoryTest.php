@@ -13,6 +13,7 @@ namespace Symfony\Component\TypeInfo\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
 use Symfony\Component\TypeInfo\Type;
@@ -194,6 +195,25 @@ class TypeFactoryTest extends TestCase
         $typeStrings = array_map(static fn ($t) => (string) $t, $types);
         sort($typeStrings);
         $this->assertSame(['float', 'int', 'string'], $typeStrings);
+    }
+
+    #[DataProvider('cannotCreateUnionWithStandaloneTypeProvider')]
+    public function testCannotCreateUnionWithStandaloneType(string $standaloneType, array $types)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot create union with "%s" standalone type.', $standaloneType));
+
+        Type::union(...$types);
+    }
+
+    public static function cannotCreateUnionWithStandaloneTypeProvider(): iterable
+    {
+        yield ['mixed', [Type::mixed(), Type::null()]];
+        yield ['mixed', [Type::null(), Type::mixed()]];
+        yield ['mixed', [Type::mixed()]];
+        yield ['mixed', [Type::nullable(Type::mixed())]];
+        yield ['mixed', [Type::mixed(), Type::string()]];
+        yield ['void', [Type::void(), Type::null()]];
     }
 
     public function testCreateIntersection()

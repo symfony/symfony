@@ -109,6 +109,11 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     }
 
                     $collectionKeyType = $this->getTypeIdentifier($typeOfField);
+
+                    // A PHP array key can never be an object: leave the key type unknown rather than claiming one the collection can't have.
+                    if (TypeIdentifier::OBJECT === $collectionKeyType) {
+                        $collectionKeyType = null;
+                    }
                 }
             }
 

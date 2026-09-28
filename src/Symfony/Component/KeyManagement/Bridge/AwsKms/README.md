@@ -32,6 +32,9 @@ $dataKey = $kms->generateDataKey('alias/app-key', 32);
 $result  = $dataKey->use(fn (string $dek): string => /* local AEAD encrypt */);
 ```
 
+Each ciphertext and wrapped data key records the ARN of the key that AWS used, not the alias.
+Moving an alias to a new key leaves older ciphertexts readable, as long as the previous key stays enabled.
+
 DSN scheme
 ----------
 

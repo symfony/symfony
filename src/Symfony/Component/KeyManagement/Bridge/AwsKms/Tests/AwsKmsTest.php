@@ -38,7 +38,7 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 class AwsKmsTest extends TestCase
 {
-    public function testEncryptForwardsKeyIdAndPlaintextAndReturnsTheBlob()
+    public function testEncryptForwardsKeyIdAndPlaintextAndReturnsTheBlobWithTheKeyArn()
     {
         $captured = null;
         $client = $this->createMock(KmsClient::class);
@@ -59,8 +59,21 @@ class AwsKmsTest extends TestCase
         $this->assertSame('hello', $captured->getPlaintext());
         $this->assertSame([], $captured->getEncryptionContext());
 
-        $this->assertSame('alias/app-key', $ciphertext->keyId);
+        $this->assertSame('arn:aws:kms:eu-west-1:111:key/abc', $ciphertext->keyId);
         $this->assertSame('binary-blob', $ciphertext->blob);
+    }
+
+    public function testEncryptWithoutKeyIdInTheResponseIsARuntimeException()
+    {
+        $client = $this->createStub(KmsClient::class);
+        $client->method('encrypt')
+            ->willReturn(ResultMockFactory::create(EncryptResponse::class, [
+                'CiphertextBlob' => 'binary-blob',
+            ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('AWS KMS did not return the ARN of the key it used.');
+        (new AwsKms($client))->encrypt('alias/app-key', 'hello');
     }
 
     public function testEncryptForwardsAadAsBase64EncryptionContextEntry()
@@ -123,6 +136,37 @@ class AwsKmsTest extends TestCase
         $this->assertSame('hello', $plaintext);
     }
 
+    public function testDecryptStillAddressesTheKeyThatEncryptedAfterTheAliasIsRetargeted()
+    {
+        $aliasTarget = 'arn:aws:kms:eu-west-1:111:key/old';
+        $client = $this->createStub(KmsClient::class);
+        $client->method('encrypt')
+            ->willReturnCallback(static function () use (&$aliasTarget): EncryptResponse {
+                return ResultMockFactory::create(EncryptResponse::class, [
+                    'CiphertextBlob' => 'blob-under-'.$aliasTarget,
+                    'KeyId' => $aliasTarget,
+                ]);
+            });
+        $client->method('decrypt')
+            ->willReturnCallback(static function (DecryptRequest $request) use (&$aliasTarget): DecryptResponse {
+                $keyId = 'alias/app-key' === $request->getKeyId() ? $aliasTarget : $request->getKeyId();
+                if ('blob-under-'.$keyId !== $request->getCiphertextBlob()) {
+                    throw self::makeAwsException(IncorrectKeyException::class);
+                }
+
+                return ResultMockFactory::create(DecryptResponse::class, [
+                    'Plaintext' => 'hello',
+                    'KeyId' => $keyId,
+                ]);
+            });
+
+        $kms = new AwsKms($client);
+        $ciphertext = $kms->encrypt('alias/app-key', 'hello');
+        $aliasTarget = 'arn:aws:kms:eu-west-1:111:key/new';
+
+        $this->assertSame('hello', $kms->decrypt($ciphertext));
+    }
+
     public function testDecryptOnNotFoundIsMaskedAsDecryptionFailure()
     {
         $client = $this->createStub(KmsClient::class);
@@ -182,9 +226,23 @@ class AwsKmsTest extends TestCase
 
         $this->assertSame('alias/app-key', $captured->getKeyId());
         $this->assertSame(32, $captured->getNumberOfBytes());
-        $this->assertSame('alias/app-key', $dataKey->wrapped->keyId);
+        $this->assertSame('arn:aws:kms:eu-west-1:111:key/abc', $dataKey->wrapped->keyId);
         $this->assertSame('wrapped-dek', $dataKey->wrapped->blob);
         $this->assertSame(str_repeat("\xAA", 32), $dataKey->use(static fn (string $p): string => $p));
+    }
+
+    public function testGenerateDataKeyWithoutKeyIdInTheResponseIsARuntimeException()
+    {
+        $client = $this->createStub(KmsClient::class);
+        $client->method('generateDataKey')
+            ->willReturn(ResultMockFactory::create(GenerateDataKeyResponse::class, [
+                'CiphertextBlob' => 'wrapped-dek',
+                'Plaintext' => str_repeat("\xAA", 32),
+            ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('AWS KMS did not return the ARN of the key it used.');
+        (new AwsKms($client))->generateDataKey('alias/app-key');
     }
 
     public function testGenerateDataKeyRejectsTooShortLength()

@@ -44,6 +44,9 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * conventional key. The same encoding is applied on decrypt so the AWS-side
  * comparison succeeds when (and only when) the same bytes are provided.
  *
+ * `$keyId` accepts a key id, a key ARN, an alias name or an alias ARN.
+ * The returned ciphertext records the ARN of the key that AWS used, so that it stays readable after its alias is moved to another key.
+ *
  * Exception mapping follows the {@see EncrypterInterface} / {@see DecrypterInterface} contract:
  *   - {@see NotFoundException} on encrypt → {@see KeyNotFoundException};
  *   - {@see NotFoundException}, {@see InvalidCiphertextException} or
@@ -81,6 +84,7 @@ final class AwsKms implements DecrypterInterface, EncrypterInterface, DataKeyGen
         try {
             $response = $this->client->encrypt(new EncryptRequest($input));
             $blob = $response->getCiphertextBlob();
+            $keyArn = $response->getKeyId();
         } catch (NotFoundException $e) {
             throw new KeyNotFoundException($keyId, $e);
         } catch (AwsException|TransportExceptionInterface $e) {
@@ -91,7 +95,7 @@ final class AwsKms implements DecrypterInterface, EncrypterInterface, DataKeyGen
             throw new RuntimeException('AWS KMS returned an empty ciphertext blob.');
         }
 
-        return new Ciphertext($blob, $keyId);
+        return new Ciphertext($blob, self::keyArn($keyArn));
     }
 
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
@@ -138,6 +142,7 @@ final class AwsKms implements DecrypterInterface, EncrypterInterface, DataKeyGen
             $response = $this->client->generateDataKey(new GenerateDataKeyRequest($input));
             $plaintext = $response->getPlaintext();
             $blob = $response->getCiphertextBlob();
+            $keyArn = $response->getKeyId();
         } catch (NotFoundException $e) {
             throw new KeyNotFoundException($keyId, $e);
         } catch (AwsException|TransportExceptionInterface $e) {
@@ -148,12 +153,21 @@ final class AwsKms implements DecrypterInterface, EncrypterInterface, DataKeyGen
             throw new RuntimeException('AWS KMS returned a malformed GenerateDataKey response.');
         }
 
-        return new DataKey($plaintext, new Ciphertext($blob, $keyId));
+        return new DataKey($plaintext, new Ciphertext($blob, self::keyArn($keyArn)));
     }
 
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         return new DataKey($this->decrypt($wrapped, $aad), $wrapped);
+    }
+
+    private static function keyArn(?string $keyArn): string
+    {
+        if (null === $keyArn || '' === $keyArn) {
+            throw new RuntimeException('AWS KMS did not return the ARN of the key it used.');
+        }
+
+        return $keyArn;
     }
 
     /**

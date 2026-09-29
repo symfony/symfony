@@ -11,7 +11,33 @@
 
 namespace Symfony\Component\Cache\Traits\Relay;
 
-if (version_compare(phpversion('relay'), '0.50.0', '>=')) {
+if (version_compare(phpversion('relay'), '0.50.2', '>=')) {
+    /**
+     * @internal
+     */
+    trait Relay40Trait
+    {
+        public function blmovem($src, $dst, $wherefrom, $whereto, $timeout, $options = null): \Relay\Relay|array|false|null
+        {
+            return $this->initializeLazyObject()->blmovem(...\func_get_args());
+        }
+
+        public function lmovem($src, $dst, $wherefrom, $whereto, $options = null): \Relay\Relay|array|false|null
+        {
+            return $this->initializeLazyObject()->lmovem(...\func_get_args());
+        }
+
+        public function sdiffcard($keys, $options = null): \Relay\Relay|false|int
+        {
+            return $this->initializeLazyObject()->sdiffcard(...\func_get_args());
+        }
+
+        public function sunioncard($keys, $options = null): \Relay\Relay|false|int
+        {
+            return $this->initializeLazyObject()->sunioncard(...\func_get_args());
+        }
+    }
+} elseif (version_compare(phpversion('relay'), '0.50.0', '>=')) {
     /**
      * @internal
      */

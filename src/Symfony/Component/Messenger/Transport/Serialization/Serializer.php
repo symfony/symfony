@@ -97,19 +97,21 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
     public function decode(array $encodedEnvelope): Envelope
     {
+        // a failure keeps the stamps that decode, so that its retries are counted
+        $stamps = $this->decodeStamps($encodedEnvelope, $stampFailure);
+
         if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
-            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.');
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.')->with(...$stamps);
         }
 
         if (empty($encodedEnvelope['headers']['type'])) {
-            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope does not have a "type" header.');
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope does not have a "type" header.')->with(...$stamps);
         }
 
-        try {
-            $stamps = $this->decodeStamps($encodedEnvelope);
-        } catch (\Throwable $e) {
-            return MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), (int) $e->getCode(), $e);
+        if (null !== $stampFailure) {
+            return MessageDecodingFailedException::wrap($encodedEnvelope, $stampFailure->getMessage(), (int) $stampFailure->getCode(), $stampFailure)->with(...$stamps);
         }
+
         $stamps[] = new SerializedMessageStamp($encodedEnvelope['body']);
 
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
@@ -177,29 +179,32 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         ];
     }
 
-    private function decodeStamps(array $encodedEnvelope): array
+    private function decodeStamps(array $encodedEnvelope, ?\Throwable &$failure = null): array
     {
         $stamps = [];
-        foreach ($encodedEnvelope['headers'] as $name => $value) {
+        foreach (\is_array($encodedEnvelope['headers'] ?? null) ? $encodedEnvelope['headers'] : [] as $name => $value) {
             if (!str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
                 continue;
             }
 
             $class = substr($name, \strlen(self::STAMP_HEADER_PREFIX));
 
-            if (!is_subclass_of($class, StampInterface::class)) {
-                throw new MessageDecodingFailedException(\sprintf('Could not decode stamp: "%s" is not a "%s".', $class, StampInterface::class));
-            }
-
-            // encoding strips these stamps, so they never come from a transport
-            if (is_subclass_of($class, NonSendableStampInterface::class)) {
-                continue;
-            }
-
             try {
+                if (!is_subclass_of($class, StampInterface::class)) {
+                    $failure ??= new MessageDecodingFailedException(\sprintf('Could not decode stamp: "%s" is not a "%s".', $class, StampInterface::class));
+                    continue;
+                }
+
+                // encoding strips these stamps, so they never come from a transport
+                if (is_subclass_of($class, NonSendableStampInterface::class)) {
+                    continue;
+                }
+
                 $stamps[] = $this->serializer->deserialize($value, $class.'[]', $this->format, $this->stampContext);
             } catch (ExceptionInterface $e) {
-                throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
+                $failure ??= new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
+            } catch (\Throwable $e) {
+                $failure ??= $e;
             }
         }
         if ($stamps) {

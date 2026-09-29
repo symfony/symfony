@@ -596,6 +596,52 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($acknowledged[0]));
         $this->assertSame('Failure from call 1', $acknowledged[0]->last(ErrorDetailsStamp::class)->getExceptionMessage());
     }
+
+    #[DataProvider('provideUndecodableMessages')]
+    public function testUndecodableMessageIsRetriedThenSentToTheFailureTransport(array $encodedEnvelope)
+    {
+        $serializer = new Serializer();
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
+        $failureTransport = new DummyFailureTestSenderAndReceiver();
+
+        $locator = new Container();
+        $locator->set('transport', $transport);
+
+        $retryStrategyLocator = new Container();
+        $retryStrategyLocator->set('transport', new MultiplierRetryStrategy(2));
+
+        $bus = new MessageBus([new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer]))]);
+
+        $retryCounts = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$retryCounts) {
+            $retryCounts[] = RedeliveryStamp::getRetryCountFromEnvelope($event->getEnvelope());
+        });
+
+        for ($i = 0; $i < 10 && $transport->getMessagesWaitingToBeReceived(); ++$i) {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        }
+
+        $this->assertSame([0, 1, 2], $retryCounts);
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failedEnvelopes = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failedEnvelopes[0]->getMessage());
+        $this->assertSame($encodedEnvelope['body'], $failedEnvelopes[0]->getMessage()->encodedEnvelope['body']);
+    }
+
+    public static function provideUndecodableMessages(): iterable
+    {
+        $encodedEnvelope = (new Serializer())->encode(new Envelope(new DummyMessage('API')));
+
+        yield 'empty body' => [['body' => ''] + $encodedEnvelope];
+        yield 'body "0"' => [['body' => '0'] + $encodedEnvelope];
+        yield 'stamp class not found' => [['headers' => $encodedEnvelope['headers'] + ['X-Message-Stamp-App\NonExistentStamp' => '[{}]']] + $encodedEnvelope];
+        yield 'stamp header that is not a stamp' => [['headers' => $encodedEnvelope['headers'] + ['X-Message-Stamp-'.DummyMessage::class => '[{"message":"injected"}]']] + $encodedEnvelope];
+        yield 'message class not found' => [['headers' => ['type' => 'App\NonExistentMessage'] + $encodedEnvelope['headers']] + $encodedEnvelope];
+    }
 }
 
 class DummyFailureTestSenderAndReceiver implements ReceiverInterface, SenderInterface

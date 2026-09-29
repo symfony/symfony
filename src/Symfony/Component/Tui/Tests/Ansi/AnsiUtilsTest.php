@@ -637,6 +637,80 @@ class AnsiUtilsTest extends TestCase
         }
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function emojiSequenceProvider(): iterable
+    {
+        yield 'zwj sequence' => ["\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}"];
+        yield 'zwj sequence with a text-default base' => ["\u{1F3F3}\u{FE0F}\u{200D}\u{1F308}"];
+        yield 'zwj sequence ending with a variation selector' => ["\u{1F3F4}\u{200D}\u{2620}\u{FE0F}"];
+        yield 'modifier sequence' => ["\u{1F44D}\u{1F3FD}"];
+        yield 'modifier sequence with a text-default base' => ["\u{261D}\u{1F3FD}"];
+        yield 'modifier sequence with a presentation selector' => ["\u{261D}\u{FE0F}\u{1F3FD}"];
+        yield 'modifier and zwj sequence' => ["\u{1F469}\u{1F3FD}\u{200D}\u{1F4BB}"];
+        yield 'tag sequence' => ["\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}"];
+    }
+
+    #[DataProvider('emojiSequenceProvider')]
+    public function testGraphemeWidthOfAnEmojiSequenceIsTwoColumns(string $grapheme)
+    {
+        $this->assertSame(2, AnsiUtils::graphemeWidth($grapheme));
+    }
+
+    #[DataProvider('emojiSequenceProvider')]
+    public function testVisibleWidthOfAnEmojiSequenceIsTwoColumns(string $grapheme)
+    {
+        $this->assertSame(2, AnsiUtils::visibleWidth($grapheme));
+        $this->assertSame(6, AnsiUtils::visibleWidth("a \x1b[1m".$grapheme."\x1b[0m b"));
+    }
+
+    /**
+     * @return iterable<string, array{int, string}>
+     */
+    public static function otherClusterWidthProvider(): iterable
+    {
+        yield 'keycap' => [2, "1\u{FE0F}\u{20E3}"];
+        yield 'emoji presentation selector' => [2, "\u{2764}\u{FE0F}"];
+        yield 'text presentation selector' => [1, "\u{263A}\u{FE0E}"];
+        yield 'combining mark' => [1, "e\u{0301}"];
+        yield 'conjunct' => [2, "\u{0915}\u{094D}\u{0937}"];
+        yield 'hangul jamo' => [2, "\u{1100}\u{1161}\u{11A8}"];
+        yield 'modifier after a letter' => [3, "a\u{1F3FD}"];
+        yield 'symbol with a trailing joiner' => [1, "\u{26A0}\u{200D}"];
+        yield 'joiner before a combining mark' => [1, "e\u{200D}\u{0301}"];
+        yield 'kitty placeholder' => [1, "\u{10EEEE}\u{0305}\u{030D}"];
+    }
+
+    #[DataProvider('otherClusterWidthProvider')]
+    public function testGraphemeWidthOfOtherClusters(int $expected, string $grapheme)
+    {
+        $this->assertSame($expected, AnsiUtils::graphemeWidth($grapheme));
+    }
+
+    public function testVisibleWidthOfConjoiningJamoMatchesItsGraphemeWidth()
+    {
+        $syllable = "\u{1100}\u{1161}\u{11A8}";
+
+        $this->assertSame(2, AnsiUtils::visibleWidth($syllable));
+        foreach (TextWrapper::wrapTextWithAnsi(str_repeat($syllable, 3), 4) as $line) {
+            $this->assertLessThanOrEqual(4, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testSlicingMeasuresAnEmojiSequenceAsTwoColumns()
+    {
+        $family = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}";
+
+        $this->assertSame($family.'x', AnsiUtils::sliceByColumn($family.'xyz', 0, 3));
+        $this->assertSame(['text' => $family, 'width' => 2], AnsiUtils::sliceWithWidth('a'.$family.'bc', 1, 2));
+
+        $line = "\u{1F44D}\u{1F3FD}\x1b[1m ab\x1b[0m";
+
+        $this->assertSame("\u{1F44D}\u{1F3FD}\x1b[1m a", AnsiUtils::sliceByColumn($line, 0, 4));
+        $this->assertSame(['text' => "\u{1F44D}\u{1F3FD}\x1b[1m a", 'width' => 4], AnsiUtils::sliceWithWidth($line, 0, 4));
+    }
+
     public function testGraphemeWidthOfMalformedUtf8()
     {
         $this->assertSame(1, AnsiUtils::graphemeWidth("\xC3\u{0301}"));

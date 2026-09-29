@@ -404,6 +404,15 @@ class CellBufferTest extends TestCase
         $this->assertSame("e\u{0301}x  ", $buf->toLines()[0]);
     }
 
+    public function testEmojiSequenceTakesTwoCells()
+    {
+        $family = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}";
+        $buf = new CellBuffer(5, 1);
+        $buf->writeAnsiLines([$family.'xyz']);
+
+        $this->assertSame($family.'xyz', $buf->toLines()[0]);
+    }
+
     public function testWritingOverTheSecondCellOfAWideCharKeepsTheLineWidth()
     {
         $buf = new CellBuffer(4, 1);

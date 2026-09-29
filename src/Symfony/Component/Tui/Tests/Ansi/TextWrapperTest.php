@@ -301,4 +301,11 @@ class TextWrapperTest extends TestCase
             $this->assertLessThanOrEqual(5, AnsiUtils::visibleWidth($line));
         }
     }
+
+    public function testBreakingAWordOfEmojiSequences()
+    {
+        $thumbs = "\u{1F44D}\u{1F3FD}";
+
+        $this->assertSame([$thumbs.$thumbs, $thumbs], TextWrapper::wrapTextWithAnsi($thumbs.$thumbs.$thumbs, 4));
+    }
 }

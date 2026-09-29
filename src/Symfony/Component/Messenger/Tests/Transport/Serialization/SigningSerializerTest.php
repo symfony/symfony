@@ -71,7 +71,8 @@ class SigningSerializerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('hello'));
         $encoded = $inner->encode($envelope);
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Message "%s" requires a signature but none was found.', DummyMessage::class));
         $serializer->decode($encoded);
     }
 
@@ -82,7 +83,8 @@ class SigningSerializerTest extends TestCase
         $encoded = $serializer->encode($envelope);
         $encoded['headers']['Body-Sign'] = 'tampered';
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid signature for message "%s".', DummyMessage::class));
         $serializer->decode($encoded);
     }
 
@@ -113,8 +115,8 @@ class SigningSerializerTest extends TestCase
 
         try {
             $serializer->decode(['body' => 'irrelevant', 'headers' => ['Body-Sign' => 'tampered', 'Sign-Algo' => 'sha256']]);
-            $this->fail(\sprintf('Expected "%s" to be thrown.', InvalidMessageSignatureException::class));
-        } catch (InvalidMessageSignatureException) {
+            $this->fail(\sprintf('Expected "%s" to be thrown.', MessageDecodingFailedException::class));
+        } catch (MessageDecodingFailedException) {
         }
 
         $this->assertFalse($inner->decoded, 'The inner serializer must not be invoked when a signed message has an invalid signature.');
@@ -127,7 +129,8 @@ class SigningSerializerTest extends TestCase
         $encoded = $serializer->encode($envelope);
         $encoded['headers']['Body-Sign'] = [$encoded['headers']['Body-Sign']];
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Message "%s" requires a signature but none was found.', DummyMessage::class));
         $serializer->decode($encoded);
     }
 
@@ -158,8 +161,8 @@ class SigningSerializerTest extends TestCase
 
         try {
             $serializer->decode(['body' => 'irrelevant', 'headers' => ['type' => DummyMessage::class]]);
-            $this->fail(\sprintf('Expected "%s" to be thrown.', InvalidMessageSignatureException::class));
-        } catch (InvalidMessageSignatureException) {
+            $this->fail(\sprintf('Expected "%s" to be thrown.', MessageDecodingFailedException::class));
+        } catch (MessageDecodingFailedException) {
         }
 
         $this->assertFalse($inner->decoded, 'A signed message arriving without a signature must be rejected before the inner serializer is invoked.');
@@ -275,8 +278,8 @@ class SigningSerializerTest extends TestCase
 
         try {
             $serializer->decode(['body' => 'irrelevant']);
-            $this->fail(\sprintf('Expected "%s" to be thrown.', InvalidMessageSignatureException::class));
-        } catch (InvalidMessageSignatureException) {
+            $this->fail(\sprintf('Expected "%s" to be thrown.', MessageDecodingFailedException::class));
+        } catch (MessageDecodingFailedException) {
         }
 
         $this->assertFalse($inner->decoded, 'A message whose type cannot be determined and that carries no signature must not be decoded.');
@@ -329,7 +332,8 @@ class SigningSerializerTest extends TestCase
         // Tamper by removing signature to ensure verification occurs for child type
         unset($encoded['headers']['Body-Sign']);
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Message "%s" requires a signature but none was found.', ChildDummyMessage::class));
         $serializer->decode($encoded);
     }
 
@@ -339,7 +343,8 @@ class SigningSerializerTest extends TestCase
         $encoded = $serializer->encode(new Envelope(new DummyMessage('hello')));
         $encoded['headers']['type'] = ChildDummyMessage::class;
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid signature for message "%s".', ChildDummyMessage::class));
         $serializer->decode($encoded);
     }
 
@@ -349,7 +354,8 @@ class SigningSerializerTest extends TestCase
         $encoded = $serializer->encode(new Envelope(new DummyMessage('hello')));
         $encoded['headers']['X-Message-Stamp-'.BusNameStamp::class] = '[{"busName":"other_bus"}]';
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid signature for message "%s".', DummyMessage::class));
         $serializer->decode($encoded);
     }
 
@@ -415,7 +421,8 @@ class SigningSerializerTest extends TestCase
         $encoded['headers']['Body-Sign'] = substr($encoded['headers']['Body-Sign'], \strlen('v2:'));
         $encoded['headers']['type'] = ChildDummyMessage::class;
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid signature for message "%s".', ChildDummyMessage::class));
         $serializer->decode($encoded);
     }
 
@@ -433,7 +440,8 @@ class SigningSerializerTest extends TestCase
             ],
         ];
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid signature for message "%s".', ChildDummyMessage::class));
         $serializer->decode($forged);
     }
 
@@ -451,7 +459,7 @@ class SigningSerializerTest extends TestCase
 
         try {
             $serializer->decode(['body' => addslashes($body), 'headers' => []]);
-        } catch (InvalidMessageSignatureException $e) {
+        } catch (MessageDecodingFailedException $e) {
             $refusal = $e->getMessage();
         } finally {
             spl_autoload_unregister($autoloader);
@@ -489,9 +497,64 @@ class SigningSerializerTest extends TestCase
         $case = DummyMessageEnum::class.':A';
         $body = str_replace('O:8:"stdClass":0:{}', 'E:'.\strlen($case).':"'.$case.'";', serialize(new Envelope(new \stdClass())));
 
-        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectException(MessageDecodingFailedException::class);
         $this->expectExceptionMessage(\sprintf('Message "%s" requires a signature but none was found.', DummyMessageEnum::class));
         $serializer->decode(['body' => addslashes($body), 'headers' => []]);
+    }
+
+    #[DataProvider('provideRefusedMessages')]
+    public function testDecodeReportsARefusedMessageAsADecodingFailure(array $encoded, string $refusal)
+    {
+        $serializer = $this->createJsonSerializer([DummyMessage::class]);
+
+        try {
+            $serializer->decode($encoded);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', MessageDecodingFailedException::class));
+        } catch (MessageDecodingFailedException $e) {
+            $this->assertSame($refusal, $e->getMessage());
+            $this->assertInstanceOf(InvalidMessageSignatureException::class, $e->getPrevious());
+            $this->assertSame($refusal, $e->getPrevious()->getMessage());
+        }
+    }
+
+    public static function provideRefusedMessages(): iterable
+    {
+        $body = (new Serializer())->encode(new Envelope(new DummyMessage('hello')))['body'];
+
+        yield 'missing signature' => [['body' => $body, 'headers' => ['type' => DummyMessage::class]], \sprintf('Message "%s" requires a signature but none was found.', DummyMessage::class)];
+        yield 'unexpected algorithm' => [['body' => $body, 'headers' => ['type' => DummyMessage::class, 'Body-Sign' => 'tampered', 'Sign-Algo' => 'md5']], \sprintf('Expected "sha256" signature algorithm for message "%s", "md5" given.', DummyMessage::class)];
+        yield 'invalid signature' => [['body' => $body, 'headers' => ['type' => DummyMessage::class, 'Body-Sign' => 'tampered', 'Sign-Algo' => 'sha256']], \sprintf('Invalid signature for message "%s".', DummyMessage::class)];
+        yield 'undeterminable type' => [['body' => $body, 'headers' => []], 'The message could not be verified and its type could not be determined; refusing to decode it.'];
+    }
+
+    public function testDecodeLetsTheDecodingFailuresOfTheInnerSerializerThrough()
+    {
+        $failure = new MessageDecodingFailedException('Could not decode the body.');
+        $inner = new class($failure) implements SerializerInterface {
+            public function __construct(
+                private MessageDecodingFailedException $failure,
+            ) {
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                throw $this->failure;
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return ['body' => 'irrelevant'];
+            }
+        };
+
+        $serializer = new SigningSerializer($inner, 'secret-key', [DummyMessage::class]);
+
+        try {
+            $serializer->decode(['body' => 'irrelevant', 'headers' => []]);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', MessageDecodingFailedException::class));
+        } catch (MessageDecodingFailedException $e) {
+            $this->assertSame($failure, $e);
+        }
     }
 
     private function createSerializer(array $signedTypes): SerializerInterface

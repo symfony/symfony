@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2026-09-29T15:24:31Z
+
+make sens, but with all the rework on 8.2 and framework bundle split and config loading, it may be interesting to do this check agains on 8.2

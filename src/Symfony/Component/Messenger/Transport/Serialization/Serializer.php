@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -80,6 +81,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
         $encoders = [new XmlEncoder(), new JsonEncoder()];
         $normalizers = [
+            new FlattenExceptionNormalizer(),
             new DateTimeNormalizer(),
             new ArrayDenormalizer(),
             new ObjectNormalizer(propertyTypeExtractor: new ReflectionExtractor()),

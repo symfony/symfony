@@ -9,7 +9,7 @@ return function (InputInterface $input, OutputInterface $output): int {
     $output = new SymfonyStyle($input, $output);
     $output->success('Lorem ipsum dolor sit amet');
     $output->success('Lorem ipsum dolor sit amet with one emoji 🎉');
-    $output->success('Lorem ipsum dolor sit amet with so many of them 👩‍🌾👩‍🌾👩‍🌾👩‍🌾👩‍🌾');
+    $output->success('Lorem ipsum dolor sit amet with so many of them 🌾🌾🌾🌾🌾');
 
     return 0;
 };

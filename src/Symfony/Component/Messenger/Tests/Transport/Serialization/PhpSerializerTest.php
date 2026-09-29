@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyLegacySerializable;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageEnum;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithLegacySerializable;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyUnloadedMessageEnum;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 // Force-load the deprecated-Serializable fixture under an error handler that swallows
@@ -157,6 +158,29 @@ class PhpSerializerTest extends TestCase
         $this->assertSame(DummyMessage::class, $serializer->getMessageType($serializer->encode(new Envelope(new DummyMessage('Hello')))));
         // base64-encoded body (non-UTF8 payload)
         $this->assertSame(DummyMessage::class, $serializer->getMessageType($serializer->encode(new Envelope(new DummyMessage("\xE9")))));
+        $this->assertSame(DummyMessageEnum::class, $serializer->getMessageType($serializer->encode(new Envelope(DummyMessageEnum::A))));
+    }
+
+    #[DataProvider('provideMessagesOfClassesThatAreNotLoaded')]
+    public function testGetMessageTypeDoesNotAutoloadClassesNamedByTheBody(string $message, string $expectedType)
+    {
+        $this->assertSame($expectedType, $this->getMessageTypeWithoutAutoloading($message));
+    }
+
+    public static function provideMessagesOfClassesThatAreNotLoaded(): iterable
+    {
+        yield 'object' => ['O:25:"Unknown\Missing\ClassName":0:{}', 'Unknown\Missing\ClassName'];
+        yield 'enum case' => ['E:33:"Unknown\Missing\EnumName:CaseName";', 'Unknown\Missing\EnumName'];
+        yield 'object holding an enum case' => ['O:25:"Unknown\Missing\ClassName":1:{s:4:"case";E:33:"Unknown\Missing\EnumName:CaseName";}', 'Unknown\Missing\ClassName'];
+    }
+
+    public function testGetMessageTypeOfAnEnumWhoseClassIsNotLoadedYet()
+    {
+        $this->assertFalse(enum_exists(DummyUnloadedMessageEnum::class, false));
+        $case = DummyUnloadedMessageEnum::class.':A';
+
+        $this->assertSame(DummyUnloadedMessageEnum::class, $this->getMessageTypeWithoutAutoloading('E:'.\strlen($case).':"'.$case.'";'));
+        $this->assertFalse(enum_exists(DummyUnloadedMessageEnum::class, false));
     }
 
     public function testGetMessageTypeWithLegacySerializableProperty()
@@ -329,6 +353,26 @@ class PhpSerializerTest extends TestCase
     protected function createPhpSerializer(): PhpSerializer
     {
         return new PhpSerializer();
+    }
+
+    private function getMessageTypeWithoutAutoloading(string $message): ?string
+    {
+        $body = str_replace('O:8:"stdClass":0:{}', $message, serialize(new Envelope(new \stdClass())));
+        $requested = [];
+        $autoloader = static function (string $class) use (&$requested) {
+            $requested[] = $class;
+        };
+        spl_autoload_register($autoloader, true, true);
+
+        try {
+            $type = $this->createPhpSerializer()->getMessageType(['body' => addslashes($body)]);
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+
+        $this->assertSame([], $requested, 'getMessageType() must not autoload any class.');
+
+        return $type;
     }
 }
 

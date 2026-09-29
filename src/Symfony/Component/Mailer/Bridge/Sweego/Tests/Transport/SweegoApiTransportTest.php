@@ -167,6 +167,34 @@ class SweegoApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
+    public function testSendWithReplyTo()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $payload = json_decode($options['body'], true);
+
+            $this->assertSame(['email' => 'pepper@marvel.com', 'name' => 'Pepper'], $payload['reply-to']);
+            $this->assertArrayNotHasKey('Reply-To', $payload['headers']);
+
+            return new JsonMockResponse(['transaction_id' => 'foobar'], [
+                'http_code' => 200,
+            ]);
+        });
+
+        $transport = new SweegoApiTransport('ACCESS_KEY', $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('tony.stark@marvel.com', 'Tony Stark'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->replyTo(new Address('pepper@marvel.com', 'Pepper'))
+            ->text('Hello here!')
+        ;
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
     /**
      * IDN (internationalized domain names) like kältetechnik-xyz.de need to be transformed to ACE
      * (ASCII Compatible Encoding) e.g.xn--kltetechnik-xyz-0kb.de, otherwise Sweego api answers with 400 http code.

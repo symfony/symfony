@@ -106,6 +106,34 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertSame(['BAZ' => 1, 'FOO' => 0], $container->getEnvCounters());
     }
 
+    public function testEnvOverriddenInPreviousExtensionIsTrackedWhenReused()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->registerExtension(new TestCccExtension());
+        $container->prependExtensionConfig('foo', ['bool_node' => false]);
+        $container->prependExtensionConfig('foo', ['bool_node' => '%env(bool:FOO)%']);
+        $container->prependExtensionConfig('test_ccc', ['bool_node' => '%env(bool:FOO)%']);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->assertSame(['bool:FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
+    }
+
+    public function testEnvOverriddenInPreviousExtensionIsTrackedWhenReusedWithoutProcessConfiguration()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->registerExtension(new RawConfigExtension());
+        $container->prependExtensionConfig('foo', ['bool_node' => false]);
+        $container->prependExtensionConfig('foo', ['bool_node' => '%env(bool:FOO)%']);
+        $container->prependExtensionConfig('raw_config', ['bool_node' => '%env(bool:FOO)%']);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->assertSame(['bool:FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
+    }
+
     public function testProcessedEnvsAreIncompatibleWithResolve()
     {
         $this->expectException(RuntimeException::class);
@@ -590,5 +618,18 @@ final class TargetExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $container->setParameter('target.configs', $configs);
+    }
+}
+
+final class RawConfigExtension extends Extension
+{
+    public function getAlias(): string
+    {
+        return 'raw_config';
+    }
+
+    public function load(array $configs, ContainerBuilder $container): void
+    {
+        $container->setParameter('raw_config.bool_node', $configs[0]['bool_node']);
     }
 }

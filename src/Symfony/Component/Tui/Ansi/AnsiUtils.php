@@ -461,11 +461,8 @@ final class AnsiUtils
                 // Unicode path
                 $textPortion = substr($line, $i, $segLen);
 
-                // Fast check: if the entire segment fits within range, use mb_strwidth
-                // to skip expensive grapheme_str_split + per-grapheme iteration.
-                // mb_strwidth may overcount for ZWJ sequences; conservative check.
-                // It also counts a tab as one column, so tabs need visibleWidth().
-                $segWidth = str_contains($textPortion, "\t") ? self::visibleWidth($textPortion) : mb_strwidth($textPortion, 'UTF-8');
+                // Take the whole segment when it fits; mb_strwidth() counts a tab, a combining mark or a joiner as a column each
+                $segWidth = !preg_match('/[\t\p{M}\p{Cf}]/u', $textPortion) ? mb_strwidth($textPortion, 'UTF-8') : self::visibleWidth($textPortion);
                 if ($currentCol >= $startCol && $currentCol + $segWidth <= $endCol) {
                     if ('' !== $pendingAnsi) {
                         $result .= $pendingAnsi;
@@ -648,7 +645,7 @@ final class AnsiUtils
                 $currentCol += $take;
             } else {
                 // Unicode path
-                $segWidth = str_contains($segment, "\t") ? self::visibleWidth($segment) : mb_strwidth($segment, 'UTF-8');
+                $segWidth = !preg_match('/[\t\p{M}\p{Cf}]/u', $segment) ? mb_strwidth($segment, 'UTF-8') : self::visibleWidth($segment);
                 if ($currentCol + $segWidth <= $length) {
                     $result .= $segment;
                     $currentCol += $segWidth;

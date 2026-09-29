@@ -38,6 +38,7 @@
         "symfony/config": "^8.2",
         "symfony/dependency-injection": "^8.2",
         "symfony/cache": "^7.4|^8.0",
+        "symfony/clock": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/lock": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",

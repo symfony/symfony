@@ -111,6 +111,7 @@ class HttpClientBundle extends AbstractBundle
                                 ->arrayNode('headers')->scalarPrototype()->end()->end()
                                 ->arrayNode('query')->info('Query-string and form field names.')->scalarPrototype()->end()->end()
                                 ->arrayNode('body')->info('JSON and form field names.')->scalarPrototype()->end()->end()
+                                ->arrayNode('except')->info('Names never masked, removed from the built-in lists and from the ones above.')->scalarPrototype()->end()->end()
                             ->end()
                         ->end()
                     ->end()
@@ -390,7 +391,7 @@ class HttpClientBundle extends AbstractBundle
 
             $recorder = $config['recorder'];
             $container->getDefinition('http_client.recorder.redactor')
-                ->setArguments([$recorder['redact']['headers'], $recorder['redact']['query'], $recorder['redact']['body']]);
+                ->setArguments([$recorder['redact']['headers'], $recorder['redact']['query'], $recorder['redact']['body'], $recorder['redact']['except']]);
 
             if ($recorder['redactor']) {
                 $container->setAlias('http_client.recorder.redactor', $recorder['redactor']);

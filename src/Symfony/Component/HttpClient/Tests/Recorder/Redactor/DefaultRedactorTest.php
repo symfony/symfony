@@ -241,15 +241,85 @@ class DefaultRedactorTest extends TestCase
         $this->assertSame($body, $redactor->redactBody($body));
     }
 
-    public function testRedactBodyKeepsSlashesAndUnicodeWhenMasking()
+    public function testRedactBodyKeepsTheRestOfTheJsonByteIdenticalWhenMasking()
     {
         $redactor = new DefaultRedactor();
 
-        $result = $redactor->redactBody('{"password":"secret","url":"https://x/y","name":"caf\u00e9"}');
+        $this->assertSame(
+            '{"meta":{},"password":"[REDACTED]","n":1.0,"big":12345678901234567890,"url":"https:\\/\\/x\\/y","name":"caf\\u00e9"}',
+            $redactor->redactBody('{"meta":{},"password":"x","n":1.0,"big":12345678901234567890,"url":"https:\\/\\/x\\/y","name":"caf\\u00e9"}')
+        );
+    }
 
-        $this->assertStringContainsString('https://x/y', $result);
-        $this->assertStringContainsString("caf\u{00E9}", $result);
-        $this->assertStringContainsString('[REDACTED]', $result);
+    public function testRedactBodyKeepsTheJsonFormattingWhenMasking()
+    {
+        $redactor = new DefaultRedactor();
+
+        $body = <<<'JSON'
+            {
+                "user": {
+                    "name": "bob",
+                    "password" : "hunter2" ,
+                    "roles": ["a", "b"]
+                },
+                "tokens": [{"access_token": {"nested": true}}, {"scope": "openid"}]
+            }
+            JSON;
+
+        $this->assertSame(<<<'JSON'
+            {
+                "user": {
+                    "name": "bob",
+                    "password" : "[REDACTED]" ,
+                    "roles": ["a", "b"]
+                },
+                "tokens": [{"access_token": "[REDACTED]"}, {"scope": "openid"}]
+            }
+            JSON, $redactor->redactBody($body));
+    }
+
+    public function testRedactBodyDoesNotMatchKeysInsideStringValues()
+    {
+        $redactor = new DefaultRedactor();
+        $body = '{"note":"a \\"password\\": \\"x\\" inside","password":"secret"}';
+
+        $this->assertSame('{"note":"a \\"password\\": \\"x\\" inside","password":"[REDACTED]"}', $redactor->redactBody($body));
+    }
+
+    public function testRedactBodyMatchesEscapedKeys()
+    {
+        $redactor = new DefaultRedactor();
+
+        $this->assertSame('{"pass\\u0077ord":"[REDACTED]"}', $redactor->redactBody('{"pass\\u0077ord":"secret"}'));
+    }
+
+    public function testRedactBodyHandlesLargeBodies()
+    {
+        $redactor = new DefaultRedactor();
+        $body = json_encode(['data' => array_fill(0, 20000, ['id' => 1, 'tags' => ['a', 'b'], 'meta' => ['deep' => [1, 2]]]), 'access_token' => 'secret']);
+
+        $this->assertSame(str_replace('"secret"', '"[REDACTED]"', $body), $redactor->redactBody($body));
+    }
+
+    public function testExceptRemovesNamesFromAllLists()
+    {
+        $redactor = new DefaultRedactor([], [], ['pin'], ['Code', 'PIN', 'Authorization']);
+
+        $this->assertSame('https://example.com/cb?code=abc&state=xyz', $redactor->redactUrl('https://example.com/cb?code=abc&state=xyz'));
+        $this->assertSame('code=abc&state=xyz', $redactor->redactBody('code=abc&state=xyz'));
+        $this->assertSame('{"pin":"1234"}', $redactor->redactBody('{"pin":"1234"}'));
+        $this->assertSame(['authorization' => ['Bearer x']], $redactor->redactHeaders(['authorization' => ['Bearer x']]));
+        $this->assertSame('{"password":"[REDACTED]"}', $redactor->redactBody('{"password":"secret"}'));
+    }
+
+    public function testRedactBodyMasksCodeInFormPostResponse()
+    {
+        $redactor = new DefaultRedactor();
+
+        parse_str($redactor->redactBody('code=abc&state=xyz'), $result);
+
+        $this->assertSame('[REDACTED]', $result['code']);
+        $this->assertSame('xyz', $result['state']);
     }
 
     public function testRedactBodyLeavesUntouchedFormBodyByteIdentical()

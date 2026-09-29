@@ -94,12 +94,15 @@ final class DefaultRedactor implements RedactorInterface
      * @param string[] $headers     header names to mask, added to the built-in list (case-insensitive)
      * @param string[] $queryParams query-string and form field names to mask, added to the built-in list (case-insensitive)
      * @param string[] $bodyFields  JSON and form field names to mask, added to the built-in list (case-insensitive)
+     * @param string[] $except      names never masked, removed from all the lists above (case-insensitive)
      */
-    public function __construct(array $headers = [], array $queryParams = [], array $bodyFields = [])
+    public function __construct(array $headers = [], array $queryParams = [], array $bodyFields = [], array $except = [])
     {
-        $this->headerDenyList = array_merge(self::DEFAULT_HEADERS, array_map(strtolower(...), $headers));
-        $this->queryParamDenyList = array_merge(self::DEFAULT_QUERY_PARAMS, array_map(strtolower(...), $queryParams));
-        $this->bodyFieldDenyList = array_merge(self::DEFAULT_BODY_FIELDS, array_map(strtolower(...), $bodyFields));
+        $except = array_map(strtolower(...), $except);
+
+        $this->headerDenyList = array_values(array_diff(array_merge(self::DEFAULT_HEADERS, array_map(strtolower(...), $headers)), $except));
+        $this->queryParamDenyList = array_values(array_diff(array_merge(self::DEFAULT_QUERY_PARAMS, array_map(strtolower(...), $queryParams)), $except));
+        $this->bodyFieldDenyList = array_values(array_diff(array_merge(self::DEFAULT_BODY_FIELDS, array_map(strtolower(...), $bodyFields)), $except));
     }
 
     public function redactUrl(string $url): string
@@ -180,13 +183,120 @@ final class DefaultRedactor implements RedactorInterface
         }
 
         $masked = false;
-        $decoded = $this->maskKeys($decoded, $this->bodyFieldDenyList, $masked);
+        $redacted = $this->maskJson($body, $masked);
 
-        if (!$masked) {
-            return $body;
+        return $masked ? $redacted : $body;
+    }
+
+    /**
+     * Masks deny-listed members in place, so that everything else stays byte-identical:
+     * decoding and re-encoding would turn {} into [], 1.0 into 1 and lose the precision of big integers.
+     *
+     * The body must be valid JSON; it is scanned once, without regular expressions, so that large bodies are handled too.
+     */
+    private function maskJson(string $json, bool &$masked): string
+    {
+        $redacted = '';
+        $copyFrom = 0;
+        $containers = [];
+        $expectKey = false;
+        $length = \strlen($json);
+
+        for ($i = 0; $i < $length;) {
+            switch ($json[$i]) {
+                case '"':
+                    $end = self::skipString($json, $i);
+
+                    if (!$expectKey) {
+                        $i = $end;
+                        break;
+                    }
+
+                    $expectKey = false;
+                    $key = json_decode(substr($json, $i, $end - $i));
+                    $i = $end + strspn($json, " \t\n\r", $end) + 1; // past the colon
+                    $i += strspn($json, " \t\n\r", $i);
+
+                    if (\in_array(strtolower($key), $this->bodyFieldDenyList, true)) {
+                        $redacted .= substr($json, $copyFrom, $i - $copyFrom).json_encode(self::MASK);
+                        $i = $copyFrom = self::skipValue($json, $i);
+                        $masked = true;
+                    }
+                    break;
+
+                case '{':
+                    $containers[] = '{';
+                    $expectKey = true;
+                    ++$i;
+                    break;
+
+                case '[':
+                    $containers[] = '[';
+                    ++$i;
+                    break;
+
+                case '}':
+                case ']':
+                    array_pop($containers);
+                    ++$i;
+                    break;
+
+                case ',':
+                    $expectKey = '{' === end($containers);
+                    ++$i;
+                    break;
+
+                default:
+                    $i += strcspn($json, '"{}[],', $i);
+            }
         }
 
-        return json_encode($decoded, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR);
+        return $redacted.substr($json, $copyFrom);
+    }
+
+    /**
+     * Returns the offset right after the string starting at $i.
+     */
+    private static function skipString(string $json, int $i): int
+    {
+        while (true) {
+            $i += 1 + strcspn($json, '"\\', $i + 1);
+
+            if ('"' === $json[$i]) {
+                return $i + 1;
+            }
+
+            ++$i; // the escaped character is skipped by the next strcspn()
+        }
+    }
+
+    /**
+     * Returns the offset right after the value starting at $i.
+     */
+    private static function skipValue(string $json, int $i): int
+    {
+        if ('"' === $json[$i]) {
+            return self::skipString($json, $i);
+        }
+
+        if ('{' !== $json[$i] && '[' !== $json[$i]) {
+            return $i + strcspn($json, " \t\n\r,}]", $i);
+        }
+
+        for ($depth = 0;;) {
+            $i += strcspn($json, '"{}[]', $i);
+
+            if ('"' === $json[$i]) {
+                $i = self::skipString($json, $i);
+            } elseif ('{' === $json[$i] || '[' === $json[$i]) {
+                ++$depth;
+                ++$i;
+            } elseif (0 === --$depth) {
+                return $i + 1;
+            } else {
+                ++$i;
+            }
+        }
     }
 
     private function redactFormEncodedBody(string $body): string

@@ -27,7 +27,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'matcher' => null,
                 'redactor' => null,
-                'redact' => ['headers' => [], 'query' => [], 'body' => []],
+                'redact' => ['headers' => [], 'query' => [], 'body' => [], 'except' => []],
             ],
             'scoped_clients' => [],
         ], $this->process([]));

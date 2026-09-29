@@ -131,7 +131,7 @@ final class HarFile
     {
         /** @psalm-var HarEntry $entry */
         $entry = [
-            'startedDateTime' => (class_exists(Clock::class) ? Clock::get()->now() : new \DateTimeImmutable())->format('Y-m-d\TH:i:s.v\Z'),
+            'startedDateTime' => (class_exists(Clock::class) ? Clock::get()->now() : new \DateTimeImmutable())->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d\TH:i:s.v\Z'),
             'time' => 0,
             'request' => [
                 'method' => $method,

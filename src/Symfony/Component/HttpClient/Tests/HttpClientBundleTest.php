@@ -124,7 +124,7 @@ class HttpClientBundleTest extends TestCase
             'default_options' => ['headers' => ['X-Foo' => 'bar']],
             'recorder' => [
                 'enabled' => true,
-                'redact' => ['headers' => ['X-Custom-Secret'], 'query' => ['sig'], 'body' => ['pin']],
+                'redact' => ['headers' => ['X-Custom-Secret'], 'query' => ['sig'], 'body' => ['pin'], 'except' => ['code']],
             ],
         ]);
 
@@ -152,7 +152,7 @@ class HttpClientBundleTest extends TestCase
         $this->assertSame('%kernel.share_dir%/http_client/recorder', $storeArguments[1]);
 
         $this->assertTrue($container->hasAlias(RecorderConfigurationInterface::class));
-        $this->assertSame([['X-Custom-Secret'], ['sig'], ['pin']], $container->getDefinition('http_client.recorder.redactor')->getArguments());
+        $this->assertSame([['X-Custom-Secret'], ['sig'], ['pin'], ['code']], $container->getDefinition('http_client.recorder.redactor')->getArguments());
         $this->assertSame('http_client.recorder.redactor', (string) $container->getDefinition('http_client.recorder.matcher')->getArgument(0));
     }
 

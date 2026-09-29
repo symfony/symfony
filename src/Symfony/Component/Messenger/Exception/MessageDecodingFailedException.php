@@ -31,4 +31,13 @@ class MessageDecodingFailedException extends InvalidArgumentException
     {
         return new Envelope(new self($message, $code, $previous, $encodedEnvelope));
     }
+
+    public function __serialize(): array
+    {
+        return [
+            'message' => $this->message,
+            'code' => $this->code,
+            'encodedEnvelope' => $this->encodedEnvelope,
+        ];
+    }
 }

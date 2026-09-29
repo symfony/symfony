@@ -64,7 +64,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         $fetchSize = \func_num_args() > 0 ? max(1, func_get_arg(0)) : 1;
         $envelopes = [];
         $now = $this->clock?->now() ?? new \DateTimeImmutable();
-        foreach ($this->decode($this->queue) as $id => $envelope) {
+        foreach ($this->decodeQueue($this->queue) as $id => $envelope) {
             if (!isset($this->availableAt[$id]) || $now > $this->availableAt[$id]) {
                 $envelopes[] = $envelope;
                 if (\count($envelopes) >= $fetchSize) {
@@ -165,5 +165,22 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         }
 
         return array_map($this->serializer->decode(...), $messagesEncoded);
+    }
+
+    /**
+     * @return array<int, Envelope>
+     */
+    private function decodeQueue(array $queue): array
+    {
+        $envelopes = $this->decode($queue);
+
+        foreach ($envelopes as $id => $envelope) {
+            // the serializer can return an envelope without stamps, as when the message fails to decode
+            if (!$envelope->last(TransportMessageIdStamp::class)) {
+                $envelopes[$id] = $envelope->with(new TransportMessageIdStamp($id));
+            }
+        }
+
+        return $envelopes;
     }
 }

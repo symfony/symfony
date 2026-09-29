@@ -568,6 +568,20 @@ class AnsiUtilsTest extends TestCase
         $this->assertSame(4, AnsiUtils::visibleWidth(AnsiUtils::truncateToWidth("\tx\t\t", 6, '')));
     }
 
+    public function testSlicingCountsACombiningMarkAsNoColumn()
+    {
+        // A decomposed "é" (e + U+0301) is one column; the escape after it
+        // ends the segment, so the segment fits and takes the fast path.
+        $line = "cafe\u{0301}\x1b[1m latte\x1b[0m";
+
+        $this->assertSame("cafe\u{0301}\x1b[1m la", AnsiUtils::sliceByColumn($line, 0, 7));
+        $this->assertSame(['text' => "cafe\u{0301}\x1b[1m la", 'width' => 7], AnsiUtils::sliceWithWidth($line, 0, 7));
+        $this->assertSame(7, AnsiUtils::visibleWidth(AnsiUtils::truncateToWidth($line, 7, '')));
+
+        // A zero-width joiner takes no column either.
+        $this->assertSame("ab\u{200D}cd\x1b[1m e", AnsiUtils::sliceByColumn("ab\u{200D}cd\x1b[1m ef\x1b[0m", 0, 6));
+    }
+
     public function testSliceByColumnStopsAtAWideCharacterInsteadOfTakingLaterColumns()
     {
         // "東" occupies columns 1-2, "京" columns 3-4, the space column 5.

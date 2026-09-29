@@ -60,7 +60,13 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
             throw $decodedEnvelope->getMessage();
         }
 
+        $received = null !== $envelope->last(ReceivedStamp::class);
         $envelope = $decodedEnvelope->with(...array_merge(...array_values($envelope->all())));
+
+        if (!$received) {
+            // a failure redispatched from the failure transport keeps this stamp only to find its serializer
+            $envelope = $envelope->withoutAll(SentToFailureTransportStamp::class);
+        }
 
         return $stack->next()->handle($envelope, $stack);
     }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Failure;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -56,10 +57,12 @@ final class FailedMessageRepository
      */
     public static function prepareForRedispatch(Envelope $envelope): Envelope
     {
-        return $envelope
+        $envelope = $envelope
             ->withoutStampsOfType(NonSendableStampInterface::class)
-            ->withoutAll(SentToFailureTransportStamp::class)
             ->withoutAll(TransportMessageIdStamp::class);
+
+        // DecodeFailedMessageMiddleware needs it to find the serializer of a decoding failure, and removes it once decoded
+        return $envelope->getMessage() instanceof MessageDecodingFailedException ? $envelope : $envelope->withoutAll(SentToFailureTransportStamp::class);
     }
 
     /**

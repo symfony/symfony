@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-29T10:35:04Z
+
+Thank you @TamasSzigeti. I extended the fix to extensions that don't call `processConfiguration()`: they had the same leak since `freezeAfterProcessing()` returned early for them. See the added test.

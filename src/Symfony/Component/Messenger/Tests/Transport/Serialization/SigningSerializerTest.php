@@ -17,6 +17,9 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageEnum;
@@ -27,6 +30,7 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 
 class SigningSerializerTest extends TestCase
 {
@@ -531,14 +535,172 @@ class SigningSerializerTest extends TestCase
         $this->assertSame(\sprintf('Message "%s" requires a signature but none was found.', DummyMessageEnum::class), $envelope->getMessage()->getPrevious()->getMessage());
     }
 
+    public function testDecodeFailureOfASignedMessageCarriesTheSignedEnvelope()
+    {
+        $encoded = $this->createJsonSerializer([DummyMessage::class], ['dummy' => DummyMessage::class])->encode(new Envelope(new DummyMessage('hello'), [new BusNameStamp('the_bus')]));
+
+        $envelope = $this->createJsonSerializer([DummyMessage::class])->decode($encoded);
+        $failure = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame($encoded, $failure->encodedEnvelope);
+        $this->assertStringStartsWith('Could not decode message: ', $failure->getMessage());
+        $this->assertInstanceOf(SerializerExceptionInterface::class, $failure->getPrevious());
+        $this->assertSame('the_bus', $envelope->last(BusNameStamp::class)?->getBusName());
+
+        $decoded = $this->createJsonSerializer([DummyMessage::class], ['dummy' => DummyMessage::class])->decode($failure->encodedEnvelope);
+
+        $this->assertSame('hello', $decoded->getMessage()->getMessage());
+    }
+
+    public function testDecodeFailureThrownByTheInnerSerializerCarriesTheSignedEnvelope()
+    {
+        $inner = new class implements SerializerInterface {
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                throw new MessageDecodingFailedException('Cannot decode.');
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return ['body' => 'the-body'];
+            }
+        };
+        $serializer = new SigningSerializer($inner, 'secret-key', [DummyMessage::class]);
+        $encoded = $serializer->encode(new Envelope(new DummyMessage('hello')));
+
+        $failure = $serializer->decode($encoded)->getMessage();
+
+        $this->assertSame('Cannot decode.', $failure->getMessage());
+        $this->assertSame($encoded, $failure->encodedEnvelope);
+    }
+
+    public function testEncodeSignsTheDecodeFailureOfASignedMessage()
+    {
+        $fixedSerializer = $this->createJsonSerializer([DummyMessage::class], ['dummy' => DummyMessage::class]);
+        $serializer = $this->createJsonSerializer([DummyMessage::class]);
+        $failed = $serializer->decode($fixedSerializer->encode(new Envelope(new DummyMessage('hello'), [new BusNameStamp('the_bus')])));
+
+        $encoded = $serializer->encode($failed->with(new SentToFailureTransportStamp('async'), new DelayStamp(0), new RedeliveryStamp(0)));
+
+        $failure = $serializer->decode($encoded)->getMessage();
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame($encoded, $failure->encodedEnvelope);
+
+        $decoded = $fixedSerializer->decode($encoded);
+
+        $this->assertSame('hello', $decoded->getMessage()->getMessage());
+        $this->assertSame('the_bus', $decoded->last(BusNameStamp::class)?->getBusName());
+        $this->assertSame('async', $decoded->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName());
+        $this->assertSame(0, $decoded->last(RedeliveryStamp::class)?->getRetryCount());
+    }
+
+    #[DataProvider('provideUnverifiedMessages')]
+    public function testEncodeDoesNotSignTheDecodeFailureOfAnUnverifiedMessage(array $encodedEnvelope)
+    {
+        $serializer = $this->createJsonSerializer([DummyMessage::class, \Throwable::class]);
+        $failed = $serializer->decode($encodedEnvelope);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failed->getMessage());
+
+        $encoded = $serializer->encode($failed->with(new DelayStamp(1000), new RedeliveryStamp(1)));
+
+        $this->assertArrayNotHasKey('Body-Sign', $encoded['headers']);
+        $this->assertArrayNotHasKey('Sign-Algo', $encoded['headers']);
+
+        $envelope = $serializer->decode($encoded);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+    }
+
+    public static function provideUnverifiedMessages(): iterable
+    {
+        $forged = ['body' => '{"message":"forged"}', 'headers' => ['type' => DummyMessage::class]];
+
+        yield 'without signature' => [$forged];
+        yield 'with an invalid signature' => [['headers' => $forged['headers'] + ['Body-Sign' => 'v2:'.str_repeat('0', 64), 'Sign-Algo' => 'sha256']] + $forged];
+        yield 'signed with another key' => [(new SigningSerializer(new Serializer(), 'another-key', [DummyMessage::class]))->encode(new Envelope(new DummyMessage('forged')))];
+    }
+
+    public function testEncodeDoesNotSignADecodeFailureWhenNoMessageTypeRequiresSignature()
+    {
+        $signed = $this->createJsonSerializer([DummyMessage::class])->encode(new Envelope(new DummyMessage('hello')));
+        $failure = new Envelope(new MessageDecodingFailedException('Cannot decode.', 0, null, $signed), [new BusNameStamp('other_bus')]);
+
+        $encoded = $this->createJsonSerializer([])->encode($failure);
+
+        $envelope = $this->createJsonSerializer([DummyMessage::class])->decode($encoded);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+    }
+
+    public function testDecodeRejectsAnUnsignedDecodeFailureThatCarriesASignedEnvelope()
+    {
+        $serializer = $this->createJsonSerializer([DummyMessage::class]);
+        $wrapper = [
+            'body' => json_encode(['message' => 'Cannot decode.', 'code' => 0, 'previous' => null, 'encodedEnvelope' => $serializer->encode(new Envelope(new DummyMessage('hello')))]),
+            'headers' => ['type' => MessageDecodingFailedException::class, 'X-Message-Stamp-'.BusNameStamp::class => '[{"busName":"other_bus"}]'],
+        ];
+
+        $envelope = $serializer->decode($wrapper);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+        $this->assertSame($wrapper, $envelope->getMessage()->encodedEnvelope);
+        $this->assertNull($envelope->last(BusNameStamp::class));
+    }
+
+    public function testDecodeFailureOfASignedMessageCanBeReplayedWithPhpSerializer()
+    {
+        $serializer = $this->createSerializer([DummyMessage::class]);
+        $encoded = $this->sign(['body' => addslashes(str_replace('s:5:"hello";', 'O:25:"Unknown\Missing\ClassName":0:{}', serialize(new Envelope(new DummyMessage('hello')))))]);
+
+        $failed = $serializer->decode($encoded);
+
+        $this->assertSame($encoded, $failed->getMessage()->encodedEnvelope);
+
+        $envelope = $serializer->decode($serializer->encode($failed->with(new DelayStamp(1000), new RedeliveryStamp(1))));
+        $failure = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame($encoded, $failure->encodedEnvelope);
+        $this->assertSame(1, $envelope->last(RedeliveryStamp::class)?->getRetryCount());
+
+        $replayed = $serializer->decode($failure->encodedEnvelope)->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $replayed);
+        $this->assertSame('Could not decode Envelope: Message class "Unknown\Missing\ClassName" not found during decoding.', $replayed->getMessage());
+    }
+
     private function createSerializer(array $signedTypes): SerializerInterface
     {
         return new SigningSerializer(new PhpSerializer(), 'secret-key', $signedTypes);
     }
 
-    private function createJsonSerializer(array $signedTypes): SerializerInterface
+    private function createJsonSerializer(array $signedTypes, array $typeToClassMap = []): SerializerInterface
     {
-        return new SigningSerializer(new Serializer(), 'secret-key', $signedTypes);
+        return new SigningSerializer(new Serializer(null, 'json', [], $typeToClassMap), 'secret-key', $signedTypes);
+    }
+
+    private function sign(array $encoded): array
+    {
+        $inner = new class($encoded) implements SerializerInterface {
+            public function __construct(
+                private array $encoded,
+            ) {
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                throw new \BadMethodCallException();
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return $this->encoded;
+            }
+        };
+
+        return (new SigningSerializer($inner, 'secret-key', [DummyMessage::class]))->encode(new Envelope(new DummyMessage('hello')));
     }
 
     private function signBodyOnly(array $encoded): array

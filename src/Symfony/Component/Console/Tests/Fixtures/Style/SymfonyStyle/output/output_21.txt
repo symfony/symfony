@@ -3,5 +3,5 @@
 
  [OK] Lorem ipsum dolor sit amet with one emoji 🎉                                                                      
 
- [OK] Lorem ipsum dolor sit amet with so many of them 👩‍🌾👩‍🌾👩‍🌾👩‍🌾👩‍🌾                                              
+ [OK] Lorem ipsum dolor sit amet with so many of them 🌾🌾🌾🌾🌾                                                        
 

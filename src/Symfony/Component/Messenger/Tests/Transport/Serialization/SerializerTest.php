@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -66,6 +67,23 @@ class SerializerTest extends TestCase
         ;
 
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
+    }
+
+    public function testEncodedWithErrorDetailsStampIsDecodable()
+    {
+        $serializer = Serializer::create();
+
+        $envelope = new Envelope(new DummyMessage('Hello'), [ErrorDetailsStamp::create(new \RuntimeException('Failure', 3, new \LogicException('Previous')))]);
+
+        $stamp = $serializer->decode($serializer->encode($envelope))->last(ErrorDetailsStamp::class);
+
+        $this->assertInstanceOf(ErrorDetailsStamp::class, $stamp);
+        $this->assertSame(\RuntimeException::class, $stamp->getExceptionClass());
+        $this->assertSame('Failure', $stamp->getExceptionMessage());
+        $this->assertSame(\RuntimeException::class, $stamp->getFlattenException()->getClass());
+        $this->assertSame('Failure', $stamp->getFlattenException()->getMessage());
+        $this->assertSame(\LogicException::class, $stamp->getFlattenException()->getPrevious()->getClass());
+        $this->assertSame('Previous', $stamp->getFlattenException()->getPrevious()->getMessage());
     }
 
     public function testSerializedMessageStampIsUsedForEncoding()
@@ -446,6 +464,30 @@ class SerializerTest extends TestCase
         $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
         $this->assertNotNull($redeliveryStamp, 'Stamps decoded from headers must be kept on the wrapper envelope, otherwise the retry counter resets on every redelivery.');
         $this->assertSame(2, $redeliveryStamp->getRetryCount());
+    }
+
+    #[DataProvider('provideEnvelopesThatFailToDecodeWithARedeliveryStamp')]
+    public function testDecodingFailureKeepsTheStampsThatDecode(array $encodedEnvelope)
+    {
+        $envelope = (new Serializer())->decode($encodedEnvelope);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertSame(2, RedeliveryStamp::getRetryCountFromEnvelope($envelope));
+    }
+
+    public static function provideEnvelopesThatFailToDecodeWithARedeliveryStamp(): iterable
+    {
+        $headers = [
+            'type' => DummyMessage::class,
+            'X-Message-Stamp-'.RedeliveryStamp::class => '[{"retryCount":2,"redeliveredAt":"2026-08-03T11:47:47+00:00"}]',
+        ];
+
+        yield 'empty body' => [['body' => '', 'headers' => $headers]];
+        yield 'body "0"' => [['body' => '0', 'headers' => $headers]];
+        yield 'no type header' => [['body' => '{"message":"hello"}', 'headers' => array_diff_key($headers, ['type' => true])]];
+        yield 'stamp class not found' => [['body' => '{"message":"hello"}', 'headers' => $headers + ['X-Message-Stamp-App\NonExistentStamp' => '[{}]']]];
+        yield 'stamp header that is not a stamp' => [['body' => '{"message":"hello"}', 'headers' => $headers + ['X-Message-Stamp-'.DummyMessage::class => '[{"message":"injected"}]']]];
+        yield 'stamp that cannot be decoded' => [['body' => '{"message":"hello"}', 'headers' => $headers + ['X-Message-Stamp-'.SerializerStamp::class => '[{}]']]];
     }
 
     public function testEncodingDecodeFailureWrapperReemitsOriginalPayload()

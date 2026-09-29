@@ -66,7 +66,7 @@ class InMemoryTransport implements TransportInterface, ListableReceiverInterface
         $fetchSize = \func_num_args() > 0 ? max(1, func_get_arg(0)) : 1;
         $envelopes = [];
         $now = $this->clock?->now() ?? new \DateTimeImmutable();
-        foreach ($this->decode($this->queue) as $id => $envelope) {
+        foreach ($this->decodeQueue($this->queue) as $id => $envelope) {
             if (!isset($this->availableAt[$id]) || $now > $this->availableAt[$id]) {
                 $envelopes[] = $envelope;
                 if (\count($envelopes) >= $fetchSize) {
@@ -112,7 +112,7 @@ class InMemoryTransport implements TransportInterface, ListableReceiverInterface
      */
     public function all(?int $limit = null): array
     {
-        return array_values($this->decode(null === $limit ? $this->queue : \array_slice($this->queue, 0, $limit, true)));
+        return array_values($this->decodeQueue(null === $limit ? $this->queue : \array_slice($this->queue, 0, $limit, true)));
     }
 
     public function find(mixed $id): ?Envelope
@@ -121,7 +121,7 @@ class InMemoryTransport implements TransportInterface, ListableReceiverInterface
             return null;
         }
 
-        return $this->decode([$this->queue[$id]])[0];
+        return $this->decodeQueue([$id => $this->queue[$id]])[$id];
     }
 
     public function send(Envelope $envelope): Envelope
@@ -191,5 +191,22 @@ class InMemoryTransport implements TransportInterface, ListableReceiverInterface
         }
 
         return array_map($this->serializer->decode(...), $messagesEncoded);
+    }
+
+    /**
+     * @return array<int, Envelope>
+     */
+    private function decodeQueue(array $queue): array
+    {
+        $envelopes = $this->decode($queue);
+
+        foreach ($envelopes as $id => $envelope) {
+            // the serializer can return an envelope without stamps, as when the message fails to decode
+            if (!$envelope->last(TransportMessageIdStamp::class)) {
+                $envelopes[$id] = $envelope->with(new TransportMessageIdStamp($id));
+            }
+        }
+
+        return $envelopes;
     }
 }

@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -56,8 +57,9 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
 
         $decodedEnvelope = $serializer->decode($message->encodedEnvelope);
 
-        if ($decodedEnvelope->getMessage() instanceof MessageDecodingFailedException) {
-            throw $decodedEnvelope->getMessage();
+        if (($failure = $decodedEnvelope->getMessage()) instanceof MessageDecodingFailedException) {
+            // retry listeners look at the thrown exception only: surface an unrecoverable cause so that the message skips retries
+            throw $failure->getPrevious() instanceof UnrecoverableExceptionInterface ? $failure->getPrevious() : $failure;
         }
 
         $envelope = $decodedEnvelope->with(...array_merge(...array_values($envelope->all())));

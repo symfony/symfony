@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
@@ -18,17 +19,21 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -38,11 +43,17 @@ use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -496,6 +507,141 @@ class FailureIntegrationTest extends TestCase
         $this->assertCount(1, $messagesWaiting);
         $this->assertSame('some.bus', $messagesWaiting[0]->last(BusNameStamp::class)?->getBusName());
     }
+
+    #[DataProvider('provideMessagesRejectedForTheirSignature')]
+    public function testMessageRejectedForItsSignatureIsSentToTheFailureTransportWithoutRetry(SerializerInterface $inner, array $encodedEnvelope)
+    {
+        $serializer = new SigningSerializer($inner, 'signing-key', [DummyMessage::class]);
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
+        $failureTransport = new DummyFailureTestSenderAndReceiver();
+
+        $locator = new Container();
+        $locator->set('transport', $transport);
+
+        $retryStrategyLocator = new Container();
+        $retryStrategyLocator->set('transport', new MultiplierRetryStrategy(2));
+
+        $handler = new DummyTestHandler(false);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $throwables = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$throwables) {
+            $throwables[] = $event->getThrowable();
+        });
+
+        for ($i = 0; $i < 10 && $transport->getMessagesWaitingToBeReceived(); ++$i) {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        }
+
+        $this->assertCount(1, $throwables);
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $throwables[0]);
+        $this->assertSame(0, $handler->getTimesCalled());
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failedEnvelopes = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failedEnvelopes[0]->getMessage());
+        $this->assertSame($encodedEnvelope, $failedEnvelopes[0]->getMessage()->encodedEnvelope);
+    }
+
+    public static function provideMessagesRejectedForTheirSignature(): iterable
+    {
+        $envelope = new Envelope(new DummyMessage('API'));
+
+        foreach (['JSON' => new Serializer(), 'PHP' => new PhpSerializer()] as $format => $inner) {
+            yield $format.' without signature' => [$inner, $inner->encode($envelope)];
+            yield $format.' signed with another key' => [$inner, (new SigningSerializer($inner, 'another-key', [DummyMessage::class]))->encode($envelope)];
+        }
+    }
+
+    public function testRetryThroughTransportUsingTheStandaloneSerializer()
+    {
+        $transport = new InMemoryTransport(Serializer::create());
+        $failureTransport = new InMemoryTransport(Serializer::create());
+
+        $calls = 0;
+        $handler = static function () use (&$calls) {
+            if (1 === ++$calls) {
+                throw new \RuntimeException('Failure from call 1');
+            }
+        };
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [$handler]]))]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new AddErrorDetailsStampListener());
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(3));
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame(2, $calls);
+        $this->assertSame([], $failureTransport->getSent());
+
+        $acknowledged = $transport->getAcknowledged();
+        $this->assertCount(1, $acknowledged);
+        $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($acknowledged[0]));
+        $this->assertSame('Failure from call 1', $acknowledged[0]->last(ErrorDetailsStamp::class)->getExceptionMessage());
+    }
+
+    #[DataProvider('provideUndecodableMessages')]
+    public function testUndecodableMessageIsRetriedThenSentToTheFailureTransport(array $encodedEnvelope)
+    {
+        $serializer = new Serializer();
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
+        $failureTransport = new DummyFailureTestSenderAndReceiver();
+
+        $locator = new Container();
+        $locator->set('transport', $transport);
+
+        $retryStrategyLocator = new Container();
+        $retryStrategyLocator->set('transport', new MultiplierRetryStrategy(2));
+
+        $bus = new MessageBus([new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer]))]);
+
+        $retryCounts = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$retryCounts) {
+            $retryCounts[] = RedeliveryStamp::getRetryCountFromEnvelope($event->getEnvelope());
+        });
+
+        for ($i = 0; $i < 10 && $transport->getMessagesWaitingToBeReceived(); ++$i) {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        }
+
+        $this->assertSame([0, 1, 2], $retryCounts);
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failedEnvelopes = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failedEnvelopes[0]->getMessage());
+        $this->assertSame($encodedEnvelope['body'], $failedEnvelopes[0]->getMessage()->encodedEnvelope['body']);
+    }
+
+    public static function provideUndecodableMessages(): iterable
+    {
+        $encodedEnvelope = (new Serializer())->encode(new Envelope(new DummyMessage('API')));
+
+        yield 'empty body' => [['body' => ''] + $encodedEnvelope];
+        yield 'body "0"' => [['body' => '0'] + $encodedEnvelope];
+        yield 'stamp class not found' => [['headers' => $encodedEnvelope['headers'] + ['X-Message-Stamp-App\NonExistentStamp' => '[{}]']] + $encodedEnvelope];
+        yield 'stamp header that is not a stamp' => [['headers' => $encodedEnvelope['headers'] + ['X-Message-Stamp-'.DummyMessage::class => '[{"message":"injected"}]']] + $encodedEnvelope];
+        yield 'message class not found' => [['headers' => ['type' => 'App\NonExistentMessage'] + $encodedEnvelope['headers']] + $encodedEnvelope];
+    }
 }
 
 class DummyFailureTestSenderAndReceiver implements ReceiverInterface, SenderInterface
@@ -534,6 +680,42 @@ class DummyFailureTestSenderAndReceiver implements ReceiverInterface, SenderInte
     public function getMessagesWaitingToBeReceived(): array
     {
         return $this->messagesWaiting;
+    }
+}
+
+class SerializingFailureTestSenderAndReceiver implements ReceiverInterface, SenderInterface
+{
+    public function __construct(
+        private SerializerInterface $serializer,
+        private array $encodedEnvelopes,
+    ) {
+    }
+
+    public function get(): iterable
+    {
+        $encodedEnvelope = array_shift($this->encodedEnvelopes);
+
+        return null === $encodedEnvelope ? [] : [$this->serializer->decode($encodedEnvelope)];
+    }
+
+    public function ack(Envelope $envelope): void
+    {
+    }
+
+    public function reject(Envelope $envelope): void
+    {
+    }
+
+    public function send(Envelope $envelope): Envelope
+    {
+        $this->encodedEnvelopes[] = $this->serializer->encode($envelope);
+
+        return $envelope;
+    }
+
+    public function getMessagesWaitingToBeReceived(): array
+    {
+        return $this->encodedEnvelopes;
     }
 }
 

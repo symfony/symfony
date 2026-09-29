@@ -54,6 +54,13 @@ final class AnsiUtils
     public const TAB_WIDTH = 3;
 
     /**
+     * Characters that mb_strwidth() does not measure the way terminals draw them.
+     *
+     * It counts a tab as one column, a combining mark as its own column, a zero-width joiner or a Hangul vowel or final consonant jamo as one more and a skin tone modifier as two more.
+     */
+    private const MISMEASURED_BY_MB_STRWIDTH = '/[\t\p{M}\p{Cf}\x{1160}-\x{11FF}\x{D7B0}-\x{D7FF}\x{1F3FB}-\x{1F3FF}]/u';
+
+    /**
      * Character set for CSI parameter bytes (0x30-0x3F).
      */
     private const CSI_PARAM_CHARS = '0123456789:;<=>?';
@@ -169,13 +176,9 @@ final class AnsiUtils
             return 0;
         }
 
-        // mb_strwidth() sums codepoints, so it counts a combining mark as its
-        // own column and a zero-width joiner as one more. Only text that
-        // carries marks or joiners needs the slower per grapheme walk, which
-        // is also the measure the wrapper breaks lines by: the two have to
-        // agree or a wrapped chunk comes back wider than the width it was
-        // wrapped to.
-        if (preg_match('/[\p{M}\p{Cf}]/u', $clean)) {
+        // Only text that mb_strwidth() mismeasures needs the slower per grapheme walk, which is also the measure the wrapper breaks lines by:
+        // the two have to agree or a wrapped chunk comes back wider than the width it was wrapped to.
+        if (preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $clean)) {
             $width = 0;
             foreach (grapheme_str_split($clean) ?: [] as $grapheme) {
                 $width += self::graphemeWidth($grapheme);
@@ -461,11 +464,8 @@ final class AnsiUtils
                 // Unicode path
                 $textPortion = substr($line, $i, $segLen);
 
-                // Fast check: if the entire segment fits within range, use mb_strwidth
-                // to skip expensive grapheme_str_split + per-grapheme iteration.
-                // mb_strwidth may overcount for ZWJ sequences; conservative check.
-                // It also counts a tab as one column, so tabs need visibleWidth().
-                $segWidth = str_contains($textPortion, "\t") ? self::visibleWidth($textPortion) : mb_strwidth($textPortion, 'UTF-8');
+                // Take the whole segment when it fits, unless mb_strwidth() would mismeasure it
+                $segWidth = !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $textPortion) ? mb_strwidth($textPortion, 'UTF-8') : self::visibleWidth($textPortion);
                 if ($currentCol >= $startCol && $currentCol + $segWidth <= $endCol) {
                     if ('' !== $pendingAnsi) {
                         $result .= $pendingAnsi;
@@ -658,10 +658,9 @@ final class AnsiUtils
     /**
      * Calculate the display width of a single grapheme in terminal columns.
      *
-     * Uses mb_strwidth() for single-codepoint graphemes (fast C-level call),
-     * falling back to UnicodeString::width() for multi-codepoint graphemes
-     * (ZWJ emoji sequences, skin tone modifiers, decomposed combining chars)
-     * where mb_strwidth() overcounts by summing component widths.
+     * Uses mb_strwidth() for single-codepoint graphemes (fast C-level call).
+     * An emoji ZWJ, modifier or tag sequence takes two columns, as terminals that support it draw one emoji.
+     * Other multi-codepoint graphemes are measured with UnicodeString::width(), which gives no width to combining marks.
      *
      * Malformed UTF-8 is measured on what is left once the invalid bytes are
      * dropped, so it never throws.
@@ -681,6 +680,13 @@ final class AnsiUtils
             if (1 >= mb_strlen($grapheme, 'UTF-8')) {
                 return mb_strwidth($grapheme, 'UTF-8');
             }
+        }
+
+        // Older symfony/string versions add up the emoji of a ZWJ, modifier or tag sequence, and this skips building a UnicodeString.
+        // In one grapheme, such a sequence is a joiner followed by a symbol, or a symbol followed by a modifier or a tag.
+        // \p{So} stands in for \p{Extended_Pictographic}, which PCRE2 lacks before 10.40.
+        if (preg_match('/^\p{So}\x{FE0F}?[\x{1F3FB}-\x{1F3FF}\x{E0020}-\x{E007F}]|\x{200D}\p{So}/u', $grapheme)) {
+            return 2;
         }
 
         return new UnicodeString($grapheme)->width(false);
@@ -792,7 +798,7 @@ final class AnsiUtils
                 $currentCol += $take;
             } else {
                 // Unicode path
-                $segWidth = str_contains($segment, "\t") ? self::visibleWidth($segment) : mb_strwidth($segment, 'UTF-8');
+                $segWidth = !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $segment) ? mb_strwidth($segment, 'UTF-8') : self::visibleWidth($segment);
                 if ($currentCol + $segWidth <= $length) {
                     $result .= $segment;
                     $currentCol += $segWidth;

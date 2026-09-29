@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyLegacySerializable;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageEnum;
@@ -126,6 +127,31 @@ class PhpSerializerTest extends TestCase
         $envelope = $serializer->decode($encodedEnvelope);
 
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+    }
+
+    public function testDecodingFailureCanBeEncodedWhenExceptionArgumentsAreRecorded()
+    {
+        $serializer = $this->createPhpSerializer();
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('true')));
+        $encodedEnvelope['body'] = str_replace('s:4:\"true\"', 'b:1', $encodedEnvelope['body']);
+        $call = static fn (\Closure $closure) => $closure();
+
+        $ignoreArgs = ini_set('zend.exception_ignore_args', '0');
+
+        try {
+            $failed = $call(static fn () => $serializer->decode($encodedEnvelope));
+        } finally {
+            ini_set('zend.exception_ignore_args', $ignoreArgs);
+        }
+
+        $envelope = $serializer->decode($serializer->encode($failed->with(new RedeliveryStamp(1))));
+        $failure = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame($failed->getMessage()->getMessage(), $failure->getMessage());
+        $this->assertSame($failed->getMessage()->getCode(), $failure->getCode());
+        $this->assertSame($encodedEnvelope, $failure->encodedEnvelope);
+        $this->assertSame(1, $envelope->last(RedeliveryStamp::class)?->getRetryCount());
     }
 
     public function testEncodedSkipsNonEncodeableStamps()

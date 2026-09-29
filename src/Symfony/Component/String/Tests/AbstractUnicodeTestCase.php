@@ -22,6 +22,15 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         $unicodeWidthTests = [
             [1, '⚠'],
             [2, '⚠️'],
+            [2, "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}"],
+            [2, "\u{1F3F3}\u{FE0F}\u{200D}\u{1F308}"],
+            [2, "\u{1F44D}\u{1F3FD}"],
+            [2, "\u{1F469}\u{1F3FD}\u{200D}\u{1F4BB}"],
+            [2, "\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}"],
+            [7, "\u{1F44D}\u{1F3FD}a\u{1F3FD}\u{1F468}\u{200D}\u{1F469}"],
+            [2, "\u{0915}\u{094D}\u{200D}\u{0937}"],
+            [2, "\u{1100}\u{1161}\u{11A8}"],
+            [2, "\u{1100}\u{D7B0}\u{D7CB}"],
             [14, '<<<END
 This is a
 multiline text

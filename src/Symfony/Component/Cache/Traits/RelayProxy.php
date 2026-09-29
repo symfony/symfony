@@ -31,6 +31,7 @@ use Symfony\Component\Cache\Traits\Relay\Relay22Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay30Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay40Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay50Trait;
+use Symfony\Component\Cache\Traits\Relay\Relay502Trait;
 use Symfony\Component\Cache\Traits\Relay\SwapdbTrait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Component\VarExporter\LazyProxyTrait;
@@ -70,24 +71,10 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     use Relay30Trait;
     use Relay40Trait;
     use Relay50Trait;
+    use Relay502Trait;
     use SwapdbTrait;
 
     private const LAZY_OBJECT_PROPERTY_SCOPES = [];
-
-    public function __construct($host = null, $port = 6379, $connect_timeout = 0.0, $command_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0)
-    {
-        ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->__construct(...\func_get_args());
-    }
-
-    public function connect($host, $port = 6379, $timeout = 0.0, $persistent_id = null, $retry_interval = 0, $read_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0): bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->connect(...\func_get_args());
-    }
-
-    public function pconnect($host, $port = 6379, $timeout = 0.0, $persistent_id = null, $retry_interval = 0, $read_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0): bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->pconnect(...\func_get_args());
-    }
 
     public function close(): bool
     {
@@ -614,24 +601,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->expire(...\func_get_args());
     }
 
-    public function pexpire($key, $milliseconds): \Relay\Relay|bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->pexpire(...\func_get_args());
-    }
-
-    public function expireat($key, $timestamp): \Relay\Relay|bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->expireat(...\func_get_args());
-    }
-
     public function expiretime($key): \Relay\Relay|false|int
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->expiretime(...\func_get_args());
-    }
-
-    public function pexpireat($key, $timestamp_ms): \Relay\Relay|bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->pexpireat(...\func_get_args());
     }
 
     public function pexpiretime($key): \Relay\Relay|false|int
@@ -679,19 +651,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->lset(...\func_get_args());
     }
 
-    public function lpop($key, $count = 1): mixed
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->lpop(...\func_get_args());
-    }
-
     public function lpos($key, $value, $options = null): \Relay\Relay|array|false|int|null
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->lpos(...\func_get_args());
-    }
-
-    public function rpop($key, $count = 1): mixed
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->rpop(...\func_get_args());
     }
 
     public function rpoplpush($source, $dest): mixed
@@ -772,51 +734,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function ltrim($key, $start, $end): \Relay\Relay|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->ltrim(...\func_get_args());
-    }
-
-    public function hget($hash, $member): mixed
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hget(...\func_get_args());
-    }
-
-    public function hstrlen($hash, $member): \Relay\Relay|false|int
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hstrlen(...\func_get_args());
-    }
-
-    public function hgetall($hash): \Relay\Relay|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hgetall(...\func_get_args());
-    }
-
-    public function hkeys($hash): \Relay\Relay|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hkeys(...\func_get_args());
-    }
-
-    public function hvals($hash): \Relay\Relay|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hvals(...\func_get_args());
-    }
-
-    public function hmget($hash, $members): \Relay\Relay|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hmget(...\func_get_args());
-    }
-
-    public function hmset($hash, $members): \Relay\Relay|bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hmset(...\func_get_args());
-    }
-
-    public function hexists($hash, $member): \Relay\Relay|bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hexists(...\func_get_args());
-    }
-
-    public function hsetnx($hash, $member, $value): \Relay\Relay|bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->hsetnx(...\func_get_args());
     }
 
     public function hdel($key, $mem, ...$mems): \Relay\Relay|false|int
@@ -934,11 +851,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->pipeline(...\func_get_args());
     }
 
-    public function multi($mode = 0): \Relay\Relay|bool
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->multi(...\func_get_args());
-    }
-
     public function exec(): \Relay\Relay|array|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->exec(...\func_get_args());
@@ -1019,29 +931,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sadd(...\func_get_args());
     }
 
-    public function sort($key, $options = []): \Relay\Relay|array|false|int
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sort(...\func_get_args());
-    }
-
-    public function sort_ro($key, $options = []): \Relay\Relay|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->sort_ro(...\func_get_args());
-    }
-
     public function smove($srcset, $dstset, $member): \Relay\Relay|bool
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->smove(...\func_get_args());
-    }
-
-    public function spop($set, $count = 1): mixed
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->spop(...\func_get_args());
-    }
-
-    public function srandmember($set, $count = 1): mixed
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->srandmember(...\func_get_args());
     }
 
     public function scard($key): \Relay\Relay|false|int
@@ -1257,16 +1149,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function zunionstore($dst, $keys, $weights = null, $options = null): \Relay\Relay|false|int
     {
         return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zunionstore(...\func_get_args());
-    }
-
-    public function zpopmin($key, $count = 1): \Relay\Relay|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zpopmin(...\func_get_args());
-    }
-
-    public function zpopmax($key, $count = 1): \Relay\Relay|array|false
-    {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->zpopmax(...\func_get_args());
     }
 
     public function _getKeys()

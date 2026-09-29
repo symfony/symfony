@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Messenger\Exception;
 
-class InvalidMessageSignatureException extends \RuntimeException implements ExceptionInterface
+class InvalidMessageSignatureException extends \RuntimeException implements ExceptionInterface, UnrecoverableExceptionInterface
 {
 }

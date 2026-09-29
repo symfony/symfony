@@ -121,12 +121,12 @@ final class AmpSqlTransportTest extends TestCase
         $transport = $this->createTransport();
 
         try {
-            $transport->send(new Envelope(new DummyMessage('delayed'), [new DelayStamp(100)]));
+            $transport->send(new Envelope(new DummyMessage('delayed'), [new DelayStamp(1000)]));
 
             self::assertSame([], iterator_to_array($transport->get()));
             self::assertSame(0, $transport->getMessageCount());
 
-            delay(0.15);
+            delay(1.05);
             /** @var list<Envelope> $received */
             $received = iterator_to_array($transport->get());
             self::assertSame('delayed', self::messageValue($received[0]));

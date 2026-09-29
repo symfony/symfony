@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageEnum;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Transport\Serialization\MessageTypeAwareSerializerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -432,6 +435,63 @@ class SigningSerializerTest extends TestCase
 
         $this->expectException(InvalidMessageSignatureException::class);
         $serializer->decode($forged);
+    }
+
+    #[DataProvider('provideEnumCasesCarriedBySignedMessages')]
+    public function testDecodeRejectsMissingSignatureWithoutAutoloadingTheEnumsTheBodyCarries(string $search, string $replace)
+    {
+        $serializer = $this->createSerializer([DummyMessage::class]);
+        $body = str_replace($search, $replace, serialize(new Envelope(new DummyMessage('hello'))));
+        $requested = [];
+        $autoloader = static function (string $class) use (&$requested) {
+            $requested[] = $class;
+        };
+        $refusal = null;
+        spl_autoload_register($autoloader, true, true);
+
+        try {
+            $serializer->decode(['body' => addslashes($body), 'headers' => []]);
+        } catch (InvalidMessageSignatureException $e) {
+            $refusal = $e->getMessage();
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+
+        $this->assertNotContains('Unknown\Missing\EnumName', $requested);
+        $this->assertSame(\sprintf('Message "%s" requires a signature but none was found.', DummyMessage::class), $refusal);
+    }
+
+    public static function provideEnumCasesCarriedBySignedMessages(): iterable
+    {
+        yield 'in the stamps' => ['a:0:{}', 'a:1:{i:0;E:33:"Unknown\Missing\EnumName:CaseName";}'];
+        yield 'in a property of the message' => ['s:5:"hello"', 'E:33:"Unknown\Missing\EnumName:CaseName"'];
+    }
+
+    #[DataProvider('provideUnsignedMessagesOfClassesThatDoNotExist')]
+    public function testDecodeRejectsUnsignedMessageOfAClassThatDoesNotExist(string $message)
+    {
+        $serializer = $this->createSerializer([DummyMessage::class]);
+        $body = str_replace('O:8:"stdClass":0:{}', $message, serialize(new Envelope(new \stdClass())));
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $serializer->decode(['body' => addslashes($body), 'headers' => []]);
+    }
+
+    public static function provideUnsignedMessagesOfClassesThatDoNotExist(): iterable
+    {
+        yield 'object' => ['O:25:"Unknown\Missing\ClassName":0:{}'];
+        yield 'enum case' => ['E:33:"Unknown\Missing\EnumName:CaseName";'];
+    }
+
+    public function testDecodeRejectsUnsignedEnumCaseOfASignedType()
+    {
+        $serializer = $this->createSerializer([DummyMessageEnum::class]);
+        $case = DummyMessageEnum::class.':A';
+        $body = str_replace('O:8:"stdClass":0:{}', 'E:'.\strlen($case).':"'.$case.'";', serialize(new Envelope(new \stdClass())));
+
+        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectExceptionMessage(\sprintf('Message "%s" requires a signature but none was found.', DummyMessageEnum::class));
+        $serializer->decode(['body' => addslashes($body), 'headers' => []]);
     }
 
     private function createSerializer(array $signedTypes): SerializerInterface

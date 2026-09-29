@@ -74,22 +74,38 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
         $body = stripslashes($body);
 
         // Fast path: when the body carries no Serializable (`C:`) payload, native
-        // unserialize() with allowed_classes restricted to Envelope is safe and fast.
-        // The carried message becomes a __PHP_Incomplete_Class with no constructor /
-        // __wakeup / __unserialize executed. This skips the in-PHP tokenizer below.
+        // unserialize() with allowed_classes restricted to Envelope turns the carried
+        // message into a __PHP_Incomplete_Class with no constructor / __wakeup /
+        // __unserialize executed. This skips the in-PHP tokenizer below.
+        // allowed_classes does not cover enums: unserialize() autoloads the class of an
+        // enum case whatever the list. So once Envelope is loaded, autoloading is refused
+        // while unserialize() runs, and the tokenizer takes over when it was needed.
         if (!str_contains($body, 'C:')) {
+            class_exists(Envelope::class);
+            $autoloadAttempted = false;
+            $autoloadGuard = static function () use (&$autoloadAttempted): never {
+                $autoloadAttempted = true;
+
+                throw new \LogicException('Autoloading is not allowed while reading the message type.');
+            };
+            spl_autoload_register($autoloadGuard, true, true);
+
             try {
                 $envelope = @unserialize($body, ['allowed_classes' => [Envelope::class]]);
-
-                if (!$envelope instanceof Envelope) {
-                    return null;
-                }
-                $message = $envelope->getMessage();
+                $message = $envelope instanceof Envelope ? $envelope->getMessage() : null;
             } catch (\Throwable) {
-                return null;
+                $message = null;
+            } finally {
+                spl_autoload_unregister($autoloadGuard);
             }
 
-            return $message instanceof \__PHP_Incomplete_Class ? ((array) $message)['__PHP_Incomplete_Class_Name'] : $message::class;
+            if (!$autoloadAttempted) {
+                return match (true) {
+                    null === $message => null,
+                    $message instanceof \__PHP_Incomplete_Class => ((array) $message)['__PHP_Incomplete_Class_Name'],
+                    default => $message::class,
+                };
+            }
         }
 
         // Slow path: parse the serialized envelope without invoking unserialize() so that

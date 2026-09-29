@@ -132,22 +132,25 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
 
     public function freezeAfterProcessing(Extension $extension, ContainerBuilder $container): void
     {
-        if (!$config = $extension->getProcessedConfigs()) {
+        if ($config = $extension->getProcessedConfigs()) {
+            $this->processedEnvPlaceholders = [];
+            $candidatePlaceholders = parent::getEnvPlaceholders() + parent::getUnusedEnvPlaceholders();
+        } else {
             // Extension::processConfiguration() wasn't called, we cannot know how configs were merged
-            return;
+            $this->processedEnvPlaceholders = parent::getEnvPlaceholders();
+            $candidatePlaceholders = array_diff_key(parent::getUnusedEnvPlaceholders(), $this->processedEnvPlaceholders);
         }
-        $this->processedEnvPlaceholders = [];
 
         // serialize config and container to catch env vars nested in object graphs
         $config = serialize($config).serialize($container->getDefinitions()).serialize($container->getAliases()).serialize($container->getParameterBag()->all());
 
-        if (false === stripos($config, 'env_')) {
+        if (!$candidatePlaceholders || false === stripos($config, 'env_')) {
             return;
         }
 
         preg_match_all('/env_[a-f0-9]{16}_\w+_[a-f0-9]{32}/Ui', $config, $matches);
         $usedPlaceholders = array_flip($matches[0]);
-        foreach (parent::getEnvPlaceholders() as $env => $placeholders) {
+        foreach ($candidatePlaceholders as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
                 if (isset($usedPlaceholders[$placeholder])) {
                     $this->processedEnvPlaceholders[$env] = $placeholders;

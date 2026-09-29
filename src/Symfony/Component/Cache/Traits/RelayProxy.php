@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Traits\Relay\Relay22Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay30Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay40Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay50Trait;
+use Symfony\Component\Cache\Traits\Relay\Relay502Trait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -38,11 +39,7 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     use Relay30Trait;
     use Relay40Trait;
     use Relay50Trait;
-
-    public function __construct($host = null, $port = 6379, $connect_timeout = 0.0, $command_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0)
-    {
-        $this->initializeLazyObject()->__construct(...\func_get_args());
-    }
+    use Relay502Trait;
 
     public function _compress($value): string
     {
@@ -249,11 +246,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->config(...\func_get_args());
     }
 
-    public function connect($host, $port = 6379, $timeout = 0.0, $persistent_id = null, $retry_interval = 0, $read_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0): bool
-    {
-        return $this->initializeLazyObject()->connect(...\func_get_args());
-    }
-
     public function copy($src, $dst, $options = null): \Relay\Relay|bool
     {
         return $this->initializeLazyObject()->copy(...\func_get_args());
@@ -342,11 +334,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function expire($key, $seconds, $mode = null): \Relay\Relay|bool
     {
         return $this->initializeLazyObject()->expire(...\func_get_args());
-    }
-
-    public function expireat($key, $timestamp): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->expireat(...\func_get_args());
     }
 
     public function expiretime($key): \Relay\Relay|false|int
@@ -629,11 +616,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->hdel(...\func_get_args());
     }
 
-    public function hexists($hash, $member): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->hexists(...\func_get_args());
-    }
-
     public function hexpire($hash, $ttl, $fields, $mode = null): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->hexpire(...\func_get_args());
@@ -649,19 +631,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->hexpiretime(...\func_get_args());
     }
 
-    public function hget($hash, $member): mixed
-    {
-        return $this->initializeLazyObject()->hget(...\func_get_args());
-    }
-
     public function hgetWithMeta($hash, $member): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->getWithMeta(...\func_get_args());
-    }
-
-    public function hgetall($hash): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->hgetall(...\func_get_args());
     }
 
     public function hgetdel($key, $fields): \Relay\Relay|array|false
@@ -684,24 +656,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->hincrbyfloat(...\func_get_args());
     }
 
-    public function hkeys($hash): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->hkeys(...\func_get_args());
-    }
-
     public function hlen($key): \Relay\Relay|false|int
     {
         return $this->initializeLazyObject()->hlen(...\func_get_args());
-    }
-
-    public function hmget($hash, $members): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->hmget(...\func_get_args());
-    }
-
-    public function hmset($hash, $members): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->hmset(...\func_get_args());
     }
 
     public function hpersist($hash, $fields): \Relay\Relay|array|false
@@ -729,11 +686,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->hpttl(...\func_get_args());
     }
 
-    public function hrandfield($hash, $options = null): \Relay\Relay|array|false|null|string
-    {
-        return $this->initializeLazyObject()->hrandfield(...\func_get_args());
-    }
-
     public function hscan($key, &$iterator, $match = null, $count = 0): array|false
     {
         return $this->initializeLazyObject()->hscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
@@ -749,24 +701,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->hsetex(...\func_get_args());
     }
 
-    public function hsetnx($hash, $member, $value): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->hsetnx(...\func_get_args());
-    }
-
-    public function hstrlen($hash, $member): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->hstrlen(...\func_get_args());
-    }
-
     public function httl($hash, $fields): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->httl(...\func_get_args());
-    }
-
-    public function hvals($hash): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->hvals(...\func_get_args());
     }
 
     public function idleTime(): \Relay\Relay|false|int
@@ -964,11 +901,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->lmpop(...\func_get_args());
     }
 
-    public function lpop($key, $count = 1): mixed
-    {
-        return $this->initializeLazyObject()->lpop(...\func_get_args());
-    }
-
     public function lpos($key, $value, $options = null): \Relay\Relay|array|false|int|null
     {
         return $this->initializeLazyObject()->lpos(...\func_get_args());
@@ -1029,11 +961,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->msetnx(...\func_get_args());
     }
 
-    public function multi($mode = 0): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->multi(...\func_get_args());
-    }
-
     public function object($op, $key): mixed
     {
         return $this->initializeLazyObject()->object(...\func_get_args());
@@ -1059,24 +986,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->pclose(...\func_get_args());
     }
 
-    public function pconnect($host, $port = 6379, $timeout = 0.0, $persistent_id = null, $retry_interval = 0, $read_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0): bool
-    {
-        return $this->initializeLazyObject()->pconnect(...\func_get_args());
-    }
-
     public function persist($key): \Relay\Relay|bool
     {
         return $this->initializeLazyObject()->persist(...\func_get_args());
-    }
-
-    public function pexpire($key, $milliseconds): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->pexpire(...\func_get_args());
-    }
-
-    public function pexpireat($key, $timestamp_ms): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->pexpireat(...\func_get_args());
     }
 
     public function pexpiretime($key): \Relay\Relay|false|int
@@ -1177,11 +1089,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function role(): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->role(...\func_get_args());
-    }
-
-    public function rpop($key, $count = 1): mixed
-    {
-        return $this->initializeLazyObject()->rpop(...\func_get_args());
     }
 
     public function rpoplpush($source, $dest): mixed
@@ -1324,29 +1231,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->socketId(...\func_get_args());
     }
 
-    public function sort($key, $options = []): \Relay\Relay|array|false|int
-    {
-        return $this->initializeLazyObject()->sort(...\func_get_args());
-    }
-
-    public function sort_ro($key, $options = []): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->sort_ro(...\func_get_args());
-    }
-
-    public function spop($set, $count = 1): mixed
-    {
-        return $this->initializeLazyObject()->spop(...\func_get_args());
-    }
-
     public function spublish($channel, $message): \Relay\Relay|false|int
     {
         return $this->initializeLazyObject()->spublish(...\func_get_args());
-    }
-
-    public function srandmember($set, $count = 1): mixed
-    {
-        return $this->initializeLazyObject()->srandmember(...\func_get_args());
     }
 
     public function srem($set, $member, ...$members): \Relay\Relay|false|int
@@ -1462,11 +1349,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function vismember($key, $element): \Relay\Relay|bool
     {
         return $this->initializeLazyObject()->vismember(...\func_get_args());
-    }
-
-    public function vlinks($key, $element, $withscores): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->vlinks(...\func_get_args());
     }
 
     public function vrandmember($key, $count = 0): \Relay\Relay|array|false|string
@@ -1647,16 +1529,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function zmscore($key, ...$mems): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->zmscore(...\func_get_args());
-    }
-
-    public function zpopmax($key, $count = 1): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zpopmax(...\func_get_args());
-    }
-
-    public function zpopmin($key, $count = 1): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zpopmin(...\func_get_args());
     }
 
     public function zrandmember($key, $options = null): mixed

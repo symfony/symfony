@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
@@ -120,6 +121,41 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
 
         $this->expectException(MessageDecodingFailedException::class);
         $middleware->handle($envelope, new StackMiddleware());
+    }
+
+    public function testItThrowsTheDecodingFailureWhenDecodingStillFails()
+    {
+        $failed = MessageDecodingFailedException::wrap(['body' => 'body', 'headers' => []], 'Could not decode.', 0, new \RuntimeException('Class not found.'));
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('decode')->willReturn($failed);
+
+        $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['transport' => $serializer]));
+
+        try {
+            $middleware->handle($failed->with(new ReceivedStamp('transport')), new StackMiddleware());
+            $this->fail('An exception should have been thrown.');
+        } catch (MessageDecodingFailedException $e) {
+            $this->assertSame($failed->getMessage(), $e);
+        }
+    }
+
+    public function testItThrowsTheUnrecoverableCauseWhenDecodingStillFails()
+    {
+        $cause = new UnrecoverableMessageHandlingException('Invalid signature.');
+        $failed = MessageDecodingFailedException::wrap(['body' => 'body', 'headers' => []], 'Invalid signature.', 0, $cause);
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('decode')->willReturn($failed);
+
+        $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['transport' => $serializer]));
+
+        try {
+            $middleware->handle($failed->with(new ReceivedStamp('transport')), new StackMiddleware());
+            $this->fail('An exception should have been thrown.');
+        } catch (UnrecoverableMessageHandlingException $e) {
+            $this->assertSame($cause, $e);
+        }
     }
 
     public function testItIgnoresRegularMessages()

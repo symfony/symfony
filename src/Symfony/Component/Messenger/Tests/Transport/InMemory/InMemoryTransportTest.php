@@ -14,13 +14,21 @@ namespace Symfony\Component\Messenger\Tests\Transport\InMemory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
+use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Worker;
 
 /**
  * @author Gary PEGEOT <garypegeot@gmail.com>
@@ -152,7 +160,7 @@ class InMemoryTransportTest extends TestCase
         ;
         $serializeTransport = new InMemoryTransport($serializer);
         $serializeTransport->send($envelope);
-        $this->assertSame([$envelopeDecoded], $serializeTransport->get());
+        $this->assertEquals([$envelopeDecoded->with(new TransportMessageIdStamp(1))], $serializeTransport->get());
     }
 
     public function testGetUsesFetchSizeWhenProvided()
@@ -241,6 +249,42 @@ class InMemoryTransportTest extends TestCase
         $this->assertSame([$envelopeDecoded], $serializeTransport->getRejected());
     }
 
+    public function testAckAndRejectMessagesThatFailedToDecode()
+    {
+        $transport = new InMemoryTransport($this->createUndecodableSerializer());
+        $transport->send(new Envelope(new DummyMessage('Hello.')));
+        $transport->send(new Envelope(new DummyMessage('Hello.')));
+
+        [$first, $second] = $transport->get(2);
+        $transport->ack($first);
+        $transport->reject($second);
+
+        $this->assertSame([], $transport->get());
+    }
+
+    public function testWorkerSendsMessageThatFailedToDecodeToTheFailureTransport()
+    {
+        $serializer = $this->createUndecodableSerializer();
+        $transport = new InMemoryTransport($serializer);
+        $failureTransport = new InMemoryTransport();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+        $bus = new MessageBus([new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer]))]);
+
+        $transport->send(new Envelope(new DummyMessage('Hello.')));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame([], $transport->get());
+        $this->assertCount(1, $failed = $failureTransport->getSent());
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failed[0]->getMessage());
+    }
+
     public function testReset()
     {
         $envelope = new Envelope(new \stdClass());
@@ -254,5 +298,14 @@ class InMemoryTransportTest extends TestCase
         $this->assertSame([], $this->transport->getAcknowledged(), 'Should be empty after reset');
         $this->assertSame([], $this->transport->getRejected(), 'Should be empty after reset');
         $this->assertSame([], $this->transport->getSent(), 'Should be empty after reset');
+    }
+
+    private function createUndecodableSerializer(): SerializerInterface
+    {
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => 'undecodable']);
+        $serializer->method('decode')->willReturnCallback(static fn (array $encodedEnvelope) => MessageDecodingFailedException::wrap($encodedEnvelope, 'Cannot decode.'));
+
+        return $serializer;
     }
 }

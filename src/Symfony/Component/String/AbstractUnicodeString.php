@@ -562,6 +562,10 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function width(bool $ignoreAnsiDecoration = true): int
     {
+        if (!preg_match('/[^\x20-\x7E]/', $this->string)) {
+            return \strlen($this->string);
+        }
+
         $width = 0;
         $s = str_replace(["\x00", "\x05", "\x07"], '', $this->string);
 
@@ -633,6 +637,10 @@ abstract class AbstractUnicodeString extends AbstractString
      */
     private function wcswidth(string $string): int
     {
+        if (!preg_match('/[^\x20-\x7E]/', $string)) {
+            return \strlen($string);
+        }
+
         $width = 0;
         $lastChar = null;
         $lastWidth = null;

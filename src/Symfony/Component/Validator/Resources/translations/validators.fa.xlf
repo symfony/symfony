@@ -92,7 +92,7 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>این مقدار نباید خالی باشد.</target>
+                <target>این مقدار نباید تهی باشد.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
@@ -184,7 +184,7 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>فایل به صورت جزئی بارگذاری گردیده است.</target>
+                <target>فایل فقط به‌صورت جزئی بارگذاری شده است.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
@@ -260,7 +260,7 @@
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>این مقدار باید برابر {{ compared_value_type }} {{ compared_value }} باشد.</target>
+                <target>این مقدار باید با {{ compared_value_type }} {{ compared_value }} یکسان باشد.</target>
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
@@ -276,7 +276,7 @@
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>این مقدار نباید برابر {{ compared_value_type }} {{ compared_value }} باشد.</target>
+                <target>این مقدار نباید با {{ compared_value_type }} {{ compared_value }} یکسان باشد.</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>

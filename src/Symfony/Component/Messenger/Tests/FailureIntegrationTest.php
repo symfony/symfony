@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
@@ -38,11 +39,14 @@ use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -495,6 +499,43 @@ class FailureIntegrationTest extends TestCase
         // Stamps should not be dropped on message that's queued for retry
         $this->assertCount(1, $messagesWaiting);
         $this->assertSame('some.bus', $messagesWaiting[0]->last(BusNameStamp::class)?->getBusName());
+    }
+
+    public function testRetryThroughTransportUsingTheStandaloneSerializer()
+    {
+        $transport = new InMemoryTransport(Serializer::create());
+        $failureTransport = new InMemoryTransport(Serializer::create());
+
+        $calls = 0;
+        $handler = static function () use (&$calls) {
+            if (1 === ++$calls) {
+                throw new \RuntimeException('Failure from call 1');
+            }
+        };
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [$handler]]))]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new AddErrorDetailsStampListener());
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(3));
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame(2, $calls);
+        $this->assertSame([], $failureTransport->getSent());
+
+        $acknowledged = $transport->getAcknowledged();
+        $this->assertCount(1, $acknowledged);
+        $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($acknowledged[0]));
+        $this->assertSame('Failure from call 1', $acknowledged[0]->last(ErrorDetailsStamp::class)->getExceptionMessage());
     }
 }
 

@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
@@ -63,6 +64,23 @@ class SerializerTest extends TestCase
         ;
 
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
+    }
+
+    public function testEncodedWithErrorDetailsStampIsDecodable()
+    {
+        $serializer = Serializer::create();
+
+        $envelope = new Envelope(new DummyMessage('Hello'), [ErrorDetailsStamp::create(new \RuntimeException('Failure', 3, new \LogicException('Previous')))]);
+
+        $stamp = $serializer->decode($serializer->encode($envelope))->last(ErrorDetailsStamp::class);
+
+        $this->assertInstanceOf(ErrorDetailsStamp::class, $stamp);
+        $this->assertSame(\RuntimeException::class, $stamp->getExceptionClass());
+        $this->assertSame('Failure', $stamp->getExceptionMessage());
+        $this->assertSame(\RuntimeException::class, $stamp->getFlattenException()->getClass());
+        $this->assertSame('Failure', $stamp->getFlattenException()->getMessage());
+        $this->assertSame(\LogicException::class, $stamp->getFlattenException()->getPrevious()->getClass());
+        $this->assertSame('Previous', $stamp->getFlattenException()->getPrevious()->getMessage());
     }
 
     public function testSerializedMessageStampIsUsedForEncoding()

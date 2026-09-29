@@ -18,6 +18,6 @@ $wh->setMetadata([
     'x-swg-uid' => '02-589edd0e-b7f2-4a1d-a3ea-a333cb9aabc0',
     'x-transaction-id' => '861aad97-e4e8-4aaf-9322-1b64835760b9',
 ]);
-$wh->setDate(\DateTimeImmutable::createFromFormat(\DATE_ATOM, '2024-09-02T12:55:09+00:00'));
+$wh->setDate(\DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', '2024-09-02T12:55:09.416380+00:00'));
 
 return $wh;

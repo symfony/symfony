@@ -41,7 +41,10 @@ final class SweegoPayloadConverter implements PayloadConverterInterface
             $event = new MailerEngagementEvent($name, $payload['headers']['x-transaction-id'], $payload);
         }
 
-        if (!$date = \DateTimeImmutable::createFromFormat(\DATE_ATOM, $payload['timestamp'])) {
+        $date = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', $payload['timestamp'])
+            ?: \DateTimeImmutable::createFromFormat(\DATE_ATOM, $payload['timestamp']);
+
+        if (!$date) {
             throw new ParseException(\sprintf('Invalid date "%s".', $payload['timestamp']));
         }
 

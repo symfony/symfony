@@ -19,12 +19,13 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Alessandro Lai <alessandro.lai85@gmail.com>
  */
-class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInterface
+class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInterface, QueueReceiverInterface
 {
     public function __construct(
         private Connection $connection,
@@ -33,20 +34,34 @@ class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInt
     }
 
     /**
-     * @param int $fetchSize
+     * Fetches one message at a time, so a batch of $fetchSize messages is
+     * claimed as the worker consumes it, not before.
      *
-     * @return Envelope[]
+     * @return iterable<Envelope>
      */
-    public function get(/* int $fetchSize = 1 */): iterable
+    public function get(int $fetchSize = 1): iterable
     {
-        $fetchSize = \func_num_args() > 0 ? max(1, func_get_arg(0)) : 1;
-
-        $envelopes = [];
+        $fetchSize = max(1, $fetchSize);
         while ($fetchSize-- > 0 && null !== $document = $this->connection->get()) {
-            $envelopes[] = $this->createEnvelope($document);
+            yield $this->createEnvelope($document);
         }
+    }
 
-        return $envelopes;
+    /**
+     * Fetches one message at a time from the given queues, with a single server
+     * request per claimed message.
+     *
+     * @param string[] $queueNames
+     *
+     * @return iterable<Envelope>
+     */
+    public function getFromQueues(array $queueNames, int $fetchSize = 1): iterable
+    {
+        $queueNames = array_values($queueNames);
+        $fetchSize = max(1, $fetchSize);
+        while ($fetchSize-- > 0 && null !== $document = $this->connection->get($queueNames)) {
+            yield $this->createEnvelope($document);
+        }
     }
 
     public function ack(Envelope $envelope): void
@@ -112,7 +127,7 @@ class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInt
         }
 
         return $envelope->with(
-            new MongoDbReceivedStamp($documentId),
+            new MongoDbReceivedStamp($documentId, $document['queueName'] ?? null),
             new TransportMessageIdStamp($documentId)
         );
     }

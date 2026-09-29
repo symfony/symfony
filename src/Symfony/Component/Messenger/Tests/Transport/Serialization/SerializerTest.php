@@ -450,6 +450,30 @@ class SerializerTest extends TestCase
         $this->assertSame(2, $redeliveryStamp->getRetryCount());
     }
 
+    #[DataProvider('provideEnvelopesThatFailToDecodeWithARedeliveryStamp')]
+    public function testDecodingFailureKeepsTheStampsThatDecode(array $encodedEnvelope)
+    {
+        $envelope = (new Serializer())->decode($encodedEnvelope);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertSame(2, RedeliveryStamp::getRetryCountFromEnvelope($envelope));
+    }
+
+    public static function provideEnvelopesThatFailToDecodeWithARedeliveryStamp(): iterable
+    {
+        $headers = [
+            'type' => DummyMessage::class,
+            'X-Message-Stamp-'.RedeliveryStamp::class => '[{"retryCount":2,"redeliveredAt":"2026-08-03T11:47:47+00:00"}]',
+        ];
+
+        yield 'empty body' => [['body' => '', 'headers' => $headers]];
+        yield 'body "0"' => [['body' => '0', 'headers' => $headers]];
+        yield 'no type header' => [['body' => '{"message":"hello"}', 'headers' => array_diff_key($headers, ['type' => true])]];
+        yield 'stamp class not found' => [['body' => '{"message":"hello"}', 'headers' => $headers + ['X-Message-Stamp-App\NonExistentStamp' => '[{}]']]];
+        yield 'stamp header that is not a stamp' => [['body' => '{"message":"hello"}', 'headers' => $headers + ['X-Message-Stamp-'.DummyMessage::class => '[{"message":"injected"}]']]];
+        yield 'stamp that cannot be decoded' => [['body' => '{"message":"hello"}', 'headers' => $headers + ['X-Message-Stamp-'.SerializerStamp::class => '[{}]']]];
+    }
+
     public function testEncodingDecodeFailureWrapperReemitsOriginalPayload()
     {
         $serializer = new Serializer();

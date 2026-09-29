@@ -34,6 +34,7 @@ use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
+use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -775,6 +776,198 @@ class OidcTokenHandlerTest extends TestCase
             'https://provider1.example.com/jwks.json',
             'https://provider2.example.com/jwks.json',
         ], $requestedUrls);
+    }
+
+    public function testPinnedDiscoveryEndpointAcceptsTheIssuerItExpects()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://www.example.com', 'jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), ['https://www.example.com' => $httpClient], 'oidc_config');
+
+        $userBadge = $handler->getUserBadgeFrom(self::buildJWS(json_encode(self::getValidClaims())));
+
+        $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
+    }
+
+    #[DataProvider('getIssuersDifferingByATrailingSlash')]
+    public function testPinnedDiscoveryEndpointIgnoresATrailingSlash(string $expected, string $announced)
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['issuer' => $announced, 'jwks_uri' => 'https://samples.auth0.com/.well-known/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, [$announced], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), [$expected => $httpClient], 'oidc_config');
+
+        $userBadge = $handler->getUserBadgeFrom(self::buildJWS(json_encode(['iss' => $announced] + self::getValidClaims())));
+
+        $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
+    }
+
+    public static function getIssuersDifferingByATrailingSlash(): iterable
+    {
+        yield 'on both sides' => ['https://samples.auth0.com/', 'https://samples.auth0.com/'];
+        yield 'on the expected issuer' => ['https://samples.auth0.com/', 'https://samples.auth0.com'];
+        yield 'on the announced issuer' => ['https://samples.auth0.com', 'https://samples.auth0.com/'];
+    }
+
+    #[DataProvider('getIssuersNotMatchingThePin')]
+    public function testPinnedDiscoveryEndpointRejectsAnotherIssuer(array $configuration, string $announced)
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse($configuration + ['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com', 'https://other.example.com', 'https://www.example.com/tenant'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), ['https://www.example.com' => $httpClient], 'oidc_config');
+
+        try {
+            $handler->getUserBadgeFrom(self::buildJWS(json_encode(self::getValidClaims())));
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertSame(\sprintf('The OIDC provider announced the issuer "%s", which does not match the expected issuer "https://www.example.com".', $announced), $e->getPrevious()?->getMessage());
+        }
+    }
+
+    public static function getIssuersNotMatchingThePin(): iterable
+    {
+        yield 'another host' => [['issuer' => 'https://other.example.com'], 'https://other.example.com'];
+        yield 'a longer path' => [['issuer' => 'https://www.example.com/tenant'], 'https://www.example.com/tenant'];
+        yield 'no issuer' => [[], 'null'];
+        yield 'a non-string issuer' => [['issuer' => ['https://www.example.com']], 'array'];
+    }
+
+    public function testPinnedDiscoveryEndpointBindsItsKeysToTheExpectedIssuer()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://www.example.com', 'jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com', 'https://other.example.com'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), ['https://www.example.com' => $httpClient], 'oidc_config');
+
+        $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $handler->getUserBadgeFrom(self::buildJWS(json_encode(self::getValidClaims())))->getUserIdentifier());
+
+        try {
+            $handler->getUserBadgeFrom(self::buildJWS(json_encode(['iss' => 'https://other.example.com'] + self::getValidClaims())));
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertInstanceOf(InvalidSignatureException::class, $e->getPrevious());
+        }
+    }
+
+    public function testPinnedDiscoveryEndpointAcceptsAnIssuerOnAnotherHost()
+    {
+        $requestedUrls = [];
+        $httpClient = new MockHttpClient(static function ($method, $url) use (&$requestedUrls): JsonMockResponse {
+            $requestedUrls[] = $url;
+
+            if (str_contains($url, 'openid-configuration')) {
+                return new JsonMockResponse(['issuer' => 'https://sts.windows.net/tenant-id/', 'jwks_uri' => 'https://login.microsoftonline.com/common/discovery/keys']);
+            }
+
+            return new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]);
+        }, 'https://login.microsoftonline.com/tenant-id/');
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://sts.windows.net/tenant-id/'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), ['https://sts.windows.net/tenant-id/' => $httpClient], 'oidc_config');
+
+        $userBadge = $handler->getUserBadgeFrom(self::buildJWS(json_encode(['iss' => 'https://sts.windows.net/tenant-id/'] + self::getValidClaims())));
+
+        $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
+        $this->assertSame([
+            'https://login.microsoftonline.com/tenant-id/.well-known/openid-configuration',
+            'https://login.microsoftonline.com/common/discovery/keys',
+        ], $requestedUrls);
+    }
+
+    public function testPinnedAndUnpinnedDiscoveryEndpointsCanBeMixed()
+    {
+        $httpClient1 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider1.example.com', 'jwks_uri' => 'https://provider1.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+        $httpClient2 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider2.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://provider1.example.com', 'https://provider2.example.com'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), [$httpClient1, 'https://provider2.example.com' => $httpClient2], 'oidc_config');
+
+        $time = time();
+        foreach ([1 => self::getJWK(), 2 => self::getSecondJWK()] as $provider => $jwk) {
+            $userBadge = $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode([
+                'iat' => $time,
+                'nbf' => $time,
+                'exp' => $time + 3600,
+                'iss' => \sprintf('https://provider%d.example.com', $provider),
+                'aud' => self::AUDIENCE,
+                'sub' => 'user-from-provider'.$provider,
+            ]), $jwk));
+
+            $this->assertSame('user-from-provider'.$provider, $userBadge->getUserIdentifier());
+        }
+    }
+
+    public function testPinningDiscoveryEndpointsDoesNotReuseTheKeysCachedWithoutPins()
+    {
+        $httpClient1 = new MockHttpClient(static fn ($method, $url) => str_contains($url, 'openid-configuration')
+            ? new JsonMockResponse(['issuer' => 'https://other.example.com', 'jwks_uri' => 'https://other.example.com/jwks.json'])
+            : new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]])
+        );
+        $httpClient2 = new MockHttpClient(static fn ($method, $url) => str_contains($url, 'openid-configuration')
+            ? new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider2.example.com/jwks.json'])
+            : new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]])
+        );
+        $cache = new ArrayAdapter();
+        $issuers = ['https://www.example.com', 'https://other.example.com', 'https://provider2.example.com'];
+        $token = self::buildJWS(json_encode(['iss' => 'https://other.example.com'] + self::getValidClaims()));
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, $issuers, 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery($cache, [$httpClient1, $httpClient2], 'oidc_config');
+        $handler->getUserBadgeFrom($token);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, $issuers, 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery($cache, ['https://www.example.com' => $httpClient1, $httpClient2], 'oidc_config');
+
+        try {
+            $handler->getUserBadgeFrom($token);
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertSame('The OIDC provider announced the issuer "https://other.example.com", which does not match the expected issuer "https://www.example.com".', $e->getPrevious()?->getMessage());
+        }
+    }
+
+    public function testChangingThePinOfADiscoveryEndpointDoesNotReuseTheKeysCachedWithTheFormerOne()
+    {
+        $httpClient = new MockHttpClient(static fn ($method, $url) => str_contains($url, 'openid-configuration')
+            ? new JsonMockResponse(['issuer' => 'https://other.example.com', 'jwks_uri' => 'https://other.example.com/jwks.json'])
+            : new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]])
+        );
+        $cache = new ArrayAdapter();
+        $token = self::buildJWS(json_encode(['iss' => 'https://other.example.com'] + self::getValidClaims()));
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com', 'https://other.example.com'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery($cache, ['https://other.example.com' => $httpClient], 'oidc_config');
+        $handler->getUserBadgeFrom($token);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com', 'https://other.example.com'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery($cache, ['https://www.example.com' => $httpClient], 'oidc_config');
+
+        try {
+            $handler->getUserBadgeFrom($token);
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertSame('The OIDC provider announced the issuer "https://other.example.com", which does not match the expected issuer "https://www.example.com".', $e->getPrevious()?->getMessage());
+        }
     }
 
     private static function buildJWSWithKey(string $payload, JWK $jwk): string

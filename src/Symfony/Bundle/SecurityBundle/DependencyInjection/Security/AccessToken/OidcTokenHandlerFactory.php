@@ -61,10 +61,18 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
             // disable JWKSet argument
             $tokenHandlerDefinition->replaceArgument(1, null);
 
+            $checkIssuer = $config['discovery']['check_issuer'] ?? null;
             $clients = [];
             foreach ($config['discovery']['base_uri'] as $uri) {
-                $clients[] = (new ChildDefinition('security.access_token_handler.oidc_discovery.http_client'))
+                $client = (new ChildDefinition('security.access_token_handler.oidc_discovery.http_client'))
                     ->replaceArgument(0, ['base_uri' => $uri]);
+
+                if (null === $checkIssuer) {
+                    $clients[] = $client;
+                } else {
+                    // OIDC Discovery 1.0 §4.1 builds the discovery URL by appending the well-known path to the issuer
+                    $clients[$checkIssuer[$uri] ?? $uri] = $client;
+                }
             }
 
             $tokenHandlerDefinition->addMethodCall('enableDiscovery', [
@@ -142,6 +150,30 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                 ->children()
                     ->arrayNode('discovery')
                         ->info('Enable the OIDC discovery.')
+                        ->validate()
+                            ->always(static function (array $v): array {
+                                if (!isset($v['check_issuer'])) {
+                                    return $v;
+                                }
+
+                                if ($unknown = array_diff(array_keys($v['check_issuer']), $v['base_uri'])) {
+                                    throw new \InvalidArgumentException(\sprintf('The "check_issuer" option lists "%s", which is not a "base_uri".', implode('", "', $unknown)));
+                                }
+
+                                $issuers = [];
+                                foreach ($v['base_uri'] as $uri) {
+                                    $issuer = $v['check_issuer'][$uri] ?? $uri;
+
+                                    if (isset($issuers[$key = rtrim($issuer, '/')])) {
+                                        throw new \InvalidArgumentException(\sprintf('The "check_issuer" option expects the issuer "%s" from more than one "base_uri".', $issuer));
+                                    }
+
+                                    $issuers[$key] = true;
+                                }
+
+                                return $v;
+                            })
+                        ->end()
                         ->children()
                             ->arrayNode('base_uri')
                                 ->acceptAndWrap(['string'])
@@ -161,6 +193,16 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                             ->booleanNode('enforce_key_usage_verification')
                                 ->info('When enabled (default), only keys explicitly designated for signature (via "use":"sig" or a "key_ops" entry containing "sign"/"verify") are accepted. When disabled, keys without any usage designation are also accepted; keys explicitly restricted to encryption are still rejected.')
                                 ->defaultTrue()
+                            ->end()
+                            ->arrayNode('check_issuer')
+                                ->info('Whether the discovery document of each "base_uri" must announce that URL as its issuer, a trailing slash aside, so that its keys only verify the tokens of that issuer. A map from "base_uri" to issuer turns the check on and expects the given issuer from the listed ones instead.')
+                                ->useAttributeAsKey('base_uri')
+                                ->normalizeKeys(false)
+                                ->canBeUnset()
+                                ->defaultNull()
+                                ->treatNullLike(false)
+                                ->beforeNormalization()->ifTrue()->then(static fn () => [])->end()
+                                ->stringPrototype()->cannotBeEmpty()->end()
                             ->end()
                         ->end()
                     ->end()

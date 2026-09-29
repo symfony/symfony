@@ -26,6 +26,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AccessTok
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -474,6 +475,140 @@ class AccessTokenFactoryTest extends TestCase
     {
         yield 'enforced' => [true];
         yield 'not enforced' => [false];
+    }
+
+    #[DataProvider('provideDiscoveryIssuerChecks')]
+    public function testOidcTokenHandlerDiscoveryKeysTheClientsByTheIssuerTheyMustAnnounce(array $discovery, array $expectedBaseUris)
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'enforce_at_jwt_type' => false,
+                    'discovery' => $discovery + [
+                        'base_uri' => ['https://my-idp.example.com/', 'https://login.microsoftonline.com/tenant-id/'],
+                        'cache' => ['id' => 'oidc_cache'],
+                    ],
+                    'issuers' => ['https://my-idp.example.com/', 'https://sts.windows.net/tenant-id/'],
+                    'audience' => 'audience',
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $factory->createAuthenticator($container, 'firewall1', $this->processConfig($config, $factory), 'userprovider');
+
+        $methodCalls = $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls();
+        $this->assertSame('enableDiscovery', $methodCalls[0][0]);
+        $this->assertSame($expectedBaseUris, array_map(static fn (ChildDefinition $client) => $client->getArgument(0)['base_uri'], $methodCalls[0][1][1]));
+    }
+
+    public static function provideDiscoveryIssuerChecks(): iterable
+    {
+        $unchecked = [0 => 'https://my-idp.example.com/', 1 => 'https://login.microsoftonline.com/tenant-id/'];
+
+        yield 'omitted' => [[], $unchecked];
+        yield 'false' => [['check_issuer' => false], $unchecked];
+        yield 'null' => [['check_issuer' => null], $unchecked];
+        yield 'true' => [['check_issuer' => true], [
+            'https://my-idp.example.com/' => 'https://my-idp.example.com/',
+            'https://login.microsoftonline.com/tenant-id/' => 'https://login.microsoftonline.com/tenant-id/',
+        ]];
+        yield 'a map' => [['check_issuer' => ['https://login.microsoftonline.com/tenant-id/' => 'https://sts.windows.net/tenant-id/']], [
+            'https://my-idp.example.com/' => 'https://my-idp.example.com/',
+            'https://sts.windows.net/tenant-id/' => 'https://login.microsoftonline.com/tenant-id/',
+        ]];
+        yield 'a map keyed by a URL with a dash' => [['check_issuer' => ['https://my-idp.example.com/' => 'https://issuer.example.com']], [
+            'https://issuer.example.com' => 'https://my-idp.example.com/',
+            'https://login.microsoftonline.com/tenant-id/' => 'https://login.microsoftonline.com/tenant-id/',
+        ]];
+        yield 'an empty map' => [['check_issuer' => []], [
+            'https://my-idp.example.com/' => 'https://my-idp.example.com/',
+            'https://login.microsoftonline.com/tenant-id/' => 'https://login.microsoftonline.com/tenant-id/',
+        ]];
+    }
+
+    public function testOidcTokenHandlerDiscoveryIssuerChecksAreMergedByBaseUri()
+    {
+        $nodeDefinition = new ArrayNodeDefinition('access_token');
+        (new AccessTokenFactory($this->createTokenHandlerFactories()))->addConfiguration($nodeDefinition);
+
+        $config = (new Processor())->process($nodeDefinition->getNode(), [
+            [
+                'token_handler' => [
+                    'oidc' => [
+                        'enforce_at_jwt_type' => false,
+                        'discovery' => [
+                            'base_uri' => ['https://my-idp.example.com/', 'https://login.microsoftonline.com/tenant-id/'],
+                            'cache' => ['id' => 'oidc_cache'],
+                            'check_issuer' => ['https://my-idp.example.com/' => 'https://issuer.example.com'],
+                        ],
+                        'issuers' => ['https://issuer.example.com', 'https://sts.windows.net/tenant-id/'],
+                        'audience' => 'audience',
+                    ],
+                ],
+            ],
+            [
+                'token_handler' => [
+                    'oidc' => [
+                        'discovery' => [
+                            'check_issuer' => ['https://login.microsoftonline.com/tenant-id/' => 'https://sts.windows.net/tenant-id/'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame([
+            'https://my-idp.example.com/' => 'https://issuer.example.com',
+            'https://login.microsoftonline.com/tenant-id/' => 'https://sts.windows.net/tenant-id/',
+        ], $config['token_handler']['oidc']['discovery']['check_issuer']);
+    }
+
+    public function testOidcTokenHandlerDiscoveryRejectsAnIssuerCheckForAnotherUri()
+    {
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'enforce_at_jwt_type' => false,
+                    'discovery' => [
+                        'base_uri' => 'https://login.microsoftonline.com/tenant-id/',
+                        'cache' => ['id' => 'oidc_cache'],
+                        'check_issuer' => ['https://login.microsoftonline.com/other-tenant-id/' => 'https://sts.windows.net/tenant-id/'],
+                    ],
+                    'issuers' => ['https://sts.windows.net/tenant-id/'],
+                    'audience' => 'audience',
+                ],
+            ],
+        ];
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "access_token.token_handler.oidc.discovery": The "check_issuer" option lists "https://login.microsoftonline.com/other-tenant-id/", which is not a "base_uri".');
+
+        $this->processConfig($config, new AccessTokenFactory($this->createTokenHandlerFactories()));
+    }
+
+    public function testOidcTokenHandlerDiscoveryRejectsAnIssuerExpectedFromSeveralBaseUris()
+    {
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'enforce_at_jwt_type' => false,
+                    'discovery' => [
+                        'base_uri' => ['https://my-idp.example.com/', 'https://my-idp.example.com/v2/'],
+                        'cache' => ['id' => 'oidc_cache'],
+                        'check_issuer' => ['https://my-idp.example.com/v2/' => 'https://my-idp.example.com'],
+                    ],
+                    'issuers' => ['https://my-idp.example.com/'],
+                    'audience' => 'audience',
+                ],
+            ],
+        ];
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "access_token.token_handler.oidc.discovery": The "check_issuer" option expects the issuer "https://my-idp.example.com" from more than one "base_uri".');
+
+        $this->processConfig($config, new AccessTokenFactory($this->createTokenHandlerFactories()));
     }
 
     public function testOidcUserInfoTokenHandlerConfigurationWithExistingClient()

@@ -93,6 +93,11 @@ final class SweegoApiTransport extends AbstractApiTransport
             'channel' => 'email',
         ];
 
+        // Sweego API supports a single reply-to address
+        if ($replyTo = $email->getReplyTo()) {
+            $payload['reply-to'] = $this->formatAddress($replyTo[0]);
+        }
+
         if ($email->getTextBody()) {
             $payload['message-txt'] = $email->getTextBody();
         }
@@ -145,7 +150,7 @@ final class SweegoApiTransport extends AbstractApiTransport
         $headersPrepared = [];
         foreach ($headers->all() as $header) {
             // Sweego API does not accept those headers.
-            if (\in_array($header->getName(), ['To', 'From', 'Subject'], true)) {
+            if (\in_array($header->getName(), ['To', 'From', 'Subject', 'Reply-To'], true)) {
                 continue;
             }
 

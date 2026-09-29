@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -59,6 +60,10 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Normali
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): FlattenException
     {
+        if (!isset($data['message'], $data['code'], $data['headers'], $data['class'], $data['file'], $data['line'], $data['status_text'], $data['trace'], $data['trace_as_string'])) {
+            throw new NotNormalizableValueException(\sprintf('The data is not a valid "%s" representation.', FlattenException::class));
+        }
+
         $object = new FlattenException();
 
         $object->setMessage($data['message']);

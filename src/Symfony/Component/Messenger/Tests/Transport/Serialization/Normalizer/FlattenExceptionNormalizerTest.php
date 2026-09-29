@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 /**
  * @author Pascal Luna <skalpa@zetareticuli.org>
@@ -157,6 +158,24 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->assertSame($normalized['previous']['message'], $previous->getMessage());
         $this->assertSame($normalized['previous']['code'], $previous->getCode());
         $this->assertSame($normalized['previous']['status_text'], $previous->getStatusText());
+    }
+
+    public function testDenormalizeInvalidData()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+
+        // keys as ObjectNormalizer writes them
+        $this->normalizer->denormalize([
+            'message' => 'Something went foobar.',
+            'code' => 42,
+            'headers' => [],
+            'class' => static::class,
+            'file' => 'foo.php',
+            'line' => 123,
+            'statusText' => 'Internal Server Error',
+            'trace' => [],
+            'traceAsString' => '',
+        ], FlattenException::class);
     }
 
     private function getMessengerContext(): array

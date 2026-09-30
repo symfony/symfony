@@ -224,7 +224,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])
-            ->replaceArgument(6, $resourceMetadataUri = isset($config['resource_metadata']) ? $this->createResourceMetadata($container, $firewallName, $config['resource_metadata'], $config['token_extractors']) : null)
+            ->replaceArgument(6, $resourceMetadataUri = isset($config['resource_metadata']) ? $this->createResourceMetadata($container, $firewallName, $config['resource_metadata'], $config['token_extractors'], $config['dpop']) : null)
             ->replaceArgument(7, $senderConstraintId ? new Reference($senderConstraintId) : null)
         ;
 
@@ -308,7 +308,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
      *
      * @param array<string> $extractors
      */
-    private function createResourceMetadata(ContainerBuilder $container, string $firewallName, array $config, array $extractors): string
+    private function createResourceMetadata(ContainerBuilder $container, string $firewallName, array $config, array $extractors, array $dpop): string
     {
         $parts = null === $config['resource'] ? [] : parse_url($config['resource']);
         $origin = isset($parts['scheme'], $parts['host']) ? $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '') : null;
@@ -340,6 +340,8 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             'resource_documentation' => $config['resource_documentation'],
             'resource_policy_uri' => $config['resource_policy_uri'],
             'resource_tos_uri' => $config['resource_tos_uri'],
+            'dpop_signing_alg_values_supported' => $dpop['enabled'] ? $dpop['algorithms'] : null,
+            'dpop_bound_access_tokens_required' => $dpop['enabled'] ?: null,
         ];
 
         $controller = $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller');

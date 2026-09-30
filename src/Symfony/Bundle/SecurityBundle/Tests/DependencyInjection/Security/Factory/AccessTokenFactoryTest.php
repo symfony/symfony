@@ -1038,6 +1038,39 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertSame(['header'], $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller')->getArgument(0)['firewall1']['bearer_methods_supported']);
     }
 
+    public function testTheResourceMetadataOfADpopFirewallAnnouncesThatItRequiresBoundTokens()
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig([
+            'token_handler' => 'in_memory_token_handler_service_id',
+            'dpop' => ['algorithms' => ['ES256', 'PS256']],
+            'resource_metadata' => ['resource' => 'https://api.example.com'],
+        ], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $metadata = $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller')->getArgument(0)['firewall1'];
+        $this->assertSame(['ES256', 'PS256'], $metadata['dpop_signing_alg_values_supported']);
+        $this->assertTrue($metadata['dpop_bound_access_tokens_required']);
+    }
+
+    public function testTheResourceMetadataOfABearerFirewallSaysNothingOfDpop()
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig([
+            'token_handler' => 'in_memory_token_handler_service_id',
+            'resource_metadata' => ['resource' => 'https://api.example.com'],
+        ], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $metadata = $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller')->getArgument(0)['firewall1'];
+        $this->assertArrayNotHasKey('dpop_signing_alg_values_supported', $metadata);
+        $this->assertArrayNotHasKey('dpop_bound_access_tokens_required', $metadata);
+    }
+
     public function testNoResourceMetadataIsServedByDefault()
     {
         $container = $this->createContainerBuilder();

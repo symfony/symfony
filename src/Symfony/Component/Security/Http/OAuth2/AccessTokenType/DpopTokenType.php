@@ -146,9 +146,11 @@ final class DpopTokenType implements AccessTokenTypeInterface
         }
 
         // the token endpoint says it in the error of a JSON body, a resource such as the
-        // UserInfo endpoint in the challenge it answers with
-        if (str_contains(implode(' ', $response->getHeaders(false)['www-authenticate'] ?? []), self::NONCE_ERROR)) {
-            return true;
+        // UserInfo endpoint in the "error" parameter of the challenge it answers with
+        foreach ($response->getHeaders(false)['www-authenticate'] ?? [] as $challenge) {
+            if (preg_match('/(?:^|[\s,])error\s*=\s*(?:"'.self::NONCE_ERROR.'"|'.self::NONCE_ERROR.')\s*(?:,|$)/', $challenge)) {
+                return true;
+            }
         }
 
         try {

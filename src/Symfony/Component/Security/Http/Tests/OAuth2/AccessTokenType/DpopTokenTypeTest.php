@@ -129,6 +129,16 @@ class DpopTokenTypeTest extends TestCase
         $this->assertTrue($this->createTokenType()->onResponse($response, 'https://resource.example.com/userinfo'));
     }
 
+    public function testAChallengeNamingAnotherErrorAsksForNothing()
+    {
+        $response = self::respond(new MockResponse('', [
+            'http_code' => 401,
+            'response_headers' => ['WWW-Authenticate' => 'DPoP error="invalid_token", error_description="the token expired, use_dpop_nonce would not help"', 'DPoP-Nonce' => 'nonce-1'],
+        ]));
+
+        $this->assertFalse($this->createTokenType()->onResponse($response, 'https://resource.example.com/userinfo'));
+    }
+
     /**
      * Sending the same proof again would be refused for the same reason.
      */

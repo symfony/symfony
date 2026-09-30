@@ -13,6 +13,7 @@ namespace Symfony\Component\KeyManagement\Bridge\DoctrineDbal;
 
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
@@ -34,6 +35,13 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * works that way, a `BLOB` column read back by pdo_pgsql or a
  * {@see \Doctrine\DBAL\Types\BlobType} handing its value over. Both paths
  * settle it into bytes before doing anything else with it.
+ *
+ * A value of zero bytes is not an envelope and is rejected rather than handed
+ * to the parent Type, so that nothing reaches it without being authenticated.
+ * An empty plaintext is unaffected, since it is written as a non-empty
+ * envelope like any other value. Anything that does not frame an envelope
+ * is reported as a {@see ValueNotConvertible}, which is how a Type is
+ * expected to report a stored value it cannot read.
  *
  * What `$key` names, and what a row ends up carrying, is decided by the
  * encrypter given to this type, exactly as {@see EnvelopeEncrypterInterface}
@@ -109,14 +117,11 @@ class EncryptedType extends Type
         }
 
         $bytes = self::bytes($value);
-        if ('' === $bytes) {
-            return $this->parentType->convertToPHPValue($bytes, $platform);
-        }
 
         try {
             $envelope = Envelope::fromBytes($bytes);
         } catch (InvalidArgumentException $e) {
-            throw new InvalidArgumentException('Stored value is not a valid KeyManagement envelope.', previous: $e);
+            throw new ValueNotConvertible('Stored value is not a valid KeyManagement envelope.', 0, $e);
         }
 
         return $this->parentType->convertToPHPValue($this->envelopes->decrypt($envelope), $platform);

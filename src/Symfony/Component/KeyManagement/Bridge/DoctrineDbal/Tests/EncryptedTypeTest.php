@@ -17,12 +17,14 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\BlobType;
+use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
 use Doctrine\DBAL\Types\FloatType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Envelope;
@@ -177,11 +179,25 @@ class EncryptedTypeTest extends TestCase
         $this->assertSame('jane@example.com', $type->convertToPHPValue(self::asStream($encrypted), $this->platform));
     }
 
-    public function testAnEmptyColumnHandedBackAsAStreamGoesToTheParentType()
+    #[TestWith([false], 'an empty string')]
+    #[TestWith([true], 'an empty stream, as pdo_pgsql hands a BLOB over')]
+    public function testAnEmptyColumnIsRejectedInsteadOfGoingToTheParentType(bool $asStream)
     {
         $type = $this->makeType(new StringType());
 
-        $this->assertSame('', $type->convertToPHPValue(self::asStream(''), $this->platform));
+        $this->expectException(ValueNotConvertible::class);
+        $this->expectExceptionMessage('not a valid KeyManagement envelope');
+        $type->convertToPHPValue($asStream ? self::asStream('') : '', $this->platform);
+    }
+
+    public function testAnEmptyPlaintextRoundTripsThroughAnEnvelope()
+    {
+        $type = $this->makeType(new StringType());
+
+        $encrypted = $type->convertToDatabaseValue('', $this->platform);
+
+        $this->assertNotSame('', $encrypted, 'An empty plaintext is framed and authenticated like any other.');
+        $this->assertSame('', $type->convertToPHPValue($encrypted, $this->platform));
     }
 
     public function testABlobParentHandsItsValueOverAsAStream()
@@ -197,7 +213,7 @@ class EncryptedTypeTest extends TestCase
     {
         $type = $this->makeType(new StringType());
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValueNotConvertible::class);
         $this->expectExceptionMessage('not a valid KeyManagement envelope');
         $type->convertToPHPValue('not-an-envelope', $this->platform);
     }

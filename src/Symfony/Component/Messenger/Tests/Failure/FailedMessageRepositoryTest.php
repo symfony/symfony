@@ -241,7 +241,7 @@ class FailedMessageRepositoryTest extends TestCase
     public function testRedispatchDoesNotPutTheStampsOfAnUnverifiedFailureOnTheSignedMessageItDecodesTo()
     {
         $phpSerializer = new PhpSerializer();
-        $encodedFailure = $phpSerializer->encode(new Envelope(new MessageDecodingFailedException('Could not retrieve the claim.', 0, null, ['body' => 'claim']), [new SentToFailureTransportStamp('async'), new BusNameStamp('failed_bus')]));
+        $encodedFailure = $phpSerializer->encode(new Envelope(new MessageDecodingFailedException('Could not retrieve the claim.', 0, null, ['body' => 'claim']), [new SentToFailureTransportStamp('async'), new RedeliveryStamp(3)]));
         $envelope = (new SigningSerializer($phpSerializer, 'signing-key', [DummyMessage::class]))->decode($encodedFailure)->with(new TransportMessageIdStamp(15));
 
         $serializer = $this->createStub(SerializerInterface::class);
@@ -258,6 +258,7 @@ class FailedMessageRepositoryTest extends TestCase
 
         $this->assertCount(1, $sent = $async->getSent());
         $this->assertSame(['the_bus'], array_map(static fn (BusNameStamp $stamp): string => $stamp->getBusName(), $sent[0]->all(BusNameStamp::class)));
+        $this->assertSame([], $sent[0]->all(RedeliveryStamp::class));
     }
 
     public function testRedispatchWithoutABusIsRejected()

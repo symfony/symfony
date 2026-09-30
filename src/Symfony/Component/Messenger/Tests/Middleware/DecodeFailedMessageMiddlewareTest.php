@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
@@ -169,7 +170,7 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
 
     public function testItKeepsOnlyTheLocalStampsOfAnUnverifiedFailureThatDecodesToASignedMessage()
     {
-        $envelope = $this->handleUnverifiedFailure(new DummyMessage('decoded'));
+        $envelope = $this->handleUnverifiedFailure(new DummyMessage('decoded'), 'the_bus');
 
         $this->assertInstanceOf(DummyMessage::class, $envelope->getMessage());
         $this->assertSame(['the_bus'], array_map(static fn (BusNameStamp $stamp): string => $stamp->getBusName(), $envelope->all(BusNameStamp::class)));
@@ -180,9 +181,17 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertCount(1, $envelope->all(AckStamp::class));
     }
 
+    public function testItRejectsAnUnverifiedFailureOnAnotherBusThanTheSignedMessageItDecodesTo()
+    {
+        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectExceptionMessage('the message belongs to the "the_bus" bus');
+
+        $this->handleUnverifiedFailure(new DummyMessage('decoded'), 'failed_bus');
+    }
+
     public function testItKeepsTheStampsOfAnUnverifiedFailureThatDecodesToAMessageWithoutSignature()
     {
-        $envelope = $this->handleUnverifiedFailure(new \stdClass());
+        $envelope = $this->handleUnverifiedFailure(new \stdClass(), 'failed_bus');
 
         $this->assertInstanceOf(\stdClass::class, $envelope->getMessage());
         $this->assertSame(['failed_bus'], array_map(static fn (BusNameStamp $stamp): string => $stamp->getBusName(), $envelope->all(BusNameStamp::class)));
@@ -264,10 +273,10 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $middleware->handle($envelope, new StackMiddleware());
     }
 
-    private function handleUnverifiedFailure(object $decodedMessage): Envelope
+    private function handleUnverifiedFailure(object $decodedMessage, string $failureBusName): Envelope
     {
         $phpSerializer = new PhpSerializer();
-        $encodedFailure = $phpSerializer->encode(new Envelope(new MessageDecodingFailedException('Could not retrieve the claim.', 0, null, ['body' => 'claim']), [new BusNameStamp('failed_bus'), new RedeliveryStamp(1), new TransportMessageIdStamp('failed_id'), new SentToFailureTransportStamp('async')]));
+        $encodedFailure = $phpSerializer->encode(new Envelope(new MessageDecodingFailedException('Could not retrieve the claim.', 0, null, ['body' => 'claim']), [new BusNameStamp($failureBusName), new RedeliveryStamp(1), new TransportMessageIdStamp('failed_id'), new SentToFailureTransportStamp('async')]));
         $failure = (new SigningSerializer($phpSerializer, 'signing-key', [DummyMessage::class]))->decode($encodedFailure);
         $this->assertInstanceOf(MessageDecodingFailedException::class, $failure->getMessage());
 

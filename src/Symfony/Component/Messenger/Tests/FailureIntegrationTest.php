@@ -581,7 +581,7 @@ class FailureIntegrationTest extends TestCase
             'body' => json_encode(['id' => 'claim', 'digest' => hash('sha256', $claimedData)]),
             'headers' => ['X-Symfony-Messenger-Claim-Check' => '1', 'X-Symfony-Messenger-Claim-Check-Type' => DummyMessage::class],
         ];
-        $forgedStamps = [new SentToFailureTransportStamp('transport'), new BusNameStamp('forged_bus'), new HandledStamp(null, DummyTestHandler::class.'::__invoke')];
+        $forgedStamps = [new SentToFailureTransportStamp('transport'), new HandledStamp(null, DummyTestHandler::class.'::__invoke')];
         // a claim that could not be retrieved is sent again unsigned: this forged failure looks the same
         $forgedFailure = $inner->encode(new Envelope(new MessageDecodingFailedException('Forged.', 0, null, $claim), $forgedStamps));
         $failureTransport = new SerializingFailureTestSenderAndReceiver($failureTransportHasClaimCheck ? $serializer : $signingSerializer, [$forgedFailure]);
@@ -612,6 +612,67 @@ class FailureIntegrationTest extends TestCase
         yield 'PHP' => [new PhpSerializer(), false];
         yield 'PHP with claim check' => [new PhpSerializer(), true];
         yield 'JSON with claim check' => [new Serializer(), true];
+    }
+
+    #[DataProvider('provideUnverifiedFailuresOfSignedClaims')]
+    public function testUnverifiedFailureIsHandledOnlyOnTheBusOfTheSignedMessageOfItsClaim(SerializerInterface $inner, ?string $failureBusName, ?string $workerBusName, array $expectedCalls)
+    {
+        $signingSerializer = new SigningSerializer($inner, 'signing-key', [DummyMessage::class]);
+        $claimedData = serialize($signingSerializer->encode(new Envelope(new DummyMessage('API'), [new BusNameStamp('command.bus')])));
+        $item = $this->createStub(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(true);
+        $item->method('get')->willReturn($claimedData);
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturn($item);
+        $serializer = new ClaimCheckSerializer($signingSerializer, $pool, 1000);
+        $claim = [
+            'body' => json_encode(['id' => 'claim', 'digest' => hash('sha256', $claimedData)]),
+            'headers' => ['X-Symfony-Messenger-Claim-Check' => '1', 'X-Symfony-Messenger-Claim-Check-Type' => DummyMessage::class, 'X-Symfony-Messenger-Claim-Check-Bus' => 'command.bus'],
+        ];
+        // a claim that could not be retrieved is sent again unsigned: anyone can write the same failure with another bus name
+        $failure = $inner->encode(new Envelope(new MessageDecodingFailedException('Unable to retrieve the claim check.', 0, null, $claim), null === $failureBusName ? [] : [new BusNameStamp($failureBusName)]));
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$failure]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($serializer, []);
+        $serializerLocator = new ServiceLocator(['transport' => static fn () => $serializer]);
+
+        $calls = [];
+        $buses = [];
+        foreach (['command.bus', 'event.bus'] as $busName) {
+            $buses[$busName] = new MessageBus([
+                new AddBusNameStampMiddleware($busName),
+                new DecodeFailedMessageMiddleware($serializerLocator),
+                new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () use (&$calls, $busName) { $calls[] = $busName; }]])),
+            ]);
+        }
+        $bus = new RoutableMessageBus(new ServiceLocator(['command.bus' => static fn () => $buses['command.bus'], 'event.bus' => static fn () => $buses['event.bus']]), $buses['event.bus']);
+
+        $throwables = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(2, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$throwables) {
+            $throwables[] = $event->getThrowable()::class;
+        });
+
+        (new Worker(['transport' => $transport], null === $workerBusName ? $bus : $buses[$workerBusName], $dispatcher))->run();
+
+        $this->assertSame($expectedCalls, $calls);
+        $this->assertSame($expectedCalls ? [] : [InvalidMessageSignatureException::class], $throwables);
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount($expectedCalls ? 0 : 1, $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    public static function provideUnverifiedFailuresOfSignedClaims(): iterable
+    {
+        foreach (['JSON' => new Serializer(), 'PHP' => new PhpSerializer()] as $format => $inner) {
+            yield $format.', on the bus of its message' => [$inner, 'command.bus', null, ['command.bus']];
+            yield $format.', naming another bus' => [$inner, 'event.bus', null, []];
+            yield $format.', naming no bus' => [$inner, null, null, []];
+        }
+
+        yield 'worker with a bus, on the bus of its message' => [new Serializer(), 'command.bus', 'event.bus', ['event.bus']];
+        yield 'worker with a bus, naming another bus' => [new Serializer(), 'event.bus', 'command.bus', []];
     }
 
     public function testRetryThroughTransportUsingTheStandaloneSerializer()

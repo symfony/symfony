@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
@@ -65,20 +66,23 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Normali
         $object = new FlattenException();
 
         $object->setMessage($data['message']);
-        $object->setCode($data['code']);
+        // the XML encoder decodes an int as a string
+        $object->setCode(XmlEncoder::FORMAT === $format && (string) (int) $data['code'] === $data['code'] ? (int) $data['code'] : $data['code']);
         $object->setStatusCode($data['status'] ?? 500);
         $object->setClass($data['class']);
         $object->setFile($data['file']);
         $object->setLine($data['line']);
         $object->setStatusText($data['status_text']);
-        $object->setHeaders((array) $data['headers']);
+        // the XML encoder decodes an empty array or null as an empty string, and a list of one frame as the frame itself
+        $object->setHeaders('' === $data['headers'] ? [] : (array) $data['headers']);
 
-        if (isset($data['previous'])) {
+        if (isset($data['previous']) && '' !== $data['previous']) {
             $object->setPrevious($this->denormalize($data['previous'], $type, $format, $context));
         }
 
+        $trace = '' === $data['trace'] ? [] : (array) $data['trace'];
         $property = new \ReflectionProperty(FlattenException::class, 'trace');
-        $property->setValue($object, (array) $data['trace']);
+        $property->setValue($object, array_is_list($trace) ? $trace : [$trace]);
 
         $property = new \ReflectionProperty(FlattenException::class, 'traceAsString');
         $property->setValue($object, $data['trace_as_string']);

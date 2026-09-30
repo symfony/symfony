@@ -749,6 +749,15 @@ class DumperTest extends TestCase
         yield 'custom indentation' => [" \n# comment\ntext", 2];
     }
 
+    public function testDumpSingleLineBreakAsMultiLineLiteralBlock()
+    {
+        $data = ['a' => "\n", 'b' => ['c' => "\n"], 'd' => ["\n"]];
+        $yml = $this->dumper->dump($data, 3, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $this->assertSame("a: |+\n\nb:\n    c: |+\n\nd:\n    - |+\n\n", $yml);
+        $this->assertSame($data, $this->parser->parse($yml));
+    }
+
     public function testCarriageReturnFollowedByNewlineIsMaintainedWhenDumpingAsMultiLineLiteralBlock()
     {
         $data = ["a\r\nb\nc"];

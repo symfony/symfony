@@ -73,7 +73,8 @@ class Dumper
                 if (Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && \is_string($value) && str_contains($value, "\n") && !str_contains($value, "\r")) {
                     $blockIndentationIndicator = $this->getBlockIndentationIndicator($value);
 
-                    if (isset($value[-2]) && "\n" === $value[-2] && "\n" === $value[-1]) {
+                    // a block made of line breaks only has no content, so only the keep indicator preserves them
+                    if ("\n" === $value || isset($value[-2]) && "\n" === $value[-2] && "\n" === $value[-1]) {
                         $blockChompingIndicator = '+';
                     } elseif ("\n" === $value[-1]) {
                         $blockChompingIndicator = '';

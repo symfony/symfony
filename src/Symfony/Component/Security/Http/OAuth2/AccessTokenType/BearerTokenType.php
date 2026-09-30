@@ -24,10 +24,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * @see https://datatracker.ietf.org/doc/html/rfc6750 The OAuth 2.0 Authorization Framework: Bearer Token Usage
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
+ *
+ * @internal
  */
 final class BearerTokenType implements AccessTokenTypeInterface
 {
-    public const TOKEN_TYPE = 'Bearer';
+    private const TOKEN_TYPE = 'Bearer';
 
     public function getTokenType(): string
     {

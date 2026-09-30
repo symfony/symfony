@@ -26,10 +26,17 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * @see https://datatracker.ietf.org/doc/html/rfc9449 OAuth 2.0 Demonstrating Proof of Possession (DPoP)
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
+ *
+ * @internal
  */
 final class DpopTokenType implements AccessTokenTypeInterface
 {
-    public const TOKEN_TYPE = 'DPoP';
+    private const TOKEN_TYPE = 'DPoP';
+
+    /**
+     * The header a server names a nonce in, Section 8.
+     */
+    private const NONCE_HEADER = 'dpop-nonce';
 
     /**
      * The error a server answers when it wants the next proof to carry a nonce of its own,
@@ -105,7 +112,7 @@ final class DpopTokenType implements AccessTokenTypeInterface
     {
         $origin = self::origin($url);
         $previous = $this->nonces[$origin] ?? null;
-        $nonce = $response->getHeaders(false)[DpopProofFactory::NONCE_HEADER][0] ?? null;
+        $nonce = $response->getHeaders(false)[self::NONCE_HEADER][0] ?? null;
 
         if (\is_string($nonce) && '' !== $nonce) {
             $this->nonces[$origin] = $nonce;

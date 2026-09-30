@@ -32,6 +32,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * @see https://datatracker.ietf.org/doc/html/rfc6749#section-7.1 Access token types
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
+ *
+ * @internal
  */
 interface AccessTokenTypeInterface
 {

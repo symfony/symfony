@@ -502,9 +502,6 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ];
         }
 
-        // the kind of access token the client asks for: a bearer token unless it holds a key
-        // to bind one to, which OidcClient defaults to on its own
-        $accessTokenType = null;
         $dpopProofFactory = null;
         if (isset($config['dpop'])) {
             $dpopProofFactoryId = 'security.authenticator.oidc_login.dpop.'.$firewallName;
@@ -514,13 +511,6 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->replaceArgument(1, $config['dpop']['algorithm'])
             ;
             $dpopProofFactory = new Reference($dpopProofFactoryId);
-
-            $accessTokenTypeId = 'security.authenticator.oidc_login.access_token_type.'.$firewallName;
-            $container
-                ->setDefinition($accessTokenTypeId, new ChildDefinition('security.oauth2.access_token_type.dpop'))
-                ->replaceArgument(0, $dpopProofFactory)
-            ;
-            $accessTokenType = new Reference($accessTokenTypeId);
         }
 
         $oidcClientId = 'security.authenticator.oidc_login.client.'.$firewallName;
@@ -531,7 +521,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(2, $config['client_id'])
             ->replaceArgument(3, new Reference($this->createClientAuthentication($container, $firewallName, $config['client_authentication'], new Reference($discoveryId))))
             ->replaceArgument(4, $certificateOptions)
-            ->replaceArgument(5, $accessTokenType)
+            ->replaceArgument(5, $dpopProofFactory)
         ;
 
         $signatureVerifier = null;

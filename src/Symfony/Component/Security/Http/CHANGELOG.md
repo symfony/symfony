@@ -12,6 +12,8 @@ CHANGELOG
  * Add `DpopTokenType` and `DpopProofFactory`, which bind what the provider issues to a key the client holds (RFC 9449): every request carries a proof signed for it, the token is presented under the `DPoP` scheme, a token the provider did not bind is refused (§5), each server keeps its own nonce (§9), and `OidcLoginAuthenticator` names the key in the `dpop_jkt` of the authorization request
  * Add `AccessTokenTypeInterface`, `BearerTokenType` and `DpopTokenType`, and the `$accessTokenType` argument to `OidcClient`
  * Add `DpopProofFactory` and the `$dpopProofFactory` argument to `OidcLoginAuthenticator`, to bind the tokens of an OIDC provider to a key the client holds (RFC 9449)
+ * Add `DpopProofFactory`, to bind the tokens of an OIDC provider to a key the client holds (RFC 9449)
+ * Add the `$dpopProofFactory` argument to `OidcClient` and `OidcLoginAuthenticator`
  * Add the `$discovery` argument to `ClientSecretJwt` and `PrivateKeyJwt`, and `OidcDiscovery::getIssuer()`
  * Support the OAuth 2.0 Form Post Response Mode in `OidcLoginAuthenticator`, reading the authorization response from the request body
  * Add `RefreshedUserCheckerListener`, running a user checker on `CheckRefreshedUserEvent` so an account disabled during a session is rejected on the next request

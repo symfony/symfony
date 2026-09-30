@@ -24,8 +24,6 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
-use Symfony\Component\Security\Http\OAuth2\AccessTokenType\BearerTokenType;
-use Symfony\Component\Security\Http\OAuth2\AccessTokenType\DpopTokenType;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
@@ -825,7 +823,7 @@ class OidcClientTest extends TestCase
     {
         // Given
         $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
-        $client = new OidcClient(new MockHttpClient($mockResponse), $this->discovery, 'client-id', new NoClientAuthentication(), new BearerTokenType());
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->discovery, 'client-id', new NoClientAuthentication());
 
         // When
         $tokens = $client->exchangeCode('auth-code', 'https://app.example.com/callback', 'a-code-verifier');
@@ -893,7 +891,7 @@ class OidcClientTest extends TestCase
             'client-id',
             $clientAuthentication ?? new NoClientAuthentication(),
             [],
-            new DpopTokenType(new DpopProofFactory(new JWK(self::DPOP_JWK), 'ES256')),
+            new DpopProofFactory(new JWK(self::DPOP_JWK), 'ES256'),
         );
     }
 

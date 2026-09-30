@@ -43,12 +43,7 @@ final class DpopProofFactory
      * The "typ" of a proof, which Section 4.2 requires and a provider checks so that a JWT
      * signed for anything else cannot be presented as one.
      */
-    public const TYPE = 'dpop+jwt';
-
-    /**
-     * The header a provider names a nonce in, Section 8.
-     */
-    public const NONCE_HEADER = 'dpop-nonce';
+    private const TYPE = 'dpop+jwt';
 
     private readonly ClockInterface $clock;
     private readonly Algorithm $algorithm;

@@ -1656,23 +1656,14 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame(self::SIGNING_KEY, $proofFactory->getArgument(0)->getArgument(0));
 
         $reference = new Reference('security.authenticator.oidc_login.dpop.main');
-        // the authenticator signs the "dpop_jkt" of the authorization request with the key
+        $this->assertEquals($reference, $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
         $this->assertEquals($reference, $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
-
-        // the client asks for a token of the DPoP type, which is what holds the proof factory
-        $accessTokenType = $container->getDefinition('security.authenticator.oidc_login.access_token_type.main');
-        $this->assertSame('security.oauth2.access_token_type.dpop', $accessTokenType->getParent());
-        $this->assertEquals($reference, $accessTokenType->getArgument(0));
-        $this->assertEquals(
-            new Reference('security.authenticator.oidc_login.access_token_type.main'),
-            $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4),
-        );
     }
 
     /**
      * A firewall that binds nothing to a key asks for the bearer token the client defaults to.
      */
-    public function testNoAccessTokenTypeIsWiredWithoutDpop()
+    public function testNoDpopProofFactoryIsWiredWithoutDpop()
     {
         // Given
         $container = new ContainerBuilder();
@@ -1687,8 +1678,9 @@ class OidcLoginFactoryTest extends TestCase
         $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
 
         // Then
-        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.access_token_type.main'));
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.dpop.main'));
         $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
     }
 
     public function testTheDpopNodeTakesTheKeyAlone()

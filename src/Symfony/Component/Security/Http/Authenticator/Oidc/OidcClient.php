@@ -15,7 +15,9 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
 use Symfony\Component\Security\Http\OAuth2\AccessTokenType\AccessTokenTypeInterface;
 use Symfony\Component\Security\Http\OAuth2\AccessTokenType\BearerTokenType;
+use Symfony\Component\Security\Http\OAuth2\AccessTokenType\DpopTokenType;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
+use Symfony\Component\Security\Http\OAuth2\Dpop\DpopProofFactory;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -33,10 +35,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * The client certificate is not part of that dependency, since a client may present one without authenticating with it (RFC 8705 §4).
  * It is sent with each request made here, and these requests then go to the mutual-TLS aliases of the endpoints (RFC 8705 §5).
  *
- * What kind of access token it asks for is another such property (RFC 6749 §7.1): the type
- * says what the provider must answer, how a token is presented, and what has to be proven
- * along the way, so that a bearer token (RFC 6750) and a token bound to a key the client
- * holds (RFC 9449) are the same client with a different dependency here as well.
+ * What kind of access token it asks for is another such property (RFC 6749 §7.1): a bearer token (RFC 6750),
+ * or a token bound to the key a DPoP proof factory signs with (RFC 9449) when one is given.
  *
  * @see https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth OIDC Core 1.0 §3.1
  * @see https://datatracker.ietf.org/doc/html/rfc6749                      OAuth 2.0 (RFC 6749)
@@ -56,11 +56,9 @@ final class OidcClient implements OidcClientInterface
         private readonly string $clientId,
         private readonly ClientAuthenticationInterface $clientAuthentication,
         private readonly array $certificateOptions = [],
-        ?AccessTokenTypeInterface $accessTokenType = null,
+        ?DpopProofFactory $dpopProofFactory = null,
     ) {
-        // the bearer token of RFC 6750 is what a client asks for unless it holds a key, and
-        // naming it here keeps the type a dependency rather than an absence of one
-        $this->accessTokenType = $accessTokenType ?? new BearerTokenType();
+        $this->accessTokenType = null === $dpopProofFactory ? new BearerTokenType() : new DpopTokenType($dpopProofFactory);
     }
 
     public function getClientAuthenticationMethod(): string

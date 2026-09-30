@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-23T20:07:49Z
+
+Looks fine, but I think it will fail in practice.
+A voter that calls isGranted() doesn't get its own AccessDecision. Both decide() and isGranted() do `$accessDecision ??= end($this->accessDecisionStack)`, so the nested votes land in the same $votes.
+
+A PasskeyVoter that exempts admins with $this->security->isGranted('ROLE_ADMIN') is enough: for a non-admin, the inner `RoleVoter` denial kills the re-authentication silently, and the tests miss it because createDenial() builds the votes by hand.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-24T05:53:54Z
+
+I reproduced it: 3 of the 4 combinations of outer and nested checks failed. The tests missed it for the reason you give.
+
+The flag now names the attribute that a re-authentication can grant: `$vote->extraData[AuthenticatedVoter::RE_AUTHENTICATION] = $attribute`. The firewall starts a re-authentication only when a denying vote names the denied attribute. Like `supportsAttribute()`, this only looks at the denied attribute. But the voter still decides: a `CAN_DELETE_ACCOUNT` voter can re-authenticate the owner and deny everyone else with a 403. A list on the entry point cannot do that, because it only knows the name of the attribute.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-29T19:08:43Z
+
+Thanks @nicolas-grekas
+
+This is better than #66235 and it covers the need. #66235 is now closed. Two small things:
+
+* The flag is an array key, so it is easy to get wrong e.g. in case of mistyping. You will get a 403 and no clue why. A method on `Vote` would fail loudly instead. The constant could also live on `Vote` rather than on   `AuthenticatedVoter`, since a voter that sets it usually has nothing else to do with authentication attributes.
+* Could `ExceptionListener` log at debug when exactly one attribute was denied and no vote flagged it? That is the "why is my re-authentication not starting" question.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T06:46:17Z
+
+Thanks @Spomky, both done: a voter now calls `$vote->requestReAuthentication($attribute)`, which fills a `private(set)` property of `Vote`, so the `AuthenticatedVoter::RE_AUTHENTICATION` key is gone. And the firewall logs at debug level when a single attribute was denied and no vote requested a re-authentication for it.

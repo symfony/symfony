@@ -16,6 +16,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
+/**
+ * @deprecated since Symfony 8.2, dispatch the message wrapped in the RedispatchMessage with a TransportNamesStamp instead
+ */
 final class RedispatchMessageHandler
 {
     public function __construct(
@@ -25,6 +28,8 @@ final class RedispatchMessageHandler
 
     public function __invoke(RedispatchMessage $message): mixed
     {
+        trigger_deprecation('symfony/messenger', '8.2', 'Dispatching a "%s" to a bus is deprecated, dispatch the message it wraps with a "%s" instead.', RedispatchMessage::class, TransportNamesStamp::class);
+
         // no transport name means "use the senders configured for the message" instead of "use no sender"
         $transportNames = array_values(array_filter((array) $message->transportNames, static fn ($name): bool => '' !== $name));
 

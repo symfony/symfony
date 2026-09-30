@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add `RedispatchStamp` to make a worker send a received message to its senders instead of handling it
+ * Deprecate `RedispatchMessageHandler`, dispatch the message wrapped in the `RedispatchMessage` with a `TransportNamesStamp` instead
  * `messenger:consume` and `messenger:failed:retry` add the listeners of a run to a `ScopedEventDispatcher` instead of to the event dispatcher of the application
  * Add `FailedMessageRepository` and `FailedMessageFilter` to list, inspect, remove and redispatch failed messages outside the console
  * Add `MessengerBundle`, which provides the `messenger` configuration and the services previously provided by `FrameworkBundle` under `framework.messenger`

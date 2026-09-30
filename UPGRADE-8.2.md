@@ -306,6 +306,17 @@ Messenger
 
    Note that a message sent to a transport is no longer handled in process, so `RedispatchMessageHandler`
    returns `null` for it instead of the result of the handler
+ * Deprecate `RedispatchMessageHandler`. Schedules can keep using `RedispatchMessage`, as the scheduler transport
+   now yields the message it wraps with a `RedispatchStamp`. Elsewhere, dispatch that message with a
+   `TransportNamesStamp` instead:
+
+   ```php
+   // before
+   $bus->dispatch(new RedispatchMessage($message, 'async'));
+
+   // after
+   $bus->dispatch($message, [new TransportNamesStamp('async')]);
+   ```
 
 Mime
 ----

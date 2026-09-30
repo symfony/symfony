@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
@@ -73,7 +74,7 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
                 $envelope = $envelope->with(new MessageDecodingFailedStamp());
             }
         } catch (\Throwable $e) {
-            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode Envelope: '.$e->getMessage(), $e->getCode(), $e);
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode Envelope: '.$e->getMessage(), $e->getCode(), $e)->with(...self::decodeBusNameStamps($serializeEnvelope));
         }
 
         return $envelope;
@@ -371,6 +372,24 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
                 default:
                     return false;
             }
+        }
+    }
+
+    /**
+     * Reads the bus names of an envelope that failed to decode, so that the failure is routed to the bus of its message.
+     *
+     * Only Envelope and BusNameStamp are instantiated: the message and the other stamps come back as incomplete objects, without running any of their code.
+     *
+     * @return list<BusNameStamp>
+     */
+    private static function decodeBusNameStamps(string $serializedEnvelope): array
+    {
+        try {
+            $envelope = @unserialize($serializedEnvelope, ['allowed_classes' => [Envelope::class, BusNameStamp::class]]);
+
+            return $envelope instanceof Envelope ? array_values(array_filter($envelope->all(BusNameStamp::class), static fn ($stamp) => $stamp instanceof BusNameStamp)) : [];
+        } catch (\Throwable) {
+            return [];
         }
     }
 }

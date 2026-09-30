@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by phcorp at 2026-09-30T15:52:42Z
+
+Measured on ac83c79 vs its parent: the 4 new cases go 5/5/5/7 → 3, and the whole `provideWidth` dataset passes for UnicodeString, CodePointString and ByteString. There's no ReDoS risk: all quantifiers are possessive, and 200k `\e(` take ~20ms, the same as before.
+
+One optional follow-up: making the final byte optional (`[\x20-\x2F]*+ [\x30-\x7E]?`) also handles sequences that never finish, the way a terminal does, where a new ESC cancels the pending one:
+- `"foo\e("` → 3 (currently 4)
+- `"\e(\e[1mfoo"` → 3 (currently 4)
+- `"\e\e[1mfoo"` → 3 (currently 6: `[\p{Cc}\x7F]++` swallows both ESCs, so `[1m` gets counted)
+
+The existing dataset still passes with it. These cases also fail on the base, so they're fine to leave for a separate PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T15:59:19Z
+
+Thanks, applied: the three cases measure 3 as in tmux, and 200k `\e(` still take ~10ms.

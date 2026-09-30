@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in and the denied attribute kept in the session
+ * Add `AuthenticationUtils::getReAuthenticationAttribute()`, the security attribute the current request is asking a re-authentication for
  * Support the OAuth 2.0 Form Post Response Mode in `OidcLoginAuthenticator`, reading the authorization response from the request body
  * Add `RefreshedUserCheckerListener`, running a user checker on `CheckRefreshedUserEvent` so an account disabled during a session is rejected on the next request
  * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, to add application-specific reasons to deauthenticate the token

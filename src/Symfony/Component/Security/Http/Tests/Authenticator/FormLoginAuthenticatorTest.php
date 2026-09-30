@@ -13,12 +13,18 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -298,6 +304,71 @@ class FormLoginAuthenticatorTest extends TestCase
 
         yield 'post_only disabled' => [['post_only' => false], Request::create('/login_check', 'GET'), []];
         yield 'supported' => [['form_only' => true], Request::create('/login_check', 'POST'), []];
+    }
+
+    public function testStartReAuthenticationRedirectsToTheLoginPathWithTheUserFilledIn()
+    {
+        $request = Request::create('/admin');
+        $request->setSession($session = new Session(new MockArraySessionStorage()));
+        $request->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY);
+
+        $this->setUpAuthenticator(['login_path' => '/login', 'use_forward' => false]);
+        $response = $this->authenticator->startReAuthentication($request, $this->createToken());
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame('http://localhost/login', $response->getTargetUrl());
+        $this->assertSame('test', $session->get(SecurityRequestAttributes::LAST_USERNAME));
+        $this->assertSame(AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, $session->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+    }
+
+    public function testStartReAuthenticationForwardsToTheLoginPath()
+    {
+        $request = Request::create('/admin');
+        $request->setSession($session = new Session(new MockArraySessionStorage()));
+        $request->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, 'IS_AUTHENTICATED_VERY_RECENTLY');
+
+        $httpKernel = $this->createMock(HttpKernelInterface::class);
+        $httpKernel->expects($this->once())
+            ->method('handle')
+            ->with($this->callback(static fn (Request $subRequest) => '/login' === $subRequest->getPathInfo()), HttpKernelInterface::SUB_REQUEST)
+            ->willReturn(new Response('the login form'));
+
+        $this->setUpAuthenticator(['login_path' => '/login', 'use_forward' => true]);
+        $this->authenticator->setHttpKernel($httpKernel);
+        $response = $this->authenticator->startReAuthentication($request, $this->createToken());
+
+        $this->assertSame(401, $response->getStatusCode());
+        $this->assertSame('test', $session->get(SecurityRequestAttributes::LAST_USERNAME));
+        $this->assertSame('IS_AUTHENTICATED_VERY_RECENTLY', $session->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+    }
+
+    public function testStartReAuthenticationWithoutSession()
+    {
+        $request = Request::create('/admin');
+        $request->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY);
+
+        $this->setUpAuthenticator(['login_path' => '/login', 'use_forward' => false]);
+        $response = $this->authenticator->startReAuthentication($request, $this->createToken());
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame('http://localhost/login', $response->getTargetUrl());
+    }
+
+    public function testAuthenticationSuccessClearsTheReAuthenticationAttribute()
+    {
+        $request = Request::create('/login_check', 'POST');
+        $request->setSession($session = new Session(new MockArraySessionStorage()));
+        $session->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY);
+
+        $this->setUpAuthenticator();
+        $this->authenticator->onAuthenticationSuccess($request, $this->createToken(), 'main');
+
+        $this->assertFalse($session->has(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+    }
+
+    private function createToken(): UsernamePasswordToken
+    {
+        return new UsernamePasswordToken(new InMemoryUser('test', 's$cr$t'), 'main');
     }
 
     private function setUpAuthenticator(array $options = [])

@@ -33,6 +33,8 @@ final class SecurityRequestAttributes
      * Holds the denied security attribute while a ReAuthenticationEntryPointInterface starts a re-authentication,
      * so that an entry point asking the same question in several ways knows which one was asked here.
      *
+     * An entry point answering with a redirect stores it in the session under the same key, for the page it sends the user to.
+     *
      * @see EntryPoint\ReAuthenticationEntryPointInterface
      */
     public const RE_AUTHENTICATION_ATTRIBUTE = '_security.re_authentication_attribute';

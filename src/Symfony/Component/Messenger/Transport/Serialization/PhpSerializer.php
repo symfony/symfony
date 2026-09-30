@@ -378,18 +378,100 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
     /**
      * Reads the bus names of an envelope that failed to decode, so that the failure is routed to the bus of its message.
      *
-     * Only Envelope and BusNameStamp are instantiated: the message and the other stamps come back as incomplete objects, without running any of their code.
+     * Only the list of BusNameStamp is unserialized: the message and the other stamps are skipped without running any of their code.
+     * Unserializing the whole envelope would fail as of PHP 8.6 when the message holds a Serializable object, since its class isn't allowed.
      *
      * @return list<BusNameStamp>
      */
     private static function decodeBusNameStamps(string $serializedEnvelope): array
     {
-        try {
-            $envelope = @unserialize($serializedEnvelope, ['allowed_classes' => [Envelope::class, BusNameStamp::class]]);
+        if (null === $serializedStamps = self::findSerializedBusNameStamps($serializedEnvelope)) {
+            return [];
+        }
 
-            return $envelope instanceof Envelope ? array_values(array_filter($envelope->all(BusNameStamp::class), static fn ($stamp) => $stamp instanceof BusNameStamp)) : [];
+        try {
+            $stamps = @unserialize($serializedStamps, ['allowed_classes' => [BusNameStamp::class]]);
         } catch (\Throwable) {
             return [];
         }
+
+        return \is_array($stamps) ? array_values(array_filter($stamps, static fn ($stamp) => $stamp instanceof BusNameStamp)) : [];
+    }
+
+    /**
+     * Returns the serialized list of BusNameStamp held by a serialized envelope, or null when there is none.
+     */
+    private static function findSerializedBusNameStamps(string $body): ?string
+    {
+        if (!preg_match('/^O:36:"Symfony\\\\Component\\\\Messenger\\\\Envelope":(\d+):\{/', $body, $m)) {
+            return null;
+        }
+        $offset = \strlen($m[0]);
+        $count = (int) $m[1];
+        $stampsKeys = ["\0".Envelope::class."\0stamps", "\0*\0stamps", 'stamps'];
+        $serializedStamps = null;
+
+        for ($i = 0; $i < $count; ++$i) {
+            $isStampsKey = self::isSerializedStringOneOf($body, $offset, $stampsKeys);
+
+            if (!self::skipSerializedValue($body, $offset)) {
+                return null;
+            }
+
+            if (!$isStampsKey) {
+                if (!self::skipSerializedValue($body, $offset)) {
+                    return null;
+                }
+
+                continue;
+            }
+
+            if (!preg_match('/\Ga:(\d+):\{/A', $body, $m, 0, $offset)) {
+                return null;
+            }
+            $offset += \strlen($m[0]);
+
+            for ($j = (int) $m[1]; $j > 0; --$j) {
+                $isBusNameKey = self::isSerializedStringOneOf($body, $offset, [BusNameStamp::class]);
+
+                if (!self::skipSerializedValue($body, $offset)) {
+                    return null;
+                }
+
+                $start = $offset;
+
+                if (!self::skipSerializedValue($body, $offset)) {
+                    return null;
+                }
+
+                if ($isBusNameKey) {
+                    // unserialize() keeps the last of duplicate keys
+                    $serializedStamps = substr($body, $start, $offset - $start);
+                }
+            }
+
+            if ('}' !== ($body[$offset++] ?? '')) {
+                return null;
+            }
+        }
+
+        return $serializedStamps;
+    }
+
+    /**
+     * Tells whether the serialized string at $offset is one of $values, without moving $offset.
+     *
+     * @param string[] $values
+     */
+    private static function isSerializedStringOneOf(string $body, int $offset, array $values): bool
+    {
+        if (!preg_match('/\Gs:(\d++):"/A', $body, $m, 0, $offset)) {
+            return false;
+        }
+
+        $length = (int) $m[1];
+        $valueOffset = $offset + \strlen($m[0]);
+
+        return '";' === substr($body, $valueOffset + $length, 2) && \in_array(substr($body, $valueOffset, $length), $values, true);
     }
 }

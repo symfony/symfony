@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
@@ -114,6 +115,11 @@ class Serializer implements SerializerInterface
         $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
+
+        // handler results are for synchronous callers: retries only need the names of the handlers that already ran
+        if ($handledStamps = $envelope->all(HandledStamp::class)) {
+            $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_map(static fn (HandledStamp $stamp) => new HandledStamp(null, $stamp->getHandlerName()), $handledStamps));
+        }
 
         $headers = ['type' => $envelope->getMessage()::class] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
 

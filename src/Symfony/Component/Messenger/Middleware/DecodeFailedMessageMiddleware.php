@@ -13,9 +13,11 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
@@ -69,6 +71,14 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
         $envelope = $envelope->withoutAll(UnverifiedDecodingFailureStamp::class);
 
         if ($unverified?->requiresSignature($decodedEnvelope->getMessage())) {
+            $busName = $decodedEnvelope->last(BusNameStamp::class)?->getBusName();
+            $failureBusName = $envelope->last(BusNameStamp::class)?->getBusName();
+
+            // the bus of the failure was chosen from stamps that nothing verified
+            if (null !== $busName && null !== $failureBusName && $busName !== $failureBusName) {
+                throw new InvalidMessageSignatureException(\sprintf('The unverified decoding failure of message "%s" is on the "%s" bus, but the message belongs to the "%s" bus.', get_debug_type($decodedEnvelope->getMessage()), $failureBusName, $busName));
+            }
+
             // the stamps an unverified failure was decoded with must not reach a signed message: keep only the ones added since,
             // and the original transport, which already chose the serializer above and routes the message to its handlers
             $envelope = new Envelope($message, array_filter(array_merge(...array_values($envelope->all())), static fn (StampInterface $stamp): bool => $stamp instanceof SentToFailureTransportStamp || !\in_array($stamp, $unverified->stamps, true)));

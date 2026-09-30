@@ -15,9 +15,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyLegacySerializable;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageEnum;
@@ -128,6 +130,25 @@ class PhpSerializerTest extends TestCase
         $envelope = $serializer->decode($encodedEnvelope);
 
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+    }
+
+    #[DataProvider('provideEnvelopesThatFailToDecode')]
+    public function testDecodingFailureKeepsTheBusNameStamp(object $message, string $search, string $replace)
+    {
+        $serializer = $this->createPhpSerializer();
+        $encodedEnvelope = $serializer->encode(new Envelope($message, [new BusNameStamp('command.bus'), new RedeliveryStamp(1), new SentToFailureTransportStamp('transport')]));
+        $encodedEnvelope['body'] = str_replace($search, $replace, $encodedEnvelope['body']);
+
+        $envelope = $serializer->decode($encodedEnvelope);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertEquals([BusNameStamp::class => [new BusNameStamp('command.bus')]], $envelope->all());
+    }
+
+    public static function provideEnvelopesThatFailToDecode(): iterable
+    {
+        yield 'property type mismatch' => [new DummyMessage('true'), 's:4:\"true\"', 'b:1'];
+        yield 'Serializable class not found' => [new DummyMessageWithLegacySerializable(new DummyLegacySerializable('15.98')), 'DummyLegacySerializable', 'OupsyLegacySerializable'];
     }
 
     public function testDecodingFailureCanBeEncodedWhenExceptionArgumentsAreRecorded()

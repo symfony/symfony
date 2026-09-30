@@ -13,12 +13,14 @@ namespace Symfony\Component\Lock\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\Lock\LockBundle;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -153,6 +155,36 @@ class LockBundleExtensionTest extends TestCase
         $connection = $storeDef->getArgument(0);
         $this->assertInstanceOf(Reference::class, $connection);
         $this->assertSame('my_service', (string) $connection);
+    }
+
+    public function testLockFactoriesAreTagged()
+    {
+        $container = $this->createContainerFromFile('lock_named');
+
+        foreach (['foo', 'bar', 'baz', 'qux', 'corge', 'grault', 'garply'] as $name) {
+            $this->assertSame([['name' => $name]], $container->getDefinition('lock.'.$name.'.factory')->getTag('lock.factory'));
+        }
+    }
+
+    public function testLockAttributeListener()
+    {
+        $container = $this->createContainerFromFile('lock');
+
+        if (!class_exists(LockAttributeListener::class)) {
+            $this->assertFalse($container->hasDefinition('lock.attribute_listener'));
+
+            return;
+        }
+
+        $definition = $container->getDefinition('lock.attribute_listener');
+        $this->assertSame(LockAttributeListener::class, $definition->getClass());
+        $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
+        $this->assertSame([['method' => 'reset']], $definition->getTag('kernel.reset'));
+
+        $locator = $definition->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+        $this->assertSame('lock.factory', $locator->getTaggedIteratorArgument()->getTag());
+        $this->assertSame('name', $locator->getTaggedIteratorArgument()->getIndexAttribute());
     }
 
     public function testLockDisabled()

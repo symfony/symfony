@@ -204,7 +204,7 @@
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
-                <target>Այս համախումբը պետք է պաուրակի {{ limit }} կամ ավելի տարրեր։|Այս հավելվածը պետք է պարունակի limit }} տարր կամ ավելին։|Այս համախումբը պետք է պարունակի {{ limit }} տարրերին կամ ավելի։</target>
+                <target>Այս համախումբը պետք է պաուրակի {{ limit }} կամ ավելի տարրեր։|Այս հավելվածը պետք է պարունակի {{ limit }} տարր կամ ավելին։|Այս համախումբը պետք է պարունակի {{ limit }} տարրերին կամ ավելի։</target>
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>

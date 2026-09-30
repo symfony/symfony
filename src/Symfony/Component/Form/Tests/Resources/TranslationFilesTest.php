@@ -58,4 +58,25 @@ class TranslationFilesTest extends TestCase
             'The NO locale should be an alias for the NB variant of the Norwegian language.'
         );
     }
+
+    public function testTargetsOnlyUseTheirSourcePlaceholders()
+    {
+        $invalidUnits = [];
+
+        foreach (glob(\dirname(__DIR__, 2).'/Resources/translations/*.xlf') as $filePath) {
+            $document = new \DOMDocument();
+            $document->load($filePath);
+
+            foreach ($document->getElementsByTagName('trans-unit') as $unit) {
+                preg_match_all('/\{\{ \w++ \}\}/', $unit->getElementsByTagName('source')->item(0)->textContent, $placeholders);
+                $target = str_replace($placeholders[0], '', $unit->getElementsByTagName('target')->item(0)->textContent);
+
+                if (str_contains($target, '{{') || str_contains($target, '}}')) {
+                    $invalidUnits[] = basename($filePath).' #'.$unit->getAttribute('id');
+                }
+            }
+        }
+
+        $this->assertSame([], $invalidUnits);
+    }
 }

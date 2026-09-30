@@ -309,6 +309,19 @@ final class CellBuffer
                 // Calculate display width
                 $charWidth = AnsiUtils::graphemeWidth($grapheme);
 
+                // A zero-width grapheme gets no cell of its own: it joins the character before it, and is dropped at the start of a row
+                if (0 === $charWidth) {
+                    if ($col > 0) {
+                        $lead = $rowOffset + $col - 1;
+                        while ($lead > $rowOffset && 0 === $this->widths[$lead]) {
+                            --$lead;
+                        }
+                        $this->chars[$lead] .= $grapheme;
+                    }
+                    $i = $nextPos;
+                    continue;
+                }
+
                 // Check if it fits
                 if ($col + $charWidth > $width) {
                     while ($col < $width) {

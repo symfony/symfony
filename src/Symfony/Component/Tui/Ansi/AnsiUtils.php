@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Tui\Ansi;
 
-use Symfony\Component\String\UnicodeString;
+use Symfony\Component\String\CodePointString;
 use Symfony\Component\Tui\Style\CursorShape;
 
 /**
@@ -69,6 +69,23 @@ final class AnsiUtils
      * Character set for CSI intermediate bytes (0x20-0x2F).
      */
     private const CSI_INTERMEDIATE_CHARS = " !\"#\$%&'()*+,-./";
+
+    /**
+     * The number of cached grapheme widths that triggers a cleanup.
+     */
+    private const GRAPHEME_WIDTHS_CLEANUP_THRESHOLD = 5000;
+
+    /**
+     * The number of cached grapheme widths kept by a cleanup.
+     */
+    private const GRAPHEME_WIDTHS_CLEANUP_SIZE = 4000;
+
+    /**
+     * Widths of the graphemes measured by graphemeWidth().
+     *
+     * @var array<string, int>
+     */
+    private static array $graphemeWidths = [];
 
     /**
      * Create a cursor marker embedding the given shape.
@@ -514,38 +531,29 @@ final class AnsiUtils
     /**
      * Calculate the display width of a single grapheme in terminal columns.
      *
-     * Uses mb_strwidth() for single-codepoint graphemes (fast C-level call).
-     * An emoji ZWJ, modifier or tag sequence takes two columns, as terminals that support it draw one emoji.
-     * Other multi-codepoint graphemes are measured with UnicodeString::width(), which gives no width to combining marks.
-     *
-     * Malformed UTF-8 is measured on what is left once the invalid bytes are
-     * dropped, so it never throws.
+     * A single code point is measured with mb_strwidth(), a fast C-level call, except the ones it gives a column that terminals do not draw, like a lone combining mark or a bidi isolate: those, and graphemes of several code points, are measured with CodePointString::width(). Malformed UTF-8 is measured on what is left once the invalid bytes are dropped, so it never throws. Widths are cached per grapheme.
      */
     public static function graphemeWidth(string $grapheme): int
     {
+        if (isset(self::$graphemeWidths[$grapheme])) {
+            return self::$graphemeWidths[$grapheme];
+        }
+
         if (1 === mb_strlen($grapheme, 'UTF-8')) {
-            return mb_strwidth($grapheme, 'UTF-8');
+            $width = !isset($grapheme[1]) || !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $grapheme) ? mb_strwidth($grapheme, 'UTF-8') : new CodePointString($grapheme)->width(false);
+        } elseif (preg_match('//u', $grapheme)) {
+            $width = new CodePointString($grapheme)->width(false);
+        } else {
+            // CodePointString rejects malformed UTF-8. Drop the invalid bytes the way visibleWidth() does, so text that reaches a measure unscrubbed comes out as a wrong glyph instead of aborting the render.
+            $valid = @iconv('UTF-8', 'UTF-8//IGNORE', $grapheme) ?: '';
+            $width = 1 >= mb_strlen($valid, 'UTF-8') ? mb_strwidth($valid, 'UTF-8') : new CodePointString($valid)->width(false);
         }
 
-        if (!preg_match('//u', $grapheme)) {
-            // UnicodeString rejects malformed UTF-8. Drop the invalid bytes the
-            // way visibleWidth() does, so text that reaches a measure unscrubbed
-            // comes out as a wrong glyph instead of aborting the render.
-            $grapheme = @iconv('UTF-8', 'UTF-8//IGNORE', $grapheme) ?: '';
-
-            if (1 >= mb_strlen($grapheme, 'UTF-8')) {
-                return mb_strwidth($grapheme, 'UTF-8');
-            }
+        if (self::GRAPHEME_WIDTHS_CLEANUP_THRESHOLD <= \count(self::$graphemeWidths)) {
+            self::$graphemeWidths = \array_slice(self::$graphemeWidths, -self::GRAPHEME_WIDTHS_CLEANUP_SIZE, null, true);
         }
 
-        // Older symfony/string versions add up the emoji of a ZWJ, modifier or tag sequence, and this skips building a UnicodeString.
-        // In one grapheme, such a sequence is a joiner followed by a symbol, or a symbol followed by a modifier or a tag.
-        // \p{So} stands in for \p{Extended_Pictographic}, which PCRE2 lacks before 10.40.
-        if (preg_match('/^\p{So}\x{FE0F}?[\x{1F3FB}-\x{1F3FF}\x{E0020}-\x{E007F}]|\x{200D}\p{So}/u', $grapheme)) {
-            return 2;
-        }
-
-        return new UnicodeString($grapheme)->width(false);
+        return self::$graphemeWidths[$grapheme] = $width;
     }
 
     /**

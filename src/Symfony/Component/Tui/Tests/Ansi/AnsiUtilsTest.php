@@ -711,6 +711,66 @@ class AnsiUtilsTest extends TestCase
         $this->assertSame(['text' => "\u{1F44D}\u{1F3FD}\x1b[1m a", 'width' => 4], AnsiUtils::sliceWithWidth($line, 0, 4));
     }
 
+    /**
+     * @return iterable<string, array{int, string}>
+     */
+    public static function singleCodePointWidthProvider(): iterable
+    {
+        yield 'left-to-right isolate' => [0, "\u{2066}"];
+        yield 'right-to-left isolate' => [0, "\u{2067}"];
+        yield 'first strong isolate' => [0, "\u{2068}"];
+        yield 'pop directional isolate' => [0, "\u{2069}"];
+        yield 'byte order mark' => [0, "\u{FEFF}"];
+        yield 'zero width space' => [0, "\u{200B}"];
+        yield 'arabic letter mark' => [0, "\u{061C}"];
+        yield 'lone combining mark' => [0, "\u{0301}"];
+        yield 'lone combining mark in a wide block' => [0, "\u{302A}"];
+        yield 'soft hyphen' => [1, "\u{00AD}"];
+        yield 'accented letter' => [1, "\u{00E9}"];
+        yield 'wide character' => [2, "\u{6771}"];
+    }
+
+    #[DataProvider('singleCodePointWidthProvider')]
+    public function testGraphemeWidthOfASingleCodePoint(int $expected, string $grapheme)
+    {
+        $this->assertSame($expected, AnsiUtils::graphemeWidth($grapheme));
+    }
+
+    public function testVisibleWidthGivesNoColumnToFormatCharacters()
+    {
+        $this->assertSame(3, AnsiUtils::visibleWidth("a\u{2067}b\u{2069}c"));
+        $this->assertSame(11, AnsiUtils::visibleWidth("\u{2068}Alice\u{2069} wrote"));
+        $this->assertSame(4, AnsiUtils::visibleWidth("\u{2068}\x1b[1m東京\x1b[0m\u{2069}"));
+        $this->assertSame(3, AnsiUtils::visibleWidth("\u{FEFF}abc"));
+        $this->assertSame(2, AnsiUtils::visibleWidth("a\u{200B}b"));
+        $this->assertSame(1, AnsiUtils::visibleWidth("\u{0301}a"));
+    }
+
+    public function testSlicingGivesNoColumnToFormatCharacters()
+    {
+        $line = "\u{2068}Alice\u{2069} wrote";
+
+        $this->assertSame("\u{2068}Alice\u{2069} ", AnsiUtils::sliceByColumn($line, 0, 6));
+        $this->assertSame(['text' => "\u{2069} wr", 'width' => 3], AnsiUtils::sliceWithWidth($line, 5, 3));
+        $this->assertSame("\u{2068}Alice\u{2069}\x1b[0m…", AnsiUtils::truncateToWidth($line, 6, '…'));
+    }
+
+    public function testSlicingGivesNoColumnToACombiningMarkSplitFromItsBase()
+    {
+        $line = "e\x1b[1m\u{0301}\x1b[0mx";
+
+        $this->assertSame($line, AnsiUtils::sliceByColumn($line, 0, AnsiUtils::visibleWidth($line)));
+        $this->assertSame(['text' => "\x1b[1m\u{0301}\x1b[0mx", 'width' => 1], AnsiUtils::sliceWithWidth($line, 1, 1));
+    }
+
+    public function testWrappingGivesNoColumnToFormatCharacters()
+    {
+        $this->assertSame(["\u{2068}Alice\u{2069} \u{2068}Bob\u{2069}"], TextWrapper::wrapTextWithAnsi("\u{2068}Alice\u{2069} \u{2068}Bob\u{2069}", 9));
+        $this->assertSame(["\u{2068}Alice\u{2069}", "\u{2068}Bob\u{2069}"], TextWrapper::wrapTextWithAnsi("\u{2068}Alice\u{2069} \u{2068}Bob\u{2069}", 5));
+        $this->assertSame(["ab\u{200B}c", "d\u{200B}ef"], TextWrapper::wrapTextWithAnsi("ab\u{200B}cd\u{200B}ef", 3));
+        $this->assertSame(["abcde\u{0301}", 'fgh'], array_map(AnsiUtils::stripAnsiCodes(...), TextWrapper::wrapTextWithAnsi("abcde\x1b[1m\u{0301}\x1b[0mfgh", 5)));
+    }
+
     public function testGraphemeWidthOfMalformedUtf8()
     {
         $this->assertSame(1, AnsiUtils::graphemeWidth("\xC3\u{0301}"));

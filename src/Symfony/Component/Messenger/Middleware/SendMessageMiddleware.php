@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\RedispatchStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
@@ -47,7 +48,7 @@ class SendMessageMiddleware implements MiddlewareInterface
 
         $relayStamp = null;
 
-        if (!$receivedStamp = $envelope->last(ReceivedStamp::class)) {
+        if (!($receivedStamp = $envelope->last(ReceivedStamp::class)) || $envelope->last(RedispatchStamp::class)) {
             $senders = $this->sendersLocator->getSenders($envelope);
         } elseif (($relayStamp = $envelope->last(OutboxStamp::class)) && $relayStamp->getTransportName() !== $receivedStamp->getTransportName()) {
             $this->logger?->info('Forwarding message {class} from the outbox to {alias}', $context + ['alias' => $relayStamp->getTransportName()]);

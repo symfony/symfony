@@ -13,9 +13,24 @@ namespace Symfony\Component\Scheduler\Tests\Messenger;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Failure\FailedMessageRepository;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\RedispatchStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
@@ -51,19 +66,70 @@ class SchedulerTransportTest extends TestCase
         $this->assertSame([], $messages);
     }
 
-    public function testAddsStampToInnerRedispatchMessageEnvelope()
+    public function testRedispatchMessageIsUnwrapped()
     {
-        $generator = $this->createStub(MessageGeneratorInterface::class);
-        $generator->method('getMessages')->willReturnCallback(function (): \Generator {
-            yield new MessageContext('default', 'id', $this->createStub(TriggerInterface::class), new \DateTimeImmutable()) => new RedispatchMessage(new \stdClass(), ['transport']);
-        });
-        $envelopes = iterator_to_array((new SchedulerTransport($generator))->get());
+        $message = new \stdClass();
+        $envelopes = iterator_to_array((new SchedulerTransport($this->createGenerator(new RedispatchMessage(new Envelope($message, [new DelayStamp(10)]), ['transport']))))->get());
 
-        $stamp = $envelopes[0]->getMessage()->envelope->last(ScheduledStamp::class);
+        $this->assertSame($message, $envelopes[0]->getMessage());
+        $this->assertNotNull($envelopes[0]->last(RedispatchStamp::class));
+        $this->assertSame(['transport'], $envelopes[0]->last(TransportNamesStamp::class)?->getTransportNames());
+        $this->assertEquals(new DelayStamp(10), $envelopes[0]->last(DelayStamp::class));
+        $this->assertSame('default', $envelopes[0]->last(ScheduledStamp::class)->messageContext->name);
+        $this->assertSame('id', $envelopes[0]->last(ScheduledStamp::class)->messageContext->id);
+    }
 
-        $this->assertSame($stamp, $envelopes[0]->last(ScheduledStamp::class));
-        $this->assertSame('default', $stamp->messageContext->name);
-        $this->assertSame('id', $stamp->messageContext->id);
+    #[TestWith([[], null])]
+    #[TestWith(['', null])]
+    #[TestWith([[''], null])]
+    #[TestWith(['0', ['0']])]
+    #[TestWith([['', 'async', 'orders'], ['async', 'orders']])]
+    public function testTransportNamesOfARedispatchMessage(array|string $transportNames, ?array $expected)
+    {
+        $envelopes = iterator_to_array((new SchedulerTransport($this->createGenerator(new RedispatchMessage(new \stdClass(), $transportNames))))->get());
+
+        $this->assertNotNull($envelopes[0]->last(RedispatchStamp::class));
+        $this->assertSame($expected, $envelopes[0]->last(TransportNamesStamp::class)?->getTransportNames());
+    }
+
+    public function testTransportNamesOfARedispatchMessageOverrideTheOnesOfItsEnvelope()
+    {
+        $envelopes = iterator_to_array((new SchedulerTransport($this->createGenerator(new RedispatchMessage(new Envelope(new \stdClass(), [new TransportNamesStamp('inner')]), 'async'))))->get());
+
+        $this->assertSame(['async'], $envelopes[0]->last(TransportNamesStamp::class)?->getTransportNames());
+    }
+
+    public function testRedispatchedMessageIsSentInsteadOfHandled()
+    {
+        $message = new \stdClass();
+        $sender = $this->createSender();
+        $handled = [];
+        $bus = $this->createBus($sender, $handled);
+
+        foreach ((new SchedulerTransport($this->createGenerator(new RedispatchMessage($message, 'async'))))->get() as $envelope) {
+            $bus->dispatch($envelope->with(new ReceivedStamp('scheduler_default')));
+        }
+
+        $this->assertCount(1, $sender->sent);
+        $this->assertSame($message, $sender->sent[0]->getMessage());
+        $this->assertSame([], $handled);
+    }
+
+    public function testRedispatchingARedispatchedMessageFromTheFailureTransportSendsItToItsTransports()
+    {
+        $envelopes = iterator_to_array((new SchedulerTransport($this->createGenerator(new RedispatchMessage((object) ['text' => 'Hello'], 'async'))))->get());
+
+        // the failure transport keeps the sendable stamps only
+        $serializer = new PhpSerializer();
+        $failed = $serializer->decode($serializer->encode($envelopes[0]->with(new ReceivedStamp('scheduler_default'), new SentToFailureTransportStamp('scheduler_default'))));
+
+        $sender = $this->createSender();
+        $handled = [];
+        $this->createBus($sender, $handled)->dispatch(FailedMessageRepository::prepareForRedispatch($failed));
+
+        $this->assertCount(1, $sender->sent);
+        $this->assertEquals((object) ['text' => 'Hello'], $sender->sent[0]->getMessage());
+        $this->assertSame([], $handled);
     }
 
     public function testMessageIsNotWrappedWhenUseMessengerRoutingIsDisabled()
@@ -75,9 +141,10 @@ class SchedulerTransportTest extends TestCase
         $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: false))->get());
 
         $this->assertInstanceOf(\stdClass::class, $envelopes[0]->getMessage());
+        $this->assertNull($envelopes[0]->last(RedispatchStamp::class));
     }
 
-    public function testMessageIsWrappedInRedispatchMessageWhenUseMessengerRoutingIsEnabled()
+    public function testMessageIsRedispatchedWhenUseMessengerRoutingIsEnabled()
     {
         $generator = $this->createStub(MessageGeneratorInterface::class);
         $generator->method('getMessages')->willReturnCallback(function (): \Generator {
@@ -85,13 +152,10 @@ class SchedulerTransportTest extends TestCase
         });
         $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: true))->get());
 
-        $this->assertInstanceOf(RedispatchMessage::class, $envelopes[0]->getMessage());
-        $this->assertSame([], $envelopes[0]->getMessage()->transportNames);
-        // the ScheduledStamp must live on the inner envelope so it survives the redispatch
-        $this->assertSame(
-            $envelopes[0]->getMessage()->envelope->last(ScheduledStamp::class),
-            $envelopes[0]->last(ScheduledStamp::class)
-        );
+        $this->assertInstanceOf(\stdClass::class, $envelopes[0]->getMessage());
+        $this->assertNotNull($envelopes[0]->last(RedispatchStamp::class));
+        $this->assertNull($envelopes[0]->last(TransportNamesStamp::class));
+        $this->assertNotNull($envelopes[0]->last(ScheduledStamp::class));
     }
 
     #[Group('legacy')]
@@ -119,7 +183,8 @@ class SchedulerTransportTest extends TestCase
 
         $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: null))->get());
 
-        $this->assertInstanceOf(RedispatchMessage::class, $envelopes[0]->getMessage());
+        $this->assertNotNull($envelopes[0]->last(RedispatchStamp::class));
+        $this->assertSame(['transport'], $envelopes[0]->last(TransportNamesStamp::class)?->getTransportNames());
     }
 
     public function testNoMessageMeansNoDeprecationWhenUseMessengerRoutingIsNull()
@@ -157,5 +222,40 @@ class SchedulerTransportTest extends TestCase
 
         $this->expectException(LogicException::class);
         $transport->send(new Envelope(new \stdClass()));
+    }
+
+    private function createGenerator(object $message): MessageGeneratorInterface
+    {
+        $generator = $this->createStub(MessageGeneratorInterface::class);
+        $generator->method('getMessages')->willReturnCallback(function () use ($message): \Generator {
+            yield new MessageContext('default', 'id', $this->createStub(TriggerInterface::class), new \DateTimeImmutable()) => $message;
+        });
+
+        return $generator;
+    }
+
+    private function createSender(): SenderInterface
+    {
+        return new class implements SenderInterface {
+            public array $sent = [];
+
+            public function send(Envelope $envelope): Envelope
+            {
+                return $this->sent[] = $envelope;
+            }
+        };
+    }
+
+    private function createBus(SenderInterface $sender, array &$handled): MessageBus
+    {
+        $senders = new Container();
+        $senders->set('async', $sender);
+
+        return new MessageBus([
+            new SendMessageMiddleware(new SendersLocator([], $senders)),
+            new HandleMessageMiddleware(new HandlersLocator(['*' => [static function (object $message) use (&$handled) {
+                $handled[] = $message;
+            }]])),
+        ]);
     }
 }

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Yield the message of a `RedispatchMessage` with a `RedispatchStamp`, and with a `TransportNamesStamp` when it names transports, instead of the `RedispatchMessage` itself
  * Register the listeners of `before()`, `after()` and `onFailure()` on the schedule itself, and deprecate the `$dispatcher` argument of `Schedule::__construct()`
  * Add `SchedulerBundle`, which provides the `scheduler` configuration and the services previously provided by `FrameworkBundle` under `framework.scheduler`
  * Add a "Next Run In" column to `debug:scheduler` showing the time until the next run

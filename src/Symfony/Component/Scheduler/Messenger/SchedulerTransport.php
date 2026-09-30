@@ -13,6 +13,8 @@ namespace Symfony\Component\Scheduler\Messenger;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
+use Symfony\Component\Messenger\Stamp\RedispatchStamp;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
@@ -31,20 +33,24 @@ class SchedulerTransport implements TransportInterface
     public function get(/* int $fetchSize = 1 */): iterable
     {
         foreach ($this->messageGenerator->getMessages() as $context => $message) {
-            $stamp = new ScheduledStamp($context);
+            $stamps = [new ScheduledStamp($context)];
 
             if ($message instanceof RedispatchMessage) {
-                $message = new RedispatchMessage(
-                    Envelope::wrap($message->envelope, [$stamp]),
-                    $message->transportNames,
-                );
+                $stamps[] = new RedispatchStamp();
+
+                // unlike the RedispatchStamp, this stamp is kept by the failure transport, for messenger:failed:retry --redispatch
+                if ($transportNames = array_values(array_filter((array) $message->transportNames, static fn ($name): bool => '' !== $name))) {
+                    $stamps[] = new TransportNamesStamp($transportNames);
+                }
+
+                $message = $message->envelope;
             } elseif (null === $this->useMessengerRouting) {
                 trigger_deprecation('symfony/framework-bundle', '8.2', 'Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
             } elseif ($this->useMessengerRouting) {
-                $message = new RedispatchMessage(Envelope::wrap($message, [$stamp]));
+                $stamps[] = new RedispatchStamp();
             }
 
-            yield Envelope::wrap($message, [$stamp]);
+            yield Envelope::wrap($message, $stamps);
         }
     }
 

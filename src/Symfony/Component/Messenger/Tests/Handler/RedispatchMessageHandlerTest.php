@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\Handler;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -28,8 +30,22 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
+#[Group('legacy')]
+#[IgnoreDeprecations]
 class RedispatchMessageHandlerTest extends TestCase
 {
+    public function testHandlingARedispatchMessageIsDeprecated()
+    {
+        $message = new DummyMessage('hello');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->willReturn(new Envelope($message));
+
+        $this->expectUserDeprecationMessage('Since symfony/messenger 8.2: Dispatching a "Symfony\Component\Messenger\Message\RedispatchMessage" to a bus is deprecated, dispatch the message it wraps with a "Symfony\Component\Messenger\Stamp\TransportNamesStamp" instead.');
+
+        (new RedispatchMessageHandler($bus))(new RedispatchMessage($message, 'async'));
+    }
+
     public function testRedispatchWithTransportNamesAddsTransportNamesStamp()
     {
         $message = new DummyMessage('hello');

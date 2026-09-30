@@ -21,7 +21,9 @@ use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\RedispatchStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
+use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -235,6 +237,46 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $target->expects($this->never())->method('send');
 
         $middleware = new SendMessageMiddleware($this->createSendersLocator([], ['orders' => $target]));
+
+        $envelope = $middleware->handle($envelope, $this->getStackMock());
+
+        $this->assertNull($envelope->last(SentStamp::class));
+    }
+
+    public function testItSendsAReceivedMessageCarryingARedispatchStampToItsTransports()
+    {
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), new RedispatchStamp(), new TransportNamesStamp(['orders']));
+        $target = $this->createMock(SenderInterface::class);
+        $routed = $this->createMock(SenderInterface::class);
+
+        $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['routed']], ['orders' => $target, 'routed' => $routed]);
+        $middleware = new SendMessageMiddleware($sendersLocator);
+
+        $target->expects($this->once())->method('send')->with($envelope->with(new SentStamp($target::class, 'orders')))->willReturnArgument(0);
+        $routed->expects($this->never())->method('send');
+
+        $envelope = $middleware->handle($envelope, $this->getStackMock(false));
+
+        $this->assertSame('orders', $envelope->last(SentStamp::class)?->getSenderAlias());
+    }
+
+    public function testItSendsAReceivedMessageCarryingARedispatchStampToItsConfiguredSenders()
+    {
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), new RedispatchStamp());
+        $routed = $this->createMock(SenderInterface::class);
+
+        $middleware = new SendMessageMiddleware($this->createSendersLocator([DummyMessage::class => ['routed']], ['routed' => $routed]));
+
+        $routed->expects($this->once())->method('send')->with($envelope->with(new SentStamp($routed::class, 'routed')))->willReturnArgument(0);
+
+        $middleware->handle($envelope, $this->getStackMock(false));
+    }
+
+    public function testItHandlesAReceivedMessageCarryingARedispatchStampWhenItHasNoSender()
+    {
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), new RedispatchStamp());
+
+        $middleware = new SendMessageMiddleware($this->createSendersLocator([], []));
 
         $envelope = $middleware->handle($envelope, $this->getStackMock());
 

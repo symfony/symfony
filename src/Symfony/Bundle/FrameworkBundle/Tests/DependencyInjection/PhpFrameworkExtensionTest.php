@@ -20,9 +20,12 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
+use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
+use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
+use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
 use Symfony\Component\Workflow\Definition;
@@ -530,6 +533,29 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
         $this->assertArrayHasKey('*', $mapping);
         $this->assertContains('messenger.default_serializer', $mapping['*']);
+    }
+
+    public function testMessengerRedispatchAndServiceCallMessagesRequireSignature()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'annotations' => false,
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'messenger' => [
+                    'transports' => [
+                        'async' => ['dsn' => 'in-memory://'],
+                    ],
+                ],
+                'scheduler' => true,
+            ]);
+            $container->addCompilerPass(new MessengerPass());
+        });
+
+        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
+        $this->assertContains(RedispatchMessage::class, $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+        $this->assertContains(ServiceCallMessage::class, $container->getDefinition('messenger.signing_serializer')->getArgument(2));
     }
 
     public function testMailerWebhookProdExcludesLocalhost()

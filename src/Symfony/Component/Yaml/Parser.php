@@ -898,12 +898,9 @@ class Parser
 
         $isCurrentLineBlank = $this->isCurrentLineBlank();
         $blockLines = [];
-        $longestBlankLine = 0;
 
         // leading blank lines are consumed before determining indentation
         while ($notEOF && $isCurrentLineBlank && (!$indentation || \strlen($this->currentLine) <= $indentation)) {
-            $longestBlankLine = max($longestBlankLine, \strlen($this->currentLine));
-
             // newline only if not EOF
             if ($notEOF = $this->moveToNextLine()) {
                 $blockLines[] = '';
@@ -917,11 +914,6 @@ class Parser
 
             for ($i = 0; $i < $currentLineLength && ' ' === $this->currentLine[$i]; ++$i) {
                 ++$indentation;
-            }
-
-            // a comment less indented than the leading empty lines is not content, the indentation is then the one of the longest empty line
-            if ($indentation < $longestBlankLine && $this->isCurrentLineComment()) {
-                $indentation = $longestBlankLine;
             }
         }
 

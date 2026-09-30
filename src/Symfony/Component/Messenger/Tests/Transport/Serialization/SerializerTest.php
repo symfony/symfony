@@ -16,9 +16,11 @@ use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -105,6 +107,18 @@ class SerializerTest extends TestCase
         $this->assertCount(1, $flattenException->getPrevious()->getTrace());
         $this->assertNull($flattenException->getPrevious()->getPrevious());
         $this->assertTrue($stamp->equals(ErrorDetailsStamp::create($exception)));
+    }
+
+    public function testEncodedWithErrorDetailsStampWithoutFlattenExceptionIsDecodableInXml()
+    {
+        $serializer = new Serializer(null, 'xml');
+
+        $envelope = new Envelope(new DummyMessage('Hello'), [ErrorDetailsStamp::create(new RecoverableMessageHandlingException('Try again'))]);
+
+        $stamp = $serializer->decode($serializer->encode($envelope))->last(ErrorDetailsStamp::class);
+
+        $this->assertSame('Try again', $stamp->getExceptionMessage());
+        $this->assertNull($stamp->getFlattenException());
     }
 
     public function testSerializedMessageStampIsUsedForEncoding()
@@ -319,6 +333,23 @@ class SerializerTest extends TestCase
 
         $encoded = $serializer->encode($envelope);
         $this->assertStringNotContainsString('DummySymfonySerializerNonSendableStamp', print_r($encoded['headers'], true));
+    }
+
+    public function testEncodedHandledStampsKeepTheHandlerNamesButNotTheResults()
+    {
+        $serializer = new Serializer();
+
+        $result = new \stdClass();
+        $result->self = $result;
+
+        $envelope = new Envelope(new DummyMessage('Hello'), [
+            new HandledStamp($result, 'handler_a'),
+            new HandledStamp('result', 'handler_b'),
+        ]);
+
+        $decodedEnvelope = $serializer->decode($serializer->encode($envelope));
+
+        $this->assertEquals([new HandledStamp(null, 'handler_a'), new HandledStamp(null, 'handler_b')], $decodedEnvelope->all(HandledStamp::class));
     }
 
     public function testDecodingFailedConstructorDeserialization()
@@ -574,6 +605,33 @@ class SerializerTest extends TestCase
         $this->assertSame('Encoded envelope does not have a "type" header.', $failure->getMessage());
         $this->assertSame(['body' => $encodedEnvelope['body'], 'headers' => array_diff_key($encodedEnvelope['headers'], ['type' => true])], $failure->encodedEnvelope);
         $this->assertSame('other_bus', $envelope->last(BusNameStamp::class)?->getBusName());
+    }
+
+    public function testDecodingFailsWithAStampHeaderThatDoesNotFitTheStamp()
+    {
+        $serializer = new Serializer();
+
+        $envelope = $serializer->decode([
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.ValidationStamp::class => '[{"groups":"foo"}]',
+            ],
+        ]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+    }
+
+    public function testDecodingFailsWithABodyThatDoesNotFitTheMessage()
+    {
+        $serializer = new Serializer();
+
+        $envelope = $serializer->decode([
+            'body' => '{"message":["hello"]}',
+            'headers' => ['type' => DummyMessage::class],
+        ]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
     }
 
     public function testDecodingFailsWithAStampHeaderThatIsNotAStamp()

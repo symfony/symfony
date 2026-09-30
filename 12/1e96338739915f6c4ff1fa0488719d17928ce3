@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T10:47:11Z
+
+Thanks @amirreza-khaleghverdi, I squashed and rebased (please fetch before pushing again), and fixed a few details: missing periods, extra spaces, `صوتیی` in 165, and `{{limit}}` in unit 19, which was never replaced.
+
+A few changes replace a Persian term by the English word, while the rest of the file uses "Persian (English)": 39 `locale`, 79 `Host`, 103 `NetMask`, 110 `extension` instead of `پسوند`, 113 `top-level`, and 124 `checkbox` in Form. Is that on purpose? Also 164 now reads `فرمت قالب صوتی` while the video one (139) is `فرمت ویدئو`: shouldn't it be `فرمت صوت`?
+
+---------------------------------------------------------------------------
+
+by amirreza-khaleghverdi at 2026-09-30T12:41:10Z
+
+[nicolas-grekas](https://github.com/nicolas-grekas)
+Thanks for the review
+**Units 19 and 165:** You're right, thanks for catching them. I also fixed a broken sentence in unit 136. **English terms:** This was intentional at first. My concern was that Persian speakers normally use the English terms for most of these (Host, NetMask, checkbox, locale). But I agree that it should follow the file's "Persian (English)" pattern, so I now use the Persian transliteration with the English term in parentheses. Where a real Persian term exists, I used it (`پسوند`, `دامنه سطح بالا`), and `locale` now matches the wording already used in the Form file.**Container:** I used `قالب` for both the video (138) and audio (164) container strings, and `کُدک` for both codec strings (137, 163), so the two concepts stay distinct. `فرمت` is a loanword, while `قالب` is the Persian equivalent and is already used for "format" in this file (unit 116), but I can switch back to `فرمت` if you prefer. I've pushed the updates.

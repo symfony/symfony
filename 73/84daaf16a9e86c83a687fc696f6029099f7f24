@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by kbond at 2026-09-30T18:47:08Z
+
+Both probes are in, thanks - the round trip through the form and the `_target_path` precedence, which is worth having pinned given how quiet the failure is. `startReAuthentication()` now says that the return only works while the success handler uses the saved target path, and that `always_use_default_target_path` and a form `_target_path` outrank it.
+
+For the leftover attribute: `onAuthenticationSuccess()` now removes it, so a completed login ends the re-authentication whether or not a page read it. What stays is a re-authentication abandoned without ever loading the login page - that one needs a walk-away *and* no later login in the same session to show up, which felt like the right amount of machinery for it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T22:11:01Z
+
+Pushed a change on top: reading the attribute no longer clears it, and the flag is gone.
+
+With the removal you added in `onAuthenticationSuccess()`, consuming it on read only costs the retry: one mistyped password and the second render of the login page no longer knows it is a re-authentication. The error and the last username both survive that, because the framework rewrites them on every failed attempt, while this one is written once by `startReAuthentication()`. That left `false` as the only correct value for the flag, so it seemed better not to have one.
+
+Lifecycle is the authenticator's now: set on start, cleared on success, cleared on logout.

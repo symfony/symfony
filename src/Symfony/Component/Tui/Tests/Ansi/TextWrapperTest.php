@@ -230,6 +230,41 @@ class TextWrapperTest extends TestCase
         $this->assertSame('world', $chunks[1]['text']);
     }
 
+    /**
+     * @param list<array{text: string, start_index: int, end_index: int}> $expected
+     */
+    #[DataProvider('chunksWrapAtASpaceBeforeAWideCharacterProvider')]
+    public function testChunksWrapAtASpaceBeforeAWideCharacter(string $input, int $width, array $expected)
+    {
+        $this->assertSame($expected, TextWrapper::wrapLineIntoChunks($input, $width));
+    }
+
+    /**
+     * @return iterable<string, array{string, int, list<array{text: string, start_index: int, end_index: int}>}>
+     */
+    public static function chunksWrapAtASpaceBeforeAWideCharacterProvider(): iterable
+    {
+        yield 'word after a leading space' => [' a日', 2, [
+            ['text' => ' ', 'start_index' => 0, 'end_index' => 1],
+            ['text' => 'a', 'start_index' => 1, 'end_index' => 2],
+            ['text' => '日', 'start_index' => 2, 'end_index' => 5],
+        ]];
+        yield 'word after a word that fills the width' => ['abcd efg日', 4, [
+            ['text' => 'abcd', 'start_index' => 0, 'end_index' => 4],
+            ['text' => ' ', 'start_index' => 4, 'end_index' => 5],
+            ['text' => 'efg', 'start_index' => 5, 'end_index' => 8],
+            ['text' => '日', 'start_index' => 8, 'end_index' => 11],
+        ]];
+        yield 'word that fits the width once wrapped' => ['a bc日', 4, [
+            ['text' => 'a ', 'start_index' => 0, 'end_index' => 2],
+            ['text' => 'bc日', 'start_index' => 2, 'end_index' => 7],
+        ]];
+        yield 'character wider than the width' => [' 日', 1, [
+            ['text' => ' ', 'start_index' => 0, 'end_index' => 1],
+            ['text' => '日', 'start_index' => 1, 'end_index' => 4],
+        ]];
+    }
+
     // --- Tab as word-wrap boundary tests ---
 
     public function testWrapAtTabBoundaryAsciiPath()

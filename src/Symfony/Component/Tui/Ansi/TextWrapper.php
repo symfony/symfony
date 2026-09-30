@@ -83,8 +83,10 @@ final class TextWrapper
                     ];
                     $chunkStart = $wrapOppIndex;
                     $currentWidth -= $wrapOppWidth;
-                } elseif ($chunkStart < $byteOffset) {
-                    // No word boundary available: force-break at current position.
+                }
+
+                if ($currentWidth + $gWidth > $width && $chunkStart < $byteOffset) {
+                    // No word boundary available, or the word still does not fit on its own line: force-break at current position.
                     $chunks[] = [
                         'text' => substr($line, $chunkStart, $byteOffset - $chunkStart),
                         'start_index' => $chunkStart,

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageTyped;
@@ -90,6 +91,63 @@ class PhpSerializerTest extends TestCase
         $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
     }
 
+    public function testDecodingFailsWithNonSendableStamps()
+    {
+        $serializer = new PhpSerializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(sprintf('Could not decode stamp: "%s" is a "%s".', DummyPhpSerializerNonSendableStamp::class, NonSendableStampInterface::class));
+
+        $serializer->decode(['body' => addslashes(serialize(new Envelope(new DummyMessage('Hello'), [
+            new BusNameStamp('a'),
+            new DummyPhpSerializerNonSendableStamp(),
+        ])))]);
+    }
+
+    public function testDecodingFailsWhenAStampIsFiledUnderAnotherClass()
+    {
+        $serializer = new PhpSerializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage('Could not decode Envelope: Cannot unserialize '.Envelope::class);
+
+        $serializer->decode(['body' => addslashes(self::serializeEnvelope([
+            'stamps' => [BusNameStamp::class => [new BusNameStamp('a'), new DummyPhpSerializerNonSendableStamp()]],
+            'message' => new DummyMessage('Hello'),
+        ]))]);
+    }
+
+    public function testDecodingFailsWithMalformedEnvelopes()
+    {
+        $serializer = new PhpSerializer();
+
+        foreach ([
+            'stamps that are not an array' => ['stamps' => 'foo', 'message' => new DummyMessage('Hello')],
+            'stamps that are not in arrays' => ['stamps' => [BusNameStamp::class => new BusNameStamp('a')], 'message' => new DummyMessage('Hello')],
+            'an empty array of stamps' => ['stamps' => [BusNameStamp::class => []], 'message' => new DummyMessage('Hello')],
+            'a stamp that is not a stamp' => ['stamps' => [DummyMessage::class => [new DummyMessage('Hello')]], 'message' => new DummyMessage('Hello')],
+            'no message' => ['stamps' => []],
+            'a message that is not an object' => ['stamps' => [], 'message' => 'Hello'],
+        ] as $case => $properties) {
+            try {
+                $serializer->decode(['body' => addslashes(self::serializeEnvelope($properties))]);
+                $this->fail(sprintf('Decoding an envelope with %s should fail.', $case));
+            } catch (MessageDecodingFailedException $e) {
+                $this->assertStringStartsWith('Could not decode Envelope: ', $e->getMessage(), $case);
+            }
+        }
+    }
+
+    public function testDecodingFailsWhenThePayloadIsNotAnEnvelope()
+    {
+        $serializer = new PhpSerializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage('Could not decode message into an Envelope.');
+
+        $serializer->decode(['body' => addslashes(serialize(new DummyMessage('Hello')))]);
+    }
+
     public function testNonUtf8IsBase64Encoded()
     {
         $serializer = new PhpSerializer();
@@ -115,6 +173,17 @@ class PhpSerializerTest extends TestCase
         $this->expectExceptionMessageMatches('/Could not decode/');
 
         $serializer->decode($encodedEnvelope);
+    }
+
+    private static function serializeEnvelope(array $properties): string
+    {
+        $serializedProperties = '';
+
+        foreach ($properties as $name => $value) {
+            $serializedProperties .= serialize("\0".Envelope::class."\0".$name).serialize($value);
+        }
+
+        return sprintf('O:%d:"%s":%d:{%s}', \strlen(Envelope::class), Envelope::class, \count($properties), $serializedProperties);
     }
 }
 

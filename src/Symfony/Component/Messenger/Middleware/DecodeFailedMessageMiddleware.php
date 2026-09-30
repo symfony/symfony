@@ -18,6 +18,8 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\UnverifiedDecodingFailureStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
@@ -63,6 +65,15 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
         }
 
         $received = null !== $envelope->last(ReceivedStamp::class);
+        $unverified = $envelope->last(UnverifiedDecodingFailureStamp::class);
+        $envelope = $envelope->withoutAll(UnverifiedDecodingFailureStamp::class);
+
+        if ($unverified?->requiresSignature($decodedEnvelope->getMessage())) {
+            // the stamps an unverified failure was decoded with must not reach a signed message: keep only the ones added since,
+            // and the original transport, which already chose the serializer above and routes the message to its handlers
+            $envelope = new Envelope($message, array_filter(array_merge(...array_values($envelope->all())), static fn (StampInterface $stamp): bool => $stamp instanceof SentToFailureTransportStamp || !\in_array($stamp, $unverified->stamps, true)));
+        }
+
         // the failed envelope holds the stamps its own decoding kept and the ones added since: they replace the decoded stamps of the same class
         $envelope = new Envelope($decodedEnvelope->getMessage(), array_merge(...array_values($envelope->all() + $decodedEnvelope->all())));
 

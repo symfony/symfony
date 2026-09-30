@@ -35,6 +35,8 @@ use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 
 class FailedMessageRepositoryTest extends TestCase
 {
@@ -234,6 +236,28 @@ class FailedMessageRepositoryTest extends TestCase
         $this->assertCount(1, $sent = $async->getSent());
         $this->assertEquals(new DummyMessage('a'), $sent[0]->getMessage());
         $this->assertSame([], $sent[0]->all(SentToFailureTransportStamp::class));
+    }
+
+    public function testRedispatchDoesNotPutTheStampsOfAnUnverifiedFailureOnTheSignedMessageItDecodesTo()
+    {
+        $phpSerializer = new PhpSerializer();
+        $encodedFailure = $phpSerializer->encode(new Envelope(new MessageDecodingFailedException('Could not retrieve the claim.', 0, null, ['body' => 'claim']), [new SentToFailureTransportStamp('async'), new BusNameStamp('failed_bus')]));
+        $envelope = (new SigningSerializer($phpSerializer, 'signing-key', [DummyMessage::class]))->decode($encodedFailure)->with(new TransportMessageIdStamp(15));
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('decode')->willReturn(new Envelope(new DummyMessage('a'), [new BusNameStamp('the_bus')]));
+
+        $async = new InMemoryTransport();
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['async' => static fn () => $serializer])),
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['async']], new ServiceLocator(['async' => static fn () => $async]))),
+        ]);
+
+        $repository = new FailedMessageRepository(new ServiceLocator(['global' => fn () => $this->createStub(ListableReceiverInterface::class)]), 'global', null, $bus);
+        $repository->redispatch($envelope);
+
+        $this->assertCount(1, $sent = $async->getSent());
+        $this->assertSame(['the_bus'], array_map(static fn (BusNameStamp $stamp): string => $stamp->getBusName(), $sent[0]->all(BusNameStamp::class)));
     }
 
     public function testRedispatchWithoutABusIsRejected()

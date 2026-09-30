@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\UnverifiedDecodingFailureStamp;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -104,12 +105,17 @@ final class SigningSerializer implements SerializerInterface
                 $envelope ??= $this->inner->decode($encodedEnvelope);
                 $failure = $envelope->getMessage();
 
+                if (!$failure instanceof MessageDecodingFailedException) {
+                    return $envelope;
+                }
+
                 // encode() signs a failure that carries a signed envelope. An unsigned one is forged: it would attach unverified stamps to that envelope.
-                if ($failure instanceof MessageDecodingFailedException && $this->hasValidSignature($failure->encodedEnvelope)) {
+                if ($this->hasValidSignature($failure->encodedEnvelope)) {
                     throw new InvalidMessageSignatureException('The message is an unsigned decoding failure that carries a signed envelope; refusing to decode it.');
                 }
 
-                return $envelope;
+                // a claim reference it carries is verified only once retrieved: the stamps of this failure must not reach the signed message it resolves to
+                return $envelope->with(new UnverifiedDecodingFailureStamp(array_merge(...array_values($envelope->all())), $this->signedMessageTypes));
             }
 
             if (!$sign) {

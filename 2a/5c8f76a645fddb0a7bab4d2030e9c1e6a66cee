@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T20:41:45Z
+
+Thanks @drewmt, the dumper fix is right. But files written by previous versions, like the one linked in the issue, still failed to parse: the regression comes from the parser rule added in #66344, so I reverted it in a separate commit. While testing, I also found that `"\n"` stopped round-tripping, fixed in the last commit.

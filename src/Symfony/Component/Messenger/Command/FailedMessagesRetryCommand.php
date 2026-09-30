@@ -258,7 +258,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
     private function runWorker(string $failureTransportName, ReceiverInterface $receiver, SymfonyStyle $io, SymfonyStyle $errorIo, bool $shouldForce, bool $shouldRedispatch): int
     {
         $count = 0;
-        $listener = function (WorkerMessageReceivedEvent $messageReceivedEvent) use ($io, $errorIo, $receiver, $shouldForce, $shouldRedispatch, &$count) {
+        $listener = function (WorkerMessageReceivedEvent $messageReceivedEvent) use ($failureTransportName, $io, $errorIo, $receiver, $shouldForce, $shouldRedispatch, &$count) {
             ++$count;
             $envelope = $messageReceivedEvent->getEnvelope();
 
@@ -296,7 +296,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
             }
 
             if ('skip' === $choice) {
-                $this->scopedDispatcher->dispatch(new WorkerMessageSkipEvent($envelope, $envelope->last(SentToFailureTransportStamp::class)->getOriginalReceiverName()));
+                $this->scopedDispatcher->dispatch(new WorkerMessageSkipEvent($envelope, $envelope->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName() ?? $failureTransportName));
             }
 
             $messageReceivedEvent->shouldHandle(false);

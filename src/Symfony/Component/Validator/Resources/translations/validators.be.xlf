@@ -280,7 +280,7 @@
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>Суадносіны бакоў выявы занадта вялікія ({{ ratio }}). Дазваляецца максімальныя суадносіны {{max_ratio}} .</target>
+                <target>Суадносіны бакоў выявы занадта вялікія ({{ ratio }}). Дазваляецца максімальныя суадносіны {{ max_ratio }} .</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
@@ -288,7 +288,7 @@
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
-                <target>Выява квадратная ({{width}}x{{height}}px). Квадратныя выявы не дазволены.</target>
+                <target>Выява квадратная ({{ width }}x{{ height }}px). Квадратныя выявы не дазволены.</target>
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
@@ -364,7 +364,7 @@
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>Значэнне павінна быць паміж {{min}} і {{max}}.</target>
+                <target>Значэнне павінна быць паміж {{ min }} і {{ max }}.</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
@@ -372,7 +372,7 @@
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>Колькасць элементаў у гэтай калекцыі павінна быць кратнай {{compared_value}}.</target>
+                <target>Колькасць элементаў у гэтай калекцыі павінна быць кратнай {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
@@ -400,7 +400,7 @@
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target>Значэнне сеткавай маскі павінна быць ад {{min}} да {{max}}.</target>
+                <target>Значэнне сеткавай маскі павінна быць ад {{ min }} да {{ max }}.</target>
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>

@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>این یک آدرس رایانامه (ایمیل) معتبر نمی‌باشد.</target>
+                <target>این مقدار یک آدرس رایانامه (ایمیل) معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>فایل بیش از اندازه بزرگ است({{ size }} {{ suffix }}). بیشینه (حداکثر) اندازه مجاز برابر با {{ limit }} {{ suffix }} می‌باشد.</target>
+                <target>فایل بیش از اندازه بزرگ است({{ size }} {{ suffix }}). بیشینه اندازه مجاز برابر با {{ limit }} {{ suffix }} می‌باشد.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>این مقدار بسیار طولانی است. باید دارای {{limit}} کاراکتر یا کمتر باشد. | این مقدار بسیار طولانی است. باید دارای {{limit}} کاراکتر یا کمتر باشد.</target>
+                <target>این مقدار بسیار طولانی است. باید دارای {{ limit }} کاراکتر یا کمتر باشد.|این مقدار بسیار طولانی است. باید دارای {{ limit }} کاراکتر یا کمتر باشد.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
@@ -92,11 +92,11 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>این مقدار نباید خالی باشد.</target>
+                <target>این مقدار نباید تهی باشد.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>این مقدار باید خالی باشد.</target>
+                <target>این مقدار باید تهی باشد.</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
@@ -108,7 +108,7 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>این مقدار شامل یک URL معتبر نمی‌باشد.</target>
+                <target>این مقدار یک URL معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>فایل بیش از اندازه بزرگ است. بیشینه (حداکثر) اندازه مجاز {{ limit }} {{ suffix }} است.</target>
+                <target>فایل بیش از اندازه بزرگ است. بیشینه اندازه مجاز {{ limit }} {{ suffix }} است.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>بارگذاری فایل با شکست مواجه گردید.</target>
+                <target>بارگذاری فایل امکان‌پذیر نبود.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -144,7 +144,7 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>این مقدار یک محل (locale) معتبر نمی‌باشد.</target>
+                <target>این مقدار یک منطقه‌جغرافیایی (locale) معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
@@ -180,15 +180,15 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target> این مقدار باید دقیقا {{ limit }} کاراکتر داشته باشد.| این مقدار باید دقیقا {{ limit }} کاراکتر داشته باشد.</target>
+                <target>این مقدار باید دقیقا {{ limit }} کاراکتر داشته باشد.|این مقدار باید دقیقا {{ limit }} کاراکتر داشته باشد.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>فایل به صورت جزئی بارگذاری گردیده است.</target>
+                <target>فایل فقط به‌صورت جزئی بارگذاری شده است.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
-                <target>هیچ فایلی بارگذاری نشد.</target>
+                <target>هیچ فایلی بارگذاری نشده است.</target>
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target>این مقدار یک شماره شبای معتبر نمی‌باشد.</target>
+                <target>این مقدار یک شماره IBAN معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -260,7 +260,7 @@
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>این مقدار باید برابر {{ compared_value_type }} {{ compared_value }} باشد.</target>
+                <target>این مقدار باید با {{ compared_value_type }} {{ compared_value }} یکسان باشد.</target>
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
@@ -276,7 +276,7 @@
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>این مقدار نباید برابر {{ compared_value_type }} {{ compared_value }} باشد.</target>
+                <target>این مقدار نباید با {{ compared_value_type }} {{ compared_value }} یکسان باشد.</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>میزبان (Host) شناسایی نشد.</target>
+                <target>هاست (Host) شناسایی نشد.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -360,11 +360,11 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده است. لطفاً از یک رمزعبور دیگر استفاده کنید.</target>
+                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده است و نباید از آن استفاده شود. لطفاً از یک رمزعبور دیگر استفاده کنید.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>این مقدار باید بین {{ min }} و {{ max }} باشد</target>
+                <target>این مقدار باید بین {{ min }} و {{ max }} باشد.</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
@@ -372,15 +372,15 @@
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>تعداد عناصر این مجموعه باید ضریبی از {{ compared_value }} باشد.</target>
+                <target>تعداد عناصر این مجموعه باید مضربی از {{ compared_value }} باشد.</target>
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>این مقدار باید حداقل یکی از محدودیت‌های زیر را ارضا کند:</target>
+                <target>این مقدار باید حداقل یکی از محدودیت‌های زیر را رعایت کند:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>هر یک از عناصر این مجموعه باید دسته محدودیت‌های خودش را ارضا کند.</target>
+                <target>هر یک از عناصر این مجموعه باید دسته محدودیت‌های خودش را رعایت کند.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
@@ -396,15 +396,15 @@
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target>این مقدار یک نماد معتبر در CIDR نیست.</target>
+                <target>این مقدار یک نمادگذاری معتبر در CIDR نیست.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target>مقدار ماسک شبکه (NetMask) باید بین {{ min }} و {{ max }} باشد.</target>
+                <target>مقدار نت‌ماسک (NetMask) باید بین {{ min }} و {{ max }} باشد.</target>
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>نام فایل طولانی است. نام فایل باید {{ filename_max_length }} کاراکتر یا کمتر باشد.|نام فایل طولانی است. نام فایل باید {{ filename_max_length }} کاراکتر یا کمتر باشد.</target>
+                <target>نام فایل بسیار طولانی است. نام فایل باید {{ filename_max_length }} کاراکتر یا کمتر باشد.|نام فایل بسیار طولانی است. نام فایل باید {{ filename_max_length }} کاراکتر یا کمتر باشد.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
@@ -420,11 +420,11 @@
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target>مخلوط کردن اعداد از اسکریپت های مختلف مجاز نیست.</target>
+                <target>ترکیب کردن اعداد از اسکریپت های مختلف مجاز نیست.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target>استفاده از کاراکترهای همپوشانی پنهان (hidden overlay characters) مجاز نیست.</target>
+                <target>استفاده از کاراکترهای همپوشان پنهان (hidden overlay characters) مجاز نیست.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
@@ -440,7 +440,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target>این آدرس دارای دامنه نمی‌باشد.</target>
+                <target>این آدرس دارای دامنه سطح بالا (top-level) نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
@@ -476,39 +476,39 @@
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target>اندازه ویدئو قابل تشخیص نبود.</target>
+                <target>اندازه ویدئو قابل تشخیص نیست.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>عرض ویدئو خیلی زیاد است ({{ width }}px). حداکثر عرض مجاز {{ max_width }}px می‌باشد.</target>
+                <target>عرض ویدئو بسیار زیاد است ({{ width }}px). حداکثر عرض مجاز {{ max_width }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>عرض ویدئو خیلی کم است ({{ width }}px). حداقل عرض مورد انتظار {{ min_width }}px می‌باشد.</target>
+                <target>عرض ویدئو بسیار کم است ({{ width }}px). حداقل عرض مورد انتظار {{ min_width }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>ارتفاع ویدئو خیلی زیاد است ({{ height }}px). حداکثر ارتفاع مجاز {{ max_height }}px می‌باشد.</target>
+                <target>ارتفاع ویدئو بسیار زیاد است ({{ height }}px). حداکثر ارتفاع مجاز {{ max_height }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>ارتفاع ویدئو خیلی کم است ({{ height }}px). حداقل ارتفاع مورد انتظار {{ min_height }}px می‌باشد.</target>
+                <target>ارتفاع ویدئو بسیار کم است ({{ height }}px). حداقل ارتفاع مورد انتظار {{ min_height }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>مقدار پیکسل‌های ویدئو خیلی کم است ({{ pixels }}px). حداقل مقدار مورد انتظار {{ min_pixels }}px می‌باشد.</target>
+                <target>مقدار پیکسل‌های ویدئو بسیار کم است ({{ pixels }}px). حداقل مقدار مورد انتظار {{ min_pixels }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>مقدار پیکسل‌های ویدئو خیلی زیاد است ({{ pixels }}px). حداکثر مقدار مورد انتظار {{ max_pixels }}px می‌باشد.</target>
+                <target>مقدار پیکسل‌های ویدئو بسیار زیاد است ({{ pixels }}px). حداکثر مقدار مورد انتظار {{ max_pixels }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>نسبت ویدئو خیلی بزرگ است ({{ ratio }}). حداکثر نسبت مجاز {{ max_ratio }} است.</target>
+                <target>نسبت ویدئو بسیار بزرگ است ({{ ratio }}). حداکثر نسبت مجاز {{ max_ratio }} است.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>نسبت ویدئو خیلی کوچک است ({{ ratio }}). نسبت حداقل مورد انتظار {{ min_ratio }} است.</target>
+                <target>نسبت ویدئو بسیار کوچک است ({{ ratio }}). نسبت حداقل مورد انتظار {{ min_ratio }} است.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
@@ -528,15 +528,15 @@
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target>ویدئو شامل چندین استریم است. در صورتی که فقط یک استریم مجاز است.</target>
+                <target>ویدئو شامل چندین استریم است. فقط یک استریم مجاز است.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target>قالب (کُدک) ویدئویی پشتیبانی نمی‌شود «{{ codec }}».</target>
+                <target>کُدک ویدئویی پشتیبانی نمی‌شود «{{ codec }}».</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target>فرمت ویدئو پشتیبانی نمی‌شود "{{ container }}".</target>
+                <target>قالب ویدئو پشتیبانی نمی‌شود "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
@@ -544,11 +544,11 @@
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>تصویر پیکسل‌های خیلی کمی دارد ({{ pixels }}px). حداقل مقدار مورد انتظار {{ min_pixels }}px می‌باشد.</target>
+                <target>تصویر پیکسل‌های بسیار کمی دارد ({{ pixels }}px). حداقل مقدار مورد انتظار {{ min_pixels }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>تصویر پیکسل‌های خیلی زیادی دارد ({{ pixels }}px). حداکثر مقدار مورد انتظار {{ max_pixels }}px می‌باشد.</target>
+                <target>تصویر پیکسل‌های بسیار زیادی دارد ({{ pixels }}px). حداکثر مقدار مورد انتظار {{ max_pixels }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
@@ -580,71 +580,71 @@
             </trans-unit>
             <trans-unit id="149">
                 <source>This file is not a valid audio file.</source>
-                <target state="needs-review-translation">این فایل یک فایل صوتی معتبر نیست.</target>
+                <target>این فایل یک فایل صوتی معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="150">
                 <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
-                <target state="needs-review-translation">مدت زمان صدا خیلی کم است ({{ duration }} ثانیه). حداقل مدت زمان مورد انتظار {{ min_duration }} ثانیه می‌باشد.</target>
+                <target>مدت زمان صوت بسیار کم است ({{ duration }} ثانیه). حداقل مدت زمان مورد انتظار {{ min_duration }} ثانیه می‌باشد.</target>
             </trans-unit>
             <trans-unit id="151">
                 <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
-                <target state="needs-review-translation">مدت زمان صدا خیلی زیاد است ({{ duration }} ثانیه). حداکثر مدت زمان مجاز {{ max_duration }} ثانیه می‌باشد.</target>
+                <target>مدت زمان صوت بسیار زیاد است ({{ duration }} ثانیه). حداکثر مدت زمان مجاز {{ max_duration }} ثانیه می‌باشد.</target>
             </trans-unit>
             <trans-unit id="152">
                 <source>The duration of the audio could not be detected.</source>
-                <target state="needs-review-translation">مدت زمان صدا قابل تشخیص نبود.</target>
+                <target>مدت زمان صوت قابل تشخیص نبود.</target>
             </trans-unit>
             <trans-unit id="153">
                 <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
-                <target state="needs-review-translation">نرخ بیت صدا خیلی کم است ({{ bitrate }} bps). حداقل نرخ بیت مورد انتظار {{ min_bitrate }} bps می‌باشد.</target>
+                <target>نرخ بیت صوت بسیار کم است ({{ bitrate }} bps). حداقل نرخ بیت مورد انتظار {{ min_bitrate }} bps می‌باشد.</target>
             </trans-unit>
             <trans-unit id="154">
                 <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
-                <target state="needs-review-translation">نرخ بیت صدا خیلی زیاد است ({{ bitrate }} bps). حداکثر نرخ بیت مجاز {{ max_bitrate }} bps می‌باشد.</target>
+                <target>نرخ بیت صوت بسیار زیاد است ({{ bitrate }} bps). حداکثر نرخ بیت مجاز {{ max_bitrate }} bps می‌باشد.</target>
             </trans-unit>
             <trans-unit id="155">
                 <source>The bitrate of the audio could not be detected.</source>
-                <target state="needs-review-translation">نرخ بیت صدا قابل تشخیص نبود.</target>
+                <target>نرخ بیت صوت قابل تشخیص نبود.</target>
             </trans-unit>
             <trans-unit id="156">
                 <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
-                <target state="needs-review-translation">نرخ نمونه‌برداری صدا پشتیبانی نمی‌شود ({{ sample_rate }} Hz).</target>
+                <target>نرخ نمونه‌برداری صوت پشتیبانی نمی‌شود ({{ sample_rate }} Hz).</target>
             </trans-unit>
             <trans-unit id="157">
                 <source>The sample rate of the audio could not be detected.</source>
-                <target state="needs-review-translation">نرخ نمونه‌برداری صدا قابل تشخیص نبود.</target>
+                <target>نرخ نمونه‌برداری صوت قابل تشخیص نبود.</target>
             </trans-unit>
             <trans-unit id="158">
                 <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
-                <target state="needs-review-translation">تعداد کانال‌های صدا خیلی کم است ({{ channels }}). حداقل مقدار مورد انتظار {{ min_channels }} می‌باشد.</target>
+                <target>تعداد کانال‌های صوت بسیار کم است ({{ channels }}). حداقل مقدار مورد انتظار {{ min_channels }} می‌باشد.</target>
             </trans-unit>
             <trans-unit id="159">
                 <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
-                <target state="needs-review-translation">تعداد کانال‌های صدا خیلی زیاد است ({{ channels }}). حداکثر مقدار مورد انتظار {{ max_channels }} می‌باشد.</target>
+                <target>تعداد کانال‌های صوت بسیار زیاد است ({{ channels }}). حداکثر مقدار مورد انتظار {{ max_channels }} می‌باشد.</target>
             </trans-unit>
             <trans-unit id="160">
                 <source>The number of audio channels could not be detected.</source>
-                <target state="needs-review-translation">تعداد کانال‌های صدا قابل تشخیص نبود.</target>
+                <target>تعداد کانال‌های صوت قابل تشخیص نبود.</target>
             </trans-unit>
             <trans-unit id="161">
                 <source>The audio file is corrupted.</source>
-                <target state="needs-review-translation">فایل صوتی خراب است.</target>
+                <target>فایل صوتی خراب است.</target>
             </trans-unit>
             <trans-unit id="162">
                 <source>The audio contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">صدا شامل چندین استریم است. فقط یک استریم مجاز است.</target>
+                <target>صوت شامل چندین استریم است. فقط یک استریم مجاز است.</target>
             </trans-unit>
             <trans-unit id="163">
                 <source>Unsupported audio codec "{{ codec }}".</source>
-                <target state="needs-review-translation">قالب (کُدک) صوتی پشتیبانی نمی‌شود «{{ codec }}».</target>
+                <target>کُدک صوتی پشتیبانی نمی‌شود «{{ codec }}».</target>
             </trans-unit>
             <trans-unit id="164">
                 <source>Unsupported audio container "{{ container }}".</source>
-                <target state="needs-review-translation">فرمت صدا پشتیبانی نمی‌شود "{{ container }}".</target>
+                <target>قالب صوتی پشتیبانی نمی‌شود "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="165">
                 <source>The file does not contain any audio stream.</source>
-                <target state="needs-review-translation">این فایل هیچ استریم صدایی ندارد.</target>
+                <target>این فایل هیچ استریم صوتی ندارد.</target>
             </trans-unit>
         </body>
     </file>

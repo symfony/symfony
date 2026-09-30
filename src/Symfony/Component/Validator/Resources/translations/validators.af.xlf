@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>Hierdie waarde moet van die soort {{type}} wees.</target>
+                <target>Hierdie waarde moet van die soort {{ type }} wees.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>

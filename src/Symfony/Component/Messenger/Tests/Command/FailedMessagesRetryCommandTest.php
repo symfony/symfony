@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
+use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\MessageBus;
@@ -39,6 +40,7 @@ use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Worker;
@@ -692,6 +694,39 @@ class FailedMessagesRetryCommandTest extends TestCase
 
         $this->assertSame([false], $exitCodes);
         $this->assertStringNotContainsString('[OK] All done!', $tester->getDisplay());
+    }
+
+    public function testSkipRequeuesMessageWithoutOriginalTransportInFailureTransport()
+    {
+        $failureTransportName = 'failure_receiver';
+
+        $message = new \stdClass();
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->willReturn(new Envelope($message));
+        $receiver->expects($this->never())->method('ack');
+        $receiver->expects($this->once())->method('reject');
+
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->once())->method('send')
+            ->with($this->callback(static fn (Envelope $envelope) => $message === $envelope->getMessage()))
+            ->willReturnArgument(0);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator([$failureTransportName => static fn () => $sender])));
+
+        $command = new FailedMessagesRetryCommand(
+            $failureTransportName,
+            new ServiceLocator([$failureTransportName => static fn () => $receiver]),
+            new MessageBus(),
+            $dispatcher
+        );
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['skip']);
+
+        $tester->execute(['id' => ['10']]);
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
     private function createFailedEnvelope(int $id, string $failedAt): Envelope

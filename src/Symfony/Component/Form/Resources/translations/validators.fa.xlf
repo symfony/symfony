@@ -12,11 +12,11 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>توکن CSRF نامعتبر است. لطفاً فرم را مجدداً ارسال نمایید.</target>
+                <target>توکن CSRF نامعتبر است. لطفاً فرم را دوباره ارسال نمایید.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
-                <target>این مقدار یک رنگ معتبر HTML5  نیست.</target>
+                <target>این مقدار یک رنگ معتبر HTML5 نیست.</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>Please enter a valid birthdate.</source>
@@ -88,7 +88,7 @@
             </trans-unit>
             <trans-unit id="117">
                 <source>Please enter a percentage value.</source>
-                <target>لطفاً یک درصد معتبر وارد کنید.</target>
+                <target>لطفاً یک مقدار درصدی معتبر وارد کنید.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
-                <target>کادر انتخاب (checkbox) دارای مقداری نامعتبر است.</target>
+                <target>چک‌باکس (checkbox) دارای مقداری نامعتبر است.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>Please enter a valid email address.</source>
@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>
-                <target state="needs-review-translation">کران پایین نباید بزرگ‌تر از کران بالا باشد.</target>
+                <target>کران پایین نباید بزرگ‌تر از کران بالا باشد.</target>
             </trans-unit>
         </body>
     </file>

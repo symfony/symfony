@@ -945,6 +945,80 @@ class FailureIntegrationTest extends TestCase
         yield 'message class not found' => [['headers' => ['type' => 'App\NonExistentMessage'] + $encodedEnvelope['headers']] + $encodedEnvelope];
     }
 
+    #[DataProvider('provideMessagesThatFailToDecodeUntilTheirClassIsDeployed')]
+    public function testMessageThatFailedToDecodeIsHandledOnItsOwnBus(string $messageClass, string $serializerClass, string $failureSerializerClass, int $maxRetries)
+    {
+        $encodedEnvelope = (new $serializerClass())->encode(new Envelope(new DummyMessage('API'), [new BusNameStamp('command.bus')]));
+
+        if (PhpSerializer::class === $serializerClass) {
+            $encodedEnvelope['body'] = addslashes(str_replace('O:'.\strlen(DummyMessage::class).':"'.DummyMessage::class.'"', 'O:'.\strlen($messageClass).':"'.$messageClass.'"', stripslashes($encodedEnvelope['body'])));
+        } else {
+            $encodedEnvelope['headers']['type'] = $messageClass;
+        }
+
+        $queues = ['transport' => [$encodedEnvelope], 'failed' => []];
+        $calls = [];
+        $handled = [];
+
+        $runWorkers = static function (int $messageLimit) use (&$queues, &$calls, &$handled, $serializerClass, $failureSerializerClass, $maxRetries) {
+            $serializer = new $serializerClass();
+            $failureSerializer = new $failureSerializerClass();
+            $transport = new SerializingFailureTestSenderAndReceiver($serializer, $queues['transport']);
+            $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, $queues['failed']);
+            $serializerLocator = new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer]);
+
+            $commandBus = new MessageBus([
+                new AddBusNameStampMiddleware('command.bus'),
+                new DecodeFailedMessageMiddleware($serializerLocator),
+                new FailedMessageProcessingMiddleware(),
+                new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () use (&$calls) { $calls[] = 'command.bus'; }]])),
+            ]);
+            $eventBus = new MessageBus([
+                new AddBusNameStampMiddleware('event.bus'),
+                new DecodeFailedMessageMiddleware($serializerLocator),
+                new FailedMessageProcessingMiddleware(),
+                new HandleMessageMiddleware(new HandlersLocator([]), true),
+            ]);
+            $bus = new RoutableMessageBus(new ServiceLocator(['command.bus' => static fn () => $commandBus, 'event.bus' => static fn () => $eventBus]), $eventBus);
+
+            $dispatcher = new EventDispatcher();
+            $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy($maxRetries, 0)])));
+            $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+            $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+            $dispatcher->addListener(WorkerMessageHandledEvent::class, static function (WorkerMessageHandledEvent $event) use (&$handled) {
+                $handled[] = $event->getEnvelope();
+            });
+
+            for ($i = 0; $i < $messageLimit && $receivers = array_filter(['transport' => $transport, 'failed' => $failureTransport], static fn ($receiver) => $receiver->getMessagesWaitingToBeReceived()); ++$i) {
+                (new Worker($receivers, $bus, $dispatcher))->run();
+            }
+
+            $queues = ['transport' => $transport->getMessagesWaitingToBeReceived(), 'failed' => $failureTransport->getMessagesWaitingToBeReceived()];
+        };
+
+        $runWorkers(1);
+
+        $this->assertSame([], $handled);
+
+        class_alias(DummyMessage::class, $messageClass);
+        $runWorkers(10);
+
+        $this->assertSame(['command.bus'], $calls);
+        $this->assertCount(1, $handled);
+        $this->assertSame('command.bus', $handled[0]->last(BusNameStamp::class)?->getBusName());
+        $this->assertSame(['transport' => [], 'failed' => []], $queues);
+    }
+
+    public static function provideMessagesThatFailToDecodeUntilTheirClassIsDeployed(): iterable
+    {
+        yield 'PHP, retried' => ['App\PhpMessageRetried', PhpSerializer::class, PhpSerializer::class, 1];
+        yield 'PHP, from a PHP failure transport' => ['App\PhpMessageFromPhpFailureTransport', PhpSerializer::class, PhpSerializer::class, 0];
+        yield 'PHP, from a JSON failure transport' => ['App\PhpMessageFromJsonFailureTransport', PhpSerializer::class, Serializer::class, 0];
+        yield 'JSON, retried' => ['App\JsonMessageRetried', Serializer::class, Serializer::class, 1];
+        yield 'JSON, from a JSON failure transport' => ['App\JsonMessageFromJsonFailureTransport', Serializer::class, Serializer::class, 0];
+        yield 'JSON, from a PHP failure transport' => ['App\JsonMessageFromPhpFailureTransport', Serializer::class, PhpSerializer::class, 0];
+    }
+
     public function testRetryThroughTransportSkipsTheHandlerWhoseResultCannotBeEncoded()
     {
         $transport = new InMemoryTransport(Serializer::create());
@@ -985,6 +1059,65 @@ class FailureIntegrationTest extends TestCase
         $acknowledged = $transport->getAcknowledged();
         $this->assertCount(1, $acknowledged);
         $this->assertSame(['Closure@a', 'Closure@b'], array_map(static fn (HandledStamp $stamp) => $stamp->getHandlerName(), $acknowledged[0]->all(HandledStamp::class)));
+    }
+
+    public function testFailedMessageMovesFromJsonToXmlFailureTransport()
+    {
+        $this->assertHandledFromTheFailureTransport(new Serializer(null, 'json'), new Serializer(null, 'xml'));
+    }
+
+    public function testFailedMessageMovesFromXmlToJsonFailureTransport()
+    {
+        $this->assertHandledFromTheFailureTransport(new Serializer(null, 'xml'), new Serializer(null, 'json'));
+    }
+
+    public function testFailedMessageMovesToAFailureTransportThatUsesTheSameFormat()
+    {
+        $this->assertHandledFromTheFailureTransport(new Serializer(null, 'json'), new Serializer(null, 'json'));
+
+        $serializer = new Serializer(null, 'xml');
+        $this->assertHandledFromTheFailureTransport($serializer, $serializer);
+    }
+
+    private function assertHandledFromTheFailureTransport(Serializer $serializer, Serializer $failureSerializer): void
+    {
+        $transport = new InMemoryTransport($serializer);
+        $failureTransport = new InMemoryTransport($failureSerializer);
+
+        $calls = 0;
+        $handler = static function () use (&$calls) {
+            if (3 > ++$calls) {
+                throw new \RuntimeException('Failure from call '.$calls);
+            }
+        };
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [$handler]]))]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(3));
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame(2, $calls);
+        $this->assertCount(1, $failureTransport->getSent());
+
+        (new Worker(['failure_transport' => $failureTransport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame(3, $calls);
+        $this->assertSame([], $failureTransport->get());
+
+        $acknowledged = $failureTransport->getAcknowledged();
+        $this->assertCount(1, $acknowledged);
+        $this->assertEquals(new DummyMessage('Hello'), $acknowledged[0]->getMessage());
+        $this->assertSame('transport', $acknowledged[0]->last(SentToFailureTransportStamp::class)->getOriginalReceiverName());
     }
 }
 

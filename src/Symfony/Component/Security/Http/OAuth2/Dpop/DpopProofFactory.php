@@ -87,9 +87,9 @@ final class DpopProofFactory
         // is a 500 and a key on the wrong curve is a signature the provider cannot verify
         JwsAlgorithms::checkKey($signingKey, $this->algorithm);
         $this->clock = $clock ?? new Clock();
-        // the public half is derived once: it goes in the header of every proof, and a
-        // private parameter leaking into it would hand the key to whoever gets the proof
-        $this->publicKey = $signingKey->toPublic();
+        // the header of every proof carries the members RFC 7638 names a public key by and nothing else,
+        // since any other member may be private, such as the "oth" of a multi-prime RSA key
+        $this->publicKey = new JWK(array_intersect_key($signingKey->all(), array_flip(['kty', 'crv', 'x', 'y', 'n', 'e'])));
     }
 
     /**

@@ -42,6 +42,14 @@ final class LockKeyNormalizer implements NormalizerInterface, DenormalizerInterf
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Key
     {
+        // the XML encoder decodes null and empty arrays as empty strings
+        if ('' === ($data['expiringTime'] ?? null)) {
+            $data['expiringTime'] = null;
+        }
+        if ('' === ($data['state'] ?? null)) {
+            $data['state'] = [];
+        }
+
         $key = (new \ReflectionClass(Key::class))->newInstanceWithoutConstructor();
         $key->__unserialize($data);
 

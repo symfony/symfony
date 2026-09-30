@@ -511,7 +511,14 @@ abstract class AbstractUnicodeString extends AbstractString
     public function width(bool $ignoreAnsiDecoration = true): int
     {
         $width = 0;
-        $s = str_replace(["\x00", "\x05", "\x07"], '', $this->string);
+        $s = $this->string;
+
+        if ($ignoreAnsiDecoration && str_contains($s, "\x07")) {
+            // BEL can terminate an OSC sequence instead of ST: strip such sequences before BEL is removed
+            $s = preg_replace('/\x1B\][^\x07\x1B\n\r]*+\x07/', '', $s);
+        }
+
+        $s = str_replace(["\x00", "\x05", "\x07"], '', $s);
 
         if (str_contains($s, "\r")) {
             $s = str_replace(["\r\n", "\r"], "\n", $s);

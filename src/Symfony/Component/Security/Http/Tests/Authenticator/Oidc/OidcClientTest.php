@@ -644,6 +644,27 @@ class OidcClientTest extends TestCase
     }
 
     /**
+     * Section 9: a resource server asks for a nonce in its challenge rather than in a JSON body.
+     */
+    public function testAUserInfoRequestRefusedForWantOfANonceIsSentAgainWithIt()
+    {
+        // Given
+        $client = $this->createDpopClient(
+            new MockResponse('', ['http_code' => 401, 'response_headers' => ['WWW-Authenticate' => 'DPoP error="use_dpop_nonce", error_description="Resource server requires nonce in DPoP proof"', 'DPoP-Nonce' => 'nonce-1']]),
+            new JsonMockResponse(['sub' => 'user-1']),
+        );
+
+        // When
+        $claims = $client->fetchUserInfo('access-123');
+
+        // Then
+        $this->assertSame(['sub' => 'user-1'], $claims);
+        $this->assertCount(2, $this->sentProofs);
+        $this->assertArrayNotHasKey('nonce', self::decodePayload($this->sentProofs[0]));
+        $this->assertSame('nonce-1', self::decodePayload($this->sentProofs[1])['nonce']);
+    }
+
+    /**
      * A client assertion carries a "jti" the provider remembers, so the retry is a new request.
      */
     public function testTheRetryAuthenticatesTheClientAgain()

@@ -23,16 +23,24 @@ use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
+use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Worker;
 
 class FailedMessagesRetryCommandTest extends TestCase
@@ -388,6 +396,35 @@ class FailedMessagesRetryCommandTest extends TestCase
         $tester->execute(['id' => ['failed-id'], '--force' => true, '--redispatch' => true]);
 
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRedispatchDecodesADecodingFailureWithTheSerializerOfItsOriginalTransport()
+    {
+        $serializer = new PhpSerializer();
+        $envelope = MessageDecodingFailedException::wrap($serializer->encode(new Envelope(new DummyMessage('a'))), 'Could not decode.')
+            ->with(new SentToFailureTransportStamp('async'), new TransportMessageIdStamp('failed-id'));
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->method('find')->willReturn($envelope);
+        $receiver->expects($this->once())->method('ack');
+        $receiver->expects($this->never())->method('reject');
+
+        $async = new InMemoryTransport();
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['async' => static fn () => $serializer])),
+            new FailedMessageProcessingMiddleware(),
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['async']], new ServiceLocator(['async' => static fn () => $async]))),
+        ]);
+
+        $command = new FailedMessagesRetryCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]), $bus, new EventDispatcher());
+
+        $tester = new CommandTester($command);
+        $tester->execute(['id' => ['failed-id'], '--force' => true, '--redispatch' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+        $this->assertCount(1, $sent = $async->getSent());
+        $this->assertEquals(new DummyMessage('a'), $sent[0]->getMessage());
+        $this->assertSame([], $sent[0]->all(SentToFailureTransportStamp::class));
     }
 
     public function testRedispatchKeepsTheMessageWhenTheBusThrows()

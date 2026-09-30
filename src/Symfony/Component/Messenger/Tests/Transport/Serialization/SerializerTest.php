@@ -355,6 +355,33 @@ class SerializerTest extends TestCase
         ]);
     }
 
+    public function testDecodingFailsWithAStampHeaderThatDoesNotFitTheStamp()
+    {
+        $serializer = new Serializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+
+        $serializer->decode([
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.ValidationStamp::class => '[{"groups":"foo"}]',
+            ],
+        ]);
+    }
+
+    public function testDecodingFailsWithABodyThatDoesNotFitTheMessage()
+    {
+        $serializer = new Serializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+
+        $serializer->decode([
+            'body' => '{"message":["hello"]}',
+            'headers' => ['type' => DummyMessage::class],
+        ]);
+    }
+
     public function testDecodingFailsWithAStampHeaderThatIsNotAStamp()
     {
         $serializer = new Serializer();

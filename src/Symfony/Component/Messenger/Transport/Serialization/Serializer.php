@@ -22,7 +22,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -96,8 +95,8 @@ class Serializer implements SerializerInterface
 
         try {
             $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $this->format, $context);
-        } catch (ExceptionInterface $e) {
-            throw new MessageDecodingFailedException('Could not decode message: '.$e->getMessage(), $e->getCode(), $e);
+        } catch (\Throwable $e) {
+            throw new MessageDecodingFailedException('Could not decode message: '.$e->getMessage(), (int) $e->getCode(), $e);
         }
 
         return new Envelope($message, $stamps);
@@ -152,8 +151,8 @@ class Serializer implements SerializerInterface
 
             try {
                 $stamps[] = $this->serializer->deserialize($value, $class.'[]', $this->format, $this->stampContext);
-            } catch (ExceptionInterface $e) {
-                throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
+            } catch (\Throwable $e) {
+                throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), (int) $e->getCode(), $e);
             }
         }
         if ($stamps) {

@@ -15,6 +15,7 @@ use Symfony\Component\Lock\Serializer\LockKeyNormalizer;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
@@ -23,7 +24,6 @@ use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExcept
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -106,8 +106,8 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
         try {
             $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $this->format, $context);
-        } catch (ExceptionInterface $e) {
-            throw new MessageDecodingFailedException('Could not decode message: '.$e->getMessage(), $e->getCode(), $e);
+        } catch (\Throwable $e) {
+            throw new MessageDecodingFailedException('Could not decode message: '.$e->getMessage(), (int) $e->getCode(), $e);
         }
 
         return new Envelope($message, $stamps);
@@ -130,6 +130,11 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
+
+        // handler results are for synchronous callers: retries only need the names of the handlers that already ran
+        if ($handledStamps = $envelope->all(HandledStamp::class)) {
+            $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_map(static fn (HandledStamp $stamp) => new HandledStamp(null, $stamp->getHandlerName()), $handledStamps));
+        }
 
         $headers = ['type' => $envelope->getMessage()::class] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
 
@@ -162,8 +167,8 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
             try {
                 $stamps[] = $this->serializer->deserialize($value, $class.'[]', $this->format, $this->stampContext);
-            } catch (ExceptionInterface $e) {
-                throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
+            } catch (\Throwable $e) {
+                throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), (int) $e->getCode(), $e);
             }
         }
         if ($stamps) {

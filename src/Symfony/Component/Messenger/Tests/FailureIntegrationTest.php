@@ -39,6 +39,7 @@ use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -536,6 +537,48 @@ class FailureIntegrationTest extends TestCase
         $this->assertCount(1, $acknowledged);
         $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($acknowledged[0]));
         $this->assertSame('Failure from call 1', $acknowledged[0]->last(ErrorDetailsStamp::class)->getExceptionMessage());
+    }
+
+    public function testRetryThroughTransportSkipsTheHandlerWhoseResultCannotBeEncoded()
+    {
+        $transport = new InMemoryTransport(Serializer::create());
+
+        $calls = ['a' => 0, 'b' => 0];
+        $handlerA = static function () use (&$calls) {
+            ++$calls['a'];
+            $result = new \stdClass();
+            $result->self = $result;
+
+            return $result;
+        };
+        $handlerB = static function () use (&$calls) {
+            if (1 === ++$calls['b']) {
+                throw new \RuntimeException('Failure from call 1');
+            }
+        };
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [
+            new HandlerDescriptor($handlerA, ['alias' => 'a']),
+            new HandlerDescriptor($handlerB, ['alias' => 'b']),
+        ]]))]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(3));
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame(['a' => 1, 'b' => 2], $calls);
+
+        $acknowledged = $transport->getAcknowledged();
+        $this->assertCount(1, $acknowledged);
+        $this->assertSame(['Closure@a', 'Closure@b'], array_map(static fn (HandledStamp $stamp) => $stamp->getHandlerName(), $acknowledged[0]->all(HandledStamp::class)));
     }
 }
 

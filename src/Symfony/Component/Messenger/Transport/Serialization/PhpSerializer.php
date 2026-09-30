@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
@@ -187,6 +188,11 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
     public function encode(Envelope $envelope): array
     {
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
+
+        // handler results are for synchronous callers: retries only need the names of the handlers that already ran
+        if ($handledStamps = $envelope->all(HandledStamp::class)) {
+            $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_map(static fn (HandledStamp $stamp) => new HandledStamp(null, $stamp->getHandlerName()), $handledStamps));
+        }
 
         $body = addslashes(serialize($envelope));
 

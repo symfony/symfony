@@ -484,7 +484,7 @@ abstract class AbstractUnicodeString extends AbstractString
                 $s = preg_replace('/(?:\x1B(?:
                     \[ [\x30-\x3F]*+ [\x20-\x2F]*+ [\x40-\x7E]
                     | [P\]X^_] .*? \x1B\\\\
-                    | [\x41-\x7E]
+                    | [\x20-\x2F]*+ [\x30-\x7E]?
                 )|[\p{Cc}\x7F]++)/xu', '', $s);
             }
 

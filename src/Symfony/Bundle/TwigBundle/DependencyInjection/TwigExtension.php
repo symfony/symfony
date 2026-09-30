@@ -30,6 +30,7 @@ use Twig\Attribute\AsTwigFunction;
 use Twig\Attribute\AsTwigTest;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
+use Twig\Loader\FilesystemLoader;
 use Twig\Loader\LoaderInterface;
 
 /**
@@ -135,20 +136,21 @@ class TwigExtension extends Extension
             $container->getDefinition('twig.command.lint')->replaceArgument(1, $config['file_name_pattern'] ?: ['*.twig']);
         }
 
+        // the directories below are known to exist, false tells the loader not to check them again on each request
         foreach ($this->getBundleTemplatePaths($container, $config) as $name => $paths) {
             $namespace = $this->normalizeBundleName($name);
             foreach ($paths as $path) {
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace]);
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace, false]);
             }
 
             if ($paths) {
                 // the last path must be the bundle views directory
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, '!'.$namespace]);
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, '!'.$namespace, false]);
             }
         }
 
         if (file_exists($defaultTwigPath)) {
-            $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$parameterBag->escapeValue($defaultTwigPath)]);
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$parameterBag->escapeValue($defaultTwigPath), FilesystemLoader::MAIN_NAMESPACE, false]);
         }
         $container->addResource(new FileExistenceResource($defaultTwigPath));
 

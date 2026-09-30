@@ -53,7 +53,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     // parameters of the authorization request the authenticator computes itself, so
     // that no configuration can weaken them; "max_age" is owned too, as sending it
     // obliges this client to check the "auth_time" claim of the resulting ID token
-    private const MANAGED_PARAMS = ['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'max_age'];
+    private const MANAGED_PARAMS = ['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'max_age', 'dpop_jkt'];
 
     private array $options;
     private readonly ClockInterface $clock;

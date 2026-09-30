@@ -229,6 +229,21 @@ class OidcLoginFactoryTest extends TestCase
         ], $factory);
     }
 
+    public function testAuthorizationParamsCannotNameTheDpopKey()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('nor "dpop_jkt": the authenticator manages these');
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+            'authorization_params' => ['dpop_jkt' => 'another-key-thumbprint'],
+        ], $factory);
+    }
+
     public function testPkceMethodRejectsUnknownValue()
     {
         $factory = new OidcLoginFactory();

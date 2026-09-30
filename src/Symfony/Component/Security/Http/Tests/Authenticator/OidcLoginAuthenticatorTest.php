@@ -1125,6 +1125,14 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->createAuthenticator(authorizationParams: ['state' => 'fixed', 'code_challenge' => '', 'prompt' => 'consent']);
     }
 
+    public function testTheDpopKeyIsNotTakenFromTheAuthorizationParams()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The authorization request parameter(s) "dpop_jkt" are managed by the authenticator');
+
+        $this->createAuthenticator(authorizationParams: ['dpop_jkt' => 'another-key-thumbprint']);
+    }
+
     public function testStartDispatchesTheAuthorizationRequestEvent()
     {
         $dispatcher = new EventDispatcher();

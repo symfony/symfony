@@ -74,17 +74,22 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
 
     public function onMessageSkip(WorkerMessageSkipEvent $event): void
     {
-        if (!$this->failureSenders->has($event->getReceiverName())) {
+        $envelope = $event->getEnvelope();
+        $senderName = $event->getReceiverName();
+
+        if ($envelope->last(SentToFailureTransportStamp::class)) {
+            $envelope = $envelope->with(new SentToFailureTransportStamp($senderName));
+        } elseif (false !== $transportName = array_search($senderName, $this->failureTransportsByName, true)) {
+            // a message that was not sent to the failure transport after failing goes back to the failure transport it was received from,
+            // whose sender is keyed by the transports that fail to it
+            $senderName = $transportName;
+        }
+
+        if (!$this->failureSenders->has($senderName)) {
             return;
         }
 
-        $failureSender = $this->failureSenders->get($event->getReceiverName());
-        $envelope = $event->getEnvelope()->with(
-            new SentToFailureTransportStamp($event->getReceiverName()),
-            new DelayStamp(0),
-        );
-
-        $failureSender->send($envelope);
+        $this->failureSenders->get($senderName)->send($envelope->with(new DelayStamp(0)));
     }
 
     public static function getSubscribedEvents(): array

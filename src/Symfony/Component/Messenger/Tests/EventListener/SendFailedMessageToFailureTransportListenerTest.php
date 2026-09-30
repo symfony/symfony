@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageSkipEvent;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -183,5 +184,23 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
+    }
+
+    public function testSkippedMessageWithoutOriginalTransportGoesBackToTheFailureTransportItWasReceivedFrom()
+    {
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->once())->method('send')
+            ->with($this->callback(static fn (Envelope $envelope) => null === $envelope->last(SentToFailureTransportStamp::class)))
+            ->willReturnArgument(0);
+        $chainedSender = $this->createMock(SenderInterface::class);
+        $chainedSender->expects($this->never())->method('send');
+
+        $serviceLocator = new ServiceLocator([
+            'my_receiver' => static fn () => $sender,
+            'failed' => static fn () => $chainedSender,
+        ]);
+        $listener = new SendFailedMessageToFailureTransportListener($serviceLocator, null, ['my_receiver' => 'failed', 'failed' => 'super_failed']);
+
+        $listener->onMessageSkip(new WorkerMessageSkipEvent(new Envelope(new \stdClass()), 'failed'));
     }
 }

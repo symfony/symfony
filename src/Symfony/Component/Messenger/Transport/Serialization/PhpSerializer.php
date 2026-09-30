@@ -242,6 +242,15 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
             throw new MessageDecodingFailedException('Could not decode message into an Envelope.');
         }
 
+        foreach ($envelope->all() as $stamps) {
+            foreach ($stamps as $stamp) {
+                // encoding strips these stamps, so they never come from a transport
+                if ($stamp instanceof NonSendableStampInterface) {
+                    throw new MessageDecodingFailedException(\sprintf('Could not decode stamp: "%s" is a "%s".', $stamp::class, NonSendableStampInterface::class));
+                }
+            }
+        }
+
         if ($envelope->getMessage() instanceof \__PHP_Incomplete_Class) {
             $envelope = $envelope->with(new MessageDecodingFailedStamp());
         }

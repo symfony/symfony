@@ -681,10 +681,11 @@ class ParserTest extends TestCase
         $this->assertSameData([['a' => new TaggedValue('text', "\n")], 'b'], $this->parser->parse("- a: !text\t|+\n\n- b\n", Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testEmptyBlockScalarFollowedByLessIndentedComment()
+    public function testHashLedLinesAfterMoreIndentedEmptyLinesAreBlockScalarContent()
     {
-        $this->assertSame(['k' => "\n", 'next' => 1], $this->parser->parse("k: |+\n   \n  # comment\nnext: 1\n"));
-        $this->assertSame(['k' => ''], $this->parser->parse("k: >\n   \n  # comment\n"));
+        $this->assertSame(['k' => "\n# comment\ntext", 'next' => 1], $this->parser->parse("k: |-\n     \n    # comment\n    text\nnext: 1\n"));
+        $this->assertSame(['k' => "\n# comment\n", 'next' => 1], $this->parser->parse("k: |+\n   \n  # comment\nnext: 1\n"));
+        $this->assertSame(['k' => "\n# comment\n"], $this->parser->parse("k: >\n   \n  # comment\n"));
         $this->assertSame(["\n\n# detected\n"], $this->parser->parse("- >\n \n  \n  # detected\n"));
     }
 

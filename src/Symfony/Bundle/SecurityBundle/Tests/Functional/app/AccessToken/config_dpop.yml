@@ -1,0 +1,36 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+framework:
+    serializer: ~
+
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    dunglas: { password: foo, roles: [ROLE_USER] }
+
+    firewalls:
+        main:
+            pattern: ^/
+            stateless: true
+            access_token:
+                dpop: true
+                token_handler:
+                    oidc:
+                        claim: 'username'
+                        audience: 'Symfony OIDC'
+                        issuers: [ 'https://www.example.com' ]
+                        algorithms: [ 'ES256' ]
+                        enforce_at_jwt_type: true
+                        # tip: use https://mkjwk.org/ to generate a JWK
+                        keyset: '{"keys":[{"kty":"EC","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo"}]}'
+                token_extractors: 'header'
+                realm: 'My API'
+
+    access_control:
+        - { path: ^/foo, roles: ROLE_USER }

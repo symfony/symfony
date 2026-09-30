@@ -241,12 +241,14 @@ final class EditorRenderer
             return $beforeCursor.$marker.' ';
         }
 
-        // Full width, place cursor on the last grapheme
+        // Full width, place cursor on the last grapheme that takes a column
         if ($graphemesFallback = grapheme_str_split($beforeCursor)) {
-            /** @var string $lastGrapheme */
-            $lastGrapheme = array_pop($graphemesFallback);
+            $lastGraphemes = '';
+            do {
+                $lastGraphemes = array_pop($graphemesFallback).$lastGraphemes;
+            } while ($graphemesFallback && 0 === AnsiUtils::visibleWidth($lastGraphemes));
 
-            return implode('', $graphemesFallback).$marker.$lastGrapheme;
+            return implode('', $graphemesFallback).$marker.$lastGraphemes;
         }
 
         return $beforeCursor;

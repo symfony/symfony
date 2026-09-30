@@ -38,6 +38,23 @@ class LoginLinkFactoryTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.authenticator.login_link_handler.firewall1'));
     }
 
+    public function testSecretAcceptsSeveralSecrets()
+    {
+        $container = new ContainerBuilder();
+        $factory = new LoginLinkFactory();
+
+        $factory->createAuthenticator($container, 'firewall1', $this->processConfig(['check_route' => 'app_check_login_link', 'signature_properties' => ['email'], 'secret' => ['new', 'old']], $factory), 'userprovider');
+
+        $this->assertSame(['new', 'old'], $container->getDefinition('security.authenticator.login_link_signature_hasher.firewall1')->getArgument(2));
+    }
+
+    public function testSecretDefaultsToTheKernelSecret()
+    {
+        $config = $this->processConfig(['check_route' => 'app_check_login_link', 'signature_properties' => ['email']], new LoginLinkFactory());
+
+        $this->assertSame(['%kernel.secret%'], $config['secret']);
+    }
+
     private function processConfig(array $config, LoginLinkFactory $factory)
     {
         $nodeDefinition = new ArrayNodeDefinition('login-link');

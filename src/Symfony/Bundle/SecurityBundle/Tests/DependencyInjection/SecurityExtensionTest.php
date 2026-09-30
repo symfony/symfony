@@ -988,7 +988,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $handler = $container->getDefinition('security.authenticator.remember_me_signature_hasher.default');
-        $this->assertSame('very', $handler->getArgument(2));
+        $this->assertSame(['very'], $handler->getArgument(2));
     }
 
     public function testRememberMeSignaturePropertiesDefaultToPassword()

@@ -69,9 +69,13 @@ class LoginLinkFactory extends AbstractFactory
             ->scalarNode('provider')
                 ->info('The user provider to load users from.')
             ->end()
-            ->scalarNode('secret')
-                ->cannotBeEmpty()
-                ->defaultValue('%kernel.secret%')
+            ->arrayNode('secret')
+                ->info('Secret used to sign the links. List several to rotate it: the first one signs, all of them verify.')
+                ->acceptAndWrap(['string'])
+                ->requiresAtLeastOneElement()
+                ->performNoDeepMerging()
+                ->defaultValue(['%kernel.secret%'])
+                ->scalarPrototype()->cannotBeEmpty()->end()
             ->end()
         ;
 

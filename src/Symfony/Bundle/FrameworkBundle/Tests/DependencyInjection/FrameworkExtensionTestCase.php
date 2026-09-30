@@ -56,6 +56,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -278,6 +279,29 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('fragment.renderer.hinclude'));
         $this->assertTrue($container->hasParameter('fragment.renderer.hinclude.global_template'));
         $this->assertNull($container->getDefinition('fragment.renderer.hinclude')->getArgument(2));
+    }
+
+    public function testUriSignerSecretDefaultsToTheKernelSecret()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+            ]);
+        });
+
+        $this->assertEquals(new Parameter('kernel.secret'), $container->getDefinition('uri_signer')->getArgument(0));
+    }
+
+    public function testUriSignerSecrets()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'uri_signer' => ['secret' => ['n3w', 's3cr3t']],
+            ]);
+        });
+
+        $this->assertSame(['n3w', 's3cr3t'], $container->getDefinition('uri_signer')->getArgument(0));
     }
 
     #[Group('legacy')]

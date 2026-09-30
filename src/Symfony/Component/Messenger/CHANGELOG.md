@@ -45,6 +45,8 @@ CHANGELOG
  * Add `chain` to the default bus middleware, between `send_message` and `handle_message`
  * Add `DispatchOnFailureStamp`, `FailedMessageStamp`, `DispatchOnFailureMiddleware` and `DispatchOnFailureListener` to dispatch a message when another one fails for good
  * Add `dispatch_on_failure` to the default bus middleware, between `flow_context` and `dispatch_after_current_bus`
+ * Accept a list of keys in `SigningSerializer::__construct()` to rotate them
+ * Add the `messenger.serializer.signing_secret` option
 
 8.1
 ---

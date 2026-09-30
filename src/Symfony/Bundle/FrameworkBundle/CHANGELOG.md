@@ -69,6 +69,7 @@ CHANGELOG
  * Add `MessengerAssertionsTrait` to `KernelTestCase`, with `assertQueuedMessageCount()`, `getQueuedMessages()`, `getMessengerTransport()` and `consumeQueuedMessages()` for in-memory Messenger transports
  * Don't use the secrets vault as an env var loader when its directory is in the project but does not exist at build time
  * Add the `framework.request.serializer` and `framework.response.serializer` options
+ * Add the `framework.uri_signer.secret` option
 
 8.1
 ---

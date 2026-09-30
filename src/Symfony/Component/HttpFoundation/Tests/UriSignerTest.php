@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -432,5 +433,51 @@ class UriSignerTest extends TestCase
         $this->expectException(UnverifiedSignedUriException::class);
 
         $signer->verify($uri, 'invalid');
+    }
+
+    public function testSignWithTheFirstOfSeveralSecrets()
+    {
+        $expiration = new \DateTimeImmutable('2099-01-01 00:00:00');
+        $signer = new UriSigner(['new-secret', 'old-secret']);
+
+        $this->assertSame((new UriSigner('new-secret'))->sign('http://example.com/foo', $expiration), $signer->sign('http://example.com/foo', $expiration));
+    }
+
+    public function testCheckWithAnyOfSeveralSecrets()
+    {
+        $expiration = new \DateTimeImmutable('2099-01-01 00:00:00');
+        $signer = new UriSigner(['new-secret', 'old-secret']);
+        $uri = (new UriSigner('old-secret'))->sign('http://example.com/foo', $expiration, 'v1');
+
+        $this->assertTrue($signer->check($uri, 'v1'));
+        $this->assertTrue($signer->checkRequest(Request::create($uri), 'v1'));
+        $this->assertFalse($signer->check($uri, 'v2'));
+        $this->assertFalse($signer->check((new UriSigner('other-secret'))->sign('http://example.com/foo', $expiration)));
+    }
+
+    public function testVerifyExpiredUriSignedWithAPreviousSecret()
+    {
+        $signer = new UriSigner(['new-secret', 'old-secret']);
+        $uri = (new UriSigner('old-secret'))->sign('http://example.com/foo', 123456);
+
+        $this->expectException(ExpiredSignedUriException::class);
+
+        $signer->verify($uri);
+    }
+
+    #[DataProvider('provideEmptySecrets')]
+    public function testConstructorRejectsEmptySecrets(string|array $secret)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+
+        new UriSigner($secret);
+    }
+
+    public static function provideEmptySecrets(): iterable
+    {
+        yield 'empty string' => [''];
+        yield 'empty list' => [[]];
+        yield 'empty string in a list' => [['secret', '']];
     }
 }

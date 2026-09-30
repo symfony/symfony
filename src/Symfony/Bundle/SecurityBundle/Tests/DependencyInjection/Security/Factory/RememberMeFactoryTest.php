@@ -69,6 +69,36 @@ class RememberMeFactoryTest extends TestCase
         $this->assertArrayNotHasKey('samesite', $withSessionDefaults);
     }
 
+    public function testSecretDefaultsToTheKernelSecret()
+    {
+        $factory = new RememberMeFactory();
+        $factory->addConfiguration($nodeDefinition = new ArrayNodeDefinition('remember_me'));
+        $node = $nodeDefinition->getNode();
+
+        $this->assertSame(['%kernel.secret%'], $node->finalize($node->normalize([]))['secret']);
+    }
+
+    public function testSecretAcceptsSeveralSecrets()
+    {
+        $container = new ContainerBuilder();
+        $factory = $this->createFactory($container, null);
+
+        $factory->createAuthenticator($container, 'main', $this->processConfig($factory, ['secret' => ['new', 'old']]), 'security.user.provider.concrete.default');
+
+        $this->assertSame(['new', 'old'], $container->getDefinition('security.authenticator.remember_me_signature_hasher.main')->getArgument(2));
+    }
+
+    public function testSecretIsOverriddenAcrossFiles()
+    {
+        $factory = new RememberMeFactory();
+        $factory->addConfiguration($nodeDefinition = new ArrayNodeDefinition('remember_me'));
+        $node = $nodeDefinition->getNode();
+
+        $config = $node->finalize($node->merge($node->normalize(['secret' => 'old']), $node->normalize(['secret' => ['new', 'old']])));
+
+        $this->assertSame(['new', 'old'], $config['secret']);
+    }
+
     private function createHandlerOptions(?array $frameworkConfig, array $rememberMeConfig = []): array
     {
         $container = new ContainerBuilder();

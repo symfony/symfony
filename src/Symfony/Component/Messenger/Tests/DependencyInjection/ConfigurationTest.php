@@ -26,6 +26,7 @@ class ConfigurationTest extends TestCase
             'routing' => [],
             'serializer' => [
                 'default_serializer' => 'messenger.transport.native_php_serializer',
+                'signing_secret' => [],
                 'symfony_serializer' => [
                     'service' => null,
                     'format' => 'json',
@@ -172,6 +173,23 @@ class ConfigurationTest extends TestCase
             ],
             $config['buses']
         );
+    }
+
+    public function testSigningSecretAcceptsASingleSecret()
+    {
+        $config = $this->process(['serializer' => ['signing_secret' => 's3cr3t']]);
+
+        $this->assertSame(['s3cr3t'], $config['serializer']['signing_secret']);
+    }
+
+    public function testSigningSecretIsOverriddenAcrossFiles()
+    {
+        $config = new Processor()->processConfiguration($this->configuration(), [
+            ['serializer' => ['signing_secret' => 'old']],
+            ['serializer' => ['signing_secret' => ['new', 'old']]],
+        ]);
+
+        $this->assertSame(['new', 'old'], $config['serializer']['signing_secret']);
     }
 
     private function process(mixed $config): array

@@ -223,6 +223,11 @@ class FrameworkExtension extends Extension
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $container->getDefinition('uri_signer')->addArgument($config['uri_signer']['expiration']);
+
+        if ($config['uri_signer']['secret']) {
+            $container->getDefinition('uri_signer')->replaceArgument(0, $config['uri_signer']['secret']);
+        }
+
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader, $config['secret'] ?? null);
 

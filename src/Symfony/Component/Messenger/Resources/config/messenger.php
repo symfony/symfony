@@ -309,7 +309,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('messenger.default_bus'),
             ])
-            ->tag('messenger.message_handler')
+            ->tag('messenger.message_handler', ['sign' => true])
 
         ->set('messenger.failed_message_repository', FailedMessageRepository::class)
             ->args([

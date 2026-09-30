@@ -37,6 +37,7 @@ use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransportFactory
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
+use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -730,6 +731,17 @@ class MessengerBundleExtensionTest extends TestCase
         $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
         $this->assertArrayHasKey('*', $mapping);
         $this->assertContains('messenger.default_serializer', $mapping['*']);
+    }
+
+    public function testMessengerRedispatchMessageRequiresSignature()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', ['transports' => ['async' => ['dsn' => 'in-memory://']]]);
+            $container->addCompilerPass(new MessengerPass());
+        });
+
+        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
+        $this->assertContains(RedispatchMessage::class, $container->getDefinition('messenger.signing_serializer')->getArgument(2));
     }
 
     private function getBusMiddlewareIds(ContainerBuilder $container, string $busId): array

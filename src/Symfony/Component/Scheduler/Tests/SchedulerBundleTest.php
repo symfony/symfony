@@ -87,6 +87,14 @@ class SchedulerBundleTest extends TestCase
         $this->assertFalse($container->hasDefinition('serializer.normalizer.scheduler_trigger'));
     }
 
+    public function testServiceCallMessageHandlerRequiresSignature()
+    {
+        $container = new ContainerBuilder();
+        new SchedulerBundle()->getContainerExtension()->load([['enabled' => true]], $container);
+
+        $this->assertSame([['sign' => true]], $container->getDefinition('scheduler.messenger.service_call_message_handler')->getTag('messenger.message_handler'));
+    }
+
     public function testUseMessengerRoutingNotSetKeepsTheParameterNull()
     {
         // no deprecation is expected here: it is only triggered lazily by SchedulerTransport,

@@ -202,6 +202,62 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals([new HandledStamp(null, 'handler_a'), new HandledStamp(null, 'handler_b')], $decodedEnvelope->all(HandledStamp::class));
     }
 
+    public function testDecodingFailsWithNonSendableStamps()
+    {
+        $serializer = $this->createPhpSerializer();
+
+        $envelope = $serializer->decode(['body' => addslashes(serialize(new Envelope(new DummyMessage('Hello'), [
+            new BusNameStamp('a'),
+            new DummyPhpSerializerNonSendableStamp(),
+        ])))]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertSame(\sprintf('Could not decode stamp: "%s" is a "%s".', DummyPhpSerializerNonSendableStamp::class, NonSendableStampInterface::class), $envelope->getMessage()->getMessage());
+        $this->assertEquals([new BusNameStamp('a')], $envelope->all(BusNameStamp::class));
+    }
+
+    public function testDecodingFailsWhenAStampIsFiledUnderAnotherClass()
+    {
+        $serializer = $this->createPhpSerializer();
+
+        $envelope = $serializer->decode(['body' => addslashes(self::serializeEnvelope([
+            'stamps' => [BusNameStamp::class => [new BusNameStamp('a'), new DummyPhpSerializerNonSendableStamp()]],
+            'message' => new DummyMessage('Hello'),
+        ]))]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertSame('Could not decode Envelope: Cannot unserialize '.Envelope::class, $envelope->getMessage()->getMessage());
+    }
+
+    public function testDecodingFailsWithMalformedEnvelopes()
+    {
+        $serializer = $this->createPhpSerializer();
+
+        foreach ([
+            'stamps that are not an array' => ['stamps' => 'foo', 'message' => new DummyMessage('Hello')],
+            'stamps that are not in arrays' => ['stamps' => [BusNameStamp::class => new BusNameStamp('a')], 'message' => new DummyMessage('Hello')],
+            'an empty array of stamps' => ['stamps' => [BusNameStamp::class => []], 'message' => new DummyMessage('Hello')],
+            'a stamp that is not a stamp' => ['stamps' => [DummyMessage::class => [new DummyMessage('Hello')]], 'message' => new DummyMessage('Hello')],
+            'no message' => ['stamps' => []],
+            'a message that is not an object' => ['stamps' => [], 'message' => 'Hello'],
+        ] as $case => $properties) {
+            $envelope = $serializer->decode(['body' => addslashes(self::serializeEnvelope($properties))]);
+
+            $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage(), $case);
+            $this->assertStringStartsWith('Could not decode Envelope: ', $envelope->getMessage()->getMessage(), $case);
+        }
+    }
+
+    public function testDecodingFailsWhenThePayloadIsNotAnEnvelope()
+    {
+        $serializer = $this->createPhpSerializer();
+
+        $envelope = $serializer->decode(['body' => addslashes(serialize(new DummyMessage('Hello')))]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertSame('Could not decode message into an Envelope.', $envelope->getMessage()->getMessage());
+    }
+
     public function testNonUtf8IsBase64Encoded()
     {
         $serializer = $this->createPhpSerializer();
@@ -309,13 +365,13 @@ class PhpSerializerTest extends TestCase
             $enumClass,
         ];
 
-        yield 'stamp string value containing message-key bytes: ignored' => (static function () use ($stampsKey, $messageKey, $envelopePrefix) {
+        yield 'stamp string value containing message-key bytes: rejected as PHP rejects the malformed stamps' => (static function () use ($stampsKey, $messageKey, $envelopePrefix) {
             $decoy = $messageKey.'O:5:"PWNED":0:{}';
             $stamps = 'a:1:{i:0;s:'.\strlen($decoy).':"'.$decoy.'";}';
 
             return [
                 $envelopePrefix.':2:{'.$stampsKey.$stamps.$messageKey.'O:6:"Honest":0:{}}',
-                'Honest',
+                null,
             ];
         })();
 
@@ -435,6 +491,17 @@ class PhpSerializerTest extends TestCase
         $this->assertSame([], $requested, 'getMessageType() must not autoload any class.');
 
         return $type;
+    }
+
+    private static function serializeEnvelope(array $properties): string
+    {
+        $serializedProperties = '';
+
+        foreach ($properties as $name => $value) {
+            $serializedProperties .= serialize("\0".Envelope::class."\0".$name).serialize($value);
+        }
+
+        return \sprintf('O:%d:"%s":%d:{%s}', \strlen(Envelope::class), Envelope::class, \count($properties), $serializedProperties);
     }
 }
 

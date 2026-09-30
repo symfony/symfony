@@ -28,7 +28,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 tagged_locator('scheduler.task'),
             ])
-            ->tag('messenger.message_handler')
+            ->tag('messenger.message_handler', ['sign' => true])
         ->set('scheduler.messenger_transport_factory', SchedulerTransportFactory::class)
             ->args([
                 tagged_locator('scheduler.schedule_provider', 'name'),

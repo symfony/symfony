@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T09:17:38Z
+
+Thanks @thomas-chauchefoin-tob, I took this over: instead of deriving the expected issuer from the discovery URL, each endpoint can now be pinned to an explicit issuer, with `check_issuer: true` in SecurityBundle, or a map for providers like Entra v1 whose issuer lives on another host. A pinned endpoint also binds its keys to that issuer, which is what makes the check useful with a single endpoint. The description is updated accordingly.

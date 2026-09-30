@@ -794,17 +794,40 @@ class DumperTest extends TestCase
             ],
         ];
 
-        $expectedData = [
-            'data' => [
-                'multi_line' => "\nthe second line\nThe third line.",
-            ],
-        ];
-
-        $expectedYml = "data:\n    multi_line: |-\n            \n        the second line\n        The third line.";
+        $expectedYml = "data:\n    multi_line: |4-\n            \n        the second line\n        The third line.";
 
         $yml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
         $this->assertSame($expectedYml, $yml);
-        $this->assertSame($expectedData, $this->parser->parse($yml));
+        $this->assertSame($data, $this->parser->parse($yml));
+    }
+
+    #[DataProvider('provideMultiLineStringsWithLeadingSpacesOnlyLines')]
+    public function testDumpMultiLineStringWithLeadingSpacesOnlyLines(string $value, int $indentation)
+    {
+        $data = ['value' => $value];
+        $yml = (new Dumper($indentation))->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $this->assertSame($data, $this->parser->parse($yml));
+    }
+
+    public static function provideMultiLineStringsWithLeadingSpacesOnlyLines(): iterable
+    {
+        yield 'comment after one space' => [" \n# comment\ntext", 4];
+        yield 'comment after several spaces' => ["    \n# comment\ntext", 4];
+        yield 'empty line before spaces' => ["\n \n# comment\ntext", 4];
+        yield 'several spaces-only lines' => [" \n   \n# comment\ntext", 4];
+        yield 'ordinary text after spaces' => [" \ntext\nmore text", 4];
+        yield 'only spaces and newlines' => [" \n  \n", 4];
+        yield 'custom indentation' => [" \n# comment\ntext", 2];
+    }
+
+    public function testDumpSingleLineBreakAsMultiLineLiteralBlock()
+    {
+        $data = ['a' => "\n", 'b' => ['c' => "\n"], 'd' => ["\n"]];
+        $yml = $this->dumper->dump($data, 3, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $this->assertSame("a: |+\n\nb:\n    c: |+\n\nd:\n    - |+\n\n", $yml);
+        $this->assertSame($data, $this->parser->parse($yml));
     }
 
     public function testCarriageReturnFollowedByNewlineIsMaintainedWhenDumpingAsMultiLineLiteralBlock()

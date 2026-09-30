@@ -143,7 +143,8 @@ class Dumper
 
     private function getBlockChompingIndicator(string $value): string
     {
-        if (isset($value[-2]) && "\n" === $value[-2] && "\n" === $value[-1]) {
+        // a block made of line breaks only has no content, so only the keep indicator preserves them
+        if ("\n" === $value || isset($value[-2]) && "\n" === $value[-2] && "\n" === $value[-1]) {
             return '+';
         }
 
@@ -173,11 +174,10 @@ class Dumper
     {
         $lines = explode("\n", $value);
 
-        // If the first line (that is neither empty nor contains only spaces)
-        // starts with a space character, the spec requires a block indentation indicator
+        // The spec requires a block indentation indicator when the first line that is not empty starts with a space, even if that line holds only spaces
         // http://www.yaml.org/spec/1.2/spec.html#id2793979
         foreach ($lines as $line) {
-            if ('' !== trim($line, ' ')) {
+            if ('' !== $line) {
                 return str_starts_with($line, ' ') ? (string) $this->indentation : '';
             }
         }

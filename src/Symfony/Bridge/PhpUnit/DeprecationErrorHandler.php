@@ -171,13 +171,6 @@ class DeprecationErrorHandler
             exit(1);
         }
 
-        if (\PHP_VERSION_ID >= 80500 && \in_array($msg, [
-            'The __sleep() serialization magic method has been deprecated. Implement __serialize() instead (or in addition, if support for old PHP versions is necessary)',
-            'The __wakeup() serialization magic method has been deprecated. Implement __unserialize() instead (or in addition, if support for old PHP versions is necessary)',
-        ], true)) {
-            return null;
-        }
-
         if ('legacy' === $group) {
             $this->deprecationGroups[$group]->addNotice();
         } elseif ($deprecation->originatesFromAnObject()) {

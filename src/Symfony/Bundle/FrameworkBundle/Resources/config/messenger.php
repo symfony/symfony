@@ -276,6 +276,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('messenger.default_bus'),
             ])
-            ->tag('messenger.message_handler')
+            ->tag('messenger.message_handler', ['sign' => true])
     ;
 };

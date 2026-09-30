@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -145,6 +146,30 @@ class SerializerTest extends TestCase
         );
 
         $this->assertSame('{"message":"Hello"}', $encoded['body'] ?? null);
+    }
+
+    public function testSerializedMessageStampIsUsedBySerializersThatEncodeLikeTheDecodingOne()
+    {
+        $symfonySerializer = new SymfonySerializer([new ObjectNormalizer()], [new JsonEncoder()]);
+        $serializer = new Serializer($symfonySerializer);
+
+        $envelope = $serializer->decode(['body' => '{"message": "Hello"}', 'headers' => ['type' => DummyMessage::class]]);
+
+        $this->assertSame('{"message": "Hello"}', $serializer->encode($envelope)['body']);
+        $this->assertSame('{"message": "Hello"}', (new Serializer($symfonySerializer))->encode($envelope)['body']);
+    }
+
+    public function testSerializedMessageStampIsNotUsedBySerializersThatEncodeDifferently()
+    {
+        $symfonySerializer = new SymfonySerializer([new ObjectNormalizer()], [new XmlEncoder(), new JsonEncoder()]);
+
+        $envelope = (new Serializer($symfonySerializer))->decode(['body' => '{"message": "Hello"}', 'headers' => ['type' => DummyMessage::class]]);
+
+        $this->assertSame('{"message":"Hello"}', (new Serializer())->encode($envelope)['body']);
+        $this->assertSame("{\n    \"message\": \"Hello\"\n}", (new Serializer($symfonySerializer, 'json', [JsonEncode::OPTIONS => \JSON_PRETTY_PRINT]))->encode($envelope)['body']);
+
+        $xmlSerializer = new Serializer($symfonySerializer, 'xml');
+        $this->assertEquals(new DummyMessage('Hello'), $xmlSerializer->decode($xmlSerializer->encode($envelope))->getMessage());
     }
 
     public function testEncodedIsHavingTheBodyAndTypeHeader()

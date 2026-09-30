@@ -54,6 +54,7 @@ class Serializer implements SerializerInterface
     private string $format;
     private array $context;
     private array $stampContext;
+    private static \WeakMap $decoders;
 
     public function __construct(?SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
     {
@@ -88,7 +89,9 @@ class Serializer implements SerializerInterface
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);
-        $stamps[] = new SerializedMessageStamp($encodedEnvelope['body']);
+        $stamps[] = $serializedMessageStamp = new SerializedMessageStamp($encodedEnvelope['body']);
+        self::$decoders ??= new \WeakMap();
+        self::$decoders[$serializedMessageStamp] = $this;
 
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
@@ -116,6 +119,11 @@ class Serializer implements SerializerInterface
 
         /** @var SerializedMessageStamp|null $serializedMessageStamp */
         $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
+
+        // the body can be reused only when it is what this serializer would produce
+        if ($serializedMessageStamp && ($decoder = self::$decoders[$serializedMessageStamp] ?? null) && [$decoder->serializer, $decoder->format, $decoder->context] !== [$this->serializer, $this->format, $this->context]) {
+            $serializedMessageStamp = null;
+        }
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 

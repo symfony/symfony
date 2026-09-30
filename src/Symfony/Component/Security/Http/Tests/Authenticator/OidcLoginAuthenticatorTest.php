@@ -2067,7 +2067,7 @@ class OidcLoginAuthenticatorTest extends TestCase
     }
 
     /**
-     * RFC 9449, Section 10.1: the code is bound to the key before it exists.
+     * RFC 9449, Section 10: the code is bound to the key before it exists.
      *
      * The thumbprint names the key without carrying it, which is what lets it travel in a
      * front channel, so that a code stolen from the redirect cannot be exchanged by whoever

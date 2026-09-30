@@ -70,7 +70,7 @@ class BearerTokenTypeTest extends TestCase
      * understand the token type.".
      *
      * A bound token presented as a bearer token is refused by the resource server anyway
-     * (RFC 9449, Section 7.1), and saying so here names what is wrong.
+     * (RFC 9449, Section 7.2), and saying so here names what is wrong.
      */
     public function testRefusesATokenOfAnotherType()
     {

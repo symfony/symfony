@@ -216,7 +216,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             $params['max_age'] = (string) $this->options['max_age'];
         }
 
-        // RFC 9449, Section 10.1: the code is bound to the key before it exists, so that a
+        // RFC 9449, Section 10: the code is bound to the key before it exists, so that a
         // code stolen from the redirect cannot be exchanged by whoever does not hold it. The
         // thumbprint names the key without carrying it, which is what lets it travel here,
         // in a front channel.

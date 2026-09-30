@@ -159,7 +159,7 @@ class DpopTokenTypeTest extends TestCase
     }
 
     /**
-     * Section 9: "a nonce is only accepted by the server that issued it".
+     * Section 9: "nonces will be only accepted by the server that issued them".
      *
      * The provider and a protected resource are not the same server, so a nonce is kept by
      * the origin that named it and never sent to another.

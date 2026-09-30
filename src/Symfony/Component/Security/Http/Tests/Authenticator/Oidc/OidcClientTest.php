@@ -735,9 +735,6 @@ class OidcClientTest extends TestCase
     }
 
     /**
-     * A client whose requests are answered by the given responses, recording what it sent.
-     */
-    /**
      * RFC 9449, Section 5: a provider "MAY elect to issue access tokens that are not DPoP
      * bound, which is signaled to the client with a value of Bearer in the token_type".
      *
@@ -804,7 +801,7 @@ class OidcClientTest extends TestCase
      * understand the token type.".
      *
      * A client presenting bearer tokens cannot use a bound one, and sending it as a bearer
-     * token is what RFC 9449, Section 7.1 has the resource server reject.
+     * token is what RFC 9449, Section 7.2 has the resource server reject.
      */
     public function testAClientPresentingBearerTokensRefusesATokenOfAnotherType()
     {
@@ -838,7 +835,7 @@ class OidcClientTest extends TestCase
     }
 
     /**
-     * RFC 9449, Section 9: "a nonce is only accepted by the server that issued it".
+     * RFC 9449, Section 9: "nonces will be only accepted by the server that issued them".
      *
      * The provider and a protected resource are not the same server, so the nonce of one is
      * never sent to the other: it would be refused, and cost a round trip every time the

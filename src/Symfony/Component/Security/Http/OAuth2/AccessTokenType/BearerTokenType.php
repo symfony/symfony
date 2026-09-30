@@ -41,7 +41,7 @@ final class BearerTokenType implements AccessTokenTypeInterface
      * still handing out a token to be used as this one is, which is what clients have always
      * done with it. A provider naming another type is the case to refuse: that token carries
      * a protection this client does not implement, and presenting it as a bearer token is
-     * both a failure and, for a bound token, the one thing RFC 9449, Section 7.1 has the
+     * both a failure and, for a bound token, the one thing RFC 9449, Section 7.2 has the
      * resource server reject.
      */
     public function checkTokenResponse(array $tokenResponse): void

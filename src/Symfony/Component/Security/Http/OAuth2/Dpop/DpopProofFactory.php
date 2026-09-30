@@ -98,7 +98,7 @@ final class DpopProofFactory
      *
      * It names the key without carrying it, which is why an authorization request can bind
      * the code it is about to receive to the key without the key travelling in a front
-     * channel (Section 10.1).
+     * channel (Section 10).
      */
     public function getKeyThumbprint(): string
     {

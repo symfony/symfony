@@ -18,10 +18,12 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\ClaimCheckNotFoundException;
 use Symfony\Component\Messenger\Exception\ClaimCheckStorageException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\MessageTypeAwareSerializerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 
@@ -96,6 +98,24 @@ class ClaimCheckSerializerTest extends TestCase
 
         $this->assertInstanceOf(MessageDecodingFailedException::class, $decoded->getMessage());
         $this->assertStringContainsString('integrity', $decoded->getMessage()->getMessage());
+    }
+
+    public function testFailureToRetrieveAClaimIsSentAgainWithItsReference()
+    {
+        $values = [];
+        $serializer = new ClaimCheckSerializer(new Serializer(), $this->createCachePool($values), 300);
+        $encoded = $serializer->encode(new Envelope(new DummyMessage(str_repeat('a', 1000))));
+        $claim = json_decode($encoded['body'], true, flags: \JSON_THROW_ON_ERROR);
+        $data = $values[$claim['id']];
+        unset($values[$claim['id']]);
+
+        $failure = $serializer->decode($encoded);
+        $values[$claim['id']] = $data;
+        $encodedFailure = $serializer->encode($failure->with(new RedeliveryStamp(1)));
+
+        $this->assertCount(1, $values);
+        $this->assertSame($encoded['body'], $encodedFailure['body']);
+        $this->assertEquals(new DummyMessage(str_repeat('a', 1000)), $serializer->decode($encodedFailure)->getMessage());
     }
 
     public function testMessageTypeDoesNotRetrieveClaim()

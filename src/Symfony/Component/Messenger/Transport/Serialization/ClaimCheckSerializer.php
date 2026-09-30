@@ -51,6 +51,11 @@ final class ClaimCheckSerializer implements SerializerInterface, MessageTypeAwar
             return $encodedEnvelope;
         }
 
+        // a claim that could not be retrieved is sent again with its reference, which the payload never left
+        if (($message = $envelope->getMessage()) instanceof MessageDecodingFailedException && '1' === ($message->encodedEnvelope['headers'][self::HEADER] ?? null)) {
+            return $encodedEnvelope;
+        }
+
         $data = serialize($encodedEnvelope);
         $id = $this->storeClaim($data);
         $claim = [

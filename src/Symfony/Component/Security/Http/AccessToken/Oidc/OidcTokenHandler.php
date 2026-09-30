@@ -67,9 +67,18 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
     private ?string $oidcConfigurationCacheKey = null;
 
     /**
-     * @var HttpClientInterface[]
+     * @var list<HttpClientInterface>
      */
     private array $discoveryClients = [];
+
+    /**
+     * The issuers that the discovery documents fetched through $discoveryClients must announce, or null to accept any allowed one.
+     *
+     * @var list<string|null>
+     */
+    private array $discoveryIssuers = [];
+
+    private bool $bindKeysToIssuers = false;
 
     /**
      * @var OidcDiscovery[]
@@ -128,8 +137,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
     }
 
     /**
-     * @param HttpClientInterface|HttpClientInterface[] $client
-     * @param string                                    $oidcConfigurationCacheKey   Base cache key; with several clients, issuer-indexed key sets are cached below its ".issuer_keysets" suffix
+     * @param HttpClientInterface|HttpClientInterface[] $client                      A client keyed by a string requires the discovery document it fetches to announce that issuer, a trailing slash aside
+     * @param string                                    $oidcConfigurationCacheKey   Base cache key; with several clients or a keyed one, issuer-indexed key sets are cached below its ".issuer_keysets" suffix
      * @param bool                                      $enforceKeyUsageVerification When true (default, strict), only JWKs whose `use` is "sig" or whose
      *                                                                               `key_ops` contains "sign"/"verify" are accepted for signature verification.
      *                                                                               When false (lax), JWKs missing both `use` and `key_ops` are also accepted;
@@ -139,10 +148,19 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
      */
     public function enableDiscovery(CacheInterface $cache, array|HttpClientInterface $client, string $oidcConfigurationCacheKey, bool $enforceKeyUsageVerification = true): void
     {
+        $clients = \is_array($client) ? $client : [$client];
         $this->discoveryCache = $cache;
-        $this->discoveryClients = \is_array($client) ? $client : [$client];
-        $this->oidcConfigurationCacheKey = 1 < \count($this->discoveryClients) ? $oidcConfigurationCacheKey.'.issuer_keysets' : $oidcConfigurationCacheKey;
+        $this->discoveryClients = array_values($clients);
+        $this->discoveryIssuers = array_map(static fn ($key) => \is_string($key) ? $key : null, array_keys($clients));
+        $pinned = array_filter($this->discoveryIssuers, \is_string(...));
+        $this->bindKeysToIssuers = 1 < \count($clients) || $pinned;
+        $this->oidcConfigurationCacheKey = $this->bindKeysToIssuers ? $oidcConfigurationCacheKey.'.issuer_keysets' : $oidcConfigurationCacheKey;
         $this->enforceKeyUsageVerification = $enforceKeyUsageVerification;
+
+        if ($pinned) {
+            // setting or changing an expected issuer must discard the key sets cached without checking it
+            $this->oidcConfigurationCacheKey .= '.'.substr(hash('xxh128', serialize($this->discoveryIssuers)), 0, 8);
+        }
 
         // the discovery documents get their own cache entries: $oidcConfigurationCacheKey
         // keeps holding the JWKS, whose lifetime is driven by the JWKS response headers
@@ -168,7 +186,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         if ($this->discoveryClients) {
             $keys = $this->discoveryCache->get($this->oidcConfigurationCacheKey, [$this, 'computeDiscoveryKeys']);
 
-            $jwkset = 1 < \count($this->discoveryClients) ? $keys : JWKSet::createFromKeyData(['keys' => $keys]);
+            $jwkset = $this->bindKeysToIssuers ? $keys : JWKSet::createFromKeyData(['keys' => $keys]);
         }
 
         try {
@@ -200,7 +218,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
     /**
      * Computes the JWKS and sets the cache item TTL from provider headers.
      *
-     * With several providers, keys are indexed by the issuer each provider announces, so that a token can only be verified with the keys of its own issuer.
+     * With several providers, or when one is expected to announce a given issuer, keys are indexed by the issuer each provider announces, so that a token can only be verified with the keys of its own issuer.
      *
      * The cache entry lifetime is automatically adjusted based on the lowest TTL
      * advertised by the providers (via "Cache-Control: max-age" or "Expires" headers).
@@ -218,7 +236,6 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         try {
             $discoveredKeys = [];
             $minTtl = null;
-            $bindKeysToIssuers = 1 < \count($this->discoveries);
             $jwkSetResponses = [];
 
             // the ".well-known" requests are sent first, so that they travel concurrently:
@@ -231,8 +248,13 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
                 $configuration = $discovery->getConfiguration();
                 $issuer = '';
 
-                if ($bindKeysToIssuers) {
+                if ($this->bindKeysToIssuers) {
                     $issuer = $configuration['issuer'] ?? null;
+                    $expectedIssuer = $this->discoveryIssuers[$i];
+
+                    if (null !== $expectedIssuer && (!\is_string($issuer) || rtrim($issuer, '/') !== rtrim($expectedIssuer, '/'))) {
+                        throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which does not match the expected issuer "%s".', \is_string($issuer) ? $issuer : get_debug_type($issuer), $expectedIssuer));
+                    }
 
                     if (!\is_string($issuer) || !\in_array($issuer, $this->issuers, true)) {
                         throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which is not allowed.', \is_string($issuer) ? $issuer : get_debug_type($issuer)));
@@ -266,7 +288,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
                 $item->expiresAfter(min($minTtl, OidcJwks::MAX_TTL));
             }
 
-            return $bindKeysToIssuers ? $discoveredKeys : $discoveredKeys[''] ?? [];
+            return $this->bindKeysToIssuers ? $discoveredKeys : $discoveredKeys[''] ?? [];
         } catch (\Exception $e) {
             $logger?->error('An error occurred while requesting OIDC certs.', [
                 'error' => $e->getMessage(),

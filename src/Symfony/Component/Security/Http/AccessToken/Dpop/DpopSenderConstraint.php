@@ -247,18 +247,17 @@ final class DpopSenderConstraint implements SenderConstraintInterface
             throw new InvalidDpopProofException('The DPoP proof carries no "iat" (RFC 9449, Section 4.2).');
         }
 
-        $issuedAt = (int) $issuedAt;
         $now = $this->clock->now()->getTimestamp();
         if ($issuedAt > $now + $this->allowedTimeDrift) {
             throw new InvalidDpopProofException('The DPoP proof was made later than the request that carries it (RFC 9449, Section 4.3).');
         }
 
-        $expiresAt = $issuedAt + $this->proofLifetime + $this->allowedTimeDrift;
-        if ($expiresAt <= $now) {
+        if ($issuedAt + $this->proofLifetime + $this->allowedTimeDrift <= $now) {
             throw new InvalidDpopProofException('The DPoP proof is older than this resource server accepts (RFC 9449, Section 4.3).');
         }
 
-        return $expiresAt;
+        // cast once the window bounds it: a float out of the integer range has no integer value
+        return (int) ceil($issuedAt) + $this->proofLifetime + $this->allowedTimeDrift;
     }
 
     /**

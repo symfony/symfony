@@ -232,6 +232,23 @@ class DpopSenderConstraintTest extends TestCase
         $this->createConstraint()->check($this->createRequest($proof), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
     }
 
+    #[DataProvider('provideIssuedAtNoTimestampHolds')]
+    public function testItRefusesAProofIssuedAtAMomentNoTimestampHolds(float $issuedAt, string $message)
+    {
+        $proof = $this->createProof(['iat' => $issuedAt]);
+
+        $this->expectException(InvalidDpopProofException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->createConstraint()->check($this->createRequest($proof), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
+    }
+
+    public static function provideIssuedAtNoTimestampHolds(): iterable
+    {
+        yield 'far in the future' => [1e30, 'made later than the request that carries it'];
+        yield 'far in the past' => [-1e30, 'older than this resource server accepts'];
+    }
+
     public function testItRefusesAProofCarryingNoIssuedAt()
     {
         $proof = $this->createProof(['iat' => '2026-09-22T10:00:00Z']);

@@ -610,6 +610,7 @@ class FailureIntegrationTest extends TestCase
         yield 'JSON' => [new Serializer(), false];
         yield 'PHP' => [new PhpSerializer(), false];
         yield 'PHP with claim check' => [new PhpSerializer(), true];
+        yield 'JSON with claim check' => [new Serializer(), true];
     }
 
     public function testRetryThroughTransportUsingTheStandaloneSerializer()
@@ -727,6 +728,59 @@ class FailureIntegrationTest extends TestCase
 
     public static function provideFailureTransportSerializers(): iterable
     {
+        yield 'JSON' => [new Serializer()];
+        yield 'PHP' => [new PhpSerializer()];
+    }
+
+    #[DataProvider('provideFailureTransportSerializersForClaims')]
+    public function testClaimThatCannotBeRetrievedIsRetriedThenSentToTheFailureTransport(?SerializerInterface $failureSerializer)
+    {
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturn($this->createStub(CacheItemInterface::class));
+        $serializer = new ClaimCheckSerializer(new Serializer(), $pool, 100);
+        $failureSerializer ??= $serializer;
+        $claim = [
+            'body' => json_encode(['id' => 'missing', 'digest' => hash('sha256', '')]),
+            'headers' => ['X-Symfony-Messenger-Claim-Check' => '1', 'X-Symfony-Messenger-Claim-Check-Type' => DummyMessage::class],
+        ];
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$claim]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+
+        $locator = new Container();
+        $locator->set('transport', $transport);
+
+        $retryStrategyLocator = new Container();
+        $retryStrategyLocator->set('transport', new MultiplierRetryStrategy(2));
+
+        $bus = new MessageBus([new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer]))]);
+
+        $errors = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$errors) {
+            $errors[RedeliveryStamp::getRetryCountFromEnvelope($event->getEnvelope())] = $event->getThrowable()->getMessage();
+        });
+
+        for ($i = 0; $i < 10 && $transport->getMessagesWaitingToBeReceived(); ++$i) {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        }
+
+        $this->assertSame(array_fill(0, 3, 'Claim check "missing" was not found.'), $errors);
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failedEnvelopes = $failureTransport->getMessagesWaitingToBeReceived());
+
+        $failure = $failureSerializer->decode($failedEnvelopes[0])->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame($claim['body'], $failure->encodedEnvelope['body']);
+        $this->assertSame($claim['headers'], array_intersect_key($failure->encodedEnvelope['headers'], $claim['headers']));
+    }
+
+    public static function provideFailureTransportSerializersForClaims(): iterable
+    {
+        yield 'claim check' => [null];
         yield 'JSON' => [new Serializer()];
         yield 'PHP' => [new PhpSerializer()];
     }

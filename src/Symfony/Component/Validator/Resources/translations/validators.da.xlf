@@ -280,7 +280,7 @@
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>Billedforholdet er for stort ({{ratio}}). Tilladt maksimumsforhold er {{ max_ratio }}.</target>
+                <target>Billedforholdet er for stort ({{ ratio }}). Tilladt maksimumsforhold er {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
@@ -292,7 +292,7 @@
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
-                <target>Billedet er landskabsorienteret ({{width}} x {{height}} px). Landskabsorienterede billeder er ikke tilladt</target>
+                <target>Billedet er landskabsorienteret ({{ width }} x {{ height }} px). Landskabsorienterede billeder er ikke tilladt</target>
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>

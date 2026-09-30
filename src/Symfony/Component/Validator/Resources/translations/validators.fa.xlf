@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>این مقدار بسیار طولانی است. باید دارای {{limit}} کاراکتر یا کمتر باشد. | این مقدار بسیار طولانی است. باید دارای {{limit}} کاراکتر یا کمتر باشد.</target>
+                <target>این مقدار بسیار طولانی است. باید دارای {{ limit }} کاراکتر یا کمتر باشد.|این مقدار بسیار طولانی است. باید دارای {{ limit }} کاراکتر یا کمتر باشد.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>

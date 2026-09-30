@@ -400,7 +400,7 @@
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target>Vrijednost NetMask bi trebala biti između {{min}} i {{max}}.</target>
+                <target>Vrijednost NetMask bi trebala biti između {{ min }} i {{ max }}.</target>
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>

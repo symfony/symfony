@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-09-30T07:04:58Z
+
+The Psalm failure is on lines 897-898 in `find()`, which this PR does not change. It reports `Relay\Relay` as undefined, and #64933 had the same failure on this file.

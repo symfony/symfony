@@ -44,7 +44,7 @@ class Vote
     }
 
     /**
-     * Tells the firewall that a fresh authentication could grant the attribute this vote denies.
+     * Tells the firewall that a fresh authentication could grant the attribute this vote denies, or one an expression or a closure it evaluated was denied.
      *
      * The firewall then starts a re-authentication rather than answering with a 403.
      * With a strategy other than "affirmative", another voter denying the same attribute can leave the user denied after re-authenticating.

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -161,10 +162,8 @@ class ExceptionListener
         $reAuthenticationEntryPoint = $this->reAuthenticationEntryPoint
             ?? ($this->authenticationEntryPoint instanceof ReAuthenticationEntryPointInterface ? $this->authenticationEntryPoint : null);
 
-        if (null !== $token && null !== $reAuthenticationEntryPoint && self::isCurableByReAuthentication($exception)) {
-            [$attribute] = $exception->getAttributes();
-
-            $this->logger?->debug('Starting a re-authentication requested by the vote denying "{attribute}".', ['attribute' => $attribute, 'entry_point' => $reAuthenticationEntryPoint]);
+        if (null !== $token && null !== $reAuthenticationEntryPoint && null !== $attribute = self::getReAuthenticationAttribute($exception)) {
+            $this->logger?->debug('Starting a re-authentication for "{attribute}".', ['attribute' => $attribute, 'entry_point' => $reAuthenticationEntryPoint]);
 
             if (!$this->stateless) {
                 $this->setTargetPath($event->getRequest());
@@ -246,26 +245,29 @@ class ExceptionListener
     }
 
     /**
-     * Tells whether a voter that denied the single denied attribute requested a re-authentication for it.
+     * Returns the attribute a voter that denied the single denied attribute requested a re-authentication for.
      *
      * Several attributes are left alone, as deciding them at once is deprecated since Symfony 8.2.
      * The votes of the checks a voter makes on other attributes land in the same decision, so the request has to name the denied attribute for the denial to be told apart from them.
+     * An expression or a closure decides its checks apart, so the request of its voter names the check a re-authentication could grant.
      */
-    private static function isCurableByReAuthentication(AccessDeniedException $exception): bool
+    private static function getReAuthenticationAttribute(AccessDeniedException $exception): ?string
     {
         $attributes = $exception->getAttributes();
 
         if (1 !== \count($attributes)) {
-            return false;
+            return null;
         }
 
+        $checksApart = $attributes[0] instanceof Expression || $attributes[0] instanceof \Closure;
+
         foreach ($exception->getAccessDecision()?->votes ?? [] as $vote) {
-            if (VoterInterface::ACCESS_DENIED === $vote->result && $attributes[0] === $vote->reAuthenticationAttribute) {
-                return true;
+            if (VoterInterface::ACCESS_DENIED === $vote->result && null !== $vote->reAuthenticationAttribute && ($checksApart || $attributes[0] === $vote->reAuthenticationAttribute)) {
+                return $vote->reAuthenticationAttribute;
             }
         }
 
-        return false;
+        return null;
     }
 
     private function throwUnauthorizedException(AuthenticationException $authException): never

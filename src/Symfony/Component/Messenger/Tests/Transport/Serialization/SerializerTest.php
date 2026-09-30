@@ -544,6 +544,38 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('traceAsString', $body);
     }
 
+    public function testDecodingTheFailureOfAnEnvelopeWithoutTypeCarriesThatEnvelope()
+    {
+        $serializer = new Serializer();
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('Hello')));
+        unset($encodedEnvelope['headers']['type']);
+
+        $reEncoded = $serializer->encode($serializer->decode($encodedEnvelope)->with(new RedeliveryStamp(1)));
+        $envelope = $serializer->decode($reEncoded);
+        $failure = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame('Encoded envelope does not have a "type" header.', $failure->getMessage());
+        $this->assertSame(['body' => $encodedEnvelope['body'], 'headers' => array_diff_key($reEncoded['headers'], ['type' => true])], $failure->encodedEnvelope);
+        $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($envelope));
+    }
+
+    public function testDecodingNeverDeserializesADecodingFailure()
+    {
+        $encodedEnvelope = [
+            'body' => json_encode(['message' => 'Cannot decode.', 'code' => 0, 'previous' => null, 'encodedEnvelope' => ['body' => '{"message":"Hello"}', 'headers' => ['type' => DummyMessage::class]]]),
+            'headers' => ['type' => MessageDecodingFailedException::class, 'X-Message-Stamp-'.BusNameStamp::class => '[{"busName":"other_bus"}]'],
+        ];
+
+        $envelope = (new Serializer())->decode($encodedEnvelope);
+        $failure = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame('Encoded envelope does not have a "type" header.', $failure->getMessage());
+        $this->assertSame(['body' => $encodedEnvelope['body'], 'headers' => array_diff_key($encodedEnvelope['headers'], ['type' => true])], $failure->encodedEnvelope);
+        $this->assertSame('other_bus', $envelope->last(BusNameStamp::class)?->getBusName());
+    }
+
     public function testDecodingFailsWithAStampHeaderThatIsNotAStamp()
     {
         $serializer = new Serializer();

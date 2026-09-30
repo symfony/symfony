@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
@@ -103,6 +104,11 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         // a failure keeps the stamps that decode, so that its retries are counted
         $stamps = $this->decodeStamps($encodedEnvelope, $stampFailure);
 
+        // encode() sends a failure under its own class when the envelope it carries has no type: decode that envelope, never a failure built from the body
+        if (\is_string($type = $encodedEnvelope['headers']['type'] ?? null) && is_a($this->typeToClassMap[$type] ?? $type, MessageDecodingFailedException::class, true)) {
+            unset($encodedEnvelope['headers']['type']);
+        }
+
         if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
             return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.')->with(...$stamps);
         }
@@ -167,6 +173,11 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         }
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
+
+        // handler results are for synchronous callers: retries only need the names of the handlers that already ran
+        if ($handledStamps = $envelope->all(HandledStamp::class)) {
+            $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_map(static fn (HandledStamp $stamp) => new HandledStamp(null, $stamp->getHandlerName()), $handledStamps));
+        }
 
         $headers = [
             'type' => $decodingFailureHeaders['type'] ?? $this->getTypeFromEnvelope($envelope),

@@ -635,11 +635,8 @@ class SigningSerializerTest extends TestCase
 
     public function testDecodeRejectsAnUnsignedDecodeFailureThatCarriesASignedEnvelope()
     {
-        $serializer = $this->createJsonSerializer([DummyMessage::class]);
-        $wrapper = [
-            'body' => json_encode(['message' => 'Cannot decode.', 'code' => 0, 'previous' => null, 'encodedEnvelope' => $serializer->encode(new Envelope(new DummyMessage('hello')))]),
-            'headers' => ['type' => MessageDecodingFailedException::class, 'X-Message-Stamp-'.BusNameStamp::class => '[{"busName":"other_bus"}]'],
-        ];
+        $serializer = $this->createSerializer([DummyMessage::class]);
+        $wrapper = (new PhpSerializer())->encode(new Envelope(new MessageDecodingFailedException('Cannot decode.', 0, null, $serializer->encode(new Envelope(new DummyMessage('hello')))), [new BusNameStamp('other_bus')]));
 
         $envelope = $serializer->decode($wrapper);
 

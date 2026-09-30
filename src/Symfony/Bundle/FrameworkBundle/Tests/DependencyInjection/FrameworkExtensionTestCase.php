@@ -1091,6 +1091,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals($expectedFactories, $container->getDefinition('messenger.transport_factory')->getArgument(0)->getValues());
         $this->assertTrue($container->hasDefinition('messenger.listener.reset_services'));
         $this->assertSame('messenger.listener.reset_services', (string) $container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
+        $this->assertSame('messenger.transport.serializer_locator', (string) $container->getDefinition('messenger.routable_message_bus')->getArgument(2));
     }
 
     public function testMessengerWithoutConsole()

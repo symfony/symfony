@@ -13,6 +13,9 @@ namespace Symfony\Component\Messenger;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 
 /**
@@ -28,6 +31,7 @@ class RoutableMessageBus implements MessageBusInterface
     public function __construct(
         private ContainerInterface $busLocator,
         private ?MessageBusInterface $fallbackBus = null,
+        private ?ContainerInterface $serializerLocator = null,
     ) {
     }
 
@@ -35,6 +39,11 @@ class RoutableMessageBus implements MessageBusInterface
     {
         if (!$envelope instanceof Envelope) {
             throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope.');
+        }
+
+        if ($this->serializerLocator && $envelope->getMessage() instanceof MessageDecodingFailedException) {
+            // a decoding failure does not always carry the BusNameStamp of its message: decode it before choosing the bus
+            $envelope = (new DecodeFailedMessageMiddleware($this->serializerLocator))->handle($envelope, new StackMiddleware());
         }
 
         /** @var BusNameStamp|null $busNameStamp */

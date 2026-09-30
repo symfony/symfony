@@ -270,6 +270,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('message bus locator'),
                 service('messenger.default_bus'),
+                service('messenger.transport.serializer_locator'),
             ])
 
         ->set('messenger.redispatch_message_handler', RedispatchMessageHandler::class)

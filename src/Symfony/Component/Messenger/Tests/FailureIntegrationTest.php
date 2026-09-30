@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
@@ -40,6 +41,7 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
+use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
@@ -689,6 +691,66 @@ class FailureIntegrationTest extends TestCase
         yield 'stamp class not found' => [['headers' => $encodedEnvelope['headers'] + ['X-Message-Stamp-App\NonExistentStamp' => '[{}]']] + $encodedEnvelope];
         yield 'stamp header that is not a stamp' => [['headers' => $encodedEnvelope['headers'] + ['X-Message-Stamp-'.DummyMessage::class => '[{"message":"injected"}]']] + $encodedEnvelope];
         yield 'message class not found' => [['headers' => ['type' => 'App\NonExistentMessage'] + $encodedEnvelope['headers']] + $encodedEnvelope];
+    }
+
+    #[DataProvider('provideMessagesThatFailedToDecode')]
+    public function testMessageThatFailedToDecodeIsHandledOnItsOwnBusOnceDecoded(SerializerInterface $serializer, string $receiverName, Envelope $failure)
+    {
+        $failureSerializer = new PhpSerializer();
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, 'transport' === $receiverName ? [$serializer->encode($failure)] : []);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, 'failed' === $receiverName ? [$failureSerializer->encode($failure)] : []);
+        $serializerLocator = new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer]);
+
+        $calls = 0;
+        $commandBus = new MessageBus([
+            new AddBusNameStampMiddleware('command.bus'),
+            new DecodeFailedMessageMiddleware($serializerLocator),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () use (&$calls) { ++$calls; }]])),
+        ]);
+        $eventBus = new MessageBus([
+            new AddBusNameStampMiddleware('event.bus'),
+            new DecodeFailedMessageMiddleware($serializerLocator),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([]), true),
+        ]);
+        $bus = new RoutableMessageBus(new ServiceLocator(['command.bus' => static fn () => $commandBus, 'event.bus' => static fn () => $eventBus]), $eventBus, $serializerLocator);
+
+        $handled = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport, 'failed' => static fn () => $failureTransport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(2, 0), 'failed' => static fn () => new MultiplierRetryStrategy(2, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageHandledEvent::class, static function (WorkerMessageHandledEvent $event) use (&$handled) {
+            $handled[] = $event->getEnvelope();
+        });
+
+        $receiver = 'transport' === $receiverName ? $transport : $failureTransport;
+        for ($i = 0; $i < 10 && $receiver->getMessagesWaitingToBeReceived(); ++$i) {
+            (new Worker([$receiverName => $receiver], $bus, $dispatcher))->run();
+        }
+
+        $this->assertSame(1, $calls);
+        $this->assertCount(1, $handled);
+        $this->assertInstanceOf(DummyMessage::class, $handled[0]->getMessage());
+        $this->assertSame('command.bus', $handled[0]->last(BusNameStamp::class)?->getBusName());
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    public static function provideMessagesThatFailedToDecode(): iterable
+    {
+        $envelope = new Envelope(new DummyMessage('API'), [new BusNameStamp('command.bus')]);
+
+        $serializer = new PhpSerializer();
+        $failure = MessageDecodingFailedException::wrap($serializer->encode($envelope), 'Could not decode Envelope: Message class "App\Message" not found.');
+        yield 'PHP, retried' => [$serializer, 'transport', $failure->with(new RedeliveryStamp(1))];
+        yield 'PHP, from the failure transport' => [$serializer, 'failed', $failure->with(new RedeliveryStamp(2), new SentToFailureTransportStamp('transport'))];
+
+        $serializer = new Serializer();
+        $failure = MessageDecodingFailedException::wrap($serializer->encode($envelope), 'Could not decode message: Message class "App\Message" not found.')->with(new BusNameStamp('command.bus'));
+        yield 'JSON, retried' => [$serializer, 'transport', $failure->with(new RedeliveryStamp(1))];
+        yield 'JSON, from the failure transport' => [$serializer, 'failed', $failure->with(new RedeliveryStamp(2), new SentToFailureTransportStamp('transport'))];
     }
 
     public function testRetryThroughTransportSkipsTheHandlerWhoseResultCannotBeEncoded()

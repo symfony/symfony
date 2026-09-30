@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -28,6 +29,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
@@ -135,6 +137,35 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertSame([1, 0], array_map(static fn (RedeliveryStamp $stamp): int => $stamp->getRetryCount(), $envelope->all(RedeliveryStamp::class)));
         $this->assertCount(1, $envelope->all(SentToFailureTransportStamp::class));
         $this->assertCount(1, $envelope->all(SerializedMessageStamp::class));
+    }
+
+    #[DataProvider('provideBusNames')]
+    public function testTheBusNameStampOfTheDecodedMessageWins(array $stamps, array $expectedBusNames)
+    {
+        $serializer = new PhpSerializer();
+        $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['async' => $serializer]));
+
+        $nextMiddleware = new class implements MiddlewareInterface {
+            public ?Envelope $envelope = null;
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                return $this->envelope = $envelope;
+            }
+        };
+
+        $envelope = MessageDecodingFailedException::wrap($serializer->encode(new Envelope(new DummyMessage('Hello'), $stamps)), 'Could not decode.')
+            ->with(new ReceivedStamp('async'), new BusNameStamp('fallback_bus'));
+
+        $middleware->handle($envelope, new StackMiddleware($nextMiddleware));
+
+        $this->assertSame($expectedBusNames, array_map(static fn (BusNameStamp $stamp): string => $stamp->getBusName(), $nextMiddleware->envelope->all(BusNameStamp::class)));
+    }
+
+    public static function provideBusNames(): iterable
+    {
+        yield 'decoded with a bus name' => [[new BusNameStamp('bus')], ['bus']];
+        yield 'decoded without a bus name' => [[], ['fallback_bus']];
     }
 
     public function testItThrowsWhenNoReceivedStampAndNoSentToFailureStamp()

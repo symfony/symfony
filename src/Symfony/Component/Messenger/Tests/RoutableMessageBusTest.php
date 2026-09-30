@@ -15,10 +15,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 class RoutableMessageBusTest extends TestCase
 {
@@ -51,6 +55,45 @@ class RoutableMessageBusTest extends TestCase
         $routableBus = new RoutableMessageBus(new Container(), $defaultBus);
 
         $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
+    }
+
+    public function testItRoutesAMessageThatFailedToDecodeToTheBusOfTheDecodedMessage()
+    {
+        $serializer = new PhpSerializer();
+        $envelope = MessageDecodingFailedException::wrap($serializer->encode(new Envelope(new DummyMessage('Hello'), [new BusNameStamp('foo_bus')])), 'Could not decode.')
+            ->with(new ReceivedStamp('transport'));
+
+        $fooBus = $this->createMock(MessageBusInterface::class);
+        $fooBus->expects($this->once())->method('dispatch')->willReturnArgument(0);
+        $fallbackBus = $this->createMock(MessageBusInterface::class);
+        $fallbackBus->expects($this->never())->method('dispatch');
+
+        $buses = new Container();
+        $buses->set('foo_bus', $fooBus);
+        $serializers = new Container();
+        $serializers->set('transport', $serializer);
+
+        $envelope = (new RoutableMessageBus($buses, $fallbackBus, $serializers))->dispatch($envelope);
+
+        $this->assertInstanceOf(DummyMessage::class, $envelope->getMessage());
+        $this->assertSame('foo_bus', $envelope->last(BusNameStamp::class)?->getBusName());
+        $this->assertSame('transport', $envelope->last(ReceivedStamp::class)?->getTransportName());
+    }
+
+    public function testItDoesNotRouteAMessageThatStillFailsToDecode()
+    {
+        $envelope = MessageDecodingFailedException::wrap(['body' => 'not a serialized envelope'], 'Could not decode.')
+            ->with(new ReceivedStamp('transport'));
+
+        $fallbackBus = $this->createMock(MessageBusInterface::class);
+        $fallbackBus->expects($this->never())->method('dispatch');
+
+        $serializers = new Container();
+        $serializers->set('transport', new PhpSerializer());
+
+        $this->expectException(MessageDecodingFailedException::class);
+
+        (new RoutableMessageBus(new Container(), $fallbackBus, $serializers))->dispatch($envelope);
     }
 
     public function testItExceptionOnBusNotFound()

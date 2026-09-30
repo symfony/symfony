@@ -64,7 +64,7 @@ return static function (ContainerConfigurator $container) {
         ->set('security.access_token_extractor.dpop_header', HeaderAccessTokenExtractor::class)
             ->args([
                 'Authorization',
-                DpopSenderConstraint::SCHEME,
+                'DPoP',
             ])
         ->set('security.access_token_extractor.query_string', QueryAccessTokenExtractor::class)
         ->set('security.access_token_extractor.request_body', FormEncodedBodyExtractor::class)

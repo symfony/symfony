@@ -55,15 +55,15 @@ final class DpopSenderConstraint implements SenderConstraintInterface
      * RFC 9449, Section 4.1: the header a proof travels in, and Section 4.2, the "typ" that tells a proof
      * from every other JWT a client signs, so that one is never taken for another (RFC 8725, Section 3.11).
      */
-    public const HEADER = 'DPoP';
+    private const HEADER = 'DPoP';
 
-    public const TYPE = 'dpop+jwt';
+    private const TYPE = 'dpop+jwt';
 
     /**
      * RFC 9449, Section 7.1: the authentication scheme a DPoP-bound access token is presented under, and the
      * one the challenge of this resource server names.
      */
-    public const SCHEME = 'DPoP';
+    private const SCHEME = 'DPoP';
 
     /**
      * RFC 7518, Section 6: what the private half of a key holds, the other primes of a multi-prime RSA key among them, the single member of a symmetric key, and the private half of an AKP key.

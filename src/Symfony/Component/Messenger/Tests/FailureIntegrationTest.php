@@ -43,6 +43,7 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
+use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
@@ -783,6 +784,93 @@ class FailureIntegrationTest extends TestCase
         yield 'claim check' => [null];
         yield 'JSON' => [new Serializer()];
         yield 'PHP' => [new PhpSerializer()];
+    }
+
+    #[DataProvider('provideClaimsThatCannotBeRetrievedUntilThePoolIsBack')]
+    public function testClaimThatCouldNotBeRetrievedIsHandledOnItsOwnBus(string $innerClass, bool $signed, ?string $failureSerializerClass, int $maxRetries)
+    {
+        $values = [];
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturnCallback(function (string $id) use (&$values): CacheItemInterface {
+            $item = $this->createStub(CacheItemInterface::class);
+            $item->method('isHit')->willReturn(isset($values[$id]));
+            $item->method('get')->willReturn($values[$id] ?? null);
+            $item->method('set')->willReturnCallback(static function (mixed $value) use (&$values, $id, $item): CacheItemInterface {
+                $values[$id] = $value;
+
+                return $item;
+            });
+
+            return $item;
+        });
+        $pool->method('save')->willReturn(true);
+        $createSerializer = static fn (): SerializerInterface => new ClaimCheckSerializer($signed ? new SigningSerializer(new $innerClass(), 'signing-key', [DummyMessage::class]) : new $innerClass(), $pool, 300);
+
+        $queues = ['transport' => [$createSerializer()->encode(new Envelope(new DummyMessage(str_repeat('a', 1000)), [new BusNameStamp('command.bus')]))], 'failed' => []];
+        $calls = [];
+        $handled = [];
+
+        $runWorkers = static function (int $messageLimit) use (&$queues, &$calls, &$handled, $createSerializer, $failureSerializerClass, $maxRetries) {
+            $serializer = $createSerializer();
+            $failureSerializer = null === $failureSerializerClass ? $serializer : new $failureSerializerClass();
+            $transport = new SerializingFailureTestSenderAndReceiver($serializer, $queues['transport']);
+            $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, $queues['failed']);
+            $serializerLocator = new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer]);
+
+            $commandBus = new MessageBus([
+                new AddBusNameStampMiddleware('command.bus'),
+                new DecodeFailedMessageMiddleware($serializerLocator),
+                new FailedMessageProcessingMiddleware(),
+                new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () use (&$calls) { $calls[] = 'command.bus'; }]])),
+            ]);
+            $eventBus = new MessageBus([
+                new AddBusNameStampMiddleware('event.bus'),
+                new DecodeFailedMessageMiddleware($serializerLocator),
+                new FailedMessageProcessingMiddleware(),
+                new HandleMessageMiddleware(new HandlersLocator([]), true),
+            ]);
+            $bus = new RoutableMessageBus(new ServiceLocator(['command.bus' => static fn () => $commandBus, 'event.bus' => static fn () => $eventBus]), $eventBus);
+
+            $dispatcher = new EventDispatcher();
+            $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy($maxRetries, 0)])));
+            $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+            $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+            $dispatcher->addListener(WorkerMessageHandledEvent::class, static function (WorkerMessageHandledEvent $event) use (&$handled) {
+                $handled[] = $event->getEnvelope();
+            });
+
+            for ($i = 0; $i < $messageLimit && $receivers = array_filter(['transport' => $transport, 'failed' => $failureTransport], static fn ($receiver) => $receiver->getMessagesWaitingToBeReceived()); ++$i) {
+                (new Worker($receivers, $bus, $dispatcher))->run();
+            }
+
+            $queues = ['transport' => $transport->getMessagesWaitingToBeReceived(), 'failed' => $failureTransport->getMessagesWaitingToBeReceived()];
+        };
+
+        $claims = $values;
+        $values = [];
+        $runWorkers(1);
+
+        $this->assertSame([], $handled);
+
+        $values = $claims;
+        $runWorkers(10);
+
+        $this->assertSame(['command.bus'], $calls);
+        $this->assertCount(1, $handled);
+        $this->assertSame('command.bus', $handled[0]->last(BusNameStamp::class)?->getBusName());
+        $this->assertSame(['transport' => [], 'failed' => []], $queues);
+    }
+
+    public static function provideClaimsThatCannotBeRetrievedUntilThePoolIsBack(): iterable
+    {
+        foreach (['JSON' => Serializer::class, 'PHP' => PhpSerializer::class] as $format => $innerClass) {
+            yield $format.', retried' => [$innerClass, false, null, 1];
+            yield $format.' signed, retried' => [$innerClass, true, null, 1];
+            yield $format.' signed, from the failure transport' => [$innerClass, true, null, 0];
+        }
+
+        yield 'JSON signed, from a PHP failure transport' => [Serializer::class, true, PhpSerializer::class, 0];
+        yield 'PHP signed, from a JSON failure transport' => [PhpSerializer::class, true, Serializer::class, 0];
     }
 
     public static function provideUndecodableMessages(): iterable

@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\ClaimCheckNotFoundException;
 use Symfony\Component\Messenger\Exception\ClaimCheckStorageException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
@@ -84,6 +85,33 @@ class ClaimCheckSerializerTest extends TestCase
         $this->assertInstanceOf(MessageDecodingFailedException::class, $decoded->getMessage());
         $this->assertSame($encoded, $decoded->getMessage()->encodedEnvelope);
         $this->assertInstanceOf(ClaimCheckNotFoundException::class, $decoded->getMessage()->getPrevious());
+    }
+
+    public function testFailureToRetrieveAClaimKeepsTheBusOfItsEnvelope()
+    {
+        $values = [];
+        $serializer = new ClaimCheckSerializer(new PhpSerializer(), $this->createCachePool($values), 512);
+        $encoded = $serializer->encode(new Envelope(new DummyMessage(str_repeat('a', 1000)), [new BusNameStamp('command.bus')]));
+        $values = [];
+
+        $decoded = $serializer->decode($encoded);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $decoded->getMessage());
+        $this->assertEquals([BusNameStamp::class => [new BusNameStamp('command.bus')]], $decoded->all());
+    }
+
+    public function testReferenceNamingAnotherBusThanItsClaimProducesDecodingFailure()
+    {
+        $values = [];
+        $serializer = new ClaimCheckSerializer(new PhpSerializer(), $this->createCachePool($values), 512);
+        $encoded = $serializer->encode(new Envelope(new DummyMessage(str_repeat('a', 1000)), [new BusNameStamp('command.bus')]));
+        $encoded['headers']['X-Symfony-Messenger-Claim-Check-Bus'] = 'event.bus';
+
+        $decoded = $serializer->decode($encoded);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $decoded->getMessage());
+        $this->assertStringContainsString('integrity', $decoded->getMessage()->getMessage());
+        $this->assertSame([], $decoded->all());
     }
 
     public function testChangedClaimProducesDecodingFailure()

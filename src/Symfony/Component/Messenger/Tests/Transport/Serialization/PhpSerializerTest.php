@@ -148,7 +148,11 @@ class PhpSerializerTest extends TestCase
     public static function provideEnvelopesThatFailToDecode(): iterable
     {
         yield 'property type mismatch' => [new DummyMessage('true'), 's:4:\"true\"', 'b:1'];
-        yield 'Serializable class not found' => [new DummyMessageWithLegacySerializable(new DummyLegacySerializable('15.98')), 'DummyLegacySerializable', 'OupsyLegacySerializable'];
+
+        // PHP 8.6 fails to unserialize the `C:` format of a class that is not allowed, so the envelope cannot be read at all
+        if (\PHP_VERSION_ID < 80600) {
+            yield 'Serializable class not found' => [new DummyMessageWithLegacySerializable(new DummyLegacySerializable('15.98')), 'DummyLegacySerializable', 'OupsyLegacySerializable'];
+        }
     }
 
     public function testDecodingFailureCanBeEncodedWhenExceptionArgumentsAreRecorded()

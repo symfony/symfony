@@ -21,8 +21,10 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -30,9 +32,11 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterface;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -214,7 +218,11 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
                     continue;
                 }
 
-                $stamps[] = $this->serializer->deserialize($value, $class.'[]', $this->format, $this->stampContext);
+                if (ValidationStamp::class === $class && XmlEncoder::FORMAT === $this->format && $this->serializer instanceof DecoderInterface && $this->serializer instanceof DenormalizerInterface) {
+                    $stamps[] = $this->decodeXmlValidationStamps($value);
+                } else {
+                    $stamps[] = $this->serializer->deserialize($value, $class.'[]', $this->format, $this->stampContext);
+                }
             } catch (ExceptionInterface $e) {
                 $failure ??= new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
             } catch (\Throwable $e) {
@@ -228,7 +236,27 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         foreach ($stamps as $i => $stamp) {
             if ($stamp instanceof SerializerStamp) {
                 $stamps[$i] = new SerializerStamp(array_diff_key($stamp->getContext(), self::CODE_AFFECTING_CONTEXT_OPTIONS));
+            } elseif ($stamp instanceof ValidationStamp && \is_array($groups = $stamp->getGroups()) && isset($groups['groups']) && class_exists(GroupSequence::class)) {
+                // without type information, a GroupSequence decodes as an array
+                $stamps[$i] = new ValidationStamp(new GroupSequence((array) $groups['groups'], (bool) ($groups['cascadeCurrentGroup'] ?? false)));
             }
+        }
+
+        return $stamps;
+    }
+
+    /**
+     * The XML encoder decodes a list of one group as the group itself, and an empty list as an empty string.
+     *
+     * @return ValidationStamp[]
+     */
+    private function decodeXmlValidationStamps(string $value): array
+    {
+        $stamps = [];
+        foreach ((array) $this->serializer->decode($value, $this->format, $this->stampContext) as $data) {
+            $stamps[] = \is_string($groups = $data['groups'] ?? null)
+                ? new ValidationStamp('' === $groups ? [] : [$groups])
+                : $this->serializer->denormalize($data, ValidationStamp::class, $this->format, $this->stampContext);
         }
 
         return $stamps;

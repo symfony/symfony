@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -139,6 +140,21 @@ class ErrorDetailsStampTest extends TestCase
 
         $this->assertTrue($stampA->equals($stampB));
     }
+
+    public function testEqualsAfterXmlRoundTrip()
+    {
+        $serializer = new Serializer(null, 'xml');
+
+        foreach ([
+            ErrorDetailsStamp::create(new RecoverableTestException('recoverable', 123)),
+            ErrorDetailsStamp::create(new StringCodeTestException('23000')),
+            new ErrorDetailsStamp(StringCodeTestException::class, '23000', 'string code'),
+        ] as $stamp) {
+            $decoded = $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'), [$stamp])))->last(ErrorDetailsStamp::class);
+
+            $this->assertTrue($decoded->equals($stamp));
+        }
+    }
 }
 
 class RecoverableTestException extends \RuntimeException implements RecoverableExceptionInterface
@@ -146,5 +162,14 @@ class RecoverableTestException extends \RuntimeException implements RecoverableE
     public function getRetryDelay(): ?int
     {
         return null;
+    }
+}
+
+class StringCodeTestException extends \RuntimeException
+{
+    public function __construct(string $code)
+    {
+        parent::__construct('string code');
+        $this->code = $code;
     }
 }

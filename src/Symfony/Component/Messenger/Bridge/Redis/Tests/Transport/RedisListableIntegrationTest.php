@@ -102,6 +102,26 @@ class RedisListableIntegrationTest extends TestCase
         $this->assertNull($this->createReceiver()->find('9999999999-0'));
     }
 
+    public function testAckDeletesListedMessage()
+    {
+        $this->addEnvelope(new Envelope(new DummyMessage('Hi')));
+
+        $receiver = $this->createReceiver();
+        $receiver->ack($receiver->find($this->connection->findAll()[0]['id']));
+
+        $this->assertSame([], $this->connection->findAll());
+    }
+
+    public function testRejectDeletesListedMessage()
+    {
+        $this->addEnvelope(new Envelope(new DummyMessage('Hi')));
+
+        $receiver = $this->createReceiver();
+        $receiver->reject($receiver->find($this->connection->findAll()[0]['id']));
+
+        $this->assertSame([], $this->connection->findAll());
+    }
+
     private function createReceiver(): RedisReceiver
     {
         return new RedisReceiver($this->connection, $this->createSerializer());

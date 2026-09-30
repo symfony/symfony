@@ -583,6 +583,9 @@ class Connection
             // the ack decides the outcome: the entry may already be gone from the stream (e.g. trimmed), deleting it is best effort
             if ($acknowledged && $this->deleteAfterAck && false === $redis->xdel($this->stream, [$id])) {
                 $redis->clearLastError();
+            } elseif (!$acknowledged && $this->deleteAfterAck) {
+                // entries listed with find() or findAll() were never delivered to the group, deleting them is the only way to ack them
+                $acknowledged = $redis->xdel($this->stream, [$id]);
             }
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
@@ -608,6 +611,8 @@ class Connection
             // same as in ack(): the entry may already be gone from the stream, deleting it is best effort
             if ($rejected && $this->deleteAfterReject && false === $redis->xdel($this->stream, [$id])) {
                 $redis->clearLastError();
+            } elseif (!$rejected && $this->deleteAfterReject) {
+                $rejected = $redis->xdel($this->stream, [$id]);
             }
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);

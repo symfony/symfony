@@ -142,6 +142,58 @@ class EnvelopeTest extends TestCase
         $this->assertCount(1, $envelope->all(DelayStamp::class));
         $this->assertCount(1, $envelope->all(ReceivedStamp::class));
     }
+
+    public function testUnserializeKeepsWellFormedEnvelopes()
+    {
+        $envelope = new Envelope(new DummyMessage('dummy'));
+
+        $this->assertEquals($envelope, unserialize(serialize($envelope)));
+
+        $envelope = new Envelope(new DummyMessage('dummy'), [new ReceivedStamp('a'), new DelayStamp(5), new ReceivedStamp('b')]);
+        $unserialized = unserialize(serialize($envelope));
+
+        $this->assertEquals($envelope, $unserialized);
+        $this->assertSame([ReceivedStamp::class, DelayStamp::class], array_keys($unserialized->all()));
+    }
+
+    public function testUnserializeKeepsStampsOfMissingClasses()
+    {
+        $serialized = serialize(new Envelope(new DummyMessage('dummy'), [new DelayStamp(5)]));
+        // simulate a stamp class that was removed from the code base
+        $serialized = str_replace('DelayStamp', 'DelayStomp', $serialized);
+
+        $envelope = unserialize($serialized);
+
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $envelope->all('Symfony\Component\Messenger\Stamp\DelayStomp')[0]);
+    }
+
+    public function testUnserializeRejectsStampsFiledUnderAnotherClass()
+    {
+        $delayed = serialize(new Envelope(new DummyMessage('dummy'), [new DelayStamp(5)]));
+        $incomplete = serialize(new Envelope(new DummyMessage('dummy'), [unserialize('O:12:"MissingStamp":0:{}')]));
+
+        foreach ([
+            str_replace(serialize(DelayStamp::class), serialize(ReceivedStamp::class), $delayed),
+            str_replace(serialize('__PHP_Incomplete_Class'), serialize(DelayStamp::class), $incomplete),
+        ] as $serialized) {
+            try {
+                unserialize($serialized);
+                $this->fail('Unserializing an envelope that files a stamp under another class should fail.');
+            } catch (\BadMethodCallException $e) {
+                $this->assertSame('Cannot unserialize '.Envelope::class, $e->getMessage());
+            }
+        }
+    }
+
+    public function testUnserializeRejectsObjectsThatAreNotStamps()
+    {
+        $serialized = serialize(new Envelope(new DummyMessage('dummy'), [new DummyMessage('not a stamp')]));
+
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot unserialize '.Envelope::class);
+
+        unserialize($serialized);
+    }
 }
 
 interface DummyFooBarStampInterface extends StampInterface

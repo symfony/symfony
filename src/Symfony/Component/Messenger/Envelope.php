@@ -127,4 +127,30 @@ final class Envelope
     {
         return $this->message;
     }
+
+    public function __wakeup(): void
+    {
+        if (!isset($this->message)) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
+
+        foreach ($this->stamps as $class => $stamps) {
+            if (!\is_array($stamps) || !$stamps) {
+                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+            }
+
+            foreach ($stamps as $stamp) {
+                if ($stamp instanceof \__PHP_Incomplete_Class) {
+                    // the class of the stamp is missing, or unserialize() was not allowed to load it
+                    $stampClass = ((array) $stamp)['__PHP_Incomplete_Class_Name'] ?? null;
+                } else {
+                    $stampClass = $stamp instanceof StampInterface ? $stamp::class : null;
+                }
+
+                if ($class !== $stampClass) {
+                    throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+                }
+            }
+        }
+    }
 }

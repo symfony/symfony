@@ -36,6 +36,7 @@
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
         "symfony/mime": "^7.4|^8.0",
+        "symfony/polyfill-deepclone": "^1.40",
         "symfony/property-access": "^8.1",
         "symfony/property-info": "^7.4.15|~8.0.15|^8.1.2",
         "symfony/translation-contracts": "^2.5|^3",

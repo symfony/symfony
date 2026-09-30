@@ -23,6 +23,7 @@ CHANGELOG
  * Resolve generic template types during denormalization, e.g. `T` in a `Box<Circle>`-typed property is denormalized as `Circle`
  * Add an optional `$mappedClasses` argument to `Mapping\Loader\LoaderChain::__construct()`, to declare which classes each loader maps
  * Trigger a deprecation when denormalizing a property from its PHP name while a name converter maps it to another key
+ * Add `ClosureNormalizer` to normalize and denormalize closures declared in constant expressions and first-class callables, using the `deepclone` extension or its polyfill
 
 8.1
 ---

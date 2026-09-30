@@ -41,6 +41,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SerializerComponentInterface;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 class SerializerTest extends TestCase
 {
@@ -116,6 +117,26 @@ class SerializerTest extends TestCase
 
         $this->assertSame('Try again', $stamp->getExceptionMessage());
         $this->assertNull($stamp->getFlattenException());
+    }
+
+    public function testEncodedWithValidationStampIsDecodableInXml()
+    {
+        $serializer = new Serializer(null, 'xml');
+
+        $stamps = [new ValidationStamp(['foo']), new ValidationStamp([]), new ValidationStamp(['foo', 'bar'])];
+
+        $this->assertEquals($stamps, $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'), $stamps)))->all(ValidationStamp::class));
+    }
+
+    public function testEncodedWithGroupSequenceValidationStampIsDecodable()
+    {
+        $stamps = [new ValidationStamp(new GroupSequence(['foo', 'bar'])), new ValidationStamp(new GroupSequence(['foo']))];
+
+        $serializer = new Serializer();
+        $this->assertEquals($stamps, $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'), $stamps)))->all(ValidationStamp::class));
+
+        $serializer = new Serializer(null, 'xml');
+        $this->assertEquals($stamps, $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'), $stamps)))->all(ValidationStamp::class));
     }
 
     public function testSerializedMessageStampIsUsedForEncoding()

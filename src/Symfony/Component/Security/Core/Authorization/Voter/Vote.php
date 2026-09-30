@@ -33,8 +33,24 @@ class Vote
      */
     public array $extraData = [];
 
+    /**
+     * The denied attribute a fresh authentication could grant, see {@see requestReAuthentication()}.
+     */
+    public private(set) ?string $reAuthenticationAttribute = null;
+
     public function addReason(string $reason): void
     {
         $this->reasons[] = $reason;
+    }
+
+    /**
+     * Tells the firewall that a fresh authentication could grant the attribute this vote denies.
+     *
+     * The firewall then starts a re-authentication rather than answering with a 403.
+     * With a strategy other than "affirmative", another voter denying the same attribute can leave the user denied after re-authenticating.
+     */
+    public function requestReAuthentication(string $attribute): void
+    {
+        $this->reAuthenticationAttribute = $attribute;
     }
 }

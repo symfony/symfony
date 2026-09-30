@@ -15,6 +15,7 @@ use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -100,6 +101,18 @@ class SerializerTest extends TestCase
         $this->assertCount(1, $flattenException->getPrevious()->getTrace());
         $this->assertNull($flattenException->getPrevious()->getPrevious());
         $this->assertTrue($stamp->equals(ErrorDetailsStamp::create($exception)));
+    }
+
+    public function testEncodedWithErrorDetailsStampWithoutFlattenExceptionIsDecodableInXml()
+    {
+        $serializer = new Serializer(null, 'xml');
+
+        $envelope = new Envelope(new DummyMessage('Hello'), [ErrorDetailsStamp::create(new RecoverableMessageHandlingException('Try again'))]);
+
+        $stamp = $serializer->decode($serializer->encode($envelope))->last(ErrorDetailsStamp::class);
+
+        $this->assertSame('Try again', $stamp->getExceptionMessage());
+        $this->assertNull($stamp->getFlattenException());
     }
 
     public function testSerializedMessageStampIsUsedForEncoding()

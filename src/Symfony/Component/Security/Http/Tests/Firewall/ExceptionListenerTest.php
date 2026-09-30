@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -37,7 +38,11 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\ClosureVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -46,6 +51,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Http\Attribute\IsGrantedContext;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
@@ -494,6 +500,45 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertContains([LogLevel::DEBUG, 'Access denied, the user is neither anonymous, nor remember-me, nor asked to re-authenticate.', ['exception' => $exception]], $logger->logs);
+    }
+
+    #[DataProvider('provideCompositeAttributes')]
+    public function testACheckMadeByAnExpressionOrAClosureStartsTheReAuthenticationItsVoteRequested(\Closure $attribute)
+    {
+        $tokenStorage = $this->createTokenStorageWithAToken();
+        $voters = new \ArrayObject([new AuthenticatedVoter(new AuthenticationTrustResolver()), new RoleVoter()]);
+        $decisionManager = new AccessDecisionManager($voters);
+        $authorizationChecker = new AuthorizationChecker($tokenStorage, $decisionManager);
+        $voters[] = new ExpressionVoter(new ExpressionLanguage(), new AuthenticationTrustResolver(), $authorizationChecker);
+        $voters[] = new ClosureVoter($authorizationChecker);
+
+        $attribute = $attribute();
+        $accessDecision = new AccessDecision();
+        $accessDecision->isGranted = $authorizationChecker->isGranted($attribute, null, $accessDecision);
+        $exception = new AccessDeniedException($accessDecision->getMessage());
+        $exception->setAttributes([$attribute]);
+        $exception->setAccessDecision($accessDecision);
+        $event = $this->createEvent($exception);
+
+        $entryPoint = $this->createMock(ReAuthenticationEntryPointInterface::class);
+        $entryPoint->expects($this->once())
+            ->method('startReAuthentication')
+            ->willReturnCallback(function (Request $request): Response {
+                $this->assertSame(AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, $request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+
+                return new Response('Confirm your password', 200);
+            });
+
+        $listener = $this->createExceptionListener($tokenStorage, $this->createFullFledgedTrustResolver(), null, null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+
+        $this->assertSame('Confirm your password', $event->getResponse()->getContent());
+    }
+
+    public static function provideCompositeAttributes(): iterable
+    {
+        yield 'allow_if' => [static fn () => new Expression("is_granted('ROLE_USER') and is_recently_authenticated()")];
+        yield 'closure' => [static fn () => static fn (IsGrantedContext $context): bool => $context->isGranted('ROLE_USER') && $context->isAuthenticatedRecently()];
     }
 
     public function testReAuthenticationEntryPointIsNotStartedWithoutTheDecision()

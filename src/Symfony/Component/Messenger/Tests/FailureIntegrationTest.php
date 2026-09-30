@@ -632,6 +632,53 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame($encodedEnvelope['body'], $failedEnvelopes[0]->getMessage()->encodedEnvelope['body']);
     }
 
+    #[DataProvider('provideFailureTransportSerializers')]
+    public function testMessageWithoutTypeKeepsItsPayloadUntilTheFailureTransport(SerializerInterface $failureSerializer)
+    {
+        $serializer = new Serializer();
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('API')));
+        unset($encodedEnvelope['headers']['type']);
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+
+        $locator = new Container();
+        $locator->set('transport', $transport);
+
+        $retryStrategyLocator = new Container();
+        $retryStrategyLocator->set('transport', new MultiplierRetryStrategy(2));
+
+        $bus = new MessageBus([new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer]))]);
+
+        $errors = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$errors) {
+            $errors[RedeliveryStamp::getRetryCountFromEnvelope($event->getEnvelope())] = $event->getThrowable()->getMessage();
+        });
+
+        for ($i = 0; $i < 10 && $transport->getMessagesWaitingToBeReceived(); ++$i) {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        }
+
+        $this->assertSame(array_fill(0, 3, 'Encoded envelope does not have a "type" header.'), $errors);
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failedEnvelopes = $failureTransport->getMessagesWaitingToBeReceived());
+
+        $failure = $failureSerializer->decode($failedEnvelopes[0])->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame($encodedEnvelope['body'], $failure->encodedEnvelope['body']);
+        $this->assertArrayNotHasKey('type', $failure->encodedEnvelope['headers']);
+    }
+
+    public static function provideFailureTransportSerializers(): iterable
+    {
+        yield 'JSON' => [new Serializer()];
+        yield 'PHP' => [new PhpSerializer()];
+    }
+
     public static function provideUndecodableMessages(): iterable
     {
         $encodedEnvelope = (new Serializer())->encode(new Envelope(new DummyMessage('API')));

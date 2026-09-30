@@ -404,6 +404,43 @@ class CellBufferTest extends TestCase
         $this->assertSame("e\u{0301}x  ", $buf->toLines()[0]);
     }
 
+    public function testZeroWidthCharacterGoesInTheCellBeforeIt()
+    {
+        $buf = new CellBuffer(6, 1);
+        $buf->writeAnsiLines(['......']);
+        $buf->writeAnsiLines(["a\u{2067}漢\u{2069}b"]);
+
+        $this->assertSame("a\u{2067}漢\u{2069}b..", $buf->toLines()[0]);
+
+        $buf->writeAnsiLines(["cd\u{2069}"]);
+
+        $this->assertSame("cd\u{2069} b..", $buf->toLines()[0]);
+    }
+
+    public function testCombiningMarkSplitFromItsBaseCharacterStaysInTheCellOfIt()
+    {
+        $buf = new CellBuffer(4, 1);
+        $buf->writeAnsiLines(["e\x1b[1m\u{0301}\x1b[0mx"]);
+
+        $this->assertSame("e\u{0301}x  ", $buf->toLines()[0]);
+    }
+
+    public function testZeroWidthCharacterAtTheStartOfARowIsDropped()
+    {
+        $buf = new CellBuffer(4, 1);
+        $buf->writeAnsiLines(["\u{2068}ab\u{2069}"]);
+
+        $this->assertSame("ab\u{2069}  ", $buf->toLines()[0]);
+    }
+
+    public function testCursorMarkerAfterZeroWidthCharacters()
+    {
+        $buf = new CellBuffer(10, 1);
+        $buf->writeAnsiLines(["\u{2068}ab\u{2069}\u{200B}".AnsiUtils::cursorMarker().'c']);
+
+        $this->assertSame(['row' => 0, 'col' => 2], $buf->getCursorPosition());
+    }
+
     public function testEmojiSequenceTakesTwoCells()
     {
         $family = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}";

@@ -117,6 +117,13 @@ class EditorRendererTest extends TestCase
         }
     }
 
+    public function testCursorAtTheEndOfAFullLineSitsOnItsLastCharacterThatTakesAColumn()
+    {
+        $lines = $this->renderSimple(["abcd\u{2069}"], 0, \strlen("abcd\u{2069}"), 4, 10, false, true);
+
+        $this->assertSame('abc'.AnsiUtils::cursorMarker()."d\u{2069}", $lines[1]);
+    }
+
     public function testRenderEmojiProducesValidUtf8()
     {
         $lines = $this->renderSimple(['📝 Hello'], 0, 0, 40, 10, false, true);

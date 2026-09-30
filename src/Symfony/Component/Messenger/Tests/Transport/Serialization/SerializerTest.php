@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
@@ -308,6 +309,23 @@ class SerializerTest extends TestCase
 
         $encoded = $serializer->encode($envelope);
         $this->assertStringNotContainsString('DummySymfonySerializerNonSendableStamp', print_r($encoded['headers'], true));
+    }
+
+    public function testEncodedHandledStampsKeepTheHandlerNamesButNotTheResults()
+    {
+        $serializer = new Serializer();
+
+        $result = new \stdClass();
+        $result->self = $result;
+
+        $envelope = new Envelope(new DummyMessage('Hello'), [
+            new HandledStamp($result, 'handler_a'),
+            new HandledStamp('result', 'handler_b'),
+        ]);
+
+        $decodedEnvelope = $serializer->decode($serializer->encode($envelope));
+
+        $this->assertEquals([new HandledStamp(null, 'handler_a'), new HandledStamp(null, 'handler_b')], $decodedEnvelope->all(HandledStamp::class));
     }
 
     public function testDecodingFailedConstructorDeserialization()

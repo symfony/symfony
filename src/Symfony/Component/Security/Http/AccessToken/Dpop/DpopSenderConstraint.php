@@ -301,7 +301,7 @@ final class DpopSenderConstraint implements SenderConstraintInterface
             throw new InvalidDpopProofException('The DPoP proof was presented before (RFC 9449, Section 11.1).');
         }
 
-        $this->proofReplayCache->save($item->set(true)->expiresAfter(max(1, $expiresAt - $this->clock->now()->getTimestamp())));
+        $this->proofReplayCache->save($item->set(true)->expiresAt(new \DateTimeImmutable('@'.$expiresAt)));
     }
 
     /**

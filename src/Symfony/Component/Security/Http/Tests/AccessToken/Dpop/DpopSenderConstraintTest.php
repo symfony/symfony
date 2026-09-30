@@ -278,12 +278,12 @@ class DpopSenderConstraintTest extends TestCase
 
     public function testItAcceptsTheSameIdentifierOnceTheProofStoppedStanding()
     {
-        $proof = $this->createProof();
+        $proof = $this->createProof(['jti' => 'reused']);
         $constraint = $this->createConstraint();
         $constraint->check($this->createRequest($proof), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
 
         $this->clock->sleep(120);
-        $refreshed = $this->createProof();
+        $refreshed = $this->createProof(['jti' => 'reused']);
 
         $constraint->check($this->createRequest($refreshed), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
 

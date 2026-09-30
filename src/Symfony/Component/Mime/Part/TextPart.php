@@ -36,7 +36,7 @@ class TextPart extends AbstractPart
     private string $subtype;
     private ?string $disposition = null;
     private ?string $name = null;
-    private string $encoding;
+    private ?string $encoding;
     private ?bool $seekable = null;
 
     /**
@@ -62,14 +62,12 @@ class TextPart extends AbstractPart
         $this->subtype = $subtype;
         $this->seekable = \is_resource($body) ? stream_get_meta_data($body)['seekable'] && 0 === fseek($body, 0, \SEEK_CUR) : null;
 
-        if (null === $encoding) {
-            $this->encoding = $this->chooseEncoding();
-        } else {
-            if (!\in_array($encoding, self::DEFAULT_ENCODERS, true) && !\array_key_exists($encoding, self::$encoders)) {
-                throw new InvalidArgumentException(\sprintf('The encoding must be one of "%s" ("%s" given).', implode('", "', array_unique(array_merge(self::DEFAULT_ENCODERS, array_keys(self::$encoders)))), $encoding));
-            }
-            $this->encoding = $encoding;
+        if (null !== $encoding && !\in_array($encoding, self::DEFAULT_ENCODERS, true) && !\array_key_exists($encoding, self::$encoders)) {
+            throw new InvalidArgumentException(\sprintf('The encoding must be one of "%s" ("%s" given).', implode('", "', array_unique(array_merge(self::DEFAULT_ENCODERS, array_keys(self::$encoders)))), $encoding));
         }
+
+        // null means that the encoding is chosen from the disposition and the charset when rendering
+        $this->encoding = $encoding;
     }
 
     public function getMediaType(): string
@@ -178,7 +176,7 @@ class TextPart extends AbstractPart
         if ($this->name && 'form-data' !== $this->disposition) {
             $headers->setHeaderParameter('Content-Type', 'name', $this->name);
         }
-        $headers->setHeaderBody('Text', 'Content-Transfer-Encoding', $this->encoding);
+        $headers->setHeaderBody('Text', 'Content-Transfer-Encoding', $this->encoding ?? $this->chooseEncoding());
 
         if (!$headers->has('Content-Disposition') && null !== $this->disposition) {
             $headers->setHeaderBody('Parameterized', 'Content-Disposition', $this->disposition);
@@ -205,7 +203,9 @@ class TextPart extends AbstractPart
 
     private function getEncoder(): ContentEncoderInterface
     {
-        return self::$encoders[$this->encoding] ??= match ($this->encoding) {
+        $encoding = $this->encoding ?? $this->chooseEncoding();
+
+        return self::$encoders[$encoding] ??= match ($encoding) {
             '8bit', 'binary' => new EightBitContentEncoder(),
             'quoted-printable' => new QpContentEncoder(),
             'base64' => new Base64ContentEncoder(),
@@ -223,6 +223,10 @@ class TextPart extends AbstractPart
 
     private function chooseEncoding(): string
     {
+        if ('form-data' === $this->disposition) {
+            return '8bit';
+        }
+
         if (null === $this->charset) {
             return 'base64';
         }
@@ -245,7 +249,8 @@ class TextPart extends AbstractPart
             'subtype' => $this->subtype,
             'disposition' => $this->disposition,
             'name' => $this->name,
-            'encoding' => $this->encoding,
+            'encoding' => $this->encoding ?? $this->chooseEncoding(),
+            'explicitEncoding' => null !== $this->encoding,
         ];
     }
 
@@ -267,6 +272,12 @@ class TextPart extends AbstractPart
         $this->disposition = $data['disposition'] ?? $data["\0".self::class."\0disposition"] ?? null;
         $this->name = $data['name'] ?? $data["\0".self::class."\0name"] ?? null;
         $this->encoding = $data['encoding'] ?? $data["\0".self::class."\0encoding"];
+
+        // the resolved encoding is serialized for older versions, and payloads created
+        // before Symfony 8.2 have no "explicitEncoding" key: treat the default as implicit
+        if (true !== ($data['explicitEncoding'] ?? false) && $this->encoding === $this->chooseEncoding()) {
+            $this->encoding = null;
+        }
 
         if (!\is_string($this->body) && !$this->body instanceof File) {
             throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);

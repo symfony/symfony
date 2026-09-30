@@ -66,6 +66,27 @@ class TextPartTest extends TestCase
         yield ['encoding'];
     }
 
+    #[DataProvider('provideLegacyEncodings')]
+    public function testUnserializePayloadWithoutExplicitEncodingKeepsEncoding(?string $encoding, string $expected)
+    {
+        // payloads serialized before Symfony 8.2 have no "explicitEncoding" key
+        $original = new TextPart('content', 'utf-8', 'plain', $encoding);
+        $data = $original->__serialize();
+        unset($data['explicitEncoding']);
+        $part = (new \ReflectionClass(TextPart::class))->newInstanceWithoutConstructor();
+        $part->__unserialize($data);
+
+        $this->assertSame($expected, $part->getPreparedHeaders()->getHeaderBody('Content-Transfer-Encoding'));
+        $this->assertSame($original->bodyToString(), $part->bodyToString());
+    }
+
+    public static function provideLegacyEncodings(): iterable
+    {
+        yield 'default' => [null, 'quoted-printable'];
+        yield 'explicit default' => ['quoted-printable', 'quoted-printable'];
+        yield 'explicit other' => ['base64', 'base64'];
+    }
+
     public function testConstructor()
     {
         $p = new TextPart('content');

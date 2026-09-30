@@ -130,14 +130,22 @@ class DpopSenderConstraintTest extends TestCase
         $this->createConstraint()->check($this->createRequest($proof), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
     }
 
-    public function testItRefusesAProofCarryingAPrivateKey()
+    #[DataProvider('provideKeysCarryingPrivateMaterial')]
+    public function testItRefusesAProofCarryingAPrivateKey(array $key)
     {
-        $proof = $this->createProof(header: ['jwk' => self::PRIVATE_JWK]);
+        $proof = $this->createProof(header: ['jwk' => $key]);
 
         $this->expectException(InvalidDpopProofException::class);
         $this->expectExceptionMessage('is not a public key');
 
         $this->createConstraint()->check($this->createRequest($proof), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
+    }
+
+    public static function provideKeysCarryingPrivateMaterial(): iterable
+    {
+        yield 'the "d" of an EC key' => [self::PRIVATE_JWK];
+        yield 'the "oth" of a multi-prime RSA key' => [['kty' => 'RSA', 'n' => 'AQAB', 'e' => 'AQAB', 'oth' => [['r' => 'AQAB', 'd' => 'AQAB', 't' => 'AQAB']]]];
+        yield 'the "priv" of an AKP key' => [['kty' => 'AKP', 'alg' => 'ML-DSA-44', 'pub' => 'AQAB', 'priv' => 'AQAB']];
     }
 
     public function testItRefusesAProofCarryingAKeyThatIsNotOne()

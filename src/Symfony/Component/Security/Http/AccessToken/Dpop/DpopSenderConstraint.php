@@ -66,9 +66,9 @@ final class DpopSenderConstraint implements SenderConstraintInterface
     public const SCHEME = 'DPoP';
 
     /**
-     * RFC 7518, Section 6: what the private half of a key holds, and the single member of a symmetric one.
+     * RFC 7518, Section 6: what the private half of a key holds, the other primes of a multi-prime RSA key among them, the single member of a symmetric key, and the private half of an AKP key.
      */
-    private const PRIVATE_MEMBERS = ['d', 'p', 'q', 'dp', 'dq', 'qi', 'k'];
+    private const PRIVATE_MEMBERS = ['d', 'p', 'q', 'dp', 'dq', 'qi', 'oth', 'k', 'priv'];
 
     /**
      * @param AlgorithmManager       $algorithms       The signature algorithms a proof may be signed with, all

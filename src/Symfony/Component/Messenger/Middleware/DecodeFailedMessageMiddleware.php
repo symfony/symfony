@@ -63,7 +63,8 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
         }
 
         $received = null !== $envelope->last(ReceivedStamp::class);
-        $envelope = $decodedEnvelope->with(...array_merge(...array_values($envelope->all())));
+        // the failed envelope holds the stamps its own decoding kept and the ones added since: they replace the decoded stamps of the same class
+        $envelope = new Envelope($decodedEnvelope->getMessage(), array_merge(...array_values($envelope->all() + $decodedEnvelope->all())));
 
         if (!$received) {
             // a failure redispatched from the failure transport keeps this stamp only to find its serializer

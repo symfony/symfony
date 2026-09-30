@@ -22,10 +22,13 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\AckStamp;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class DecodeFailedMessageMiddlewareTest extends TestCase
@@ -124,6 +127,41 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertInstanceOf(DummyMessage::class, $nextMiddleware->envelope?->getMessage());
         $this->assertSame([], $nextMiddleware->envelope->all(SentToFailureTransportStamp::class));
         $this->assertNotNull($nextMiddleware->envelope->last(RedeliveryStamp::class));
+    }
+
+    public function testItDoesNotDuplicateTheStampsKeptByTheFailedEnvelope()
+    {
+        $serializer = Serializer::create();
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('Hello'), [new BusNameStamp('bus'), new RedeliveryStamp(1)]));
+
+        $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['async' => $serializer]));
+
+        $nextMiddleware = new class implements MiddlewareInterface {
+            public ?Envelope $envelope = null;
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                return $this->envelope = $envelope;
+            }
+        };
+
+        $envelope = MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode.')
+            ->with(
+                new BusNameStamp('bus'),
+                new RedeliveryStamp(1),
+                new SentToFailureTransportStamp('async'),
+                new RedeliveryStamp(0),
+                new ReceivedStamp('failed'),
+            );
+
+        $middleware->handle($envelope, new StackMiddleware($nextMiddleware));
+
+        $envelope = $nextMiddleware->envelope;
+        $this->assertInstanceOf(DummyMessage::class, $envelope?->getMessage());
+        $this->assertCount(1, $envelope->all(BusNameStamp::class));
+        $this->assertSame([1, 0], array_map(static fn (RedeliveryStamp $stamp): int => $stamp->getRetryCount(), $envelope->all(RedeliveryStamp::class)));
+        $this->assertCount(1, $envelope->all(SentToFailureTransportStamp::class));
+        $this->assertCount(1, $envelope->all(SerializedMessageStamp::class));
     }
 
     public function testItThrowsWhenNoReceivedStampAndNoSentToFailureStamp()

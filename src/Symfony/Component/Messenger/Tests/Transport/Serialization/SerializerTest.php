@@ -86,6 +86,27 @@ class SerializerTest extends TestCase
         $this->assertSame('Previous', $stamp->getFlattenException()->getPrevious()->getMessage());
     }
 
+    public function testEncodedWithErrorDetailsStampIsDecodableInXml()
+    {
+        $serializer = new Serializer(null, 'xml');
+
+        $exception = new \RuntimeException('Failure', 3, new \LogicException('Previous'));
+        $envelope = new Envelope(new DummyMessage('Hello'), [ErrorDetailsStamp::create($exception)]);
+
+        $stamp = $serializer->decode($serializer->encode($envelope))->last(ErrorDetailsStamp::class);
+        $flattenException = $stamp->getFlattenException();
+
+        $this->assertSame('Failure', $flattenException->getMessage());
+        $this->assertSame(3, $flattenException->getCode());
+        $this->assertSame([], $flattenException->getHeaders());
+        $this->assertCount(1, $flattenException->getTrace());
+        $this->assertSame(__FILE__, $flattenException->getTrace()[0]['file']);
+        $this->assertSame('Previous', $flattenException->getPrevious()->getMessage());
+        $this->assertCount(1, $flattenException->getPrevious()->getTrace());
+        $this->assertNull($flattenException->getPrevious()->getPrevious());
+        $this->assertTrue($stamp->equals(ErrorDetailsStamp::create($exception)));
+    }
+
     public function testSerializedMessageStampIsUsedForEncoding()
     {
         $serializer = new Serializer();

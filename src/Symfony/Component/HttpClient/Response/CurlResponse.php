@@ -367,6 +367,12 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             }
         }
 
+        // curl_multi_select() passes the timeout to curl as milliseconds in a signed
+        // 32-bit int, so it rejects anything above 2147483.647 seconds: a warning on
+        // PHP < 8.5, a ValueError since. A large timeout or max_duration reaches that.
+        // The lower bound is clamped by the caller, in TransportResponseTrait.
+        $timeout = min($timeout, 2147483.647);
+
         if (0 !== $selected = curl_multi_select($multi->handle, $timeout)) {
             return $selected;
         }

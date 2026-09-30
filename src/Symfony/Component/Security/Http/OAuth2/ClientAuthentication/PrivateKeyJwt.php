@@ -51,6 +51,7 @@ final class PrivateKeyJwt extends AbstractClientAssertion
         }
 
         $signatureAlgorithm = self::createAlgorithm($algorithm, JwsAlgorithms::ASYMMETRIC, 'private_key_jwt');
+        JwsAlgorithms::checkKey($signingKey, $signatureAlgorithm);
 
         if (!$signingKey->has('d')) {
             throw new \InvalidArgumentException('The "private_key_jwt" client assertion must be signed with the private key of the client, and the given JWK has no "d" parameter: it is the public key. Register that public key at the provider, and sign with the private one.');

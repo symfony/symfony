@@ -13,12 +13,15 @@ namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
@@ -51,6 +54,7 @@ use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -559,6 +563,53 @@ class FailureIntegrationTest extends TestCase
             yield $format.' without signature' => [$inner, $inner->encode($envelope)];
             yield $format.' signed with another key' => [$inner, (new SigningSerializer($inner, 'another-key', [DummyMessage::class]))->encode($envelope)];
         }
+    }
+
+    #[DataProvider('provideUnverifiedFailureSerializers')]
+    public function testUnverifiedFailureDoesNotPutItsStampsOnTheSignedMessageOfItsClaim(SerializerInterface $inner, bool $failureTransportHasClaimCheck)
+    {
+        $signingSerializer = new SigningSerializer($inner, 'signing-key', [DummyMessage::class]);
+        $claimedData = serialize($signingSerializer->encode(new Envelope(new DummyMessage('API'), [new BusNameStamp('the_bus')])));
+        $item = $this->createStub(CacheItemInterface::class);
+        $item->method('isHit')->willReturn(true);
+        $item->method('get')->willReturn($claimedData);
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturn($item);
+        $serializer = new ClaimCheckSerializer($signingSerializer, $pool, 1000);
+        $claim = [
+            'body' => json_encode(['id' => 'claim', 'digest' => hash('sha256', $claimedData)]),
+            'headers' => ['X-Symfony-Messenger-Claim-Check' => '1', 'X-Symfony-Messenger-Claim-Check-Type' => DummyMessage::class],
+        ];
+        $forgedStamps = [new SentToFailureTransportStamp('transport'), new BusNameStamp('forged_bus'), new HandledStamp(null, DummyTestHandler::class.'::__invoke')];
+        // a claim that could not be retrieved is sent again unsigned: this forged failure looks the same
+        $forgedFailure = $inner->encode(new Envelope(new MessageDecodingFailedException('Forged.', 0, null, $claim), $forgedStamps));
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureTransportHasClaimCheck ? $serializer : $signingSerializer, [$forgedFailure]);
+
+        $handler = new DummyTestHandler(false);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $handledEnvelope = null;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageHandledEvent::class, static function (WorkerMessageHandledEvent $event) use (&$handledEnvelope) {
+            $handledEnvelope = $event->getEnvelope();
+        });
+
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $handler->getTimesCalled());
+        $this->assertSame('the_bus', $handledEnvelope?->last(BusNameStamp::class)?->getBusName());
+    }
+
+    public static function provideUnverifiedFailureSerializers(): iterable
+    {
+        yield 'JSON' => [new Serializer(), false];
+        yield 'PHP' => [new PhpSerializer(), false];
+        yield 'PHP with claim check' => [new PhpSerializer(), true];
     }
 
     public function testRetryThroughTransportUsingTheStandaloneSerializer()

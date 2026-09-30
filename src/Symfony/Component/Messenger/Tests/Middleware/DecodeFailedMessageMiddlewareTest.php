@@ -27,9 +27,12 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 
 class DecodeFailedMessageMiddlewareTest extends TestCase
 {
@@ -164,6 +167,31 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertCount(1, $envelope->all(SerializedMessageStamp::class));
     }
 
+    public function testItKeepsOnlyTheLocalStampsOfAnUnverifiedFailureThatDecodesToASignedMessage()
+    {
+        $envelope = $this->handleUnverifiedFailure(new DummyMessage('decoded'));
+
+        $this->assertInstanceOf(DummyMessage::class, $envelope->getMessage());
+        $this->assertSame(['the_bus'], array_map(static fn (BusNameStamp $stamp): string => $stamp->getBusName(), $envelope->all(BusNameStamp::class)));
+        $this->assertSame([], $envelope->all(RedeliveryStamp::class));
+        $this->assertSame('async', $envelope->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName());
+        $this->assertSame([42], array_map(static fn (TransportMessageIdStamp $stamp): mixed => $stamp->getId(), $envelope->all(TransportMessageIdStamp::class)));
+        $this->assertSame('async', $envelope->last(ReceivedStamp::class)?->getTransportName());
+        $this->assertCount(1, $envelope->all(AckStamp::class));
+    }
+
+    public function testItKeepsTheStampsOfAnUnverifiedFailureThatDecodesToAMessageWithoutSignature()
+    {
+        $envelope = $this->handleUnverifiedFailure(new \stdClass());
+
+        $this->assertInstanceOf(\stdClass::class, $envelope->getMessage());
+        $this->assertSame(['failed_bus'], array_map(static fn (BusNameStamp $stamp): string => $stamp->getBusName(), $envelope->all(BusNameStamp::class)));
+        $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($envelope));
+        $this->assertSame(['failed_id', 42], array_map(static fn (TransportMessageIdStamp $stamp): mixed => $stamp->getId(), $envelope->all(TransportMessageIdStamp::class)));
+        $this->assertSame('async', $envelope->last(ReceivedStamp::class)?->getTransportName());
+        $this->assertCount(1, $envelope->all(AckStamp::class));
+    }
+
     public function testItThrowsWhenNoReceivedStampAndNoSentToFailureStamp()
     {
         $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator([]));
@@ -234,6 +262,32 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $envelope = new Envelope(new DummyMessage('ok'));
 
         $middleware->handle($envelope, new StackMiddleware());
+    }
+
+    private function handleUnverifiedFailure(object $decodedMessage): Envelope
+    {
+        $phpSerializer = new PhpSerializer();
+        $encodedFailure = $phpSerializer->encode(new Envelope(new MessageDecodingFailedException('Could not retrieve the claim.', 0, null, ['body' => 'claim']), [new BusNameStamp('failed_bus'), new RedeliveryStamp(1), new TransportMessageIdStamp('failed_id'), new SentToFailureTransportStamp('async')]));
+        $failure = (new SigningSerializer($phpSerializer, 'signing-key', [DummyMessage::class]))->decode($encodedFailure);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure->getMessage());
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('decode')->willReturn(new Envelope($decodedMessage, [new BusNameStamp('the_bus')]));
+
+        $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['async' => $serializer]));
+
+        $nextMiddleware = new class implements MiddlewareInterface {
+            public ?Envelope $envelope = null;
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                return $this->envelope = $envelope;
+            }
+        };
+
+        $middleware->handle($failure->with(new TransportMessageIdStamp(42), new ReceivedStamp('async'), new AckStamp(static fn () => null)), new StackMiddleware($nextMiddleware));
+
+        return $nextMiddleware->envelope;
     }
 }
 

@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterface;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -169,6 +170,9 @@ class Serializer implements SerializerInterface
         foreach ($stamps as $i => $stamp) {
             if ($stamp instanceof SerializerStamp) {
                 $stamps[$i] = new SerializerStamp(array_diff_key($stamp->getContext(), self::CODE_AFFECTING_CONTEXT_OPTIONS));
+            } elseif ($stamp instanceof ValidationStamp && \is_array($groups = $stamp->getGroups()) && isset($groups['groups']) && class_exists(GroupSequence::class)) {
+                // without type information, a GroupSequence decodes as an array
+                $stamps[$i] = new ValidationStamp(new GroupSequence((array) $groups['groups']));
             }
         }
 

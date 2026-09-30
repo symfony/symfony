@@ -74,7 +74,7 @@ final class ClaimCheckSerializer implements SerializerInterface, MessageTypeAwar
 
     public function decode(array $encodedEnvelope): Envelope
     {
-        if ('1' !== ($encodedEnvelope['headers'][self::HEADER] ?? null)) {
+        if (!$this->isClaimReference($encodedEnvelope)) {
             return $this->inner->decode($encodedEnvelope);
         }
 
@@ -103,13 +103,24 @@ final class ClaimCheckSerializer implements SerializerInterface, MessageTypeAwar
 
     public function getMessageType(array $encodedEnvelope): ?string
     {
-        if ('1' === ($encodedEnvelope['headers'][self::HEADER] ?? null)) {
+        if ($this->isClaimReference($encodedEnvelope)) {
             $type = $encodedEnvelope['headers'][self::TYPE_HEADER] ?? null;
 
             return \is_string($type) ? $type : null;
         }
 
         return $this->inner instanceof MessageTypeAwareSerializerInterface ? $this->inner->getMessageType($encodedEnvelope) : null;
+    }
+
+    /**
+     * Tells a claim reference apart from a failure to retrieve one that is sent again.
+     *
+     * Such a failure keeps the headers of the reference, and the inner serializer adds a "type" header that a reference never has.
+     * The inner serializer decodes it then, with its stamps, and the failure carries the reference to retrieve on replay.
+     */
+    private function isClaimReference(array $encodedEnvelope): bool
+    {
+        return '1' === ($encodedEnvelope['headers'][self::HEADER] ?? null) && !isset($encodedEnvelope['headers']['type']);
     }
 
     /**

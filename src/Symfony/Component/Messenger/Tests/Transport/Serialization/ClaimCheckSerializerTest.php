@@ -115,7 +115,12 @@ class ClaimCheckSerializerTest extends TestCase
 
         $this->assertCount(1, $values);
         $this->assertSame($encoded['body'], $encodedFailure['body']);
-        $this->assertEquals(new DummyMessage(str_repeat('a', 1000)), $serializer->decode($encodedFailure)->getMessage());
+
+        $failure = $serializer->decode($encodedFailure);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure->getMessage());
+        $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($failure));
+        $this->assertEquals(new DummyMessage(str_repeat('a', 1000)), $serializer->decode($failure->getMessage()->encodedEnvelope)->getMessage());
     }
 
     public function testMessageTypeDoesNotRetrieveClaim()

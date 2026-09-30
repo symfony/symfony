@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Exception\ClaimCheckNotFoundException;
 use Symfony\Component\Messenger\Exception\ClaimCheckStorageException;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 
 /**
  * Stores oversized encoded envelopes in a cache pool.
@@ -29,6 +30,7 @@ final class ClaimCheckSerializer implements SerializerInterface, MessageTypeAwar
 {
     private const HEADER = 'X-Symfony-Messenger-Claim-Check';
     private const TYPE_HEADER = 'X-Symfony-Messenger-Claim-Check-Type';
+    private const BUS_HEADER = 'X-Symfony-Messenger-Claim-Check-Bus';
 
     /**
      * @param CacheItemPoolInterface $pool    Dedicated pool configured to retain claims for the complete message lifetime
@@ -63,6 +65,11 @@ final class ClaimCheckSerializer implements SerializerInterface, MessageTypeAwar
             'headers' => [self::HEADER => '1', self::TYPE_HEADER => $envelope->getMessage()::class],
         ];
 
+        // the stamps stay in the claim: a failure to retrieve it still needs the bus of the message
+        if ($busNameStamp = $envelope->last(BusNameStamp::class)) {
+            $claim['headers'][self::BUS_HEADER] = $busNameStamp->getBusName();
+        }
+
         if ($this->getSize($claim) > $this->maxSize) {
             $this->removeClaim($id);
 
@@ -91,14 +98,23 @@ final class ClaimCheckSerializer implements SerializerInterface, MessageTypeAwar
 
             $claimedEnvelope = $this->decodeClaim($data);
         } catch (\Throwable $e) {
-            return MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), (int) $e->getCode(), $e);
+            $failure = MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), (int) $e->getCode(), $e);
+
+            return \is_string($busName = $encodedEnvelope['headers'][self::BUS_HEADER] ?? null) ? $failure->with(new BusNameStamp($busName)) : $failure;
         }
 
         if (isset($encodedEnvelope['extra'])) {
             $claimedEnvelope['extra'] = $encodedEnvelope['extra'];
         }
 
-        return $this->inner->decode($claimedEnvelope);
+        $envelope = $this->inner->decode($claimedEnvelope);
+
+        // nothing signs the reference: the bus it names must be the one of the claimed envelope
+        if (\is_string($busName = $encodedEnvelope['headers'][self::BUS_HEADER] ?? null) && $busName !== ($envelope->last(BusNameStamp::class)?->getBusName() ?? $busName)) {
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'The claim check integrity check failed: the reference names another bus than the claimed envelope.');
+        }
+
+        return $envelope;
     }
 
     public function getMessageType(array $encodedEnvelope): ?string

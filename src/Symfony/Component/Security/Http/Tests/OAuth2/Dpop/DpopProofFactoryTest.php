@@ -227,8 +227,8 @@ class DpopProofFactoryTest extends TestCase
      * The key is read against the algorithm before anything is signed.
      *
      * The first proof is signed on the callback of a user who has already logged in at the
-     * provider, so a key the algorithm cannot use is a 500 on them rather than a container
-     * that refuses to build.
+     * provider, so a key the algorithm cannot use is refused on the first request the
+     * firewall handles rather than on that callback.
      */
     public function testRejectsAKeyOfTheWrongType()
     {

@@ -15,6 +15,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class FormLoginTest extends AbstractWebTestCase
 {
@@ -58,6 +61,60 @@ class FormLoginTest extends AbstractWebTestCase
         // falls back to time() and the wiring could rot unnoticed
         $trustResolver = static::getContainer()->get('security.authentication.trust_resolver');
         $this->assertInstanceOf(ClockInterface::class, (new \ReflectionProperty($trustResolver, 'clock'))->getValue($trustResolver));
+    }
+
+    public function testAnOutdatedAuthenticationStartsAReAuthenticationOnTheLoginForm()
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 're_authentication.yml']);
+
+        // a session holding no authentication proof: the user is logged in, but nothing says
+        // when they last proved their credentials, which is what an expired one amounts to
+        $client->loginUser(new InMemoryUser('johannes', 'test', ['ROLE_USER']), 'default');
+
+        $client->request('GET', '/protected_resource');
+
+        $this->assertRedirect($client->getResponse(), '/login');
+
+        $session = $client->getRequest()->getSession();
+        $this->assertSame(AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, $session->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+        $this->assertSame('http://localhost/protected_resource', $session->get('_security.default.target_path'));
+
+        // the form only has the password left to ask for
+        $form = $client->followRedirect()->selectButton('login')->form();
+        $this->assertSame('johannes', $form['_username']->getValue());
+    }
+
+    public function testAReAuthenticationSendsTheUserBackToTheDeniedResource()
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 're_authentication.yml']);
+        $client->loginUser(new InMemoryUser('johannes', 'test', ['ROLE_USER']), 'default');
+
+        $client->request('GET', '/protected_resource');
+        $form = $client->followRedirect()->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/protected_resource');
+
+        $client->followRedirect();
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertFalse($client->getRequest()->getSession()->has(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+    }
+
+    public function testTheTargetPathOfTheLoginFormWinsOverTheDeniedResource()
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 're_authentication.yml']);
+        $client->loginUser(new InMemoryUser('johannes', 'test', ['ROLE_USER']), 'default');
+
+        $client->request('GET', '/protected_resource');
+        $form = $client->followRedirect()->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $form['_target_path'] = '/profile';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/profile');
     }
 
     #[DataProvider('provideClientOptions')]

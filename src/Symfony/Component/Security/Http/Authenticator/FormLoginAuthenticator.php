@@ -31,6 +31,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\EntryPoint\ReAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
@@ -41,7 +42,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  *
  * @final
  */
-class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
+class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements ReAuthenticationEntryPointInterface
 {
     private array $options;
     private HttpKernelInterface $httpKernel;
@@ -120,6 +121,11 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        if ($request->hasSession()) {
+            // whether or not a login page read it, the re-authentication this login may have answered is over
+            $request->getSession()->remove(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE);
+        }
+
         return $this->successHandler->onAuthenticationSuccess($request, $token);
     }
 
@@ -186,5 +192,21 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         return $response;
+    }
+
+    /**
+     * Sends the user back to the login form to type their password again, with their identifier and the denied attribute kept in the session for the login page.
+     *
+     * They land back on the resource they were denied as long as the success handler uses the target path saved before this, which "always_use_default_target_path" and a "_target_path" of the form both outrank.
+     */
+    public function startReAuthentication(Request $request, TokenInterface $token): Response
+    {
+        if ($request->hasSession()) {
+            $session = $request->getSession();
+            $session->set(SecurityRequestAttributes::LAST_USERNAME, $token->getUserIdentifier());
+            $session->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+        }
+
+        return $this->start($request);
     }
 }

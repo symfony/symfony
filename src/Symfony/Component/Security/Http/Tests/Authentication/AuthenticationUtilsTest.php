@@ -124,4 +124,47 @@ class AuthenticationUtilsTest extends TestCase
         $utils = new AuthenticationUtils($requestStack);
         $this->assertSame('user', $utils->getLastUsername());
     }
+
+    public function testReAuthenticationAttributeWhenRequestHasAttribute()
+    {
+        $request = Request::create('/login');
+        $request->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, 'IS_AUTHENTICATED_RECENTLY');
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $utils = new AuthenticationUtils($requestStack);
+        $this->assertSame('IS_AUTHENTICATED_RECENTLY', $utils->getReAuthenticationAttribute());
+    }
+
+    public function testReAuthenticationAttributeInSession()
+    {
+        $request = Request::create('/login');
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, 'IS_AUTHENTICATED_VERY_RECENTLY');
+        $request->setSession($session);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        // a mistyped password sends the user back to the same page, which still has to know
+        // what it is asking for; only a successful login ends the re-authentication
+        $utils = new AuthenticationUtils($requestStack);
+        $this->assertSame('IS_AUTHENTICATED_VERY_RECENTLY', $utils->getReAuthenticationAttribute());
+        $this->assertSame('IS_AUTHENTICATED_VERY_RECENTLY', $utils->getReAuthenticationAttribute());
+        $this->assertTrue($session->has(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+    }
+
+    public function testNoReAuthenticationAttribute()
+    {
+        $request = Request::create('/login');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $utils = new AuthenticationUtils($requestStack);
+        $this->assertNull($utils->getReAuthenticationAttribute());
+    }
 }

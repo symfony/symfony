@@ -58,6 +58,23 @@ class AuthenticationUtils
     }
 
     /**
+     * Returns the security attribute the current request is asking a re-authentication for, if it is.
+     *
+     * Reading it does not end the re-authentication, a successful login does, so that the page
+     * still knows what it is asking for when the user mistypes their password.
+     */
+    public function getReAuthenticationAttribute(): ?string
+    {
+        $request = $this->getRequest();
+
+        if ($request->attributes->has(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE)) {
+            return $request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE);
+        }
+
+        return $request->hasSession() ? $request->getSession()->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE) : null;
+    }
+
+    /**
      * @throws \LogicException
      */
     private function getRequest(): Request

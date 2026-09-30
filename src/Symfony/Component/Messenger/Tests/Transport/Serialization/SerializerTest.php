@@ -115,6 +115,15 @@ class SerializerTest extends TestCase
         $this->assertNull($stamp->getFlattenException());
     }
 
+    public function testEncodedWithValidationStampIsDecodableInXml()
+    {
+        $serializer = new Serializer(null, 'xml');
+
+        $stamps = [new ValidationStamp(['foo']), new ValidationStamp([]), new ValidationStamp(['foo', 'bar'])];
+
+        $this->assertEquals($stamps, $serializer->decode($serializer->encode(new Envelope(new DummyMessage('Hello'), $stamps)))->all(ValidationStamp::class));
+    }
+
     public function testSerializedMessageStampIsUsedForEncoding()
     {
         $serializer = new Serializer();

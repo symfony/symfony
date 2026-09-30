@@ -808,6 +808,65 @@ class FailureIntegrationTest extends TestCase
         $this->assertCount(1, $acknowledged);
         $this->assertSame(['Closure@a', 'Closure@b'], array_map(static fn (HandledStamp $stamp) => $stamp->getHandlerName(), $acknowledged[0]->all(HandledStamp::class)));
     }
+
+    public function testFailedMessageMovesFromJsonToXmlFailureTransport()
+    {
+        $this->assertHandledFromTheFailureTransport(new Serializer(null, 'json'), new Serializer(null, 'xml'));
+    }
+
+    public function testFailedMessageMovesFromXmlToJsonFailureTransport()
+    {
+        $this->assertHandledFromTheFailureTransport(new Serializer(null, 'xml'), new Serializer(null, 'json'));
+    }
+
+    public function testFailedMessageMovesToAFailureTransportThatUsesTheSameFormat()
+    {
+        $this->assertHandledFromTheFailureTransport(new Serializer(null, 'json'), new Serializer(null, 'json'));
+
+        $serializer = new Serializer(null, 'xml');
+        $this->assertHandledFromTheFailureTransport($serializer, $serializer);
+    }
+
+    private function assertHandledFromTheFailureTransport(Serializer $serializer, Serializer $failureSerializer): void
+    {
+        $transport = new InMemoryTransport($serializer);
+        $failureTransport = new InMemoryTransport($failureSerializer);
+
+        $calls = 0;
+        $handler = static function () use (&$calls) {
+            if (3 > ++$calls) {
+                throw new \RuntimeException('Failure from call '.$calls);
+            }
+        };
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [$handler]]))]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(3));
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame(2, $calls);
+        $this->assertCount(1, $failureTransport->getSent());
+
+        (new Worker(['failure_transport' => $failureTransport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame(3, $calls);
+        $this->assertSame([], $failureTransport->get());
+
+        $acknowledged = $failureTransport->getAcknowledged();
+        $this->assertCount(1, $acknowledged);
+        $this->assertEquals(new DummyMessage('Hello'), $acknowledged[0]->getMessage());
+        $this->assertSame('transport', $acknowledged[0]->last(SentToFailureTransportStamp::class)->getOriginalReceiverName());
+    }
 }
 
 class DummyFailureTestSenderAndReceiver implements ReceiverInterface, SenderInterface

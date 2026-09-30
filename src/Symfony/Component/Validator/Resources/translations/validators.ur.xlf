@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>قسم کی ہونی چاہیے {{type}} يھ ويليو</target>
+                <target>قسم کی ہونی چاہیے {{ type }} يھ ويليو</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>
@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>کا انتخاب کرنا چاہیے {{limit}} کا انتخاب کرنا چاہیے ۔آّپ کو کم اذ کم {{limit}} آپ کو کم از کم</target>
+                <target>کا انتخاب کرنا چاہیے {{ limit }} کا انتخاب کرنا چاہیے ۔آّپ کو کم اذ کم {{ limit }} آپ کو کم از کم</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>کا انتخاب کرنا چاہیے {{limit}} کا انتخاب کرنا چاہیے ۔آّپ کو ذيادھ سے ذيادھ {{limit}} آپ کو ذيادھ سے ذيادھ</target>
+                <target>کا انتخاب کرنا چاہیے {{ limit }} کا انتخاب کرنا چاہیے ۔آّپ کو ذيادھ سے ذيادھ {{ limit }} آپ کو ذيادھ سے ذيادھ</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -204,11 +204,11 @@
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
-                <target>عناصر یا اس سے زیادہ ہونا چاہیے {{ limit }  عنصر یا اس سے زیادہ ہونا چاہیے۔|اس مجموعہ میں {{ limit }} اس مجموعہ میں</target>
+                <target>عناصر یا اس سے زیادہ ہونا چاہیے {{ limit }}  عنصر یا اس سے زیادہ ہونا چاہیے۔|اس مجموعہ میں {{ limit }} اس مجموعہ میں</target>
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
-                <target>عناصر یا اس سے کم ہونا چاہیے {{ limit } عنصر یا اس سے کم ہونا چاہیے۔|اس مجموعہ میں {{ limit }} اس مجموعہ میں</target>
+                <target>عناصر یا اس سے کم ہونا چاہیے {{ limit }} عنصر یا اس سے کم ہونا چاہیے۔|اس مجموعہ میں {{ limit }} اس مجموعہ میں</target>
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>

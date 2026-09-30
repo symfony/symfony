@@ -56,6 +56,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
     private SymfonySerializerInterface $serializer;
     private array $stampContext;
+    private static \WeakMap $decoders;
 
     /**
      * @var array<string-class, string>
@@ -122,7 +123,9 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
             return MessageDecodingFailedException::wrap($encodedEnvelope, $stampFailure->getMessage(), (int) $stampFailure->getCode(), $stampFailure)->with(...$stamps);
         }
 
-        $stamps[] = new SerializedMessageStamp($encodedEnvelope['body']);
+        $stamps[] = $serializedMessageStamp = new SerializedMessageStamp($encodedEnvelope['body']);
+        self::$decoders ??= new \WeakMap();
+        self::$decoders[$serializedMessageStamp] = $this;
 
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
@@ -158,6 +161,11 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         }
 
         $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
+
+        // the body can be reused only when it is what this serializer would produce
+        if ($serializedMessageStamp && ($decoder = self::$decoders[$serializedMessageStamp] ?? null) && [$decoder->serializer, $decoder->format, $decoder->context] !== [$this->serializer, $this->format, $this->context]) {
+            $serializedMessageStamp = null;
+        }
 
         // A decode failure keeps the original encoded envelope: re-emit its body as-is
         // instead of serializing the exception, which cannot be decoded back

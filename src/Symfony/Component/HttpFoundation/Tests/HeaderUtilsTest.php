@@ -42,6 +42,10 @@ class HeaderUtilsTest extends TestCase
             [['foo bar'], 'foo "bar"', ','],
             [['foo bar'], '"foo" bar', ','],
             [['foo bar'], '"foo" "bar"', ','],
+            [['foo', 'bar'], 'foo bar', ' '],
+            [['foo', 'bar'], 'foo   bar', ' '],
+            [[['foo', 'bar'], ['baz']], 'foo bar, baz', ', '],
+            [['foo bar', 'baz'], "foo bar\tbaz", "\t"],
 
             [[['foo_cookie', 'foo=1&bar=2&baz=3'], ['expires', 'Tue, 22-Sep-2020 06:27:09 GMT'], ['path', '/']], 'foo_cookie=foo=1&bar=2&baz=3; expires=Tue, 22-Sep-2020 06:27:09 GMT; path=/', ';='],
             [[['foo_cookie', 'foo=='], ['expires', 'Tue, 22-Sep-2020 06:27:09 GMT'], ['path', '/']], 'foo_cookie=foo==; expires=Tue, 22-Sep-2020 06:27:09 GMT; path=/', ';='],

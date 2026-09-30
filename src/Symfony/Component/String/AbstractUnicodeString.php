@@ -44,8 +44,8 @@ abstract class AbstractUnicodeString extends AbstractString
     private const TRANSLIT_FROM = ['Æ', 'Ð', 'Ø', 'Þ', 'ß', 'æ', 'ð', 'ø', 'þ', 'Đ', 'đ', 'Ħ', 'ħ', 'ı', 'ĸ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'ŉ', 'Ŋ', 'ŋ', 'Œ', 'œ', 'Ŧ', 'ŧ', 'ƀ', 'Ɓ', 'Ƃ', 'ƃ', 'Ƈ', 'ƈ', 'Ɖ', 'Ɗ', 'Ƌ', 'ƌ', 'Ɛ', 'Ƒ', 'ƒ', 'Ɠ', 'ƕ', 'Ɩ', 'Ɨ', 'Ƙ', 'ƙ', 'ƚ', 'Ɲ', 'ƞ', 'Ƣ', 'ƣ', 'Ƥ', 'ƥ', 'ƫ', 'Ƭ', 'ƭ', 'Ʈ', 'Ʋ', 'Ƴ', 'ƴ', 'Ƶ', 'ƶ', 'Ǆ', 'ǅ', 'ǆ', 'Ǥ', 'ǥ', 'ȡ', 'Ȥ', 'ȥ', 'ȴ', 'ȵ', 'ȶ', 'ȷ', 'ȸ', 'ȹ', 'Ⱥ', 'Ȼ', 'ȼ', 'Ƚ', 'Ⱦ', 'ȿ', 'ɀ', 'Ƀ', 'Ʉ', 'Ɇ', 'ɇ', 'Ɉ', 'ɉ', 'Ɍ', 'ɍ', 'Ɏ', 'ɏ', 'ɓ', 'ɕ', 'ɖ', 'ɗ', 'ɛ', 'ɟ', 'ɠ', 'ɡ', 'ɢ', 'ɦ', 'ɧ', 'ɨ', 'ɪ', 'ɫ', 'ɬ', 'ɭ', 'ɱ', 'ɲ', 'ɳ', 'ɴ', 'ɶ', 'ɼ', 'ɽ', 'ɾ', 'ʀ', 'ʂ', 'ʈ', 'ʉ', 'ʋ', 'ʏ', 'ʐ', 'ʑ', 'ʙ', 'ʛ', 'ʜ', 'ʝ', 'ʟ', 'ʠ', 'ʣ', 'ʥ', 'ʦ', 'ʪ', 'ʫ', 'ᴀ', 'ᴁ', 'ᴃ', 'ᴄ', 'ᴅ', 'ᴆ', 'ᴇ', 'ᴊ', 'ᴋ', 'ᴌ', 'ᴍ', 'ᴏ', 'ᴘ', 'ᴛ', 'ᴜ', 'ᴠ', 'ᴡ', 'ᴢ', 'ᵫ', 'ᵬ', 'ᵭ', 'ᵮ', 'ᵯ', 'ᵰ', 'ᵱ', 'ᵲ', 'ᵳ', 'ᵴ', 'ᵵ', 'ᵶ', 'ᵺ', 'ᵻ', 'ᵽ', 'ᵾ', 'ᶀ', 'ᶁ', 'ᶂ', 'ᶃ', 'ᶄ', 'ᶅ', 'ᶆ', 'ᶇ', 'ᶈ', 'ᶉ', 'ᶊ', 'ᶌ', 'ᶍ', 'ᶎ', 'ᶏ', 'ᶑ', 'ᶒ', 'ᶓ', 'ᶖ', 'ᶙ', 'ẚ', 'ẜ', 'ẝ', 'ẞ', 'Ỻ', 'ỻ', 'Ỽ', 'ỽ', 'Ỿ', 'ỿ', '©', '®', '₠', '₢', '₣', '₤', '₧', '₺', '₹', 'ℌ', '℞', '㎧', '㎮', '㏆', '㏗', '㏞', '㏟', '¼', '½', '¾', '⅓', '⅔', '⅕', '⅖', '⅗', '⅘', '⅙', '⅚', '⅛', '⅜', '⅝', '⅞', '⅟', '〇', '‘', '’', '‚', '‛', '“', '”', '„', '‟', '′', '″', '〝', '〞', '«', '»', '‹', '›', '‐', '‑', '‒', '–', '—', '―', '︱', '︲', '﹘', '‖', '⁄', '⁅', '⁆', '⁎', '、', '。', '〈', '〉', '《', '》', '〔', '〕', '〘', '〙', '〚', '〛', '︑', '︒', '︹', '︺', '︽', '︾', '︿', '﹀', '﹑', '﹝', '﹞', '｟', '｠', '｡', '､', '×', '÷', '−', '∕', '∖', '∣', '∥', '≪', '≫', '⦅', '⦆'];
     private const TRANSLIT_TO = ['AE', 'D', 'O', 'TH', 'ss', 'ae', 'd', 'o', 'th', 'D', 'd', 'H', 'h', 'i', 'q', 'L', 'l', 'L', 'l', '\'n', 'N', 'n', 'OE', 'oe', 'T', 't', 'b', 'B', 'B', 'b', 'C', 'c', 'D', 'D', 'D', 'd', 'E', 'F', 'f', 'G', 'hv', 'I', 'I', 'K', 'k', 'l', 'N', 'n', 'OI', 'oi', 'P', 'p', 't', 'T', 't', 'T', 'V', 'Y', 'y', 'Z', 'z', 'DZ', 'Dz', 'dz', 'G', 'g', 'd', 'Z', 'z', 'l', 'n', 't', 'j', 'db', 'qp', 'A', 'C', 'c', 'L', 'T', 's', 'z', 'B', 'U', 'E', 'e', 'J', 'j', 'R', 'r', 'Y', 'y', 'b', 'c', 'd', 'd', 'e', 'j', 'g', 'g', 'G', 'h', 'h', 'i', 'I', 'l', 'l', 'l', 'm', 'n', 'n', 'N', 'OE', 'r', 'r', 'r', 'R', 's', 't', 'u', 'v', 'Y', 'z', 'z', 'B', 'G', 'H', 'j', 'L', 'q', 'dz', 'dz', 'ts', 'ls', 'lz', 'A', 'AE', 'B', 'C', 'D', 'D', 'E', 'J', 'K', 'L', 'M', 'O', 'P', 'T', 'U', 'V', 'W', 'Z', 'ue', 'b', 'd', 'f', 'm', 'n', 'p', 'r', 'r', 's', 't', 'z', 'th', 'I', 'p', 'U', 'b', 'd', 'f', 'g', 'k', 'l', 'm', 'n', 'p', 'r', 's', 'v', 'x', 'z', 'a', 'd', 'e', 'e', 'i', 'u', 'a', 's', 's', 'SS', 'LL', 'll', 'V', 'v', 'Y', 'y', '(C)', '(R)', 'CE', 'Cr', 'Fr.', 'L.', 'Pts', 'TL', 'Rs', 'x', 'Rx', 'm/s', 'rad/s', 'C/kg', 'pH', 'V/m', 'A/m', ' 1/4', ' 1/2', ' 3/4', ' 1/3', ' 2/3', ' 1/5', ' 2/5', ' 3/5', ' 4/5', ' 1/6', ' 5/6', ' 1/8', ' 3/8', ' 5/8', ' 7/8', ' 1/', '0', '\'', '\'', ',', '\'', '"', '"', ',,', '"', '\'', '"', '"', '"', '<<', '>>', '<', '>', '-', '-', '-', '-', '-', '-', '-', '-', '-', '||', '/', '[', ']', '*', ',', '.', '<', '>', '<<', '>>', '[', ']', '[', ']', '[', ']', ',', '.', '[', ']', '<<', '>>', '<', '>', ',', '[', ']', '((', '))', '.', ',', '*', '/', '-', '/', '\\', '|', '||', '<<', '>>', '((', '))'];
 
-    // \p{Emoji} requires PCRE2 10.40
-    private const EMOJI_REGEX = \PCRE_VERSION_MAJOR < 10 || \PCRE_VERSION_MAJOR === 10 && \PCRE_VERSION_MINOR < 40 ? '/\p{So}/u' : '/\p{Emoji}/u';
+    // \p{ExtPict} requires PCRE2 10.40; U+1F1E6-1F1FF are regional indicators, #*0-9 keycap bases
+    private const EMOJI_REGEX = \PCRE_VERSION_MAJOR < 10 || \PCRE_VERSION_MAJOR === 10 && \PCRE_VERSION_MINOR < 40 ? '/[\p{So}#*0-9]/u' : '/[\p{ExtPict}\x{1F1E6}-\x{1F1FF}#*0-9]/u';
 
     private static array $transliterators = [];
     private static array $tableZero;
@@ -546,26 +546,35 @@ abstract class AbstractUnicodeString extends AbstractString
 
             $codePoint = mb_ord($c, 'UTF-8');
 
-            if (0 === $codePoint // NULL
-                || 0x034F === $codePoint // COMBINING GRAPHEME JOINER
-                || (0x1160 <= $codePoint && 0x11FF >= $codePoint) // HANGUL JUNGSEONG FILLER to HANGUL JONGSEONG SSANGNIEUN
-                || (0xD7B0 <= $codePoint && 0xD7FF >= $codePoint) // HANGUL JAMO EXTENDED-B
-                || (0x200B <= $codePoint && 0x200F >= $codePoint) // ZERO WIDTH SPACE to RIGHT-TO-LEFT MARK
-                || 0x2028 === $codePoint // LINE SEPARATOR
-                || 0x2029 === $codePoint // PARAGRAPH SEPARATOR
-                || (0x202A <= $codePoint && 0x202E >= $codePoint) // LEFT-TO-RIGHT EMBEDDING to RIGHT-TO-LEFT OVERRIDE
-                || (0x2060 <= $codePoint && 0x2063 >= $codePoint) // WORD JOINER to INVISIBLE SEPARATOR
-            ) {
-                // after an emoji, a ZERO WIDTH JOINER makes the next character part of it
-                $joined = 0x200D === $codePoint && null !== $lastChar && preg_match(self::EMOJI_REGEX, $lastChar);
+            if (0x7F > $codePoint && 0x20 <= $codePoint) { // printable ASCII
+                ++$width;
+                $lastChar = $c;
+                $lastWidth = 1;
 
                 continue;
             }
 
-            // Non printable characters
-            if (32 > $codePoint // C0 control characters
-                || (0x07F <= $codePoint && 0x0A0 > $codePoint) // C1 control characters and DEL
+            if (0 === $codePoint // NULL
+                || 0x034F === $codePoint // COMBINING GRAPHEME JOINER
+                || 0x061C === $codePoint // ARABIC LETTER MARK
+                || (0x1160 <= $codePoint && 0x11FF >= $codePoint) // HANGUL JUNGSEONG FILLER to HANGUL JONGSEONG SSANGNIEUN
+                || 0x180E === $codePoint // MONGOLIAN VOWEL SEPARATOR
+                || (0x200B <= $codePoint && 0x200F >= $codePoint) // ZERO WIDTH SPACE to RIGHT-TO-LEFT MARK
+                || 0x2028 === $codePoint // LINE SEPARATOR
+                || 0x2029 === $codePoint // PARAGRAPH SEPARATOR
+                || (0x202A <= $codePoint && 0x202E >= $codePoint) // LEFT-TO-RIGHT EMBEDDING to RIGHT-TO-LEFT OVERRIDE
+                || (0x2060 <= $codePoint && 0x206F >= $codePoint) // WORD JOINER to NOMINAL DIGIT SHAPES
+                || (0xD7B0 <= $codePoint && 0xD7FF >= $codePoint) // HANGUL JAMO EXTENDED-B
+                || 0xFEFF === $codePoint // ZERO WIDTH NO-BREAK SPACE
+                || (0xFFF0 <= $codePoint && 0xFFFB >= $codePoint) // INTERLINEAR ANNOTATION ANCHOR to TERMINATOR, and the unassigned code points before them
             ) {
+                // after an emoji, a ZERO WIDTH JOINER makes the next character part of it
+                $joined = 0x200D === $codePoint && null !== $lastChar && 1 < \strlen($lastChar) && preg_match(self::EMOJI_REGEX, $lastChar);
+
+                continue;
+            }
+
+            if (0x0A0 > $codePoint) { // C0 and C1 control characters and DEL
                 return -1;
             }
 
@@ -579,11 +588,21 @@ abstract class AbstractUnicodeString extends AbstractString
             }
 
             if (0xFFFF < $codePoint) {
-                if (0xE0001 <= $codePoint && 0xE007F >= $codePoint) { // LANGUAGE TAG to CANCEL TAG
+                if ((0x13430 <= $codePoint && 0x1343F >= $codePoint) // EGYPTIAN HIEROGLYPH VERTICAL JOINER to EGYPTIAN HIEROGLYPH END WALLED ENCLOSURE
+                    || (0x1BCA0 <= $codePoint && 0x1BCA3 >= $codePoint) // SHORTHAND FORMAT LETTER OVERLAP to SHORTHAND FORMAT UP STEP
+                    || (0x1D173 <= $codePoint && 0x1D17A >= $codePoint) // MUSICAL SYMBOL BEGIN BEAM to MUSICAL SYMBOL END PHRASE
+                    || (0xE0000 <= $codePoint && 0xE0FFF >= $codePoint) // TAGS and the default ignorable code points around them
+                ) {
                     continue;
                 }
 
-                if (0x1F3FB <= $codePoint && 0x1F3FF >= $codePoint && null !== $lastChar && preg_match(self::EMOJI_REGEX, $lastChar)) { // EMOJI MODIFIER FITZPATRICK TYPE-1-2 to TYPE-6
+                if (0x1F3FB <= $codePoint && 0x1F3FF >= $codePoint && null !== $lastChar && 1 < \strlen($lastChar) && preg_match(self::EMOJI_REGEX, $lastChar)) { // EMOJI MODIFIER FITZPATRICK TYPE-1-2 to TYPE-6, not after a keycap base
+                    // like VS16, a skin tone gives a text-default emoji its emoji presentation
+                    if (1 === $lastWidth) {
+                        ++$width;
+                        $lastWidth = 2;
+                    }
+
                     continue;
                 }
             }

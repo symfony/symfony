@@ -29,15 +29,22 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
             [2, "\u{0915}\u{094D}\u{200D}\u{0937}"],
             [2, "\u{1100}\u{1161}\u{11A8}"],
             [2, "\u{1100}\u{D7B0}\u{D7CB}"],
+            [2, '1️⃣'],
+            [3, "1\u{1F3FB}"],
+            [3, "#\u{1F3FB}"],
+            [4, "\u{1F3FB}\u{1F3FB}"],
+            [2, "1\u{200D}x"],
+            [2, "\u{270C}\u{1F3FD}"],
+            [2, "\u{261D}\u{FE0F}\u{1F3FD}"],
+            [2, "\u{1F575}\u{1F3FD}\u{200D}\u{2642}\u{FE0F}"],
+            [3, "a\u{2067}b\u{2069}c"],
+            [3, "\u{FEFF}abc"],
+            [2, "a\u{061C}b"],
             [14, '<<<END
 This is a
 multiline text
 END'],
         ];
-
-        if (\PCRE_VERSION_MAJOR > 10 || \PCRE_VERSION_MAJOR === 10 && \PCRE_VERSION_MINOR >= 40) {
-            $unicodeWidthTests[] = [2, '1️⃣'];
-        }
 
         return array_merge(
             parent::provideWidth(),

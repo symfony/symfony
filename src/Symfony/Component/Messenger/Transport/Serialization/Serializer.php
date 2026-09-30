@@ -54,6 +54,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
     private SymfonySerializerInterface $serializer;
     private array $stampContext;
+    private static \WeakMap $decoders;
 
     public function __construct(
         ?SymfonySerializerInterface $serializer = null,
@@ -99,7 +100,9 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);
-        $stamps[] = new SerializedMessageStamp($encodedEnvelope['body']);
+        $stamps[] = $serializedMessageStamp = new SerializedMessageStamp($encodedEnvelope['body']);
+        self::$decoders ??= new \WeakMap();
+        self::$decoders[$serializedMessageStamp] = $this;
 
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
@@ -132,6 +135,11 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
         /** @var SerializedMessageStamp|null $serializedMessageStamp */
         $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
+
+        // the body can be reused only when it is what this serializer would produce
+        if ($serializedMessageStamp && ($decoder = self::$decoders[$serializedMessageStamp] ?? null) && [$decoder->serializer, $decoder->format, $decoder->context] !== [$this->serializer, $this->format, $this->context]) {
+            $serializedMessageStamp = null;
+        }
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 

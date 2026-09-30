@@ -372,7 +372,7 @@
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>El nombre d'elements d'aquesta col·lecció ha de ser múltiple de {{compared_value}}.</target>
+                <target>El nombre d'elements d'aquesta col·lecció ha de ser múltiple de {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>

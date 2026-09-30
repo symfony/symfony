@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -24,6 +25,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedispatchStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -245,7 +247,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testItSendsAReceivedMessageCarryingARedispatchStampToItsTransports()
     {
-        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), new RedispatchStamp(), new TransportNamesStamp(['orders']));
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), TrustStamp::trusted(), new RedispatchStamp(), new TransportNamesStamp(['orders']));
         $target = $this->createMock(SenderInterface::class);
         $routed = $this->createMock(SenderInterface::class);
 
@@ -262,7 +264,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testItSendsAReceivedMessageCarryingARedispatchStampToItsConfiguredSenders()
     {
-        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), new RedispatchStamp());
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), TrustStamp::trusted(), new RedispatchStamp());
         $routed = $this->createMock(SenderInterface::class);
 
         $middleware = new SendMessageMiddleware($this->createSendersLocator([DummyMessage::class => ['routed']], ['routed' => $routed]));
@@ -274,13 +276,31 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testItHandlesAReceivedMessageCarryingARedispatchStampWhenItHasNoSender()
     {
-        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), new RedispatchStamp());
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('scheduler_default'), TrustStamp::trusted(), new RedispatchStamp());
 
         $middleware = new SendMessageMiddleware($this->createSendersLocator([], []));
 
         $envelope = $middleware->handle($envelope, $this->getStackMock());
 
         $this->assertNull($envelope->last(SentStamp::class));
+    }
+
+    #[DataProvider('provideUntrustedEnvelopesCarryingARedispatchStamp')]
+    public function testItHandlesAReceivedMessageCarryingARedispatchStampWhenItIsNotTrusted(Envelope $envelope)
+    {
+        $routed = $this->createMock(SenderInterface::class);
+        $routed->expects($this->never())->method('send');
+
+        $middleware = new SendMessageMiddleware($this->createSendersLocator([DummyMessage::class => ['routed']], ['routed' => $routed]));
+
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public static function provideUntrustedEnvelopesCarryingARedispatchStamp(): iterable
+    {
+        yield 'without trust stamp' => [new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('async'), new RedispatchStamp()])];
+        yield 'untrusted' => [new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('async'), TrustStamp::untrusted(), new RedispatchStamp()])];
+        yield 'with a trust stamp that this process did not create' => [new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('async'), unserialize(serialize(TrustStamp::trusted())), new RedispatchStamp()])];
     }
 
     public function testItDispatchesTheEventOneTime()

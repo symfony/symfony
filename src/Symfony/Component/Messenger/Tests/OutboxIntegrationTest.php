@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\Container;
@@ -23,6 +24,7 @@ use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
@@ -42,6 +44,9 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Messenger\Worker;
 
 class OutboxIntegrationTest extends TestCase
@@ -182,6 +187,35 @@ class OutboxIntegrationTest extends TestCase
 
         $this->assertSame(2, $this->handler->calls);
         $this->assertSame([], $this->target->get());
+    }
+
+    #[DataProvider('provideOutboxSerializers')]
+    public function testATargetThatSignsEveryMessageAcceptsOnlyWhatItsOutboxVerified(SerializerInterface $outboxSerializer, bool $expectAccepted)
+    {
+        $this->target = new InMemoryTransport(new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']), $this->clock);
+        $this->outbox = new InMemoryTransport($outboxSerializer, $this->clock);
+
+        $senders = new Container();
+        $senders->set('orders', new OutboxSender($this->target, $this->outbox, 'orders'));
+        $senders->set('outbox', $this->outbox);
+        $this->bus = new MessageBus([
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['orders']], $senders)),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($this->handler, ['from_transport' => 'orders'])]])),
+        ]);
+
+        $this->bus->dispatch(new DummyMessage('Hey'));
+        $this->assertNull($this->runWorker('outbox', $this->outbox));
+
+        $this->assertCount(1, $forwarded = $this->target->get());
+        $this->assertInstanceOf($expectAccepted ? DummyMessage::class : MessageDecodingFailedException::class, $forwarded[0]->getMessage());
+    }
+
+    public static function provideOutboxSerializers(): iterable
+    {
+        yield 'outbox signing every message' => [new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']), true];
+        yield 'outbox signing the message type' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class]), true];
+        yield 'outbox signing other message types' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [\stdClass::class]), false];
+        yield 'outbox not signing' => [new PhpSerializer(), false];
     }
 
     private function runWorker(string $transportName, ReceiverInterface $receiver): ?\Throwable

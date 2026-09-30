@@ -18,8 +18,11 @@ use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\RedispatchStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageEnum;
@@ -429,7 +432,7 @@ class SigningSerializerTest extends TestCase
         $inner = new Serializer();
         $serializer = new SigningSerializer($inner, 'secret-key', [DummyMessage::class]);
 
-        $decoded = $serializer->decode($this->signBodyOnly($inner->encode(new Envelope(new DummyMessage('hello')))));
+        $decoded = $serializer->decode(self::signBodyOnly($inner->encode(new Envelope(new DummyMessage('hello')))));
 
         $this->assertSame('hello', $decoded->getMessage()->getMessage());
     }
@@ -438,7 +441,7 @@ class SigningSerializerTest extends TestCase
     {
         $inner = new Serializer();
         $serializer = new SigningSerializer($inner, 'secret-key', [DummyMessage::class]);
-        $encoded = $this->signBodyOnly($inner->encode(new Envelope(new DummyMessage('hello'))));
+        $encoded = self::signBodyOnly($inner->encode(new Envelope(new DummyMessage('hello'))));
         $encoded['headers']['type'] = ChildDummyMessage::class;
 
         // messages signed before the headers were covered keep working, headers included
@@ -668,9 +671,372 @@ class SigningSerializerTest extends TestCase
         $this->assertSame('Could not decode Envelope: Message class "Unknown\Missing\ClassName" not found during decoding.', $replayed->getMessage());
     }
 
+    public function testSignAllSignsEveryMessage()
+    {
+        $serializer = $this->createSignAllSerializer(new Serializer());
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessage('hello')));
+
+        $this->assertStringStartsWith('v2:', $encoded['headers']['Body-Sign']);
+        $this->assertSame('sha256', $encoded['headers']['Sign-Algo']);
+
+        $decoded = $serializer->decode($encoded);
+
+        $this->assertSame('hello', $decoded->getMessage()->getMessage());
+        $this->assertTrue($decoded->last(TrustStamp::class)?->isTrusted());
+    }
+
+    public function testWildcardAmongMessageTypesRequiresASignatureForEveryMessage()
+    {
+        $serializer = new SigningSerializer(new PhpSerializer(), 'secret-key', [DummyMessage::class, '*']);
+
+        $this->assertStringStartsWith('v2:', $serializer->encode(new Envelope(new \stdClass()))['headers']['Body-Sign']);
+
+        $envelope = $serializer->decode((new PhpSerializer())->encode(new Envelope(new \stdClass())));
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertSame('The message requires a signature but none was found.', $envelope->getMessage()->getMessage());
+    }
+
+    #[DataProvider('provideMessagesRefusedByATransportThatSignsEverything')]
+    public function testSignAllRefusesAMessageWithoutReadingIt(array $encodedEnvelope, string $expectedError)
+    {
+        $inner = new class implements SerializerInterface, MessageTypeAwareSerializerInterface {
+            public array $calls = [];
+
+            public function getMessageType(array $encodedEnvelope): ?string
+            {
+                $this->calls[] = __FUNCTION__;
+
+                return $encodedEnvelope['headers']['type'] ?? null;
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                $this->calls[] = __FUNCTION__;
+
+                return new Envelope(new DummyMessage('hello'));
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                throw new \BadMethodCallException();
+            }
+        };
+        $serializer = $this->createSignAllSerializer($inner);
+        $requested = [];
+        $autoloader = static function (string $class) use (&$requested) {
+            $requested[] = $class;
+        };
+        spl_autoload_register($autoloader, true, true);
+
+        try {
+            $envelope = $serializer->decode($encodedEnvelope);
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+
+        $this->assertSame([], preg_grep('/^Unknown\\\\/', $requested));
+        $this->assertSame([], $inner->calls);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+        $this->assertSame($expectedError, $envelope->getMessage()->getMessage());
+        $this->assertSame($encodedEnvelope, $envelope->getMessage()->encodedEnvelope);
+        $this->assertSame([], $envelope->all());
+    }
+
+    public static function provideMessagesRefusedByATransportThatSignsEverything(): iterable
+    {
+        $message = [
+            'body' => '{"message":"forged"}',
+            'headers' => [
+                'type' => 'Unknown\Missing\MessageClass',
+                'X-Message-Stamp-Unknown\Missing\StampClass' => '[{}]',
+                'X-Message-Stamp-'.BusNameStamp::class => '[{"busName":"the_bus"}]',
+            ],
+        ];
+        $signed = self::signWith($message, 'secret-key');
+        $signedWithAnotherKey = self::signWith($message, 'another-key');
+
+        yield 'without signature' => [$message, 'The message requires a signature but none was found.'];
+        yield 'with a signature that is not a string' => [['headers' => ['Body-Sign' => [$signed['headers']['Body-Sign']]] + $message['headers']] + $message, 'The message requires a signature but none was found.'];
+        yield 'signed with another key' => [$signedWithAnotherKey, 'Invalid message signature.'];
+        yield 'with a tampered type' => [['headers' => ['type' => 'Unknown\Missing\OtherClass'] + $signed['headers']] + $signed, 'Invalid message signature.'];
+        yield 'with a body-only signature' => [['headers' => ['Body-Sign' => hash_hmac('sha256', $message['body'], 'secret-key'), 'Sign-Algo' => 'sha256'] + $message['headers']] + $message, 'The signature of the message does not cover its headers.'];
+        yield 'with another algorithm' => [['headers' => ['Sign-Algo' => 'md5'] + $signedWithAnotherKey['headers']] + $signedWithAnotherKey, 'Expected "sha256" signature algorithm, "md5" given.'];
+        yield 'signed as unverified' => [self::signWith($message, 'secret-key', false), 'The message is signed as unverified: only a failure transport accepts it.'];
+    }
+
+    public function testSignAllRefusesAnUnsignedDecodeFailureThatCarriesASignedEnvelope()
+    {
+        $serializer = $this->createSignAllSerializer(new PhpSerializer());
+        $wrapper = (new PhpSerializer())->encode(new Envelope(new MessageDecodingFailedException('Cannot decode.', 0, null, $serializer->encode(new Envelope(new DummyMessage('hello')))), [new BusNameStamp('other_bus')]));
+
+        $envelope = $serializer->decode($wrapper);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+        $this->assertSame($wrapper, $envelope->getMessage()->encodedEnvelope);
+        $this->assertSame([], $envelope->all());
+    }
+
+    #[DataProvider('provideEnvelopesSignedAsUnverifiedUnlessTrusted')]
+    public function testSignAllSignsEveryEnvelopeAndMarksTheOnesItDidNotVerify(\Closure $createEnvelope, bool $expectVerified)
+    {
+        $serializer = $this->createSignAllSerializer(new Serializer());
+
+        $encoded = $serializer->encode($createEnvelope($serializer));
+
+        $this->assertStringStartsWith('v2:', $encoded['headers']['Body-Sign']);
+        $this->assertSame('sha256', $encoded['headers']['Sign-Algo']);
+        $this->assertSame($expectVerified ? null : 'unverified', $encoded['headers']['Sign-Trust'] ?? null);
+    }
+
+    public static function provideEnvelopesSignedAsUnverifiedUnlessTrusted(): iterable
+    {
+        yield 'dispatched in process' => [static fn () => new Envelope(new DummyMessage('hello')), true];
+        yield 'verified on receipt' => [static fn (SerializerInterface $serializer) => $serializer->decode($serializer->encode(new Envelope(new DummyMessage('hello'))))->with(new ReceivedStamp('async')), true];
+        yield 'verified on receipt, then redispatched' => [static fn (SerializerInterface $serializer) => $serializer->decode($serializer->encode(new Envelope(new DummyMessage('hello')))), true];
+        yield 'received without verification' => [static fn () => (new Serializer())->decode((new Serializer())->encode(new Envelope(new DummyMessage('hello'))))->with(new ReceivedStamp('async')), false];
+        yield 'redispatched without verification' => [static fn () => new Envelope(new DummyMessage('hello'), [TrustStamp::untrusted()]), false];
+        yield 'received with a forged trust stamp' => [static fn (SerializerInterface $serializer) => new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async'), unserialize(serialize($serializer->decode($serializer->encode(new Envelope(new DummyMessage('hello'))))->last(TrustStamp::class)))]), false];
+        yield 'verified by a transport that signs per message type' => [static fn () => (new SigningSerializer(new Serializer(), 'secret-key', [DummyMessage::class]))->decode((new SigningSerializer(new Serializer(), 'secret-key', [DummyMessage::class]))->encode(new Envelope(new DummyMessage('hello'))))->with(new ReceivedStamp('async')), true];
+        yield 'received with a body-only signature' => [static fn () => (new SigningSerializer(new Serializer(), 'secret-key', [DummyMessage::class]))->decode(self::signBodyOnly((new Serializer())->encode(new Envelope(new DummyMessage('hello')))))->with(new ReceivedStamp('async')), false];
+        yield 'received signed as unverified by a failure transport' => [static fn () => self::createSignAllFailureSerializer()->decode(self::signWith((new Serializer())->encode(new Envelope(new DummyMessage('hello'))), 'secret-key', false))->with(new ReceivedStamp('failed')), false];
+        yield 'created in process and received from a transport that trusts it' => [static fn () => new Envelope(new DummyMessage('hello'), [new ReceivedStamp('scheduler_default'), TrustStamp::trusted()]), true];
+        yield 'received from a transport that redispatches it without trusting it' => [static fn () => new Envelope(new DummyMessage('hello'), [new ReceivedStamp('scheduler_default'), new RedispatchStamp()]), false];
+        yield 'redispatched after a failed verification' => [static fn () => new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async'), TrustStamp::untrusted(), new RedispatchStamp()]), false];
+    }
+
+    #[DataProvider('provideDecodeFailuresSignedAsUnverifiedUnlessTheirEnvelopeWasVerified')]
+    public function testSignAllSignsEveryDecodeFailureAndMarksTheOnesWhoseEnvelopeItDidNotVerify(array $carriedEnvelope, bool $expectVerified)
+    {
+        $serializer = $this->createSignAllSerializer(new Serializer());
+
+        $encoded = $serializer->encode(new Envelope(new MessageDecodingFailedException('Cannot decode.', 0, null, $carriedEnvelope)));
+
+        $this->assertStringStartsWith('v2:', $encoded['headers']['Body-Sign']);
+        $this->assertSame($expectVerified ? null : 'unverified', $encoded['headers']['Sign-Trust'] ?? null);
+    }
+
+    public static function provideDecodeFailuresSignedAsUnverifiedUnlessTheirEnvelopeWasVerified(): iterable
+    {
+        $encoded = (new Serializer())->encode(new Envelope(new DummyMessage('hello')));
+
+        yield 'signed' => [self::signWith($encoded, 'secret-key'), true];
+        yield 'unsigned' => [$encoded, false];
+        yield 'signed with another key' => [self::signWith($encoded, 'another-key'), false];
+        yield 'with a body-only signature' => [self::signBodyOnly($encoded), false];
+        yield 'signed as unverified' => [self::signWith($encoded, 'secret-key', false), false];
+    }
+
+    #[DataProvider('provideMessagesRefusedBySignature')]
+    public function testDecodeFailureOfAMessageRefusedForItsSignatureIsNeverSigned(SerializerInterface $serializer, array $encodedEnvelope)
+    {
+        $refused = $serializer->decode($encodedEnvelope);
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $refused->getMessage()->getPrevious());
+
+        $failureSerializer = self::createSignAllFailureSerializer();
+        $encoded = $failureSerializer->encode($refused->with(new SentToFailureTransportStamp('async'), new DelayStamp(0), new RedeliveryStamp(0)));
+
+        $this->assertArrayNotHasKey('Body-Sign', $encoded['headers'] ?? []);
+        $this->assertArrayNotHasKey('Sign-Algo', $encoded['headers'] ?? []);
+        $this->assertArrayNotHasKey('Sign-Trust', $encoded['headers'] ?? []);
+
+        $envelope = $failureSerializer->decode($encoded);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+    }
+
+    public static function provideMessagesRefusedBySignature(): iterable
+    {
+        foreach (['JSON' => new Serializer(), 'PHP' => new PhpSerializer()] as $format => $inner) {
+            $encoded = $inner->encode(new Envelope(new DummyMessage('hello')));
+
+            yield $format.', unsigned, by a transport that signs every message' => [new SigningSerializer($inner, 'secret-key', ['*']), $encoded];
+            yield $format.', signed as unverified, by a transport that signs every message' => [new SigningSerializer($inner, 'secret-key', ['*']), self::signWith($encoded, 'secret-key', false)];
+            yield $format.', unsigned, by a transport that signs the message type' => [new SigningSerializer($inner, 'secret-key', [DummyMessage::class]), $encoded];
+            yield $format.', signed as unverified, by a transport that signs the message type' => [new SigningSerializer($inner, 'secret-key', [DummyMessage::class]), self::signWith($encoded, 'secret-key', false)];
+        }
+    }
+
+    public function testSignAllFailureTransportAcceptsAMessageSignedAsUnverified()
+    {
+        $encoded = $this->createSignAllSerializer(new Serializer())->encode(new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async')]));
+
+        $envelope = self::createSignAllFailureSerializer()->decode($encoded);
+
+        $this->assertSame('hello', $envelope->getMessage()->getMessage());
+        $this->assertNotNull($trust = $envelope->last(TrustStamp::class));
+        $this->assertFalse($trust->isTrusted());
+    }
+
+    public function testSignAllFailureTransportAcceptsAVerifiedMessageAsVerified()
+    {
+        $encoded = $this->createSignAllSerializer(new Serializer())->encode(new Envelope(new DummyMessage('hello')));
+
+        $this->assertTrue(self::createSignAllFailureSerializer()->decode($encoded)->last(TrustStamp::class)?->isTrusted());
+    }
+
+    public function testSignAllFailureTransportRefusesAMessageSignedAsUnverifiedWhoseTypeRequiresASignature()
+    {
+        $inner = new class implements SerializerInterface, MessageTypeAwareSerializerInterface {
+            public array $calls = [];
+
+            public function getMessageType(array $encodedEnvelope): ?string
+            {
+                $this->calls[] = __FUNCTION__;
+
+                return $encodedEnvelope['headers']['type'] ?? null;
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                $this->calls[] = __FUNCTION__;
+
+                return new Envelope(new DummyMessage('hello'));
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                throw new \BadMethodCallException();
+            }
+        };
+        $encoded = self::signWith((new Serializer())->encode(new Envelope(new DummyMessage('hello'))), 'secret-key', false);
+
+        $envelope = (new SigningSerializer($inner, 'secret-key', ['*', DummyMessage::class], 'sha256', true))->decode($encoded);
+
+        $this->assertSame(['getMessageType'], $inner->calls);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+        $this->assertSame(\sprintf('Message "%s" requires a verified signature, but it is signed as unverified.', DummyMessage::class), $envelope->getMessage()->getMessage());
+    }
+
+    #[DataProvider('provideSigningSerializersThatAcceptMessagesSignedAsUnverified')]
+    public function testAddingOrRemovingTheUnverifiedMarkInvalidatesTheSignature(array $signedMessageTypes)
+    {
+        $serializer = new SigningSerializer(new Serializer(), 'secret-key', $signedMessageTypes, 'sha256', true);
+        $verified = $serializer->encode(new Envelope(new DummyMessage('hello')));
+        $unverified = $serializer->encode(new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async')]));
+
+        $this->assertArrayNotHasKey('Sign-Trust', $verified['headers']);
+        $this->assertSame('unverified', $unverified['headers']['Sign-Trust']);
+        $this->assertTrue($serializer->decode($verified)->last(TrustStamp::class)?->isTrusted());
+
+        $marked = $verified;
+        $marked['headers']['Sign-Trust'] = 'unverified';
+        $unmarked = $unverified;
+        unset($unmarked['headers']['Sign-Trust']);
+        $remarked = $unverified;
+        $remarked['headers']['Sign-Trust'] = 'verified';
+
+        foreach ([$marked, $unmarked, $remarked] as $tampered) {
+            $envelope = $serializer->decode($tampered);
+
+            $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+            $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+        }
+    }
+
+    public static function provideSigningSerializersThatAcceptMessagesSignedAsUnverified(): iterable
+    {
+        yield 'signing every message' => [['*']];
+        yield 'signing the message type' => [[DummyMessage::class]];
+    }
+
+    public function testMessageSignedBeforeTheUnverifiedMarkExistedCountsAsVerified()
+    {
+        $encoded = [
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.BusNameStamp::class => '[{"busName":"the_bus"}]',
+                'Content-Type' => 'application/json',
+                'Body-Sign' => 'v2:2848ec5ccbd264b23a447faa609df7def2eb2f1ff3fad580f26630025da2c3a0',
+                'Sign-Algo' => 'sha256',
+            ],
+        ];
+
+        foreach ([$this->createSignAllSerializer(new Serializer()), self::createSignAllFailureSerializer(), $this->createJsonSerializer([DummyMessage::class])] as $serializer) {
+            $envelope = $serializer->decode($encoded);
+
+            $this->assertSame('hello', $envelope->getMessage()->getMessage());
+            $this->assertSame('the_bus', $envelope->last(BusNameStamp::class)?->getBusName());
+            $this->assertTrue($envelope->last(TrustStamp::class)?->isTrusted());
+        }
+    }
+
+    #[DataProvider('provideEnvelopesOfASignedTypeSignedAsUnverifiedUnlessTrusted')]
+    public function testEncodeMarksAMessageOfASignedTypeAsUnverifiedUnlessTrusted(Envelope $envelope, bool $expectVerified)
+    {
+        $encoded = $this->createJsonSerializer([DummyMessage::class])->encode($envelope);
+
+        $this->assertStringStartsWith('v2:', $encoded['headers']['Body-Sign']);
+        $this->assertSame($expectVerified ? null : 'unverified', $encoded['headers']['Sign-Trust'] ?? null);
+    }
+
+    public static function provideEnvelopesOfASignedTypeSignedAsUnverifiedUnlessTrusted(): iterable
+    {
+        yield 'dispatched in process' => [new Envelope(new DummyMessage('hello')), true];
+        yield 'verified on receipt' => [new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async'), TrustStamp::trusted()]), true];
+        yield 'received without verification' => [new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async')]), false];
+        yield 'redispatched without verification' => [new Envelope(new DummyMessage('hello'), [TrustStamp::untrusted()]), false];
+        yield 'created in process and received from a transport that trusts it' => [new Envelope(new DummyMessage('hello'), [new ReceivedStamp('scheduler_default'), TrustStamp::trusted()]), true];
+        yield 'received from a transport that redispatches it without trusting it' => [new Envelope(new DummyMessage('hello'), [new ReceivedStamp('scheduler_default'), new RedispatchStamp()]), false];
+    }
+
+    public function testEncodeDoesNotSignAMessageOfAnUnsignedTypeEvenWhenUnverified()
+    {
+        $encoded = $this->createJsonSerializer([DummyMessage::class])->encode(new Envelope(new DummyMessageWithSerializedTypeName('hello'), [new ReceivedStamp('async'), TrustStamp::untrusted()]));
+
+        $this->assertArrayNotHasKey('Body-Sign', $encoded['headers']);
+        $this->assertArrayNotHasKey('Sign-Trust', $encoded['headers']);
+    }
+
+    public function testDecodeRefusesAMessageSignedAsUnverifiedWhoseTypeRequiresASignature()
+    {
+        $serializer = $this->createJsonSerializer([DummyMessage::class]);
+
+        $envelope = $serializer->decode($serializer->encode(new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async')])));
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+        $this->assertSame(\sprintf('Message "%s" requires a verified signature, but it is signed as unverified.', DummyMessage::class), $envelope->getMessage()->getMessage());
+    }
+
+    public function testDecodeAcceptsAMessageSignedAsUnverifiedWhoseTypeDoesNotRequireASignature()
+    {
+        $encoded = $this->createSignAllSerializer(new Serializer())->encode(new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async')]));
+
+        $envelope = $this->createJsonSerializer([ChildDummyMessage::class])->decode($encoded);
+
+        $this->assertSame('hello', $envelope->getMessage()->getMessage());
+        $this->assertNotNull($trust = $envelope->last(TrustStamp::class));
+        $this->assertFalse($trust->isTrusted());
+    }
+
+    public function testDecodeMarksOnlyASignatureThatCoversTheHeadersAsVerified()
+    {
+        $inner = new Serializer();
+        $serializer = new SigningSerializer($inner, 'secret-key', [DummyMessage::class]);
+
+        $this->assertTrue($serializer->decode($serializer->encode(new Envelope(new DummyMessage('hello'))))->last(TrustStamp::class)?->isTrusted());
+        $this->assertNull($serializer->decode(self::signBodyOnly($inner->encode(new Envelope(new DummyMessage('hello')))))->last(TrustStamp::class));
+    }
+
     private function createSerializer(array $signedTypes): SerializerInterface
     {
         return new SigningSerializer(new PhpSerializer(), 'secret-key', $signedTypes);
+    }
+
+    private function createSignAllSerializer(SerializerInterface $inner): SerializerInterface
+    {
+        return new SigningSerializer($inner, 'secret-key', ['*']);
+    }
+
+    private static function createSignAllFailureSerializer(): SerializerInterface
+    {
+        return new SigningSerializer(new Serializer(), 'secret-key', ['*'], 'sha256', true);
     }
 
     private function createJsonSerializer(array $signedTypes, array $typeToClassMap = []): SerializerInterface
@@ -700,7 +1066,29 @@ class SigningSerializerTest extends TestCase
         return (new SigningSerializer($inner, 'secret-key', [DummyMessage::class]))->encode(new Envelope(new DummyMessage('hello')));
     }
 
-    private function signBodyOnly(array $encoded): array
+    private static function signWith(array $encoded, string $signingKey, bool $verified = true): array
+    {
+        $inner = new class($encoded) implements SerializerInterface {
+            public function __construct(
+                private array $encoded,
+            ) {
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                throw new \BadMethodCallException();
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return $this->encoded;
+            }
+        };
+
+        return (new SigningSerializer($inner, $signingKey, ['*']))->encode(new Envelope(new DummyMessage('hello'), $verified ? [] : [new ReceivedStamp('async')]));
+    }
+
+    private static function signBodyOnly(array $encoded): array
     {
         $encoded['headers']['Body-Sign'] = hash_hmac('sha256', $encoded['body'] ?? '', 'secret-key');
         $encoded['headers']['Sign-Algo'] = 'sha256';

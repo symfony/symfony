@@ -23,10 +23,13 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Worker;
 
@@ -372,6 +375,39 @@ class InMemoryTransportTest extends TestCase
         $this->assertNull($this->transport->find(1));
         $this->transport->reject($envelope2);
         $this->assertNull($this->transport->find(2));
+    }
+
+    public function testEnvelopesDispatchedInThisProcessAreHandedBackTrusted()
+    {
+        $this->transport->send(new Envelope(new \stdClass()));
+
+        $this->assertTrue($this->transport->get()[0]->last(TrustStamp::class)?->isTrusted());
+        $this->assertTrue($this->transport->all()[0]->last(TrustStamp::class)?->isTrusted());
+        $this->assertTrue($this->transport->find(1)?->last(TrustStamp::class)?->isTrusted());
+        $this->assertNull($this->transport->getSent()[0]->last(TrustStamp::class));
+    }
+
+    public function testEnvelopesReceivedFromATransportAreHandedBackWithTheirOwnTrust()
+    {
+        $untrusted = TrustStamp::untrusted();
+        $trusted = TrustStamp::trusted();
+        $this->transport->send(new Envelope(new \stdClass(), [new ReceivedStamp('async')]));
+        $this->transport->send(new Envelope(new \stdClass(), [new ReceivedStamp('async'), $untrusted]));
+        $this->transport->send(new Envelope(new \stdClass(), [new ReceivedStamp('scheduler_default'), $trusted]));
+
+        [$received, $receivedUntrusted, $receivedTrusted] = $this->transport->get(3);
+
+        $this->assertNull($received->last(TrustStamp::class));
+        $this->assertSame($untrusted, $receivedUntrusted->last(TrustStamp::class));
+        $this->assertSame($trusted, $receivedTrusted->last(TrustStamp::class));
+    }
+
+    public function testEnvelopesAreNotTrustedWhenTheyAreSerialized()
+    {
+        $transport = new InMemoryTransport(new PhpSerializer());
+        $transport->send(new Envelope(new DummyMessage('Hello.')));
+
+        $this->assertNull($transport->get()[0]->last(TrustStamp::class));
     }
 
     private function createUndecodableSerializer(): SerializerInterface

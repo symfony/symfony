@@ -27,6 +27,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -85,11 +86,12 @@ class SyncTransport implements TransportInterface
 
         while (true) {
             try {
-                return $this->messageBus->dispatch($envelope->with(new ReceivedStamp($alias)));
+                return $this->messageBus->dispatch($envelope->with($receivedStamp = new ReceivedStamp($alias)));
             } catch (\Throwable $e) {
-                if ($e instanceof EnvelopeAwareExceptionInterface && null !== $e->getEnvelope()) {
-                    // keep the stamps added while handling, so that a retry skips the handlers that succeeded
-                    $envelope = $e->getEnvelope()->withoutAll(ReceivedStamp::class);
+                if ($e instanceof EnvelopeAwareExceptionInterface && null !== $handled = $e->getEnvelope()) {
+                    // keep the stamps added while handling, so that a retry skips the handlers that succeeded,
+                    // and the ReceivedStamp of a message that came from another transport, which tells it wasn't dispatched in this process
+                    $envelope = new Envelope($handled->getMessage(), array_filter(array_merge(...array_values($handled->all())), static fn (StampInterface $stamp): bool => $stamp !== $receivedStamp));
                 }
 
                 // a forced retry is bounded by the strategy too: without a wait between

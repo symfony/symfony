@@ -97,13 +97,15 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.signing_serializer', SigningSerializer::class)
             ->abstract()
             ->args([
-                service('.inner'),
+                abstract_arg('the serializer of the transport'),
                 inline_service('string') // wrap the signing key in a lazy string to prevent a hard dependency on the kernel.secret parameter
                     ->factory(class_exists(LazyString::class) ? [LazyString::class, 'fromCallable'] : 'current')
                     ->args([
                         class_exists(LazyString::class, false) ? service_closure('.messenger.signing_serializer.signing_key') : [new Parameter('kernel.secret')],
                     ]),
-                abstract_arg('message types to serializers'), // read and replaced by MessengerPass
+                abstract_arg('message types that require a signature'), // set by MessengerPass
+                'sha256',
+                false, // set by MessengerBundle for the failure transports
             ])
         ->set('.messenger.signing_serializer.signing_key', 'string')
             ->factory('current')

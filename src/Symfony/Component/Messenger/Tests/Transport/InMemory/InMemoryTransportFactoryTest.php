@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory;
@@ -58,7 +59,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $message = Envelope::wrap(new DummyMessage('Hello.'));
         $transport->send($message);
 
-        $this->assertEquals([$message->with(new TransportMessageIdStamp(1))], $transport->get());
+        $this->assertEquals([$message->with(new TransportMessageIdStamp(1), TrustStamp::trusted())], $transport->get());
     }
 
     public function testCreateTransportWithSerializer()

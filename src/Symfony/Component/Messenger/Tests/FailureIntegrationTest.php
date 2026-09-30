@@ -32,6 +32,7 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
+use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
@@ -48,8 +49,10 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -675,6 +678,359 @@ class FailureIntegrationTest extends TestCase
         yield 'worker with a bus, naming another bus' => [new Serializer(), 'event.bus', 'command.bus', []];
     }
 
+    #[DataProvider('provideMessagesRefusedByATransportThatSignsEveryMessage')]
+    public function testMessageRefusedByATransportThatSignsEveryMessageIsNeverHandled(SerializerInterface $inner, array $encodedEnvelope)
+    {
+        $serializer = new SigningSerializer($inner, 'signing-key', ['*']);
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*'], 'sha256', true);
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+
+        $handler = new DummyTestHandler(false);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $throwables = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport, 'failed' => static fn () => $failureTransport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(2, 0), 'failed' => static fn () => new MultiplierRetryStrategy(2, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$throwables) {
+            $throwables[] = $event->getThrowable();
+        });
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failed = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertArrayNotHasKey('Body-Sign', $failed[0]['headers'] ?? []);
+
+        // messenger:failed:retry consumes the failure transport
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(0, $handler->getTimesCalled());
+        $this->assertCount(2, $throwables);
+        $this->assertContainsOnlyInstancesOf(InvalidMessageSignatureException::class, $throwables);
+    }
+
+    public static function provideMessagesRefusedByATransportThatSignsEveryMessage(): iterable
+    {
+        $envelope = new Envelope(new DummyMessage('API'));
+
+        foreach (['JSON' => new Serializer(), 'PHP' => new PhpSerializer()] as $format => $inner) {
+            yield $format.' without signature' => [$inner, $inner->encode($envelope)];
+            yield $format.' signed with another key' => [$inner, (new SigningSerializer($inner, 'another-key', ['*']))->encode($envelope)];
+            yield $format.' signed by a transport that signs the message type with another key' => [$inner, (new SigningSerializer($inner, 'another-key', [DummyMessage::class]))->encode($envelope)];
+            yield $format.' with a body-only signature' => [$inner, ['headers' => ['Body-Sign' => hash_hmac('sha256', $inner->encode($envelope)['body'], 'signing-key'), 'Sign-Algo' => 'sha256'] + ($inner->encode($envelope)['headers'] ?? [])] + $inner->encode($envelope)];
+            yield $format.' signed as unverified' => [$inner, (new SigningSerializer($inner, 'signing-key', ['*']))->encode($envelope->with(new ReceivedStamp('async')))];
+        }
+    }
+
+    #[DataProvider('provideInnerSerializers')]
+    public function testMessageSignedByTransportsThatSignEveryMessageIsRetriedThenRetriedFromTheFailureTransport(SerializerInterface $inner)
+    {
+        $serializer = new SigningSerializer($inner, 'signing-key', ['*']);
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*'], 'sha256', true);
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, []);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+        $senders = new ServiceLocator(['transport' => static fn () => $transport, 'failed' => static fn () => $failureTransport]);
+
+        $handler = new DummyTestHandler(true);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer])),
+            new FailedMessageProcessingMiddleware(),
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['transport']], $senders)),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($senders, new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0), 'failed' => static fn () => new MultiplierRetryStrategy(1, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $bus->dispatch(new DummyMessage('API'));
+        $this->assertStringStartsWith('v2:', $transport->getMessagesWaitingToBeReceived()[0]['headers']['Body-Sign']);
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        $this->assertStringStartsWith('v2:', $transport->getMessagesWaitingToBeReceived()[0]['headers']['Body-Sign']);
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertStringStartsWith('v2:', $failureTransport->getMessagesWaitingToBeReceived()[0]['headers']['Body-Sign']);
+        $this->assertArrayNotHasKey('Sign-Trust', $failureTransport->getMessagesWaitingToBeReceived()[0]['headers']);
+        $this->assertTrue($failureSerializer->decode($failureTransport->getMessagesWaitingToBeReceived()[0])->last(TrustStamp::class)?->isTrusted());
+
+        // messenger:failed:retry consumes the failure transport
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+        $this->assertStringStartsWith('v2:', $failureTransport->getMessagesWaitingToBeReceived()[0]['headers']['Body-Sign']);
+        $this->assertArrayNotHasKey('Sign-Trust', $failureTransport->getMessagesWaitingToBeReceived()[0]['headers']);
+
+        $handler->setShouldThrow(false);
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(4, $handler->getTimesCalled());
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    public static function provideInnerSerializers(): iterable
+    {
+        yield 'JSON' => [new Serializer()];
+        yield 'PHP' => [new PhpSerializer()];
+    }
+
+    #[DataProvider('provideInnerSerializers')]
+    public function testFailureOfATransportThatDoesNotSignIsSignedAsUnverifiedByAFailureTransportThatSignsEveryMessage(SerializerInterface $inner)
+    {
+        $serializer = new SigningSerializer($inner, 'signing-key', [\stdClass::class]);
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*', \stdClass::class], 'sha256', true);
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$serializer->encode(new Envelope(new DummyMessage('API')))]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+
+        $handler = new DummyTestHandler(true);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport, 'failed' => static fn () => $failureTransport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(0, 0), 'failed' => static fn () => new MultiplierRetryStrategy(1, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failed = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertStringStartsWith('v2:', $failed[0]['headers']['Body-Sign']);
+        $this->assertSame('unverified', $failed[0]['headers']['Sign-Trust']);
+
+        // messenger:failed:retry consumes the failure transport
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertCount(1, $failed = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertSame('unverified', $failed[0]['headers']['Sign-Trust']);
+
+        $handler->setShouldThrow(false);
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(3, $handler->getTimesCalled());
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    #[DataProvider('provideInnerSerializers')]
+    public function testFailureOfATransportThatDoesNotSignIsRefusedByATransportThatSignsEveryMessageWhenRedispatched(SerializerInterface $inner)
+    {
+        $serializer = new SigningSerializer($inner, 'signing-key', [\stdClass::class]);
+        $signingSerializer = new SigningSerializer($inner, 'signing-key', ['*', \stdClass::class]);
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*', \stdClass::class], 'sha256', true);
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$serializer->encode(new Envelope(new DummyMessage('API')))]);
+        $signingTransport = new SerializingFailureTestSenderAndReceiver($signingSerializer, []);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+
+        $handler = new DummyTestHandler(true);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer, 'signing' => static fn () => $signingSerializer, 'failed' => static fn () => $failureSerializer])),
+            new FailedMessageProcessingMiddleware(),
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['signing']], new ServiceLocator(['signing' => static fn () => $signingTransport]))),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $throwables = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport, 'signing' => static fn () => $signingTransport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(0, 0), 'signing' => static fn () => new MultiplierRetryStrategy(0, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport, 'signing' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$throwables) {
+            $throwables[] = $event->getThrowable()::class;
+        });
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        $this->assertSame('unverified', $failureTransport->getMessagesWaitingToBeReceived()[0]['headers']['Sign-Trust']);
+
+        // messenger:failed:retry --redispatch
+        $failed = iterator_to_array($failureTransport->get());
+        (new FailedMessageRepository(new ServiceLocator(['failed' => static fn () => $failureTransport]), 'failed', null, $bus))->redispatch($failed[0]);
+
+        $this->assertCount(1, $redispatched = $signingTransport->getMessagesWaitingToBeReceived());
+        $this->assertSame('unverified', $redispatched[0]['headers']['Sign-Trust']);
+
+        (new Worker(['signing' => $signingTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $handler->getTimesCalled());
+        $this->assertSame([HandlerFailedException::class, InvalidMessageSignatureException::class], $throwables);
+        $this->assertSame([], $signingTransport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $refused = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertArrayNotHasKey('Body-Sign', $refused[0]['headers'] ?? []);
+
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $handler->getTimesCalled());
+        $this->assertSame([HandlerFailedException::class, InvalidMessageSignatureException::class, InvalidMessageSignatureException::class], $throwables);
+    }
+
+    #[DataProvider('provideInnerSerializers')]
+    public function testClaimCheckOverATransportThatSignsEveryMessage(SerializerInterface $inner)
+    {
+        $values = [];
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturnCallback(function (string $id) use (&$values): CacheItemInterface {
+            $item = $this->createStub(CacheItemInterface::class);
+            $item->method('isHit')->willReturn(isset($values[$id]));
+            $item->method('get')->willReturn($values[$id] ?? null);
+            $item->method('set')->willReturnCallback(static function (mixed $value) use (&$values, $id, $item): CacheItemInterface {
+                $values[$id] = $value;
+
+                return $item;
+            });
+
+            return $item;
+        });
+        $pool->method('save')->willReturn(true);
+        $serializer = new ClaimCheckSerializer(new SigningSerializer($inner, 'signing-key', ['*']), $pool, 300);
+
+        $forgedData = serialize(['body' => '{"message":"forged"}', 'headers' => ['type' => 'Unknown\Missing\MessageClass', 'X-Message-Stamp-Unknown\Missing\StampClass' => '[{}]']]);
+        $values['forged'] = $forgedData;
+        $forged = [
+            'body' => json_encode(['id' => 'forged', 'digest' => hash('sha256', $forgedData)]),
+            'headers' => ['X-Symfony-Messenger-Claim-Check' => '1', 'X-Symfony-Messenger-Claim-Check-Type' => 'Unknown\Missing\MessageClass'],
+        ];
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$forged, $serializer->encode(new Envelope(new DummyMessage(str_repeat('a', 1000))))]);
+        $failureTransport = new DummyFailureTestSenderAndReceiver();
+        $this->assertArrayNotHasKey('Body-Sign', $transport->getMessagesWaitingToBeReceived()[1]['headers']);
+
+        $handler = new DummyTestHandler(true);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $throwables = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$throwables) {
+            $throwables[] = $event->getThrowable()::class;
+        });
+
+        $requested = [];
+        $autoloader = static function (string $class) use (&$requested) {
+            $requested[] = $class;
+        };
+        spl_autoload_register($autoloader, true, true);
+
+        try {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+
+        $this->assertSame([], preg_grep('/^Unknown\\\\/', $requested));
+        $this->assertSame([InvalidMessageSignatureException::class], $throwables);
+        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        $handler->setShouldThrow(false);
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame(2, $handler->getTimesCalled());
+        $this->assertSame([InvalidMessageSignatureException::class, HandlerFailedException::class], $throwables);
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    #[DataProvider('provideInnerSerializers')]
+    public function testClaimThatCouldNotBeRetrievedIsRetriedFromAFailureTransportThatSignsEveryMessage(SerializerInterface $inner)
+    {
+        $values = [];
+        $available = true;
+        $pool = $this->createStub(CacheItemPoolInterface::class);
+        $pool->method('getItem')->willReturnCallback(function (string $id) use (&$values, &$available): CacheItemInterface {
+            $item = $this->createStub(CacheItemInterface::class);
+            $item->method('isHit')->willReturnCallback(static function () use (&$values, &$available, $id) { return $available && isset($values[$id]); });
+            $item->method('get')->willReturnCallback(static function () use (&$values, $id) { return $values[$id] ?? null; });
+            $item->method('set')->willReturnCallback(static function (mixed $value) use (&$values, $id, $item): CacheItemInterface {
+                $values[$id] = $value;
+
+                return $item;
+            });
+
+            return $item;
+        });
+        $pool->method('save')->willReturn(true);
+        $serializer = new ClaimCheckSerializer(new SigningSerializer($inner, 'signing-key', ['*']), $pool, 300);
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*'], 'sha256', true);
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$serializer->encode(new Envelope(new DummyMessage(str_repeat('a', 1000))))]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+
+        $handler = new DummyTestHandler(false);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(0, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $available = false;
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame(0, $handler->getTimesCalled());
+        $this->assertCount(1, $failed = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertSame('unverified', $failed[0]['headers']['Sign-Trust']);
+
+        // messenger:failed:retry consumes the failure transport
+        $available = true;
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $handler->getTimesCalled());
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    #[DataProvider('provideInnerSerializers')]
+    public function testMessageOfASignedTypeFromATransportThatDoesNotSerializeIsRetriedFromAFailureTransportThatSignsIt(SerializerInterface $inner)
+    {
+        $transport = new InMemoryTransport();
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', [DummyMessage::class]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+
+        $handler = new DummyTestHandler(true);
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['failed' => static fn () => $failureSerializer])),
+            new FailedMessageProcessingMiddleware(),
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['transport']], new ServiceLocator(['transport' => static fn () => $transport]))),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]])),
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $bus->dispatch(new DummyMessage('API'));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $handler->getTimesCalled());
+        $this->assertCount(1, $failed = $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertStringStartsWith('v2:', $failed[0]['headers']['Body-Sign']);
+        $this->assertArrayNotHasKey('Sign-Trust', $failed[0]['headers']);
+
+        // messenger:failed:retry consumes the failure transport
+        $handler->setShouldThrow(false);
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(2, $handler->getTimesCalled());
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
     public function testRetryThroughTransportUsingTheStandaloneSerializer()
     {
         $transport = new InMemoryTransport(Serializer::create());
@@ -946,7 +1302,7 @@ class FailureIntegrationTest extends TestCase
     }
 
     #[DataProvider('provideMessagesThatFailToDecodeUntilTheirClassIsDeployed')]
-    public function testMessageThatFailedToDecodeIsHandledOnItsOwnBus(string $messageClass, string $serializerClass, string $failureSerializerClass, int $maxRetries)
+    public function testMessageThatFailedToDecodeIsHandledOnItsOwnBus(string $messageClass, string $serializerClass, string $failureSerializerClass, int $maxRetries, bool $signAll = false, ?bool $failureTransportSignsAll = null)
     {
         $encodedEnvelope = (new $serializerClass())->encode(new Envelope(new DummyMessage('API'), [new BusNameStamp('command.bus')]));
 
@@ -956,13 +1312,35 @@ class FailureIntegrationTest extends TestCase
             $encodedEnvelope['headers']['type'] = $messageClass;
         }
 
+        $failureTransportSignsAll ??= $signAll;
+        $createSerializer = static fn (string $class, bool $signAll, bool $acceptUnverified = false): SerializerInterface => $signAll ? new SigningSerializer(new $class(), 'signing-key', ['*'], 'sha256', $acceptUnverified) : new $class();
+
+        if ($signAll) {
+            $encodedEnvelope = (new SigningSerializer(new class($encodedEnvelope) implements SerializerInterface {
+                public function __construct(
+                    private array $encodedEnvelope,
+                ) {
+                }
+
+                public function decode(array $encodedEnvelope): Envelope
+                {
+                    throw new \BadMethodCallException();
+                }
+
+                public function encode(Envelope $envelope): array
+                {
+                    return $this->encodedEnvelope;
+                }
+            }, 'signing-key', ['*']))->encode(new Envelope(new DummyMessage('API')));
+        }
+
         $queues = ['transport' => [$encodedEnvelope], 'failed' => []];
         $calls = [];
         $handled = [];
 
-        $runWorkers = static function (int $messageLimit) use (&$queues, &$calls, &$handled, $serializerClass, $failureSerializerClass, $maxRetries) {
-            $serializer = new $serializerClass();
-            $failureSerializer = new $failureSerializerClass();
+        $runWorkers = static function (int $messageLimit) use (&$queues, &$calls, &$handled, $serializerClass, $failureSerializerClass, $maxRetries, $createSerializer, $signAll, $failureTransportSignsAll) {
+            $serializer = $createSerializer($serializerClass, $signAll);
+            $failureSerializer = $createSerializer($failureSerializerClass, $failureTransportSignsAll, true);
             $transport = new SerializingFailureTestSenderAndReceiver($serializer, $queues['transport']);
             $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, $queues['failed']);
             $serializerLocator = new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer]);
@@ -1017,6 +1395,14 @@ class FailureIntegrationTest extends TestCase
         yield 'JSON, retried' => ['App\JsonMessageRetried', Serializer::class, Serializer::class, 1];
         yield 'JSON, from a JSON failure transport' => ['App\JsonMessageFromJsonFailureTransport', Serializer::class, Serializer::class, 0];
         yield 'JSON, from a PHP failure transport' => ['App\JsonMessageFromPhpFailureTransport', Serializer::class, PhpSerializer::class, 0];
+        yield 'PHP signing every message, retried' => ['App\PhpSignedMessageRetried', PhpSerializer::class, PhpSerializer::class, 1, true];
+        yield 'PHP signing every message, from a failure transport' => ['App\PhpSignedMessageFromFailureTransport', PhpSerializer::class, PhpSerializer::class, 0, true];
+        yield 'JSON signing every message, retried' => ['App\JsonSignedMessageRetried', Serializer::class, Serializer::class, 1, true];
+        yield 'JSON signing every message, from a failure transport' => ['App\JsonSignedMessageFromFailureTransport', Serializer::class, Serializer::class, 0, true];
+        yield 'PHP signing every message, from a failure transport that does not sign' => ['App\PhpSignedMessageFromUnsignedFailureTransport', PhpSerializer::class, PhpSerializer::class, 0, true, false];
+        yield 'JSON signing every message, from a failure transport that does not sign' => ['App\JsonSignedMessageFromUnsignedFailureTransport', Serializer::class, Serializer::class, 0, true, false];
+        yield 'PHP not signing, from a failure transport that signs every message' => ['App\PhpUnsignedMessageFromSignedFailureTransport', PhpSerializer::class, PhpSerializer::class, 0, false, true];
+        yield 'JSON not signing, from a failure transport that signs every message' => ['App\JsonUnsignedMessageFromSignedFailureTransport', Serializer::class, Serializer::class, 0, false, true];
     }
 
     public function testRetryThroughTransportSkipsTheHandlerWhoseResultCannotBeEncoded()

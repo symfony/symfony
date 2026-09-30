@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Stamp\UnverifiedDecodingFailureStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
@@ -58,11 +59,13 @@ final class FailedMessageRepository
      */
     public static function prepareForRedispatch(Envelope $envelope): Envelope
     {
-        // DecodeFailedMessageMiddleware needs this non-sendable stamp to keep the stamps of an unverified decoding failure away from a signed message
+        // DecodeFailedMessageMiddleware needs these non-sendable stamps to keep the stamps of an unverified decoding failure away from a signed message,
+        // and a signing transport needs the second one: without its ReceivedStamp, the message would look dispatched in this process
         $envelope = $envelope
             ->withoutStampsOfType(NonSendableStampInterface::class)
             ->withoutAll(TransportMessageIdStamp::class)
-            ->with(...$envelope->all(UnverifiedDecodingFailureStamp::class));
+            ->with(...$envelope->all(UnverifiedDecodingFailureStamp::class))
+            ->with($envelope->last(TrustStamp::class) ?? TrustStamp::untrusted());
 
         // DecodeFailedMessageMiddleware needs it to find the serializer of a decoding failure, and removes it once decoded
         return $envelope->getMessage() instanceof MessageDecodingFailedException ? $envelope : $envelope->withoutAll(SentToFailureTransportStamp::class);

@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Exception\ClaimCheckStorageException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\MessageTypeAwareSerializerInterface;
@@ -186,7 +187,11 @@ class ClaimCheckSerializerTest extends TestCase
 
         $this->assertArrayNotHasKey('Body-Sign', $encoded['headers']);
         $this->assertStringContainsString('Body-Sign', $values[$claim['id']]);
-        $this->assertEquals($envelope, $serializer->decode($encoded));
+
+        $decoded = $serializer->decode($encoded);
+
+        $this->assertEquals($envelope->getMessage(), $decoded->getMessage());
+        $this->assertTrue($decoded->last(TrustStamp::class)?->isTrusted());
     }
 
     public function testReferenceThatExceedsMaximumSizeIsRemoved()

@@ -164,8 +164,7 @@ class Dumper
     {
         $lines = explode("\n", $value);
 
-        // If the first non-empty line starts with a space character,
-        // the spec requires a block indentation indicator
+        // The spec requires a block indentation indicator when the first line that is not empty starts with a space, even if that line holds only spaces
         // http://www.yaml.org/spec/1.2/spec.html#id2793979
         foreach ($lines as $line) {
             if ('' !== $line) {

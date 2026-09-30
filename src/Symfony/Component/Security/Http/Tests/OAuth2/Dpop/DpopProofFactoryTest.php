@@ -243,6 +243,19 @@ class DpopProofFactoryTest extends TestCase
         new DpopProofFactory($rsaKey, 'ES256');
     }
 
+    public function testRejectsASymmetricKeyForWhatItIs()
+    {
+        // Given
+        $secret = new JWK(['kty' => 'oct', 'k' => 'c2VjcmV0']);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "ES256" algorithm signs with a key of the "EC" type, and the given JWK is of the "oct" type.');
+
+        // When
+        new DpopProofFactory($secret, 'ES256');
+    }
+
     /**
      * RFC 7518, Section 3.4 names a curve per algorithm, and "web-token/jwt-library" only
      * checks that an EC key carries one: a P-384 key would otherwise sign something that is

@@ -73,6 +73,12 @@ final class DpopProofFactory
             throw new \InvalidArgumentException(\sprintf('The "%s" algorithm cannot sign a DPoP proof. Use one of "%s".', $algorithm, implode('", "', array_keys(JwsAlgorithms::ASYMMETRIC))));
         }
 
+        $this->algorithm = new (JwsAlgorithms::ASYMMETRIC[$algorithm])();
+        // read here and not at the first signature: the first proof is signed on the callback
+        // of a user who has already logged in at the provider, where a key of the wrong type
+        // is a 500 and a key on the wrong curve is a signature the provider cannot verify
+        JwsAlgorithms::checkKey($signingKey, $this->algorithm);
+
         if (!$signingKey->has('d')) {
             throw new \InvalidArgumentException('A DPoP proof must be signed with the private key of the client, and the given JWK has no "d" parameter: it is the public key.');
         }
@@ -81,11 +87,6 @@ final class DpopProofFactory
             throw new \LogicException(\sprintf('The "symfony/clock" component is required to build "%s" without a clock. Try running "composer require symfony/clock", or pass any PSR-20 clock to the constructor.', self::class));
         }
 
-        $this->algorithm = new (JwsAlgorithms::ASYMMETRIC[$algorithm])();
-        // read here and not at the first signature: the first proof is signed on the callback
-        // of a user who has already logged in at the provider, where a key of the wrong type
-        // is a 500 and a key on the wrong curve is a signature the provider cannot verify
-        JwsAlgorithms::checkKey($signingKey, $this->algorithm);
         $this->clock = $clock ?? new Clock();
         // the header of every proof carries the members RFC 7638 names a public key by and nothing else,
         // since any other member may be private, such as the "oth" of a multi-prime RSA key

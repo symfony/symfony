@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Message\DefaultStampsProviderInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -64,6 +65,15 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
 
         // the failed envelope holds the stamps its own decoding kept and the ones added since: they replace the decoded stamps of the same class
         $envelope = new Envelope($decodedEnvelope->getMessage(), array_merge(...array_values($envelope->all() + $decodedEnvelope->all())));
+
+        // the default stamps middleware saw the failure, not the decoded message
+        if (($message = $envelope->getMessage()) instanceof DefaultStampsProviderInterface) {
+            foreach ($message->getDefaultStamps() as $stamp) {
+                if (null === $envelope->last($stamp::class)) {
+                    $envelope = $envelope->with($stamp);
+                }
+            }
+        }
 
         return $stack->next()->handle($envelope, $stack);
     }

@@ -32,8 +32,10 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Message\DefaultStampsProviderInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
@@ -46,6 +48,7 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -767,6 +770,53 @@ class FailureIntegrationTest extends TestCase
         yield 'JSON, from a PHP failure transport' => ['App\JsonMessageFromPhpFailureTransport', Serializer::class, PhpSerializer::class, 0];
     }
 
+    #[DataProvider('provideMessagesThatFailToDecodeUntilTheirClassIsDeployedAndHaveDefaultStamps')]
+    public function testMessageThatFailedToDecodeGetsItsDefaultStampsWhenReplayed(string $messageClass, string $serializerClass)
+    {
+        $serializer = new $serializerClass();
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('API')));
+
+        if (PhpSerializer::class === $serializerClass) {
+            $encodedEnvelope['body'] = addslashes(str_replace('O:'.\strlen(DummyMessage::class).':"'.DummyMessage::class.'"', 'O:'.\strlen($messageClass).':"'.$messageClass.'"', stripslashes($encodedEnvelope['body'])));
+        } else {
+            $encodedEnvelope['headers']['type'] = $messageClass;
+        }
+
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver(new PhpSerializer(), []);
+
+        $calls = [];
+        $bus = new MessageBus([
+            new AddDefaultStampsMiddleware(),
+            // a new serializer per replay, as after a restart: the serializer remembers the types it could not denormalize
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => new $serializerClass()])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function (DummyMessage $message, string ...$arguments) use (&$calls) { $calls[] = $arguments; }]])),
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(0, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame([], $calls);
+        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
+
+        class_alias(HandlerArgumentsProviderDummyMessage::class, $messageClass);
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame([['default']], $calls);
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    public static function provideMessagesThatFailToDecodeUntilTheirClassIsDeployedAndHaveDefaultStamps(): iterable
+    {
+        yield 'PHP' => ['App\PhpMessageWithDefaultStamps', PhpSerializer::class];
+        yield 'JSON' => ['App\JsonMessageWithDefaultStamps', Serializer::class];
+    }
+
     public function testRetryThroughTransportSkipsTheHandlerWhoseResultCannotBeEncoded()
     {
         $transport = new InMemoryTransport(Serializer::create());
@@ -970,5 +1020,13 @@ class DummyTestHandler
     public function setShouldThrow(bool $shouldThrow)
     {
         $this->shouldThrow = $shouldThrow;
+    }
+}
+
+class HandlerArgumentsProviderDummyMessage extends DummyMessage implements DefaultStampsProviderInterface
+{
+    public function getDefaultStamps(): array
+    {
+        return [new HandlerArgumentsStamp(['default'])];
     }
 }

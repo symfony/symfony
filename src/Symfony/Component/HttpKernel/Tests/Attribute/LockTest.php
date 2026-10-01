@@ -18,9 +18,9 @@ class LockTest extends TestCase
 {
     public function testDefaults()
     {
-        $lock = new Lock();
+        $lock = new Lock('import');
 
-        $this->assertNull($lock->key);
+        $this->assertSame('import', $lock->key);
         $this->assertSame('default', $lock->factory);
         $this->assertSame(30.0, $lock->ttl);
         $this->assertFalse($lock->blocking);
@@ -32,23 +32,23 @@ class LockTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageIs('The "$ttl" argument of "Symfony\\Component\\HttpKernel\\Attribute\\Lock" must be greater than 0 or null, "0" given.');
 
-        new Lock(ttl: 0);
+        new Lock('import', ttl: 0);
     }
 
     public function testNullTtlMeansNoExpiration()
     {
-        $this->assertNull(new Lock(ttl: null)->ttl);
+        $this->assertNull(new Lock('import', ttl: null)->ttl);
     }
 
     public function testMethodsAreNormalized()
     {
-        $lock = new Lock(methods: ['get', 'post']);
+        $lock = new Lock('import', methods: ['get', 'post']);
 
         $this->assertSame(['GET', 'POST', 'HEAD'], $lock->methods);
     }
 
     public function testSingleMethodIsWrapped()
     {
-        $this->assertSame(['POST'], new Lock(methods: 'post')->methods);
+        $this->assertSame(['POST'], new Lock('import', methods: 'post')->methods);
     }
 }

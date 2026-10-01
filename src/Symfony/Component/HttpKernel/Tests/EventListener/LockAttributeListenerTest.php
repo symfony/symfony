@@ -90,7 +90,7 @@ class LockAttributeListenerTest extends TestCase
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
 
-        return new ControllerAttributeEvent(new Lock(), match ($eventName) {
+        return new ControllerAttributeEvent(new Lock('foo'), match ($eventName) {
             'response' => new ResponseEvent($kernel, $request, $requestType, $response ?? new Response()),
             'exception' => new ExceptionEvent($kernel, $request, $requestType, new \RuntimeException()),
             'finish_request' => new FinishRequestEvent($kernel, $request, $requestType),
@@ -129,11 +129,11 @@ class LockAttributeListenerTest extends TestCase
         $listener = $this->makeListener();
         $request = Request::create('/import', 'POST');
 
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
-        $this->assertTrue($this->isLocked('/import'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('import'), $request));
+        $this->assertTrue($this->isLocked('import'));
 
         $listener->releaseLocks($this->makeReleaseEvent($request));
-        $this->assertFalse($this->isLocked('/import'));
+        $this->assertFalse($this->isLocked('import'));
     }
 
     #[DataProvider('provideReleaseEvents')]
@@ -142,10 +142,10 @@ class LockAttributeListenerTest extends TestCase
         $listener = $this->makeListener();
         $request = Request::create('/');
 
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $request));
         $listener->releaseLocks($this->makeReleaseEvent($request, $eventName));
 
-        $this->assertFalse($this->isLocked('/'));
+        $this->assertFalse($this->isLocked('foo'));
     }
 
     public static function provideReleaseEvents(): iterable
@@ -162,13 +162,13 @@ class LockAttributeListenerTest extends TestCase
         $second = Request::create('/');
 
         // e.g. an exception listener sets a response, so the locks are released on "kernel.exception", "kernel.response" and "kernel.finish_request"
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $first));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $first));
         $listener->releaseLocks($this->makeReleaseEvent($first, 'exception'));
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $second));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $second));
         $listener->releaseLocks($this->makeReleaseEvent($first, 'response'));
         $listener->releaseLocks($this->makeReleaseEvent($first, 'finish_request'));
 
-        $this->assertTrue($this->isLocked('/'));
+        $this->assertTrue($this->isLocked('foo'));
     }
 
     public function testStreamedResponseReleasesTheLockOnceItsContentIsSent()
@@ -177,18 +177,18 @@ class LockAttributeListenerTest extends TestCase
         $request = Request::create('/');
         $lockedWhileStreaming = null;
         $response = new StreamedResponse(function () use (&$lockedWhileStreaming) {
-            $lockedWhileStreaming = $this->isLocked('/');
+            $lockedWhileStreaming = $this->isLocked('foo');
         });
 
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $request));
         $listener->releaseLocks($this->makeReleaseEvent($request, 'response', response: $response));
         $listener->releaseLocks($this->makeReleaseEvent($request, 'finish_request'));
-        $this->assertTrue($this->isLocked('/'));
+        $this->assertTrue($this->isLocked('foo'));
 
         $response->sendContent();
 
         $this->assertTrue($lockedWhileStreaming);
-        $this->assertFalse($this->isLocked('/'));
+        $this->assertFalse($this->isLocked('foo'));
     }
 
     public function testStreamedResponseReleasesTheLockWhenItsCallbackThrows()
@@ -197,7 +197,7 @@ class LockAttributeListenerTest extends TestCase
         $request = Request::create('/');
         $response = new StreamedResponse(static fn () => throw new \RuntimeException('Streaming failed.'));
 
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $request));
         $listener->releaseLocks($this->makeReleaseEvent($request, 'response', response: $response));
 
         try {
@@ -207,21 +207,21 @@ class LockAttributeListenerTest extends TestCase
             $this->assertSame('Streaming failed.', $e->getMessage());
         }
 
-        $this->assertFalse($this->isLocked('/'));
+        $this->assertFalse($this->isLocked('foo'));
     }
 
     public function testKernelKeepsTheLockWhileStreamingTheResponse()
     {
         $lockedWhileStreaming = null;
         $request = Request::create('/');
-        $request->attributes->set('_controller', #[Lock] function () use (&$lockedWhileStreaming) {
+        $request->attributes->set('_controller', #[Lock('foo')] function () use (&$lockedWhileStreaming) {
             return new StreamedResponse(function () use (&$lockedWhileStreaming) {
-                $lockedWhileStreaming = $this->isLocked('/');
+                $lockedWhileStreaming = $this->isLocked('foo');
             });
         });
 
         $response = $this->makeKernel()->handle($request);
-        $this->assertTrue($this->isLocked('/'));
+        $this->assertTrue($this->isLocked('foo'));
 
         ob_start();
         try {
@@ -231,7 +231,7 @@ class LockAttributeListenerTest extends TestCase
         }
 
         $this->assertTrue($lockedWhileStreaming);
-        $this->assertFalse($this->isLocked('/'));
+        $this->assertFalse($this->isLocked('foo'));
     }
 
     public function testKernelFragmentRenderedWhileStreamingReusesTheLock()
@@ -273,25 +273,25 @@ class LockAttributeListenerTest extends TestCase
         $listener = $this->makeListener();
         $request = Request::create('/');
 
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $request));
         $listener->releaseLocks($this->makeReleaseEvent($request, response: new StreamedResponse(static function () {})));
-        $this->assertTrue($this->isLocked('/'));
+        $this->assertTrue($this->isLocked('foo'));
 
         $listener->reset();
-        $this->assertFalse($this->isLocked('/'));
+        $this->assertFalse($this->isLocked('foo'));
 
         // the lock is acquired again instead of being considered as handed over to the streamed response
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $request));
         $listener->releaseLocks($this->makeReleaseEvent($request));
-        $this->assertFalse($this->isLocked('/'));
+        $this->assertFalse($this->isLocked('foo'));
     }
 
     public function testKernelReleasesTheLockWhenTheControllerThrows()
     {
         $lockedInController = null;
         $request = Request::create('/');
-        $request->attributes->set('_controller', #[Lock] function () use (&$lockedInController) {
-            $lockedInController = $this->isLocked('/');
+        $request->attributes->set('_controller', #[Lock('foo')] function () use (&$lockedInController) {
+            $lockedInController = $this->isLocked('foo');
 
             throw new \RuntimeException('Controller failed.');
         });
@@ -304,7 +304,7 @@ class LockAttributeListenerTest extends TestCase
         }
 
         $this->assertTrue($lockedInController);
-        $this->assertFalse($this->isLocked('/'));
+        $this->assertFalse($this->isLocked('foo'));
     }
 
     public function testRejectsAConcurrentRequestWith409()
@@ -312,14 +312,14 @@ class LockAttributeListenerTest extends TestCase
         $listener = $this->makeListener();
         $first = Request::create('/');
         $second = Request::create('/');
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $first));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $first));
 
         try {
-            $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $second));
+            $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $second));
             $this->fail('A ConcurrentRequestHttpException should have been thrown.');
         } catch (ConcurrentRequestHttpException $e) {
             $this->assertSame(409, $e->getStatusCode());
-            $this->assertSame('/', $e->key);
+            $this->assertSame('foo', $e->key);
             $this->assertSame('default', $e->factory);
             $this->assertNull($e->getPrevious());
         }
@@ -350,11 +350,11 @@ class LockAttributeListenerTest extends TestCase
         $first = Request::create('/');
         $second = Request::create('/');
 
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $first));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $first));
         $listener->releaseLocks($this->makeReleaseEvent($first));
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $second));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $second));
 
-        $this->assertTrue($this->isLocked('/'));
+        $this->assertTrue($this->isLocked('foo'));
     }
 
     public function testTheSameLockIsAcquiredOnceForARequest()
@@ -363,12 +363,12 @@ class LockAttributeListenerTest extends TestCase
         $request = Request::create('/');
 
         // e.g. the attribute is set on both the controller class and its method
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
-        $this->assertTrue($this->isLocked('/'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $request));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $request));
+        $this->assertTrue($this->isLocked('foo'));
 
         $listener->releaseLocks($this->makeReleaseEvent($request));
-        $this->assertFalse($this->isLocked('/'));
+        $this->assertFalse($this->isLocked('foo'));
     }
 
     public function testSeveralLocksCanBeHeldByARequest()
@@ -493,7 +493,7 @@ class LockAttributeListenerTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageIs('Lock factory "missing" does not exist. Did you forget to configure it? Available factories: "default".');
 
-        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(new Lock(factory: 'missing'), Request::create('/')));
+        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(new Lock('foo', factory: 'missing'), Request::create('/')));
     }
 
     public function testTtlIsPassedToTheFactory()
@@ -502,9 +502,9 @@ class LockAttributeListenerTest extends TestCase
         $lock->method('acquire')->willReturn(true);
 
         $factory = $this->createMock(LockFactory::class);
-        $factory->expects($this->once())->method('createLock')->with('/', 10.0)->willReturn($lock);
+        $factory->expects($this->once())->method('createLock')->with('foo', 10.0)->willReturn($lock);
 
-        $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock(ttl: 10.0), Request::create('/')));
+        $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock('foo', ttl: 10.0), Request::create('/')));
     }
 
     public function testBlockingWaitsForTheLock()
@@ -515,7 +515,7 @@ class LockAttributeListenerTest extends TestCase
         $factory = $this->createStub(LockFactory::class);
         $factory->method('createLock')->willReturn($lock);
 
-        $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock(blocking: true), Request::create('/')));
+        $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock('foo', blocking: true), Request::create('/')));
     }
 
     public function testExpressionKey()
@@ -584,6 +584,6 @@ class LockAttributeListenerTest extends TestCase
         $factory = $this->createMock(LockFactory::class);
         $factory->expects($this->never())->method('createLock');
 
-        $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock(methods: ['POST']), Request::create('/', 'GET')));
+        $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock('foo', methods: ['POST']), Request::create('/', 'GET')));
     }
 }

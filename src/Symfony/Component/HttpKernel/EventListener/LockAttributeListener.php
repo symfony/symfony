@@ -76,9 +76,7 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
             throw new \InvalidArgumentException(\sprintf('Lock factory "%s" does not exist. Did you forget to configure it? Available factories: "%s".', $attribute->factory, implode('", "', array_keys($this->lockFactories->getProvidedServices()))));
         }
 
-        if (null === $attribute->key) {
-            $key = $request->getPathInfo();
-        } elseif (\is_string($key = $event->evaluate($attribute->key)) || \is_int($key) || $key instanceof \Stringable) {
+        if (\is_string($key = $event->evaluate($attribute->key)) || \is_int($key) || $key instanceof \Stringable) {
             $key = (string) $key;
         } else {
             throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, an integer or a "Stringable" object, "%s" given.', Lock::class, get_debug_type($key)));

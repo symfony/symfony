@@ -28,14 +28,14 @@ final class Lock
     public readonly array $methods;
 
     /**
-     * @param string|Expression|\Closure|null $key      A literal string key, an Expression, or a Closure (defaults to the request path, so that all clients and methods contend for the same lock)
-     * @param string                          $factory  The name of the lock factory to use, as configured under the "lock" resources
-     * @param float|null                      $ttl      The maximum expected duration of the request in seconds, after which the lock expires; null means never
-     * @param bool                            $blocking Whether to wait for the lock to be released instead of rejecting the request with a "409 Conflict" response
-     * @param string[]|string                 $methods  HTTP methods to lock; empty means all methods
+     * @param string|Expression|\Closure $key      The requests sharing the same key contend for the lock: a literal string, or an Expression or a Closure evaluating to a string, an integer or a \Stringable object
+     * @param string                     $factory  The name of the lock factory to use, as configured under the "lock" resources
+     * @param float|null                 $ttl      The maximum expected duration of the request in seconds, after which the lock expires; null means never
+     * @param bool                       $blocking Whether to wait for the lock to be released instead of rejecting the request with a "409 Conflict" response
+     * @param string[]|string            $methods  HTTP methods to lock; empty means all methods
      */
     public function __construct(
-        public readonly string|Expression|\Closure|null $key = null,
+        public readonly string|Expression|\Closure $key,
         public readonly string $factory = 'default',
         public readonly ?float $ttl = 30.0,
         public readonly bool $blocking = false,

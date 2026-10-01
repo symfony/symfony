@@ -16,7 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -29,8 +31,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 /**
  * Handles the Lock attribute on controllers.
  *
- * The locks acquired for a request are released when the request is finished,
- * whether the controller returned a response or threw an exception.
+ * The locks acquired for a request are released right after the controller,
+ * whether it returned a response or threw an exception.
  */
 final class LockAttributeListener implements EventSubscriberInterface, ResetInterface
 {
@@ -93,10 +95,12 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
 
     /**
      * Releases the locks acquired for the request.
+     *
+     * @param ControllerAttributeEvent<Lock, ResponseEvent|ExceptionEvent|FinishRequestEvent> $event
      */
-    public function onKernelFinishRequest(FinishRequestEvent $event): void
+    public function releaseLocks(ControllerAttributeEvent $event): void
     {
-        $request = $event->getRequest();
+        $request = $event->kernelEvent->getRequest();
 
         if (!$locks = $this->locks[$request] ?? []) {
             return;
@@ -135,7 +139,9 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
     {
         return [
             KernelEvents::CONTROLLER_ARGUMENTS.'.'.Lock::class => 'onKernelControllerAttribute',
-            KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
+            KernelEvents::RESPONSE.'.'.Lock::class => 'releaseLocks',
+            KernelEvents::EXCEPTION.'.'.Lock::class => 'releaseLocks',
+            KernelEvents::FINISH_REQUEST.'.'.Lock::class => 'releaseLocks',
         ];
     }
 }

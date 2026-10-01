@@ -11,14 +11,18 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -62,9 +66,18 @@ class LockAttributeListenerTest extends TestCase
         ), $el);
     }
 
-    private function makeFinishRequestEvent(Request $request): FinishRequestEvent
+    /**
+     * @param 'response'|'exception'|'finish_request' $eventName
+     */
+    private function makeReleaseEvent(Request $request, string $eventName = 'response', int $requestType = HttpKernelInterface::MAIN_REQUEST): ControllerAttributeEvent
     {
-        return new FinishRequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $kernel = $this->createStub(HttpKernelInterface::class);
+
+        return new ControllerAttributeEvent(new Lock(), match ($eventName) {
+            'response' => new ResponseEvent($kernel, $request, $requestType, new Response()),
+            'exception' => new ExceptionEvent($kernel, $request, $requestType, new \RuntimeException()),
+            'finish_request' => new FinishRequestEvent($kernel, $request, $requestType),
+        });
     }
 
     private function isLocked(string $key): bool
@@ -88,8 +101,43 @@ class LockAttributeListenerTest extends TestCase
         $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
         $this->assertTrue($this->isLocked('/import'));
 
-        $listener->onKernelFinishRequest($this->makeFinishRequestEvent($request));
+        $listener->releaseLocks($this->makeReleaseEvent($request));
         $this->assertFalse($this->isLocked('/import'));
+    }
+
+    #[DataProvider('provideReleaseEvents')]
+    public function testReleasesTheLockAfterTheController(string $eventName)
+    {
+        $listener = $this->makeListener();
+        $request = Request::create('/');
+
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->releaseLocks($this->makeReleaseEvent($request, $eventName));
+
+        $this->assertFalse($this->isLocked('/'));
+    }
+
+    public static function provideReleaseEvents(): iterable
+    {
+        yield 'response' => ['response'];
+        yield 'exception' => ['exception'];
+        yield 'finish request' => ['finish_request'];
+    }
+
+    public function testReleasingSeveralTimesIsANoop()
+    {
+        $listener = $this->makeListener();
+        $first = Request::create('/');
+        $second = Request::create('/');
+
+        // e.g. an exception listener sets a response, so the locks are released on "kernel.exception", "kernel.response" and "kernel.finish_request"
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $first));
+        $listener->releaseLocks($this->makeReleaseEvent($first, 'exception'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $second));
+        $listener->releaseLocks($this->makeReleaseEvent($first, 'response'));
+        $listener->releaseLocks($this->makeReleaseEvent($first, 'finish_request'));
+
+        $this->assertTrue($this->isLocked('/'));
     }
 
     public function testRejectsAConcurrentRequestWith409()
@@ -110,7 +158,7 @@ class LockAttributeListenerTest extends TestCase
         $second = Request::create('/');
 
         $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $first));
-        $listener->onKernelFinishRequest($this->makeFinishRequestEvent($first));
+        $listener->releaseLocks($this->makeReleaseEvent($first));
         $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $second));
 
         $this->assertTrue($this->isLocked('/'));
@@ -126,7 +174,7 @@ class LockAttributeListenerTest extends TestCase
         $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
         $this->assertTrue($this->isLocked('/'));
 
-        $listener->onKernelFinishRequest($this->makeFinishRequestEvent($request));
+        $listener->releaseLocks($this->makeReleaseEvent($request));
         $this->assertFalse($this->isLocked('/'));
     }
 
@@ -140,7 +188,7 @@ class LockAttributeListenerTest extends TestCase
         $this->assertTrue($this->isLocked('foo'));
         $this->assertTrue($this->isLocked('bar'));
 
-        $listener->onKernelFinishRequest($this->makeFinishRequestEvent($request));
+        $listener->releaseLocks($this->makeReleaseEvent($request));
         $this->assertFalse($this->isLocked('foo'));
         $this->assertFalse($this->isLocked('bar'));
     }

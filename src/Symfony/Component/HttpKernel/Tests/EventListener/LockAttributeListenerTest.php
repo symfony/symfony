@@ -545,12 +545,38 @@ class LockAttributeListenerTest extends TestCase
         $this->assertTrue($this->isLocked('order-42'));
     }
 
-    public function testNonStringKeyThrows()
+    public function testIntegerKey()
+    {
+        $listener = $this->makeListener();
+        $request = Request::create('/');
+
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(static fn () => 42), $request));
+
+        $this->assertTrue($this->isLocked('42'));
+    }
+
+    public function testStringableKey()
+    {
+        $listener = $this->makeListener();
+        $request = Request::create('/');
+        $key = new class implements \Stringable {
+            public function __toString(): string
+            {
+                return 'order-42';
+            }
+        };
+
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(static fn () => $key), $request));
+
+        $this->assertTrue($this->isLocked('order-42'));
+    }
+
+    public function testInvalidKeyThrows()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageIs('The value of the "$key" option of the "Symfony\\Component\\HttpKernel\\Attribute\\Lock" attribute must evaluate to a string, "int" given.');
+        $this->expectExceptionMessageIs('The value of the "$key" option of the "Symfony\\Component\\HttpKernel\\Attribute\\Lock" attribute must evaluate to a string, an integer or a "Stringable" object, "float" given.');
 
-        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(new Lock(static fn () => 42), Request::create('/')));
+        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(new Lock(static fn () => 4.2), Request::create('/')));
     }
 
     public function testMethodFilterSkipsNonMatchingMethod()

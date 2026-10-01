@@ -254,12 +254,13 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['routed']], ['orders' => $target, 'routed' => $routed]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $target->expects($this->once())->method('send')->with($envelope->with(new SentStamp($target::class, 'orders')))->willReturnArgument(0);
+        $target->expects($this->once())->method('send')->with($envelope->withoutAll(RedispatchStamp::class)->with(new SentStamp($target::class, 'orders')))->willReturnArgument(0);
         $routed->expects($this->never())->method('send');
 
         $envelope = $middleware->handle($envelope, $this->getStackMock(false));
 
         $this->assertSame('orders', $envelope->last(SentStamp::class)?->getSenderAlias());
+        $this->assertNull($envelope->last(RedispatchStamp::class));
     }
 
     public function testItSendsAReceivedMessageCarryingARedispatchStampToItsConfiguredSenders()
@@ -269,7 +270,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $middleware = new SendMessageMiddleware($this->createSendersLocator([DummyMessage::class => ['routed']], ['routed' => $routed]));
 
-        $routed->expects($this->once())->method('send')->with($envelope->with(new SentStamp($routed::class, 'routed')))->willReturnArgument(0);
+        $routed->expects($this->once())->method('send')->with($envelope->withoutAll(RedispatchStamp::class)->with(new SentStamp($routed::class, 'routed')))->willReturnArgument(0);
 
         $middleware->handle($envelope, $this->getStackMock(false));
     }

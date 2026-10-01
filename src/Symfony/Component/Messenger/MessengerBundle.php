@@ -396,7 +396,6 @@ class MessengerBundle extends AbstractBundle
             $container->removeDefinition('messenger.message_id_generator');
         } elseif (!ContainerBuilder::willBeAvailable('symfony/uid', Uuid::class, ['symfony/messenger'])) {
             $container->removeDefinition('messenger.message_id_generator');
-            $container->getDefinition('messenger.middleware.add_identity_stamps')->replaceArgument(0, null);
         }
 
         foreach ($config['buses'] as $busId => $bus) {

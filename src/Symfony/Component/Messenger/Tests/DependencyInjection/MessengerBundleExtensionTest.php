@@ -237,6 +237,14 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertInstanceOf(UuidV7::class, Uuid::fromString($envelope->last(MessageIdStamp::class)->getId()));
     }
 
+    public function testMessengerIdentityStampsMiddlewareReferencesTheMessageIdGeneratorOptionally()
+    {
+        $container = $this->createContainerFromFile('messenger_identity_stamps', false);
+        $container->compile();
+
+        $this->assertEquals(new Reference('messenger.message_id_generator', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('messenger.middleware.add_identity_stamps')->getArgument(0));
+    }
+
     public function testMessengerPropagateStampsMiddlewareIsSharedByAllBuses()
     {
         $container = $this->createContainerFromFile('messenger_reject_redelivered_messages_disabled_explicit_bus', false);

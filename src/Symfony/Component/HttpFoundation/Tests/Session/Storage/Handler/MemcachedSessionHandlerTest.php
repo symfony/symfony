@@ -63,6 +63,40 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertEquals('', $this->getSessionHandler($memcached)->read('id'));
     }
 
+    public function testReadMissingSession()
+    {
+        $memcached = $this->getMemcachedMock();
+        $memcached
+            ->expects($this->once())
+            ->method('get')
+            ->with(self::PREFIX.'id')
+            ->willReturn(false)
+        ;
+        $memcached
+            ->method('getResultCode')
+            ->willReturn(\Memcached::RES_NOTFOUND)
+        ;
+
+        $this->assertSame('', $this->getSessionHandler($memcached)->read('id'));
+    }
+
+    public function testReadSessionFailure()
+    {
+        $memcached = $this->getMemcachedMock();
+        $memcached
+            ->expects($this->once())
+            ->method('get')
+            ->with(self::PREFIX.'id')
+            ->willReturn(false)
+        ;
+        $memcached
+            ->method('getResultCode')
+            ->willReturn(\Memcached::RES_CONNECTION_FAILURE)
+        ;
+
+        $this->assertFalse($this->getSessionHandler($memcached)->read('id'));
+    }
+
     public function testWriteSession()
     {
         $memcached = $this->getMemcachedMock();

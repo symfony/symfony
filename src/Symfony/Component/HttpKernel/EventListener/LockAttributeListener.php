@@ -122,18 +122,12 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
      */
     private function release(array $locks): void
     {
-        $exception = null;
-
         foreach ($locks as $lock) {
             try {
                 $lock->release();
-            } catch (LockReleasingException $e) {
-                $exception ??= $e;
+            } catch (LockReleasingException) {
+                // already logged by the lock, and the TTL bounds the damage
             }
-        }
-
-        if ($exception) {
-            throw $exception;
         }
     }
 

@@ -155,6 +155,15 @@ class LockBundleExtensionTest extends TestCase
         $this->assertSame('my_service', (string) $connection);
     }
 
+    public function testLockFactoriesAreTagged()
+    {
+        $container = $this->createContainerFromFile('lock_named');
+
+        foreach (['foo', 'bar', 'baz', 'qux', 'corge', 'grault', 'garply'] as $name) {
+            $this->assertSame([['name' => $name]], $container->getDefinition('lock.'.$name.'.factory')->getTag('lock.factory'));
+        }
+    }
+
     public function testLockDisabled()
     {
         $container = $this->createContainerFromFile('lock_disabled');

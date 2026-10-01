@@ -90,6 +90,22 @@ class ConfigurationTest extends TestCase
         ], $config['transports']['async']['claim_check']);
     }
 
+    public function testSignConfiguration()
+    {
+        $config = $this->process([
+            'transports' => [
+                'async' => [
+                    'dsn' => 'in-memory:///',
+                    'sign' => true,
+                ],
+                'sync' => 'sync://',
+            ],
+        ]);
+
+        $this->assertTrue($config['transports']['async']['sign']);
+        $this->assertFalse($config['transports']['sync']['sign']);
+    }
+
     public function testOutboxConfiguration()
     {
         $config = $this->process([

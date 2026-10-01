@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Failure;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
@@ -28,6 +29,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
@@ -187,6 +189,41 @@ class FailedMessageRepositoryTest extends TestCase
         // sendable stamps are kept, so the redispatched message keeps its history
         $this->assertCount(1, $prepared->all(RedeliveryStamp::class));
         $this->assertCount(1, $prepared->all(BusNameStamp::class));
+    }
+
+    public function testPrepareForRedispatchKeepsTellingWhetherTheEnvelopeIsTrusted()
+    {
+        $trust = TrustStamp::trusted();
+
+        $this->assertSame($trust, FailedMessageRepository::prepareForRedispatch(new Envelope(new DummyMessage('a'), [new ReceivedStamp('failed'), $trust]))->last(TrustStamp::class));
+        $this->assertFalse(FailedMessageRepository::prepareForRedispatch(new Envelope(new DummyMessage('a'), [new ReceivedStamp('failed')]))->last(TrustStamp::class)?->isTrusted());
+        $this->assertFalse(FailedMessageRepository::prepareForRedispatch(new Envelope(new DummyMessage('a')))->last(TrustStamp::class)?->isTrusted());
+    }
+
+    #[DataProvider('provideFailureTransportSerializers')]
+    public function testRedispatchToATransportThatSignsEverythingIsAcceptedOnlyWhenTheFailureTransportVerifiedTheMessage(SerializerInterface $failureSerializer, bool $expectAccepted)
+    {
+        $serializer = new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']);
+        $envelope = $failureSerializer->decode($failureSerializer->encode(new Envelope(new DummyMessage('a'), [new SentToFailureTransportStamp('async')])))->with(new ReceivedStamp('failed'));
+
+        $async = new InMemoryTransport($serializer);
+        $bus = new MessageBus([
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['async']], new ServiceLocator(['async' => static fn () => $async]))),
+        ]);
+
+        $repository = new FailedMessageRepository(new ServiceLocator(['global' => fn () => $this->createStub(ListableReceiverInterface::class)]), 'global', null, $bus);
+        $repository->redispatch($envelope);
+
+        $this->assertCount(1, $sent = $async->getSent());
+        $this->assertInstanceOf($expectAccepted ? DummyMessage::class : MessageDecodingFailedException::class, $sent[0]->getMessage());
+    }
+
+    public static function provideFailureTransportSerializers(): iterable
+    {
+        yield 'signing every message' => [new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']), true];
+        yield 'signing the message type' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class]), true];
+        yield 'signing other message types' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [\stdClass::class]), false];
+        yield 'not signing' => [new PhpSerializer(), false];
     }
 
     public function testRedispatchDispatchesTheStrippedEnvelopeThenAcksTheOriginal()

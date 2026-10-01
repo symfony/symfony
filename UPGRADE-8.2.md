@@ -317,6 +317,9 @@ Messenger
    // after
    $bus->dispatch($message, [new TransportNamesStamp('async')]);
    ```
+ * [BC BREAK] Messages are signed by a serializer created for each transport, instead of by decorators of the serializer services.
+   Encoding a message with `messenger.default_serializer`, or with another serializer service, does not sign it anymore, and decoding with it does not check the signature.
+   Send and receive the messages through their transport instead
 
 Mime
 ----

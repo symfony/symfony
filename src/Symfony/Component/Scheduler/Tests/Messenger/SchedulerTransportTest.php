@@ -16,11 +16,16 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -28,9 +33,13 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedispatchStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
+use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
@@ -130,6 +139,53 @@ class SchedulerTransportTest extends TestCase
         $this->assertCount(1, $sender->sent);
         $this->assertEquals((object) ['text' => 'Hello'], $sender->sent[0]->getMessage());
         $this->assertSame([], $handled);
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testEveryYieldedEnvelopeIsTrusted(bool $useMessengerRouting)
+    {
+        foreach ([new \stdClass(), new RedispatchMessage(new \stdClass(), 'async'), new RedispatchMessage(new Envelope(new \stdClass(), [TrustStamp::untrusted()]), 'async')] as $message) {
+            $envelopes = iterator_to_array((new SchedulerTransport($this->createGenerator($message), $useMessengerRouting))->get());
+
+            $this->assertTrue($envelopes[0]->last(TrustStamp::class)?->isTrusted());
+        }
+    }
+
+    public function testFailedScheduledMessageOfASignedTypeIsRetriedFromAFailureTransportThatSignsIt()
+    {
+        $failureSerializer = new SigningSerializer(new PhpSerializer(), 'signing-key', [\stdClass::class]);
+        $failureTransport = new InMemoryTransport($failureSerializer);
+
+        $handled = [];
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['failed' => static fn () => $failureSerializer])),
+            new HandleMessageMiddleware(new HandlersLocator([\stdClass::class => [static function (\stdClass $message) use (&$handled) {
+                $handled[] = $message;
+
+                if (1 === \count($handled)) {
+                    throw new \RuntimeException('The first run fails.');
+                }
+            }]])),
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['scheduler_default' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        (new Worker(['scheduler_default' => new SchedulerTransport($this->createGenerator((object) ['text' => 'Hello']))], $bus, $dispatcher))->run();
+
+        $this->assertCount(1, $handled);
+        $this->assertCount(1, $failed = $failureTransport->all());
+        $this->assertEquals((object) ['text' => 'Hello'], $failed[0]->getMessage());
+        $this->assertTrue($failed[0]->last(TrustStamp::class)?->isTrusted());
+
+        // messenger:failed:retry consumes the failure transport
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertCount(2, $handled);
+        $this->assertEquals((object) ['text' => 'Hello'], $handled[1]);
+        $this->assertSame(0, $failureTransport->getMessageCount());
     }
 
     public function testMessageIsNotWrappedWhenUseMessengerRoutingIsDisabled()

@@ -239,18 +239,22 @@ class MessengerPass implements CompilerPassInterface
         }
         $container->addDefinitions($definitions);
 
-        if ($signedMessageTypes && $container->hasDefinition('messenger.signing_serializer')) {
-            $signingSerializerDefinition = $container->getDefinition('messenger.signing_serializer');
-            $messageToSerializersMapping = $signingSerializerDefinition->getArgument(2);
+        if ($container->hasDefinition('messenger.signing_serializer')) {
+            $container->getDefinition('messenger.signing_serializer')->replaceArgument(2, array_keys($signedMessageTypes));
 
-            $signingSerializerDefinition->replaceArgument(2, array_keys($signedMessageTypes));
+            foreach ($container->getDefinitions() as $id => $definition) {
+                if (!$definition instanceof ChildDefinition || 'messenger.signing_serializer' !== $definition->getParent()) {
+                    continue;
+                }
 
-            // because transports accept any message types - not only listed ones - we have to decorate all serializers regardless of message signing
-            foreach (array_unique(array_merge(...array_values($messageToSerializersMapping))) as $serializerId) {
-                $container->setDefinition('.signing.'.$serializerId, (new ChildDefinition('messenger.signing_serializer'))->setDecoratedService($serializerId));
+                if ($signAll = $definition->getArguments()['index_2'] ?? null) {
+                    // even as a failure transport, a transport that signs every message refuses the unverified messages of the types that require a signature
+                    $definition->replaceArgument(2, [...$signAll, ...array_keys($signedMessageTypes)]);
+                } elseif (!$signedMessageTypes) {
+                    // the signing serializer of a transport that does not sign every message has nothing to do when no message type requires a signature
+                    $container->setAlias($id, (string) $definition->getArgument(0));
+                }
             }
-        } else {
-            $container->removeDefinition('messenger.signing_serializer');
         }
 
         if ($handlerTransports) {

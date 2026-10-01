@@ -15,7 +15,9 @@ use Psr\Clock\ClockInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -130,6 +132,12 @@ class InMemoryTransport implements TransportInterface, ListableReceiverInterface
         $envelope = $envelope->with(new TransportMessageIdStamp($id));
         $encodedEnvelope = $this->encode($envelope);
         $this->sent[] = $encodedEnvelope;
+
+        if (null === $this->serializer && !$envelope->last(TrustStamp::class) && !$envelope->last(ReceivedStamp::class)) {
+            // the envelope is handed back as is: a ReceivedStamp must not hide that it was dispatched in this process
+            $encodedEnvelope = $envelope = $envelope->with(TrustStamp::trusted());
+        }
+
         $this->queue[$id] = $encodedEnvelope;
 
         /** @var DelayStamp|null $delayStamp */

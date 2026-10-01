@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\Stamp\RedispatchStamp;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Generator\MessageGeneratorInterface;
@@ -33,7 +34,7 @@ class SchedulerTransport implements TransportInterface
     public function get(/* int $fetchSize = 1 */): iterable
     {
         foreach ($this->messageGenerator->getMessages() as $context => $message) {
-            $stamps = [new ScheduledStamp($context)];
+            $stamps = [new ScheduledStamp($context), TrustStamp::trusted()];
 
             if ($message instanceof RedispatchMessage) {
                 $stamps[] = new RedispatchStamp();

@@ -46,6 +46,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 
 class SyncTransportTest extends TestCase
@@ -280,6 +282,32 @@ class SyncTransportTest extends TestCase
         $this->assertSame('Attempt 3', $failed->last(ErrorDetailsStamp::class)->getExceptionMessage());
         $this->assertNull($failed->last(ReceivedStamp::class));
         $this->assertNull($failed->last(HandledStamp::class));
+    }
+
+    public function testFailuresKeepTheReceivedStampsTheyCameWith()
+    {
+        $failureTransport = new InMemoryTransport();
+        $transport = new SyncTransport(self::createBus(static function () { throw new \RuntimeException('no!'); }), new MultiplierRetryStrategy(1), $failureTransport);
+
+        $transport->send(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('outbox'), new SentStamp(SyncTransport::class, 'my_sync')]));
+
+        $this->assertCount(1, $failureTransport->getSent());
+        $this->assertSame(['outbox'], array_map(static fn (ReceivedStamp $stamp): string => $stamp->getTransportName(), $failureTransport->getSent()[0]->all(ReceivedStamp::class)));
+    }
+
+    public function testAFailureOfAMessageReceivedUnverifiedIsSignedAsUnverified()
+    {
+        $failureTransport = new InMemoryTransport();
+        $transport = new SyncTransport(self::createBus(static function () { throw new \RuntimeException('no!'); }), null, $failureTransport);
+
+        $transport->send(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('outbox')]));
+        $transport->send(new Envelope(new DummyMessage('Hey')));
+
+        $signingSerializer = new SigningSerializer(new PhpSerializer(), 'secret', ['*']);
+        [$received, $dispatched] = $failureTransport->getSent();
+
+        $this->assertSame('unverified', $signingSerializer->encode($received)['headers']['Sign-Trust'] ?? null);
+        $this->assertArrayNotHasKey('Sign-Trust', $signingSerializer->encode($dispatched)['headers']);
     }
 
     public function testFailuresAreSentToTheFailureTransportWithoutRetryStrategy()

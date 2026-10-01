@@ -134,6 +134,10 @@ class MessengerBundle extends AbstractBundle
                         ->children()
                             ->scalarNode('dsn')->end()
                             ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
+                            ->booleanNode('sign')
+                                ->defaultFalse()
+                                ->info('Whether to sign every message sent to this transport with its trust level, and to refuse any message received from it that is unsigned, or signed as unverified when this is not a failure transport. When false, only the messages whose handlers ask for it are signed.')
+                            ->end()
                             ->arrayNode('claim_check')
                                 ->children()
                                     ->scalarNode('cache_pool')->isRequired()->cannotBeEmpty()->info('Service id of the dedicated cache pool used to store claims. Pools declared under "framework.cache.pools" must define a "default_lifetime".')->end()
@@ -473,26 +477,54 @@ class MessengerBundle extends AbstractBundle
             }
         }
 
+        // a transport that signs every message refuses the messages signed as unverified, unless it is a failure transport:
+        // its failure transport and its outbox must sign every message too, or the messages they hand back would not be verified anymore
+        foreach ($config['transports'] as $name => $transport) {
+            $failureTransport = $transport['failure_transport'] ?? $config['failure_transport'];
+
+            if ($transport['sign'] && null !== $failureTransport && $failureTransport !== $name && !($config['transports'][$failureTransport]['sign'] ?? true)) {
+                throw new LogicException(\sprintf('Invalid Messenger configuration: the "%s" transport signs every message, so its failure transport "%s" must sign every message too.', $name, $failureTransport));
+            }
+
+            if ($transport['sign'] && null !== $transport['outbox'] && !($config['transports'][$transport['outbox']]['sign'] ?? true)) {
+                throw new LogicException(\sprintf('Invalid Messenger configuration: the "%s" transport signs every message, so its outbox "%s" must sign every message too.', $name, $transport['outbox']));
+            }
+        }
+
         $senderAliases = [];
         $transportRetryReferences = [];
         $transportRateLimiterReferences = [];
         $serializerReferencesByTransport = [];
-        $serializerIds = [];
         foreach ($config['transports'] as $name => $transport) {
             $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
-            $transportSerializerId = $serializerId;
             $tags = [
                 'alias' => $name,
                 'is_failure_transport' => \in_array($name, $failureTransports, true),
                 'priority' => $transport['priority'],
             ];
+
+            $signingSerializer = (new ChildDefinition('messenger.signing_serializer'))->replaceArgument(0, new Reference($serializerId));
+
+            if ($transport['sign']) {
+                $signingSerializer->replaceArgument(2, ['*']);
+            }
+
+            if (\in_array($name, $failureTransports, true)) {
+                $signingSerializer->replaceArgument(4, true);
+            }
+
+            // MessengerPass replaces this serializer with the inner one when it has nothing to sign
+            $container->setDefinition($transportSerializerId = '.messenger.transport.'.$name.'.signing_serializer', $signingSerializer);
+
+            // the claim check wraps the signing serializer, so that the signature covers the claimed envelope and not only its reference
             if ($transport['claim_check'] ?? null) {
-                $container->setDefinition($transportSerializerId = '.messenger.transport.'.$name.'.claim_check_serializer', (new Definition(ClaimCheckSerializer::class))
+                $container->setDefinition('.messenger.transport.'.$name.'.claim_check_serializer', (new Definition(ClaimCheckSerializer::class))
                     ->setArguments([
-                        new Reference($serializerId),
+                        new Reference($transportSerializerId),
                         new Reference($transport['claim_check']['cache_pool']),
                         $transport['claim_check']['max_size'],
                     ]));
+                $transportSerializerId = '.messenger.transport.'.$name.'.claim_check_serializer';
             }
 
             $serializerReferencesByTransport[$name] = new Reference($transportSerializerId);
@@ -506,7 +538,6 @@ class MessengerBundle extends AbstractBundle
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
-            $serializerIds[$transportId] = $serializerId;
 
             if (null !== $transport['retry_strategy']['service']) {
                 $transportRetryReferences[$name] = new Reference($transport['retry_strategy']['service']);
@@ -592,22 +623,6 @@ class MessengerBundle extends AbstractBundle
             ->replaceArgument(0, $messageToSendersMapping)
             ->replaceArgument(1, $sendersServiceLocator)
         ;
-
-        $messageToSerializersMapping = [];
-        foreach ($messageToSendersMapping as $message => $senders) {
-            foreach ($senders as $sender) {
-                $serializerId = $serializerIds[$senderAliases[$sender] ?? $sender];
-                $messageToSerializersMapping[$message][$serializerId] = $serializerId;
-            }
-            $messageToSerializersMapping[$message] = array_keys($messageToSerializersMapping[$message]);
-        }
-
-        // Transports can carry any message class regardless of routing, so every transport
-        // serializer must be decoration-eligible whenever signing is requested.
-        $messageToSerializersMapping['*'] = array_values(array_unique($serializerIds));
-
-        $container->getDefinition('messenger.signing_serializer')
-            ->replaceArgument(2, $messageToSerializersMapping);
 
         $container->getDefinition('messenger.retry.send_failed_message_for_retry_listener')
             ->replaceArgument(0, $sendersServiceLocator)

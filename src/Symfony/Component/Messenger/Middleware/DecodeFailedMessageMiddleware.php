@@ -18,9 +18,12 @@ use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Stamp\UnverifiedDecodingFailureStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
@@ -68,9 +71,12 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
 
         $received = null !== $envelope->last(ReceivedStamp::class);
         $unverified = $envelope->last(UnverifiedDecodingFailureStamp::class);
-        $envelope = $envelope->withoutAll(UnverifiedDecodingFailureStamp::class);
+        $trust = $envelope->last(TrustStamp::class);
+        $decodedTrust = $decodedEnvelope->last(TrustStamp::class);
+        $envelope = $envelope->withoutAll(UnverifiedDecodingFailureStamp::class)->withoutAll(TrustStamp::class);
+        $decodedEnvelope = $decodedEnvelope->withoutAll(TrustStamp::class);
 
-        if ($unverified?->requiresSignature($decodedEnvelope->getMessage())) {
+        if (!$trust?->isTrusted() && ($decodedTrust?->isTrusted() || $unverified?->requiresSignature($decodedEnvelope->getMessage()))) {
             $busName = $decodedEnvelope->last(BusNameStamp::class)?->getBusName();
             $failureBusName = $envelope->last(BusNameStamp::class)?->getBusName();
 
@@ -80,12 +86,19 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
             }
 
             // the stamps an unverified failure was decoded with must not reach a signed message: keep only the ones added since,
-            // and the original transport, which already chose the serializer above and routes the message to its handlers
-            $envelope = new Envelope($message, array_filter(array_merge(...array_values($envelope->all())), static fn (StampInterface $stamp): bool => $stamp instanceof SentToFailureTransportStamp || !\in_array($stamp, $unverified->stamps, true)));
+            // and the original transport, which already chose the serializer above and routes the message to its handlers.
+            // Without the marker of a signing serializer, the stamps added since are the ones no transport can carry, and the id the receiver gave the failure.
+            $transportMessageId = $envelope->last(TransportMessageIdStamp::class);
+            $envelope = new Envelope($message, array_filter(array_merge(...array_values($envelope->all())), static fn (StampInterface $stamp): bool => $stamp instanceof SentToFailureTransportStamp || ($unverified ? !\in_array($stamp, $unverified->stamps, true) : $stamp instanceof NonSendableStampInterface || $stamp === $transportMessageId)));
         }
 
         // the failed envelope holds the stamps its own decoding kept and the ones added since: they replace the decoded stamps of the same class
         $envelope = new Envelope($decodedEnvelope->getMessage(), array_merge(...array_values($envelope->all() + $decodedEnvelope->all())));
+
+        if ($trust || $decodedTrust) {
+            // the message gets the stamps of the failure: it is trusted only when both were
+            $envelope = $envelope->with($trust?->isTrusted() && $decodedTrust?->isTrusted() ? $decodedTrust : TrustStamp::untrusted());
+        }
 
         if (!$received) {
             // a failure redispatched from the failure transport keeps this stamp only to find its serializer

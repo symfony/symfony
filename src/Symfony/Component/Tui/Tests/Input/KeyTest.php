@@ -34,6 +34,8 @@ class KeyTest extends TestCase
         yield ['Ctrl+Shift+X', Key::ctrlShift('x')];
         yield ['Ctrl+Space', Key::ctrl(Key::SPACE)];
         yield ['Alt+⇞', Key::alt(Key::PAGE_UP)];
+        yield ['Super+C', Key::super('c')];
+        yield ['Shift+Super+Z', 'shift+super+z'];
         yield ['?', '?'];
     }
 }

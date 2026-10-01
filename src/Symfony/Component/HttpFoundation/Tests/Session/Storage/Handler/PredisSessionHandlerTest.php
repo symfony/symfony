@@ -43,4 +43,20 @@ class PredisSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
             $rawClient->del('my_session_prefix_test_id');
         }
     }
+
+    public function testReadFailure()
+    {
+        $host = getenv('REDIS_HOST') ?: 'localhost';
+        $handler = SessionHandlerFactory::createHandler('redis://'.$host.'?prefix='.self::PREFIX.'&class='.urlencode(Client::class));
+        $rawClient = new Client(array_combine(['host', 'port'], explode(':', $host) + [1 => 6379]));
+
+        // GET on a list gets a WRONGTYPE error reply
+        $rawClient->rpush(self::PREFIX.'list', ['data']);
+
+        try {
+            $this->assertFalse($handler->read('list'));
+        } finally {
+            $rawClient->del(self::PREFIX.'list');
+        }
+    }
 }

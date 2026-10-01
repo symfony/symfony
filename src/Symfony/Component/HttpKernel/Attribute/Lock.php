@@ -18,6 +18,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  *
  * While another request holds the lock, the request is rejected with a "409 Conflict" response,
  * unless $blocking is enabled, in which case it waits for the lock to be released.
+ * Read locks are shared between requests, and exclusive of write locks.
  *
  * @see https://symfony.com/doc/current/lock.html
  */
@@ -33,6 +34,7 @@ final class Lock
      * @param float|null                 $ttl      The maximum expected duration of the request in seconds, after which the lock expires; null means never
      * @param bool                       $blocking Whether to wait for the lock to be released instead of rejecting the request with a "409 Conflict" response
      * @param string[]|string            $methods  HTTP methods to lock; empty means all methods
+     * @param bool                       $read     Whether to acquire a read lock, shared with the other read locks of the same key; falls back to a write lock when the store does not support read locks
      */
     public function __construct(
         public readonly string|Expression|\Closure $key,
@@ -40,6 +42,7 @@ final class Lock
         public readonly ?float $ttl = 30.0,
         public readonly bool $blocking = false,
         array|string $methods = [],
+        public readonly bool $read = false,
     ) {
         if (null !== $this->ttl && $this->ttl <= 0) {
             throw new \InvalidArgumentException(\sprintf('The "$ttl" argument of "%s" must be greater than 0 or null, "%s" given.', self::class, $this->ttl));

@@ -111,6 +111,19 @@ class LockAttributeListenerTest extends TestCase
         return new HttpKernel($dispatcher, new ControllerResolver(), $this->requestStack, new ArgumentResolver());
     }
 
+    private function isWriteLocked(string $key): bool
+    {
+        $lock = new LockFactory($this->store)->createLock($key);
+
+        if (!$lock->acquireRead()) {
+            return true;
+        }
+
+        $lock->release();
+
+        return false;
+    }
+
     private function isLocked(string $key): bool
     {
         $lock = new LockFactory($this->store)->createLock($key);
@@ -474,6 +487,118 @@ class LockAttributeListenerTest extends TestCase
 
         $this->assertTrue($lockedInFragment);
         $this->assertFalse($this->isLocked('foo'));
+    }
+
+    public function testReadLocksAreShared()
+    {
+        $listener = $this->makeListener();
+        $first = Request::create('/');
+        $second = Request::create('/');
+
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), $first));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), $second));
+        $this->assertFalse($this->isWriteLocked('foo'));
+        $this->assertTrue($this->isLocked('foo'));
+
+        $listener->releaseLocks($this->makeReleaseEvent($first));
+        $listener->releaseLocks($this->makeReleaseEvent($second));
+        $this->assertFalse($this->isLocked('foo'));
+    }
+
+    public function testRejectsAWriteLockWhileAReadLockIsHeld()
+    {
+        $listener = $this->makeListener();
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), Request::create('/')));
+
+        $this->expectException(ConcurrentRequestHttpException::class);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), Request::create('/')));
+    }
+
+    public function testRejectsAReadLockWhileAWriteLockIsHeld()
+    {
+        $listener = $this->makeListener();
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), Request::create('/')));
+
+        $this->expectException(ConcurrentRequestHttpException::class);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), Request::create('/')));
+    }
+
+    public function testBlockingReadLockWaitsForTheLock()
+    {
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->expects($this->once())->method('acquireRead')->with(true)->willReturn(true);
+        $lock->expects($this->never())->method('acquire');
+
+        $factory = $this->createStub(LockFactory::class);
+        $factory->method('createLock')->willReturn($lock);
+
+        $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock('foo', blocking: true, read: true), Request::create('/')));
+    }
+
+    public function testSubRequestReusesTheWriteLockOfItsMainRequestForReading()
+    {
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->expects($this->once())->method('acquire')->willReturn(true);
+        $lock->expects($this->never())->method('acquireRead');
+
+        $factory = $this->createMock(LockFactory::class);
+        $factory->expects($this->once())->method('createLock')->willReturn($lock);
+
+        $listener = $this->makeListener(['default' => $factory]);
+        $this->requestStack->push($main = Request::create('/'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $main));
+        $this->requestStack->push($sub = Request::create('/fragment'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), $sub));
+    }
+
+    public function testReadLockIsPromotedWhenAWriteLockIsNeeded()
+    {
+        $listener = $this->makeListener();
+        $main = Request::create('/');
+        $sub = Request::create('/fragment');
+
+        // e.g. the controller is locked for reading, and renders a fragment locked for writing with the same key
+        $this->requestStack->push($main);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), $main));
+        $this->requestStack->push($sub);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $sub));
+        $this->assertTrue($this->isWriteLocked('foo'));
+        $this->requestStack->pop();
+
+        $listener->releaseLocks($this->makeReleaseEvent($main));
+        $this->assertFalse($this->isLocked('foo'));
+    }
+
+    public function testReadLockIsPromotedOnce()
+    {
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->expects($this->once())->method('acquireRead')->willReturn(true);
+        $lock->expects($this->once())->method('acquire')->willReturn(true);
+
+        $factory = $this->createStub(LockFactory::class);
+        $factory->method('createLock')->willReturn($lock);
+
+        $listener = $this->makeListener(['default' => $factory]);
+        $this->requestStack->push($main = Request::create('/'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), $main));
+        $this->requestStack->push($sub = Request::create('/fragment'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $sub));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $sub));
+    }
+
+    public function testRejectsThePromotionWhileAnotherRequestHoldsAReadLock()
+    {
+        // the other request is handled by another process, sharing only the store
+        $otherListener = $this->makeListener();
+        $otherListener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), Request::create('/')));
+
+        $listener = $this->makeListener();
+        $this->requestStack->push($main = Request::create('/'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', read: true), $main));
+        $this->requestStack->push($sub = Request::create('/fragment'));
+
+        $this->expectException(ConcurrentRequestHttpException::class);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $sub));
     }
 
     public function testNamedFactory()

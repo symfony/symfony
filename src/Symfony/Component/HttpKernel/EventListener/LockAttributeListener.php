@@ -27,6 +27,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
@@ -39,8 +40,11 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 final class LockAttributeListener implements EventSubscriberInterface, ResetInterface
 {
-    /** @var \WeakMap<Request, array<string, LockInterface>> */
+    /** @var \WeakMap<Request, array<string, SharedLockInterface>> */
     private \WeakMap $locks;
+
+    /** @var \WeakMap<SharedLockInterface, true> */
+    private \WeakMap $readLocks;
 
     /**
      * The main requests whose locks are released once their streamed response has been sent.
@@ -57,6 +61,7 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         private readonly RequestStack $requestStack,
     ) {
         $this->locks = new \WeakMap();
+        $this->readLocks = new \WeakMap();
         $this->streamedRequests = new \WeakMap();
     }
 
@@ -87,20 +92,21 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
 
         // the same lock is already held for the main request, e.g. when the attribute is set on both
         // the class and the method, or when a fragment is rendered from a controller locked with the same key
-        if (isset($locks[$id = $attribute->factory."\0".$key])) {
+        if ($lock = $locks[$id = $attribute->factory."\0".$key] ?? null) {
+            // a write lock is needed while only a read lock is held: promote it
+            if (!$attribute->read && isset($this->readLocks[$lock])) {
+                $this->acquire($lock, $attribute, $key);
+                unset($this->readLocks[$lock]);
+            }
+
             return;
         }
 
         $lock = $this->lockFactories->get($attribute->factory)->createLock($key, $attribute->ttl);
+        $this->acquire($lock, $attribute, $key);
 
-        try {
-            $acquired = $lock->acquire($attribute->blocking);
-        } catch (LockConflictedException $e) {
-            throw new ConcurrentRequestHttpException($key, $attribute->factory, $e);
-        }
-
-        if (!$acquired) {
-            throw new ConcurrentRequestHttpException($key, $attribute->factory);
+        if ($attribute->read) {
+            $this->readLocks[$lock] = true;
         }
 
         $locks[$id] = $lock;
@@ -149,9 +155,23 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
             array_push($locks, ...array_values($requestLocks));
         }
         $this->locks = new \WeakMap();
+        $this->readLocks = new \WeakMap();
         $this->streamedRequests = new \WeakMap();
 
         self::release($locks);
+    }
+
+    private function acquire(SharedLockInterface $lock, Lock $attribute, string $key): void
+    {
+        try {
+            $acquired = $attribute->read ? $lock->acquireRead($attribute->blocking) : $lock->acquire($attribute->blocking);
+        } catch (LockConflictedException $e) {
+            throw new ConcurrentRequestHttpException($key, $attribute->factory, $e);
+        }
+
+        if (!$acquired) {
+            throw new ConcurrentRequestHttpException($key, $attribute->factory);
+        }
     }
 
     private function releaseRequestLocks(Request $mainRequest): void

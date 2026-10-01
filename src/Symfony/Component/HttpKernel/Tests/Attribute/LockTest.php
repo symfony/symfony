@@ -25,6 +25,7 @@ class LockTest extends TestCase
         $this->assertSame(30.0, $lock->ttl);
         $this->assertFalse($lock->blocking);
         $this->assertSame([], $lock->methods);
+        $this->assertFalse($lock->read);
     }
 
     public function testTtlMustBePositive()

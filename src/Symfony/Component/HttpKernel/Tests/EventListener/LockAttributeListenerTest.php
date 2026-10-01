@@ -43,10 +43,12 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 class LockAttributeListenerTest extends TestCase
 {
     private InMemoryStore $store;
+    private RequestStack $requestStack;
 
     protected function setUp(): void
     {
         $this->store = new InMemoryStore();
+        $this->requestStack = new RequestStack();
     }
 
     /**
@@ -54,14 +56,20 @@ class LockAttributeListenerTest extends TestCase
      */
     private function makeListener(array $factories = []): LockAttributeListener
     {
-        $factories ?: $factories = ['default' => new LockFactory($this->store)];
+        // locks are not released on destruction, so that tests fail when the listener does not release them
+        $factories ?: $factories = ['default' => new class($this->store) extends LockFactory {
+            public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): SharedLockInterface
+            {
+                return parent::createLock($resource, $ttl, false);
+            }
+        }];
 
         $locator = $this->createStub(ServiceProviderInterface::class);
         $locator->method('has')->willReturnCallback(static fn (string $id): bool => isset($factories[$id]));
         $locator->method('get')->willReturnCallback(static fn (string $id): LockFactory => $factories[$id]);
         $locator->method('getProvidedServices')->willReturn(array_map(static fn (): string => LockFactory::class, $factories));
 
-        return new LockAttributeListener($locator);
+        return new LockAttributeListener($locator, $this->requestStack);
     }
 
     private function makeEvent(Lock $attribute, Request $request, ?ExpressionLanguage $el = null): ControllerAttributeEvent
@@ -100,7 +108,7 @@ class LockAttributeListenerTest extends TestCase
         ]));
         $dispatcher->addSubscriber($this->makeListener());
 
-        return new HttpKernel($dispatcher, new ControllerResolver(), new RequestStack(), new ArgumentResolver());
+        return new HttpKernel($dispatcher, new ControllerResolver(), $this->requestStack, new ArgumentResolver());
     }
 
     private function isLocked(string $key): bool
@@ -226,6 +234,58 @@ class LockAttributeListenerTest extends TestCase
         $this->assertFalse($this->isLocked('/'));
     }
 
+    public function testKernelFragmentRenderedWhileStreamingReusesTheLock()
+    {
+        $kernel = $this->makeKernel();
+        $fragment = Request::create('/fragment');
+        $fragment->attributes->set('_controller', #[Lock('foo')] static fn () => new Response());
+        $request = Request::create('/');
+        $request->attributes->set('_controller', #[Lock('foo')] static fn () => new StreamedResponse(static fn () => $kernel->handle($fragment, HttpKernelInterface::SUB_REQUEST, false)));
+
+        $kernel->handle($request)->sendContent();
+
+        $this->assertFalse($this->isLocked('foo'));
+    }
+
+    public function testKernelReleasesTheLocksAcquiredWhileStreaming()
+    {
+        $kernel = $this->makeKernel();
+        $lockedWhileStreaming = null;
+        $fragment = Request::create('/fragment');
+        $fragment->attributes->set('_controller', #[Lock('bar')] static fn () => new Response());
+        $request = Request::create('/');
+        $request->attributes->set('_controller', #[Lock('foo')] function () use ($kernel, $fragment, &$lockedWhileStreaming) {
+            return new StreamedResponse(function () use ($kernel, $fragment, &$lockedWhileStreaming) {
+                $kernel->handle($fragment, HttpKernelInterface::SUB_REQUEST, false);
+                $lockedWhileStreaming = $this->isLocked('bar');
+            });
+        });
+
+        $kernel->handle($request)->sendContent();
+
+        $this->assertTrue($lockedWhileStreaming);
+        $this->assertFalse($this->isLocked('foo'));
+        $this->assertFalse($this->isLocked('bar'));
+    }
+
+    public function testResetReleasesTheLocksOfAStreamedResponseThatWasNotSent()
+    {
+        $listener = $this->makeListener();
+        $request = Request::create('/');
+
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->releaseLocks($this->makeReleaseEvent($request, response: new StreamedResponse(static function () {})));
+        $this->assertTrue($this->isLocked('/'));
+
+        $listener->reset();
+        $this->assertFalse($this->isLocked('/'));
+
+        // the lock is acquired again instead of being considered as handed over to the streamed response
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->releaseLocks($this->makeReleaseEvent($request));
+        $this->assertFalse($this->isLocked('/'));
+    }
+
     public function testKernelReleasesTheLockWhenTheControllerThrows()
     {
         $lockedInController = null;
@@ -324,6 +384,96 @@ class LockAttributeListenerTest extends TestCase
         $listener->releaseLocks($this->makeReleaseEvent($request));
         $this->assertFalse($this->isLocked('foo'));
         $this->assertFalse($this->isLocked('bar'));
+    }
+
+    public function testSubRequestReusesTheLockHeldByItsMainRequest()
+    {
+        $listener = $this->makeListener();
+        $main = Request::create('/');
+        $sub = Request::create('/fragment');
+
+        // e.g. a fragment rendered from a controller locked with the same key
+        $this->requestStack->push($main);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $main));
+        $this->requestStack->push($sub);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $sub));
+        $listener->releaseLocks($this->makeReleaseEvent($sub, requestType: HttpKernelInterface::SUB_REQUEST));
+        $this->requestStack->pop();
+        $this->assertTrue($this->isLocked('foo'));
+
+        $listener->releaseLocks($this->makeReleaseEvent($main));
+        $this->assertFalse($this->isLocked('foo'));
+    }
+
+    public function testBlockingSubRequestDoesNotWaitForTheLockHeldByItsMainRequest()
+    {
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->expects($this->once())->method('acquire')->willReturn(true);
+
+        $factory = $this->createStub(LockFactory::class);
+        $factory->method('createLock')->willReturn($lock);
+
+        $listener = $this->makeListener(['default' => $factory]);
+        $this->requestStack->push($main = Request::create('/'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', blocking: true), $main));
+        $this->requestStack->push($sub = Request::create('/fragment'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo', blocking: true), $sub));
+    }
+
+    public function testLocksOfASubRequestAreReleasedWithItsMainRequest()
+    {
+        $listener = $this->makeListener();
+        $main = Request::create('/');
+        $sub = Request::create('/fragment');
+
+        $this->requestStack->push($main);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $main));
+        $this->requestStack->push($sub);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('bar'), $sub));
+        $listener->releaseLocks($this->makeReleaseEvent($sub, requestType: HttpKernelInterface::SUB_REQUEST));
+        $this->requestStack->pop();
+        $this->assertTrue($this->isLocked('bar'));
+
+        $listener->releaseLocks($this->makeReleaseEvent($main));
+        $this->assertFalse($this->isLocked('foo'));
+        $this->assertFalse($this->isLocked('bar'));
+    }
+
+    public function testNestedSubRequestReusesTheLockHeldByItsParentSubRequest()
+    {
+        $listener = $this->makeListener();
+        $main = Request::create('/');
+        $sub = Request::create('/fragment');
+        $nestedSub = Request::create('/nested-fragment');
+
+        $this->requestStack->push($main);
+        $this->requestStack->push($sub);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $sub));
+        $this->requestStack->push($nestedSub);
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $nestedSub));
+        $this->assertTrue($this->isLocked('foo'));
+
+        $listener->releaseLocks($this->makeReleaseEvent($main));
+        $this->assertFalse($this->isLocked('foo'));
+    }
+
+    public function testKernelSubRequestReusesTheLockHeldByItsMainRequest()
+    {
+        $kernel = $this->makeKernel();
+        $lockedInFragment = null;
+        $fragment = Request::create('/fragment');
+        $fragment->attributes->set('_controller', #[Lock('foo')] function () use (&$lockedInFragment) {
+            $lockedInFragment = $this->isLocked('foo');
+
+            return new Response();
+        });
+        $request = Request::create('/');
+        $request->attributes->set('_controller', #[Lock('foo')] static fn () => $kernel->handle($fragment, HttpKernelInterface::SUB_REQUEST, false));
+
+        $kernel->handle($request);
+
+        $this->assertTrue($lockedInFragment);
+        $this->assertFalse($this->isLocked('foo'));
     }
 
     public function testNamedFactory()

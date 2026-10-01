@@ -34,7 +34,7 @@ return static function (ContainerConfigurator $container) {
         ->set('lock.attribute_listener', LockAttributeListener::class)
             ->tag('kernel.event_subscriber')
             ->tag('kernel.reset', ['method' => 'reset'])
-            ->args([tagged_locator('lock.factory', 'name')])
+            ->args([tagged_locator('lock.factory', 'name'), service('request_stack')])
 
         ->set('serializer.normalizer.lock_key', LockKeyNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])

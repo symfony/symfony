@@ -185,6 +185,7 @@ class LockBundleExtensionTest extends TestCase
         $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
         $this->assertSame('lock.factory', $locator->getTaggedIteratorArgument()->getTag());
         $this->assertSame('name', $locator->getTaggedIteratorArgument()->getIndexAttribute());
+        $this->assertEquals(new Reference('request_stack'), $definition->getArgument(1));
     }
 
     public function testLockDisabled()

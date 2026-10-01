@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -32,9 +33,9 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 /**
  * Handles the Lock attribute on controllers.
  *
- * The locks acquired for a request are released right after the controller,
- * whether it returned a response or threw an exception. When the response is
- * streamed, they are released once its content has been sent.
+ * The locks belong to the main request, including the ones acquired by its sub-requests,
+ * and are released right after its controller, whether it returned a response or threw
+ * an exception. When the response is streamed, they are released once its content has been sent.
  */
 final class LockAttributeListener implements EventSubscriberInterface, ResetInterface
 {
@@ -42,12 +43,21 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
     private \WeakMap $locks;
 
     /**
+     * The main requests whose locks are released once their streamed response has been sent.
+     *
+     * @var \WeakMap<Request, true>
+     */
+    private \WeakMap $streamedRequests;
+
+    /**
      * @param ServiceProviderInterface<LockFactory> $lockFactories
      */
     public function __construct(
         private readonly ServiceProviderInterface $lockFactories,
+        private readonly RequestStack $requestStack,
     ) {
         $this->locks = new \WeakMap();
+        $this->streamedRequests = new \WeakMap();
     }
 
     /**
@@ -72,9 +82,11 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
             throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, "%s" given.', Lock::class, get_debug_type($key)));
         }
 
-        $locks = $this->locks[$request] ?? [];
+        $mainRequest = $this->requestStack->getMainRequest() ?? $request;
+        $locks = $this->locks[$mainRequest] ?? [];
 
-        // the same lock is already held by this request, e.g. when the attribute is set on both the class and the method
+        // the same lock is already held for the main request, e.g. when the attribute is set on both
+        // the class and the method, or when a fragment is rendered from a controller locked with the same key
         if (isset($locks[$id = $attribute->factory."\0".$key])) {
             return;
         }
@@ -92,7 +104,7 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         }
 
         $locks[$id] = $lock;
-        $this->locks[$request] = $locks;
+        $this->locks[$mainRequest] = $locks;
     }
 
     /**
@@ -104,29 +116,30 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
     {
         $request = $event->kernelEvent->getRequest();
 
-        if (!$locks = $this->locks[$request] ?? []) {
+        // locks handed over to a streamed response are released once it has been sent
+        if (!isset($this->locks[$request]) || isset($this->streamedRequests[$request])) {
             return;
         }
 
-        unset($this->locks[$request]);
-
-        // the content of streamed responses is generated after the kernel handled the request
         if ($event->kernelEvent instanceof ResponseEvent
             && ($response = $event->kernelEvent->getResponse()) instanceof StreamedResponse
             && $callback = $response->getCallback()
         ) {
-            $response->setCallback(static function () use ($callback, $locks) {
+            $this->streamedRequests[$request] = true;
+
+            $response->setCallback(function () use ($callback, $request) {
                 try {
                     $callback();
                 } finally {
-                    self::release($locks);
+                    unset($this->streamedRequests[$request]);
+                    $this->releaseRequestLocks($request);
                 }
             });
 
             return;
         }
 
-        self::release($locks);
+        $this->releaseRequestLocks($request);
     }
 
     public function reset(): void
@@ -136,6 +149,15 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
             array_push($locks, ...array_values($requestLocks));
         }
         $this->locks = new \WeakMap();
+        $this->streamedRequests = new \WeakMap();
+
+        self::release($locks);
+    }
+
+    private function releaseRequestLocks(Request $mainRequest): void
+    {
+        $locks = $this->locks[$mainRequest] ?? [];
+        unset($this->locks[$mainRequest]);
 
         self::release($locks);
     }

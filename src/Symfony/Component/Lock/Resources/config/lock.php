@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Serializer\LockKeyNormalizer;
 use Symfony\Component\Lock\Store\CombinedStore;
@@ -30,11 +29,6 @@ return static function (ContainerConfigurator $container) {
             ->args([abstract_arg('Store')])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'lock'])
-
-        ->set('lock.attribute_listener', LockAttributeListener::class)
-            ->tag('kernel.event_subscriber')
-            ->tag('kernel.reset', ['method' => 'reset'])
-            ->args([tagged_locator('lock.factory', 'name'), service('request_stack')])
 
         ->set('serializer.normalizer.lock_key', LockKeyNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])

@@ -36,6 +36,7 @@ use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\IsSignatureValidAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
+use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
 use Symfony\Component\HttpKernel\EventListener\SerializeControllerResultAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
@@ -166,6 +167,15 @@ return static function (ContainerConfigurator $container) {
                 service('uri_signer'),
             ])
             ->tag('kernel.event_subscriber')
+
+        ->set('lock.attribute_listener', LockAttributeListener::class)
+            ->args([
+                tagged_locator('lock.factory', 'name'),
+                service('request_stack'),
+            ])
+            ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
+            ->tag('container.remove_if_missing', ['service' => 'lock.factory.abstract'])
 
         ->set('controller.helper', ControllerHelper::class)
             ->tag('container.service_subscriber')

@@ -625,7 +625,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $definition = $container->getDefinition('lock.attribute_listener');
         $this->assertSame(LockAttributeListener::class, $definition->getClass());
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
+        $this->assertSame([['method' => 'reset']], $definition->getTag('kernel.reset'));
+
+        $locator = $definition->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+        $this->assertSame('lock.factory', $locator->getTaggedIteratorArgument()->getTag());
+        $this->assertSame('name', $locator->getTaggedIteratorArgument()->getIndexAttribute());
+        $this->assertEquals(new Reference('request_stack'), $definition->getArgument(1));
         $this->assertSame([['name' => 'default']], $container->getDefinition('lock.default.factory')->getTag('lock.factory'));
+    }
+
+    public function testLockAttributeListenerIsRemovedWhenLockIsDisabled()
+    {
+        $container = $this->createContainerFromFile('legacy_lock_disabled');
+
+        $this->assertFalse($container->hasDefinition('lock.attribute_listener'));
     }
 
     public function testEnabledPhpErrorsConfig()

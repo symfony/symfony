@@ -21,7 +21,6 @@ use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -122,10 +121,6 @@ class LockBundle extends AbstractBundle
 
         if (!interface_exists(DenormalizerInterface::class)) {
             $container->removeDefinition('serializer.normalizer.lock_key');
-        }
-
-        if (!class_exists(LockAttributeListener::class)) {
-            $container->removeDefinition('lock.attribute_listener');
         }
 
         foreach ($config['resources'] as $resourceName => $resourceStores) {

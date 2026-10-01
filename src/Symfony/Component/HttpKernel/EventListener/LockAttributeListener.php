@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
@@ -32,7 +33,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  * Handles the Lock attribute on controllers.
  *
  * The locks acquired for a request are released right after the controller,
- * whether it returned a response or threw an exception.
+ * whether it returned a response or threw an exception. When the response is
+ * streamed, they are released once its content has been sent.
  */
 final class LockAttributeListener implements EventSubscriberInterface, ResetInterface
 {
@@ -107,7 +109,24 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         }
 
         unset($this->locks[$request]);
-        $this->release($locks);
+
+        // the content of streamed responses is generated after the kernel handled the request
+        if ($event->kernelEvent instanceof ResponseEvent
+            && ($response = $event->kernelEvent->getResponse()) instanceof StreamedResponse
+            && $callback = $response->getCallback()
+        ) {
+            $response->setCallback(static function () use ($callback, $locks) {
+                try {
+                    $callback();
+                } finally {
+                    self::release($locks);
+                }
+            });
+
+            return;
+        }
+
+        self::release($locks);
     }
 
     public function reset(): void
@@ -118,13 +137,13 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         }
         $this->locks = new \WeakMap();
 
-        $this->release($locks);
+        self::release($locks);
     }
 
     /**
      * @param LockInterface[] $locks
      */
-    private function release(array $locks): void
+    private static function release(array $locks): void
     {
         foreach ($locks as $lock) {
             try {

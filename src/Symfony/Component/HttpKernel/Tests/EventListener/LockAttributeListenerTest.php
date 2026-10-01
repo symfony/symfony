@@ -13,19 +13,27 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\Lock;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Component\Lock\Store\InMemoryStore;
@@ -69,15 +77,29 @@ class LockAttributeListenerTest extends TestCase
     /**
      * @param 'response'|'exception'|'finish_request' $eventName
      */
-    private function makeReleaseEvent(Request $request, string $eventName = 'response', int $requestType = HttpKernelInterface::MAIN_REQUEST): ControllerAttributeEvent
+    private function makeReleaseEvent(Request $request, string $eventName = 'response', int $requestType = HttpKernelInterface::MAIN_REQUEST, ?Response $response = null): ControllerAttributeEvent
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
 
         return new ControllerAttributeEvent(new Lock(), match ($eventName) {
-            'response' => new ResponseEvent($kernel, $request, $requestType, new Response()),
+            'response' => new ResponseEvent($kernel, $request, $requestType, $response ?? new Response()),
             'exception' => new ExceptionEvent($kernel, $request, $requestType, new \RuntimeException()),
             'finish_request' => new FinishRequestEvent($kernel, $request, $requestType),
         });
+    }
+
+    private function makeKernel(): HttpKernel
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ControllerAttributesListener([
+            KernelEvents::CONTROLLER_ARGUMENTS => [Lock::class => true],
+            KernelEvents::RESPONSE => [Lock::class => true],
+            KernelEvents::EXCEPTION => [Lock::class => true],
+            KernelEvents::FINISH_REQUEST => [Lock::class => true],
+        ]));
+        $dispatcher->addSubscriber($this->makeListener());
+
+        return new HttpKernel($dispatcher, new ControllerResolver(), new RequestStack(), new ArgumentResolver());
     }
 
     private function isLocked(string $key): bool
@@ -138,6 +160,69 @@ class LockAttributeListenerTest extends TestCase
         $listener->releaseLocks($this->makeReleaseEvent($first, 'finish_request'));
 
         $this->assertTrue($this->isLocked('/'));
+    }
+
+    public function testStreamedResponseReleasesTheLockOnceItsContentIsSent()
+    {
+        $listener = $this->makeListener();
+        $request = Request::create('/');
+        $lockedWhileStreaming = null;
+        $response = new StreamedResponse(function () use (&$lockedWhileStreaming) {
+            $lockedWhileStreaming = $this->isLocked('/');
+        });
+
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->releaseLocks($this->makeReleaseEvent($request, 'response', response: $response));
+        $listener->releaseLocks($this->makeReleaseEvent($request, 'finish_request'));
+        $this->assertTrue($this->isLocked('/'));
+
+        $response->sendContent();
+
+        $this->assertTrue($lockedWhileStreaming);
+        $this->assertFalse($this->isLocked('/'));
+    }
+
+    public function testStreamedResponseReleasesTheLockWhenItsCallbackThrows()
+    {
+        $listener = $this->makeListener();
+        $request = Request::create('/');
+        $response = new StreamedResponse(static fn () => throw new \RuntimeException('Streaming failed.'));
+
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $request));
+        $listener->releaseLocks($this->makeReleaseEvent($request, 'response', response: $response));
+
+        try {
+            $response->sendContent();
+            $this->fail('A RuntimeException should have been thrown.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Streaming failed.', $e->getMessage());
+        }
+
+        $this->assertFalse($this->isLocked('/'));
+    }
+
+    public function testKernelKeepsTheLockWhileStreamingTheResponse()
+    {
+        $lockedWhileStreaming = null;
+        $request = Request::create('/');
+        $request->attributes->set('_controller', #[Lock] function () use (&$lockedWhileStreaming) {
+            return new StreamedResponse(function () use (&$lockedWhileStreaming) {
+                $lockedWhileStreaming = $this->isLocked('/');
+            });
+        });
+
+        $response = $this->makeKernel()->handle($request);
+        $this->assertTrue($this->isLocked('/'));
+
+        ob_start();
+        try {
+            $response->sendContent();
+        } finally {
+            ob_end_clean();
+        }
+
+        $this->assertTrue($lockedWhileStreaming);
+        $this->assertFalse($this->isLocked('/'));
     }
 
     public function testRejectsAConcurrentRequestWith409()

@@ -201,7 +201,9 @@ class StoreFactoryTest extends TestCase
         yield ['in-memory', InMemoryStore::class];
 
         yield ['flock', FlockStore::class];
+        yield ['flock+remove', FlockStore::class];
         yield ['flock://'.sys_get_temp_dir(), FlockStore::class];
+        yield ['flock+remove://'.sys_get_temp_dir(), FlockStore::class];
 
         yield ['null', NullStore::class];
     }

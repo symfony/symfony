@@ -23,6 +23,12 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  *
  * Original implementation in \Symfony\Component\Filesystem\LockHandler.
  *
+ * By default, the lock file is kept on disk when the lock is released. Keeping it suits locks
+ * reused intensively under the same name, as it avoids recreating the file on each acquisition.
+ * Passing true as $removeOnRelease removes the file of an exclusive lock on release, which suits
+ * many distinct locks (one per database row, for example). The store then checks that the file
+ * it locked is still linked, and retries on the new file otherwise. Shared locks keep their file.
+ *
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Romain Neutron <imprec@gmail.com>
@@ -33,15 +39,17 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     private readonly string $lockPath;
 
     /**
-     * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory
+     * @param string|null $lockPath        the directory to store the lock, defaults to the system's temporary directory
+     * @param bool        $removeOnRelease whether the lock file is removed when the lock is released;
+     *                                     only exclusive locks are removed, shared locks are kept
      *
      * @throws LockStorageException If the lock directory doesn’t exist or is not writable
      */
-    public function __construct(?string $lockPath = null)
+    public function __construct(?string $lockPath = null, private readonly bool $removeOnRelease = false)
     {
         if (!is_dir($lockPath ??= sys_get_temp_dir())) {
             if (!@mkdir($lockPath, 0o777, true) && !is_dir($lockPath)) {
-                throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
+                throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" does not exist and cannot be created.', $lockPath));
             }
         } elseif (!is_writable($lockPath)) {
             throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" is not writable.', $lockPath));
@@ -82,41 +90,54 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
             }
         }
 
-        if (!$handle) {
-            $fileName = \sprintf('%s/sf.%s.%s.lock',
-                $this->lockPath,
-                substr(preg_replace('/[^a-z0-9\._-]+/i', '-', $key), 0, 50),
-                strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
-            );
+        $fileName = \sprintf('%s/sf.%s.%s.lock',
+            $this->lockPath,
+            substr(preg_replace('/[^a-z0-9\._-]+/i', '-', $key), 0, 50),
+            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
+        );
 
-            // Silence error reporting
-            set_error_handler(static function ($type, $msg) use (&$error) { $error = $msg; });
-            try {
-                if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
-                    if ($handle = fopen($fileName, 'x')) {
-                        chmod($fileName, 0o666);
-                    } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
-                        usleep(100); // Give some time for chmod() to complete
-                        $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
-                    }
-                }
-            } finally {
-                restore_error_handler();
+        while (true) {
+            if (!$handle) {
+                $handle = $this->openFile($fileName);
+            }
+
+            // On Windows, even if PHP doc says the contrary, LOCK_NB works, see
+            // https://bugs.php.net/54129
+            if (!flock($handle, ($read ? \LOCK_SH : \LOCK_EX) | ($blocking ? 0 : \LOCK_NB))) {
+                fclose($handle);
+                throw new LockConflictedException();
+            }
+
+            if (!$this->removeOnRelease) {
+                break;
+            }
+
+            // When the lock file is removed on release, the file may have been removed and
+            // recreated by another process while this one was waiting for the lock. The handle
+            // would then point to the removed file, which is not the one the path resolves to
+            // anymore, and two processes could hold the lock at the same time. A removed file
+            // has a link count of zero, so release the handle and retry on the new file.
+            if (false === $stat = fstat($handle)) {
+                flock($handle, \LOCK_UN);
+                fclose($handle);
+                throw new LockStorageException('Unable to read the status of the lock file.');
+            }
+
+            if (0 < $stat['nlink']) {
+                break;
+            }
+
+            flock($handle, \LOCK_UN);
+            fclose($handle);
+            $handle = null;
+
+            // A non-blocking acquire does not wait, so report the contention instead of retrying.
+            if (!$blocking) {
+                throw new LockConflictedException();
             }
         }
 
-        if (!$handle) {
-            throw new LockStorageException($error, 0, null);
-        }
-
-        // On Windows, even if PHP doc says the contrary, LOCK_NB works, see
-        // https://bugs.php.net/54129
-        if (!flock($handle, ($read ? \LOCK_SH : \LOCK_EX) | ($blocking ? 0 : \LOCK_NB))) {
-            fclose($handle);
-            throw new LockConflictedException();
-        }
-
-        $key->setState(__CLASS__, [$read, $handle]);
+        $key->setState(__CLASS__, [$read, $handle, $fileName]);
         $key->markUnserializable();
     }
 
@@ -132,7 +153,15 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
             return;
         }
 
-        $handle = $key->getState(__CLASS__)[1];
+        [$read, $handle, $fileName] = $key->getState(__CLASS__);
+
+        // Remove the file while the lock is still held, so that a process waiting for the lock
+        // detects the removed file once it acquires it and retries on a new one. Only exclusive
+        // locks are removed: a shared lock may be held by other processes that would keep
+        // holding the removed file while a new one gets created.
+        if ($this->removeOnRelease && !$read) {
+            @unlink($fileName);
+        }
 
         flock($handle, \LOCK_UN | \LOCK_NB);
         fclose($handle);
@@ -143,5 +172,38 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     public function exists(Key $key): bool
     {
         return $key->hasState(__CLASS__);
+    }
+
+    /**
+     * @return resource
+     */
+    private function openFile(string $fileName)
+    {
+        $error = 'Unable to open the lock file.';
+
+        // Silence error reporting
+        set_error_handler(static function ($type, $msg) use (&$error): bool {
+            $error = $msg;
+
+            return true;
+        });
+        try {
+            if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
+                if ($handle = fopen($fileName, 'x')) {
+                    chmod($fileName, 0o666);
+                } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
+                    usleep(100); // Give some time for chmod() to complete
+                    $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');
+                }
+            }
+        } finally {
+            restore_error_handler();
+        }
+
+        if (!$handle) {
+            throw new LockStorageException($error, 0, null);
+        }
+
+        return $handle;
     }
 }

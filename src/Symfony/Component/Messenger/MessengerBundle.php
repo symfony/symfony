@@ -375,8 +375,7 @@ class MessengerBundle extends AbstractBundle
                 ['id' => 'add_bus_name_stamp_middleware'],
                 ...($config['reject_redelivered_messages'] ? [['id' => 'reject_redelivered_message_middleware']] : []),
                 ['id' => 'decode_failed_message_middleware'],
-                ...($config['identity_stamps'] ? [['id' => 'add_identity_stamps']] : []),
-                ['id' => 'propagate_stamps'],
+                ['id' => 'flow_context'],
                 ['id' => 'dispatch_after_current_bus'],
                 ['id' => 'failed_message_processing_middleware'],
             ],
@@ -391,10 +390,9 @@ class MessengerBundle extends AbstractBundle
             $defaultMiddleware['before'][] = ['id' => 'deduplicate_middleware'];
         }
 
-        if (!$config['identity_stamps']) {
-            $container->removeDefinition('messenger.middleware.add_identity_stamps');
-            $container->removeDefinition('messenger.message_id_generator');
-        } elseif (!ContainerBuilder::willBeAvailable('symfony/uid', Uuid::class, ['symfony/messenger'])) {
+        $container->getDefinition('messenger.middleware.flow_context')->replaceArgument(0, $config['identity_stamps']);
+
+        if (!$config['identity_stamps'] || !ContainerBuilder::willBeAvailable('symfony/uid', Uuid::class, ['symfony/messenger'])) {
             $container->removeDefinition('messenger.message_id_generator');
         }
 

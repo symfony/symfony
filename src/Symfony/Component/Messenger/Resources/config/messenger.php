@@ -32,14 +32,13 @@ use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
-use Symfony\Component\Messenger\Middleware\AddIdentityStampsMiddleware;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
+use Symfony\Component\Messenger\Middleware\FlowContextMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
-use Symfony\Component\Messenger\Middleware\PropagateStampsMiddleware;
 use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
@@ -137,12 +136,11 @@ return static function (ContainerConfigurator $container) {
             ->factory([\Closure::class, 'fromCallable'])
             ->args([[Uuid::class, 'v7']])
 
-        ->set('messenger.middleware.add_identity_stamps', AddIdentityStampsMiddleware::class)
+        ->set('messenger.middleware.flow_context', FlowContextMiddleware::class)
             ->args([
+                false,
                 service('messenger.message_id_generator')->nullOnInvalid(),
             ])
-
-        ->set('messenger.middleware.propagate_stamps', PropagateStampsMiddleware::class)
 
         ->set('messenger.middleware.dispatch_after_current_bus', DispatchAfterCurrentBusMiddleware::class)
 

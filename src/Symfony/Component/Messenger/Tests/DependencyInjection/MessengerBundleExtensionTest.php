@@ -41,8 +41,7 @@ use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\MessengerBundle;
-use Symfony\Component\Messenger\Middleware\AddIdentityStampsMiddleware;
-use Symfony\Component\Messenger\Middleware\PropagateStampsMiddleware;
+use Symfony\Component\Messenger\Middleware\FlowContextMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -200,24 +199,30 @@ class MessengerBundleExtensionTest extends TestCase
         $container = $this->createContainerFromFile('messenger', false);
         $container->compile();
 
-        $this->assertNotContains(['id' => 'add_identity_stamps'], $container->getParameter('messenger.bus.default.middleware'));
-        $this->assertFalse($container->hasDefinition('messenger.middleware.add_identity_stamps'));
+        $this->assertFalse($container->getDefinition('messenger.middleware.flow_context')->getArgument(0));
         $this->assertFalse($container->hasDefinition('messenger.message_id_generator'));
     }
 
-    public function testMessengerIdentityStampsMiddlewareRunsBetweenDecodingFailedMessagesAndPropagateStamps()
+    public function testMessengerIdentityStampsAreEnabledOnTheFlowContextMiddleware()
     {
         $container = $this->createContainerFromFile('messenger_identity_stamps', false);
         $container->compile();
 
-        $middleware = array_values($container->getParameter('messenger.bus.default.middleware'));
-        $position = array_search(['id' => 'add_identity_stamps'], $middleware, true);
+        $this->assertTrue($container->getDefinition('messenger.middleware.flow_context')->getArgument(0));
+    }
 
-        $this->assertNotFalse($position, 'The add_identity_stamps middleware is listed.');
+    public function testMessengerFlowContextMiddlewareRunsBetweenDecodingFailedMessagesAndDispatchAfterCurrentBus()
+    {
+        $container = $this->createContainerFromFile('messenger', false);
+        $container->compile();
+
+        $middleware = array_values($container->getParameter('messenger.bus.default.middleware'));
+        $position = array_search(['id' => 'flow_context'], $middleware, true);
+
+        $this->assertNotFalse($position, 'The flow_context middleware is listed.');
         $this->assertSame(['id' => 'decode_failed_message_middleware'], $middleware[$position - 1]);
-        $this->assertSame(['id' => 'propagate_stamps'], $middleware[$position + 1]);
-        $this->assertSame(['id' => 'dispatch_after_current_bus'], $middleware[$position + 2]);
-        $this->assertSame(AddIdentityStampsMiddleware::class, $container->getDefinition('messenger.middleware.add_identity_stamps')->getClass());
+        $this->assertSame(['id' => 'dispatch_after_current_bus'], $middleware[$position + 1]);
+        $this->assertSame(FlowContextMiddleware::class, $container->getDefinition('messenger.middleware.flow_context')->getClass());
     }
 
     public function testMessengerIdentityStampsUseUuidV7WhenTheUidComponentIsInstalled()
@@ -229,7 +234,7 @@ class MessengerBundleExtensionTest extends TestCase
         $container = $this->createContainerFromFile('messenger_identity_stamps', false);
         $container->register('foo', \stdClass::class)
             ->setPublic(true)
-            ->setProperty('middleware', new Reference('messenger.middleware.add_identity_stamps'));
+            ->setProperty('middleware', new Reference('messenger.middleware.flow_context'));
         $container->compile();
 
         $envelope = $container->get('foo')->middleware->handle(new Envelope(new \stdClass()), new StackMiddleware());
@@ -237,23 +242,22 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertInstanceOf(UuidV7::class, Uuid::fromString($envelope->last(MessageIdStamp::class)->getId()));
     }
 
-    public function testMessengerIdentityStampsMiddlewareReferencesTheMessageIdGeneratorOptionally()
+    public function testMessengerFlowContextMiddlewareReferencesTheMessageIdGeneratorOptionally()
     {
         $container = $this->createContainerFromFile('messenger_identity_stamps', false);
         $container->compile();
 
-        $this->assertEquals(new Reference('messenger.message_id_generator', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('messenger.middleware.add_identity_stamps')->getArgument(0));
+        $this->assertEquals(new Reference('messenger.message_id_generator', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('messenger.middleware.flow_context')->getArgument(1));
     }
 
-    public function testMessengerPropagateStampsMiddlewareIsSharedByAllBuses()
+    public function testMessengerFlowContextMiddlewareIsSharedByAllBuses()
     {
         $container = $this->createContainerFromFile('messenger_reject_redelivered_messages_disabled_explicit_bus', false);
         $container->addCompilerPass(new MessengerPass());
         $container->compile();
 
-        $this->assertSame(PropagateStampsMiddleware::class, $container->getDefinition('messenger.middleware.propagate_stamps')->getClass());
-        $this->assertContains('messenger.middleware.propagate_stamps', $this->getBusMiddlewareIds($container, 'messenger.bus.default'));
-        $this->assertContains('messenger.middleware.propagate_stamps', $this->getBusMiddlewareIds($container, 'messenger.bus.commands'));
+        $this->assertContains('messenger.middleware.flow_context', $this->getBusMiddlewareIds($container, 'messenger.bus.default'));
+        $this->assertContains('messenger.middleware.flow_context', $this->getBusMiddlewareIds($container, 'messenger.bus.commands'));
     }
 
     public function testMessengerMultipleFailureTransports()
@@ -647,7 +651,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'decode_failed_message_middleware'],
-            ['id' => 'propagate_stamps'],
+            ['id' => 'flow_context'],
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
@@ -667,7 +671,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'decode_failed_message_middleware'],
-            ['id' => 'propagate_stamps'],
+            ['id' => 'flow_context'],
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
@@ -681,7 +685,7 @@ class MessengerBundleExtensionTest extends TestCase
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'decode_failed_message_middleware'],
-            ['id' => 'propagate_stamps'],
+            ['id' => 'flow_context'],
             ['id' => 'dispatch_after_current_bus'],
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],

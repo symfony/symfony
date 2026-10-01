@@ -25,8 +25,10 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\BlindIndex;
-use Symfony\Component\KeyManagement\BlindIndex\Email;
-use Symfony\Component\KeyManagement\BlindIndex\EmailDomain;
+use Symfony\Component\KeyManagement\BlindIndex\Projection\Email;
+use Symfony\Component\KeyManagement\BlindIndex\Projection\EmailDomain;
+use Symfony\Component\KeyManagement\BlindIndex\Projection\Verbatim;
+use Symfony\Component\KeyManagement\BlindIndexInterface;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\BlindIndexedEntity;
@@ -41,16 +43,16 @@ use Symfony\Component\KeyManagement\Test\InMemoryKms;
 class BlindIndexListenerTest extends TestCase
 {
     private EntityManagerInterface $entityManager;
-    private Email $email;
-    private EmailDomain $domain;
+    private BlindIndexInterface $email;
+    private BlindIndexInterface $domain;
 
     protected function setUp(): void
     {
         $kms = new InMemoryKms();
         $wrappedKey = $kms->generateDataKey('app')->wrapped;
 
-        $this->email = new Email($kms, $wrappedKey);
-        $this->domain = new EmailDomain($kms, $wrappedKey);
+        $this->email = new BlindIndex($kms, $wrappedKey, new Email());
+        $this->domain = new BlindIndex($kms, $wrappedKey, new EmailDomain());
 
         $config = ORMSetup::createConfiguration(true);
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Fixtures'], true));
@@ -59,9 +61,9 @@ class BlindIndexListenerTest extends TestCase
 
         $eventManager = new EventManager();
         $eventManager->addEventListener(Events::onFlush, new BlindIndexListener(new ServiceLocator([
-            BlindIndex::class => static fn (): BlindIndex => new BlindIndex($kms, $wrappedKey),
-            Email::class => fn (): Email => $this->email,
-            EmailDomain::class => fn (): EmailDomain => $this->domain,
+            Verbatim::class => static fn (): BlindIndexInterface => new BlindIndex($kms, $wrappedKey, new Verbatim()),
+            Email::class => fn (): BlindIndexInterface => $this->email,
+            EmailDomain::class => fn (): BlindIndexInterface => $this->domain,
         ])));
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config, $eventManager);
@@ -209,7 +211,7 @@ class BlindIndexListenerTest extends TestCase
         $this->entityManager->persist((new BlindIndexedEntity())->setEmail('ada@example.org'));
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(\sprintf('No blind index of class "%s" is registered, as "%s::$emailIndex" requires.', Email::class, BlindIndexedEntity::class));
+        $this->expectExceptionMessage(\sprintf('No blind index over the projection "%s" is registered, as "%s::$emailIndex" requires.', Email::class, BlindIndexedEntity::class));
 
         $listener->onFlush(new OnFlushEventArgs($this->entityManager));
     }

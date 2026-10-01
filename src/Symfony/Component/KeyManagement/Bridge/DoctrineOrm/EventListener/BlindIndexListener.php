@@ -14,7 +14,8 @@ namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
+use Symfony\Component\KeyManagement\BlindIndexInterface;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 
 /**
@@ -38,12 +39,12 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 final class BlindIndexListener
 {
     /**
-     * @var array<class-string, list<array{\ReflectionProperty, \ReflectionProperty, class-string<BlindIndex>}>>
+     * @var array<class-string, list<array{\ReflectionProperty, \ReflectionProperty, class-string<ProjectionInterface>}>>
      */
     private array $indexed = [];
 
     /**
-     * @param ContainerInterface $indexes The blind indexes of the application, keyed by class name
+     * @param ContainerInterface $indexes The blind indexes of the application, each a {@see BlindIndexInterface}, keyed by the projection it derives through
      */
     public function __construct(
         private readonly ContainerInterface $indexes,
@@ -73,7 +74,7 @@ final class BlindIndexListener
     {
         $written = false;
 
-        foreach ($this->indexedProperties($classMetadata) as [$source, $target, $index]) {
+        foreach ($this->indexedProperties($classMetadata) as [$source, $target, $projection]) {
             if (!$source->isInitialized($entity)) {
                 continue;
             }
@@ -83,7 +84,7 @@ final class BlindIndexListener
                 throw new \LogicException(\sprintf('The property "%s::$%s" holds a value of type "%s", which "%s" cannot index: a blind index is derived from a string.', $entity::class, $source->name, get_debug_type($value), BlindIndexed::class));
             }
 
-            $tag = null === $value ? null : $this->indexes->get($index)->of($value);
+            $tag = null === $value ? null : $this->indexes->get($projection)->of($value);
 
             if (!$target->isInitialized($entity) || $target->getValue($entity) !== $tag) {
                 $target->setValue($entity, $tag);
@@ -99,7 +100,7 @@ final class BlindIndexListener
      *
      * A flush walks every entity it holds, and most of them carry no index at all.
      *
-     * @return list<array{\ReflectionProperty, \ReflectionProperty, class-string<BlindIndex>}>
+     * @return list<array{\ReflectionProperty, \ReflectionProperty, class-string<ProjectionInterface>}>
      */
     private function indexedProperties(ClassMetadata $classMetadata): array
     {
@@ -134,11 +135,11 @@ final class BlindIndexListener
                     throw new \LogicException(\sprintf('The property "%s::$%s" may be null, but "%s::$%s", which indexes it, does not accept null: declare it nullable.', $class, $source->name, $class, $target->name));
                 }
 
-                if (!$this->indexes->has($attribute->index)) {
-                    throw new \LogicException(\sprintf('No blind index of class "%s" is registered, as "%s::$%s" requires. Register it as a service, or check the class the attribute names.', $attribute->index, $class, $target->name));
+                if (!$this->indexes->has($attribute->projection)) {
+                    throw new \LogicException(\sprintf('No blind index over the projection "%s" is registered, as "%s::$%s" requires. Tag an index service with that projection, or check the class the attribute names.', $attribute->projection, $class, $target->name));
                 }
 
-                $indexed[] = [$source, $target, $attribute->index];
+                $indexed[] = [$source, $target, $attribute->projection];
             }
         }
 

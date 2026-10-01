@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\Projection\Email;
+use Symfony\Component\KeyManagement\BlindIndexInterface;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVaultFactory;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
@@ -105,7 +107,7 @@ class KeyManagementBundleExtensionTest extends TestCase
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             // the blind index listener is dropped when the application registers no index at all
-            $container->register('app.email_index', BlindIndex::class)->addTag('key_management.blind_index');
+            $container->register('app.email_index', BlindIndex::class)->setAutoconfigured(true)->addTag('key_management.blind_index', ['projection' => Email::class]);
             $container->loadFromExtension('key_management', []);
         });
 
@@ -316,7 +318,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         }
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            $container->register('app.email_index', BlindIndex::class)->addTag('key_management.blind_index');
+            $container->register('app.email_index', BlindIndex::class)->setAutoconfigured(true)->addTag('key_management.blind_index', ['projection' => Email::class]);
             $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']]);
         });
 
@@ -325,10 +327,11 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame(BlindIndexListener::class, $definition->getClass());
         $this->assertSame([['event' => 'onFlush']], $definition->getTag('doctrine.event_listener'));
         $this->assertInstanceOf(Reference::class, $definition->getArgument(0), 'the pass hands the listener the blind indexes of the application.');
+        $this->assertSame([Email::class], array_keys($container->getDefinition((string) $definition->getArgument(0))->getArgument(0)), 'the listener reaches an index by the projection its tag names.');
         $this->assertSame([['key_management.blind_index' => [[]]]], array_map(
             static fn (ChildDefinition $child): array => $child->getTags(),
-            array_values(array_intersect_key($container->getAutoconfiguredInstanceof(), [BlindIndex::class => true])),
-        ), 'a blind index the application registers is found by the listener without being tagged by hand.');
+            array_values(array_intersect_key($container->getAutoconfiguredInstanceof(), [BlindIndexInterface::class => true])),
+        ), 'an index the application registers is tagged without being tagged by hand, so the pass asks it for its projection rather than dropping the listener.');
     }
 
     public function testTheBlindIndexListenerGoesWhenNoIndexIsRegistered()

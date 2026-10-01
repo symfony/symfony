@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute;
 
-use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
 
 /**
  * Declares that a property holds the blind index of another, and has it filled on flush.
@@ -39,10 +39,15 @@ use Symfony\Component\KeyManagement\BlindIndex;
  * It goes on the derived property rather than on the source, so that the column carries its own
  * derivation and two indexes cannot end up writing the same one.
  *
+ * It names a projection and not an index, because an index is a `BlindIndex` or a
+ * `StoredKeyBlindIndex` like every other one and the class would not tell two apart, while what a
+ * column is indexed by is exactly its projection. The index service says which one it carries in
+ * its `key_management.blind_index` tag.
+ *
  * Four things it does not do, each of which leaves a tag that does not match its value.
  *
  * It covers the write path only. A query has no entity to hang the attribute on, so it keeps
- * calling `of()`, and the projection it names has to be the one the attribute names.
+ * calling `of()`, and on the index this attribute names.
  *
  * It covers the ORM only. A row inserted through DBAL, or a bulk `UPDATE ... SET email = ...`,
  * never reaches a listener and leaves the tag as it was. That is worse than an empty tag: the
@@ -63,12 +68,12 @@ use Symfony\Component\KeyManagement\BlindIndex;
 final class BlindIndexed
 {
     /**
-     * @param string                   $property Name of the property this one indexes, declared on the same entity
-     * @param class-string<BlindIndex> $index    Class of the blind index deriving the tag, as registered in the container
+     * @param string                            $property   Name of the property this one indexes, declared on the same entity
+     * @param class-string<ProjectionInterface> $projection Projection the index derives the tag through, which is what its service is tagged with
      */
     public function __construct(
         public string $property,
-        public string $index,
+        public string $projection,
     ) {
     }
 }

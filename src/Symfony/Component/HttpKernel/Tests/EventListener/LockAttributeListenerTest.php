@@ -225,6 +225,27 @@ class LockAttributeListenerTest extends TestCase
         $this->assertFalse($this->isLocked('/'));
     }
 
+    public function testKernelReleasesTheLockWhenTheControllerThrows()
+    {
+        $lockedInController = null;
+        $request = Request::create('/');
+        $request->attributes->set('_controller', #[Lock] function () use (&$lockedInController) {
+            $lockedInController = $this->isLocked('/');
+
+            throw new \RuntimeException('Controller failed.');
+        });
+
+        try {
+            $this->makeKernel()->handle($request);
+            $this->fail('A RuntimeException should have been thrown.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Controller failed.', $e->getMessage());
+        }
+
+        $this->assertTrue($lockedInController);
+        $this->assertFalse($this->isLocked('/'));
+    }
+
     public function testRejectsAConcurrentRequestWith409()
     {
         $listener = $this->makeListener();

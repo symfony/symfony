@@ -21,7 +21,16 @@ class ConfigurationTest extends TestCase
 {
     public function testDefaultConfig()
     {
-        $this->assertSame(['enabled' => true, 'scoped_clients' => []], $this->process([]));
+        $this->assertSame([
+            'enabled' => true,
+            'recorder' => [
+                'enabled' => false,
+                'matcher' => null,
+                'redactor' => null,
+                'redact' => ['headers' => [], 'query' => [], 'body' => [], 'except' => []],
+            ],
+            'scoped_clients' => [],
+        ], $this->process([]));
     }
 
     public function testScopedClientsInheritRateLimiterAndRetryFailedConfiguration()

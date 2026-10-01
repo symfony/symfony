@@ -139,7 +139,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('messenger.middleware.add_identity_stamps', AddIdentityStampsMiddleware::class)
             ->args([
-                service('messenger.message_id_generator'),
+                service('messenger.message_id_generator')->nullOnInvalid(),
             ])
 
         ->set('messenger.middleware.propagate_stamps', PropagateStampsMiddleware::class)

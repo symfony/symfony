@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Messenger\Tests;
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -37,6 +40,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Uid\Uuid;
 
 class MessengerBundleTest extends TestCase
 {
@@ -177,6 +181,48 @@ class MessengerBundleTest extends TestCase
         $this->assertSame($id, $child->last(CausationStamp::class)?->getId());
         $this->assertSame($id, $child->last(CorrelationStamp::class)?->getId());
     }
+
+    public function testAnApplicationDefinedMessageIdGeneratorIsUsed()
+    {
+        $kernel = new TestMessageIdGeneratorKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $envelope = $kernel->getContainer()->get('test.messenger.default_bus')->dispatch(new DummyMessage('Hey'));
+
+        $this->assertSame('app-message-id', $envelope->last(MessageIdStamp::class)?->getId());
+    }
+
+    #[RunInSeparateProcess]
+    public function testAnApplicationDefinedMessageIdGeneratorIsUsedWithoutTheUidComponent()
+    {
+        self::hideTheUidComponent();
+
+        $kernel = new TestMessageIdGeneratorKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $envelope = $kernel->getContainer()->get('test.messenger.default_bus')->dispatch(new DummyMessage('Hey'));
+
+        $this->assertSame('app-message-id', $envelope->last(MessageIdStamp::class)?->getId());
+    }
+
+    #[RunInSeparateProcess]
+    public function testIdentityStampsGenerateTheirOwnIdsWithoutTheUidComponent()
+    {
+        self::hideTheUidComponent();
+
+        $kernel = new TestFlowContextKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $envelope = $kernel->getContainer()->get('test.messenger.default_bus')->dispatch(new SecondMessage());
+
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $envelope->last(MessageIdStamp::class)->getId());
+    }
+
+    private static function hideTheUidComponent(): void
+    {
+        ClassExistsMock::register(ContainerBuilder::class);
+        ClassExistsMock::withMockedClasses([Uuid::class => false]);
+    }
 }
 
 class TestMessengerKernel extends AbstractKernel
@@ -282,6 +328,46 @@ class TestFlowContextKernel extends AbstractKernel
         ]);
         $container->services()
             ->set(FlowContextHandler::class)->autowire()->autoconfigure()
+            ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
+        ;
+    }
+}
+
+class TestMessageIdGeneratorKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    public static function generateMessageId(): string
+    {
+        return 'app-message-id';
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'identity_stamps' => true,
+            'transports' => ['async' => 'in-memory://'],
+            'routing' => [DummyMessage::class => 'async'],
+        ]);
+        $container->services()
+            ->set('messenger.message_id_generator', \Closure::class)
+                ->factory([\Closure::class, 'fromCallable'])
+                ->args([[self::class, 'generateMessageId']])
             ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
         ;
     }

@@ -40,7 +40,7 @@ class DataKeyStoreSchemaListenerTest extends TestCase
         $table = $event->getSchema()->getTable('key_management_data_keys');
 
         $this->assertSame(
-            ['id', 'scope', 'key_material', 'master_key_id', 'client'],
+            ['id', 'scope', 'key_material', 'master_key_id', 'client', 'binding'],
             array_map(static fn ($column) => $column->getObjectName()->toString(), $table->getColumns()),
         );
     }

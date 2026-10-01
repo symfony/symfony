@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\ConcurrentRequestHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
@@ -84,11 +84,11 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         try {
             $acquired = $lock->acquire($attribute->blocking);
         } catch (LockConflictedException $e) {
-            throw new ConflictHttpException('A concurrent request is already being processed.', $e);
+            throw new ConcurrentRequestHttpException($key, $attribute->factory, $e);
         }
 
         if (!$acquired) {
-            throw new ConflictHttpException('A concurrent request is already being processed.');
+            throw new ConcurrentRequestHttpException($key, $attribute->factory);
         }
 
         $locks[$id] = $lock;

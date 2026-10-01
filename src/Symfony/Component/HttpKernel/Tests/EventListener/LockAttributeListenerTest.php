@@ -30,10 +30,11 @@ use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\ConcurrentRequestHttpException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Component\Lock\Store\InMemoryStore;
@@ -253,8 +254,34 @@ class LockAttributeListenerTest extends TestCase
         $second = Request::create('/');
         $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $first));
 
-        $this->expectException(ConflictHttpException::class);
-        $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $second));
+        try {
+            $listener->onKernelControllerAttribute($this->makeEvent(new Lock(), $second));
+            $this->fail('A ConcurrentRequestHttpException should have been thrown.');
+        } catch (ConcurrentRequestHttpException $e) {
+            $this->assertSame(409, $e->getStatusCode());
+            $this->assertSame('/', $e->key);
+            $this->assertSame('default', $e->factory);
+            $this->assertNull($e->getPrevious());
+        }
+    }
+
+    public function testLockConflictedExceptionIsConvertedTo409()
+    {
+        $conflict = new LockConflictedException();
+        $lock = $this->createStub(SharedLockInterface::class);
+        $lock->method('acquire')->willThrowException($conflict);
+
+        $factory = $this->createStub(LockFactory::class);
+        $factory->method('createLock')->willReturn($lock);
+
+        try {
+            $this->makeListener(['other' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock('foo', factory: 'other', blocking: true), Request::create('/')));
+            $this->fail('A ConcurrentRequestHttpException should have been thrown.');
+        } catch (ConcurrentRequestHttpException $e) {
+            $this->assertSame('foo', $e->key);
+            $this->assertSame('other', $e->factory);
+            $this->assertSame($conflict, $e->getPrevious());
+        }
     }
 
     public function testAcceptsTheNextRequestOnceTheLockIsReleased()

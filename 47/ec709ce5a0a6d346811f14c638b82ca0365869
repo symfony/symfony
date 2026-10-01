@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-01T08:03:32Z
+
+Thank you @Firehed. I added two things: `MarshallingSessionHandler` now returns `false` before unmarshalling (it turned it into `''`, so the kept ID got an empty session that overwrote the stored one on write), and `MemcachedSessionHandler` reports a failed `get()` as `false` instead of a missing session, since ext-memcached never throws.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-01T08:12:33Z
+
+I also made `RedisSessionHandler` report Predis error replies as failed reads: clients created by `RedisAdapter::createConnection()` return them instead of throwing, so they ended up being read as session data.

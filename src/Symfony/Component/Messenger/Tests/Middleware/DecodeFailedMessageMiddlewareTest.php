@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -23,10 +24,12 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\DefaultStampsProviderDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -135,6 +138,39 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertSame([1, 0], array_map(static fn (RedeliveryStamp $stamp): int => $stamp->getRetryCount(), $envelope->all(RedeliveryStamp::class)));
         $this->assertCount(1, $envelope->all(SentToFailureTransportStamp::class));
         $this->assertCount(1, $envelope->all(SerializedMessageStamp::class));
+    }
+
+    #[DataProvider('provideDefaultStamps')]
+    public function testItAddsTheDefaultStampsOfTheDecodedMessageThatTheEnvelopeDoesNotCarry(array $failedStamps, array $decodedStamps, int $expectedDelay)
+    {
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('decode')->willReturn(new Envelope(new DefaultStampsProviderDummyMessage('decoded'), $decodedStamps));
+
+        $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['async' => $serializer]));
+
+        $nextMiddleware = new class implements MiddlewareInterface {
+            public ?Envelope $envelope = null;
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                return $this->envelope = $envelope;
+            }
+        };
+
+        $envelope = MessageDecodingFailedException::wrap(['body' => 'body', 'headers' => []], 'Could not decode.')
+            ->with(new ReceivedStamp('async'), ...$failedStamps);
+
+        $middleware->handle($envelope, new StackMiddleware($nextMiddleware));
+
+        $this->assertInstanceOf(DefaultStampsProviderDummyMessage::class, $nextMiddleware->envelope?->getMessage());
+        $this->assertSame([$expectedDelay], array_map(static fn (DelayStamp $stamp): int => $stamp->getDelay(), $nextMiddleware->envelope->all(DelayStamp::class)));
+    }
+
+    public static function provideDefaultStamps(): iterable
+    {
+        yield 'missing' => [[], [], 1];
+        yield 'carried by the failed envelope' => [[new DelayStamp(5)], [], 5];
+        yield 'decoded with the message' => [[], [new DelayStamp(5)], 5];
     }
 
     public function testItThrowsWhenNoReceivedStampAndNoSentToFailureStamp()

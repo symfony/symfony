@@ -97,6 +97,12 @@ class StoreFactory
             case str_starts_with($connection, 'flock://'):
                 return new FlockStore(substr($connection, 8));
 
+            case 'flock+remove' === $connection:
+                return new FlockStore(null, true);
+
+            case str_starts_with($connection, 'flock+remove://'):
+                return new FlockStore(substr($connection, 15), true);
+
             case 'semaphore' === $connection:
                 return new SemaphoreStore();
 

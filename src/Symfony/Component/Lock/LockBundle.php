@@ -131,7 +131,7 @@ class LockBundle extends AbstractBundle
             // Generate stores
             $storeDefinitions = [];
             foreach ($resourceStores as $resourceStore) {
-                if (\in_array($resourceStore, ['flock', 'semaphore'], true)) {
+                if (\in_array($resourceStore, ['flock', 'flock+remove', 'semaphore'], true)) {
                     $storeDefinitionId = \sprintf('.lock.%s.store', $resourceStore);
                     $storeDefinitions[] = new Reference($storeDefinitionId);
                     $container->getDefinition($storeDefinitionId)->addTag('lock.store');

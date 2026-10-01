@@ -98,7 +98,6 @@ class RateLimiterBundleTest extends TestCase
         $this->assertFalse($container->hasDefinition('limiter'));
         $this->assertFalse($container->hasDefinition('limiter_builder'));
         $this->assertFalse($container->hasDefinition('cache.rate_limiter'));
-        $this->assertFalse($container->hasDefinition('rate_limiter.attribute_listener'));
     }
 }
 

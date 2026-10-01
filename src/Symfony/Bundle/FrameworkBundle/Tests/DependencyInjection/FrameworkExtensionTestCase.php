@@ -1722,6 +1722,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
     }
 
+    public function testRateLimiterAttributeListenerIsRemovedWhenRateLimiterIsDisabled()
+    {
+        $container = $this->createContainerFromFile('rate_limiter_disabled');
+
+        $this->assertFalse($container->hasDefinition('rate_limiter.attribute_listener'));
+    }
+
     public function testControllerExpressionLanguageRegistersTheSecurityProvider()
     {
         $container = $this->createContainerFromFile('full');

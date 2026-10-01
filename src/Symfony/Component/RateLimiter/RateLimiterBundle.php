@@ -21,7 +21,6 @@ use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\DependencyInjection\DefaultLockFactoryPass;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
@@ -177,10 +176,6 @@ class RateLimiterBundle extends AbstractBundle
         }
 
         $configurator->import('Resources/config/rate_limiter.php');
-
-        if (!class_exists(RateLimitAttributeListener::class)) {
-            $container->removeDefinition('rate_limiter.attribute_listener');
-        }
 
         $limiters = [];
         $compoundLimiters = [];

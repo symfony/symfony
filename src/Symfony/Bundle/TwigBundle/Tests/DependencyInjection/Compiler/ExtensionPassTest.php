@@ -60,7 +60,7 @@ class ExtensionPassTest extends TestCase
 
         $nativeTwigLoader = new Definition(FilesystemLoader::class);
         $container->setDefinition('twig.loader.native_filesystem', $nativeTwigLoader);
-        $container->setDefinition('twig.template_iterator', new Definition(TemplateIterator::class, [null, [], null]));
+        $container->setDefinition('twig.template_iterator', $templateIterator = new Definition(TemplateIterator::class, [null, [], null, [], null, []]));
 
         (new ExtensionPass())->process($container);
 
@@ -70,6 +70,7 @@ class ExtensionPassTest extends TestCase
             ['addPath', [$viewDir.'/Email', '!email', false]],
             ['addPath', [$viewDir.'/Form', FilesystemLoader::MAIN_NAMESPACE, false]],
         ], $nativeTwigLoader->getMethodCalls());
+        $this->assertSame($viewDir.'/Form', $templateIterator->getArgument(4));
         $this->assertDirectoryExists($viewDir.'/Email');
         $this->assertDirectoryExists($viewDir.'/Form');
     }

@@ -27,6 +27,7 @@ use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\CausationStamp;
 use Symfony\Component\Messenger\Stamp\CorrelationStamp;
+use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Stamp\PropagatedStampInterface;
@@ -218,6 +219,30 @@ class MessengerBundleTest extends TestCase
         $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $envelope->last(MessageIdStamp::class)->getId());
     }
 
+    public function testAMessageHandledAfterTheCurrentBusIsTheContextOfWhatItsHandlerDispatches()
+    {
+        $kernel = new TestFlowContextKernel('test', true, $this->varDir);
+        $kernel->boot();
+        FlowContextHandler::$handled = [];
+
+        $kernel->getContainer()->get('test.messenger.default_bus')->dispatch(new FlowDelayingMessage(), [new FlowTenantStamp('root')]);
+
+        $this->assertCount(3, FlowContextHandler::$handled);
+        [$root, $delayed, $child] = FlowContextHandler::$handled;
+
+        $this->assertInstanceOf(FlowDelayingMessage::class, $root->getMessage());
+        $this->assertInstanceOf(FlowDelayedMessage::class, $delayed->getMessage());
+        $this->assertInstanceOf(SecondMessage::class, $child->getMessage());
+
+        $rootId = $root->last(MessageIdStamp::class)->getId();
+        $delayedId = $delayed->last(MessageIdStamp::class)->getId();
+        $this->assertSame($rootId, $delayed->last(CausationStamp::class)?->getId());
+        $this->assertSame($delayedId, $child->last(CausationStamp::class)?->getId());
+        $this->assertSame($rootId, $child->last(CorrelationStamp::class)?->getId());
+        $this->assertSame(['delayed'], array_map(static fn (FlowTenantStamp $stamp) => $stamp->tenant, $delayed->all(FlowTenantStamp::class)));
+        $this->assertSame(['delayed'], array_map(static fn (FlowTenantStamp $stamp) => $stamp->tenant, $child->all(FlowTenantStamp::class)));
+    }
+
     private static function hideTheUidComponent(): void
     {
         ClassExistsMock::register(ContainerBuilder::class);
@@ -402,6 +427,28 @@ class FlowContextHandler
     {
         self::$handled[] = $envelope;
     }
+
+    #[AsMessageHandler]
+    public function onFlowDelayingMessage(FlowDelayingMessage $message, Envelope $envelope): void
+    {
+        self::$handled[] = $envelope;
+        $this->bus->dispatch(new FlowDelayedMessage(), [new DispatchAfterCurrentBusStamp(), new FlowTenantStamp('delayed')]);
+    }
+
+    #[AsMessageHandler]
+    public function onFlowDelayedMessage(FlowDelayedMessage $message, Envelope $envelope): void
+    {
+        self::$handled[] = $envelope;
+        $this->bus->dispatch(new SecondMessage());
+    }
+}
+
+class FlowDelayingMessage
+{
+}
+
+class FlowDelayedMessage
+{
 }
 
 class FlowTenantStamp implements PropagatedStampInterface

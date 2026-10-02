@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SyncMessageFailedEvent;
 use Symfony\Component\Messenger\Event\SyncMessageRetryingEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
@@ -374,6 +375,32 @@ class SyncTransportTest extends TestCase
         $this->assertTrue($dispatched->last(TrustStamp::class)?->isTrusted());
         $this->assertSame('sync', $relayed->last(ReceivedStamp::class)?->getTransportName());
         $this->assertNull($relayed->last(TrustStamp::class));
+    }
+
+    public function testHandlersThatRequireASignatureRefuseTheEnvelopesMarkedUntrusted()
+    {
+        $calls = 0;
+        $senders = new Container();
+        $recorder = new RecordingMiddleware();
+        $bus = new MessageBus([
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['sync']], $senders)),
+            $recorder,
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor(static function () use (&$calls) { ++$calls; }, ['sign' => true])]])),
+        ]);
+        $senders->set('sync', new SyncTransport($bus, new MultiplierRetryStrategy(3)));
+
+        $bus->dispatch(new DummyMessage('Hey'));
+        $this->assertSame(1, $calls);
+
+        try {
+            $bus->dispatch(new DummyMessage('Hey'), [TrustStamp::untrusted()]);
+            $this->fail('Exception not thrown.');
+        } catch (HandlerFailedException $e) {
+            $this->assertCount(1, $e->getWrappedExceptions(InvalidMessageSignatureException::class));
+        }
+
+        $this->assertSame(1, $calls);
+        $this->assertCount(2, $recorder->envelopes);
     }
 
     public function testFailuresAreSentToTheFailureTransportWithoutRetryStrategy()

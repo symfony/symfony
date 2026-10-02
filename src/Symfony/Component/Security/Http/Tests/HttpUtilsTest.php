@@ -520,6 +520,37 @@ class HttpUtilsTest extends TestCase
         $this->assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
     }
 
+    public function testGenerateUriIgnoresAttributesThatCannotBeRouteParameters()
+    {
+        $object = new \stdClass();
+        $object->self = $object;
+
+        $user = new class($object) implements \Stringable {
+            public function __construct(public object $object)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return 'jane';
+            }
+        };
+
+        $request = $this->getRequest('/fr/protected');
+        $request->attributes->set('_locale', 'fr');
+        $request->attributes->set('user', $user);
+        $request->attributes->set('owner', $user);
+        $request->attributes->set('objects', [$object]);
+        $request->attributes->set('object', $object);
+
+        $routes = new RouteCollection();
+        $routes->add('login', new Route('/{_locale}/login/{user}'));
+
+        $utils = new HttpUtils(new UrlGenerator($routes, (new RequestContext())->fromRequest($request)));
+
+        $this->assertSame('http://localhost/fr/login/jane', $utils->generateUri($request, 'login'));
+    }
+
     public function testUrlGeneratorIsRequiredToGenerateUrl()
     {
         $this->expectException(\LogicException::class);

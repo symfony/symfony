@@ -22,12 +22,9 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
-use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
-use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
-use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
 use Symfony\Component\Workflow\Definition;
@@ -540,12 +537,10 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                 ],
                 'scheduler' => true,
             ]);
-            $container->addCompilerPass(new MessengerPass());
         });
 
-        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
-        $this->assertContains(RedispatchMessage::class, $container->getDefinition('messenger.signing_serializer')->getArgument(2));
-        $this->assertContains(ServiceCallMessage::class, $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+        $this->assertSame([['sign' => true]], $container->getDefinition('messenger.redispatch_message_handler')->getTag('messenger.message_handler'));
+        $this->assertSame([['sign' => true]], $container->getDefinition('scheduler.messenger.service_call_message_handler')->getTag('messenger.message_handler'));
     }
 
     public function testMailerWebhookProdExcludesLocalhost()

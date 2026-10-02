@@ -243,7 +243,9 @@ class Connection implements ResetInterface
 
             return $doctrineEnvelopes;
         } catch (\Throwable $e) {
-            $this->driverConnection->rollBack();
+            if ($this->driverConnection->isTransactionActive()) {
+                $this->driverConnection->rollBack();
+            }
 
             if ($this->autoSetup && $e instanceof TableNotFoundException) {
                 $this->setup();
@@ -484,7 +486,9 @@ class Connection implements ResetInterface
 
             $this->driverConnection->commit();
         } catch (\Throwable $e) {
-            $this->driverConnection->rollBack();
+            if ($this->driverConnection->isTransactionActive()) {
+                $this->driverConnection->rollBack();
+            }
 
             // handle setup after transaction is no longer open
             if ($this->autoSetup && $e instanceof TableNotFoundException) {

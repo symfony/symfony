@@ -181,7 +181,17 @@ class HttpUtils
             throw new \LogicException('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         }
 
-        $url = $this->urlGenerator->generate($path, $request->attributes->all(), UrlGeneratorInterface::ABSOLUTE_URL);
+        // only scalars and stringables can fill path variables, the query string is removed below
+        $parameters = [];
+        foreach ($request->attributes->all() as $key => $value) {
+            if ($value instanceof \Stringable) {
+                $parameters[$key] = (string) $value;
+            } elseif (!\is_array($value) && !\is_object($value)) {
+                $parameters[$key] = $value;
+            }
+        }
+
+        $url = $this->urlGenerator->generate($path, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
 
         // unnecessary query string parameters must be removed from URL
         // (ie. query parameters that are presents in $attributes)

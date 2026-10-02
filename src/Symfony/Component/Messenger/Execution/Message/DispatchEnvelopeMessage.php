@@ -21,6 +21,7 @@ final class DispatchEnvelopeMessage
     public function __construct(
         public readonly int $requestId,
         public readonly Envelope $envelope,
+        public readonly bool $trusted = false,
     ) {
     }
 }

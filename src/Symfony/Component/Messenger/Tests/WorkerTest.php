@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -32,6 +33,7 @@ use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
@@ -54,7 +56,10 @@ use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectionStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\SeenByWorkerStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
@@ -405,6 +410,95 @@ class WorkerTest extends TestCase
         $throwable = $failedEvent->getThrowable();
         $this->assertInstanceOf(HandlerFailedException::class, $throwable);
         $this->assertNull($throwable->getEnvelope()?->last(NoAutoAckStamp::class));
+    }
+
+    public function testParallelExecutionSendsNonSendableStampsAndAcknowledgesWithTheParentInstances()
+    {
+        $stamp = new ConnectionStamp('42');
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('API'), [$stamp])],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $envelope = $receiver->getAcknowledgedEnvelopes()[0];
+        $this->assertContains(ConnectionStamp::class, $envelope->last(SeenByWorkerStamp::class)?->stampClasses ?? []);
+        $this->assertSame($stamp, $envelope->last(ConnectionStamp::class));
+    }
+
+    #[DataProvider('provideTrustStamps')]
+    public function testParallelExecutionTellsTheWorkerWhetherTheEnvelopeIsTrusted(TrustStamp $trustStamp, bool $trusted)
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('API'), [$trustStamp])],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $envelope = $receiver->getAcknowledgedEnvelopes()[0];
+        $this->assertSame($trusted, $envelope->last(SeenByWorkerStamp::class)?->trusted);
+        $this->assertSame($trustStamp, $envelope->last(TrustStamp::class));
+    }
+
+    public static function provideTrustStamps(): iterable
+    {
+        yield 'trusted' => [TrustStamp::trusted(), true];
+        yield 'untrusted' => [TrustStamp::untrusted(), false];
+    }
+
+    #[DataProvider('provideEnvelopesThatCannotBeSerialized')]
+    public function testParallelExecutionStopsOnAnEnvelopeThatCannotBeSerialized(Envelope $envelope, string $expectedMessage)
+    {
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+        $failure = null;
+
+        try {
+            $worker->run();
+        } catch (LogicException $failure) {
+        } finally {
+            $messageExecutionStrategy->shutdown();
+        }
+
+        $this->assertInstanceOf(LogicException::class, $failure);
+        $this->assertSame($expectedMessage, $failure->getMessage());
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
+    }
+
+    public static function provideEnvelopesThatCannotBeSerialized(): iterable
+    {
+        yield 'stamp' => [
+            new Envelope(new DummyMessage('live'), [new ConnectionStamp(static fn () => null)]),
+            'Cannot send message "'.DummyMessage::class.'" to a parallel worker: its "'.ConnectionStamp::class.'" stamp cannot be serialized. Make the stamp serializable, for example by implementing "__serialize()", or consume its transport without the "--concurrency" option.',
+        ];
+        yield 'message' => [
+            new Envelope(new \ArrayObject([static fn () => null])),
+            'Cannot send message "ArrayObject" to a parallel worker: it cannot be serialized.',
+        ];
     }
 
     public function testHandlingErrorCausesReject()

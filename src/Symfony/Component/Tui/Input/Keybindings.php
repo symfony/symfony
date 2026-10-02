@@ -32,7 +32,7 @@ final class Keybindings
     /**
      * @param array<string, string[]> $bindings
      *
-     * @throws InvalidArgumentException When a key id has no key or names an unknown modifier
+     * @throws InvalidArgumentException When a key id has no key, names an unknown modifier or an unknown key
      */
     public function __construct(array $bindings = [], ?KeyParser $parser = null)
     {

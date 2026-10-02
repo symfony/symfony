@@ -25,6 +25,9 @@ use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 
@@ -75,9 +78,44 @@ class ParallelExecutionStrategyTest extends TestCase
 
         $this->assertCount(1, $channel->sent);
         $this->assertInstanceOf(DispatchEnvelopeMessage::class, $channel->sent[0]);
-        $this->assertSame($envelope, $channel->sent[0]->envelope);
+        $this->assertEquals($envelope, $channel->sent[0]->envelope);
         $this->assertSame([], $calls);
         $this->assertTrue($strategy->shouldPauseConsumption());
+    }
+
+    public function testNonSendableStampsStayWithTheParent()
+    {
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy($channel);
+        $nonSendable = $this->createNonSendableStamp();
+        $envelope = new Envelope(new DummyMessage('Hello'), [new BusNameStamp('bus'), new ReceivedStamp('async'), new ConsumedByWorkerStamp(), $nonSendable]);
+        $calls = [];
+
+        $strategy->execute($envelope, 'async', $this->createOnHandled($calls));
+
+        $sent = $channel->sent[0]->envelope;
+        $this->assertNull($sent->last($nonSendable::class), 'a non-sendable stamp must not be sent to the worker');
+        $this->assertSame('bus', $sent->last(BusNameStamp::class)?->getBusName());
+        $this->assertNotNull($sent->last(ReceivedStamp::class), 'the worker needs ReceivedStamp: without it the message would be routed to its transport again');
+        $this->assertNotNull($sent->last(ConsumedByWorkerStamp::class));
+        $this->assertSame($nonSendable, $envelope->last($nonSendable::class), 'the parent keeps its own envelope, which it needs to acknowledge the message');
+        $this->assertNotSame('', serialize($channel->sent[0]));
+    }
+
+    public function testNonSendableStampsAreRestoredOnTheHandledEnvelope()
+    {
+        $nonSendable = $this->createNonSendableStamp();
+        $envelope = new Envelope(new DummyMessage('Hello'), [new ReceivedStamp('async'), $nonSendable]);
+        // the worker answers with the envelope it received, which does not have the stamp
+        $channel = $this->createFakeChannel([new HandledEnvelopeMessage(1, $envelope->withoutAll($nonSendable::class), null)]);
+        $strategy = $this->createStrategy($channel);
+        $calls = [];
+
+        $strategy->execute($envelope, 'async', $this->createOnHandled($calls));
+
+        $this->assertCount(1, $calls);
+        $this->assertCount(1, $calls[0][0]->all(ReceivedStamp::class), 'a stamp the worker already has is not added twice');
+        $this->assertSame($nonSendable, $calls[0][0]->last($nonSendable::class), 'the transport needs its stamps back to acknowledge the message');
     }
 
     public function testHandledResponseCompletesTheRequestAndReleasesTheWorker()
@@ -272,6 +310,15 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->setPrivateProperty($strategy, 'channels', $indexedChannels);
 
         return $strategy;
+    }
+
+    private function createNonSendableStamp(): NonSendableStampInterface
+    {
+        return new class(static fn () => 'live') implements NonSendableStampInterface {
+            public function __construct(public readonly \Closure $live)
+            {
+            }
+        };
     }
 
     private function createOnHandled(array &$calls): \Closure

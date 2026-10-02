@@ -23,6 +23,8 @@ use Symfony\Component\Messenger\Execution\Message\DispatchEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
 use function Amp\async;
@@ -88,7 +90,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             $channel = $this->getChannel($affinityKey, $keyMode);
             $channelId = spl_object_id($channel);
             $requestId = ++$this->nextRequestId;
-            $message = new DispatchEnvelopeMessage($requestId, $envelope);
+            $message = new DispatchEnvelopeMessage($requestId, $this->withoutTransportStamps($envelope));
 
             try {
                 $channel->send($message);
@@ -309,6 +311,23 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         return $handled;
     }
 
+    /**
+     * Stamps a transport attaches to a received message (the live AMQP message, a channel, ...) cannot cross the process boundary,
+     * just like a serializer cannot send them, and the worker never needs them: the parent keeps the original envelope and uses it
+     * to acknowledge the message. ReceivedStamp and ConsumedByWorkerStamp are non-sendable too, but they are plain markers the
+     * worker needs (without ReceivedStamp the message would be routed to its transport again instead of being handled).
+     */
+    private function withoutTransportStamps(Envelope $envelope): Envelope
+    {
+        foreach ($envelope->all() as $class => $stamps) {
+            if (is_subclass_of($class, NonSendableStampInterface::class) && !\in_array($class, [ReceivedStamp::class, ConsumedByWorkerStamp::class], true)) {
+                $envelope = $envelope->withoutAll($class);
+            }
+        }
+
+        return $envelope;
+    }
+
     private function handleResponse(int $channelId, mixed $response, callable $onHandled): bool
     {
         if (!$response instanceof DeferredEnvelopeMessage && !$response instanceof HandledEnvelopeMessage) {
@@ -359,6 +378,13 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         // rebuild the envelope around the original message object so that identity-keyed
         // bookkeeping in the parent (e.g. Worker::$keepalives) keeps matching
         $handledEnvelope = Envelope::wrap($pendingRequest->envelope->getMessage(), array_merge(...array_values($response->envelope->all())));
+
+        // the stamps that were not sent to the worker (see withoutTransportStamps()) come back from the parent's own envelope
+        foreach ($pendingRequest->envelope->all() as $class => $stamps) {
+            if (is_subclass_of($class, NonSendableStampInterface::class) && !$handledEnvelope->all($class)) {
+                $handledEnvelope = $handledEnvelope->with(...$stamps);
+            }
+        }
 
         if (null !== $error = $response->error) {
             $handledEnvelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($handledEnvelope);

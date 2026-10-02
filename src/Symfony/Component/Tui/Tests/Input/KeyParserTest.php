@@ -331,4 +331,74 @@ class KeyParserTest extends TestCase
         $this->assertFalse($this->parser->matches("\x1b[27;5;13~", 'shift+enter'));
         $this->assertFalse($this->parser->matches("\x1b[27;5;9~", 'ctrl+enter'));
     }
+
+    #[DataProvider('modifiedFunctionKeyProvider')]
+    public function testParseModifiedFunctionKey(string $sequence, string $keyId)
+    {
+        $this->assertSame($keyId, $this->parser->parse($sequence)['key']);
+        $this->assertTrue($this->parser->matches($sequence, $keyId));
+
+        $this->parser->setKittyProtocolActive(true);
+
+        $this->assertSame($keyId, $this->parser->parse($sequence)['key']);
+        $this->assertTrue($this->parser->matches($sequence, $keyId));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function modifiedFunctionKeyProvider(): iterable
+    {
+        yield 'ctrl+f1' => ["\x1b[1;5P", 'ctrl+f1'];
+        yield 'shift+f2' => ["\x1b[1;2Q", 'shift+f2'];
+        yield 'alt+f3' => ["\x1b[1;3R", 'alt+f3'];
+        yield 'shift+ctrl+f4' => ["\x1b[1;6S", 'shift+ctrl+f4'];
+        yield 'ctrl+f3 (CSI ~)' => ["\x1b[13;5~", 'ctrl+f3'];
+        yield 'ctrl+f5' => ["\x1b[15;5~", 'ctrl+f5'];
+        yield 'shift+f6' => ["\x1b[17;2~", 'shift+f6'];
+        yield 'alt+f12' => ["\x1b[24;3~", 'alt+f12'];
+        yield 'ctrl+left' => ["\x1b[1;5D", 'ctrl+left'];
+        yield 'shift+home' => ["\x1b[1;2H", 'shift+home'];
+        yield 'ctrl+delete' => ["\x1b[3;5~", 'ctrl+delete'];
+        yield 'ctrl+f1 repeat' => ["\x1b[1;5:2P", 'ctrl+f1'];
+        yield 'f5 repeat' => ["\x1b[15;1:2~", 'f5'];
+        yield 'ctrl+f1 with caps lock' => ["\x1b[1;69P", 'ctrl+f1'];
+        yield 'f5 with num lock' => ["\x1b[15;129~", 'f5'];
+    }
+
+    public function testParseUnmodifiedFunctionKey()
+    {
+        $this->assertSame('f1', $this->parser->parse("\x1b[11~")['key']);
+        $this->assertSame('f12', $this->parser->parse("\x1b[24~")['key']);
+
+        $this->parser->setKittyProtocolActive(true);
+
+        $this->assertSame('f1', $this->parser->parse("\x1b[11~")['key']);
+        $this->assertSame('f12', $this->parser->parse("\x1b[24~")['key']);
+    }
+
+    public function testModifiedFunctionKeyRelease()
+    {
+        $this->parser->setKittyProtocolActive(true);
+
+        $this->assertTrue($this->parser->isKeyRelease("\x1b[1;5:3P"));
+        $this->assertTrue($this->parser->isKeyRepeat("\x1b[1;5:2P"));
+        $this->assertSame(3, $this->parser->parse("\x1b[1;5:3P")['event_type']);
+        $this->assertSame(3, $this->parser->parse("\x1b[15;5:3~")['event_type']);
+        $this->assertFalse($this->parser->matches("\x1b[1;5:3P", 'ctrl+f1'));
+        $this->assertFalse($this->parser->isKeyRelease('foo:3P'));
+        $this->assertFalse($this->parser->isKeyRepeat('foo:2S'));
+    }
+
+    public function testFunctionKeyWithUnnameableModifierIsNotReported()
+    {
+        // Modifier value 9 means the super bit is set, which has no key id.
+        $this->assertNull($this->parser->parse("\x1b[1;9P"));
+        $this->assertNull($this->parser->parse("\x1b[15;9~"));
+    }
+
+    public function testModifyOtherKeysIsNotParsedAsAFunctionKey()
+    {
+        $this->assertNull($this->parser->parse("\x1b[27;5;13~"));
+    }
 }

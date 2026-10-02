@@ -139,7 +139,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         } elseif (1.1 === (float) $options['http_version']) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_1;
         } elseif (\defined('CURL_VERSION_HTTP2') && (\CURL_VERSION_HTTP2 & CurlClientState::$curlVersion['features']) && ('https:' === $scheme || 2.0 === (float) $options['http_version'])) {
-            $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_2_0;
+            $curlopts[\CURLOPT_HTTP_VERSION] = 2.0 === (float) $options['http_version'] ? \CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE : \CURL_HTTP_VERSION_2_0;
         } elseif (\defined('CURL_VERSION_HTTP3') && (\CURL_VERSION_HTTP3 & CurlClientState::$curlVersion['features']) && 3.0 === (float) $options['http_version'] && !self::willUseProxy($proxy, $curlopts[\CURLOPT_NOPROXY], $host)) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_3;
         }

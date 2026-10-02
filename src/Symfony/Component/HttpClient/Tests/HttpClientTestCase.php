@@ -169,6 +169,20 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertNull($response->getInfo('trailers'));
     }
 
+    public function testHttp2WithPriorKnowledge()
+    {
+        TestSocketServer::start('h2c/server.php', 8062);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://127.0.0.1:8062/', [
+            'http_version' => '2.0',
+            'body' => 'hello',
+        ]);
+
+        $this->assertSame('hello', $response->getContent());
+        $this->assertStringStartsWith('HTTP/2 200', $response->getInfo('response_headers')[0]);
+    }
+
     #[RequiresPhpExtension('openssl')]
     public function testRedirectToADifferentSchemeDropsCredentials()
     {

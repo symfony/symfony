@@ -219,6 +219,7 @@ HttpClient
 ----------
 
  * [BC BREAK] Widen the type of the `$buffer` argument of `HttpOptions::buffer()` from `bool` to `mixed`, so that the stream and closure forms the option accepts can be passed; a class extending `HttpOptions` and overriding that method must widen it too
+ * [BC BREAK] An explicit `http_version` of `2.0` makes `CurlHttpClient` and `AmpHttpClient` require HTTP/2: they use prior knowledge on `http://` URLs instead of offering an upgrade, and offer only `h2` during the TLS handshake on `https://` URLs (with curl 8.10 or higher); servers that speak only HTTP/1.1 are not reachable that way anymore, unset the option for them
 
 HttpFoundation
 --------------

@@ -14,6 +14,7 @@ CHANGELOG
  * Add the `trailers` response info
  * Add support for the `on_trailers` request option to `GuzzleHttpHandler`
  * Allow passing the `query` and `body` options as lists of single-entry arrays to repeat a field, e.g. `[['tag' => 'a'], ['tag' => 'b']]` for `tag=a&tag=b`
+ * Make `http_version: 2.0` use HTTP/2 with prior knowledge on `http://` URLs in `CurlHttpClient` and `AmpHttpClient`
 
 8.1
 ---

@@ -50,6 +50,11 @@ class NativeHttpClientTest extends HttpClientTestCase
         $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
     }
 
+    public function testHttp2WithPriorKnowledge()
+    {
+        $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
+    }
+
     public function testIPv6Resolve()
     {
         TestHttpServer::start(-8087);

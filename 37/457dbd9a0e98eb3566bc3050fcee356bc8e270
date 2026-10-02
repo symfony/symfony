@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-01T23:59:10Z
+
+Found along the way, not introduced by this PR: `parse()` returns `null` for modified function keys, while `matches()` accepts the same sequences. This already happens on 8.2 with ctrl:
+
+```php
+$parser->parse("\e[1;5P");               // null, but matches(..., 'ctrl+f1') is true
+$parser->parse("\e[15;5~");              // null, but matches(..., 'ctrl+f5') is true
+$parser->parse("\e[1;9P");               // null, but matches(..., 'super+f1') is true
+```
+
+`parseKittySequence()` only handles the `u` form, the arrow and Home/End letters, and `~` codes 2/3/5/6/7/8. It has no case for `CSI 1;<mods> P/Q/R/S` (F1–F4) or the `~` codes of F1–F12 (11–24). This should be fixed in a separate PR.
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-02T00:37:26Z
+
+Merging order: #66539 (8.1) should go first, then this PR gets rebased on 8.2 once it's merged up.
+
+Git merges `KeyParser.php` without a conflict, but the result is broken: #66539 removes `matchesLegacyFunctionKeyModifierSequence()`, which `matchesCsiOnlyKey()` here still calls, so any super chord on a function key throws:
+
+```php
+$parser->matches("\e[1;9P", 'super+f1'); // Error: Call to undefined method KeyParser::matchesLegacyFunctionKeyModifierSequence()
+```
+
+Resolution, once #66539 is in 8.2:
+
+```diff
+     private function matchesCsiOnlyKey(string $data, string $key, int $modifier): bool
+     {
+-        if (isset(self::LEGACY_FUNCTION_KEY_LETTERS[$key]) || isset(self::LEGACY_FUNCTION_KEY_CODES[$key])) {
+-            return $this->matchesLegacyFunctionKeyModifierSequence($data, $key, $modifier);
+-        }
+-
+         $key = match ($key) {
+             'esc' => 'escape',
+             'return' => 'enter',
+             default => $key,
+         };
+-        $codepoint = self::CODEPOINTS[$key] ?? self::FUNCTIONAL_CODEPOINTS[$key] ?? self::ARROW_CODEPOINTS[$key] ?? (1 === \strlen($key) ? \ord($key) : null);
++        $codepoint = self::CODEPOINTS[$key] ?? self::FUNCTIONAL_CODEPOINTS[$key] ?? self::ARROW_CODEPOINTS[$key] ?? self::FUNCTION_KEY_CODEPOINTS[$key] ?? (1 === \strlen($key) ? \ord($key) : null);
+```
+
+`testFunctionKeyWithUnnameableModifierIsNotReported()` from #66539 also needs an update: it expects `null` for `\e[1;9P` and `\e[15;9~`, which this PR now names `super+f1` and `super+f5`. Bit 256 is still unnamed, so `\e[1;257P` and `\e[15;257~` keep the test meaningful.
+
+With both changes, `super+f1` and `super+f5` parse, and they match repeats and Caps/Num Lock forms too. The 181 Input tests pass on the merged tree.
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-02T10:41:47Z
+
+Thanks @nicolas-grekas!
+
+**Meta vs Alt**: confirmed on the branch. With Terminal.app's "Use Option as Meta key", `StdinBuffer` turns the high byte into `ESC x`, which parses as `alt+x`, so `matches("\ex", 'meta+x')` is false. The kitty alt form (`\e[120;3u`) doesn't match `meta+x` either; only the kitty Meta bit (`\e[120;33u`) does, on terminals that report it. I'll send a symfony-docs PR for `tui/topics/keybindings.rst` listing the new modifiers, with a warning that what readline and terminal settings call "Meta" is `alt` here.
+
+**Rejecting unknown modifiers**: agreed, done in [b1f8f651104](https://github.com/symfony/symfony/pull/66538/commits/b1f8f6511048441702c903c3e5b123c9a00ebfda). On 8.2 an unknown modifier was dropped, so `ctlr+x` or `cmd+x` fired on a plain `x`; this PR already made it match nothing, and `Keybindings` now throws an `InvalidArgumentException` when it's created with such a key id (or one with no key, like `ctrl+`). `KeyParser::matches()` itself still returns false, so raw `InputEvent` checks are unchanged.
+
+`KeybindingsTrait::getKeybindings()` rebuilds a `Keybindings` on each input, so I measured it: with `EditorWidget`'s 41 default key ids, construction takes about 15 µs, so I didn't add caching.
+
+Typos in key names (`escpe`, `ctrl+escpe`) still match nothing silently. Catching those needs the parser to expose the key names it knows, so I'd rather do it in a follow-up.
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-02T10:50:04Z
+
+Doc PR: symfony/symfony-docs#23155 (the new modifiers, the `meta` vs Alt caution, and the key id validation).
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-02T11:26:55Z
+
+Follow-up for the key name typos: #66550 (draft until this PR is merged).

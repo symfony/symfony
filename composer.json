@@ -238,11 +238,11 @@
             "type": "package",
             "package": {
                 "name": "jsonpath-standard/jsonpath-compliance-test-suite",
-                "version": "2025.11.23",
+                "version": "2026.09.17",
                 "source": {
                     "type": "git",
                     "url": "https://github.com/jsonpath-standard/jsonpath-compliance-test-suite.git",
-                    "reference": "b9d7153e58711ad38bb8e35ece69c13f4b2f7d63"
+                    "reference": "9d1a415a53f5dfb291bc874823892e49174e38eb"
                 }
             }
         }

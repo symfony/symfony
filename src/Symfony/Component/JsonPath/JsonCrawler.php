@@ -245,7 +245,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
             $index = \count($value) + (int) $expr;
 
-            return isset($value[$index]) ? [$value[$index]] : [];
+            return \array_key_exists($index, $value) ? [$value[$index]] : [];
         }
 
         // single positive index
@@ -261,7 +261,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
             $index = (int) $expr;
 
-            return isset($value[$index]) ? [$value[$index]] : [];
+            return \array_key_exists($index, $value) ? [$value[$index]] : [];
         }
 
         // start and end index
@@ -283,7 +283,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 if ($index < 0) {
                     $index = \count($value) + $index;
                 }
-                if (isset($value[$index])) {
+                if (\array_key_exists($index, $value)) {
                     $result[] = $value[$index];
                 }
             }
@@ -358,7 +358,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
             $result = [];
             for ($i = $start; $step > 0 ? $i < $end : $i > $end; $i += $step) {
-                if (isset($value[$i])) {
+                if (\array_key_exists($i, $value)) {
                     $result[] = $value[$i];
                 }
             }

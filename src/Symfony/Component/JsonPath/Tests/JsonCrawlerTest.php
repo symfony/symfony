@@ -247,6 +247,25 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([true, false, null], $result);
     }
 
+    #[DataProvider('provideNullArrayElementSelectors')]
+    public function testNullArrayElementsAreSelected(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('["first", null, "third"]');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideNullArrayElementSelectors(): iterable
+    {
+        yield 'index' => ['$[1]', [null]];
+        yield 'negative index' => ['$[-2]', [null]];
+        yield 'multiple indices' => ['$[0,1]', ['first', null]];
+        yield 'multiple indices with negative index' => ['$[-2,-1]', [null, 'third']];
+        yield 'slice' => ['$[0:3]', ['first', null, 'third']];
+        yield 'reverse slice' => ['$[::-1]', ['third', null, 'first']];
+        yield 'out of bounds index' => ['$[3]', []];
+    }
+
     public function testFullArraySlice()
     {
         $crawler = self::getSimpleCollectionCrawler();

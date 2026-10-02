@@ -97,6 +97,12 @@ class StoreFactory
             case str_starts_with($connection, 'flock://'):
                 return new FlockStore(substr($connection, 8));
 
+            case 'flock+remove' === $connection:
+                return new FlockStore(null, true);
+
+            case str_starts_with($connection, 'flock+remove://'):
+                return new FlockStore(substr($connection, 15), true);
+
             case 'semaphore' === $connection:
                 return new SemaphoreStore();
 
@@ -174,7 +180,7 @@ class StoreFactory
     private static function requireBridgeClass(string $class, string $package): void
     {
         if (!class_exists($class)) {
-            throw new \LogicException(\sprintf('Class "%s" is missing. Try running "composer require %s" to install the lock store package.', $class, $package));
+            throw new \LogicException(\sprintf('Class "%s" is missing. Try running "composer require "%s" to install the lock store package.', $class, $package));
         }
     }
 }

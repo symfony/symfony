@@ -34,7 +34,7 @@ class FlockStoreTest extends AbstractStoreTestCase
     public function testConstructWhenRepositoryCannotBeCreated()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
+        $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exist and cannot be created.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
         }
@@ -67,11 +67,7 @@ class FlockStoreTest extends AbstractStoreTestCase
 
         $key = new Key('<?php echo "% hello word ! %" ?>');
 
-        $file = \sprintf(
-            '%s/sf.-php-echo-hello-word-.%s.lock',
-            sys_get_temp_dir(),
-            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
-        );
+        $file = self::getLockFile($key);
         // ensure the file does not exist before the store
         @unlink($file);
 
@@ -88,11 +84,7 @@ class FlockStoreTest extends AbstractStoreTestCase
 
         $key = new Key(str_repeat(__CLASS__, 100));
 
-        $file = \sprintf(
-            '%s/sf.Symfony-Component-Lock-Tests-Store-FlockStoreTestS.%s.lock',
-            sys_get_temp_dir(),
-            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
-        );
+        $file = self::getLockFile($key);
         // ensure the file does not exist before the store
         @unlink($file);
 
@@ -101,5 +93,14 @@ class FlockStoreTest extends AbstractStoreTestCase
         $this->assertFileExists($file);
 
         $store->delete($key);
+    }
+
+    public static function getLockFile(Key $key): string
+    {
+        return \sprintf('%s/sf.%s.%s.lock',
+            sys_get_temp_dir(),
+            substr(preg_replace('/[^a-z0-9\._-]+/i', '-', $key), 0, 50),
+            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
+        );
     }
 }

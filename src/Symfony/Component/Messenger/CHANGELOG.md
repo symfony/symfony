@@ -41,8 +41,10 @@ CHANGELOG
  * Add argument `$timeout` to `MessageExecutionStrategyInterface::wait()`
  * Make `HandleMessageMiddleware` refuse to call the handlers that require a signature for an envelope marked untrusted
  * Sign messages with a serializer created for each transport instead of decorating the serializer services: encoding with `messenger.default_serializer` or another serializer service does not sign anymore
- * Add `ChainStamp` and `ChainMiddleware` to dispatch messages one after another, with `ChainStampNormalizer` to carry a chain with the Symfony serializer
+ * Add `ChainStamp` and `ChainMiddleware` to dispatch messages one after another, with `MessageStampNormalizer` to carry the messages held by stamps with the Symfony serializer
  * Add `chain` to the default bus middleware, between `send_message` and `handle_message`
+ * Add `DispatchOnFailureStamp`, `FailedMessageStamp`, `DispatchOnFailureMiddleware` and `DispatchOnFailureListener` to dispatch a message when another one fails for good
+ * Add `dispatch_on_failure` to the default bus middleware, between `flow_context` and `dispatch_after_current_bus`
 
 8.1
 ---

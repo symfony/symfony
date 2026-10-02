@@ -336,7 +336,7 @@ class MessengerBundle extends AbstractBundle
 
         if (!interface_exists(DenormalizerInterface::class)) {
             $container->removeDefinition('serializer.normalizer.flatten_exception');
-            $container->removeDefinition('serializer.normalizer.chain_stamp');
+            $container->removeDefinition('serializer.normalizer.message_stamp');
         }
 
         if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', Bridge\Amqp\Transport\AmqpTransportFactory::class, ['symfony/messenger'])) {
@@ -381,6 +381,7 @@ class MessengerBundle extends AbstractBundle
                 ...($config['reject_redelivered_messages'] ? [['id' => 'reject_redelivered_message_middleware']] : []),
                 ['id' => 'decode_failed_message_middleware'],
                 ['id' => 'flow_context'],
+                ['id' => 'dispatch_on_failure'],
                 ['id' => 'dispatch_after_current_bus'],
                 ['id' => 'failed_message_processing_middleware'],
             ],

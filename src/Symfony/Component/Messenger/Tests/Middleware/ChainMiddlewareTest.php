@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ChainStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
+use Symfony\Component\Messenger\Stamp\DispatchOnFailureStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
@@ -293,6 +294,72 @@ class ChainMiddlewareTest extends MiddlewareTestCase
         $this->expectExceptionMessage('A message handled by the batch handler "Closure" cannot carry a "Symfony\\Component\\Messenger\\Stamp\\ChainStamp".');
 
         $middleware->handle($envelope, $this->getStackAdding(new NoAutoAckStamp(new HandlerDescriptor(static function () {}))));
+    }
+
+    public function testDispatchOnFailureStampIsCopiedToTheNextMessage()
+    {
+        $second = new SecondMessage();
+        $failureStamp = new DispatchOnFailureStamp(new ThirdMessage());
+        $envelope = new Envelope(new DummyMessage('first'), [$failureStamp, new ChainStamp($second)]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(function (Envelope $next) use ($second, $failureStamp) {
+                $this->assertSame($second, $next->getMessage());
+                $this->assertSame([$failureStamp], $next->all(DispatchOnFailureStamp::class));
+
+                return true;
+            }))
+            ->willReturnArgument(0);
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testEnvelopeInChainKeepsItsOwnDispatchOnFailureStamp()
+    {
+        $second = new SecondMessage();
+        $ownFailureStamp = new DispatchOnFailureStamp(new ThirdMessage());
+        $envelope = new Envelope(new DummyMessage('first'), [new DispatchOnFailureStamp(new DummyMessage('failure')), new ChainStamp(new Envelope($second, [$ownFailureStamp]))]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(function (Envelope $next) use ($second, $ownFailureStamp) {
+                $this->assertSame($second, $next->getMessage());
+                $this->assertSame([$ownFailureStamp], $next->all(DispatchOnFailureStamp::class));
+
+                return true;
+            }))
+            ->willReturnArgument(0);
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testTheDispatchOnFailureStampStaysOnTheReturnedEnvelopeOnceTheNextMessageIsDispatched()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [$failureStamp = new DispatchOnFailureStamp(new ThirdMessage()), new ChainStamp(new SecondMessage())]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->willReturnArgument(0);
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+
+        $this->assertSame([$failureStamp], $middleware->handle($envelope, $this->getStackMock())->all(DispatchOnFailureStamp::class));
+    }
+
+    public function testTheDispatchOnFailureStampsStayWhenTheMessageWasSentToATransport()
+    {
+        $envelope = new Envelope(new DummyMessage('first'), [$failureStamp = new DispatchOnFailureStamp(new ThirdMessage()), new ChainStamp(new SecondMessage())]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $middleware = new ChainMiddleware($bus, new SendersLocator([], new Container()));
+
+        $this->assertSame([$failureStamp], $middleware->handle($envelope, $this->getStackAdding(new SentStamp('Some\\Sender', 'async')))->all(DispatchOnFailureStamp::class));
     }
 
     public function testNothingIsDispatchedWhenHandlingFails()

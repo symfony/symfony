@@ -588,7 +588,8 @@ final class KeyParser
             case 'escape':
             case 'esc':
                 if (0 !== $modifier) {
-                    return false;
+                    // No legacy byte carries a modified escape: "\x1b\x1b" is also two escape presses
+                    return $this->matchesKittySequence($data, self::CODEPOINTS['escape'], $modifier);
                 }
 
                 return "\x1b" === $data || $this->matchesKittySequence($data, self::CODEPOINTS['escape'], 0);

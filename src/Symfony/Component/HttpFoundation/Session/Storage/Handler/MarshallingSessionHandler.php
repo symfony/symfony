@@ -62,9 +62,11 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
         return $this->handler->gc($maxlifetime);
     }
 
-    public function read(#[\SensitiveParameter] string $sessionId): string
+    public function read(#[\SensitiveParameter] string $sessionId): string|false
     {
-        $data = $this->handler->read($sessionId);
+        if (false === $data = $this->handler->read($sessionId)) {
+            return false;
+        }
 
         try {
             return $this->marshaller->unmarshall($data);

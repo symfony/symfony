@@ -467,14 +467,11 @@ class SerializerTest extends TestCase
         ]);
     }
 
-    public function testDecodingFailsWithANonSendableStamp()
+    public function testDecodedSkipsNonSendableStamps()
     {
         $serializer = new Serializer();
 
-        $this->expectException(MessageDecodingFailedException::class);
-        $this->expectExceptionMessage(\sprintf('Could not decode stamp: "%s" is a "%s".', ReceivedStamp::class, NonSendableStampInterface::class));
-
-        $serializer->decode([
+        $envelope = $serializer->decode([
             'body' => '{"message":"hello"}',
             'headers' => [
                 'type' => DummyMessage::class,
@@ -482,6 +479,9 @@ class SerializerTest extends TestCase
                 'X-Message-Stamp-'.BusNameStamp::class => '[{"busName":"the_bus"}]',
             ],
         ]);
+
+        $this->assertNull($envelope->last(ReceivedStamp::class));
+        $this->assertEquals([new BusNameStamp('the_bus')], $envelope->all(BusNameStamp::class));
     }
 
     public function testDecodedSerializerStampSkipsCodeAffectingContextOptions()

@@ -45,7 +45,7 @@ class StrictSessionHandler extends AbstractSessionHandler
         return $this->handler->open($savePath, $sessionName);
     }
 
-    protected function doRead(#[\SensitiveParameter] string $sessionId): string
+    protected function doRead(#[\SensitiveParameter] string $sessionId): string|false
     {
         return $this->handler->read($sessionId);
     }

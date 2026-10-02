@@ -51,9 +51,11 @@ class RedisSessionHandler extends AbstractSessionHandler
         $this->ttl = $options['ttl'] ?? null;
     }
 
-    protected function doRead(#[\SensitiveParameter] string $sessionId): string
+    protected function doRead(#[\SensitiveParameter] string $sessionId): string|false
     {
-        return $this->redis->get($this->prefix.$sessionId) ?: '';
+        $data = $this->redis->get($this->prefix.$sessionId);
+
+        return $data instanceof ErrorInterface ? false : ($data ?: '');
     }
 
     protected function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool

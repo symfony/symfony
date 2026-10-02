@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-02T11:26:53Z
+
+Docs: symfony/symfony-docs#23155 (for #66538) only says `Keybindings` throws for an unknown modifier or a key id with no key. If this PR is merged, it needs a sentence about unknown key names too (e.g. `escpe`, `ctrl+pageup`).
+
+It is still open. Are you OK with one docs PR covering both? I'd add the unknown key name rule (`escpe`, `ctrl+pageup`) to #23155 instead of opening a second docs PR.
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-02T15:41:57Z
+
+Found along the way: some key ids pass this check but can never match.
+
+- `ctrl+escape`, `alt+escape`, `shift+escape` and their combinations: `parse("\e[27;5u")` names `ctrl+escape`, but `matchesKey()` rejected any modifier on escape. That is a bug since the component was added (inherited from pi-tui), fixed on 8.1 in #66555.
+- `alt+clear` and `clear` behind super, hyper or meta: no encoding is matched, but `parse()` does not name them either, so they are consistent and left as is.
+
+The check here stays as it is: it only rejects key names, and both are known keys.

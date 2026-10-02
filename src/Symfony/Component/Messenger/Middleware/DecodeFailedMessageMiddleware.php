@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Message\DefaultStampsProviderInterface;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -103,6 +104,15 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
         if (!$received) {
             // a failure redispatched from the failure transport keeps this stamp only to find its serializer
             $envelope = $envelope->withoutAll(SentToFailureTransportStamp::class);
+        }
+
+        // the default stamps middleware saw the failure, not the decoded message
+        if (($message = $envelope->getMessage()) instanceof DefaultStampsProviderInterface) {
+            foreach ($message->getDefaultStamps() as $stamp) {
+                if (null === $envelope->last($stamp::class)) {
+                    $envelope = $envelope->with($stamp);
+                }
+            }
         }
 
         return $stack->next()->handle($envelope, $stack);

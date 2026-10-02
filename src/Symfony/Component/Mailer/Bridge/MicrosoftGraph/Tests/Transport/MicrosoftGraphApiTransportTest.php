@@ -292,7 +292,34 @@ class MicrosoftGraphApiTransportTest extends TestCase
             ['content-type', 'text/plain'],
             ['reply-to', 'fabpot@symfony.com'],
             ['Return-Path', 'fabpot@symfony.com'],
+            ['Content-Language', 'en-US'],
+            ['In-Reply-To', '<abc@symfony.com>'],
+            ['References', '<abc@symfony.com>'],
+            ['Auto-Submitted', 'auto-generated'],
         ];
+    }
+
+    public function testOnlyXPrefixedHeadersAreForwarded()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $message = json_decode($options['body'], true)['message'];
+
+            $this->assertSame([['name' => 'X-Something', 'value' => 'HeaderValue']], $message['internetMessageHeaders']);
+
+            return new MockResponse('', ['http_code' => 202]);
+        });
+
+        $transport = new MicrosoftGraphApiTransport('graph', new TokenManagerMock(), true, $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('bob@symfony.com', 'Bob'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+        $mail->getHeaders()->addHeader('Content-Language', 'en-US');
+        $mail->getHeaders()->addHeader('X-Something', 'HeaderValue');
+
+        $transport->send($mail);
     }
 
     #[DataProvider('importanceProvider')]

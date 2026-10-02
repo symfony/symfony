@@ -123,6 +123,18 @@ class MarshallingSessionHandlerTest extends TestCase
         $this->assertSame('', $marshallingSessionHandler->read('session_id'));
     }
 
+    public function testReadFailure()
+    {
+        $marshaller = $this->createMock(MarshallerInterface::class);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $marshaller);
+
+        $this->handler->expects($this->once())->method('read')->with('session_id')
+            ->willReturn(false);
+        $marshaller->expects($this->never())->method('unmarshall');
+
+        $this->assertFalse($marshallingSessionHandler->read('session_id'));
+    }
+
     public function testWrite()
     {
         $marshaller = $this->createMock(MarshallerInterface::class);

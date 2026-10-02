@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -202,18 +203,19 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals([new HandledStamp(null, 'handler_a'), new HandledStamp(null, 'handler_b')], $decodedEnvelope->all(HandledStamp::class));
     }
 
-    public function testDecodingFailsWithNonSendableStamps()
+    public function testDecodingSkipsNonSendableStamps()
     {
         $serializer = $this->createPhpSerializer();
 
         $envelope = $serializer->decode(['body' => addslashes(serialize(new Envelope(new DummyMessage('Hello'), [
             new BusNameStamp('a'),
             new DummyPhpSerializerNonSendableStamp(),
+            new DelayStamp(1),
+            new BusNameStamp('b'),
         ])))]);
 
-        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
-        $this->assertSame(\sprintf('Could not decode stamp: "%s" is a "%s".', DummyPhpSerializerNonSendableStamp::class, NonSendableStampInterface::class), $envelope->getMessage()->getMessage());
-        $this->assertEquals([new BusNameStamp('a')], $envelope->all(BusNameStamp::class));
+        $this->assertEquals(new Envelope(new DummyMessage('Hello'), [new BusNameStamp('a'), new DelayStamp(1), new BusNameStamp('b')]), $envelope);
+        $this->assertSame([BusNameStamp::class, DelayStamp::class], array_keys($envelope->all()));
     }
 
     public function testDecodingFailsWhenAStampIsFiledUnderAnotherClass()

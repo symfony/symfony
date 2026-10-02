@@ -65,6 +65,41 @@ class StrictSessionHandlerTest extends TestCase
         $this->assertFalse($proxy->validateId('id'));
     }
 
+    public function testValidateIdKeepsIdWhenReadFails()
+    {
+        $handler = $this->createMock(BareSessionHandler::class);
+        $handler->expects($this->once())->method('read')
+            ->with('id')->willReturn(false);
+        $proxy = new StrictSessionHandler($handler);
+
+        $this->assertTrue($proxy->validateId('id'));
+        $this->assertFalse($proxy->read('id'));
+    }
+
+    public function testValidateIdKeepsIdWhenReadThrows()
+    {
+        $handler = $this->createMock(BareSessionHandler::class);
+        $exception = new \RuntimeException('storage unreachable');
+        $handler->expects($this->once())->method('read')
+            ->with('id')->willThrowException($exception);
+        $proxy = new StrictSessionHandler($handler);
+
+        $this->assertTrue($proxy->validateId('id'));
+
+        $this->expectExceptionObject($exception);
+        $proxy->read('id');
+    }
+
+    public function testReadFailure()
+    {
+        $handler = $this->createMock(BareSessionHandler::class);
+        $handler->expects($this->once())->method('read')
+            ->with('id')->willReturn(false);
+        $proxy = new StrictSessionHandler($handler);
+
+        $this->assertFalse($proxy->read('id'));
+    }
+
     public function testRead()
     {
         $handler = $this->createMock(BareSessionHandler::class);

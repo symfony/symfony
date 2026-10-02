@@ -13,7 +13,9 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * Allow to configure messages to be handled after the current bus is finished.
@@ -81,8 +83,14 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
              * This is intentional since the queued commands were likely dependent
              * on the preceding command.
              */
+            $hasDroppedMessages = (bool) $this->queue;
             $this->queue = [];
             $this->isRootDispatchCallRunning = false;
+
+            if ($hasDroppedMessages && $e instanceof HandlerFailedException) {
+                // a retry must run again the handlers that succeeded, so that they dispatch the dropped messages again
+                throw new HandlerFailedException($e->getEnvelope()->withoutAll(HandledStamp::class), $e->getWrappedExceptions());
+            }
 
             throw $e;
         }

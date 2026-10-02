@@ -56,6 +56,21 @@ final class KeyParser
         'end' => -15,
     ];
 
+    private const FUNCTION_KEY_CODEPOINTS = [
+        'f1' => -20,
+        'f2' => -21,
+        'f3' => -22,
+        'f4' => -23,
+        'f5' => -24,
+        'f6' => -25,
+        'f7' => -26,
+        'f8' => -27,
+        'f9' => -28,
+        'f10' => -29,
+        'f11' => -30,
+        'f12' => -31,
+    ];
+
     private const LEGACY_KEY_SEQUENCES = [
         'up' => ["\x1b[A", "\x1bOA"],
         'down' => ["\x1b[B", "\x1bOB"],
@@ -260,7 +275,7 @@ final class KeyParser
             return false;
         }
 
-        return preg_match('/:3[u~ABCDHF]$/', $data);
+        return preg_match('/^\x1b\[[\d;:]*:3[u~ABCDHFPQRS]$/', $data);
     }
 
     public function isKeyRepeat(string $data): bool
@@ -269,7 +284,7 @@ final class KeyParser
             return false;
         }
 
-        return preg_match('/:2[u~ABCDHF]$/', $data);
+        return preg_match('/^\x1b\[[\d;:]*:2[u~ABCDHFPQRS]$/', $data);
     }
 
     /**
@@ -285,7 +300,7 @@ final class KeyParser
 
         if (
             $this->kittyProtocolActive
-            || (str_starts_with($data, "\x1b[") && (str_ends_with($data, 'u') || str_contains($data, ':')))
+            || (str_starts_with($data, "\x1b[") && (str_ends_with($data, 'u') || str_contains($data, ':') || str_contains($data, ';')))
         ) {
             $kitty = $this->parseKittySequence($data);
             if (null !== $kitty && null !== $keyName = $this->keyNameFromCodepoint($kitty['codepoint'])) {
@@ -441,6 +456,22 @@ final class KeyParser
                     'event_type' => $eventType,
                 ];
             }
+
+            if (false !== $functionKey = array_search($keyNum, self::LEGACY_FUNCTION_KEY_CODES, true)) {
+                return [
+                    'codepoint' => self::FUNCTION_KEY_CODEPOINTS[$functionKey],
+                    'modifier' => $modifierValue - 1,
+                    'event_type' => $eventType,
+                ];
+            }
+        }
+
+        if (preg_match('/^\x1b\[1;(\d+)(?::(\d+))?([PQRS])$/', $data, $match) && false !== $functionKey = array_search($match[3], self::LEGACY_FUNCTION_KEY_LETTERS, true)) {
+            return [
+                'codepoint' => self::FUNCTION_KEY_CODEPOINTS[$functionKey],
+                'modifier' => (int) $match[1] - 1,
+                'event_type' => $this->parseEventType('' !== $match[2] ? $match[2] : null),
+            ];
         }
 
         if (!preg_match('/^\x1b\[1;(\d+)(?::(\d+))?([HF])$/', $data, $match)) {
@@ -488,7 +519,7 @@ final class KeyParser
             self::ARROW_CODEPOINTS['down'] => 'down',
             self::ARROW_CODEPOINTS['left'] => 'left',
             self::ARROW_CODEPOINTS['right'] => 'right',
-            default => $this->keyNameFromChar($codepoint),
+            default => array_search($codepoint, self::FUNCTION_KEY_CODEPOINTS, true) ?: $this->keyNameFromChar($codepoint),
         };
     }
 
@@ -805,11 +836,12 @@ final class KeyParser
             case 'f10':
             case 'f11':
             case 'f12':
-                if (0 !== $modifier) {
-                    return $this->matchesLegacyFunctionKeyModifierSequence($data, $key, $modifier);
+                if (0 === $modifier) {
+                    return $this->matchesLegacySequence($data, self::LEGACY_KEY_SEQUENCES[$key])
+                        || $this->matchesKittySequence($data, self::FUNCTION_KEY_CODEPOINTS[$key], 0);
                 }
 
-                return $this->matchesLegacySequence($data, self::LEGACY_KEY_SEQUENCES[$key]);
+                return $this->matchesKittySequence($data, self::FUNCTION_KEY_CODEPOINTS[$key], $modifier);
         }
 
         $isDigit = 1 === \strlen($key) && $key >= '0' && $key <= '9';
@@ -874,27 +906,6 @@ final class KeyParser
             self::MOD_CTRL => $this->matchesLegacySequence($data, self::LEGACY_CTRL_SEQUENCES[$key] ?? []),
             default => false,
         };
-    }
-
-    private function matchesLegacyFunctionKeyModifierSequence(string $data, string $key, int $modifier): bool
-    {
-        $modValue = $modifier + 1;
-
-        if (isset(self::LEGACY_FUNCTION_KEY_LETTERS[$key])) {
-            $letter = self::LEGACY_FUNCTION_KEY_LETTERS[$key];
-            if ("\x1b[1;{$modValue}{$letter}" === $data) {
-                return true;
-            }
-        }
-
-        if (isset(self::LEGACY_FUNCTION_KEY_CODES[$key])) {
-            $code = self::LEGACY_FUNCTION_KEY_CODES[$key];
-            if ("\x1b[{$code};{$modValue}~" === $data) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function matchesKittySequence(string $data, int $expectedCodepoint, int $expectedModifier): bool

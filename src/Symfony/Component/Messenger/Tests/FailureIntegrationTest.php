@@ -35,8 +35,10 @@ use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\Message\DefaultStampsProviderInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
@@ -49,6 +51,7 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -443,6 +446,125 @@ class FailureIntegrationTest extends TestCase
         // Stamps should not be dropped on message that's queued for retry
         $this->assertCount(1, $messagesWaiting);
         $this->assertSame('some.bus', $messagesWaiting[0]->last(BusNameStamp::class)?->getBusName());
+    }
+
+    public function testDelayedMessageIsDispatchedAgainWhenTheMessageThatDispatchedItIsRetried()
+    {
+        $transport = new DummyFailureTestSenderAndReceiver();
+        $locator = new ServiceLocator(['transport' => static fn () => $transport]);
+        $retryStrategyLocator = new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)]);
+
+        $delayedHandler = new DummyTestHandler(true);
+        $handler = new DummyTestHandler(false);
+
+        $middlewareStack = new \ArrayIterator([
+            new DispatchAfterCurrentBusMiddleware(),
+            new SendMessageMiddleware(new SendersLocator([], $locator)),
+        ]);
+        $bus = new MessageBus($middlewareStack);
+        $middlewareStack->append(new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [static function () use ($bus, $handler) {
+                $handler();
+                $bus->dispatch(new \stdClass(), [new DispatchAfterCurrentBusStamp()]);
+            }],
+            \stdClass::class => [$delayedHandler],
+        ])));
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $transport->send(new Envelope(new DummyMessage('API')));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $handler->getTimesCalled());
+        $this->assertSame(1, $delayedHandler->getTimesCalled());
+        $this->assertCount(1, $transport->getMessagesWaitingToBeReceived());
+
+        $delayedHandler->setShouldThrow(false);
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame(2, $handler->getTimesCalled());
+        $this->assertSame(2, $delayedHandler->getTimesCalled());
+        $this->assertCount(0, $transport->getMessagesWaitingToBeReceived());
+    }
+
+    public function testDelayedMessageIsDispatchedAgainWhenAnotherHandlerOfTheMessageThatDispatchedItFails()
+    {
+        $transport = new DummyFailureTestSenderAndReceiver();
+        $locator = new ServiceLocator(['transport' => static fn () => $transport]);
+        $retryStrategyLocator = new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)]);
+
+        $delayedHandler = new DummyTestHandler(false);
+        $handler = new DummyTestHandler(false);
+        $failingHandler = new DummyTestHandler(true);
+
+        $middlewareStack = new \ArrayIterator([
+            new DispatchAfterCurrentBusMiddleware(),
+            new SendMessageMiddleware(new SendersLocator([], $locator)),
+        ]);
+        $bus = new MessageBus($middlewareStack);
+        $middlewareStack->append(new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                new HandlerDescriptor(static function () use ($bus, $handler) {
+                    $handler();
+                    $bus->dispatch(new \stdClass(), [new DispatchAfterCurrentBusStamp()]);
+                }, ['alias' => 'dispatching']),
+                new HandlerDescriptor($failingHandler, ['alias' => 'failing']),
+            ],
+            \stdClass::class => [$delayedHandler],
+        ])));
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $transport->send(new Envelope(new DummyMessage('API')));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $handler->getTimesCalled());
+        $this->assertSame(0, $delayedHandler->getTimesCalled());
+        $this->assertCount(1, $transport->getMessagesWaitingToBeReceived());
+
+        $failingHandler->setShouldThrow(false);
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame(2, $handler->getTimesCalled());
+        $this->assertSame(1, $delayedHandler->getTimesCalled());
+        $this->assertCount(0, $transport->getMessagesWaitingToBeReceived());
+    }
+
+    public function testHandlersThatSucceededAreSkippedOnRetryWhenNoMessageWasDelayed()
+    {
+        $transport = new DummyFailureTestSenderAndReceiver();
+        $locator = new ServiceLocator(['transport' => static fn () => $transport]);
+        $retryStrategyLocator = new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(1, 0)]);
+
+        $handler = new DummyTestHandler(false);
+        $failingHandler = new DummyTestHandler(true);
+
+        $bus = new MessageBus([
+            new DispatchAfterCurrentBusMiddleware(),
+            new SendMessageMiddleware(new SendersLocator([], $locator)),
+            new HandleMessageMiddleware(new HandlersLocator([
+                DummyMessage::class => [
+                    new HandlerDescriptor($handler, ['alias' => 'succeeding']),
+                    new HandlerDescriptor($failingHandler, ['alias' => 'failing']),
+                ],
+            ])),
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $transport->send(new Envelope(new DummyMessage('API')));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        $failingHandler->setShouldThrow(false);
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $handler->getTimesCalled());
+        $this->assertSame(2, $failingHandler->getTimesCalled());
     }
 
     public function testStampsAddedByMiddlewaresDontDisappearWhenValidationFails()
@@ -1405,6 +1527,53 @@ class FailureIntegrationTest extends TestCase
         yield 'JSON not signing, from a failure transport that signs every message' => ['App\JsonUnsignedMessageFromSignedFailureTransport', Serializer::class, Serializer::class, 0, false, true];
     }
 
+    #[DataProvider('provideMessagesThatFailToDecodeUntilTheirClassIsDeployedAndHaveDefaultStamps')]
+    public function testMessageThatFailedToDecodeGetsItsDefaultStampsWhenReplayed(string $messageClass, string $serializerClass)
+    {
+        $serializer = new $serializerClass();
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('API')));
+
+        if (PhpSerializer::class === $serializerClass) {
+            $encodedEnvelope['body'] = addslashes(str_replace('O:'.\strlen(DummyMessage::class).':"'.DummyMessage::class.'"', 'O:'.\strlen($messageClass).':"'.$messageClass.'"', stripslashes($encodedEnvelope['body'])));
+        } else {
+            $encodedEnvelope['headers']['type'] = $messageClass;
+        }
+
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver(new PhpSerializer(), []);
+
+        $calls = [];
+        $bus = new MessageBus([
+            new AddDefaultStampsMiddleware(),
+            // a new serializer per replay, as after a restart: the serializer remembers the types it could not denormalize
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => new $serializerClass()])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function (DummyMessage $message, string ...$arguments) use (&$calls) { $calls[] = $arguments; }]])),
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(0, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertSame([], $calls);
+        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
+
+        class_alias(HandlerArgumentsProviderDummyMessage::class, $messageClass);
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame([['default']], $calls);
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    public static function provideMessagesThatFailToDecodeUntilTheirClassIsDeployedAndHaveDefaultStamps(): iterable
+    {
+        yield 'PHP' => ['App\PhpMessageWithDefaultStamps', PhpSerializer::class];
+        yield 'JSON' => ['App\JsonMessageWithDefaultStamps', Serializer::class];
+    }
+
     public function testRetryThroughTransportSkipsTheHandlerWhoseResultCannotBeEncoded()
     {
         $transport = new InMemoryTransport(Serializer::create());
@@ -1608,5 +1777,13 @@ class DummyTestHandler
     public function setShouldThrow(bool $shouldThrow)
     {
         $this->shouldThrow = $shouldThrow;
+    }
+}
+
+class HandlerArgumentsProviderDummyMessage extends DummyMessage implements DefaultStampsProviderInterface
+{
+    public function getDefaultStamps(): array
+    {
+        return [new HandlerArgumentsStamp(['default'])];
     }
 }

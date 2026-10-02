@@ -22,6 +22,8 @@ interface SerializerInterface
     /**
      * Decodes an envelope and its message from an encoded-form.
      *
+     * Stamps that implement NonSendableStampInterface should not be decoded.
+     *
      * The `$encodedEnvelope` parameter is a key-value array that
      * describes the envelope and its content, that will be used by the different transports.
      *

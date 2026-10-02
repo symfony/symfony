@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-10-02T11:25:12Z
+
+The Fabbot typo check flags `hasTable` on lines this PR does not change. It is a real DBAL method, so I left it as is.

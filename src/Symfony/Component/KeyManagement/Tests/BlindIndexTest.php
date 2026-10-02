@@ -23,6 +23,7 @@ use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\Verbatim;
 use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\CountingKms;
@@ -144,6 +145,30 @@ class BlindIndexTest extends TestCase
         $omitted = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim());
 
         $this->assertSame($given->of('ada@example.org'), $omitted->of('ada@example.org'));
+    }
+
+    public function testTheShippedAlgorithmsAgreeOnTheTagWidth()
+    {
+        $this->assertSame(AlgorithmInterface::TAG_BYTES, \strlen(new HmacSha256()->tag('ada@example.org', str_repeat('k', 32))));
+
+        if (\function_exists('sodium_crypto_generichash')) {
+            $this->assertSame(AlgorithmInterface::TAG_BYTES, \strlen(new Blake2b()->tag('ada@example.org', str_repeat('k', 32))));
+        }
+    }
+
+    public function testAnAlgorithmReturningAnotherWidthIsRefused()
+    {
+        $index = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim(), new class implements AlgorithmInterface {
+            public function tag(#[\SensitiveParameter] string $value, #[\SensitiveParameter] string $key): string
+            {
+                return hash_hmac('sha512', $value, $key, true);
+            }
+        });
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('returned a 64-byte tag instead of %d.', AlgorithmInterface::TAG_BYTES));
+
+        $index->of('ada@example.org');
     }
 
     public function testTheKeyIsUnwrappedOnceWhateverTheNumberOfValues()

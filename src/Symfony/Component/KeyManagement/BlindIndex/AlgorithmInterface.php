@@ -32,9 +32,19 @@ namespace Symfony\Component\KeyManagement\BlindIndex;
 interface AlgorithmInterface
 {
     /**
+     * Width of a tag, in bytes, which is fixed so that the column holding one is.
+     *
+     * A tag is stored in a column sized once and never again. An implementation returning a wider
+     * one would have its tags truncated by the database rather than refused, and a truncated tag
+     * matches rows that do not hold the value, so the width is checked on every derivation rather
+     * than trusted.
+     */
+    public const int TAG_BYTES = 32;
+
+    /**
      * @param string $key 32 bytes of key material
      *
-     * @return string The raw tag, whose length MUST NOT depend on the length of `$value`
+     * @return string The raw tag, which MUST be exactly {@see TAG_BYTES} bytes whatever the length of `$value`
      */
     public function tag(#[\SensitiveParameter] string $value, #[\SensitiveParameter] string $key): string;
 }

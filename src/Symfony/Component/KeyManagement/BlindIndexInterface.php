@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\KeyManagement;
 
+use Symfony\Component\KeyManagement\Exception\LogicException;
+
 /**
  * A searchable trace of a value whose encrypted column cannot be searched.
  *
@@ -54,6 +56,8 @@ interface BlindIndexInterface
 {
     /**
      * @return string 64 lowercase hexadecimal characters, whatever the algorithm and the length of the value
+     *
+     * @throws LogicException If the algorithm returns a tag of any other width
      */
     public function of(#[\SensitiveParameter] string $value): string;
 }

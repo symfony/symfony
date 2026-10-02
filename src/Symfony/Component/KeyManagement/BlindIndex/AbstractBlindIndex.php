@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\BlindIndexInterface;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\DataKeyStoreInterface;
+use Symfony\Component\KeyManagement\Exception\LogicException;
 
 /**
  * What the two blind indexes of the component share, which is everything but {@see open()}.
@@ -55,7 +56,13 @@ abstract class AbstractBlindIndex implements BlindIndexInterface
             $this->handle = $this->open();
         }
 
-        return bin2hex($this->handle->use(fn (#[\SensitiveParameter] string $key): string => $this->algorithm->tag($value, $key)));
+        $tag = $this->handle->use(fn (#[\SensitiveParameter] string $key): string => $this->algorithm->tag($value, $key));
+
+        if (AlgorithmInterface::TAG_BYTES !== \strlen($tag)) {
+            throw new LogicException(\sprintf('The blind index algorithm "%s" returned a %d-byte tag instead of %d.', get_debug_type($this->algorithm), \strlen($tag), AlgorithmInterface::TAG_BYTES));
+        }
+
+        return bin2hex($tag);
     }
 
     /**

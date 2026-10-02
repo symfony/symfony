@@ -382,6 +382,25 @@ class KeyParserTest extends TestCase
         $this->assertFalse($this->parser->matches("\x1b[97;5u", 'ctrl+alt+a'));
     }
 
+    public function testModifiedEscapeMatchesWhatParseNames()
+    {
+        $this->assertSame('ctrl+escape', $this->parser->parse("\x1b[27;5u")['key']);
+        $this->assertTrue($this->parser->matches("\x1b[27;5u", 'ctrl+escape'));
+        $this->assertTrue($this->parser->matches("\x1b[27;5u", 'ctrl+esc'));
+        $this->assertTrue($this->parser->matches("\x1b[27;2u", 'shift+escape'));
+        $this->assertTrue($this->parser->matches("\x1b[27;7u", 'ctrl+alt+escape'));
+        // Repeat event and Caps Lock
+        $this->assertTrue($this->parser->matches("\x1b[27;3:2u", 'alt+escape'));
+        $this->assertTrue($this->parser->matches("\x1b[27;69u", 'ctrl+escape'));
+
+        $this->assertFalse($this->parser->matches("\x1b[27;5:3u", 'ctrl+escape'));
+        $this->assertFalse($this->parser->matches("\x1b[27;5u", 'escape'));
+        $this->assertFalse($this->parser->matches("\x1b[27;5u", 'alt+escape'));
+        $this->assertFalse($this->parser->matches("\x1b", 'ctrl+escape'));
+        // Also two escape presses, so it stays unnamed as a modified escape
+        $this->assertFalse($this->parser->matches("\x1b\x1b", 'alt+escape'));
+    }
+
     /**
      * xterm's modifyOtherKeys form reports every modifier through the same
      * `CSI 27 ; mods ; keycode ~` shape, not just shift and alt.

@@ -94,6 +94,25 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->assertFalse($strategy->shouldPauseConsumption());
     }
 
+    public function testWaitReturnsOnceItsTimeoutElapses()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy($channel);
+        $calls = [];
+
+        $strategy->execute($envelope, 'async', $this->createOnHandled($calls));
+        $lateResponse = EventLoop::delay(2, static fn () => $channel->push(new HandledEnvelopeMessage(1, $envelope, null)));
+
+        try {
+            $this->assertFalse($strategy->wait($this->createOnHandled($calls), 0.2));
+        } finally {
+            EventLoop::cancel($lateResponse);
+        }
+
+        $this->assertSame([], $calls);
+    }
+
     public function testDeferredResponseReleasesTheWorkerWhileKeepingTheRequestPending()
     {
         $envelope = new Envelope(new DummyMessage('Hello'));

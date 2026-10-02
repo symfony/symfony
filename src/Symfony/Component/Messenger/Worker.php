@@ -201,7 +201,16 @@ class Worker
                     }
 
                     if (0 < $sleep) {
-                        $this->clock->sleep($sleep / 1e6);
+                        $sleepStart = $this->clock->now()->format('U.u');
+
+                        // messages in flight are acknowledged as soon as they are handled, instead of after the sleep
+                        if (!$this->messageExecutionStrategy->wait($this->preAck(...), $sleep / 1e6)) {
+                            $sleep -= (int) (1e6 * ($this->clock->now()->format('U.u') - $sleepStart));
+
+                            if (0 < $sleep) {
+                                $this->clock->sleep($sleep / 1e6);
+                            }
+                        }
                     }
                 }
             }

@@ -37,6 +37,7 @@ use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
+use Symfony\Component\Messenger\Execution\MessageExecutionStrategyInterface;
 use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
@@ -381,6 +382,70 @@ class WorkerTest extends TestCase
         }
 
         $this->assertSame(['second' => 2, 'third' => 2], $handledBatches);
+    }
+
+    #[DataProvider('provideIdleWaits')]
+    public function testIdleWorkerWaitsForTheMessagesInFlightInsteadOfSleeping(float $waited, bool $handled, float $expectedElapsed)
+    {
+        $clock = new MockClock();
+        $strategy = new class($clock, $waited, $handled) implements MessageExecutionStrategyInterface {
+            public array $timeouts = [];
+
+            public function __construct(
+                private MockClock $clock,
+                private float $waited,
+                private bool $handled,
+            ) {
+            }
+
+            public function execute(Envelope $envelope, string $transportName, callable $onHandled): void
+            {
+            }
+
+            public function shouldPauseConsumption(): bool
+            {
+                return false;
+            }
+
+            public function wait(callable $onHandled, ?float $timeout = null): bool
+            {
+                $this->timeouts[] = $timeout;
+                $this->clock->sleep($this->waited);
+
+                return $this->handled;
+            }
+
+            public function flush(callable $onHandled, bool|float $force = false): bool
+            {
+                return false;
+            }
+
+            public function shutdown(): void
+            {
+            }
+        };
+
+        $idleEvents = 0;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use (&$idleEvents) {
+            if ($event->isWorkerIdle() && 2 <= ++$idleEvents) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker(['transport' => new DummyReceiver([])], new MessageBus(), $dispatcher, clock: $clock, messageExecutionStrategy: $strategy);
+        $start = (float) $clock->now()->format('U.u');
+        $worker->run(['sleep' => 1000000]);
+
+        $this->assertSame([1.0], $strategy->timeouts);
+        $this->assertEqualsWithDelta($expectedElapsed, (float) $clock->now()->format('U.u') - $start, 0.001);
+    }
+
+    public static function provideIdleWaits(): iterable
+    {
+        yield 'a message was handled' => [0.0, true, 0.0];
+        yield 'nothing was handled before the timeout' => [1.0, false, 1.0];
+        yield 'nothing was in flight' => [0.0, false, 1.0];
     }
 
     public function testParallelExecutionFailureKeepsDebugInfoWithoutLeakingControlStamp()

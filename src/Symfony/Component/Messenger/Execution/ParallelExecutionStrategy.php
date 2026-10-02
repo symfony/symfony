@@ -131,13 +131,21 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     /**
      * @phpstan-impure
      */
-    public function wait(callable $onHandled): bool
+    public function wait(callable $onHandled, ?float $timeout = null): bool
     {
+        $deadline = null === $timeout ? null : hrtime(true) + (int) (1e9 * $timeout);
+
         while ($this->pendingRequests && $this->receiveFutures) {
+            $heartbeat = null === $deadline ? 0.1 : min(0.1, ($deadline - hrtime(true)) / 1e9);
+
+            if (0 >= $heartbeat) {
+                return false;
+            }
+
             try {
                 // the timeout is a heartbeat only: the event loop wakes us as soon as any
                 // channel produces a response, there is no per-channel polling involved
-                [$channelId, $response, $error] = awaitFirst($this->receiveFutures, new TimeoutCancellation(0.1));
+                [$channelId, $response, $error] = awaitFirst($this->receiveFutures, new TimeoutCancellation($heartbeat));
             } catch (CancelledException) {
                 continue;
             }

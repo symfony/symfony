@@ -37,11 +37,13 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\OutboxStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
@@ -301,13 +303,76 @@ class SyncTransportTest extends TestCase
         $transport = new SyncTransport(self::createBus(static function () { throw new \RuntimeException('no!'); }), null, $failureTransport);
 
         $transport->send(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('outbox')]));
+        $transport->send(new Envelope(new DummyMessage('Hey'), [TrustStamp::untrusted()]));
         $transport->send(new Envelope(new DummyMessage('Hey')));
 
         $signingSerializer = new SigningSerializer(new PhpSerializer(), 'secret', ['*']);
-        [$received, $dispatched] = $failureTransport->getSent();
+        [$received, $untrusted, $dispatched] = $failureTransport->getSent();
 
         $this->assertSame('unverified', $signingSerializer->encode($received)['headers']['Sign-Trust'] ?? null);
+        $this->assertSame('unverified', $signingSerializer->encode($untrusted)['headers']['Sign-Trust'] ?? null);
         $this->assertArrayNotHasKey('Sign-Trust', $signingSerializer->encode($dispatched)['headers']);
+    }
+
+    public function testEnvelopesDispatchedInThisProcessAreHandledTrusted()
+    {
+        $calls = 0;
+        $recorder = new RecordingMiddleware();
+        $transport = new SyncTransport(self::createBus(static function () use (&$calls) {
+            if (2 > ++$calls) {
+                throw new \RuntimeException('Attempt '.$calls);
+            }
+        }, $recorder), new MultiplierRetryStrategy(1));
+
+        $envelope = $transport->send(new Envelope(new DummyMessage('Hey')));
+
+        $this->assertCount(2, $recorder->envelopes);
+        foreach ($recorder->envelopes as $attemptEnvelope) {
+            $this->assertNotNull($attemptEnvelope->last(ReceivedStamp::class));
+            $this->assertTrue($attemptEnvelope->last(TrustStamp::class)?->isTrusted());
+        }
+        $this->assertCount(1, $envelope->all(TrustStamp::class));
+        $this->assertTrue($envelope->last(TrustStamp::class)->isTrusted());
+    }
+
+    public function testEnvelopesReceivedFromATransportAreHandledWithTheirOwnTrust()
+    {
+        $recorder = new RecordingMiddleware();
+        $transport = new SyncTransport(self::createBus(static function () {}, $recorder));
+        $untrusted = TrustStamp::untrusted();
+        $trusted = TrustStamp::trusted();
+
+        $transport->send(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('outbox')]));
+        $transport->send(new Envelope(new DummyMessage('Hey'), [$untrusted]));
+        $transport->send(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('scheduler_default'), $trusted]));
+
+        [$received, $receivedUntrusted, $receivedTrusted] = $recorder->envelopes;
+
+        $this->assertNull($received->last(TrustStamp::class));
+        $this->assertSame([$untrusted], $receivedUntrusted->all(TrustStamp::class));
+        $this->assertSame([$trusted], $receivedTrusted->all(TrustStamp::class));
+    }
+
+    public function testMessagesDispatchedOnTheBusAreTrustedButNotTheRelayedOnes()
+    {
+        $senders = new Container();
+        $recorder = new RecordingMiddleware();
+        $bus = new MessageBus([
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['sync']], $senders)),
+            $recorder,
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () {}]])),
+        ]);
+        $senders->set('sync', new SyncTransport($bus));
+
+        $bus->dispatch(new DummyMessage('Hey'));
+        $bus->dispatch(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('outbox'), new OutboxStamp('sync')]));
+
+        [$dispatched, $relayed] = $recorder->envelopes;
+
+        $this->assertSame('sync', $dispatched->last(ReceivedStamp::class)?->getTransportName());
+        $this->assertTrue($dispatched->last(TrustStamp::class)?->isTrusted());
+        $this->assertSame('sync', $relayed->last(ReceivedStamp::class)?->getTransportName());
+        $this->assertNull($relayed->last(TrustStamp::class));
     }
 
     public function testFailuresAreSentToTheFailureTransportWithoutRetryStrategy()

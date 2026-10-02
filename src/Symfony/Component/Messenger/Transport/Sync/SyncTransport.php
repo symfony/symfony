@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -83,6 +84,11 @@ class SyncTransport implements TransportInterface
 
         $retryCount = RedeliveryStamp::getRetryCountFromEnvelope($envelope);
         $context = ['class' => $envelope->getMessage()::class];
+
+        if (!$envelope->last(TrustStamp::class) && !$envelope->last(ReceivedStamp::class)) {
+            // the ReceivedStamp added below must not hide that the envelope was dispatched in this process
+            $envelope = $envelope->with(TrustStamp::trusted());
+        }
 
         while (true) {
             try {

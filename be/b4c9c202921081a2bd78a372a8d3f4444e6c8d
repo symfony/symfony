@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-10-02T11:20:05Z
+
+The two red jobs are not caused by this change. Unit Tests (8.6) also fails on Messenger on the 8.1 branch, and the high-deps job stopped on a corrupted composer download in FrameworkBundle.

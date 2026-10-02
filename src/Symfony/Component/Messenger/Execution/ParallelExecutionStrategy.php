@@ -15,15 +15,19 @@ use Amp\CancelledException;
 use Amp\Future;
 use Amp\Parallel\Worker\ContextWorkerFactory;
 use Amp\Parallel\Worker\Worker;
+use Amp\Serialization\SerializationException;
 use Amp\Sync\Channel;
 use Amp\TimeoutCancellation;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Execution\Message\DeferredEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\DispatchEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -88,10 +92,12 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             $channel = $this->getChannel($affinityKey, $keyMode);
             $channelId = spl_object_id($channel);
             $requestId = ++$this->nextRequestId;
-            $message = new DispatchEnvelopeMessage($requestId, $envelope);
+            $message = new DispatchEnvelopeMessage($requestId, $envelope, $envelope->last(TrustStamp::class)?->isTrusted() ?? false);
 
             try {
                 $channel->send($message);
+            } catch (SerializationException $e) {
+                throw $e;
             } catch (\Throwable $e) {
                 $this->removeChannel($channelId, $onHandled, $e);
                 $channel = $this->getChannel($affinityKey, $keyMode);
@@ -108,6 +114,9 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
 
             $this->armChannel($channelId);
             $this->drainReadyResponses($onHandled);
+        } catch (SerializationException $e) {
+            // stopping leaves the message on its transport: a stamp that a transport adds is on every message, failing them would drain the queue
+            throw self::createSerializationFailure($envelope, $e);
         } catch (\Throwable $e) {
             $acked = false;
             $onHandled($envelope, $transportName, $acked, $e);
@@ -356,9 +365,18 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
 
         $this->keyModes[$pendingRequest->affinityKey] ??= self::KEY_MODE_NON_BATCHING;
 
+        $stamps = $response->envelope->all();
+
+        // the worker returns copies: a transport needs its own instances to settle the message, and a copied TrustStamp is never trusted
+        foreach ($pendingRequest->envelope->all() as $class => $parentStamps) {
+            if (isset($stamps[$class]) && is_a($class, NonSendableStampInterface::class, true)) {
+                $stamps[$class] = $parentStamps;
+            }
+        }
+
         // rebuild the envelope around the original message object so that identity-keyed
         // bookkeeping in the parent (e.g. Worker::$keepalives) keeps matching
-        $handledEnvelope = Envelope::wrap($pendingRequest->envelope->getMessage(), array_merge(...array_values($response->envelope->all())));
+        $handledEnvelope = Envelope::wrap($pendingRequest->envelope->getMessage(), array_merge(...array_values($stamps)));
 
         if (null !== $error = $response->error) {
             $handledEnvelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($handledEnvelope);
@@ -419,5 +437,18 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     private function getAffinityKey(Envelope $envelope): string
     {
         return ($envelope->last(BusNameStamp::class)?->getBusName() ?? 'message.bus').'|'.($envelope->last(ReceivedStamp::class)?->getTransportName() ?? '').'|'.$envelope->getMessage()::class;
+    }
+
+    private static function createSerializationFailure(Envelope $envelope, SerializationException $e): LogicException
+    {
+        foreach ($envelope->all() as $stamps) {
+            try {
+                serialize($stamps);
+            } catch (\Throwable $stampError) {
+                return new LogicException(\sprintf('Cannot send message "%s" to a parallel worker: its "%s" stamp cannot be serialized. Make the stamp serializable, for example by implementing "__serialize()", or consume its transport without the "--concurrency" option.', get_debug_type($envelope->getMessage()), get_debug_type($stamps[0])), 0, $stampError);
+            }
+        }
+
+        return new LogicException(\sprintf('Cannot send message "%s" to a parallel worker: it cannot be serialized.', get_debug_type($envelope->getMessage())), 0, $e);
     }
 }

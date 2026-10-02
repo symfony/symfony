@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Runtime\RuntimeInterface;
 use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Contracts\Service\ContainerProviderInterface;
@@ -76,8 +77,15 @@ final class DispatchTask implements Task
                 self::sendHandled($channel, $requestId, $handledEnvelope->withoutAll(AckStamp::class), $handledError);
             };
 
+            $envelope = $message->envelope;
+
+            // a TrustStamp counts only in the process that created it
+            if ($message->trusted) {
+                $envelope = $envelope->withoutAll(TrustStamp::class)->with(TrustStamp::trusted());
+            }
+
             try {
-                $envelope = $bus->dispatch($message->envelope->with(new AckStamp($ack)));
+                $envelope = $bus->dispatch($envelope->with(new AckStamp($ack)));
                 $envelope = $envelope->withoutAll(AckStamp::class);
             } catch (\Throwable $e) {
                 $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($message->envelope);

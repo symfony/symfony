@@ -190,6 +190,24 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString("query_bus\n---------\n\n No middleware registered.", $display);
     }
 
+    public function testOutputWithMiddlewareForASpecificBus()
+    {
+        $command = new DebugCommand(
+            ['command_bus' => [], 'query_bus' => []],
+            middleware: [
+                'command_bus' => [['command_bus.middleware.send_message', SendMessageMiddleware::class]],
+                'query_bus' => [['query_bus.middleware.handle_message', HandleMessageMiddleware::class]],
+            ],
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['bus' => 'query_bus', '--middleware' => true], ['decorated' => false]);
+        $display = $tester->getDisplay(true);
+
+        $this->assertStringContainsString('query_bus.middleware.handle_message', $display);
+        $this->assertStringNotContainsString('command_bus', $display);
+    }
+
     public function testOutputDoesNotIncludeMiddlewareByDefault()
     {
         $command = new DebugCommand(

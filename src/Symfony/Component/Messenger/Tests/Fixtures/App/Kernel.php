@@ -20,11 +20,15 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
+use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Contracts\Service\ContainerProviderInterface;
 
 final class App implements ContainerProviderInterface
@@ -33,7 +37,13 @@ final class App implements ContainerProviderInterface
 
     public function __construct()
     {
-        $defaultBus = new MessageBus([new StampingMiddleware('default.bus'), new BatchHandlingMiddleware()]);
+        $delayedMessageHandlers = [
+            SecondMessage::class => [static function () use (&$defaultBus) {
+                $defaultBus->dispatch(new ThirdMessage(), [new DispatchAfterCurrentBusStamp()]);
+            }],
+            ThirdMessage::class => [static fn () => throw new \RuntimeException('Delayed handler failed.')],
+        ];
+        $defaultBus = new MessageBus([new DispatchAfterCurrentBusMiddleware(), new StampingMiddleware('default.bus'), new BatchHandlingMiddleware($delayedMessageHandlers)]);
         $otherBus = new MessageBus([new StampingMiddleware('other.bus'), new BatchHandlingMiddleware()]);
 
         $this->container = new TestContainer([
@@ -103,11 +113,11 @@ final class BatchHandlingMiddleware implements MiddlewareInterface
 {
     private readonly HandleMessageMiddleware $middleware;
 
-    public function __construct()
+    public function __construct(array $handlers = [])
     {
         $this->middleware = new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [new HandlerDescriptor(new BatchSizeReportingHandler())],
-        ]));
+        ] + $handlers));
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

@@ -26,11 +26,13 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnIdleListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
@@ -54,6 +56,9 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
@@ -435,14 +440,166 @@ class FailureIntegrationTest extends TestCase
         // Receive the message from "transport1"
         $throwable = $runWorker('transport1');
 
-        $this->assertInstanceOf(DelayedMessageHandlingException::class, $throwable, $throwable->getMessage());
+        $this->assertInstanceOf(HandlerFailedException::class, $throwable, $throwable->getMessage());
         $this->assertSame(1, $syncHandlerThatFails->getTimesCalled());
 
         $messagesWaiting = $transport1->getMessagesWaitingToBeReceived();
 
         // Stamps should not be dropped on message that's queued for retry
         $this->assertCount(1, $messagesWaiting);
+        $this->assertInstanceOf(\stdClass::class, $messagesWaiting[0]->getMessage());
         $this->assertSame('some.bus', $messagesWaiting[0]->last(BusNameStamp::class)?->getBusName());
+    }
+
+    public function testDelayedMessageThatFailsInAWorkerIsRetriedOnItsOwn()
+    {
+        $transport = new InMemoryTransport(new PhpSerializer());
+        $failureTransport = new InMemoryTransport(new PhpSerializer());
+        $calls = [];
+        $bus = $this->createBusDispatchingDelayedMessages($calls, [new SecondMessage()], [SecondMessage::class => [$this->createRecordingHandler($calls, 'second', 1)]]);
+        $dispatcher = $this->createDispatcherForDelayedMessages(['transport' => static fn () => $transport], ['transport' => static fn () => new MultiplierRetryStrategy(3, 0)], ['transport' => static fn () => $failureTransport]);
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame([DummyMessage::class, 'second', 'second'], $calls);
+        $this->assertSame([DummyMessage::class, SecondMessage::class], array_map(static fn (Envelope $envelope) => $envelope->getMessage()::class, $acknowledged = $transport->getAcknowledged()));
+        $this->assertSame(1, $acknowledged[1]->last(RedeliveryStamp::class)?->getRetryCount());
+        $this->assertSame('some.bus', $acknowledged[1]->last(BusNameStamp::class)?->getBusName());
+        $this->assertSame([], $transport->getRejected());
+        $this->assertSame(0, $transport->getMessageCount());
+        $this->assertSame([], $failureTransport->getSent());
+    }
+
+    public function testDelayedMessageThatFailsForGoodIsSentAloneToTheFailureTransport()
+    {
+        $transport = new InMemoryTransport(new PhpSerializer());
+        $failureTransport = new InMemoryTransport(new PhpSerializer());
+        $calls = [];
+        $bus = $this->createBusDispatchingDelayedMessages($calls, [new SecondMessage()], [SecondMessage::class => [$this->createRecordingHandler($calls, 'second', 1)]]);
+        $dispatcher = $this->createDispatcherForDelayedMessages(['transport' => static fn () => $transport], ['transport' => static fn () => new MultiplierRetryStrategy(0, 0)], ['transport' => static fn () => $failureTransport]);
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame([DummyMessage::class, 'second'], $calls);
+        $this->assertSame([DummyMessage::class], array_map(static fn (Envelope $envelope) => $envelope->getMessage()::class, $transport->getAcknowledged()));
+        $this->assertSame([], $transport->getRejected());
+        $this->assertSame(0, $transport->getMessageCount());
+        $this->assertCount(1, $failed = $failureTransport->getSent());
+        $this->assertInstanceOf(SecondMessage::class, $failed[0]->getMessage());
+        $this->assertSame('transport', $failed[0]->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName());
+        $this->assertSame('Failure from second', $failed[0]->last(ErrorDetailsStamp::class)?->getExceptionMessage());
+    }
+
+    public function testOnlyTheDelayedMessagesAndHandlersThatFailedAreRetried()
+    {
+        $transport = new InMemoryTransport(new PhpSerializer());
+        $calls = [];
+        $handlers = [
+            SecondMessage::class => [new HandlerDescriptor($this->createRecordingHandler($calls, 'second@a'), ['alias' => 'a']), new HandlerDescriptor($this->createRecordingHandler($calls, 'second@b', 1), ['alias' => 'b'])],
+            ThirdMessage::class => [$this->createRecordingHandler($calls, 'third')],
+        ];
+        $bus = $this->createBusDispatchingDelayedMessages($calls, [new SecondMessage(), new ThirdMessage()], $handlers);
+        $dispatcher = $this->createDispatcherForDelayedMessages(['transport' => static fn () => $transport], ['transport' => static fn () => new MultiplierRetryStrategy(3, 0)], []);
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame([DummyMessage::class, 'second@a', 'second@b', 'third', 'second@b'], $calls);
+        $this->assertSame([DummyMessage::class, SecondMessage::class], array_map(static fn (Envelope $envelope) => $envelope->getMessage()::class, $transport->getSent()));
+        $this->assertSame([], $transport->getRejected());
+        $this->assertSame(0, $transport->getMessageCount());
+    }
+
+    public function testDelayedMessagesThatDoNotAllFailInTheirHandlersFailTheMessageThatDispatchedThem()
+    {
+        $transport = new InMemoryTransport(new PhpSerializer());
+        $failureTransport = new InMemoryTransport(new PhpSerializer());
+        $unavailableTransport = $this->createStub(SenderInterface::class);
+        $unavailableTransport->method('send')->willThrowException(new TransportException('The transport is unavailable.'));
+        $calls = [];
+        $bus = $this->createBusDispatchingDelayedMessages($calls, [new SecondMessage(), new ThirdMessage()], [SecondMessage::class => [$this->createRecordingHandler($calls, 'second', 1)]], [ThirdMessage::class => ['unavailable']], ['unavailable' => static fn () => $unavailableTransport]);
+        $dispatcher = $this->createDispatcherForDelayedMessages(['transport' => static fn () => $transport], ['transport' => static fn () => new MultiplierRetryStrategy(0, 0)], ['transport' => static fn () => $failureTransport]);
+        $throwables = [];
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$throwables) {
+            $throwables[] = $event->getThrowable();
+        });
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertCount(1, $throwables);
+        $this->assertInstanceOf(DelayedMessageHandlingException::class, $throwables[0]);
+        $this->assertSame([], $transport->getAcknowledged());
+        $this->assertCount(1, $transport->getRejected());
+        $this->assertCount(1, $failed = $failureTransport->getSent());
+        $this->assertInstanceOf(DummyMessage::class, $failed[0]->getMessage());
+        $this->assertSame('some.bus', $failed[0]->last(BusNameStamp::class)?->getBusName());
+    }
+
+    public function testDelayedMessageThatFailsAfterAMessageOfAReceiverThatCannotSendGoesAloneToTheFailureTransport()
+    {
+        $receiver = new DummyReceiver([[new Envelope(new DummyMessage('Hello'))]]);
+        $failureTransport = new InMemoryTransport(new PhpSerializer());
+        $calls = [];
+        $bus = $this->createBusDispatchingDelayedMessages($calls, [new SecondMessage()], [SecondMessage::class => [$this->createRecordingHandler($calls, 'second', 1)]]);
+        $dispatcher = $this->createDispatcherForDelayedMessages([], [], ['schedule' => static fn () => $failureTransport]);
+
+        (new Worker(['schedule' => $receiver], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame([DummyMessage::class, 'second'], $calls);
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
+        $this->assertCount(1, $failed = $failureTransport->getSent());
+        $this->assertInstanceOf(SecondMessage::class, $failed[0]->getMessage());
+        $this->assertSame('schedule', $failed[0]->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName());
+    }
+
+    public function testMessageThatDispatchedAFailedDelayedMessageIsNotAckedWhenTheDelayedMessageCannotBeSentForRetry()
+    {
+        $transport = new InMemoryTransport(new PhpSerializer());
+        $unavailableTransport = $this->createStub(SenderInterface::class);
+        $unavailableTransport->method('send')->willThrowException(new TransportException('The transport is unavailable.'));
+        $calls = [];
+        $bus = $this->createBusDispatchingDelayedMessages($calls, [new SecondMessage()], [SecondMessage::class => [$this->createRecordingHandler($calls, 'second', 1)]]);
+        $dispatcher = $this->createDispatcherForDelayedMessages(['transport' => static fn () => $unavailableTransport], ['transport' => static fn () => new MultiplierRetryStrategy(3, 0)], []);
+
+        $transport->send(new Envelope(new DummyMessage('Hello')));
+
+        try {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+            $this->fail('The worker should have stopped on the failure to send the delayed message for retry.');
+        } catch (TransportException $e) {
+            $this->assertSame('The transport is unavailable.', $e->getMessage());
+        }
+
+        $this->assertSame([DummyMessage::class, 'second'], $calls);
+        $this->assertSame([], $transport->getAcknowledged());
+        $this->assertSame([], $transport->getRejected());
+        $this->assertSame(1, $transport->getMessageCount());
+    }
+
+    #[DataProvider('provideInnerSerializers')]
+    public function testDelayedMessageSentForRetryIsSignedAsCreatedInThisProcess(SerializerInterface $inner)
+    {
+        $serializer = new SigningSerializer($inner, 'signing-key', [SecondMessage::class]);
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$serializer->encode(new Envelope(new DummyMessage('Hello')))]);
+        $calls = [];
+        $bus = $this->createBusDispatchingDelayedMessages($calls, [new SecondMessage()], [SecondMessage::class => [$this->createRecordingHandler($calls, 'second', 1)]]);
+        $dispatcher = $this->createDispatcherForDelayedMessages(['transport' => static fn () => $transport], ['transport' => static fn () => new MultiplierRetryStrategy(3, 0)], []);
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertCount(1, $retried = $transport->getMessagesWaitingToBeReceived());
+        $this->assertStringStartsWith('v2:', $retried[0]['headers']['Body-Sign']);
+        $this->assertArrayNotHasKey('Sign-Trust', $retried[0]['headers']);
+
+        (new Worker(['transport' => $transport], $bus, $dispatcher))->run(['sleep' => 0]);
+
+        $this->assertSame([DummyMessage::class, 'second', 'second'], $calls);
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
     }
 
     public function testStampsAddedByMiddlewaresDontDisappearWhenValidationFails()
@@ -1504,6 +1661,46 @@ class FailureIntegrationTest extends TestCase
         $this->assertCount(1, $acknowledged);
         $this->assertEquals(new DummyMessage('Hello'), $acknowledged[0]->getMessage());
         $this->assertSame('transport', $acknowledged[0]->last(SentToFailureTransportStamp::class)->getOriginalReceiverName());
+    }
+
+    private function createBusDispatchingDelayedMessages(array &$calls, array $delayedMessages, array $handlers, array $routing = [], array $senders = []): MessageBus
+    {
+        $handlers[DummyMessage::class] = [static function () use (&$bus, &$calls, $delayedMessages) {
+            $calls[] = DummyMessage::class;
+
+            foreach ($delayedMessages as $delayedMessage) {
+                $bus->dispatch($delayedMessage, [new DispatchAfterCurrentBusStamp()]);
+            }
+        }];
+
+        return $bus = new MessageBus([
+            new AddBusNameStampMiddleware('some.bus'),
+            new DispatchAfterCurrentBusMiddleware(),
+            new SendMessageMiddleware(new SendersLocator($routing, new ServiceLocator($senders))),
+            new HandleMessageMiddleware(new HandlersLocator($handlers)),
+        ]);
+    }
+
+    private function createDispatcherForDelayedMessages(array $senders, array $retryStrategies, array $failureSenders): EventDispatcher
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new AddErrorDetailsStampListener());
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator($senders), new ServiceLocator($retryStrategies)));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator($failureSenders)));
+        $dispatcher->addSubscriber(new StopWorkerOnIdleListener());
+
+        return $dispatcher;
+    }
+
+    private function createRecordingHandler(array &$calls, string $name, int $failures = 0): \Closure
+    {
+        return static function () use (&$calls, $name, &$failures) {
+            $calls[] = $name;
+
+            if (0 < $failures--) {
+                throw new \RuntimeException('Failure from '.$name);
+            }
+        };
     }
 }
 

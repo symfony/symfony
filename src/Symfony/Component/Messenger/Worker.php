@@ -22,7 +22,9 @@ use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\EnvelopeAwareExceptionInterface;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
@@ -256,6 +258,16 @@ class Worker
 
         foreach ($acks as [$transportName, $envelope, $e]) {
             $receiver = $this->receivers[$transportName];
+
+            // delayed messages that failed in their handlers are retried on their own before acking the message that dispatched them, which is redelivered if that fails
+            if ($e instanceof DelayedMessageHandlingException && $e->getWrappedExceptions() === $delayedFailures = $e->getWrappedExceptions(HandlerFailedException::class)) {
+                foreach ($delayedFailures as $delayedFailure) {
+                    $this->eventDispatcher?->dispatch(new WorkerMessageFailedEvent($delayedFailure->getEnvelope(), $transportName, $delayedFailure));
+                }
+
+                $envelope = $e->getEnvelope() ?? $envelope;
+                $e = null;
+            }
 
             if (null !== $e) {
                 if ($rejectFirst = $e instanceof RejectRedeliveredMessageException) {

@@ -59,6 +59,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
@@ -405,6 +407,33 @@ class WorkerTest extends TestCase
         $throwable = $failedEvent->getThrowable();
         $this->assertInstanceOf(HandlerFailedException::class, $throwable);
         $this->assertNull($throwable->getEnvelope()?->last(NoAutoAckStamp::class));
+    }
+
+    public function testParallelExecutionFailsTheDelayedMessageThatFailedInsteadOfTheMessageThatDispatchedIt()
+    {
+        $receiver = new DummyReceiver([[new Envelope(new SecondMessage())]]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $failedEvents = [];
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failedEvents) {
+            $failedEvents[] = $event;
+        });
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertCount(1, $failedEvents);
+        $this->assertInstanceOf(ThirdMessage::class, $failedEvents[0]->getEnvelope()->getMessage());
+        $this->assertSame('transport', $failedEvents[0]->getReceiverName());
+        $this->assertInstanceOf(HandlerFailedException::class, $throwable = $failedEvents[0]->getThrowable());
+        $this->assertSame('Delayed handler failed.', $throwable->getPrevious()->getMessage());
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
     }
 
     public function testHandlingErrorCausesReject()

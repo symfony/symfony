@@ -39,6 +39,7 @@ CHANGELOG
  * Make `SigningSerializer` sign the messages it did not verify as unverified, and refuse such a message when its type requires a signature
  * Add `TrustStamp`, for transports that yield messages created in the same process to have `SigningSerializer` sign them as verified and `SendMessageMiddleware` honor their `RedispatchStamp`
  * Sign messages with a serializer created for each transport instead of decorating the serializer services: encoding with `messenger.default_serializer` or another serializer service does not sign anymore
+ * Retry and send to the failure transport on their own the messages dispatched with `DispatchAfterCurrentBusStamp` whose handlers fail in a worker, instead of failing the message that dispatched them
 
 8.1
 ---

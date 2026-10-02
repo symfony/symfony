@@ -37,7 +37,14 @@ final class ParallelExecutionFailureSanitizer
         }
 
         if ($error instanceof DelayedMessageHandlingException) {
-            return new DelayedMessageHandlingException(self::sanitizeWrappedExceptions($error->getWrappedExceptions(), $envelope), $envelope);
+            $exceptions = [];
+
+            foreach ($error->getWrappedExceptions() as $key => $exception) {
+                // a delayed message keeps its own envelope, for the worker to retry it on its own
+                $exceptions[$key] = $exception instanceof HandlerFailedException ? self::sanitizeError($exception, self::decorateFailedEnvelope($exception->getEnvelope())) : self::sanitizeError($exception, $envelope);
+            }
+
+            return new DelayedMessageHandlingException($exceptions, $envelope);
         }
 
         if ($error instanceof ValidationFailedException) {

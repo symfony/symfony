@@ -282,13 +282,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             return $schema;
         }
 
-        if (method_exists($schema, 'edit')) {
-            return $schema->edit()->addTable($this->buildSchemaTable())->create();
-        }
-
-        $this->configureSchemaTable($schema->createTable($this->table));
-
-        return $schema;
+        return $schema->edit()->addTable($this->buildSchemaTable())->create();
     }
 
     private function buildSchemaTable(): Table
@@ -305,20 +299,6 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
                 ->setUnquotedName($this->table.'_scope_idx')
                 ->setColumnNames(new UnqualifiedName(Identifier::unquoted('scope')), new UnqualifiedName(Identifier::unquoted('id'))))
             ->create();
-    }
-
-    /**
-     * To be removed when doctrine/dbal minimum is bumped to ^4.5.
-     */
-    private function configureSchemaTable(Table $table): void
-    {
-        $table->addColumn('id', 'binary', ['length' => 16, 'fixed' => true]);
-        $table->addColumn('scope', 'string', ['length' => self::MAX_SCOPE_LENGTH]);
-        $table->addColumn('key_material', 'blob');
-        $table->addColumn('master_key_id', 'string', ['length' => 255]);
-        $table->addColumn('client', 'string', ['length' => 64]);
-        $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
-        $table->addIndex(['scope', 'id'], $this->table.'_scope_idx');
     }
 
     /**

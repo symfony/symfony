@@ -88,6 +88,11 @@ final class Key
         return 'alt+'.strtolower($key);
     }
 
+    public static function super(string $key): string
+    {
+        return 'super+'.strtolower($key);
+    }
+
     public static function ctrlShift(string $key): string
     {
         return 'ctrl+shift+'.strtolower($key);
@@ -119,6 +124,9 @@ final class Key
                 'ctrl' => 'Ctrl',
                 'shift' => 'Shift',
                 'alt' => 'Alt',
+                'super' => 'Super',
+                'hyper' => 'Hyper',
+                'meta' => 'Meta',
                 default => self::LABELS[$part] ?? mb_strtoupper($part),
             },
             explode('+', $key),

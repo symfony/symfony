@@ -246,9 +246,88 @@ class KeyParserTest extends TestCase
     {
         $this->parser->setKittyProtocolActive(true);
 
-        // Modifier value 9 means the super bit is set, which has no key id.
-        $this->assertNull($this->parser->parse("\x1b[97;9u"));
-        $this->assertFalse($this->parser->matches("\x1b[97;9u", 'a'));
+        // Modifier value 257 sets bit 256, which the protocol does not define.
+        $this->assertNull($this->parser->parse("\x1b[97;257u"));
+        $this->assertFalse($this->parser->matches("\x1b[97;257u", 'a'));
+    }
+
+    #[DataProvider('csiOnlyModifierProvider')]
+    public function testSuperHyperAndMetaAreParsed(string $input, string $expectedKey, array $expectedModifiers)
+    {
+        $this->parser->setKittyProtocolActive(true);
+
+        $result = $this->parser->parse($input);
+        $this->assertSame($expectedKey, $result['key']);
+        $this->assertSame($expectedModifiers, $result['modifiers']);
+        $this->assertTrue($this->parser->matches($input, $expectedKey));
+    }
+
+    public static function csiOnlyModifierProvider(): iterable
+    {
+        yield 'super+c' => ["\x1b[99;9u", 'super+c', ['super']];
+        yield 'super+c with caps lock' => ["\x1b[99;73u", 'super+c', ['super']];
+        yield 'shift+super+z' => ["\x1b[122;10u", 'shift+super+z', ['shift', 'super']];
+        yield 'ctrl+alt+super+a' => ["\x1b[97;15u", 'ctrl+alt+super+a', ['ctrl', 'alt', 'super']];
+        yield 'hyper+a' => ["\x1b[97;17u", 'hyper+a', ['hyper']];
+        yield 'meta+a' => ["\x1b[97;33u", 'meta+a', ['meta']];
+        yield 'super+left' => ["\x1b[1;9D", 'super+left', ['super']];
+        yield 'super+enter' => ["\x1b[13;9u", 'super+enter', ['super']];
+        yield 'super+backspace' => ["\x1b[127;9u", 'super+backspace', ['super']];
+        yield 'super+delete' => ["\x1b[3;9~", 'super+delete', ['super']];
+        yield 'super+/' => ["\x1b[47;9u", 'super+/', ['super']];
+        yield 'super++' => ["\x1b[43;9u", 'super++', ['super']];
+        // As Ghostty sends them on an AZERTY layout, with the base layout key
+        yield 'super+z with a base layout key' => ["\x1b[122::119;9u", 'super+z', ['super']];
+        yield 'shift+super+z with shifted and base layout keys' => ["\x1b[122:90:119;10u", 'shift+super+z', ['shift', 'super']];
+    }
+
+    public function testSuperKeyIdDoesNotMatchTheBareKey()
+    {
+        $this->parser->setKittyProtocolActive(true);
+
+        $this->assertFalse($this->parser->matches('c', 'super+c'));
+        $this->assertFalse($this->parser->matches("\x1b[99u", 'super+c'));
+        $this->assertFalse($this->parser->matches("\x03", 'super+c'));
+        $this->assertFalse($this->parser->matches("\x1b[99;5u", 'super+c'));
+        $this->assertFalse($this->parser->matches("\x1b[99;9u", 'c'));
+        $this->assertFalse($this->parser->matches("\x1b[99;9u", 'ctrl+c'));
+        $this->assertFalse($this->parser->matches("\x1b[1;3D", 'alt+super+left'));
+    }
+
+    public function testSuperMatchesTheKeypadEnterAndModifiedFunctionKeys()
+    {
+        $this->assertTrue($this->parser->matches("\x1b[57414;9u", 'super+enter'));
+        $this->assertTrue($this->parser->matches("\x1b[1;9P", 'super+f1'));
+        $this->assertTrue($this->parser->matches("\x1b[15;9~", 'super+f5'));
+        $this->assertFalse($this->parser->matches("\x1b[15~", 'super+f5'));
+    }
+
+    public function testSuperFunctionKeyIsParsedAndMatchesRepeatsAndLockModifiers()
+    {
+        $this->assertSame('super+f1', $this->parser->parse("\x1b[1;9P")['key'] ?? null);
+        $this->assertSame('super+f5', $this->parser->parse("\x1b[15;9~")['key'] ?? null);
+        // Repeat event
+        $this->assertTrue($this->parser->matches("\x1b[1;9:2P", 'super+f1'));
+        $this->assertTrue($this->parser->matches("\x1b[15;9:2~", 'super+f5'));
+        // Caps Lock (64) and Num Lock (128) are ignored
+        $this->assertTrue($this->parser->matches("\x1b[1;73P", 'super+f1'));
+        $this->assertTrue($this->parser->matches("\x1b[15;137~", 'super+f5'));
+    }
+
+    public function testUnknownModifierInAKeyIdMatchesNothing()
+    {
+        $this->assertFalse($this->parser->matches('c', 'cmd+c'));
+        $this->assertFalse($this->parser->matches("\x1b[99;9u", 'cmd+c'));
+        $this->assertFalse($this->parser->matches('c', 'foo+c'));
+    }
+
+    public function testSuperKeyIdNamingAKeyTheParserDoesNotNameMatchesNothing()
+    {
+        $this->parser->setKittyProtocolActive(true);
+
+        $this->assertFalse($this->parser->matches("\x1b[57414;9u", 'super+kp_enter'));
+        $this->assertFalse($this->parser->matches("\x1b[32;9u", 'super+ '));
+        $this->assertFalse($this->parser->matches("\x1b[34;9u", 'super+"'));
     }
 
     public function testLockModifiersAreStillIgnored()
@@ -392,9 +471,9 @@ class KeyParserTest extends TestCase
 
     public function testFunctionKeyWithUnnameableModifierIsNotReported()
     {
-        // Modifier value 9 means the super bit is set, which has no key id.
-        $this->assertNull($this->parser->parse("\x1b[1;9P"));
-        $this->assertNull($this->parser->parse("\x1b[15;9~"));
+        // Modifier value 257 means bit 256 is set, which has no key id.
+        $this->assertNull($this->parser->parse("\x1b[1;257P"));
+        $this->assertNull($this->parser->parse("\x1b[15;257~"));
     }
 
     public function testModifyOtherKeysIsNotParsedAsAFunctionKey()

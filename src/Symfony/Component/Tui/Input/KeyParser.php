@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Tui\Input;
 
+use Symfony\Component\Tui\Exception\InvalidArgumentException;
+
 /**
  * Parses raw terminal input into key identifiers.
  *
@@ -25,7 +27,22 @@ final class KeyParser
     private const MOD_SHIFT = 1;
     private const MOD_ALT = 2;
     private const MOD_CTRL = 4;
+    private const MOD_SUPER = 8;
+    private const MOD_HYPER = 16;
+    private const MOD_META = 32;
+    // Super, hyper and meta only exist in the CSI encodings, never in a legacy byte
+    private const MOD_CSI_ONLY = self::MOD_SUPER | self::MOD_HYPER | self::MOD_META;
     private const LOCK_MASK = 192; // Caps Lock + Num Lock
+
+    // In the order key ids are written, e.g. "shift+ctrl+alt+super+a"
+    private const MODIFIER_NAMES = [
+        'shift' => self::MOD_SHIFT,
+        'ctrl' => self::MOD_CTRL,
+        'alt' => self::MOD_ALT,
+        'super' => self::MOD_SUPER,
+        'hyper' => self::MOD_HYPER,
+        'meta' => self::MOD_META,
+    ];
 
     private const EVENT_PRESS = 1;
     private const EVENT_REPEAT = 2;
@@ -267,6 +284,20 @@ final class KeyParser
         }
 
         return $this->matchesKey($data, $keyId);
+    }
+
+    /**
+     * @internal
+     *
+     * @throws InvalidArgumentException When the key id has no key or names an unknown modifier
+     */
+    public function validateKeyId(string $keyId): void
+    {
+        if (null !== $this->parseKeyId($keyId)) {
+            return;
+        }
+
+        throw new InvalidArgumentException(\sprintf('Invalid key id "%s": expected a key, optionally preceded by modifiers among "%s".', $keyId, implode('", "', array_keys(self::MODIFIER_NAMES))));
     }
 
     public function isKeyRelease(string $data): bool
@@ -545,17 +576,13 @@ final class KeyParser
     {
         $mods = [];
         $effective = $modifier & ~self::LOCK_MASK;
-        if ($effective & ~(self::MOD_SHIFT | self::MOD_ALT | self::MOD_CTRL)) {
+        if ($effective & ~(self::MOD_SHIFT | self::MOD_ALT | self::MOD_CTRL | self::MOD_CSI_ONLY)) {
             return null;
         }
-        if ($effective & self::MOD_SHIFT) {
-            $mods[] = 'shift';
-        }
-        if ($effective & self::MOD_CTRL) {
-            $mods[] = 'ctrl';
-        }
-        if ($effective & self::MOD_ALT) {
-            $mods[] = 'alt';
+        foreach (self::MODIFIER_NAMES as $name => $bit) {
+            if ($effective & $bit) {
+                $mods[] = $name;
+            }
         }
 
         return $mods;
@@ -569,19 +596,13 @@ final class KeyParser
         }
 
         $key = $parsed['key'];
-        $ctrl = $parsed['ctrl'];
-        $shift = $parsed['shift'];
-        $alt = $parsed['alt'];
+        $modifier = $parsed['modifier'];
+        $ctrl = 0 !== ($modifier & self::MOD_CTRL);
+        $shift = 0 !== ($modifier & self::MOD_SHIFT);
+        $alt = 0 !== ($modifier & self::MOD_ALT);
 
-        $modifier = 0;
-        if ($shift) {
-            $modifier |= self::MOD_SHIFT;
-        }
-        if ($alt) {
-            $modifier |= self::MOD_ALT;
-        }
-        if ($ctrl) {
-            $modifier |= self::MOD_CTRL;
+        if (0 !== ($modifier & self::MOD_CSI_ONLY)) {
+            return $this->matchesCsiOnlyKey($data, $key, $modifier);
         }
 
         switch ($key) {
@@ -955,7 +976,27 @@ final class KeyParser
     }
 
     /**
-     * @return array{key: string, ctrl: bool, shift: bool, alt: bool}|null
+     * A key behind super, hyper or meta, which no legacy encoding can carry.
+     */
+    private function matchesCsiOnlyKey(string $data, string $key, int $modifier): bool
+    {
+        $key = match ($key) {
+            'esc' => 'escape',
+            'return' => 'enter',
+            default => $key,
+        };
+        $codepoint = self::CODEPOINTS[$key] ?? self::FUNCTIONAL_CODEPOINTS[$key] ?? self::ARROW_CODEPOINTS[$key] ?? self::FUNCTION_KEY_CODEPOINTS[$key] ?? (1 === \strlen($key) ? \ord($key) : null);
+        // Only a key that parse() can name, so that "super+kp_enter" matches nothing, as "kp_enter" does
+        if (null === $codepoint || $key !== $this->keyNameFromCodepoint($codepoint)) {
+            return false;
+        }
+
+        return $this->matchesKittySequence($data, $codepoint, $modifier)
+            || (self::CODEPOINTS['enter'] === $codepoint && $this->matchesKittySequence($data, self::CODEPOINTS['kp_enter'], $modifier));
+    }
+
+    /**
+     * @return array{key: string, modifier: int}|null Null when the key id names an unknown modifier
      */
     private function parseKeyId(string $keyId): ?array
     {
@@ -971,11 +1012,19 @@ final class KeyParser
             }
         }
 
-        return [
-            'key' => $key,
-            'ctrl' => \in_array('ctrl', $parts, true),
-            'shift' => \in_array('shift', $parts, true),
-            'alt' => \in_array('alt', $parts, true),
-        ];
+        if ('+' !== $key) {
+            array_pop($parts);
+        }
+
+        $modifier = 0;
+        foreach ($parts as $part) {
+            if (null === $bit = self::MODIFIER_NAMES[$part] ?? null) {
+                // An unknown modifier must not match the bare key
+                return null;
+            }
+            $modifier |= $bit;
+        }
+
+        return ['key' => $key, 'modifier' => $modifier];
     }
 }

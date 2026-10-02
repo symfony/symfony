@@ -178,6 +178,43 @@ class ConnectionTest extends TestCase
         $this->assertNull($doctrineEnvelope);
     }
 
+    public function testGetRethrowsTheCommitExceptionWhenTheTransactionIsNoLongerActive()
+    {
+        $queryBuilder = $this->getQueryBuilderStub();
+        $driverConnection = $this->getDBALConnection(true);
+        $stmt = $this->getResultMock(false);
+        $exception = $this->createStub(DBALException::class);
+
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('SELECT FOR UPDATE');
+        $driverConnection
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $driverConnection
+            ->method('executeQuery')
+            ->willReturn($stmt);
+        $driverConnection
+            ->method('commit')
+            ->willThrowException($exception);
+        $driverConnection
+            ->method('isTransactionActive')
+            ->willReturn(false);
+        $driverConnection->expects($this->never())
+            ->method('rollBack');
+
+        $connection = new Connection([], $driverConnection);
+
+        $this->expectExceptionObject($exception);
+        $connection->get();
+    }
+
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
         $this->expectException(TransportException::class);
@@ -294,6 +331,45 @@ class ConnectionTest extends TestCase
         $id = $connection->send('test', []);
 
         self::assertSame('1', $id);
+    }
+
+    public function testSendRethrowsTheCommitExceptionWhenTheTransactionIsNoLongerActive()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnection(true);
+        $exception = $this->createStub(DBALException::class);
+
+        $queryBuilder
+            ->method('insert')
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('values')
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('INSERT');
+        $driverConnection
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $driverConnection
+            ->method('executeStatement')
+            ->willReturn(1);
+        $driverConnection
+            ->method('lastInsertId')
+            ->willReturn('1');
+        $driverConnection
+            ->method('commit')
+            ->willThrowException($exception);
+        $driverConnection
+            ->method('isTransactionActive')
+            ->willReturn(false);
+        $driverConnection->expects($this->never())
+            ->method('rollBack');
+
+        $connection = new Connection([], $driverConnection);
+
+        $this->expectExceptionObject($exception);
+        $connection->send('test', []);
     }
 
     /**

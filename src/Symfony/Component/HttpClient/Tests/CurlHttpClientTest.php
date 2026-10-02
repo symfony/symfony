@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -255,6 +256,37 @@ class CurlHttpClientTest extends HttpClientTestCase
         $this->withProxyEnvironment([], [], true, function () use ($client) {
             $response = $client->request('GET', 'http://127.0.0.1:8057/', ['proxy' => 'https://127.0.0.1:8057']);
             $response->cancel();
+
+            $this->addToAssertionCount(1);
+        });
+    }
+
+    #[TestWith([null, 'https://127.0.0.1:8057/', [], false])]
+    #[TestWith(['3.0', 'https://127.0.0.1:8057/', [], true])]
+    #[TestWith([null, 'http://127.0.0.1:8057/', [], false])]
+    #[TestWith(['3.0', 'http://127.0.0.1:8057/', [], false])]
+    #[TestWith(['2.0', 'https://127.0.0.1:8057/', [], false])]
+    #[TestWith(['1.1', 'https://127.0.0.1:8057/', [], false])]
+    #[TestWith([null, 'https://127.0.0.1:8057/', ['proxy' => 'http://127.0.0.1:8057'], false])]
+    #[TestWith(['3.0', 'https://127.0.0.1:8057/', ['proxy' => 'http://127.0.0.1:8057'], false])]
+    public function testHttp3IsRequestedWhenItCanBeUsed(?string $httpVersion, string $url, array $options, bool $http3)
+    {
+        if (!\defined('CURL_HTTP_VERSION_3ONLY') || \CURL_VERSION_HTTP3 & curl_version()['features']) {
+            $this->markTestSkipped('This test needs curl 7.88 or higher without HTTP/3 support.');
+        }
+
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->withProxyEnvironment([], [], true, function () use ($client, $httpVersion, $url, $options, $http3) {
+            // The installed curl rejects HTTP/3, so requesting it fails before any connection is made
+            CurlClientState::$curlVersion['features'] |= \CURL_VERSION_HTTP3;
+
+            if ($http3) {
+                $this->expectException(TransportException::class);
+                $this->expectExceptionMessage('Curl option "CURLOPT_HTTP_VERSION" is not supported.');
+            }
+
+            $client->request('GET', $url, ['http_version' => $httpVersion] + $options)->cancel();
 
             $this->addToAssertionCount(1);
         });

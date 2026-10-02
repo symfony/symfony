@@ -138,10 +138,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_0;
         } elseif (1.1 === (float) $options['http_version']) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_1;
+        } elseif (3.0 === (float) $options['http_version'] && 'https:' === $scheme && \defined('CURL_HTTP_VERSION_3ONLY') && (\CURL_VERSION_HTTP3 & CurlClientState::$curlVersion['features']) && !self::willUseProxy($proxy, $curlopts[\CURLOPT_NOPROXY], $host)) {
+            // CURL_HTTP_VERSION_3 falls back to older versions since curl 7.88, which added CURL_HTTP_VERSION_3ONLY
+            $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_3;
         } elseif (\defined('CURL_VERSION_HTTP2') && (\CURL_VERSION_HTTP2 & CurlClientState::$curlVersion['features']) && ('https:' === $scheme || 2.0 === (float) $options['http_version'])) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_2_0;
-        } elseif (\defined('CURL_VERSION_HTTP3') && (\CURL_VERSION_HTTP3 & CurlClientState::$curlVersion['features']) && 3.0 === (float) $options['http_version'] && !self::willUseProxy($proxy, $curlopts[\CURLOPT_NOPROXY], $host)) {
-            $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_3;
         }
 
         $ntlmOriginKey = null;

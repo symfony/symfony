@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Event\HandlerFailureEvent;
 use Symfony\Component\Messenger\Event\HandlerStartingEvent;
 use Symfony\Component\Messenger\Event\HandlerSuccessEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
@@ -27,10 +28,13 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
+use Symfony\Component\Messenger\Retry\RetryDecider;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -819,6 +823,109 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $this->assertInstanceOf(HandlerSuccessEvent::class, $events[3]);
         $this->assertSame($flushingDescriptor, $events[3]->handlerDescriptor);
+    }
+
+    public function testAHandlerThatRequiresASignatureRefusesAnEnvelopeMarkedUntrusted()
+    {
+        $called = false;
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor(static function () use (&$called) { $called = true; }, ['sign' => true])],
+        ]));
+
+        foreach ([[TrustStamp::untrusted()], [new ReceivedStamp('async'), TrustStamp::untrusted()], [TrustStamp::trusted(), TrustStamp::untrusted()]] as $stamps) {
+            try {
+                $middleware->handle(new Envelope(new DummyMessage('Hey'), $stamps), $this->getStackMock(false));
+                $this->fail('Exception not thrown.');
+            } catch (HandlerFailedException $e) {
+                $this->assertCount(1, $e->getWrappedExceptions());
+                $this->assertInstanceOf(InvalidMessageSignatureException::class, $e->getWrappedExceptions()['Closure']);
+                $this->assertSame('Handler "Closure" requires a verified signature, but message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" comes from data that was not verified.', $e->getWrappedExceptions()['Closure']->getMessage());
+                $this->assertFalse(RetryDecider::decideFromException($e));
+            }
+        }
+
+        $this->assertFalse($called);
+    }
+
+    public function testOtherHandlersRunWhenAHandlerThatRequiresASignatureRefusesAnEnvelope()
+    {
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                new HandlerDescriptor(static fn () => 'signed', ['sign' => true, 'alias' => 'signed']),
+                new HandlerDescriptor(static fn () => 'other', ['alias' => 'other']),
+            ],
+        ]));
+
+        try {
+            $middleware->handle(new Envelope(new DummyMessage('Hey'), [TrustStamp::untrusted()]), $this->getStackMock(false));
+            $this->fail('Exception not thrown.');
+        } catch (HandlerFailedException $e) {
+            $this->assertSame(['Closure@signed'], array_keys($e->getWrappedExceptions()));
+            $this->assertInstanceOf(InvalidMessageSignatureException::class, $e->getWrappedExceptions()['Closure@signed']);
+            $this->assertEquals([new HandledStamp('other', 'Closure@other')], $e->getEnvelope()->all(HandledStamp::class));
+        }
+    }
+
+    public function testAHandlerThatRequiresASignatureHandlesEnvelopesNotMarkedUntrusted()
+    {
+        $calls = 0;
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor(static function () use (&$calls) { ++$calls; }, ['sign' => true])],
+        ]));
+
+        $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware());
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('async')]), new StackMiddleware());
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [TrustStamp::trusted()]), new StackMiddleware());
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [TrustStamp::untrusted(), TrustStamp::trusted()]), new StackMiddleware());
+
+        $this->assertSame(4, $calls);
+    }
+
+    public function testABatchHandlerThatRequiresASignatureRefusesAnEnvelopeMarkedUntrusted()
+    {
+        $handler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public array $processedMessages = [];
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function shouldFlush()
+            {
+                return true;
+            }
+
+            private function process(array $jobs): void
+            {
+                $this->processedMessages = array_column($jobs, 0);
+
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $descriptor = new HandlerDescriptor($handler, ['sign' => true]);
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [$descriptor]]), false, null, $dispatcher = new RecordingHandlerEventDispatcher());
+        $acked = false;
+
+        try {
+            $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp(static function () use (&$acked) { $acked = true; }), TrustStamp::untrusted()]), new StackMiddleware());
+            $this->fail('Exception not thrown.');
+        } catch (HandlerFailedException $e) {
+            $this->assertInstanceOf(InvalidMessageSignatureException::class, $e->getWrappedExceptions()[$descriptor->getName()]);
+            $this->assertNull($e->getEnvelope()->last(NoAutoAckStamp::class));
+        }
+
+        $this->assertSame([], $handler->processedMessages);
+        $this->assertFalse($acked);
+        $this->assertCount(2, $dispatcher->events);
+        $this->assertInstanceOf(HandlerStartingEvent::class, $dispatcher->events[0]);
+        $this->assertInstanceOf(HandlerFailureEvent::class, $dispatcher->events[1]);
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $dispatcher->events[1]->exception);
     }
 }
 

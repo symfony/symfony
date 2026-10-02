@@ -38,6 +38,7 @@ CHANGELOG
  * Add the `sign` transport option, `'*'` as a message type of `SigningSerializer` and its `$acceptUnverified` argument, to sign every message of a transport and refuse the unverified ones before reading their type
  * Make `SigningSerializer` sign the messages it did not verify as unverified, and refuse such a message when its type requires a signature
  * Add `TrustStamp`, for transports that yield messages created in the same process to have `SigningSerializer` sign them as verified and `SendMessageMiddleware` honor their `RedispatchStamp`
+ * Make `HandleMessageMiddleware` refuse to call the handlers that require a signature for an envelope marked untrusted
  * Sign messages with a serializer created for each transport instead of decorating the serializer services: encoding with `messenger.default_serializer` or another serializer service does not sign anymore
 
 8.1

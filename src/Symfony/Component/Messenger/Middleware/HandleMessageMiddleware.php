@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Event\HandlerFailureEvent;
 use Symfony\Component\Messenger\Event\HandlerStartingEvent;
 use Symfony\Component\Messenger\Event\HandlerSuccessEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
@@ -29,6 +30,7 @@ use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
+use Symfony\Component\Messenger\Stamp\TrustStamp;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -74,6 +76,11 @@ class HandleMessageMiddleware implements MiddlewareInterface
             try {
                 $handler = $handlerDescriptor->getHandler();
                 $batchHandler = $handlerDescriptor->getBatchHandler();
+
+                // only an explicit marker counts: transports that bypass the signing serializer add none
+                if ($handlerDescriptor->getOption('sign') && false === $envelope->last(TrustStamp::class)?->isTrusted()) {
+                    throw new InvalidMessageSignatureException(\sprintf('Handler "%s" requires a verified signature, but message "%s" comes from data that was not verified.', $handlerDescriptor->getName(), $context['class']));
+                }
 
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
                     $dispatcher = $this->dispatcher;

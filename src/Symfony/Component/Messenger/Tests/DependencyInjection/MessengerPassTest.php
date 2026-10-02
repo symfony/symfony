@@ -12,6 +12,9 @@
 namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -1149,6 +1152,83 @@ class MessengerPassTest extends TestCase
             ],
             $emptyBus => [],
         ], $container->getDefinition('console.command.messenger_debug')->getArgument(0));
+    }
+
+    public function testItAddsMiddlewareToTheDebugCommand()
+    {
+        $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
+        $container->register($barBusId = 'messenger.bus.bar', MessageBusInterface::class)->setArgument(0, [])->addTag('messenger.bus');
+        $container->register($bazBusId = 'messenger.bus.baz', MessageBusInterface::class)
+            ->setArgument(0, new IteratorArgument([new Reference(UselessMiddleware::class)]))
+            ->addTag('messenger.bus');
+        $container->register('middleware_with_factory', UselessMiddleware::class)->setAbstract(true);
+        $container->register(UselessMiddleware::class, UselessMiddleware::class);
+        $container->register('console.command.messenger_debug', DebugCommand::class)->addArgument([]);
+
+        $container->setParameter($fooBusId.'.middleware', [
+            ['id' => 'middleware_with_factory'],
+            ['id' => UselessMiddleware::class],
+        ]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([
+            $fooBusId => [
+                [$fooBusId.'.middleware.middleware_with_factory', UselessMiddleware::class],
+                [UselessMiddleware::class, UselessMiddleware::class],
+            ],
+            $barBusId => [],
+            $bazBusId => [
+                [UselessMiddleware::class, UselessMiddleware::class],
+            ],
+        ], $container->getDefinition('console.command.messenger_debug')->getArgument('$middleware'));
+    }
+
+    public function testItAddsTaggedIteratorMiddlewareToTheDebugCommand()
+    {
+        $container = $this->getContainerBuilder($busId = 'messenger.bus.foo');
+        $container->getDefinition($busId)->setArgument(0, new TaggedIteratorArgument('app.middleware'));
+        $container->register('second_middleware', UselessMiddleware::class)->addTag('app.middleware', ['priority' => -1]);
+        $container->register('first_middleware', UselessMiddleware::class)->addTag('app.middleware', ['priority' => 1]);
+        $container->register('console.command.messenger_debug', DebugCommand::class)->addArgument([]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([
+            $busId => [
+                ['first_middleware', UselessMiddleware::class],
+                ['second_middleware', UselessMiddleware::class],
+            ],
+        ], $container->getDefinition('console.command.messenger_debug')->getArgument('$middleware'));
+    }
+
+    public function testItAddsMiddlewareToTheDebugCommandWithoutSendersLocator()
+    {
+        $container = new ContainerBuilder();
+        $container->register('message_bus', MessageBusInterface::class)->addArgument([])->addTag('messenger.bus');
+        $container->register(UselessMiddleware::class, UselessMiddleware::class);
+        $container->setParameter('message_bus.middleware', [['id' => UselessMiddleware::class]]);
+        $container->register('console.command.messenger_debug', DebugCommand::class)->addArgument([])->setPublic(true);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
+
+        $tester = new CommandTester($container->get('console.command.messenger_debug'));
+        $tester->execute(['--middleware' => true], ['decorated' => false]);
+
+        $this->assertStringContainsString(UselessMiddleware::class, $tester->getDisplay(true));
+    }
+
+    public function testItStopsOnCircularMiddlewareParentsForTheDebugCommand()
+    {
+        $container = $this->getContainerBuilder($busId = 'messenger.bus.foo');
+        $container->getDefinition($busId)->setArgument(0, [new Reference('middleware_a')]);
+        $container->setDefinition('middleware_a', new ChildDefinition('middleware_b'));
+        $container->setDefinition('middleware_b', new ChildDefinition('middleware_a'));
+        $container->register('console.command.messenger_debug', DebugCommand::class)->addArgument([]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([$busId => [['middleware_a', null]]], $container->getDefinition('console.command.messenger_debug')->getArgument('$middleware'));
     }
 
     public function testItAddsRoutingToTheDebugCommand()

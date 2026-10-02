@@ -18,6 +18,8 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Command\DebugCommand;
+use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithDescription;
@@ -161,6 +163,77 @@ class DebugCommandTest extends TestCase
             TXT,
             $tester->getDisplay(true)
         );
+    }
+
+    public function testOutputWithMiddleware()
+    {
+        $command = new DebugCommand(
+            ['command_bus' => [DummyCommand::class => [[DummyCommandHandler::class, []]]], 'query_bus' => []],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [
+                'command_bus' => [
+                    ['command_bus.middleware.send_message', SendMessageMiddleware::class],
+                    ['command_bus.middleware.handle_message', HandleMessageMiddleware::class],
+                ],
+                'query_bus' => [],
+            ],
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--middleware' => true], ['decorated' => false]);
+        $display = $tester->getDisplay(true);
+
+        $this->assertStringContainsString('The following middleware are called, in this order:', $display);
+        $this->assertStringContainsString(SendMessageMiddleware::class, $display);
+        $this->assertStringContainsString(HandleMessageMiddleware::class, $display);
+        $this->assertLessThan(strpos($display, 'command_bus.middleware.handle_message'), strpos($display, 'command_bus.middleware.send_message'));
+        $this->assertLessThan(strpos($display, 'The following messages can be dispatched:'), strpos($display, 'command_bus.middleware.handle_message'));
+        $this->assertStringContainsString("query_bus\n---------\n\n No middleware registered.", $display);
+    }
+
+    public function testOutputWithMiddlewareForASpecificBus()
+    {
+        $command = new DebugCommand(
+            ['command_bus' => [], 'query_bus' => []],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [
+                'command_bus' => [['command_bus.middleware.send_message', SendMessageMiddleware::class]],
+                'query_bus' => [['query_bus.middleware.handle_message', HandleMessageMiddleware::class]],
+            ],
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['bus' => 'query_bus', '--middleware' => true], ['decorated' => false]);
+        $display = $tester->getDisplay(true);
+
+        $this->assertStringContainsString('query_bus.middleware.handle_message', $display);
+        $this->assertStringNotContainsString('command_bus', $display);
+    }
+
+    public function testOutputDoesNotIncludeMiddlewareByDefault()
+    {
+        $command = new DebugCommand(
+            ['command_bus' => []],
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['command_bus' => [['command_bus.middleware.handle_message', HandleMessageMiddleware::class]]],
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute([], ['decorated' => false]);
+
+        $this->assertStringNotContainsString('command_bus.middleware.handle_message', $tester->getDisplay(true));
     }
 
     public function testOutputIncludesRoutingInformationAndGlobalTransportRules()

@@ -40,6 +40,7 @@ class DebugCommand extends Command
      * @param array<string, list<string>>                                    $attributeMessages Message classes discovered via #[AsMessage] attribute mapped to their transports
      * @param array<string, string>                                          $failureTransports Failure transports mapped by source transport
      * @param array<string, list<string>>                                    $handlerTransports Transports declared by handlers, mapped by handled message type
+     * @param array<string, list<array{0: string, 1: string|null}>>          $middleware        Middleware service ids and classes mapped by bus, in the order they are called
      */
     public function __construct(
         private array $mapping,
@@ -48,6 +49,7 @@ class DebugCommand extends Command
         private readonly array $attributeMessages = [],
         private readonly array $failureTransports = [],
         private readonly array $handlerTransports = [],
+        private readonly array $middleware = [],
     ) {
         parent::__construct();
     }
@@ -57,6 +59,7 @@ class DebugCommand extends Command
         $this
             ->addArgument('bus', InputArgument::OPTIONAL, \sprintf('The bus id (one of "%s")', implode('", "', array_keys($this->mapping))))
             ->addOption('message', null, InputOption::VALUE_REQUIRED, 'A message FQCN to inspect')
+            ->addOption('middleware', null, InputOption::VALUE_NONE, 'Display the middleware of each bus')
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command displays all messages that can be
                 dispatched using the message buses, their handlers, routing rules and
@@ -71,6 +74,10 @@ class DebugCommand extends Command
                 Or inspect what happens when dispatching a specific message:
 
                   <info>php %command.full_name% --message='App\Message\MyMessage'</info>
+
+                Or display the middleware of each bus, in the order they are called:
+
+                  <info>php %command.full_name% --middleware</info>
 
                 Routing is based on configuration and #[AsMessage] attributes.
                 TransportNamesStamp can override this routing at dispatch time.
@@ -104,6 +111,10 @@ class DebugCommand extends Command
 
         foreach ($mapping as $bus => $handlersByMessage) {
             $io->section($bus);
+
+            if ($input->getOption('middleware')) {
+                $this->displayMiddleware($io, $bus);
+            }
 
             if (null !== $messageClass) {
                 $handlersByMessage = [$messageClass => $this->getHandlersForMessage($messageClass, $handlersByMessage)];
@@ -260,6 +271,31 @@ class DebugCommand extends Command
         sort($transportNames);
 
         return $transportNames;
+    }
+
+    private function displayMiddleware(SymfonyStyle $io, string $bus): void
+    {
+        if (!$middleware = $this->middleware[$bus] ?? []) {
+            $io->text('No middleware registered.');
+            $io->newLine();
+
+            return;
+        }
+
+        $tableRows = [];
+        foreach ($middleware as [$id, $class]) {
+            $tableRows[] = [\sprintf('<fg=cyan>%s</fg=cyan>', $id)];
+            if (null !== $class && $class !== $id) {
+                $tableRows[] = [\sprintf('    <info>%s</>', $class)];
+            }
+            if (null !== $class && $description = self::getClassDescription($class)) {
+                $tableRows[] = [\sprintf('    <comment>%s</>', $description)];
+            }
+        }
+
+        $io->text('The following middleware are called, in this order:');
+        $io->newLine();
+        $io->table([], $tableRows);
     }
 
     private function displayTransportRules(SymfonyStyle $io, ?string $messageClass): void

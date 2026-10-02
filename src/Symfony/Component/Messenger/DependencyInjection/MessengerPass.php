@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
@@ -59,6 +60,7 @@ class MessengerPass implements CompilerPassInterface
         $this->registerHandlers($container, $busIds);
         $this->registerTypeMapping($container);
         $this->registerDebugCommandRouting($container);
+        $this->registerDebugCommandMiddleware($container, $busIds);
     }
 
     private function registerHandlers(ContainerBuilder $container, array $busIds): void
@@ -623,5 +625,46 @@ class MessengerPass implements CompilerPassInterface
             ->setArgument(4, $failureTransports)
             ->setArgument(5, $this->handlerTransports)
         ;
+    }
+
+    private function registerDebugCommandMiddleware(ContainerBuilder $container, array $busIds): void
+    {
+        if (!$container->hasDefinition('console.command.messenger_debug')) {
+            return;
+        }
+
+        $middlewareByBus = [];
+        foreach ($busIds as $busId) {
+            $middlewareByBus[$busId] = [];
+
+            $arguments = $container->getDefinition($busId)->getArguments();
+            $middleware = $arguments[0] ?? [];
+            if ($middleware instanceof TaggedIteratorArgument) {
+                $middleware = $this->findAndSortTaggedServices($middleware, $container, $middleware->excludeSelf() ? [$busId] : []);
+            } elseif ($middleware instanceof IteratorArgument) {
+                $middleware = $middleware->getValues();
+            }
+            if (!\is_array($middleware)) {
+                continue;
+            }
+
+            foreach ($middleware as $reference) {
+                if (!$reference instanceof Reference) {
+                    continue;
+                }
+
+                $id = $class = (string) $reference;
+                $seen = [];
+                do {
+                    $definition = !isset($seen[$class]) && $container->has($class) ? $container->findDefinition($class) : null;
+                    $seen[$class] = true;
+                    $class = $definition instanceof ChildDefinition && !$definition->getClass() ? $definition->getParent() : $definition?->getClass();
+                } while ($definition instanceof ChildDefinition && !$definition->getClass());
+
+                $middlewareByBus[$busId][] = [$id, $class];
+            }
+        }
+
+        $container->getDefinition('console.command.messenger_debug')->setArgument('$middleware', $middlewareByBus);
     }
 }

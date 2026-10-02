@@ -36,6 +36,7 @@ use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\IsSignatureValidAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
+use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
 use Symfony\Component\HttpKernel\EventListener\SerializeControllerResultAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
@@ -186,5 +187,12 @@ return static function (ContainerConfigurator $container) {
             service('serializer')->nullOnInvalid(),
         ])
         ->tag('kernel.event_subscriber')
+
+        ->set('rate_limiter.attribute_listener', RateLimitAttributeListener::class)
+            ->args([
+                tagged_locator('rate_limiter', 'name'),
+            ])
+            ->tag('kernel.event_subscriber')
+            ->tag('container.remove_if_missing', ['service' => 'limiter'])
     ;
 };

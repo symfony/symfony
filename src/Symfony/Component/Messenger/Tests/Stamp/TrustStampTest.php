@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -35,5 +37,21 @@ class TrustStampTest extends TestCase
     public function testADenormalizedStampIsNotTrusted()
     {
         $this->assertFalse((new ObjectNormalizer())->denormalize([], TrustStamp::class)->isTrusted());
+    }
+
+    public function testAnEnvelopeDispatchedInThisProcessIsTrusted()
+    {
+        $this->assertTrue(TrustStamp::isEnvelopeTrusted(new Envelope(new \stdClass())));
+    }
+
+    public function testAReceivedEnvelopeIsNotTrusted()
+    {
+        $this->assertFalse(TrustStamp::isEnvelopeTrusted(new Envelope(new \stdClass(), [new ReceivedStamp('async')])));
+    }
+
+    public function testTheLastTrustStampDecides()
+    {
+        $this->assertTrue(TrustStamp::isEnvelopeTrusted(new Envelope(new \stdClass(), [new ReceivedStamp('async'), TrustStamp::untrusted(), TrustStamp::trusted()])));
+        $this->assertFalse(TrustStamp::isEnvelopeTrusted(new Envelope(new \stdClass(), [TrustStamp::trusted(), TrustStamp::untrusted()])));
     }
 }

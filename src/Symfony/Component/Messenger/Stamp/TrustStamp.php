@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
+use Symfony\Component\Messenger\Envelope;
+
 /**
  * Tells whether the content of an envelope can be trusted, because it was created in this process or its signature was verified on receipt.
  *
@@ -44,5 +46,13 @@ final class TrustStamp implements NonSendableStampInterface
     public function isTrusted(): bool
     {
         return isset(self::$trusted[$this]);
+    }
+
+    /**
+     * Tells whether an envelope can be trusted: its last TrustStamp decides, and without one, an envelope that no transport delivered was dispatched in this process.
+     */
+    public static function isEnvelopeTrusted(Envelope $envelope): bool
+    {
+        return ($stamp = $envelope->last(self::class)) ? $stamp->isTrusted() : null === $envelope->last(ReceivedStamp::class);
     }
 }

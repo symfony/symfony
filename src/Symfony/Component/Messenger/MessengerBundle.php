@@ -336,6 +336,7 @@ class MessengerBundle extends AbstractBundle
 
         if (!interface_exists(DenormalizerInterface::class)) {
             $container->removeDefinition('serializer.normalizer.flatten_exception');
+            $container->removeDefinition('serializer.normalizer.chain_stamp');
         }
 
         if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', Bridge\Amqp\Transport\AmqpTransportFactory::class, ['symfony/messenger'])) {
@@ -385,6 +386,7 @@ class MessengerBundle extends AbstractBundle
             ],
             'after' => [
                 ['id' => 'send_message'],
+                ['id' => 'chain'],
                 ['id' => 'handle_message'],
             ],
         ];
@@ -405,7 +407,7 @@ class MessengerBundle extends AbstractBundle
 
             if ($bus['default_middleware']['enabled']) {
                 $defaultMiddleware['after'][0]['arguments'] = [$bus['default_middleware']['allow_no_senders']];
-                $defaultMiddleware['after'][1]['arguments'] = ['index_1' => $bus['default_middleware']['allow_no_handlers']];
+                $defaultMiddleware['after'][2]['arguments'] = ['index_1' => $bus['default_middleware']['allow_no_handlers']];
 
                 $middleware = array_merge($defaultMiddleware['before'], $middleware, $defaultMiddleware['after']);
             }

@@ -1,0 +1,13 @@
+open
+read
+close
+
+Warning: session_start(): Failed to read session data: user (path: Fixtures) in Fixtures/strict_read_failure.php on line 65
+bool(false)
+
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: max-age=10800, private, must-revalidate
+)
+shutdown

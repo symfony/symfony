@@ -689,8 +689,7 @@ class DumperTest extends TestCase
         $expected = "foo: !bar |+\n    a\n    b\n\n\n";
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
-        // @todo Fix the parser, the result should be identical to $data.
-        $this->assertSameData(['foo' => new TaggedValue('bar', "a\nb\n\n\n")], $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
+        $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function testDumpingTaggedMultiLineTrailingNewlinesInList()
@@ -719,6 +718,68 @@ class DumperTest extends TestCase
         $yml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
         $this->assertSame($expected, $yml);
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
+    }
+
+    public function testTaggedMultiLineLiteralBlocksRoundTrip()
+    {
+        $data = [
+            'strip' => new TaggedValue('my-tag', "one\ntwo"),
+            'clip' => new TaggedValue('my-tag', "one\ntwo\n"),
+            'keep' => new TaggedValue('my-tag', "one\ntwo\n\n"),
+            'line break' => new TaggedValue('my-tag', "\n"),
+            'list' => [
+                new TaggedValue('my-tag', "one\ntwo"),
+                new TaggedValue('my-tag', "one\ntwo\n"),
+                new TaggedValue('my-tag', "one\ntwo\n\n"),
+                new TaggedValue('my-tag', "one\ntwo"),
+            ],
+        ];
+        $yaml = $this->dumper->dump($data, 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $expected = <<<YAML
+            strip: !my-tag |-
+                one
+                two
+            clip: !my-tag |
+                one
+                two
+            keep: !my-tag |+
+                one
+                two
+
+            'line break': !my-tag |+
+
+            list:
+                - !my-tag |-
+                    one
+                    two
+                - !my-tag |
+                    one
+                    two
+                - !my-tag |+
+                    one
+                    two
+
+                - !my-tag |-
+                    one
+                    two
+            YAML;
+
+        $this->assertSame($expected, $yaml);
+        $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
+    }
+
+    public function testDumpingTaggedValueWithCarriageReturnAsQuotedString()
+    {
+        $data = [
+            'foo' => new TaggedValue('bar', "a\rb\nc"),
+            'baz' => [new TaggedValue('bar', "a\rb\nc")],
+        ];
+        $yaml = $this->dumper->dump($data, 3, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $this->assertSame("foo: !bar \"a\\rb\\nc\"\nbaz:\n    - !bar \"a\\rb\\nc\"\n", $yaml);
+        $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
+        $this->assertSame("!bar \"a\\rb\\nc\"\n", $this->dumper->dump(new TaggedValue('bar', "a\rb\nc"), 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     public function testDumpMultiLineStringAsScalarBlock()

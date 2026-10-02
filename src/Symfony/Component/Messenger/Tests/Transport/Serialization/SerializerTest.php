@@ -696,7 +696,7 @@ class SerializerTest extends TestCase
         $this->assertSame(\sprintf('Could not decode stamp: "%s" is not a "%s".', DummyMessage::class, StampInterface::class), $envelope->getMessage()->getMessage());
     }
 
-    public function testDecodingFailsWithANonSendableStamp()
+    public function testDecodedSkipsNonSendableStamps()
     {
         $serializer = new Serializer();
 
@@ -709,8 +709,6 @@ class SerializerTest extends TestCase
             ],
         ]);
 
-        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
-        $this->assertSame(\sprintf('Could not decode stamp: "%s" is a "%s".', ReceivedStamp::class, NonSendableStampInterface::class), $envelope->getMessage()->getMessage());
         $this->assertNull($envelope->last(ReceivedStamp::class));
         $this->assertEquals([new BusNameStamp('the_bus')], $envelope->all(BusNameStamp::class));
     }

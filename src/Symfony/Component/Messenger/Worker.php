@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\EnvelopeAwareExceptionInterface;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
@@ -31,6 +32,7 @@ use Symfony\Component\Messenger\Execution\SyncMessageExecutionStrategy;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -230,6 +232,11 @@ class Worker
 
                 if ($e instanceof EnvelopeAwareExceptionInterface && null !== $e->getEnvelope()) {
                     $envelope = $e->getEnvelope();
+                }
+
+                if ($e instanceof DelayedMessageHandlingException) {
+                    // a retry must run the handlers again, so that they dispatch the delayed messages that failed again
+                    $envelope = $envelope->withoutAll(HandledStamp::class);
                 }
 
                 $failedEvent = new WorkerMessageFailedEvent($envelope, $transportName, $e);

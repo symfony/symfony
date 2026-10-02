@@ -361,7 +361,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         return parent::open($savePath, $sessionName);
     }
 
-    public function read(#[\SensitiveParameter] string $sessionId): string
+    public function read(#[\SensitiveParameter] string $sessionId): string|false
     {
         try {
             return parent::read($sessionId);

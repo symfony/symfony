@@ -220,7 +220,6 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
                 // encoding strips these stamps, so they never come from a transport
                 if (is_subclass_of($class, NonSendableStampInterface::class)) {
-                    $failure ??= new MessageDecodingFailedException(\sprintf('Could not decode stamp: "%s" is a "%s".', $class, NonSendableStampInterface::class));
                     continue;
                 }
 

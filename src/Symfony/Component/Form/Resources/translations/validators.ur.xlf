@@ -8,15 +8,15 @@
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>اپ لوڈ کردھ فائل بہت بڑی تھی۔ براہ کرم ایک چھوٹی فائل اپ لوڈ کرنے کی کوشش کریں</target>
+                <target>اپ لوڈ کردہ فائل بہت بڑی تھی۔ براہ کرم ایک چھوٹی فائل اپ لوڈ کرنے کی کوشش کریں</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>ٹوکن غلط ہے۔ براۓ کرم فارم کو دوبارہ جمع کرانے کی کوشش کریں CSRF</target>
+                <target>CSRF ٹوکن غلط ہے۔ براۓ کرم فارم کو دوبارہ جمع کرانے کی کوشش کریں</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
-                <target>ر نگ نھیں ھےHTML یھ ولیو در ست</target>
+                <target>یہ ویلیو ایک درست HTML5 رنگ نہیں ہے</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>Please enter a valid birthdate.</source>
@@ -28,7 +28,7 @@
             </trans-unit>
             <trans-unit id="102">
                 <source>The collection is invalid.</source>
-                <target>یھ مجموعہ غلط ہے</target>
+                <target>یہ مجموعہ غلط ہے</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>Please select a valid color.</source>
@@ -44,7 +44,7 @@
             </trans-unit>
             <trans-unit id="106">
                 <source>Please choose a valid date interval.</source>
-                <target>براۓ کرم ایک درست تاریخی وقفھہ منتخب کریں</target>
+                <target>براۓ کرم تاریخ کا درست وقفہ منتخب کریں</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Please enter a valid date and time.</source>
@@ -60,7 +60,7 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
-                <target>پوشیدھہ فیلڈ غلط ہے</target>
+                <target>پوشیدہ فیلڈ غلط ہے</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>Please enter an integer.</source>

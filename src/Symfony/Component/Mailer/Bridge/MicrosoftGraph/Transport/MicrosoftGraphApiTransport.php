@@ -171,10 +171,13 @@ class MicrosoftGraphApiTransport extends AbstractApiTransport
     {
         $headers = [];
 
-        $headersToBypass = ['x-ms-client-request-id', 'operation-id', 'authorization', 'x-ms-content-sha256', 'received', 'dkim-signature', 'content-transfer-encoding', 'sender', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to', 'return-path'];
+        // Graph rejects the whole request when an internetMessageHeaders name does not start
+        // with "x-", so forwarding anything else fails the send instead of dropping a header.
+        // These two are x-prefixed but belong to the API request rather than to the message.
+        $headersToBypass = ['x-ms-client-request-id', 'x-ms-content-sha256'];
 
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            if (!str_starts_with($name, 'x-') || \in_array($name, $headersToBypass, true)) {
                 continue;
             }
             $headers[] = [

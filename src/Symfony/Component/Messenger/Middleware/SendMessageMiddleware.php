@@ -73,6 +73,9 @@ class SendMessageMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
+        // the redispatch is done once sent: transports that keep the envelope as is, like the sync one, must not trigger it again
+        $envelope = $envelope->withoutAll(RedispatchStamp::class);
+
         if (null !== $this->eventDispatcher) {
             $event = new SendMessageToTransportsEvent($envelope, $senders);
             $this->eventDispatcher->dispatch($event);

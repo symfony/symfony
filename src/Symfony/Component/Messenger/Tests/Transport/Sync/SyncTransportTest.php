@@ -40,6 +40,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\RedispatchStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -428,6 +429,25 @@ class SyncTransportTest extends TestCase
         $this->assertCount(1, $failureTransport->getSent());
     }
 
+    public function testARedispatchedMessageRoutedToTheSyncTransportIsHandledOnce()
+    {
+        $calls = 0;
+        $senders = new Container();
+        $bus = new MessageBus([
+            new LoopGuardMiddleware(),
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['sync']], $senders)),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () use (&$calls) { ++$calls; }]])),
+        ]);
+        $senders->set('sync', new SyncTransport($bus));
+
+        $envelope = $bus->dispatch(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('scheduler_default'), TrustStamp::trusted(), new RedispatchStamp()]));
+
+        $this->assertSame(1, $calls);
+        $this->assertCount(1, $envelope->all(HandledStamp::class));
+        $this->assertCount(1, $envelope->all(SentStamp::class));
+        $this->assertNull($envelope->last(RedispatchStamp::class));
+    }
+
     public function testEventsAreDispatchedForARetryFollowedBySuccess()
     {
         $firstCalls = $secondCalls = 0;
@@ -574,6 +594,24 @@ class SyncTransportTest extends TestCase
     private static function getRetryCounts(Envelope $envelope): array
     {
         return array_map(static fn (RedeliveryStamp $stamp) => $stamp->getRetryCount(), $envelope->all(RedeliveryStamp::class));
+    }
+}
+
+final class LoopGuardMiddleware implements MiddlewareInterface
+{
+    private int $depth = 0;
+
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
+    {
+        if (5 < ++$this->depth) {
+            throw new \LogicException('The message is dispatched in a loop.');
+        }
+
+        try {
+            return $stack->next()->handle($envelope, $stack);
+        } finally {
+            --$this->depth;
+        }
     }
 }
 

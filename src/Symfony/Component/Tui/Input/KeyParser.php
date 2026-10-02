@@ -225,6 +225,14 @@ final class KeyParser
         "\x1bn" => 'alt+down',
     ];
 
+    // The named keys matchesKey() handles, besides the single characters
+    private const KEY_NAMES = [
+        'escape', 'esc', 'enter', 'return', 'tab', 'space', 'backspace',
+        'insert', 'delete', 'clear', 'home', 'end', 'page_up', 'page_down',
+        'up', 'down', 'left', 'right',
+        'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12',
+    ];
+
     private const SYMBOL_KEYS = [
         '`', '-', '=', '[', ']', '\\', ';', "'", ',', '.', '/',
         '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+',
@@ -289,15 +297,17 @@ final class KeyParser
     /**
      * @internal
      *
-     * @throws InvalidArgumentException When the key id has no key or names an unknown modifier
+     * @throws InvalidArgumentException When the key id has no key, names an unknown modifier or an unknown key
      */
     public function validateKeyId(string $keyId): void
     {
-        if (null !== $this->parseKeyId($keyId)) {
-            return;
+        if (null === $parsed = $this->parseKeyId($keyId)) {
+            throw new InvalidArgumentException(\sprintf('Invalid key id "%s": expected a key, optionally preceded by modifiers among "%s".', $keyId, implode('", "', array_keys(self::MODIFIER_NAMES))));
         }
 
-        throw new InvalidArgumentException(\sprintf('Invalid key id "%s": expected a key, optionally preceded by modifiers among "%s".', $keyId, implode('", "', array_keys(self::MODIFIER_NAMES))));
+        if (!$this->isKeyName($parsed['key'])) {
+            throw new InvalidArgumentException(\sprintf('Invalid key id "%s": "%s" is not a key name, expected one of "%s", a letter, a digit or a symbol.', $keyId, $parsed['key'], implode('", "', self::KEY_NAMES)));
+        }
     }
 
     public function isKeyRelease(string $data): bool
@@ -866,7 +876,7 @@ final class KeyParser
         }
 
         $isDigit = 1 === \strlen($key) && $key >= '0' && $key <= '9';
-        if (1 === \strlen($key) && (($key >= 'a' && $key <= 'z') || $isDigit || \in_array($key, self::SYMBOL_KEYS, true))) {
+        if (1 === \strlen($key) && $this->isKeyName($key)) {
             $codepoint = \ord($key);
             $rawCtrl = $this->rawCtrlChar($key);
 
@@ -1026,5 +1036,14 @@ final class KeyParser
         }
 
         return ['key' => $key, 'modifier' => $modifier];
+    }
+
+    private function isKeyName(string $key): bool
+    {
+        if (1 === \strlen($key)) {
+            return ($key >= 'a' && $key <= 'z') || ($key >= '0' && $key <= '9') || \in_array($key, self::SYMBOL_KEYS, true);
+        }
+
+        return \in_array($key, self::KEY_NAMES, true);
     }
 }

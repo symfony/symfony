@@ -20,7 +20,7 @@ CHANGELOG
  * Add `KeyBindingWidget` to display the keybindings of the focused widget
  * Add the `super`, `hyper` and `meta` modifiers to key ids, and `Key::super()`
  * Make a key id naming an unknown modifier match nothing instead of the bare key
- * Make `Keybindings` throw an `InvalidArgumentException` for a key id that has no key or names an unknown modifier
+ * Make `Keybindings` throw an `InvalidArgumentException` for a key id that has no key, names an unknown modifier or an unknown key
 
 8.1
 ---

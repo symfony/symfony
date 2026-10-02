@@ -1,0 +1,5 @@
+[codespell]
+# "smove" is the name of a Redis command
+# "hastable" is Doctrine's Schema::hasTable() method
+# "signall" is the $signAll property of Messenger's SigningSerializer
+ignore-words-list = smove,hastable,signall

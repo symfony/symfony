@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by dgafka at 2026-09-08T18:50:42Z
+
+Hey,
+
+From this side [Ecotone Framework](https://ecotone.tech) author.
+
+I've written article today about [Symfony Messenger vs Ecotone: The Real Difference](https://blog.ecotone.tech/ecotone-vs-symfony-messenger-the-real-difference/). This goes in depth about how Ecotone provides messaging abstraction, which goes far beyond what Symfony Messenger provides.
+
+There have been six new features created, all at the same time, all 3 hours after my article was published.
+<img width="1524" height="599" alt="Screenshot from 2026-09-08 18-20-40" src="https://github.com/user-attachments/assets/f68dd7ad-9fc9-4969-913e-728cbbe35e4b" />
+<img width="993" height="164" alt="Screenshot from 2026-09-08 19-51-33" src="https://github.com/user-attachments/assets/df7b4dd8-53b1-4a81-a332-04187fdd3186" />
+
+It's clear to me that those all improvements are based on what I've written in article.
+
+- Six PRs, one morning, covering — in order — all the features I've described within the article:
+
+| Symfony PR | What it adds | Mirrors article section |
+|---|---|---|
+| [#65903](https://github.com/symfony/symfony/pull/65903) — ChainStamp | Declare a multi-step flow once at dispatch, instead of each handler dispatching the next message class | [The messaging layer focuses on flows](https://blog.ecotone.tech/ecotone-vs-symfony-messenger-the-real-difference/#the-messaging-layer-focuses-on-flows) |
+| [#65899](https://github.com/symfony/symfony/pull/65899) — Stamp propagation, stamp handler arguments, message identity | Context travels the flow in stamps instead of accumulating as message-class fields; handlers can read it | [The messaging layer focuses on flows](https://blog.ecotone.tech/ecotone-vs-symfony-messenger-the-real-difference/#the-messaging-layer-focuses-on-flows) (the stamps/metadata passage) |
+| [#65898](https://github.com/symfony/symfony/pull/65898) — `transport:` on `#[AsMessageHandler]` | Each handler declares its own execution; each gets its own copy, retries, dead letter | [Async is about execution, not the message](https://blog.ecotone.tech/ecotone-vs-symfony-messenger-the-real-difference/#async-is-about-execution-not-the-message) |
+| [#65900](https://github.com/symfony/symfony/pull/65900) — MessengerAssertionsTrait | Test an async flow without hand-building a Worker; release queued steps inside the test | [Testing the flow, piece by piece](https://blog.ecotone.tech/ecotone-vs-symfony-messenger-the-real-difference/#testing-the-flow-piece-by-piece) |
+| [#65901](https://github.com/symfony/symfony/pull/65901) — `outbox:` transport option | Store in the database inside the transaction, relay to the real broker | [The outbox is channel composition](https://blog.ecotone.tech/ecotone-vs-symfony-messenger-the-real-difference/#the-outbox-is-channel-composition) |
+| [#65902](https://github.com/symfony/symfony/pull/65902) — retries + failure transport for `sync://` | Queue-grade resilience for synchronous handling (payment webhook example) | [Messaging is not only about async](https://blog.ecotone.tech/ecotone-vs-symfony-messenger-the-real-difference/#messaging-is-not-only-about-async) |
+
+Everyone who will take a look on the article content, the timing when it all have been generated, will see that those all ideas came from the [article I've written](https://blog.ecotone.tech/ecotone-vs-symfony-messenger-the-real-difference/).
+
+**Meaning it's obvious that you've ran AI agents over article and Ecotone features, to vibe code that into Symfony Messenger.**
+Some things are literally taken 1:1 from the article, meaning test example, pull request description, and of course most importantly the reason for given PR to exists - the feature itself. So all the hard work was already done, running agents against my article and Ecotone feature was all needed for creating those features into Symfony Messenger.
+
+Literally ai taken content from article:
+<img width="2307" height="892" alt="Screenshot from 2026-09-08 19-41-17" src="https://github.com/user-attachments/assets/41e9dc46-ed80-4743-b939-36ed67c7a02c" />
+<img width="1874" height="530" alt="image" src="https://github.com/user-attachments/assets/0f621164-ff08-44c7-973a-f8112342baae" />
+
+  I'm genuinely glad Symfony Messenger is drawing inspiration from Ecotone.
+But when a body of work serves as the blueprint, the source deserves a mention — here it was vibe-coded directly into a set of features without a single word about where it came from.
+  Saying "this comes from Ecotone" or providing link to the article costs one sentence and helps everyone: people can go see how these features have worked in Ecotone for years, what edge cases the design already answers, and judge for themselves what the mature version of messaging looks like.
+
+  And saying a word gives my work and Ecotone better recognization. There's no rivalry to manage here — Ecotone doesn't replace Symfony, it runs inside it: `composer require ecotone/symfony-bundle`.
+  I'm not a competitor whose existence needs to be hidden.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T19:22:44Z
+
+@dgafka you are 100% right, I used your article as a starting point and worked with an LLM to send those PRs. So yes, big thanks for that article.
+
+What I got wrong is the credit. The descriptions reuse your examples, the order subscribers, the loan flow, the payment webhook, and none of them says where the analysis comes from. I'm adding a note to each PR: they started from your article, and they are proposals open for discussion, nothing more yet.
+
+As you might see in most of them, there were preexisting issues in the Symfony repo describing those as desired capabilities, yet nobody had achieved them in Symfony itself, a community-bandwidth issue of the pre-LLM world. It's now within reach, and your article is what turned a list of old issues into a coherent picture.
+
+They are not ports of Ecotone though. Several go a different way on purpose, Messenger keeps routing by class and has no channel concept.
+
+Ecotone running inside Symfony is a good thing, and your article is the best explanation of what the fuller version of this looks like.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T19:27:44Z
+
+(disclaimers posted)
+
+---------------------------------------------------------------------------
+
+by dgafka at 2026-09-08T20:33:40Z
+
+<img width="1098" height="534" alt="image" src="https://github.com/user-attachments/assets/7946d181-7746-4d58-b4af-31953d6be4d4" />
+
+@nicolas-grekas thank you for putting those disclaimers on top of the pull request descriptions
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-08T20:51:06Z
+
+@dgafka OK to mark the previous messages as resolved (thus collapsing them)?

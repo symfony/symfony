@@ -48,7 +48,7 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
         return false;
     }
 
-    public function wait(callable $onHandled): bool
+    public function wait(callable $onHandled, ?float $timeout = null): bool
     {
         return false;
     }

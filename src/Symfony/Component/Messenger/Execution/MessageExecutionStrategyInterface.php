@@ -29,8 +29,9 @@ interface MessageExecutionStrategyInterface
 
     /**
      * @param callable(Envelope, string, bool &$acked, ?\Throwable): void $onHandled
+     * @param float|null                                                  $timeout   The number of seconds to wait at most for a message to be handled, or null to wait until one is
      */
-    public function wait(callable $onHandled): bool;
+    public function wait(callable $onHandled/* , ?float $timeout = null */): bool;
 
     /**
      * @param callable(Envelope, string, bool &$acked, ?\Throwable): void $onHandled

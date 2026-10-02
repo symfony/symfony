@@ -49,6 +49,13 @@ parameters:
         -
             message: '#^PHPDoc tag @param references unknown parameter\: \$fetchSize$#'
             path: src/Symfony/Component/Messenger/*
+        # the $timeout argument is a commented-out argument of MessageExecutionStrategyInterface::wait(), which the Worker passes
+        -
+            message: '#^PHPDoc tag @param references unknown parameter\: \$timeout$#'
+            path: src/Symfony/Component/Messenger/Execution/MessageExecutionStrategyInterface.php
+        -
+            message: '#^Method Symfony\\Component\\Messenger\\Execution\\MessageExecutionStrategyInterface\:\:wait\(\) invoked with 2 parameters, 1 required\.$#'
+            path: src/Symfony/Component/Messenger/Worker.php
         # the $regexp argument is a commented-out argument of the case conversion methods, documented
         # with @param so that DebugClassLoader reports the implementations that do not declare it
         -

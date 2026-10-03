@@ -17,6 +17,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -32,6 +33,8 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcmSivEncryptionScheme;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipEncryptionSchemeInterface;
 use Symfony\Component\KeyManagement\DependencyInjection\KeyManagementPass;
 use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 
@@ -56,6 +59,11 @@ class KeyManagementBundle extends AbstractBundle
      * Name the store's envelope encrypter answers to, both as an argument and as a target.
      */
     private const string STORE_TARGET = 'stored';
+    private const string KMIP_VENDOR_BLOCK_CIPHER_MODE_PATTERN = '/^0x8[0-9A-Fa-f]{7}$/D';
+    private const string DEFAULT_KMIP_AES_GCM_SCHEME_NAME = 'aes-gcm';
+    private const string DEFAULT_KMIP_CHACHA20_POLY1305_SCHEME_NAME = 'chacha20-poly1305';
+    private const int MAX_KMIP_SCHEME_NAME_LENGTH = 255;
+    private const string KMIP_SCHEME_NAME_PATTERN = '/^[a-z][a-z0-9-]*(?:\/[a-z][a-z0-9-]*)?$/D';
 
     public function getPath(): string
     {
@@ -136,6 +144,41 @@ class KeyManagementBundle extends AbstractBundle
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('kmip')
+                    ->info('KMIP bridge options.')
+                    ->children()
+                        ->arrayNode('aes_gcm_siv_schemes', 'scheme')
+                            ->info('Map of AES-GCM-SIV scheme names to server-specific vendor extension Block Cipher Mode values, written as hexadecimal strings for 32-bit PHP compatibility.')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
+                            ->validate()
+                                ->always(static function (array $schemes): array {
+                                    foreach ($schemes as $name => $mode) {
+                                        if (!preg_match(self::KMIP_SCHEME_NAME_PATTERN, $name) || \strlen($name) > self::MAX_KMIP_SCHEME_NAME_LENGTH || \in_array($name, [self::DEFAULT_KMIP_AES_GCM_SCHEME_NAME, self::DEFAULT_KMIP_CHACHA20_POLY1305_SCHEME_NAME], true)) {
+                                            throw new InvalidArgumentException(\sprintf('The KMIP AES-GCM-SIV scheme name "%s" is invalid or reserved.', $name));
+                                        }
+                                    }
+
+                                    return $schemes;
+                                })
+                            ->end()
+                            ->scalarPrototype()
+                                ->validate()
+                                    ->always(static function (mixed $mode): string {
+                                        if (\is_int($mode) && $mode >= 0) {
+                                            $mode = \sprintf('0x%08X', $mode);
+                                        }
+                                        if (!\is_string($mode) || !preg_match(self::KMIP_VENDOR_BLOCK_CIPHER_MODE_PATTERN, $mode)) {
+                                            throw new InvalidArgumentException('A KMIP AES-GCM-SIV Block Cipher Mode must be a hexadecimal value in the vendor extension range 0x80000000 to 0x8FFFFFFF.');
+                                        }
+
+                                        return '0x'.strtoupper(substr($mode, 2));
+                                    })
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
                 ->arrayNode('store')
                     ->info('Data key store: payloads then refer to a stored data key instead of carrying it, so the KMS is reached once per key and per process, and that key can be rewrapped under another provider without rewriting a payload.')
                     ->children()
@@ -194,6 +237,19 @@ class KeyManagementBundle extends AbstractBundle
 
         $configurator->import('Resources/config/key_management.php');
 
+        $aesGcmSivSchemes = $config['kmip']['aes_gcm_siv_schemes'] ?? [];
+        if ($aesGcmSivSchemes && !class_exists(AesGcmSivEncryptionScheme::class)) {
+            throw new LogicException('Configuring "key_management.kmip.aes_gcm_siv_schemes" requires symfony/kmip-key-management.');
+        }
+
+        foreach ($aesGcmSivSchemes as $name => $blockCipherMode) {
+            $container->setDefinition('key_management.kmip.encryption_scheme.aes_gcm_siv.'.$name,
+                (new ChildDefinition('key_management.kmip.encryption_scheme.aes_gcm_siv_template'))
+                    ->setArguments([$blockCipherMode, $name])
+                    ->addTag('key_management.kmip.encryption_scheme')
+            );
+        }
+
         if ($container->getParameter('kernel.debug')) {
             $configurator->import('Resources/config/key_management_debug.php');
         }
@@ -204,6 +260,11 @@ class KeyManagementBundle extends AbstractBundle
 
         $container->registerForAutoconfiguration(KmsFactoryInterface::class)
             ->addTag('key_management.factory');
+
+        if (interface_exists(KmipEncryptionSchemeInterface::class)) {
+            $container->registerForAutoconfiguration(KmipEncryptionSchemeInterface::class)
+                ->addTag('key_management.kmip.encryption_scheme');
+        }
 
         $container->registerForAutoconfiguration(BlindIndex::class)
             ->addTag('key_management.blind_index');

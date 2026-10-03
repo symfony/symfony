@@ -17,6 +17,11 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexL
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKmsFactory;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcmEncryptionScheme;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcmSivEncryptionScheme;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ChaCha20Poly1305EncryptionScheme;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipEncryptionSchemeRegistry;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKmsFactory;
 use Symfony\Component\KeyManagement\Factory\FactoryRegistry;
 use Symfony\Component\KeyManagement\Local\OpenSslKmsFactory;
 use Symfony\Component\KeyManagement\Local\SealedBoxKmsFactory;
@@ -65,6 +70,27 @@ return static function (ContainerConfigurator $container) {
             ->args([service('http_client')->nullOnInvalid()])
             ->tag('key_management.factory')
             ->tag('container.remove_if_missing', ['class' => GoogleCloudKmsFactory::class, 'package' => 'symfony/google-cloud-key-management', 'parent_packages' => ['symfony/key-management']])
+
+        ->set('key_management.kmip.encryption_scheme.aes_gcm', AesGcmEncryptionScheme::class)
+            ->tag('key_management.kmip.encryption_scheme')
+            ->tag('container.remove_if_missing', ['class' => AesGcmEncryptionScheme::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => ['symfony/key-management']])
+
+        ->set('key_management.kmip.encryption_scheme.chacha20_poly1305', ChaCha20Poly1305EncryptionScheme::class)
+            ->tag('key_management.kmip.encryption_scheme')
+            ->tag('container.remove_if_missing', ['class' => ChaCha20Poly1305EncryptionScheme::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => ['symfony/key-management']])
+
+        ->set('key_management.kmip.encryption_scheme.aes_gcm_siv_template', AesGcmSivEncryptionScheme::class)
+            ->abstract()
+            ->tag('container.remove_if_missing', ['class' => AesGcmSivEncryptionScheme::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => ['symfony/key-management']])
+
+        ->set('key_management.kmip.encryption_scheme_registry', KmipEncryptionSchemeRegistry::class)
+            ->args([tagged_iterator('key_management.kmip.encryption_scheme')])
+            ->tag('container.remove_if_missing', ['class' => KmipEncryptionSchemeRegistry::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => ['symfony/key-management']])
+
+        ->set('key_management.factory.kmip', KmipKmsFactory::class)
+            ->args([service('key_management.kmip.encryption_scheme_registry')])
+            ->tag('key_management.factory')
+            ->tag('container.remove_if_missing', ['service' => 'key_management.kmip.encryption_scheme_registry', 'class' => KmipKmsFactory::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => ['symfony/key-management']])
 
         ->set('serializer.normalizer.key_management_envelope', EnvelopeNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])

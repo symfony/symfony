@@ -12,6 +12,7 @@
 namespace Symfony\Component\KeyManagement;
 
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\RuntimeException;
 use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
@@ -32,7 +33,8 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 interface DecrypterInterface
 {
     /**
-     * @throws DecryptionFailedException     If the ciphertext is invalid, tampered, names an unknown key, or `$aad` does not match
+     * @throws DecryptionFailedException     If the backend identifies an invalid ciphertext, unknown key, or AAD mismatch
+     * @throws RuntimeException              If the backend reports an operational or ambiguous failure that it cannot identify as a ciphertext failure
      * @throws UnsupportedOperationException If `$aad` is non-empty and the backend cannot enforce it
      */
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string;

@@ -12,8 +12,11 @@
 namespace Symfony\Component\KeyManagement\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -24,6 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\KeyManagement\Base64UrlSafe;
 use Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVaultFactory;
@@ -33,6 +37,13 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeySto
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKmsFactory;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcmEncryptionScheme;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcmSivEncryptionScheme;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\CiphertextCodec;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipEncryptionSchemeRegistry;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKms;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKmsFactory;
+use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\CompositeKms;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyStoreInterface;
@@ -50,6 +61,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class KeyManagementBundleExtensionTest extends TestCase
 {
+    private const string EVIDEN_GCM_SIV_BLOCK_CIPHER_MODE = '0x80000002';
+    private const string OTHER_GCM_SIV_BLOCK_CIPHER_MODE = '0x80001234';
+    private const string BELOW_KMIP_VENDOR_BLOCK_CIPHER_MODE = '0x7FFFFFFF';
+    private const string ABOVE_KMIP_VENDOR_BLOCK_CIPHER_MODE = '0x90000000';
+
     #[DataProvider('provideCommandIds')]
     public function testCommandIsWiredWithTaggedLocator(string $serviceId)
     {
@@ -125,6 +141,9 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield 'aws' => ['key_management.factory.aws_kms', ['class' => AwsKmsFactory::class, 'package' => 'symfony/aws-key-management', 'parent_packages' => $parents]];
         yield 'azure' => ['key_management.factory.azure_key_vault', ['class' => AzureKeyVaultFactory::class, 'package' => 'symfony/azure-keyvault-key-management', 'parent_packages' => $parents]];
         yield 'google cloud' => ['key_management.factory.google_cloud_kms', ['class' => GoogleCloudKmsFactory::class, 'package' => 'symfony/google-cloud-key-management', 'parent_packages' => $parents]];
+        yield 'kmip registry' => ['key_management.kmip.encryption_scheme_registry', ['class' => KmipEncryptionSchemeRegistry::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => $parents]];
+        yield 'kmip aes gcm siv template' => ['key_management.kmip.encryption_scheme.aes_gcm_siv_template', ['class' => AesGcmSivEncryptionScheme::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => $parents]];
+        yield 'kmip' => ['key_management.factory.kmip', ['service' => 'key_management.kmip.encryption_scheme_registry', 'class' => KmipKmsFactory::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => $parents]];
         yield 'blind index listener' => ['key_management.blind_index_listener', ['class' => BlindIndexListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => $parents]];
         yield 'envelope normalizer' => ['serializer.normalizer.key_management_envelope', ['class' => DenormalizerInterface::class]];
     }
@@ -740,16 +759,200 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('key_management.factory.aws_kms'));
     }
 
-    private function createContainerFromClosure(\Closure $closure, bool $debug = false): ContainerBuilder
+    public function testKmipBridgeIsWiredWhenInstalled()
+    {
+        if (!class_exists(KmipKmsFactory::class)) {
+            $this->markTestSkipped('symfony/kmip-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->setExtensionConfig('key_management', ['kmip://localhost?cert=/missing/cert&key=/missing/key&version=2.0']);
+        });
+
+        $this->assertTrue($container->hasDefinition('key_management.default'));
+        $this->assertTrue($container->hasDefinition('key_management.factory.kmip'));
+        $this->assertTrue($container->hasDefinition('key_management.kmip.encryption_scheme_registry'));
+        $this->assertTrue($container->hasDefinition('key_management.kmip.encryption_scheme.aes_gcm'));
+        $this->assertTrue($container->hasDefinition('key_management.kmip.encryption_scheme.chacha20_poly1305'));
+        $this->assertFalse($container->hasDefinition('key_management.kmip.encryption_scheme.aes_gcm_siv'));
+        $this->assertTrue($container->getDefinition('key_management.kmip.encryption_scheme.aes_gcm_siv_template')->isAbstract());
+
+        $registry = $container->getDefinition('key_management.kmip.encryption_scheme_registry');
+        $iterator = $registry->getArgument(0);
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $iterator);
+        $this->assertSame('key_management.kmip.encryption_scheme', $iterator->getTag());
+
+        $reference = $container->getDefinition('key_management.factory.kmip')->getArgument(0);
+        $this->assertInstanceOf(Reference::class, $reference);
+        $this->assertSame('key_management.kmip.encryption_scheme_registry', (string) $reference);
+    }
+
+    public function testKmipAesGcmSivIsNotRegisteredWithoutAnExplicitMode()
+    {
+        if (!class_exists(AesGcmSivEncryptionScheme::class)) {
+            $this->markTestSkipped('symfony/kmip-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', []);
+        });
+
+        $this->assertFalse($container->hasDefinition('key_management.kmip.encryption_scheme.aes_gcm_siv'));
+        $this->assertTrue($container->getDefinition('key_management.kmip.encryption_scheme.aes_gcm_siv_template')->isAbstract());
+    }
+
+    public function testKmipAesGcmIvLengthCanBeSelectedPerClientDsn()
+    {
+        if (!class_exists(AesGcmEncryptionScheme::class)) {
+            $this->markTestSkipped('symfony/kmip-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', ['clients' => [
+                'short' => 'kmip://short.example?cert=/missing/cert&key=/missing/key&version=2.0&iv_length=12',
+                'long' => 'kmip://long.example?cert=/missing/cert&key=/missing/key&version=2.0&iv_length=16',
+                'default' => 'kmip://default.example?cert=/missing/cert&key=/missing/key&version=2.0',
+            ]]);
+            $container->setAlias('test.kmip.short', 'key_management.short')->setPublic(true);
+            $container->setAlias('test.kmip.long', 'key_management.long')->setPublic(true);
+            $container->setAlias('test.kmip.default', 'key_management.default')->setPublic(true);
+            $container->setAlias('test.kmip.registry', 'key_management.kmip.encryption_scheme_registry')->setPublic(true);
+        }, optimize: true);
+
+        foreach (['short' => 12, 'long' => 16, 'default' => 16] as $client => $ivLength) {
+            $kms = $container->get('test.kmip.'.$client);
+            $this->assertInstanceOf(KmipKms::class, $kms);
+            $scheme = (new \ReflectionProperty($kms, 'encryptionScheme'))->getValue($kms);
+            $this->assertInstanceOf(AesGcmEncryptionScheme::class, $scheme);
+            $this->assertSame('aes-gcm', $scheme->name());
+            $this->assertSame($ivLength, (new \ReflectionMethod($scheme, 'ivLength'))->invoke($scheme));
+        }
+        $registry = $container->get('test.kmip.registry');
+        $this->assertSame(16, (new \ReflectionMethod($registry->get('aes-gcm'), 'ivLength'))->invoke($registry->get('aes-gcm')));
+    }
+
+    public function testKmipAesGcmSivModesCanBeConfiguredThroughTheBundle()
+    {
+        if (!class_exists(AesGcmSivEncryptionScheme::class)) {
+            $this->markTestSkipped('symfony/kmip-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', ['kmip' => ['aes_gcm_siv_schemes' => [
+                'aes-gcm-siv/eviden' => self::EVIDEN_GCM_SIV_BLOCK_CIPHER_MODE,
+                'aes-gcm-siv/another' => self::OTHER_GCM_SIV_BLOCK_CIPHER_MODE,
+            ]], 'clients' => [
+                'eviden' => 'kmip://eviden.example?cert=/missing/cert&key=/missing/key&version=2.0&cipher=aes-gcm-siv/eviden',
+                'another' => 'kmip://another.example?cert=/missing/cert&key=/missing/key&version=2.0&cipher=aes-gcm-siv/another',
+            ]]);
+            $container->setAlias('test.kmip.registry', 'key_management.kmip.encryption_scheme_registry')->setPublic(true);
+            $container->setAlias('test.kmip.eviden', 'key_management.eviden')->setPublic(true);
+            $container->setAlias('test.kmip.another', 'key_management.another')->setPublic(true);
+        }, optimize: true);
+
+        $registry = $container->get('test.kmip.registry');
+        $this->assertInstanceOf(KmipEncryptionSchemeRegistry::class, $registry);
+        $codec = new CiphertextCodec($registry);
+        foreach (['aes-gcm-siv/eviden' => '80000002', 'aes-gcm-siv/another' => '80001234'] as $name => $mode) {
+            $scheme = $registry->get($name);
+            $this->assertInstanceOf(AesGcmSivEncryptionScheme::class, $scheme);
+            $this->assertSame($name, $scheme->name());
+            $this->assertSame('42002b0100000020'
+                .'4200110500000004'.$mode.'00000000'
+                .'42002805000000040000000300000000',
+                bin2hex((new \ReflectionMethod($scheme, 'cryptographicParameters'))->invoke($scheme, 12)));
+            [$decodedScheme, $decodedCiphertext] = $codec->decode($codec->encode($scheme, new Ciphertext('encrypted', 'key')), 'aad');
+            $this->assertSame($scheme, $decodedScheme);
+            $this->assertSame('encrypted', $decodedCiphertext->blob);
+        }
+        foreach (['eviden' => 'aes-gcm-siv/eviden', 'another' => 'aes-gcm-siv/another'] as $client => $schemeName) {
+            $kms = $container->get('test.kmip.'.$client);
+            $this->assertInstanceOf(KmipKms::class, $kms);
+            $this->assertSame($registry->get($schemeName), (new \ReflectionProperty($kms, 'encryptionScheme'))->getValue($kms));
+        }
+    }
+
+    #[DataProvider('invalidKmipAesGcmSivModes')]
+    public function testKmipAesGcmSivRejectsModesOutsideTheVendorRange(mixed $mode)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($mode) {
+            $container->loadFromExtension('key_management', ['kmip' => ['aes_gcm_siv_schemes' => ['aes-gcm-siv' => $mode]]]);
+        });
+    }
+
+    public static function invalidKmipAesGcmSivModes(): iterable
+    {
+        yield 'below vendor extension range' => [self::BELOW_KMIP_VENDOR_BLOCK_CIPHER_MODE];
+        yield 'above vendor extension range' => [self::ABOVE_KMIP_VENDOR_BLOCK_CIPHER_MODE];
+        yield 'invalid hexadecimal' => ['0x8000000G'];
+        yield 'unquoted decimal beyond 32-bit PHP integer range' => [2147483650.0];
+    }
+
+    #[DataProvider('invalidKmipAesGcmSivSchemeNames')]
+    public function testKmipAesGcmSivSchemeNamesAreRejectedDuringConfiguration(string $name)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($name) {
+            $container->loadFromExtension('key_management', ['kmip' => ['aes_gcm_siv_schemes' => [$name => self::EVIDEN_GCM_SIV_BLOCK_CIPHER_MODE]]]);
+        });
+    }
+
+    public static function invalidKmipAesGcmSivSchemeNames(): iterable
+    {
+        yield 'uppercase' => ['AES'];
+        yield 'built-in AES-GCM' => ['aes-gcm'];
+        yield 'built-in ChaCha20-Poly1305' => ['chacha20-poly1305'];
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testBundleLoadsWithoutKmipBridgeClasses()
+    {
+        $loaders = spl_autoload_functions();
+        foreach ($loaders as $loader) {
+            spl_autoload_unregister($loader);
+        }
+        foreach ($loaders as $loader) {
+            spl_autoload_register(static function (string $class) use ($loader): void {
+                if (!str_starts_with($class, 'Symfony\\Component\\KeyManagement\\Bridge\\Kmip\\')) {
+                    $loader($class);
+                }
+            });
+        }
+
+        $this->assertFalse(class_exists(KmipKmsFactory::class));
+        $this->assertFalse(class_exists(KmipEncryptionSchemeRegistry::class));
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->setExtensionConfig('key_management', ['openssl://?keys[app]='.Base64UrlSafe::encode(random_bytes(32))]);
+            $container->setAlias('test.kms', 'key_management.default')->setPublic(true);
+        }, optimize: true);
+
+        $this->assertFalse($container->hasDefinition('key_management.factory.kmip'));
+        $this->assertFalse($container->hasDefinition('key_management.kmip.encryption_scheme_registry'));
+        $this->assertFalse($container->hasDefinition('key_management.kmip.encryption_scheme.aes_gcm'));
+        $this->assertFalse($container->hasDefinition('key_management.kmip.encryption_scheme.chacha20_poly1305'));
+        $this->assertFalse($container->hasDefinition('key_management.kmip.encryption_scheme.aes_gcm_siv'));
+        $this->assertFalse($container->hasDefinition('key_management.kmip.encryption_scheme.aes_gcm_siv_template'));
+
+        $kms = $container->get('test.kms');
+        $this->assertSame('working', $kms->decrypt($kms->encrypt('app', 'working')));
+    }
+
+    private function createContainerFromClosure(\Closure $closure, bool $debug = false, bool $optimize = false): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag(['kernel.debug' => $debug, 'kernel.project_dir' => __DIR__]));
         $bundle = new KeyManagementBundle();
         $bundle->build($container);
         $container->registerExtension($bundle->getContainerExtension());
         new ClosureLoader($container)->load($closure);
-        $container->getCompilerPassConfig()->setOptimizationPasses([]);
-        $container->getCompilerPassConfig()->setRemovingPasses([]);
-        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        if (!$optimize) {
+            $container->getCompilerPassConfig()->setOptimizationPasses([]);
+            $container->getCompilerPassConfig()->setRemovingPasses([]);
+            $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        }
         $container->compile();
 
         return $container;

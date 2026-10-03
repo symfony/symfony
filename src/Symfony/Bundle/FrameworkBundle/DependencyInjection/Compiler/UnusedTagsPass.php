@@ -74,6 +74,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'key_management.client',
         'key_management.factory',
         'key_management.flysystem',
+        'key_management.kmip.encryption_scheme',
         'ldap',
         'mailer.transport_factory',
         'messenger.bus',

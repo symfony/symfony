@@ -107,6 +107,9 @@ class DebugAutowiringCommand extends ContainerDebugCommand
             if ($container->hasDefinition($serviceId) && $container->getDefinition($serviceId)->hasTag('container.excluded')) {
                 continue;
             }
+            if ($container->has($serviceId) && $container->findDefinition($serviceId)->isAbstract()) {
+                continue;
+            }
             $text = [];
             $resolvedServiceId = $serviceId;
             if (!str_starts_with($serviceId, $previousId.' $')) {

@@ -1656,7 +1656,7 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame(self::SIGNING_KEY, $proofFactory->getArgument(0)->getArgument(0));
 
         $reference = new Reference('security.authenticator.oidc_login.dpop.main');
-        $this->assertEquals($reference, $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+        $this->assertEquals($reference, $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(5));
         $this->assertEquals($reference, $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
     }
 
@@ -1679,7 +1679,7 @@ class OidcLoginFactoryTest extends TestCase
 
         // Then
         $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.dpop.main'));
-        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(5));
         $this->assertNull($container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
     }
 
@@ -1720,7 +1720,7 @@ class OidcLoginFactoryTest extends TestCase
 
         // Then
         $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.dpop.main'));
-        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(4));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(5));
         $this->assertNull($container->getDefinition('security.authenticator.oidc_login.main')->getArgument(13));
     }
 

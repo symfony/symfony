@@ -78,6 +78,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private bool $ticking = false;
     private ?float $lastTickAt = null;
     private ?bool $lastTickBusyHint = null;
+    private ?int $resizeColumns = null;
 
     /** @var Suspension<mixed>|null */
     private ?Suspension $runSuspension = null;
@@ -210,10 +211,8 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->stopped = false;
         $this->lastTickAt = null;
         $this->lastTickBusyHint = null;
-        // A resize forces a full repaint: multiplexers (dtach, tmux) send
-        // SIGWINCH on reattach, when the previous screen content cannot be
-        // trusted, even at an unchanged size
-        $this->terminal->start($this->handleInput(...), fn () => $this->requestRender(true), function (): void {
+        $this->resizeColumns = $this->terminal->getColumns();
+        $this->terminal->start($this->handleInput(...), $this->handleResize(...), function (): void {
             $this->keybindings->setKittyProtocolActive(true);
         });
         $this->terminal->hideCursor();
@@ -361,6 +360,20 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         }
 
         return $class;
+    }
+
+    private function handleResize(): void
+    {
+        $columns = $this->terminal->getColumns();
+        $heightOnly = $columns === $this->resizeColumns;
+        $this->resizeColumns = $columns;
+
+        // A resize forces a full repaint: multiplexers (dtach, tmux) send
+        // SIGWINCH on reattach, when the previous screen content cannot be
+        // trusted, even at an unchanged size. Termux changes the height
+        // whenever its software keyboard shows or hides, though, and a full
+        // repaint each time would replay all the content.
+        $this->requestRender(!$heightOnly || false === getenv('TERMUX_VERSION'));
     }
 
     /**

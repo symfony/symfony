@@ -620,4 +620,37 @@ class TuiTest extends TestCase
         $this->assertSame('z', $received);
         $tui->stop();
     }
+
+    /**
+     * Termux changes the height whenever its software keyboard shows or hides.
+     */
+    #[DataProvider('termuxResizeProvider')]
+    public function testOnlyAWidthChangeRepaintsTheWholeScreenInTermux(?string $termuxVersion, int $columns, int $rows, bool $repaints)
+    {
+        $previous = getenv('TERMUX_VERSION');
+        putenv(null === $termuxVersion ? 'TERMUX_VERSION' : 'TERMUX_VERSION='.$termuxVersion);
+
+        try {
+            $terminal = new VirtualTerminal(40, 20);
+            $tui = new Tui(terminal: $terminal);
+            $tui->add(new TextWidget('Hello'));
+            $tui->start();
+            $tui->processRender();
+            $terminal->clearOutput();
+
+            $terminal->simulateResize($columns, $rows);
+            $tui->processRender();
+
+            $this->assertSame($repaints, str_contains($terminal->getOutput(), "\x1b[2J"));
+        } finally {
+            putenv(false === $previous ? 'TERMUX_VERSION' : 'TERMUX_VERSION='.$previous);
+        }
+    }
+
+    public static function termuxResizeProvider(): iterable
+    {
+        yield 'height change in Termux' => ['0.118', 40, 12, false];
+        yield 'width change in Termux' => ['0.118', 30, 20, true];
+        yield 'height change elsewhere' => [null, 40, 12, true];
+    }
 }

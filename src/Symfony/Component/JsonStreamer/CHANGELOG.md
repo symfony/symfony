@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate the `JsonStreamWriter` and `JsonStreamReader` autowiring aliases, use `StreamWriterInterface` and `StreamReaderInterface` instead
  * Add `JsonStreamerBundle`, which provides the `json_streamer` configuration and the services previously provided by `FrameworkBundle` under `framework.json_streamer`
  * Drop the streamer cache warmer when no class is streamable
  * Add `BcMath\Number` value object support with `BcMathNumberValueObjectTransformer`

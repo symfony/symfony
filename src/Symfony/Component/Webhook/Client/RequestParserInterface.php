@@ -17,6 +17,8 @@ use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 /**
+ * Parses incoming webhook requests into remote events, and rejects the ones that are not authentic.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface RequestParserInterface

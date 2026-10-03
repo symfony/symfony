@@ -12,6 +12,8 @@
 namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
@@ -20,6 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
@@ -27,6 +30,7 @@ use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\MailerBundle;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Webhook\Client\RequestParserInterface;
 
 class MailerBundleTest extends TestCase
 {
@@ -256,6 +260,17 @@ class MailerBundleTest extends TestCase
         $this->assertTrue($container->hasDefinition('mailer.webhook.request_parser.mailgun'));
     }
 
+    public function testTheWebhookRequestParsersAreAutowiredByTarget()
+    {
+        $container = $this->load([]);
+        $container->register('test.consumer', MailerWebhookConsumer::class)->setAutowired(true);
+
+        new AutowirePass()->process($container);
+
+        $this->assertSame(MailgunRequestParser::class, $container->findDefinition((string) $container->getDefinition('test.consumer')->getArgument(0))->getClass());
+        $this->assertTrue($container->getAlias(MailgunRequestParser::class)->isDeprecated());
+    }
+
     public function testTheDataCollectorIsRegisteredInDebugModeOnly()
     {
         $this->assertFalse($this->load([])->hasDefinition('mailer.data_collector'));
@@ -315,5 +330,13 @@ class TestMailerKernel extends AbstractKernel
             ->alias('test.mailer', 'mailer')->public()
             ->alias('test.message_logger', 'mailer.message_logger_listener')->public()
         ;
+    }
+}
+
+class MailerWebhookConsumer
+{
+    public function __construct(
+        #[Target('mailer.mailgun')] public RequestParserInterface $parser,
+    ) {
     }
 }

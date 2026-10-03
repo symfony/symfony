@@ -14,7 +14,7 @@ namespace Symfony\Component\JsonStreamer;
 use Symfony\Component\TypeInfo\Type;
 
 /**
- * Reads an $input and convert it to given $type according to $options.
+ * Reads a string or a stream into a PHP value of the given type.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *

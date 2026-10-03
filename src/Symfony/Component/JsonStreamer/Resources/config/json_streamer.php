@@ -18,6 +18,8 @@ use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader as ReadAttributePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader as WriteAttributePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\StreamReaderInterface;
+use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\JsonStreamer\Transformer\BcMathNumberValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateIntervalValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
@@ -47,8 +49,12 @@ return static function (ContainerConfigurator $container) {
                 service('config_cache_factory')->ignoreOnInvalid(),
                 param('.json_streamer.default_options'),
             ])
+        ->alias(StreamWriterInterface::class, 'json_streamer.stream_writer')
+        ->alias(StreamReaderInterface::class, 'json_streamer.stream_reader')
         ->alias(JsonStreamWriter::class, 'json_streamer.stream_writer')
+            ->deprecate('symfony/json-streamer', '8.2', 'The "%alias_id%" alias is deprecated, use "'.StreamWriterInterface::class.'" instead.')
         ->alias(JsonStreamReader::class, 'json_streamer.stream_reader')
+            ->deprecate('symfony/json-streamer', '8.2', 'The "%alias_id%" alias is deprecated, use "'.StreamReaderInterface::class.'" instead.')
 
         // metadata
         ->set('json_streamer.write.property_metadata_loader', PropertyMetadataLoader::class)

@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\RemoteEvent\RemoteEventBundle;
+use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Webhook\Server\SignatureFormat;
 
@@ -108,6 +109,7 @@ class WebhookBundle extends AbstractBundle
         }
 
         $configurator->import('Resources/config/webhook.php');
+        $container->registerAliasForArgument('webhook.request_parser', RequestParserInterface::class, 'webhook.request_parser', 'webhook');
 
         $parsers = [];
         foreach ($config['routing'] as $type => $cfg) {

@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\JsonStreamer\JsonStreamerBundle;
+use Symfony\Component\JsonStreamer\JsonStreamReader;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\StreamReaderInterface;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\StreamableDummy;
@@ -107,6 +109,17 @@ class JsonStreamerBundleTest extends TestCase
 
         $this->assertFalse($container->hasDefinition('json_streamer.stream_writer'));
         $this->assertFalse($container->hasDefinition('.json_streamer.cache_warmer.streamer'));
+    }
+
+    public function testTheStreamerIsAutowiredByItsInterfaces()
+    {
+        $container = new ContainerBuilder();
+        new JsonStreamerBundle()->getContainerExtension()->load([[]], $container);
+
+        $this->assertSame('json_streamer.stream_writer', (string) $container->getAlias(StreamWriterInterface::class));
+        $this->assertSame('json_streamer.stream_reader', (string) $container->getAlias(StreamReaderInterface::class));
+        $this->assertTrue($container->getAlias(JsonStreamWriter::class)->isDeprecated());
+        $this->assertTrue($container->getAlias(JsonStreamReader::class)->isDeprecated());
     }
 
     private function boot(array $config = []): object

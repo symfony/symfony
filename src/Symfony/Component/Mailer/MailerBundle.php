@@ -31,6 +31,7 @@ use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Process\Process;
 use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Controller\WebhookController;
 
 /**
@@ -530,9 +531,17 @@ class MailerBundle extends AbstractBundle
             ];
 
             foreach ($webhookRequestParsers as $class => [$package, $service]) {
+                $target = 'mailer.'.substr(strrchr($service, '.'), 1);
+                $container->getAlias($class)->setDeprecated('symfony/mailer', '8.2', 'The "%alias_id%" alias is deprecated, use #[Target(\''.$target.'\')] with "'.RequestParserInterface::class.'" instead.');
+
                 if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/mailer'])) {
                     $container->removeDefinition($service);
-                } elseif ($debug && \defined($class.'::PROVIDER_IPS')) {
+                    continue;
+                }
+
+                $container->registerAliasForArgument($service, RequestParserInterface::class, $target.'.request_parser', $target);
+
+                if ($debug && \defined($class.'::PROVIDER_IPS')) {
                     $container->getDefinition($service)->setArgument('$allowedIPs', [...$class::PROVIDER_IPS, '127.0.0.1']);
                 }
             }

@@ -250,6 +250,11 @@ HttpKernel
  * `Kernel::boot()` now iterates over the `$bundles` property instead of calling `getBundles()`, so that the
    bundles that have nothing to do at boot time are not instantiated
 
+JsonStreamer
+------------
+
+ * Deprecate the `JsonStreamWriter` and `JsonStreamReader` autowiring aliases, type `StreamWriterInterface` and `StreamReaderInterface` instead
+
 Lock
 ----
 
@@ -286,6 +291,14 @@ Mailer
 
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0. The
    boolean values it accepts are `1`/`0`, `true`/`false`, `on`/`off`, `yes`/`no` and the empty string, which reads as `false`
+ * Deprecate the autowiring aliases named after the webhook request parsers of the bridges, type `Symfony\Component\Webhook\Client\RequestParserInterface` and select the parser with `#[Target]` instead:
+
+   ```php
+   public function __construct(
+       #[Target('mailer.mailgun')] private RequestParserInterface $parser,
+   ) {
+   }
+   ```
 
 Messenger
 ---------
@@ -340,6 +353,7 @@ Notifier
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0. The
    boolean values it accepts are `1`/`0`, `true`/`false`, `on`/`off`, `yes`/`no` and the empty string, which reads as `false`
  * Deprecate the `LineNotify` transport as LINE Notify was shut down, use `LineBot` instead
+ * Deprecate the autowiring aliases named after the webhook request parsers of the bridges, type `Symfony\Component\Webhook\Client\RequestParserInterface` and select the parser with `#[Target('notifier.twilio')]` for instance
 
 RateLimiter
 -----------
@@ -451,6 +465,8 @@ SecurityBundle
    new FirewallListener($map, $logoutUrlGenerator);
    ```
 
+ * Deprecate the `Symfony\Component\Security\Http\Firewall` autowiring alias, the firewall listens to kernel events and is not meant to be injected
+
 Serializer
 ----------
 
@@ -524,6 +540,12 @@ Validator
    ```
 
    In Symfony 8.2, the configured `mimeTypes` list is used as-is, while the `csv` extension is still enforced separately.
+
+Webhook
+-------
+
+ * Deprecate the `Symfony\Component\Webhook\Client\RequestParser` alias.
+   Reference the `webhook.request_parser` service in the `service` option of the webhook routing instead, and use `#[Target('webhook')]` with `RequestParserInterface` to autowire it
 
 Yaml
 ----

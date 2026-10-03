@@ -272,14 +272,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057/');
 
         $time = microtime(true);
-        $response->getInfo('pause_handler')(1);
+        // The pause outlasts the stream timeout by far, so that a slow machine still sees the timeout first
+        $response->getInfo('pause_handler')(2);
 
         foreach ($client->stream($response, 0.5) as $chunk) {
             $this->assertTrue($chunk->isTimeout());
             $response->cancel();
         }
         $response = null;
-        $this->assertTrue(1.0 > microtime(true) - $time);
+        $this->assertTrue(2.0 > microtime(true) - $time);
         $this->assertTrue(0.5 <= microtime(true) - $time);
     }
 

@@ -17,7 +17,6 @@ use Jose\Component\Encryption\Algorithm\ContentEncryption\A128GCM;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\ECDHES;
 use Jose\Component\Encryption\JWEBuilder;
 use Jose\Component\Encryption\Serializer\CompactSerializer as JweCompactSerializer;
-use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer as JwsCompactSerializer;
@@ -522,7 +521,7 @@ class AccessTokenTest extends AbstractWebTestCase
     #[RequiresPhpExtension('openssl')]
     public function testDpopBoundTokenIsAcceptedOnceWithItsProof()
     {
-        $key = JWKFactory::createECKey('P-256');
+        $key = self::createDpopKey();
         $token = self::createDpopBoundToken($key);
         $server = ['HTTP_AUTHORIZATION' => 'DPoP '.$token, 'HTTP_DPOP' => self::createDpopProof($key, $token, 'http://localhost/foo')];
 
@@ -541,7 +540,7 @@ class AccessTokenTest extends AbstractWebTestCase
     #[RequiresPhpExtension('openssl')]
     public function testDpopFirewallDoesNotReadABearerToken()
     {
-        $key = JWKFactory::createECKey('P-256');
+        $key = self::createDpopKey();
         $token = self::createDpopBoundToken($key);
 
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_dpop.yml']);
@@ -729,6 +728,17 @@ class AccessTokenTest extends AbstractWebTestCase
             [static fn () => self::createJws($claims, ['typ' => 'JWT'])],
             [static fn () => self::createJws($claims, [])],
         ];
+    }
+
+    private static function createDpopKey(): JWK
+    {
+        return new JWK([
+            'kty' => 'EC',
+            'crv' => 'P-256',
+            'x' => 'WVnRsXoNEpNEzsNLkmDjaEtKkhpcP-KkihslW781L-I',
+            'y' => '2KbDKglsg62x9FWBk740sp1etkmwoD_Dv416SQG3_mA',
+            'd' => 'dYp0PmjMg_xzq-J3Srfzpghejc38uVOaoOOHQXgEhpw',
+        ]);
     }
 
     private static function createDpopBoundToken(JWK $key): string

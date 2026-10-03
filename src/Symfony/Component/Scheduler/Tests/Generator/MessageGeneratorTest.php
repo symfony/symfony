@@ -267,6 +267,39 @@ class MessageGeneratorTest extends TestCase
         $this->assertEquals(self::makeDateTime('22:23:10'), $clock->now());
     }
 
+    public function testOnlyLastMissedRunIsProcessedByANewGeneratorAfterARecordedRun()
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:30'));
+        $cache = new ArrayAdapter();
+        $createGenerator = static fn () => new MessageGenerator((new Schedule())->add(RecurringMessage::every('1 minute', (object) ['id' => 'message'], self::makeDateTime('22:12:00')))->stateful($cache)->processOnlyLastMissedRun(true), 'dummy', $clock);
+        $getRunTimes = static function (MessageGenerator $generator): array {
+            $runTimes = [];
+            foreach ($generator->getMessages() as $context => $message) {
+                $runTimes[] = $context->triggeredAt->format('H:i');
+            }
+
+            return $runTimes;
+        };
+
+        $generator = $createGenerator();
+        $this->assertSame([], $getRunTimes($generator));
+        $clock->sleep(31);
+        $this->assertSame(['22:13'], $getRunTimes($generator));
+
+        $clock->sleep(60);
+        $this->assertSame(['22:14'], $getRunTimes($createGenerator()));
+
+        $clock->sleep(3 * 60);
+        $generator = $createGenerator();
+        $this->assertSame(['22:17'], $getRunTimes($generator));
+
+        $clock->sleep(3 * 60);
+        $this->assertSame(['22:20'], $getRunTimes($generator));
+
+        $clock->sleep(10);
+        $this->assertSame([], $getRunTimes($createGenerator()));
+    }
+
     public function testCheckpointWithMultipleRecurringMessagesAtSameTriggerTime()
     {
         $clock = new MockClock(self::makeDateTime('22:12:00'));

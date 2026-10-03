@@ -622,17 +622,13 @@ class TimeTypeTest extends BaseTypeTestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is not supported.');
 
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
+        $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'UTC',
             'view_timezone' => 'Europe/Berlin',
             'input' => 'datetime',
             'with_seconds' => true,
             'widget' => 'choice',
         ]);
-
-        $form->setData(new \DateTime('2019-07-24 14:09:10', new \DateTimeZone('UTC')));
-
-        $this->assertSame(['hour' => '16', 'minute' => '9', 'second' => '10'], $form->getViewData());
     }
 
     public function testHoursOption()

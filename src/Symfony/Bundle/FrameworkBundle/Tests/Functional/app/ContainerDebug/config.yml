@@ -32,6 +32,12 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass:
         class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass: '@public'
+    abstract_definition:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\AbstractDefinitionClass
+        abstract: true
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\AbstractDefinitionClass:
+        alias: abstract_definition
+        public: false
     env:
         class: stdClass
         arguments:

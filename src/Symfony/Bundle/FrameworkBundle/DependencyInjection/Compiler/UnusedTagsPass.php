@@ -79,6 +79,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'mailer.transport_factory',
         'messenger.bus',
         'messenger.message_handler',
+        'messenger.middleware',
         'messenger.receiver',
         'messenger.transport_factory',
         'mime.mime_type_guesser',

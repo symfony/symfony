@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Attribute\AsMessageMiddleware;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
@@ -317,6 +318,9 @@ class MessengerBundle extends AbstractBundle
                 $tagAttributes['method'] = $reflector->getName();
             }
             $definition->addTag('messenger.message_handler', $tagAttributes);
+        });
+        $container->registerAttributeForAutoconfiguration(AsMessageMiddleware::class, static function (ChildDefinition $definition, AsMessageMiddleware $attribute): void {
+            $definition->addTag('messenger.middleware', array_filter(get_object_vars($attribute), static fn ($value) => null !== $value));
         });
         $container->registerAttributeForAutoconfiguration(AsMessage::class, static function (ChildDefinition $definition, AsMessage $attribute): void {
             $definition->addResourceTag('messenger.message', [

@@ -1260,6 +1260,217 @@ class MessengerPassTest extends TestCase
             ->replaceArgument(2, ['*']));
     }
 
+    public function testTaggedMiddlewareIsAddedBeforeSendMessage()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first', 'send_message', 'handle_message']);
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['first', 'tagged', 'messenger.middleware.send_message', 'messenger.middleware.handle_message'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+    }
+
+    public function testTaggedMiddlewareIsAddedLastWhenTheBusHasNoSendMessageMiddleware()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first']);
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['first', 'tagged'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+    }
+
+    public function testTaggedMiddlewareIsAddedBeforeChainAndHandleMessageWhenTheBusDoesNotSendMessages()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first', 'chain', 'handle_message']);
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['first', 'tagged', 'messenger.middleware.chain', 'messenger.middleware.handle_message'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+    }
+
+    public function testTaggedMiddlewareIsOrderedWithBeforeAndAfter()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first', 'second', 'send_message', 'handle_message']);
+        $container->register('early', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo', 'before' => 'second']);
+        $container->register('late', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo', 'after' => ['messenger.middleware.send_message']]);
+        $container->register('by_class', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo', 'before' => 'App\\FirstMiddleware']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['by_class', 'first', 'early', 'second', 'messenger.middleware.send_message', 'late', 'messenger.middleware.handle_message'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+    }
+
+    public function testMiddlewareCanBeTaggedForSeveralBuses()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first']);
+        $container->register('messenger.bus.bar', MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, []);
+        $container->setParameter('messenger.bus.bar.middleware', [['id' => 'second']]);
+        $container->register('tagged', UselessMiddleware::class)
+            ->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo', 'before' => 'first'])
+            ->addTag('messenger.middleware', ['bus' => 'messenger.bus.bar']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['tagged', 'first'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+        $this->assertSame(['second', 'tagged'], $this->getBusMiddlewareIds($container, 'messenger.bus.bar'));
+    }
+
+    public function testMiddlewareTaggedForAllBusesIsAddedToEachBus()
+    {
+        $container = $this->getContainerBuilderWithTwoBuses();
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => '*']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['first', 'tagged'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+        $this->assertSame(['second', 'tagged'], $this->getBusMiddlewareIds($container, 'messenger.bus.bar'));
+    }
+
+    public function testATagForASpecificBusOverridesTheOneForAllBuses()
+    {
+        $container = $this->getContainerBuilderWithTwoBuses();
+        $container->register('tagged', UselessMiddleware::class)
+            ->addTag('messenger.middleware', ['bus' => '*'])
+            ->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo', 'before' => 'first']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['tagged', 'first'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+        $this->assertSame(['second', 'tagged'], $this->getBusMiddlewareIds($container, 'messenger.bus.bar'));
+    }
+
+    public function testMiddlewareTaggedForAllBusesKeepsItsConfiguredPosition()
+    {
+        $container = $this->getContainerBuilderWithTwoBuses();
+        $container->setParameter('messenger.bus.foo.middleware', [['id' => 'tagged'], ['id' => 'first']]);
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => '*']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['tagged', 'first'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+        $this->assertSame(['second', 'tagged'], $this->getBusMiddlewareIds($container, 'messenger.bus.bar'));
+    }
+
+    public function testMiddlewareTaggedForAllBusesIsIgnoredWithoutBuses()
+    {
+        $container = $this->getContainerBuilder('messenger.bus.foo');
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => '*']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([], $container->getDefinition('messenger.bus.foo')->getArgument(0));
+    }
+
+    public function testTaggedMiddlewareRequiresABus()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first']);
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid middleware service "tagged": the "messenger.middleware" tag requires a "bus" attribute.');
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testTaggedMiddlewareTargetingAnUnknownBusFails()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first']);
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.bar']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid middleware service "tagged": bus "messenger.bus.bar" specified on the tag "messenger.middleware" does not exist (known ones are: "messenger.bus.foo").');
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testMiddlewareCannotBeBothConfiguredAndTaggedForTheSameBus()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first']);
+        $container->getDefinition('first')->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid middleware service "first": it is both listed in the configuration of bus "messenger.bus.foo" and tagged "messenger.middleware" for it.');
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testMiddlewareCannotBeTaggedForABusThatListsItThroughAnAlias()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['audit']);
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo']);
+        $container->setAlias('audit', 'tagged');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid middleware service "tagged": it is both listed in the configuration of bus "messenger.bus.foo" and tagged "messenger.middleware" for it.');
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testMiddlewareTaggedForAllBusesKeepsThePositionConfiguredThroughAnAlias()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['audit', 'first']);
+        $container->register('tagged', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => '*']);
+        $container->setAlias('audit', 'tagged');
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['audit', 'first'], $this->getBusMiddlewareIds($container, 'messenger.bus.foo'));
+    }
+
+    public function testMiddlewareCannotBeTaggedTwiceForTheSameBus()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first']);
+        $container->register('tagged', UselessMiddleware::class)
+            ->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo'])
+            ->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo', 'before' => 'first']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid middleware service "tagged": it is tagged "messenger.middleware" more than once for bus "messenger.bus.foo".');
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testTaggedMiddlewareCyclesAreReported()
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first']);
+        $container->register('a', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo', 'before' => 'b']);
+        $container->register('b', UselessMiddleware::class)->addTag('messenger.middleware', ['bus' => 'messenger.bus.foo', 'before' => 'a']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cannot order the middleware of bus "messenger.bus.foo": cycle detected in the "before"/"after" constraints: "a" -> "b" -> "a".');
+
+        (new MessengerPass())->process($container);
+    }
+
+    private function getContainerBuilderWithMiddleware(array $configuredIds): ContainerBuilder
+    {
+        $container = $this->getContainerBuilder('messenger.bus.foo');
+        $container->setParameter('messenger.bus.foo.middleware', array_map(static fn ($id) => ['id' => $id], $configuredIds));
+        $container->register('first', 'App\\FirstMiddleware');
+        $container->register('second', 'App\\SecondMiddleware');
+        $container->register('messenger.middleware.send_message', 'App\\SendMessageMiddleware');
+        $container->register('messenger.middleware.chain', 'App\\ChainMiddleware');
+        $container->register('messenger.middleware.handle_message', 'App\\HandleMessageMiddleware');
+
+        return $container;
+    }
+
+    private function getContainerBuilderWithTwoBuses(): ContainerBuilder
+    {
+        $container = $this->getContainerBuilderWithMiddleware(['first']);
+        $container->register('messenger.bus.bar', MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, []);
+        $container->setParameter('messenger.bus.bar.middleware', [['id' => 'second']]);
+
+        return $container;
+    }
+
+    private function getBusMiddlewareIds(ContainerBuilder $container, string $busId): array
+    {
+        return array_map('strval', $container->getDefinition($busId)->getArgument(0)->getValues());
+    }
+
     private function getContainerBuilder(string $busId = 'message_bus'): ContainerBuilder
     {
         $container = new ContainerBuilder();

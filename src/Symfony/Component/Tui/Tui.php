@@ -79,6 +79,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private ?float $lastTickAt = null;
     private ?bool $lastTickBusyHint = null;
     private ?int $resizeColumns = null;
+    private ?int $resizeRows = null;
 
     /** @var Suspension<mixed>|null */
     private ?Suspension $runSuspension = null;
@@ -212,6 +213,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->lastTickAt = null;
         $this->lastTickBusyHint = null;
         $this->resizeColumns = $this->terminal->getColumns();
+        $this->resizeRows = $this->terminal->getRows();
         $this->terminal->start($this->handleInput(...), $this->handleResize(...), function (): void {
             $this->keybindings->setKittyProtocolActive(true);
         });
@@ -365,8 +367,10 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private function handleResize(): void
     {
         $columns = $this->terminal->getColumns();
-        $heightOnly = $columns === $this->resizeColumns;
+        $rows = $this->terminal->getRows();
+        $heightOnly = $columns === $this->resizeColumns && $rows !== $this->resizeRows;
         $this->resizeColumns = $columns;
+        $this->resizeRows = $rows;
 
         // A resize forces a full repaint: multiplexers (dtach, tmux) send
         // SIGWINCH on reattach, when the previous screen content cannot be

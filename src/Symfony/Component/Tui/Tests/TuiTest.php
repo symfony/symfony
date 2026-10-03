@@ -625,7 +625,7 @@ class TuiTest extends TestCase
      * Termux changes the height whenever its software keyboard shows or hides.
      */
     #[DataProvider('termuxResizeProvider')]
-    public function testOnlyAWidthChangeRepaintsTheWholeScreenInTermux(?string $termuxVersion, int $columns, int $rows, bool $repaints)
+    public function testResizeRepaintsTheWholeScreenUnlessOnlyTheHeightChangedInTermux(?string $termuxVersion, int $columns, int $rows, bool $repaints)
     {
         $previous = getenv('TERMUX_VERSION');
         putenv(null === $termuxVersion ? 'TERMUX_VERSION' : 'TERMUX_VERSION='.$termuxVersion);
@@ -651,6 +651,7 @@ class TuiTest extends TestCase
     {
         yield 'height change in Termux' => ['0.118', 40, 12, false];
         yield 'width change in Termux' => ['0.118', 30, 20, true];
+        yield 'same size in Termux' => ['0.118', 40, 20, true];
         yield 'height change elsewhere' => [null, 40, 12, true];
     }
 }

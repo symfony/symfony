@@ -988,6 +988,12 @@ class ScreenWriterTest extends TestCase
                 $screen = self::resizeLikeTermux($screen, 20, $step);
                 $writer->followTermuxHeightChange($rows, $step);
                 $rows = $step;
+            } elseif (\is_string($step)) {
+                // Two height changes, "16>12", reported by a single SIGWINCH
+                [$intermediate, $step] = array_map(intval(...), explode('>', $step));
+                $screen = self::resizeLikeTermux(self::resizeLikeTermux($screen, 20, $intermediate), 20, $step);
+                $writer->followTermuxHeightChange($rows, $step);
+                $rows = $step;
             } else {
                 $lines = $step;
             }
@@ -1032,11 +1038,25 @@ class ScreenWriterTest extends TestCase
             [...$lines(11, 23), '', ...$lines(25, 30)],
         ];
 
-        yield 'blank rows below the cursor marker dropped on shrink' => [
+        yield 'blank row between non-blank rows below the cursor marker' => [
             [[...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 29)], 12, [...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 28), 'L29x'], 20, [...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 30)]],
-            false,
+            true,
             $lines(0, 10),
             [...$lines(11, 23), '', ...$lines(25, 30)],
+        ];
+
+        yield 'coalesced shrinks with a blank row between non-blank rows below the cursor marker' => [
+            [[...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 29)], '16>12', [...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 28), 'L29x'], 20],
+            true,
+            $lines(0, 9),
+            [...$lines(10, 23), '', ...$lines(25, 28), 'L29x'],
+        ];
+
+        yield 'coalesced shrinks with blank rows at the bottom only' => [
+            [[...$lines(0, 25), 'L26'.$cursor, '', '', ''], '16>12', [...$lines(0, 25), 'L26x'.$cursor, '', '', ''], 20],
+            false,
+            $lines(0, 9),
+            [...$lines(10, 25), 'L26x', '', '', ''],
         ];
 
         yield 'content drawn after an empty frame' => [

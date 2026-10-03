@@ -171,14 +171,25 @@ final class ScreenWriter
             return;
         }
 
-        if ($rows < $previousRows) {
-            $shift = $previousRows - $rows;
-            for ($row = $previousRows - 1; $row > $this->hardwareCursorRow - $top; --$row) {
-                $line = $this->previousLines[$top + $row] ?? '';
-                if ('' === trim(AnsiUtils::stripAnsiCodes($line), ' ') && !AnsiUtils::containsImage($line) && 0 === --$shift) {
-                    break;
-                }
+        // Termux drops the blank rows below the cursor first on shrink, but cuts the bottom rows: when a non-blank row lies below a blank one,
+        // two height changes coalesced into one SIGWINCH would not move the same rows as the single change seen here
+        $blankRows = 0;
+        $nonBlankBelow = false;
+        for ($row = $previousRows - 1; $row > $this->hardwareCursorRow - $top; --$row) {
+            $line = $this->previousLines[$top + $row] ?? '';
+            if ('' !== trim(AnsiUtils::stripAnsiCodes($line), ' ') || AnsiUtils::containsImage($line)) {
+                $nonBlankBelow = true;
+            } elseif ($nonBlankBelow) {
+                $this->reset();
+
+                return;
+            } else {
+                ++$blankRows;
             }
+        }
+
+        if ($rows < $previousRows) {
+            $shift = max(0, $previousRows - $rows - $blankRows);
             $top += $shift;
             // A cursor moved above the screen is put back on its first row
             $this->hardwareCursorRow = max($this->hardwareCursorRow, $top);

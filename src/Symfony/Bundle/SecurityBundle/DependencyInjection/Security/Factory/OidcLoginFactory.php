@@ -43,6 +43,14 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
 
         \assert($node instanceof ArrayNodeDefinition);
 
+        $node
+            ->validate()
+                ->ifTrue(static fn (array $v): bool => null === ($v['client_certificate'] ?? null)
+                    && (true === ($v['client_authentication']['tls_client_auth'] ?? null) || true === ($v['client_authentication']['self_signed_tls_client_auth'] ?? null)))
+                ->thenInvalid('The OIDC "tls_client_auth" and "self_signed_tls_client_auth" methods require the "client_certificate" option.')
+            ->end()
+        ;
+
         $node->children()
             ->scalarNode('provider_uri')
                 ->isRequired()
@@ -72,6 +80,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->cannotBeEmpty()
                 ->info('The OIDC client identifier.')
             ->end()
+            ->append(self::createClientCertificateNode())
             ->arrayNode('client_authentication')
                 ->isRequired()
                 ->info('How the client authenticates at the token endpoint, which RFC 7591, Section 2 names in its "token_endpoint_auth_method" metadata. Set the method Symfony ships with its parameters, or the id of a service implementing "Symfony\\Component\\Security\\Http\\OAuth2\\ClientAuthentication\\ClientAuthenticationInterface" for a scheme it does not. Exactly one of them.')
@@ -81,16 +90,20 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 // service id or as a single-key mapping to declare a public client
                 ->beforeNormalization()
                     ->ifString()
-                    ->then(static fn (string $v): array => 'none' === $v ? ['none' => true] : ['id' => $v])
+                    ->then(static fn (string $v): array => \in_array($v, ['none', 'tls_client_auth', 'self_signed_tls_client_auth'], true) ? [$v => true] : ['id' => $v])
                 ->end()
                 // "isRequired" must be set otherwise the following custom validation is not called
                 ->validate()
                     ->ifTrue(static fn (array $v): bool => 1 !== \count($v))
-                    ->thenInvalid('Exactly one OIDC "client_authentication" method must be configured, got %s. Set "client_secret_basic", "client_secret_post", "client_secret_jwt", "private_key_jwt" or "none", or the "id" of your own implementation.')
+                    ->thenInvalid('Exactly one OIDC "client_authentication" method must be configured, got %s. Set "client_secret_basic", "client_secret_post", "client_secret_jwt", "private_key_jwt", "tls_client_auth", "self_signed_tls_client_auth" or "none", or the "id" of your own implementation.')
                 ->end()
                 ->validate()
                     ->ifTrue(static fn (array $v): bool => false === ($v['none'] ?? null))
                     ->thenInvalid('The OIDC "client_authentication.none" option only takes true, which declares a public client. Set "client_secret_basic" or "client_secret_post" with your client secret to authenticate the client instead.')
+                ->end()
+                ->validate()
+                    ->ifTrue(static fn (array $v): bool => false === ($v['tls_client_auth'] ?? null) || false === ($v['self_signed_tls_client_auth'] ?? null))
+                    ->thenInvalid('The OIDC "client_authentication.tls_client_auth" and "client_authentication.self_signed_tls_client_auth" options only take true; the certificate is set with "client_certificate".')
                 ->end()
                 ->children()
                     ->scalarNode('client_secret_basic')
@@ -165,9 +178,17 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                             ->end()
                         ->end()
                     ->end()
+                    ->booleanNode('tls_client_auth')
+                        ->treatNullLike(true)
+                        ->info('Authenticate with "client_certificate", issued by a certificate authority.')
+                    ->end()
+                    ->booleanNode('self_signed_tls_client_auth')
+                        ->treatNullLike(true)
+                        ->info('Authenticate with "client_certificate", self-signed.')
+                    ->end()
                     ->scalarNode('id')
                         ->cannotBeEmpty()
-                        ->info('The id of a service implementing "ClientAuthenticationInterface", for a scheme Symfony does not ship, such as the "tls_client_auth" of RFC 8705, Section 2. The method it reports is only known once it is built, so the rules a public client cannot bend are then checked on the first request to this firewall instead of while the container compiles.')
+                        ->info('The id of a service implementing "ClientAuthenticationInterface", for a scheme Symfony does not ship. The method it reports is only known once it is built, so the rules a public client cannot bend are then checked on the first request to this firewall instead of while the container compiles.')
                     ->end()
                 ->end()
             ->end()
@@ -293,6 +314,43 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
     }
 
     /**
+     * Builds the node of the certificate the client presents to the provider.
+     *
+     * It belongs to the client and not to its authentication method, since a client may present one only to have its tokens bound to it (RFC 8705, Section 4).
+     */
+    private static function createClientCertificateNode(): ArrayNodeDefinition
+    {
+        $node = new ArrayNodeDefinition('client_certificate');
+        $node
+            ->info('The TLS client certificate presented to the token and UserInfo endpoints.')
+            ->example(['certificate' => '%kernel.project_dir%/config/oidc/client.pem', 'key' => '%kernel.project_dir%/config/oidc/client.key'])
+            ->beforeNormalization()
+                ->ifString()
+                ->then(static fn (string $v): array => ['certificate' => $v])
+            ->end()
+            ->children()
+                ->scalarNode('certificate')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                    ->info('Path to the PEM file of the certificate.')
+                ->end()
+                ->scalarNode('key')
+                    ->defaultNull()
+                    ->cannotBeEmpty()
+                    ->info('Path to the PEM file of the private key, when not in the certificate file.')
+                ->end()
+                ->scalarNode('passphrase')
+                    ->defaultNull()
+                    ->cannotBeEmpty()
+                    ->info('Passphrase of the private key.')
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    /**
      * Registers the client authentication of the firewall and returns its service id.
      *
      * A method this bundle knows is built here, which is what lets the configuration check the
@@ -305,9 +363,11 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             return $config['id'];
         }
 
-        // the only method with nothing to configure, so every public client shares the one service
-        if (isset($config['none'])) {
-            return 'security.oauth2.client_authentication.none';
+        // the methods with nothing to configure, so every firewall using one shares its service
+        foreach (['none', 'tls_client_auth', 'self_signed_tls_client_auth'] as $method) {
+            if (isset($config[$method])) {
+                return 'security.oauth2.client_authentication.'.$method;
+            }
         }
 
         $method = array_key_first($config);
@@ -379,6 +439,15 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             $checkedEndpoints[] = 'userinfo_endpoint';
         }
 
+        // only the aliases this client requests with its certificate: the browser reaches the authorization endpoint
+        $checkedMtlsAliases = [];
+        if (null !== ($config['client_certificate'] ?? null)) {
+            $checkedMtlsAliases = ['token_endpoint'];
+            if ('userinfo' === $config['user_data_source']) {
+                $checkedMtlsAliases[] = 'userinfo_endpoint';
+            }
+        }
+
         $httpClient = new Reference($config['http_client'] ?? 'http_client');
 
         $discoveryId = 'security.authenticator.oidc_login.discovery.'.$firewallName;
@@ -390,6 +459,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(3, $config['provider_uri'])
             ->replaceArgument(4, $config['discovery_cache_ttl'])
             ->replaceArgument(6, $checkedEndpoints)
+            ->replaceArgument(7, $checkedMtlsAliases)
             ->addTag('kernel.reset', ['method' => 'reset'])
         ;
 
@@ -400,6 +470,18 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             )
         ;
 
+        // sent with each request of OidcClient rather than set on the HTTP client, so that it wins over the options of a scoped client and stays off the discovery and JWKS requests
+        $clientCertificate = $config['client_certificate'] ?? null;
+        $certificateOptions = [];
+        if (null !== $clientCertificate) {
+            // null values too, so that the certificate is never paired with a key the HTTP client carries for another one
+            $certificateOptions = [
+                'local_cert' => $clientCertificate['certificate'],
+                'local_pk' => $clientCertificate['key'],
+                'passphrase' => $clientCertificate['passphrase'],
+            ];
+        }
+
         $oidcClientId = 'security.authenticator.oidc_login.client.'.$firewallName;
         $container
             ->setDefinition($oidcClientId, new ChildDefinition('security.authenticator.oidc_login.client'))
@@ -407,6 +489,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(1, new Reference($discoveryId))
             ->replaceArgument(2, $config['client_id'])
             ->replaceArgument(3, new Reference($this->createClientAuthentication($container, $firewallName, $config['client_authentication'], new Reference($discoveryId))))
+            ->replaceArgument(4, $certificateOptions)
         ;
 
         $signatureVerifier = null;

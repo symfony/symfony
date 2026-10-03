@@ -12,18 +12,22 @@
 namespace Symfony\Component\Security\Http\Tests\Authenticator\Oidc;
 
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -31,6 +35,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 #[AllowMockObjectsWithoutExpectations]
 class OidcClientTest extends TestCase
 {
+    private const CERTIFICATE = ['local_cert' => '/path/to/client.pem', 'local_pk' => '/path/to/client.key', 'passphrase' => null];
+
     private OidcDiscovery $discovery;
     private HttpClientInterface $httpClient;
 
@@ -328,6 +334,189 @@ class OidcClientTest extends TestCase
         $this->expectExceptionMessage('must use HTTPS');
 
         $client->refreshToken('refresh-123');
+    }
+
+    public function testTheTokenRequestIsMadeToTheMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new TlsClientAuth(), self::CERTIFICATE);
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertSame('https://mtls.provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    public function testTheRefreshRequestIsMadeToTheMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-456']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new SelfSignedTlsClientAuth(), self::CERTIFICATE);
+
+        $client->refreshToken('refresh-123');
+
+        $this->assertSame('https://mtls.provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    public function testTheTokenRequestOfAClientAuthenticatingWithASecretIsMadeToTheMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new ClientSecretPost('test-client-secret'), self::CERTIFICATE);
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertSame('https://mtls.provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    public function testTheTokenRequestOfAClientAuthenticationOfItsOwnIsMadeToTheMtlsAlias()
+    {
+        $clientAuthentication = new class implements ClientAuthenticationInterface {
+            public function getMethod(): string
+            {
+                return 'tls_client_auth';
+            }
+
+            public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
+            {
+                return $options;
+            }
+        };
+
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', $clientAuthentication, self::CERTIFICATE);
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertSame('https://mtls.provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    public function testFetchUserInfoIsMadeToTheMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['sub' => '123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new TlsClientAuth(), self::CERTIFICATE);
+
+        $claims = $client->fetchUserInfo('access-token');
+
+        $this->assertSame('123', $claims['sub']);
+        $this->assertSame('https://mtls.provider.example.com/userinfo', $mockResponse->getRequestUrl());
+        $this->assertSame(['Authorization: Bearer access-token'], $mockResponse->getRequestOptions()['normalized_headers']['authorization']);
+    }
+
+    public function testFetchUserInfoIsMadeToTheAnnouncedEndpointWhenItHasNoMtlsAlias()
+    {
+        $mockResponse = new JsonMockResponse(['sub' => '123']);
+        $discovery = $this->createDiscovery([
+            'issuer' => 'https://provider.example.com',
+            'token_endpoint' => 'https://provider.example.com/token',
+            'userinfo_endpoint' => 'https://provider.example.com/userinfo',
+            'mtls_endpoint_aliases' => ['token_endpoint' => 'https://mtls.provider.example.com/token'],
+        ]);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $discovery, 'test-client-id', new TlsClientAuth(), self::CERTIFICATE);
+
+        $client->fetchUserInfo('access-token');
+
+        $this->assertSame('https://provider.example.com/userinfo', $mockResponse->getRequestUrl());
+        $this->assertSame('/path/to/client.pem', $mockResponse->getRequestOptions()['local_cert'], 'the endpoint having no alias is no reason to drop the certificate');
+    }
+
+    public function testTheMtlsAliasesAreIgnoredByAClientPresentingNoCertificate()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new ClientSecretPost('test-client-secret'));
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertSame('https://provider.example.com/token', $mockResponse->getRequestUrl());
+    }
+
+    #[DataProvider('provideUnusableMtlsAliases')]
+    public function testAnUnusableMtlsAliasIsRefusedBeforeAnyRequest(\Closure $request, string $endpoint, mixed $alias)
+    {
+        $httpClient = new MockHttpClient();
+        $discovery = $this->createDiscovery([
+            'issuer' => 'https://provider.example.com',
+            'token_endpoint' => 'https://provider.example.com/token',
+            'userinfo_endpoint' => 'https://provider.example.com/userinfo',
+            'mtls_endpoint_aliases' => [$endpoint => $alias],
+        ]);
+        $client = new OidcClient($httpClient, $discovery, 'test-client-id', new TlsClientAuth(), self::CERTIFICATE);
+
+        try {
+            $request($client);
+            $this->fail(\sprintf('Expected an "%s" to be thrown.', AuthenticationException::class));
+        } catch (AuthenticationException $e) {
+            $this->assertSame(\sprintf('The "mtls_endpoint_aliases.%s" announced by the OIDC provider must be an HTTPS URL.', $endpoint), $e->getMessage());
+        }
+
+        $this->assertSame(0, $httpClient->getRequestsCount());
+    }
+
+    public static function provideUnusableMtlsAliases(): iterable
+    {
+        $exchangeCode = static fn (OidcClient $client) => $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+        $refreshToken = static fn (OidcClient $client) => $client->refreshToken('refresh-123');
+        $fetchUserInfo = static fn (OidcClient $client) => $client->fetchUserInfo('access-token');
+
+        yield 'token, plain HTTP' => [$exchangeCode, 'token_endpoint', 'http://mtls.provider.example.com/token'];
+        yield 'token, empty' => [$exchangeCode, 'token_endpoint', ''];
+        yield 'token, null' => [$exchangeCode, 'token_endpoint', null];
+        yield 'refresh, plain HTTP' => [$refreshToken, 'token_endpoint', 'http://mtls.provider.example.com/token'];
+        yield 'userinfo, plain HTTP' => [$fetchUserInfo, 'userinfo_endpoint', 'http://mtls.provider.example.com/userinfo'];
+        yield 'userinfo, null' => [$fetchUserInfo, 'userinfo_endpoint', null];
+    }
+
+    public function testNoClientCertificateIsAddedToTheRequestOfAClientHoldingNone()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new TlsClientAuth());
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertArrayNotHasKey('local_cert', array_filter($mockResponse->getRequestOptions(), static fn ($value): bool => null !== $value));
+    }
+
+    #[DataProvider('provideRequestsToTheProvider')]
+    public function testTheCertificateIsPresentedOnEveryRequestToTheProvider(\Closure $request)
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123', 'sub' => '123']);
+        $client = new OidcClient(new MockHttpClient($mockResponse), $this->createMtlsDiscovery(), 'test-client-id', new TlsClientAuth(), self::CERTIFICATE);
+
+        $request($client);
+
+        $options = $mockResponse->getRequestOptions();
+        $this->assertSame('/path/to/client.pem', $options['local_cert']);
+        $this->assertSame('/path/to/client.key', $options['local_pk']);
+    }
+
+    public static function provideRequestsToTheProvider(): iterable
+    {
+        yield 'token' => [static fn (OidcClient $client) => $client->exchangeCode('auth-code', 'https://app.example.com/callback')];
+        yield 'refresh' => [static fn (OidcClient $client) => $client->refreshToken('refresh-123')];
+        yield 'userinfo' => [static fn (OidcClient $client) => $client->fetchUserInfo('access-token')];
+    }
+
+    public function testTheCertificateWinsOverTheOptionsOfAScopedHttpClient()
+    {
+        $mockResponse = new JsonMockResponse(['access_token' => 'access-123']);
+        $httpClient = new ScopingHttpClient(new MockHttpClient($mockResponse), [
+            'https://mtls\.provider\.example\.com/' => ['local_cert' => '/path/to/another.pem'],
+        ]);
+        $client = new OidcClient($httpClient, $this->createMtlsDiscovery(), 'test-client-id', new TlsClientAuth(), self::CERTIFICATE);
+
+        $client->exchangeCode('auth-code', 'https://app.example.com/callback');
+
+        $this->assertSame('/path/to/client.pem', $mockResponse->getRequestOptions()['local_cert']);
+    }
+
+    private function createMtlsDiscovery(): OidcDiscovery
+    {
+        return $this->createDiscovery([
+            'issuer' => 'https://provider.example.com',
+            'token_endpoint' => 'https://provider.example.com/token',
+            'userinfo_endpoint' => 'https://provider.example.com/userinfo',
+            'mtls_endpoint_aliases' => [
+                'token_endpoint' => 'https://mtls.provider.example.com/token',
+                'userinfo_endpoint' => 'https://mtls.provider.example.com/userinfo',
+            ],
+        ]);
     }
 
     private function createClient(?ClientAuthenticationInterface $clientAuthentication = null, ?OidcDiscovery $discovery = null): OidcClient

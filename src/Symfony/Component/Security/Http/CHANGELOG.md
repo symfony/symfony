@@ -60,6 +60,7 @@ CHANGELOG
  * Add `PrivateKeyJwt` and `ClientSecretJwt`, which authenticate the OAuth2 client at the token endpoint with a JWT assertion it signs itself, respectively with its private key and with its secret (RFC 7523, OIDC Core 1.0 §9)
  * Add `OidcAuthorizationRequestEvent` and the `$eventDispatcher` argument to `OidcLoginAuthenticator`, so that the extra parameters of the OIDC authorization request can be computed per request
  * Allow keying the clients passed to `OidcTokenHandler::enableDiscovery()` by the issuer their discovery document must announce
+ * Add `TlsClientAuth`, `SelfSignedTlsClientAuth`, the `$certificateOptions` argument of `OidcClient` and the `$checkedMtlsAliases` argument of `OidcDiscovery` (RFC 8705)
 
 8.1
 ---

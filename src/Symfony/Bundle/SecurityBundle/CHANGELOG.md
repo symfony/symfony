@@ -49,6 +49,7 @@ CHANGELOG
  * Dispatch `OidcAuthorizationRequestEvent` from the `oidc_login` authenticator through the firewall event dispatcher, so that a listener can tailor the `authorization_params` of each authorization request
  * Add the `check_issuer` option to the `discovery` of the `oidc` token handler, to require the discovery document of each `base_uri` to announce the expected issuer
  * Accept a list of secrets in the `secret` option of the `remember_me` and `login_link` authenticators to rotate them
+ * Add the `client_certificate` option and the `tls_client_auth` and `self_signed_tls_client_auth` client authentication methods to the `oidc_login` authenticator (RFC 8705)
 
 8.1
 ---

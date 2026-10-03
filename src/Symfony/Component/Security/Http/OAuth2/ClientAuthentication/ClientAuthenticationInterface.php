@@ -16,9 +16,10 @@ namespace Symfony\Component\Security\Http\OAuth2\ClientAuthentication;
  *
  * A client registration carries exactly one such method, which RFC 7591, Section 2
  * names in its "token_endpoint_auth_method" metadata: a secret sent in the request
- * body or as HTTP Basic credentials, nothing at all for a public client, or a signed
- * assertion (OIDC Core 1.0, Section 9). It is a property of the registration and not
- * of the grant, so the same method authenticates every request to that endpoint.
+ * body or as HTTP Basic credentials, nothing at all for a public client, a signed
+ * assertion (OIDC Core 1.0, Section 9), or a certificate presented in the TLS handshake
+ * (RFC 8705, Section 2). It is a property of the registration and not of the grant, so
+ * the same method authenticates every request to that endpoint.
  *
  * @see https://datatracker.ietf.org/doc/html/rfc6749#section-2.3 Client authentication
  * @see https://datatracker.ietf.org/doc/html/rfc7591#section-2   Client metadata

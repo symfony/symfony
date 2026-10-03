@@ -13,6 +13,7 @@ namespace Symfony\Component\JsonPath\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\JsonPath\JsonCrawler;
 use Symfony\Component\JsonPath\JsonPath;
 
 class JsonPathTest extends TestCase
@@ -71,17 +72,18 @@ class JsonPathTest extends TestCase
         $path = $path->key($key);
 
         $this->assertSame($expectedPath, (string) $path);
+        $this->assertSame(['value'], (new JsonCrawler(json_encode([$key => 'value'])))->find($path));
     }
 
     public static function provideKeysToEscape(): iterable
     {
         yield ['simple_key', '$["simple_key"]'];
         yield ['key"with"quotes', '$["key\\"with\\"quotes"]'];
-        yield ['path\\backslash', '$["path\\backslash"]'];
+        yield ['path\\backslash', '$["path\\\\backslash"]'];
         yield ['mixed\\"case', '$["mixed\\\\\\"case"]'];
         yield ['unicode_🔑', '$["unicode_🔑"]'];
         yield ['"quotes_only"', '$["\\"quotes_only\\""]'];
-        yield ['\\\\multiple\\\\backslashes', '$["\\\\\\\\multiple\\\\\\backslashes"]'];
+        yield ['\\\\multiple\\\\backslashes', '$["\\\\\\\\multiple\\\\\\\\backslashes"]'];
         yield ["control\x00\x1f\x1echar", '$["control\u0000\u001f\u001echar"]'];
 
         yield ['key"with\\"mixed', '$["key\\"with\\\\\\"mixed"]'];
@@ -101,5 +103,8 @@ class JsonPathTest extends TestCase
         yield ["newline\nkey", '$["newline\\nkey"]'];
         yield ["tab\tkey", '$["tab\\tkey"]'];
         yield ["carriage\rreturn", '$["carriage\\rreturn"]'];
+        yield ["back\x08space", '$["back\\bspace"]'];
+        yield ["form\ffeed", '$["form\\ffeed"]'];
+        yield ["vertical\vtab", '$["vertical\u000btab"]'];
     }
 }

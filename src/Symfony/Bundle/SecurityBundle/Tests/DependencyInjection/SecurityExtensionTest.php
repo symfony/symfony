@@ -1533,6 +1533,43 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    /**
+     * A stateful firewall stores the token in the session, so the cookie alone would stand for an
+     * access token nobody has to sign for any more.
+     */
+    public function testDpopRequiresAStatelessFirewall()
+    {
+        $container = $this->getRawContainer();
+        $container->register('token_handler', \stdClass::class);
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'main' => ['access_token' => ['token_handler' => 'token_handler', 'dpop' => true]],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "dpop" option of the "access_token" authenticator requires the "main" firewall to be stateless');
+
+        $container->compile();
+    }
+
+    public function testDpopOnAStatelessFirewallIsAccepted()
+    {
+        $container = $this->getRawContainer();
+        $container->register('token_handler', \stdClass::class);
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'main' => ['stateless' => true, 'access_token' => ['token_handler' => 'token_handler', 'dpop' => true]],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.sender_constraint.dpop.main'));
+    }
+
     public function testOidcLoginRegistersTheTokenRefreshListenerAfterTheContextListener()
     {
         // the listener renews the tokens the context listener just restored from the

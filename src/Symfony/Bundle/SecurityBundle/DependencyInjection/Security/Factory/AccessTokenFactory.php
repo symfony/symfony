@@ -169,7 +169,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             ->end()
             ->arrayNode('dpop')
                 ->canBeEnabled()
-                ->info('Accepts the access tokens of this firewall only from a request proving possession of the key they are bound to (RFC 9449). The token is then presented under the "DPoP" scheme rather than under "Bearer", which the "header" extractor of this firewall reads accordingly, and a token bound to nothing is refused. The URL a proof names is compared with the one this application answers on, so a deployment behind a reverse proxy declares its trusted proxies and hosts.')
+                ->info('Accepts the access tokens of this firewall only from a request proving possession of the key they are bound to (RFC 9449). The token is then presented under the "DPoP" scheme rather than under "Bearer", which the "header" extractor of this firewall reads accordingly, and a token bound to nothing is refused. The URL a proof names is compared with the one this application answers on, so a deployment behind a reverse proxy declares its trusted proxies and hosts. The firewall must be stateless, or its session cookie would stand for a bound token on its own.')
                 ->children()
                     ->arrayNode('algorithms', 'algorithm')
                         ->info('The signature algorithms a proof is accepted to be signed with, announced in the "algs" parameter of the challenge. All asymmetric: a shared secret proves possession to whoever shares it. Another algorithm is accepted once its service is tagged "security.access_token_handler.oidc.signature_algorithm".')

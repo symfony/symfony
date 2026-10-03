@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T15:05:34Z
+
+I squashed the commits and made the test check `triggeredAt`, including a step where the same worker misses several runs, so that sending the latest missed run is covered too.

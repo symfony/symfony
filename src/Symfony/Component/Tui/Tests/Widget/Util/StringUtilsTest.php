@@ -65,4 +65,22 @@ class StringUtilsTest extends TestCase
         $this->assertSame('helloworld', $result);
         $this->assertTrue(mb_check_encoding($result, 'UTF-8'));
     }
+
+    #[DataProvider('ctrlLetterKeysProvider')]
+    public function testDecodeCtrlLetterKeys(string $input, string $expected)
+    {
+        $this->assertSame($expected, StringUtils::decodeCtrlLetterKeys($input));
+    }
+
+    public static function ctrlLetterKeysProvider(): iterable
+    {
+        yield 'no escape sequence' => ['plain text', 'plain text'];
+        yield 'ctrl+j' => ["a\x1b[106;5ub", "a\nb"];
+        yield 'ctrl+J' => ["a\x1b[74;5ub", "a\nb"];
+        yield 'ctrl+i' => ["a\x1b[105;5ub", "a\tb"];
+        yield 'ctrl+digit is kept' => ["\x1b[49;5u", "\x1b[49;5u"];
+        yield 'other modifiers are kept' => ["\x1b[106;3u", "\x1b[106;3u"];
+        yield 'ctrl+j in the xterm format' => ["a\x1b[27;5;106~b", "a\nb"];
+        yield 'other modifiers in the xterm format are kept' => ["\x1b[27;6;106~", "\x1b[27;6;106~"];
+    }
 }

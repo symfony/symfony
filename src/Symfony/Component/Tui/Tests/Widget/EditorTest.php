@@ -1319,6 +1319,14 @@ class EditorTest extends TestCase
         $this->assertSame("Hello!\nWorld", $editor->getText());
     }
 
+    public function testPasteDecodesCtrlLetterKeys()
+    {
+        $editor = new EditorWidget();
+        $editor->handleInput("\x1b[200~line1\x1b[106;5uline2\x1b[74;5uline3\x1b[201~");
+
+        $this->assertSame("line1\nline2\nline3", $editor->getText());
+    }
+
     #[DataProvider('pasteLineEndingNormalizationProvider')]
     public function testPasteNormalizesLineEndings(string $pasteContent)
     {

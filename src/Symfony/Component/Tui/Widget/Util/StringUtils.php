@@ -74,4 +74,27 @@ final class StringUtils
     {
         return preg_replace("/[\x00-\x08\x0b-\x1f\x7f]|\xc2[\x80-\x9f]/", '', $value) ?? '';
     }
+
+    /**
+     * Decode the Ctrl+letter keys of a paste back to their control bytes.
+     *
+     * A tmux popup whose program enabled modifyOtherKeys mode 2, like a nested tmux client, sends the control bytes of a paste as Ctrl+letter keys: a newline arrives as ESC [ 27 ; 5 ; 106 ~, or as ESC [ 106 ; 5 u with extended-keys-format=csi-u.
+     * Stripping the ESC would otherwise leave the rest of the sequence, like "[106;5u", in the text.
+     */
+    public static function decodeCtrlLetterKeys(string $value): string
+    {
+        if (!str_contains($value, "\x1b[")) {
+            return $value;
+        }
+
+        return preg_replace_callback('/\x1b\[(?|(\d+);5u|27;5;(\d+)~)/', static function (array $match): string {
+            $codepoint = (int) $match[1];
+
+            return match (true) {
+                $codepoint >= 97 && $codepoint <= 122 => \chr($codepoint - 96),
+                $codepoint >= 65 && $codepoint <= 90 => \chr($codepoint - 64),
+                default => $match[0],
+            };
+        }, $value) ?? $value;
+    }
 }

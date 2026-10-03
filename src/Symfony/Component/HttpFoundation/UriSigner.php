@@ -28,21 +28,25 @@ class UriSigner
     private const STATUS_MISSING = 3;
     private const STATUS_EXPIRED = 4;
 
+    private array $secrets;
     private ?\DateInterval $defaultExpiration;
 
     /**
-     * @param string                 $hashParameter       Query string parameter to use
-     * @param string                 $expirationParameter Query string parameter to use for expiration
-     * @param \DateInterval|int|null $defaultExpiration   The expiration applied when none is passed to sign(); an int is a number of seconds
+     * @param string|non-empty-list<string> $secret              The secret, or a list of secrets to rotate it: the first one signs, all of them verify
+     * @param string                        $hashParameter       Query string parameter to use
+     * @param string                        $expirationParameter Query string parameter to use for expiration
+     * @param \DateInterval|int|null        $defaultExpiration   The expiration applied when none is passed to sign(); an int is a number of seconds
      */
     public function __construct(
-        #[\SensitiveParameter] private string $secret,
+        #[\SensitiveParameter] string|array $secret,
         private string $hashParameter = '_hash',
         private string $expirationParameter = '_expiration',
         private ?ClockInterface $clock = null,
         \DateInterval|int|null $defaultExpiration = null,
     ) {
-        if (!$secret) {
+        $this->secrets = \is_array($secret) ? array_values($secret) : [$secret];
+
+        if (!$this->secrets || \in_array('', $this->secrets, true)) {
             throw new \InvalidArgumentException('A non-empty secret is required.');
         }
 
@@ -94,7 +98,7 @@ class UriSigner
             $params[$this->expirationParameter] = $this->getExpirationTime($expiration);
         }
 
-        $params[$this->hashParameter] = $this->computeHash($this->buildUrl($url, $params), $version);
+        $params[$this->hashParameter] = $this->computeHash($this->secrets[0], $this->buildUrl($url, $params), $version);
 
         return $this->buildUrl($url, $params);
     }
@@ -147,7 +151,7 @@ class UriSigner
         };
     }
 
-    private function computeHash(string $uri, #[\SensitiveParameter] ?string $version = null): string
+    private function computeHash(#[\SensitiveParameter] string $secret, string $uri, #[\SensitiveParameter] ?string $version = null): string
     {
         if (null !== $version) {
             // the version is folded into the signature without ever being exposed in the URI;
@@ -155,7 +159,7 @@ class UriSigner
             $uri .= "\0".$version;
         }
 
-        return strtr(rtrim(base64_encode(hash_hmac('sha256', $uri, $this->secret, true)), '='), ['/' => '_', '+' => '-']);
+        return strtr(rtrim(base64_encode(hash_hmac('sha256', $uri, $secret, true)), '='), ['/' => '_', '+' => '-']);
     }
 
     private function buildUrl(array $url, array $params = []): string
@@ -211,8 +215,10 @@ class UriSigner
         }
 
         unset($params[$this->hashParameter]);
+        $unsignedUri = $this->buildUrl($url, $params);
+        $hash = strtr(rtrim($hash, '='), ['/' => '_', '+' => '-']);
 
-        if (!hash_equals($this->computeHash($this->buildUrl($url, $params), $version), strtr(rtrim($hash, '='), ['/' => '_', '+' => '-']))) {
+        if (!array_any($this->secrets, fn ($secret) => hash_equals($this->computeHash($secret, $unsignedUri, $version), $hash))) {
             return self::STATUS_INVALID;
         }
 

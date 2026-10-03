@@ -107,6 +107,12 @@ class MessengerBundle extends AbstractBundle
                             ->defaultValue('messenger.transport.native_php_serializer')
                             ->info('Service id to use as the default serializer for the transports.')
                         ->end()
+                        ->arrayNode('signing_secret')
+                            ->info('Secret used to sign messages, defaults to the "kernel.secret" parameter. List several to rotate it: the first one signs, all of them verify.')
+                            ->acceptAndWrap(['string'])
+                            ->performNoDeepMerging()
+                            ->scalarPrototype()->cannotBeEmpty()->end()
+                        ->end()
                         ->arrayNode('symfony_serializer')
                             ->addDefaultsIfNotSet()
                             ->children()
@@ -458,6 +464,11 @@ class MessengerBundle extends AbstractBundle
                 ->replaceArgument(1, $config['serializer']['symfony_serializer']['format'])
                 ->replaceArgument(2, $config['serializer']['symfony_serializer']['context']);
             $container->setAlias('messenger.default_serializer', $config['serializer']['default_serializer']);
+        }
+
+        if ($config['serializer']['signing_secret']) {
+            $container->getDefinition('messenger.signing_serializer')
+                ->replaceArgument(1, $config['serializer']['signing_secret']);
         }
 
         $failureTransports = [];

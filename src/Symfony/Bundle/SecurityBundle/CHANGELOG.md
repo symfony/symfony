@@ -46,6 +46,7 @@ CHANGELOG
  * Add the `client_secret_jwt` and `private_key_jwt` client authentication methods to the `oidc_login` authenticator, which authenticate the client at the token endpoint with a JWT assertion it signs itself (RFC 7523, OIDC Core 1.0 §9)
  * Dispatch `OidcAuthorizationRequestEvent` from the `oidc_login` authenticator through the firewall event dispatcher, so that a listener can tailor the `authorization_params` of each authorization request
  * Add the `check_issuer` option to the `discovery` of the `oidc` token handler, to require the discovery document of each `base_uri` to announce the expected issuer
+ * Accept a list of secrets in the `secret` option of the `remember_me` and `login_link` authenticators to rotate them
 
 8.1
 ---

@@ -166,6 +166,25 @@ class ConfigurationTest extends TestCase
         ]]);
     }
 
+    public function testUriSignerSecretAcceptsASingleSecret()
+    {
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
+            'uri_signer' => ['secret' => 's3cr3t'],
+        ]]);
+
+        $this->assertSame(['s3cr3t'], $config['uri_signer']['secret']);
+    }
+
+    public function testUriSignerSecretIsOverriddenAcrossFiles()
+    {
+        $config = (new Processor())->processConfiguration(new Configuration(), [
+            ['uri_signer' => ['secret' => 'old']],
+            ['uri_signer' => ['secret' => ['new', 'old']]],
+        ]);
+
+        $this->assertSame(['new', 'old'], $config['uri_signer']['secret']);
+    }
+
     #[DataProvider('getTestInvalidSessionName')]
     public function testInvalidSessionName($sessionName)
     {
@@ -287,6 +306,7 @@ class ConfigurationTest extends TestCase
                 'hinclude_default_template' => null,
             ],
             'uri_signer' => [
+                'secret' => [],
                 'expiration' => null,
             ],
             'profiler' => [

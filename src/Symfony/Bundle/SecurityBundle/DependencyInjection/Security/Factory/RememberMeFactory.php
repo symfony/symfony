@@ -137,9 +137,13 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
     {
         $builder = $node->children();
         $builder
-            ->scalarNode('secret')
-                ->cannotBeEmpty()
-                ->defaultValue('%kernel.secret%')
+            ->arrayNode('secret')
+                ->info('Secret used to sign the cookies. List several to rotate it: the first one signs, all of them verify.')
+                ->acceptAndWrap(['string'])
+                ->requiresAtLeastOneElement()
+                ->performNoDeepMerging()
+                ->defaultValue(['%kernel.secret%'])
+                ->scalarPrototype()->cannotBeEmpty()->end()
             ->end()
             ->scalarNode('service')->end()
             ->arrayNode('user_providers', 'user_provider')

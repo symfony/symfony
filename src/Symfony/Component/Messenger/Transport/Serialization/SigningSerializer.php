@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
@@ -33,19 +34,25 @@ final class SigningSerializer implements SerializerInterface
     // Marks a message that is signed although nothing verified it: the signature covers this header, so that adding or removing it breaks the signature.
     private const UNVERIFIED_HEADER = 'Sign-Trust';
 
+    private array $signingKeys;
     private bool $signAll;
 
     /**
-     * @param list<class-string|'*'> $signedMessageTypes The message types that require a verified signature, or "*" to sign every message and to refuse a message without a valid signature before reading its type
-     * @param bool                   $acceptUnverified   Whether a serializer that signs every message accepts the messages signed as unverified, as the one of a failure transport does
+     * @param string|\Stringable|non-empty-list<string|\Stringable> $signingKey         The key, or a list of keys to rotate it: the first one signs, all of them verify
+     * @param list<class-string|'*'>                                $signedMessageTypes The message types that require a verified signature, or "*" to sign every message and to refuse a message without a valid signature before reading its type
+     * @param bool                                                  $acceptUnverified   Whether a serializer that signs every message accepts the messages signed as unverified, as the one of a failure transport does
      */
     public function __construct(
         private SerializerInterface $inner,
-        #[\SensitiveParameter] private string|\Stringable $signingKey,
+        #[\SensitiveParameter] string|\Stringable|array $signingKey,
         private array $signedMessageTypes,
         private string $algorithm = 'sha256',
         private bool $acceptUnverified = false,
     ) {
+        if (!$this->signingKeys = \is_array($signingKey) ? array_values($signingKey) : [$signingKey]) {
+            throw new InvalidArgumentException('At least one signing key is required.');
+        }
+
         $this->signAll = \in_array('*', $signedMessageTypes, true);
     }
 
@@ -60,7 +67,7 @@ final class SigningSerializer implements SerializerInterface
         $trusted = TrustStamp::isEnvelopeTrusted($envelope);
 
         if (($message = $envelope->getMessage()) instanceof MessageDecodingFailedException) {
-            // the inner serializer can send the failed envelope again as it is: it must have been signed with this key, and not as unverified
+            // the inner serializer can send the failed envelope again as it is: it must have been signed with one of the keys, and not as unverified
             unset($encoded['headers']['Body-Sign'], $encoded['headers']['Sign-Algo'], $encoded['headers'][self::UNVERIFIED_HEADER]);
             $trusted = $trusted && $this->hasValidSignature($message->encodedEnvelope, false) && !isset($message->encodedEnvelope['headers'][self::UNVERIFIED_HEADER]);
 
@@ -77,7 +84,7 @@ final class SigningSerializer implements SerializerInterface
                 $encoded['headers'][self::UNVERIFIED_HEADER] = 'unverified';
             }
 
-            $encoded['headers']['Body-Sign'] = self::SIGNATURE_MARKER.hash_hmac($this->algorithm, self::getSignedPayload($encoded), $this->getSigningKey(false));
+            $encoded['headers']['Body-Sign'] = self::SIGNATURE_MARKER.hash_hmac($this->algorithm, self::getSignedPayload($encoded), $this->getSigningKey($this->signingKeys[0], false));
             $encoded['headers']['Sign-Algo'] = $this->algorithm;
         }
 
@@ -205,12 +212,12 @@ final class SigningSerializer implements SerializerInterface
 
         $payload = $bodyOnly ? $body : self::getSignedPayload($encodedEnvelope);
 
-        return hash_equals(($bodyOnly ? '' : self::SIGNATURE_MARKER).hash_hmac($this->algorithm, $payload, $this->getSigningKey($bodyOnly)), $sign);
+        return array_any($this->signingKeys, fn ($key) => hash_equals(($bodyOnly ? '' : self::SIGNATURE_MARKER).hash_hmac($this->algorithm, $payload, $this->getSigningKey($key, $bodyOnly)), $sign));
     }
 
-    private function getSigningKey(bool $bodyOnly): string
+    private function getSigningKey(#[\SensitiveParameter] string $key, bool $bodyOnly): string
     {
-        return $bodyOnly ? $this->signingKey : hash_hmac($this->algorithm, self::SIGNATURE_MARKER, $this->signingKey);
+        return $bodyOnly ? $key : hash_hmac($this->algorithm, self::SIGNATURE_MARKER, $key);
     }
 
     /**

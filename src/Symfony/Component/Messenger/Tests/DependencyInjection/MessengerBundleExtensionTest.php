@@ -24,8 +24,10 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Attribute\AsMessage;
@@ -1008,6 +1010,28 @@ class MessengerBundleExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
         $this->assertContains(RedispatchMessage::class, $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+    }
+
+    public function testMessengerSigningSecretDefaultsToTheKernelSecret()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', []);
+        });
+
+        $this->assertInstanceOf(Definition::class, $container->getDefinition('messenger.signing_serializer')->getArgument(1));
+        $this->assertEquals([[new Parameter('kernel.secret')]], $container->getDefinition('.messenger.signing_serializer.signing_key')->getArguments());
+    }
+
+    public function testMessengerSigningSecrets()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'serializer' => ['signing_secret' => ['new', 'old']],
+                'transports' => ['async' => ['dsn' => 'in-memory://', 'sign' => true]],
+            ]);
+        });
+
+        $this->assertSame(['new', 'old'], $container->getDefinition('.messenger.transport.async.signing_serializer')->getArgument(1));
     }
 
     private function getBusMiddlewareIds(ContainerBuilder $container, string $busId): array

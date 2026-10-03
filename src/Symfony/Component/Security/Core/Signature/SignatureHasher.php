@@ -25,19 +25,24 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SignatureHasher
 {
+    private array $secrets;
+
     /**
-     * @param array                        $signatureProperties      Properties of the User; the hash is invalidated if these properties change
-     * @param ExpiredSignatureStorage|null $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
-     * @param int|null                     $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
+     * @param array                         $signatureProperties      Properties of the User; the hash is invalidated if these properties change
+     * @param string|non-empty-list<string> $secret                   The secret, or a list of secrets to rotate it: the first one signs, all of them verify
+     * @param ExpiredSignatureStorage|null  $expiredSignaturesStorage If provided, secures a sequence of hashes that are expired
+     * @param int|null                      $maxUses                  Used together with $expiredSignatureStorage to allow a maximum usage of a hash
      */
     public function __construct(
         private PropertyAccessorInterface $propertyAccessor,
         private array $signatureProperties,
-        #[\SensitiveParameter] private string $secret,
+        #[\SensitiveParameter] string|array $secret,
         private ?ExpiredSignatureStorage $expiredSignaturesStorage = null,
         private ?int $maxUses = null,
     ) {
-        if (!$secret) {
+        $this->secrets = \is_array($secret) ? array_values($secret) : [$secret];
+
+        if (!$this->secrets || \in_array('', $this->secrets, true)) {
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
     }
@@ -61,10 +66,8 @@ class SignatureHasher
         if ($expires < time()) {
             throw new ExpiredSignatureException('Signature has expired.');
         }
-        $hmac = substr($hash, 0, 44);
-        $payload = substr($hash, 44).':'.$expires.':'.$userIdentifier.self::squashParameters($parameters);
 
-        if (!hash_equals($hmac, $this->generateHash($payload))) {
+        if (!$this->hasValidHmac($hash, $expires, $userIdentifier, $parameters)) {
             throw new InvalidSignatureException('Invalid or expired signature.');
         }
     }
@@ -87,7 +90,7 @@ class SignatureHasher
             throw new ExpiredSignatureException('Signature has expired.');
         }
 
-        if (!hash_equals($hash, $this->computeSignatureHash($user, $expires, $parameters))) {
+        if (!hash_equals($this->computeFieldsHash($user, $parameters), substr($hash, 44)) || !$this->hasValidHmac($hash, $expires, $user->getUserIdentifier(), $parameters)) {
             throw new InvalidSignatureException('Invalid or expired signature.');
         }
 
@@ -105,7 +108,16 @@ class SignatureHasher
     public function computeSignatureHash(UserInterface $user, int $expires/* , array $parameters = [] */): string
     {
         $parameters = 2 < \func_num_args() ? func_get_arg(2) : [];
-        $userIdentifier = $user->getUserIdentifier();
+        $fieldsHash = $this->computeFieldsHash($user, $parameters);
+
+        return $this->generateHash($this->secrets[0], $fieldsHash.':'.$expires.':'.$user->getUserIdentifier().self::squashParameters($parameters)).$fieldsHash;
+    }
+
+    /**
+     * Hashes the signature properties and the extra parameters, the part of the hash that does not depend on the secret.
+     */
+    private function computeFieldsHash(UserInterface $user, array $parameters): string
+    {
         $fieldsHash = hash_init('sha256');
 
         foreach ($this->signatureProperties as $property) {
@@ -125,9 +137,15 @@ class SignatureHasher
 
         hash_update($fieldsHash, self::squashParameters($parameters));
 
-        $fieldsHash = strtr(base64_encode(hash_final($fieldsHash, true)), '+/=', '-_~');
+        return strtr(base64_encode(hash_final($fieldsHash, true)), '+/=', '-_~');
+    }
 
-        return $this->generateHash($fieldsHash.':'.$expires.':'.$userIdentifier.self::squashParameters($parameters)).$fieldsHash;
+    private function hasValidHmac(string $hash, int $expires, string $userIdentifier, array $parameters): bool
+    {
+        $hmac = substr($hash, 0, 44);
+        $payload = substr($hash, 44).':'.$expires.':'.$userIdentifier.self::squashParameters($parameters);
+
+        return array_any($this->secrets, fn ($secret) => hash_equals($this->generateHash($secret, $payload), $hmac));
     }
 
     /**
@@ -157,8 +175,8 @@ class SignatureHasher
         return $result;
     }
 
-    private function generateHash(string $tokenValue): string
+    private function generateHash(#[\SensitiveParameter] string $secret, string $tokenValue): string
     {
-        return strtr(base64_encode(hash_hmac('sha256', $tokenValue, $this->secret, true)), '+/=', '-_~');
+        return strtr(base64_encode(hash_hmac('sha256', $tokenValue, $secret, true)), '+/=', '-_~');
     }
 }

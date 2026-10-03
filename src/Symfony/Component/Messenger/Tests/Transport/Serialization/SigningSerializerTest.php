@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
@@ -1022,6 +1023,68 @@ class SigningSerializerTest extends TestCase
 
         $this->assertTrue($serializer->decode($serializer->encode(new Envelope(new DummyMessage('hello'))))->last(TrustStamp::class)?->isTrusted());
         $this->assertNull($serializer->decode(self::signBodyOnly($inner->encode(new Envelope(new DummyMessage('hello')))))->last(TrustStamp::class));
+    }
+
+    public function testEncodeSignsWithTheFirstOfSeveralKeys()
+    {
+        $envelope = new Envelope(new DummyMessage('hello'));
+
+        $encoded = (new SigningSerializer(new Serializer(), ['new-key', 'old-key'], [DummyMessage::class]))->encode($envelope);
+
+        $this->assertSame((new SigningSerializer(new Serializer(), 'new-key', [DummyMessage::class]))->encode($envelope), $encoded);
+    }
+
+    public function testDecodeAcceptsASignatureFromAnyOfSeveralKeys()
+    {
+        $serializer = new SigningSerializer(new Serializer(), ['new-key', 'old-key'], [DummyMessage::class]);
+
+        $decoded = $serializer->decode((new SigningSerializer(new Serializer(), 'old-key', [DummyMessage::class]))->encode(new Envelope(new DummyMessage('hello'))));
+        $this->assertSame('hello', $decoded->getMessage()->getMessage());
+
+        $envelope = $serializer->decode((new SigningSerializer(new Serializer(), 'other-key', [DummyMessage::class]))->encode(new Envelope(new DummyMessage('hello'))));
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
+    }
+
+    public function testSignAllAcceptsASignatureFromAnyOfSeveralKeys()
+    {
+        $encoded = self::signWith((new Serializer())->encode(new Envelope(new DummyMessage('hello'))), 'old-key');
+
+        $decoded = (new SigningSerializer(new Serializer(), ['new-key', 'old-key'], ['*']))->decode($encoded);
+
+        $this->assertSame('hello', $decoded->getMessage()->getMessage());
+        $this->assertTrue($decoded->last(TrustStamp::class)?->isTrusted());
+    }
+
+    public function testDecodeAcceptsABodyOnlySignatureFromAnyOfSeveralKeys()
+    {
+        $inner = new Serializer();
+        $serializer = new SigningSerializer($inner, ['new-key', 'secret-key'], [DummyMessage::class]);
+
+        $decoded = $serializer->decode(self::signBodyOnly($inner->encode(new Envelope(new DummyMessage('hello')))));
+
+        $this->assertSame('hello', $decoded->getMessage()->getMessage());
+    }
+
+    public function testEncodeSignsWithTheFirstKeyTheDecodeFailureOfAMessageSignedWithAnotherKey()
+    {
+        $typeToClassMap = ['dummy' => DummyMessage::class];
+        $serializer = new SigningSerializer(new Serializer(), ['new-key', 'old-key'], [DummyMessage::class]);
+        $failed = $serializer->decode((new SigningSerializer(new Serializer(null, 'json', [], $typeToClassMap), 'old-key', [DummyMessage::class]))->encode(new Envelope(new DummyMessage('hello'))));
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failed->getMessage());
+
+        $encoded = $serializer->encode($failed->with(new DelayStamp(0), new RedeliveryStamp(0)));
+
+        $decoded = (new SigningSerializer(new Serializer(null, 'json', [], $typeToClassMap), 'new-key', [DummyMessage::class]))->decode($encoded);
+        $this->assertSame('hello', $decoded->getMessage()->getMessage());
+    }
+
+    public function testConstructorRejectsAnEmptyListOfKeys()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('At least one signing key is required.');
+
+        new SigningSerializer(new PhpSerializer(), [], [DummyMessage::class]);
     }
 
     private function createSerializer(array $signedTypes): SerializerInterface

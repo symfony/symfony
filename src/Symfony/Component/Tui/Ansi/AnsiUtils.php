@@ -52,6 +52,7 @@ final class AnsiUtils
      * slices text must agree on this value.
      */
     public const TAB_WIDTH = 3;
+    private const GRAPHEME_CHUNK_SIZE = 8192;
 
     /**
      * Characters that mb_strwidth() does not measure the way terminals draw them.
@@ -197,7 +198,7 @@ final class AnsiUtils
         // the two have to agree or a wrapped chunk comes back wider than the width it was wrapped to.
         if (preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $clean)) {
             $width = 0;
-            foreach (grapheme_str_split($clean) ?: [] as $grapheme) {
+            foreach (self::splitGraphemes($clean) as $grapheme) {
                 $width += self::graphemeWidth($grapheme);
             }
 
@@ -347,8 +348,8 @@ final class AnsiUtils
 
         $result = self::sliceByColumn($text, 0, $targetWidth);
 
-        // Add reset code before ellipsis to prevent styling leaking into it
-        $truncated = $result."\x1b[0m".$ellipsis;
+        // Close a hyperlink the cut left open and reset styling, so that neither leaks into the ellipsis
+        $truncated = $result.self::closeOpenHyperlink($result)."\x1b[0m".$ellipsis;
 
         if ($pad) {
             $truncatedWidth = self::visibleWidth($truncated);
@@ -667,8 +668,8 @@ final class AnsiUtils
                     $result .= $segment;
                     $currentCol += $segWidth;
                 } else {
-                    $graphemes = grapheme_str_split($segment) ?: [];
-                    foreach ($graphemes as $grapheme) {
+                    // The segment can be a whole huge line: take its graphemes one at a time, only as far as needed
+                    foreach (self::splitGraphemes($segment) as $grapheme) {
                         $w = "\t" === $grapheme ? self::TAB_WIDTH : self::graphemeWidth($grapheme);
                         if ($currentCol + $w > $length) {
                             // Breaking would leave the outer scan running and let a later
@@ -685,5 +686,72 @@ final class AnsiUtils
         }
 
         return $result;
+    }
+
+    /**
+     * Split a string into graphemes, a chunk at a time when it does not fit in one.
+     *
+     * A string that fits in one chunk is split whole, as iterating over a generator would slow down measuring and truncating a line.
+     *
+     * @return iterable<string>
+     */
+    private static function splitGraphemes(string $text): iterable
+    {
+        return \strlen($text) > self::GRAPHEME_CHUNK_SIZE ? self::iterateGraphemes($text) : (grapheme_str_split($text) ?: []);
+    }
+
+    /**
+     * Iterate over the graphemes of a string without splitting all of it upfront.
+     *
+     * The string is split a chunk at a time. grapheme_extract() would walk it one grapheme at a time, but without the intl extension, its polyfill takes a time that grows with the offset.
+     *
+     * @return \Generator<int, string>
+     */
+    private static function iterateGraphemes(string $text): \Generator
+    {
+        $length = \strlen($text);
+        $offset = 0;
+        $size = self::GRAPHEME_CHUNK_SIZE;
+        while ($offset < $length) {
+            // End the chunk on a character boundary
+            $end = min($length, $offset + $size);
+            while ($end < $length && 0x80 === (\ord($text[$end]) & 0xC0)) {
+                ++$end;
+            }
+
+            if (false === $graphemes = grapheme_str_split(substr($text, $offset, $end - $offset))) {
+                return;
+            }
+
+            // The last grapheme of a chunk may go on in the next one.
+            // So may the one before: with PCRE older than 10.44, the polyfill leaves a zero-width joiner that ends the chunk out of the grapheme it extends.
+            if ($end < $length) {
+                if (\count($graphemes) < 3) {
+                    $size *= 2;
+                    continue;
+                }
+                array_splice($graphemes, -2);
+            }
+
+            foreach ($graphemes as $grapheme) {
+                yield $grapheme;
+                $offset += \strlen($grapheme);
+            }
+            $size = self::GRAPHEME_CHUNK_SIZE;
+        }
+    }
+
+    /**
+     * Return the sequence closing the OSC 8 hyperlink left open at the end of the text, if any.
+     */
+    private static function closeOpenHyperlink(string $text): string
+    {
+        if (!str_contains($text, "\x1b]8;") || !preg_match_all('/\x1b\]8;[^;\x07\x1b]*;([^\x07\x1b]*)(\x07|\x1b\\\\)/', $text, $matches, \PREG_SET_ORDER)) {
+            return '';
+        }
+
+        [, $uri, $terminator] = end($matches);
+
+        return '' === $uri ? '' : "\x1b]8;;".$terminator;
     }
 }

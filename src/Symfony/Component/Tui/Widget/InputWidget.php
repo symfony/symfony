@@ -256,6 +256,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
             }
 
             // Regular character input
+            $data = $kb->getParser()->decodePrintable($data) ?? $data;
             if (!StringUtils::hasControlChars($data)) {
                 $this->line->insert($data);
                 $this->notifyChange();

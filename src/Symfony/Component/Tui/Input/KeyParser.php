@@ -71,6 +71,37 @@ final class KeyParser
         'f12' => -31,
     ];
 
+    // The Kitty protocol reports keypad keys with codepoints of their own
+    private const KEYPAD_CODEPOINTS = [
+        57399 => 48, // 0
+        57400 => 49, // 1
+        57401 => 50, // 2
+        57402 => 51, // 3
+        57403 => 52, // 4
+        57404 => 53, // 5
+        57405 => 54, // 6
+        57406 => 55, // 7
+        57407 => 56, // 8
+        57408 => 57, // 9
+        57409 => 46, // .
+        57410 => 47, // /
+        57411 => 42, // *
+        57412 => 45, // -
+        57413 => 43, // +
+        57415 => 61, // =
+        57416 => 44, // ,
+        57417 => self::ARROW_CODEPOINTS['left'],
+        57418 => self::ARROW_CODEPOINTS['right'],
+        57419 => self::ARROW_CODEPOINTS['up'],
+        57420 => self::ARROW_CODEPOINTS['down'],
+        57421 => self::FUNCTIONAL_CODEPOINTS['page_up'],
+        57422 => self::FUNCTIONAL_CODEPOINTS['page_down'],
+        57423 => self::FUNCTIONAL_CODEPOINTS['home'],
+        57424 => self::FUNCTIONAL_CODEPOINTS['end'],
+        57425 => self::FUNCTIONAL_CODEPOINTS['insert'],
+        57426 => self::FUNCTIONAL_CODEPOINTS['delete'],
+    ];
+
     private const LEGACY_KEY_SEQUENCES = [
         'up' => ["\x1b[A", "\x1bOA"],
         'down' => ["\x1b[B", "\x1bOB"],
@@ -269,6 +300,41 @@ final class KeyParser
         return $this->matchesKey($data, $keyId);
     }
 
+    /**
+     * Return the text a Kitty protocol key event types, if any.
+     *
+     * Some terminals report keys that type text as escape sequences, like the digits and operators of the keypad.
+     *
+     * @internal
+     */
+    public function decodePrintable(string $data): ?string
+    {
+        if (!preg_match('/^\x1b\[(\d+)(?::(\d*))?(?::(\d+))?(?:;(\d+))?(?::(\d+))?u$/', $data, $match)) {
+            return null;
+        }
+
+        $modifier = (isset($match[4]) && '' !== $match[4] ? (int) $match[4] : 1) - 1;
+        // Only plain or shifted keys type text
+        if (($modifier & ~self::LOCK_MASK & ~self::MOD_SHIFT) || self::EVENT_RELEASE === $this->parseEventType($match[5] ?? null)) {
+            return null;
+        }
+
+        $codepoint = (int) $match[1];
+        if (($modifier & self::MOD_SHIFT) && isset($match[2]) && '' !== $match[2]) {
+            $codepoint = (int) $match[2];
+        }
+        $codepoint = self::KEYPAD_CODEPOINTS[$codepoint] ?? $codepoint;
+
+        // Control characters and the private use area of functional keys type nothing
+        if ($codepoint < 32 || ($codepoint >= 127 && $codepoint < 160) || ($codepoint >= 57344 && $codepoint <= 63743) || $codepoint > 0x10FFFF) {
+            return null;
+        }
+
+        $char = mb_chr($codepoint, 'UTF-8');
+
+        return false === $char ? null : $char;
+    }
+
     public function isKeyRelease(string $data): bool
     {
         if (str_contains($data, "\x1b[200~")) {
@@ -408,7 +474,7 @@ final class KeyParser
         // is intentionally ignored; keybindings must follow the logical layout
         // so that e.g. Ctrl+W means Ctrl+W on every keyboard layout.
         if (preg_match('/^\x1b\[(\d+)(?::(\d*))?(?::(\d+))?(?:;(\d+))?(?::(\d+))?u$/', $data, $match)) {
-            $codepoint = (int) $match[1];
+            $codepoint = self::KEYPAD_CODEPOINTS[(int) $match[1]] ?? (int) $match[1];
             $modifierValue = isset($match[4]) && '' !== $match[4] ? (int) $match[4] : 1;
             $eventType = $this->parseEventType($match[5] ?? null);
 

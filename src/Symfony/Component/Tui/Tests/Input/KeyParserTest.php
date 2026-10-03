@@ -124,6 +124,54 @@ class KeyParserTest extends TestCase
         yield 'digit 1' => ["\x1b[49u", '1'];
         yield 'ctrl+1' => ["\x1b[49;5u", 'ctrl+1'];
         yield 'newline as shift+enter' => ["\n", 'shift+enter'];
+        yield 'keypad 0' => ["\x1b[57399u", '0'];
+        yield 'keypad 9' => ["\x1b[57408u", '9'];
+        yield 'keypad decimal' => ["\x1b[57409u", '.'];
+        yield 'keypad add' => ["\x1b[57413u", '+'];
+        yield 'keypad separator' => ["\x1b[57416u", ','];
+        yield 'keypad left' => ["\x1b[57417u", 'left'];
+        yield 'keypad page down' => ["\x1b[57422u", 'page_down'];
+        yield 'keypad delete' => ["\x1b[57426u", 'delete'];
+        yield 'ctrl+keypad home' => ["\x1b[57423;5u", 'ctrl+home'];
+    }
+
+    public function testMatchesKittyKeypadKeysAsTheKeysTheyStandFor()
+    {
+        $this->parser->setKittyProtocolActive(true);
+
+        $this->assertTrue($this->parser->matches("\x1b[57400u", '1'));
+        $this->assertTrue($this->parser->matches("\x1b[57410u", '/'));
+        $this->assertTrue($this->parser->matches("\x1b[57417u", 'left'));
+        $this->assertTrue($this->parser->matches("\x1b[57419;5u", 'ctrl+up'));
+        $this->assertTrue($this->parser->matches("\x1b[57426u", 'delete'));
+        $this->assertFalse($this->parser->matches("\x1b[57417u", 'right'));
+    }
+
+    #[DataProvider('printableProvider')]
+    public function testDecodePrintable(string $input, ?string $expected)
+    {
+        $this->assertSame($expected, $this->parser->decodePrintable($input));
+    }
+
+    /**
+     * @return iterable<string, array{string, string|null}>
+     */
+    public static function printableProvider(): iterable
+    {
+        yield 'keypad 1' => ["\x1b[57400u", '1'];
+        yield 'keypad 0 with num lock' => ["\x1b[57399;129u", '0'];
+        yield 'keypad multiply' => ["\x1b[57411u", '*'];
+        yield 'keypad equal' => ["\x1b[57415u", '='];
+        yield 'keypad 5 repeat' => ["\x1b[57404;1:2u", '5'];
+        yield 'keypad 5 release' => ["\x1b[57404;1:3u", null];
+        yield 'ctrl+keypad 1' => ["\x1b[57400;5u", null];
+        yield 'alt+keypad 1' => ["\x1b[57400;3u", null];
+        yield 'keypad left' => ["\x1b[57417u", null];
+        yield 'keypad enter' => ["\x1b[57414u", null];
+        yield 'shifted letter' => ["\x1b[97:65;2u", 'A'];
+        yield 'escape' => ["\x1b[27u", null];
+        yield 'C1 control' => ["\x1b[155u", null];
+        yield 'not a kitty sequence' => ['1', null];
     }
 
     public function testMatchesNormalizesModifierOrder()

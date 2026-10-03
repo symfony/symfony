@@ -13,6 +13,9 @@ namespace Symfony\Component\Uid\Factory;
 
 use Symfony\Component\Uid\Ulid;
 
+/**
+ * Creates ULIDs, optionally for a given time.
+ */
 class UlidFactory
 {
     public function create(?\DateTimeInterface $time = null): Ulid

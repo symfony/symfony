@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\RawMessage;
 
 /**
- * Interface for mailers able to send emails synchronously and/or asynchronously.
+ * Sends emails, synchronously or through a message bus.
  *
  * Implementations must support synchronous and asynchronous sending.
  *

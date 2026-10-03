@@ -14,7 +14,7 @@ namespace Symfony\Component\PasswordHasher\Hasher;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
- * Interface for the user password hasher service.
+ * Hashes and checks the passwords of users.
  *
  * @author Ariel Ferrandini <arielferrandini@gmail.com>
  */

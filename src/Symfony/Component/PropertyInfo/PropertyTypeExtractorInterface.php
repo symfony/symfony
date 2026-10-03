@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyInfo;
 use Symfony\Component\TypeInfo\Type;
 
 /**
- * Type Extractor Interface.
+ * Guesses the type of a property.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

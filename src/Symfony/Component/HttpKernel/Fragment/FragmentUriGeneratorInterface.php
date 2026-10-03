@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
- * Interface implemented by rendering strategies able to generate a URL for a fragment.
+ * Generates the URL of a fragment that renders a given controller.
  *
  * @author Kévin Dunglas <kevin@dunglas.fr>
  */

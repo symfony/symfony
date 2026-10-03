@@ -18,6 +18,8 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
 /**
+ * Logs a user in programmatically, through a given authenticator.
+ *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
 interface UserAuthenticatorInterface

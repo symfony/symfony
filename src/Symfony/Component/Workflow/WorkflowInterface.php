@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
- * Describes a workflow instance.
+ * Applies transitions to a subject, and tells which ones are enabled or blocked.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Interface implemented by HTTP cache stores.
+ * Stores the responses cached by the HttpCache reverse proxy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

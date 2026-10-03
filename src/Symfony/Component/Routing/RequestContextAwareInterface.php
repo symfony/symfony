@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Routing;
 
+/**
+ * Gives access to the request context used to generate and match URLs.
+ */
 interface RequestContextAwareInterface
 {
     /**

@@ -18,6 +18,9 @@ use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV7;
 
+/**
+ * Creates UUIDs of the versions configured for the application.
+ */
 class UuidFactory
 {
     private string $defaultClass;

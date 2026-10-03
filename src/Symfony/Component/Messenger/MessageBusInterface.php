@@ -15,6 +15,8 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
+ * Dispatches messages to their handlers, directly or through a transport.
+ *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
 interface MessageBusInterface

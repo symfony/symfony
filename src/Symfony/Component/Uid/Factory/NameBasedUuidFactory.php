@@ -15,6 +15,9 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV5;
 
+/**
+ * Creates name-based UUIDs, which are always the same for a given name and namespace.
+ */
 class NameBasedUuidFactory
 {
     public function __construct(

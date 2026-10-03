@@ -12,6 +12,8 @@
 namespace Symfony\Component\Mime;
 
 /**
+ * Renders the body of messages built from templates.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface BodyRendererInterface

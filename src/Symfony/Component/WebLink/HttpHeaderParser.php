@@ -14,7 +14,7 @@ namespace Symfony\Component\WebLink;
 use Psr\Link\EvolvableLinkProviderInterface;
 
 /**
- * Parse a list of HTTP Link headers into a list of Link instances.
+ * Parses a list of HTTP Link headers into a list of Link instances.
  *
  * @see https://www.rfc-editor.org/rfc/rfc8288.html
  *

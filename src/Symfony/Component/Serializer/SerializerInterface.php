@@ -16,6 +16,8 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
+ * Serializes data into a format such as JSON or XML, and deserializes it back.
+ *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface SerializerInterface

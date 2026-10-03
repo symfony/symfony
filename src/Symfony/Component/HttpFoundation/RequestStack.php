@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * Request stack that controls the lifecycle of requests.
+ * Gives access to the current, main and parent requests, and to the session.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */

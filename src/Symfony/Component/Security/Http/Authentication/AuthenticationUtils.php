@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
- * Extracts Security Errors from Request.
+ * Returns the last authentication error and the last username, to render login forms.
  *
  * @author Boris Vujicic <boris.vujicic@gmail.com>
  */

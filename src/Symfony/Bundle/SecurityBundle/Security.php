@@ -33,7 +33,7 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
- * Helper class for commonly-needed security tasks.
+ * Returns the current user and token, checks permissions, and logs users in and out.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  * @author Robin Chalas <robin.chalas@gmail.com>

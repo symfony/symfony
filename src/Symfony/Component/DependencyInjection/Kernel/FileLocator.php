@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Kernel;
 use Symfony\Component\Config\FileLocator as BaseFileLocator;
 
 /**
- * FileLocator uses the KernelInterface to locate resources in bundles.
+ * Locates files, including "@BundleName/path" references to the resources of a bundle.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

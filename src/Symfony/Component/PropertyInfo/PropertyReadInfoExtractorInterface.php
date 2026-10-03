@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyInfo;
 
 /**
- * Extract read information for the property of a class.
+ * Extracts how a property of a class can be read.
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

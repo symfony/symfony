@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Resets provided services.
+ * Resets the services tagged with "kernel.reset", e.g. between two requests or messages.
  */
 interface ServicesResetterInterface extends ResetInterface
 {

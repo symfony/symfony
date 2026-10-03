@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
- * UrlMatcherInterface is the interface that all URL matcher classes must implement.
+ * Matches a URL path to a route and returns the parameters of that route.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

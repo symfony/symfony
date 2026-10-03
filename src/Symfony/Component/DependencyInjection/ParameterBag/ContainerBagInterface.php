@@ -15,7 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
- * ContainerBagInterface is the interface implemented by objects that manage service container parameters.
+ * Gives read-only access to the parameters of the service container.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

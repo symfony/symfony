@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
- * ParameterBagInterface is the interface implemented by objects that manage service container parameters.
+ * Holds the parameters of the service container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

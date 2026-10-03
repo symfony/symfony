@@ -16,6 +16,8 @@ use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 /**
+ * Adds, updates and removes the JavaScript packages of the importmap.
+ *
  * @author Kévin Dunglas <kevin@dunglas.dev>
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *

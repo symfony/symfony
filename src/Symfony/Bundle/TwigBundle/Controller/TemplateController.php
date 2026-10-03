@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Twig\Environment;
 
 /**
- * TemplateController.
+ * Renders a template, for routes that need no controller of their own.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *

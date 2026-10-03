@@ -15,6 +15,8 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 /**
+ * Creates rate limiter factories on the fly, for limits that are not configured up front.
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class RateLimiterBuilder

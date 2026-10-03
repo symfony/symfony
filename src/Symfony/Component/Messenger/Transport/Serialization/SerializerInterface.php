@@ -15,6 +15,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 
 /**
+ * Encodes envelopes for transports and decodes them back.
+ *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
 interface SerializerInterface

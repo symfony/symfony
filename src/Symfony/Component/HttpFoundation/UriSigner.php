@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Exception\UnsignedUriException;
 use Symfony\Component\HttpFoundation\Exception\UnverifiedSignedUriException;
 
 /**
+ * Signs URIs and checks their signature, with an optional expiration.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class UriSigner

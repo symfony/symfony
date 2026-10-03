@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Interface is used to check user authorization without a session.
+ * Checks the authorization of a given user, without needing a session.
  *
  * @author Nate Wiebe <nate@northern.co>
  */

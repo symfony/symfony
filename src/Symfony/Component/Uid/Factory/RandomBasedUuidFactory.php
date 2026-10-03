@@ -13,6 +13,9 @@ namespace Symfony\Component\Uid\Factory;
 
 use Symfony\Component\Uid\UuidV4;
 
+/**
+ * Creates random UUIDs.
+ */
 class RandomBasedUuidFactory
 {
     /**

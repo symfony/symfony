@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 /**
- * This interface must be implemented by firewall maps.
+ * Returns the listeners of the firewall that matches a request.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

@@ -272,6 +272,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
             [ClassWithDocCommentWithoutInitialSpace::class, 'Foo.'],
             [ClassWithoutDocComment::class, ''],
             [ClassWithDocComment::class, 'This is a class with a doc comment.'],
+            [ClassWithDocCommentWithInlineTags::class, 'Decrypts what an EncrypterInterface produced, as the spec says.'],
         ];
     }
 

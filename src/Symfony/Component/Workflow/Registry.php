@@ -15,6 +15,8 @@ use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 
 /**
+ * Returns the workflows that support a given subject.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */

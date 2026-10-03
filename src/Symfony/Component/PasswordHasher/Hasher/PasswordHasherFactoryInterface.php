@@ -15,7 +15,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
- * PasswordHasherFactoryInterface to support different password hashers for different user accounts.
+ * Returns the password hasher configured for a user or a user class.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>

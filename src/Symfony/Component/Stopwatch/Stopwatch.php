@@ -17,7 +17,7 @@ use Symfony\Contracts\Service\ResetInterface;
 class_exists(Section::class);
 
 /**
- * Stopwatch provides a way to profile code.
+ * Measures the time and memory spent in sections of code.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

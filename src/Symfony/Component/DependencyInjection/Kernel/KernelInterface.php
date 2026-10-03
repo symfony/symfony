@@ -14,6 +14,8 @@ namespace Symfony\Component\DependencyInjection\Kernel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Gives access to the environment, the bundles and the directories of the application.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface KernelInterface

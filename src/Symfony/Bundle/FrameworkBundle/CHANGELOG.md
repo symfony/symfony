@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * List deprecated aliases in `debug:autowiring` only when the `--all` option is passed
  * Register the security expression functions on `controller.expression_language`
  * Add the `configure_container` option to `WebTestCase::createClient()` to configure the container after every kernel reboot
  * Deprecate `Command\RouterMatchCommand`, use the one from the Routing component instead

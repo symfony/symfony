@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 /**
- * The AuthorizationCheckerInterface.
+ * Checks if the current user is granted an attribute, such as a role, on an optional subject.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

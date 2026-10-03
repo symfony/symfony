@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate the autowiring aliases named after the webhook request parsers, use `#[Target('mailer.<provider>')]` with `RequestParserInterface` instead
  * Add `MailerBundle`, which provides the `mailer` configuration and the services previously provided by `FrameworkBundle` under `framework.mailer`
  * Add a `rate_limiter` option to mailer transports
  * Add DSN param `timeout` to configure the connect/read/write timeout of SMTP transports

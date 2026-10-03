@@ -12,6 +12,8 @@
 namespace Symfony\Component\Webhook\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
@@ -23,6 +25,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\RemoteEvent\RemoteEvent;
+use Symfony\Component\Webhook\Client\RequestParser;
+use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Subscriber;
 use Symfony\Component\Webhook\Tests\Fixtures\TestConsumer;
 use Symfony\Component\Webhook\Tests\Fixtures\TestRequestParser;
@@ -95,6 +99,18 @@ class WebhookBundleTest extends TestCase
         $this->assertFalse($container->hasDefinition('webhook.transport'));
         $this->assertFalse($container->hasDefinition('webhook.request_parser'));
     }
+
+    public function testTheRequestParserIsAutowiredByTarget()
+    {
+        $container = new ContainerBuilder();
+        new WebhookBundle()->getContainerExtension()->load([[]], $container);
+        $container->register('test.consumer', WebhookConsumer::class)->setAutowired(true);
+
+        new AutowirePass()->process($container);
+
+        $this->assertSame(RequestParser::class, $container->findDefinition((string) $container->getDefinition('test.consumer')->getArgument(0))->getClass());
+        $this->assertTrue($container->getAlias(RequestParser::class)->isDeprecated());
+    }
 }
 
 class TestWebhookKernel extends AbstractKernel
@@ -131,5 +147,13 @@ class TestWebhookKernel extends AbstractKernel
             ->set('http_client', MockHttpClient::class)->args([new Reference('test.mock_response')])
             ->alias('test.webhook.transport', 'webhook.transport')->public()
         ;
+    }
+}
+
+class WebhookConsumer
+{
+    public function __construct(
+        #[Target('webhook')] public RequestParserInterface $parser,
+    ) {
     }
 }

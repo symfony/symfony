@@ -29,6 +29,7 @@ use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
 use Symfony\Component\Notifier\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
+use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Controller\WebhookController;
 
 /**
@@ -283,8 +284,13 @@ class NotifierBundle extends AbstractBundle
             ];
 
             foreach ($webhookRequestParsers as $class => [$package, $service]) {
+                $target = 'notifier.'.substr(strrchr($service, '.'), 1);
+                $container->getAlias($class)->setDeprecated('symfony/notifier', '8.2', 'The "%alias_id%" alias is deprecated, use #[Target(\''.$target.'\')] with "'.RequestParserInterface::class.'" instead.');
+
                 if (!ContainerBuilder::willBeAvailable($package, $class, ['symfony/notifier'])) {
                     $container->removeDefinition($service);
+                } else {
+                    $container->registerAliasForArgument($service, RequestParserInterface::class, $target.'.request_parser', $target);
                 }
             }
         }

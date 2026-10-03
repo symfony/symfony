@@ -14,7 +14,7 @@ namespace Symfony\Component\JsonStreamer;
 use Symfony\Component\TypeInfo\Type;
 
 /**
- * Writes $data into a specific format according to $options.
+ * Writes a PHP value of the given type as a stream of string chunks.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *

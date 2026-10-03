@@ -13,15 +13,19 @@ namespace Symfony\Component\Notifier\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Notifier\Bridge\Twilio\Webhook\TwilioRequestParser;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Notifier\NotifierBundle;
 use Symfony\Component\Notifier\TexterInterface;
+use Symfony\Component\Webhook\Client\RequestParserInterface;
 
 class NotifierBundleTest extends TestCase
 {
@@ -173,6 +177,17 @@ class NotifierBundleTest extends TestCase
         yield 'profiler and test' => [['profiler', 'test'], true, false];
     }
 
+    public function testTheWebhookRequestParsersAreAutowiredByTarget()
+    {
+        $container = $this->load();
+        $container->register('test.consumer', NotifierWebhookConsumer::class)->setAutowired(true);
+
+        new AutowirePass()->process($container);
+
+        $this->assertSame(TwilioRequestParser::class, $container->findDefinition((string) $container->getDefinition('test.consumer')->getArgument(0))->getClass());
+        $this->assertTrue($container->getAlias(TwilioRequestParser::class)->isDeprecated());
+    }
+
     public function testTheDataCollectorIsDroppedWithoutAProfiler()
     {
         $this->assertFalse($this->load(self::TRANSPORTS, ['mailer', 'messenger'], true)->hasDefinition('notifier.data_collector'));
@@ -206,5 +221,13 @@ class NotifierBundleTest extends TestCase
         new RemoveMissingDependenciesPass()->process($container);
 
         return $container;
+    }
+}
+
+class NotifierWebhookConsumer
+{
+    public function __construct(
+        #[Target('notifier.twilio')] public RequestParserInterface $parser,
+    ) {
     }
 }

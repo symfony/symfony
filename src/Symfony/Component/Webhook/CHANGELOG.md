@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate the `RequestParser` autowiring alias, use the `webhook.request_parser` service or `#[Target('webhook')]` with `RequestParserInterface` instead
  * Add `WebhookBundle`, which provides the `webhook` configuration and the services previously provided by `FrameworkBundle` under `framework.webhook`
  * Add a `Webhook-Timestamp` header to webhook requests
  * Add support for the [Standard Webhooks](https://www.standardwebhooks.com/) signature scheme with the `SignatureFormat` enum

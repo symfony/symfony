@@ -28,7 +28,8 @@
         "symfony/http-client-contracts": "^2.5|^3",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/http-foundation": "^7.4|^8.0",
-        "symfony/messenger": "^7.4|^8.0"
+        "symfony/messenger": "^7.4|^8.0",
+        "symfony/webhook": "^7.4|^8.0"
     },
     "conflict": {
         "symfony/dependency-injection": "<8.2",

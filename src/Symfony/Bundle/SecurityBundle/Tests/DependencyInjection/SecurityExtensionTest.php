@@ -53,6 +53,7 @@ use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
+use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
@@ -152,6 +153,18 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertSame('app.confirm_password', (string) $container->getDefinition('security.exception_listener.main')->getArgument(9));
+    }
+
+    public function testTheFirewallAliasIsDeprecated()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['form_login' => true]],
+        ]);
+        $container->compile();
+
+        $this->assertTrue($container->getAlias(Firewall::class)->isDeprecated());
     }
 
     public function testTheAuthenticationLifetimesArePassedToTheTrustResolver()

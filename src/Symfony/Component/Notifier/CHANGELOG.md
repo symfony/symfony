@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate the autowiring aliases named after the webhook request parsers, use `#[Target('notifier.<provider>')]` with `RequestParserInterface` instead
  * Add `NotifierBundle`, which provides the `notifier` configuration and the services previously provided by `FrameworkBundle` under `framework.notifier`
  * Add `AdminRecipientsProviderInterface`
  * Deprecate declaring `getAdminRecipients()` without implementing `AdminRecipientsProviderInterface`

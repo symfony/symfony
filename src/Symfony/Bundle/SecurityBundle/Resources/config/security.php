@@ -228,6 +228,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
         ->alias(Firewall::class, 'security.firewall')
+            ->deprecate('symfony/security-bundle', '8.2', 'The "%alias_id%" alias is deprecated, the firewall listens to kernel events and is not meant to be injected.')
 
         ->set('security.firewall.map', FirewallMap::class)
             ->args([

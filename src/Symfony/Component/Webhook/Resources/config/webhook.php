@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Webhook\Client\RequestParser;
+use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Controller\WebhookController;
 use Symfony\Component\Webhook\Messenger\SendWebhookHandler;
 use Symfony\Component\Webhook\Server\HeadersConfigurator;
@@ -80,6 +81,7 @@ return static function (ContainerConfigurator $container) {
                 service('clock')->nullOnInvalid(),
             ])
         ->alias(RequestParser::class, 'webhook.request_parser')
+            ->deprecate('symfony/webhook', '8.2', 'The "%alias_id%" alias is deprecated, use the "webhook.request_parser" service, or #[Target(\'webhook\')] with "'.RequestParserInterface::class.'", instead.')
 
         ->set('webhook.controller', WebhookController::class)
             ->public()

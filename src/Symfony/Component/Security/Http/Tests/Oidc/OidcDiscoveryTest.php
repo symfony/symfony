@@ -306,6 +306,84 @@ class OidcDiscoveryTest extends TestCase
         $discovery->getSecureEndpoint('token_endpoint');
     }
 
+    public function testGetSecureEndpointNeverReturnsTheMtlsAlias()
+    {
+        $httpClient = new MockHttpClient(new JsonMockResponse(self::CONFIGURATION + ['mtls_endpoint_aliases' => ['token_endpoint' => 'https://mtls.provider.example.com/token']]));
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER);
+
+        $this->assertSame('https://provider.example.com/token', $discovery->getSecureEndpoint('token_endpoint'));
+    }
+
+    #[DataProvider('provideUnusableAliases')]
+    public function testAnUnusableAliasOfARequestedEndpointIsRefusedBeforeTheDocumentIsCached(mixed $alias, string $expectedMessage)
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(self::CONFIGURATION + ['mtls_endpoint_aliases' => ['token_endpoint' => $alias]]),
+            new JsonMockResponse(self::CONFIGURATION + ['mtls_endpoint_aliases' => ['token_endpoint' => 'https://mtls.provider.example.com/token']]),
+        ]);
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER, 3600, null, ['token_endpoint'], ['token_endpoint']);
+
+        try {
+            $discovery->getConfiguration();
+            $this->fail('The discovery document should have been refused.');
+        } catch (AuthenticationException $e) {
+            $this->assertSame($expectedMessage, $e->getMessage());
+        }
+
+        $this->assertSame('https://mtls.provider.example.com/token', $discovery->getConfiguration()['mtls_endpoint_aliases']['token_endpoint']);
+        $this->assertSame(2, $httpClient->getRequestsCount());
+    }
+
+    public static function provideUnusableAliases(): iterable
+    {
+        yield 'plain HTTP' => ['http://127.0.0.1:8443/token', 'The "mtls_endpoint_aliases.token_endpoint" found in the OIDC discovery document must use the "https" scheme, "http" given.'];
+        yield 'empty' => ['', 'The "mtls_endpoint_aliases.token_endpoint" is missing from the OIDC discovery document.'];
+        yield 'not a URL' => [null, 'The "mtls_endpoint_aliases.token_endpoint" is missing from the OIDC discovery document.'];
+    }
+
+    public function testAnUnusableAliasOfAnEndpointThisClientDoesNotRequestIsIgnored()
+    {
+        $httpClient = new MockHttpClient(new JsonMockResponse(self::CONFIGURATION + [
+            'mtls_endpoint_aliases' => [
+                'authorization_endpoint' => 'http://mtls.provider.example.com/authorize',
+                'token_endpoint' => 'https://mtls.provider.example.com/token',
+            ],
+        ]));
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER, 3600, null, ['authorization_endpoint', 'token_endpoint'], ['token_endpoint']);
+
+        $this->assertSame('https://provider.example.com/authorize', $discovery->getSecureEndpoint('authorization_endpoint'));
+    }
+
+    public function testNoAliasIsCheckedWhenNoneIsRequested()
+    {
+        $httpClient = new MockHttpClient(new JsonMockResponse(self::CONFIGURATION + ['mtls_endpoint_aliases' => ['token_endpoint' => 'http://mtls.provider.example.com/token']]));
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER, 3600, null, ['authorization_endpoint', 'token_endpoint']);
+
+        $this->assertSame('https://provider.example.com/token', $discovery->getSecureEndpoint('token_endpoint'));
+    }
+
+    public function testADocumentAnnouncingNoAliasIsAcceptedWhenAliasesAreChecked()
+    {
+        $httpClient = new MockHttpClient(new JsonMockResponse(self::CONFIGURATION));
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER, 3600, null, ['token_endpoint'], ['token_endpoint']);
+
+        $this->assertSame('https://provider.example.com/token', $discovery->getSecureEndpoint('token_endpoint'));
+    }
+
+    public function testMtlsEndpointAliasesThatAreNotAnObjectAreIgnored()
+    {
+        $httpClient = new MockHttpClient(new JsonMockResponse(self::CONFIGURATION + ['mtls_endpoint_aliases' => 'https://mtls.provider.example.com']));
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER, 3600, null, ['token_endpoint'], ['token_endpoint']);
+
+        $this->assertSame('https://provider.example.com/token', $discovery->getSecureEndpoint('token_endpoint'));
+    }
+
     public function testGetSecureEndpointAllowsALoopbackAuthorizationEndpoint()
     {
         $httpClient = new MockHttpClient(new JsonMockResponse([

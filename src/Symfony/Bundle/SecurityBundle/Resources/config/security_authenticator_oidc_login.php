@@ -25,6 +25,8 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 return static function (ContainerConfigurator $container) {
@@ -79,6 +81,7 @@ return static function (ContainerConfigurator $container) {
                 // the cache key is derived from the configuration URL
                 null,
                 abstract_arg('endpoints that must be announced and must not downgrade to plain HTTP the transport of the discovery document'),
+                abstract_arg('endpoints whose mutual-TLS alias is checked the same way'),
             ])
 
         ->set('security.authenticator.oidc_login.client', OidcClient::class)
@@ -88,9 +91,10 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('OIDC discovery'),
                 abstract_arg('client ID'),
                 abstract_arg('client authentication'),
+                abstract_arg('HTTP client options presenting the client certificate, or none'),
             ])
 
-        // the only client authentication method that has nothing to configure, so that
+        // a client authentication method that has nothing to configure, so that
         // declaring a public client takes no service of its own
         ->set('security.oauth2.client_authentication.none', NoClientAuthentication::class)
 
@@ -125,6 +129,11 @@ return static function (ContainerConfigurator $container) {
                 service('clock'),
                 abstract_arg('the discovery naming the audience, or null for the token endpoint'),
             ])
+
+        // nothing to configure either, the certificate being an option of the firewall
+        ->set('security.oauth2.client_authentication.tls_client_auth', TlsClientAuth::class)
+
+        ->set('security.oauth2.client_authentication.self_signed_tls_client_auth', SelfSignedTlsClientAuth::class)
 
         // the private key of the "private_key_jwt" method, parsed from the JSON-encoded JWK
         // the firewall configures, as the "oidc" access token handler parses its own keyset

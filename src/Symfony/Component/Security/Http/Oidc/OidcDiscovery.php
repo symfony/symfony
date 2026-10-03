@@ -49,6 +49,7 @@ final class OidcDiscovery implements ResetInterface
      * @param list<string> $checkedEndpoints       Endpoints that must be announced and must not downgrade to plain
      *                                             HTTP the transport that carried the discovery document, checked
      *                                             before the document is cached
+     * @param list<string> $checkedMtlsAliases     Endpoints whose "mtls_endpoint_aliases" entry is checked the same way, when the provider announces one
      */
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -58,6 +59,7 @@ final class OidcDiscovery implements ResetInterface
         private readonly ?int $cacheTtl = 3600,
         private readonly ?string $cacheKey = null,
         private readonly array $checkedEndpoints = [],
+        private readonly array $checkedMtlsAliases = [],
     ) {
         // The trailing slash is trimmed here, and the configuration URL built from the
         // issuer, because an issuer coming from an environment variable is an unresolved
@@ -130,6 +132,14 @@ final class OidcDiscovery implements ResetInterface
             $url = \is_string($url) ? $url : '';
             foreach ($this->checkedEndpoints as $endpoint) {
                 self::checkEndpointScheme($configuration[$endpoint] ?? null, $endpoint, $url);
+            }
+
+            // an alias is optional: without one, the endpoint checked above is used
+            $aliases = \is_array($configuration['mtls_endpoint_aliases'] ?? null) ? $configuration['mtls_endpoint_aliases'] : [];
+            foreach ($this->checkedMtlsAliases as $endpoint) {
+                if (\array_key_exists($endpoint, $aliases)) {
+                    self::checkEndpointScheme($aliases[$endpoint], 'mtls_endpoint_aliases.'.$endpoint, $url);
+                }
             }
             $save = '' !== $url;
 

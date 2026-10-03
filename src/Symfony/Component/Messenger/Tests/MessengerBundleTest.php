@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -32,6 +33,7 @@ use Symfony\Component\Messenger\Stamp\CausationStamp;
 use Symfony\Component\Messenger\Stamp\CorrelationStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Stamp\PropagatedStampInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -39,7 +41,9 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Stamp\UnverifiedDecodingFailureStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\FailingDummyMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
@@ -75,6 +79,41 @@ class MessengerBundleTest extends TestCase
 
         $bus->dispatch(new DummyMessage('hello'));
         $this->assertCount(1, $transport->getSent());
+    }
+
+    public function testABusDispatchesOnlyTheMessagesOfItsTypes()
+    {
+        $kernel = new TestTypedBusesKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $this->assertSame('Handled "Hey"', $container->get('test.query.bus')->dispatch(new DummyMessage('Hey'))->last(HandledStamp::class)?->getResult());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('This bus only dispatches messages of type "%s", "%s" given.', DummyCommand::class, DummyMessage::class));
+
+        $container->get('test.command.bus')->dispatch(new DummyMessage('Hey'));
+    }
+
+    public function testAllTheHandlersOfAMessageRunOnABusThatDispatchesIt()
+    {
+        $kernel = new TestTypedBusesKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $envelope = $kernel->getContainer()->get('test.query.bus')->dispatch(new AuditedDummyMessage('Hey'));
+
+        $this->assertCount(2, $envelope->all(HandledStamp::class));
+    }
+
+    public function testABusCanThrowTheExceptionOfTheFailingHandler()
+    {
+        $kernel = new TestTypedBusesKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('The command failed.');
+
+        $kernel->getContainer()->get('test.command.bus')->dispatch(new DummyCommand());
     }
 
     public function testTheServicesNeedingAnotherBundleAreDropped()
@@ -640,4 +679,68 @@ class TestSignedFailureTransportKernel extends AbstractKernel
             ->alias('test.messenger.transport.serializer_locator', 'messenger.transport.serializer_locator')->public()
         ;
     }
+}
+
+class TestTypedBusesKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'default_bus' => 'command.bus',
+            'buses' => [
+                'command.bus' => ['messages' => DummyCommand::class, 'unwrap_exceptions' => true],
+                'query.bus' => ['messages' => [DummyMessageInterface::class]],
+            ],
+        ]);
+        $container->services()
+            ->set(TypedBusesHandler::class)->autoconfigure()
+            ->alias('test.command.bus', 'command.bus')->public()
+            ->alias('test.query.bus', 'query.bus')->public()
+        ;
+    }
+}
+
+class TypedBusesHandler
+{
+    #[AsMessageHandler]
+    public function onCommand(DummyCommand $command): void
+    {
+        throw new \DomainException('The command failed.');
+    }
+
+    #[AsMessageHandler]
+    public function onQuery(DummyMessage $query): string
+    {
+        return \sprintf('Handled "%s"', $query->getMessage());
+    }
+
+    #[AsMessageHandler]
+    public function onAudited(AuditedMessage $message): void
+    {
+    }
+}
+
+interface AuditedMessage
+{
+}
+
+class AuditedDummyMessage extends DummyMessage implements AuditedMessage
+{
 }

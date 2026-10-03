@@ -551,8 +551,8 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->resizeRows = $rows;
 
         // Termux changes the height whenever its software keyboard shows or hides, and a full repaint each time would replay all the content.
-        // tmux inherits TERMUX_VERSION but deletes the rows below the cursor on shrink, so it is excluded.
-        if ($heightOnly && false !== getenv('TERMUX_VERSION') && false === getenv('TMUX')) {
+        // Multiplexers inherit TERMUX_VERSION but move rows their own way on shrink (tmux deletes the rows below the cursor), so they are excluded.
+        if ($heightOnly && false !== getenv('TERMUX_VERSION') && false === getenv('TMUX') && false === getenv('STY') && false === getenv('ZELLIJ')) {
             $this->screenWriter->followTermuxHeightChange($previousRows, $rows);
             $this->requestRender();
 

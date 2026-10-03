@@ -20,7 +20,9 @@ use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -299,6 +301,23 @@ class DpopSenderConstraintTest extends TestCase
         $this->expectExceptionMessage('was presented before');
 
         $constraint->check($this->createRequest($proof), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
+    }
+
+    /**
+     * A pool that cannot write is a pool that no longer tells a replay from a first use.
+     */
+    public function testItRefusesAProofThatCouldNotBeWrittenDown()
+    {
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cache->method('getItem')->willReturn(new CacheItem());
+        $cache->expects($this->once())->method('save')->willReturn(false);
+
+        $constraint = new DpopSenderConstraint(new AlgorithmManager([new ES256()]), $cache, $this->clock);
+
+        $this->expectException(InvalidDpopProofException::class);
+        $this->expectExceptionMessage('could not be remembered');
+
+        $constraint->check($this->createRequest($this->createProof()), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
     }
 
     public function testItAcceptsTheSameIdentifierOnceTheProofStoppedStanding()

@@ -284,6 +284,11 @@ final class DpopSenderConstraint implements SenderConstraintInterface
      * RFC 9449, Section 11.1: a proof is used once. It is remembered under the key that signed it and for as
      * long as it stands, which is the whole window a replay could happen in.
      *
+     * A proof that could not be written down is refused, since a pool that does not write is a pool that
+     * tells a replay from a first use no longer: what is left of the check is the hope that the next request
+     * reaches another instance. The failure is the one of this resource server and not of the request, and
+     * the client is answered the only thing it can act on, which is to make another request.
+     *
      * @param array<string, mixed> $payload
      *
      * @throws InvalidDpopProofException
@@ -300,7 +305,9 @@ final class DpopSenderConstraint implements SenderConstraintInterface
             throw new InvalidDpopProofException('The DPoP proof was presented before (RFC 9449, Section 11.1).');
         }
 
-        $this->proofReplayCache->save($item->set(true)->expiresAt(new \DateTimeImmutable('@'.$expiresAt)));
+        if (!$this->proofReplayCache->save($item->set(true)->expiresAt(new \DateTimeImmutable('@'.$expiresAt)))) {
+            throw new InvalidDpopProofException('The DPoP proof could not be remembered, so a second presentation of it could not be told from this one (RFC 9449, Section 11.1).');
+        }
     }
 
     /**

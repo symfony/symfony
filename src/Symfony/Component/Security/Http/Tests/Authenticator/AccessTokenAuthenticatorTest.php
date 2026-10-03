@@ -19,7 +19,9 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenExtractorInterface;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
+use Symfony\Component\Security\Http\AccessToken\Dpop\Exception\InvalidDpopProofException;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
+use Symfony\Component\Security\Http\AccessToken\SenderConstraintInterface;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
@@ -242,6 +244,81 @@ class AccessTokenAuthenticatorTest extends TestCase
 
         $this->assertSame(401, $response->getStatusCode());
         $this->assertSame('Bearer realm="My API",resource_metadata="https://api.example.com/.well-known/oauth-protected-resource"', $response->headers->get('WWW-Authenticate'));
+    }
+
+    public function testTheSenderConstraintIsCheckedWithTheTokenAndTheClaimsItWasRead()
+    {
+        $request = Request::create('/test');
+        $request->headers->set('Authorization', 'DPoP an-access-token');
+
+        $accessTokenHandler = $this->createStub(AccessTokenHandlerInterface::class);
+        $accessTokenHandler
+            ->method('getUserBadgeFrom')
+            ->willReturn(new UserBadge('test', null, ['sub' => 'test', 'cnf' => ['jkt' => 'a-thumbprint']]));
+
+        $senderConstraint = $this->createMock(SenderConstraintInterface::class);
+        $senderConstraint
+            ->expects($this->once())
+            ->method('check')
+            ->with($request, 'an-access-token', ['sub' => 'test', 'cnf' => ['jkt' => 'a-thumbprint']]);
+
+        $authenticator = new AccessTokenAuthenticator(
+            $accessTokenHandler,
+            new HeaderAccessTokenExtractor('Authorization', 'DPoP'),
+            $this->userProvider,
+            null,
+            null,
+            null,
+            null,
+            $senderConstraint,
+        );
+
+        $authenticator->authenticate($request);
+    }
+
+    public function testTheChallengeOfAFirewallWithASenderConstraintNamesItsSchemeAndItsParameters()
+    {
+        $authenticator = new AccessTokenAuthenticator(
+            $this->createStub(AccessTokenHandlerInterface::class),
+            new HeaderAccessTokenExtractor('Authorization', 'DPoP'),
+            null,
+            null,
+            null,
+            'My API',
+            null,
+            $this->createDpopSenderConstraint(),
+        );
+
+        $response = $authenticator->onAuthenticationFailure(Request::create('/test'), new InvalidDpopProofException());
+
+        $this->assertSame(401, $response->getStatusCode());
+        $this->assertSame('DPoP realm="My API",error="invalid_dpop_proof",error_description="Invalid credentials.",algs="ES256"', $response->headers->get('WWW-Authenticate'));
+    }
+
+    public function testTheChallengeOfARequestCarryingNoTokenNamesTheSchemeItIsPresentedUnder()
+    {
+        $authenticator = new AccessTokenAuthenticator(
+            $this->createStub(AccessTokenHandlerInterface::class),
+            new HeaderAccessTokenExtractor('Authorization', 'DPoP'),
+            null,
+            null,
+            null,
+            null,
+            null,
+            $this->createDpopSenderConstraint(),
+        );
+
+        $this->assertSame('DPoP algs="ES256"', $authenticator->start(Request::create('/test'))->headers->get('WWW-Authenticate'));
+    }
+
+    private function createDpopSenderConstraint(): SenderConstraintInterface
+    {
+        $senderConstraint = $this->createStub(SenderConstraintInterface::class);
+        $senderConstraint
+            ->method('getChallenge')
+            ->willReturnCallback(static fn (?\Throwable $exception) => ['DPoP', $exception instanceof InvalidDpopProofException ? ['error' => 'invalid_dpop_proof', 'algs' => 'ES256'] : ['algs' => 'ES256']]);
+
+        return $senderConstraint;
     }
 
     public function testTheChallengeOfAFirewallThatPinsNothingIsTheBareScheme()

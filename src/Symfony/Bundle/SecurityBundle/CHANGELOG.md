@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `dpop` option to the `access_token` authenticator, which accepts its tokens only from a request proving possession of the key they are bound to (RFC 9449), and reads them from the `DPoP` scheme
  * Add the `audience` option to the `client_secret_jwt` and `private_key_jwt` client authentication methods of `oidc_login`, defaulting to `issuer`
  * Deprecate the `Symfony\Component\Security\Http\Firewall` autowiring alias
  * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session

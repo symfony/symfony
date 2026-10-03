@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Jose\Component\Core\Algorithm;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\TokenHandlerFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -45,9 +46,17 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
      */
     private const BEARER_METHODS = [
         'security.access_token_extractor.header' => 'header',
+        'security.access_token_extractor.dpop_header' => 'header',
         'security.access_token_extractor.request_body' => 'body',
         'security.access_token_extractor.query_string' => 'query',
     ];
+
+    /**
+     * The token handlers that read nothing of the access token itself, so that the "cnf" claim a
+     * sender-constrained token names its key in never reaches the sender constraint: "oidc_user_info"
+     * reads the claims a provider answers about the user, "cas" the ticket it validates.
+     */
+    private const HANDLERS_READING_NOTHING_OF_THE_TOKEN = ['oidc_user_info', 'cas'];
 
     /**
      * @param array<TokenHandlerFactoryInterface> $tokenHandlerFactories
@@ -165,6 +174,33 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                     ->end()
                 ->end()
             ->end()
+            ->arrayNode('dpop')
+                ->canBeEnabled()
+                ->info('Accepts the access tokens of this firewall only from a request proving possession of the key they are bound to (RFC 9449). The token is then presented under the "DPoP" scheme rather than under "Bearer", which the "header" extractor of this firewall reads accordingly, and a token bound to nothing is refused. The URL a proof names is compared with the one this application answers on, so a deployment behind a reverse proxy declares its trusted proxies and hosts. The firewall must be stateless, or its session cookie would stand for a bound token on its own.')
+                ->children()
+                    ->arrayNode('algorithms', 'algorithm')
+                        ->info('The signature algorithms a proof is accepted to be signed with, announced in the "algs" parameter of the challenge. All asymmetric: a shared secret proves possession to whoever shares it. Another algorithm is accepted once its service is tagged "security.access_token_handler.oidc.signature_algorithm".')
+                        ->defaultValue(['ES256', 'PS256', 'RS256'])
+                        ->requiresAtLeastOneElement()
+                        ->scalarPrototype()->cannotBeEmpty()->end()
+                    ->end()
+                    ->scalarNode('cache')
+                        ->info('The cache pool the identifier of a proof is remembered in for as long as the proof stands, so that a proof taken off the wire cannot be sent a second time (RFC 9449, Section 11.1). Instances of the same application share it, or a replay against another instance is not seen for what it is.')
+                        ->defaultValue('cache.app')
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->integerNode('proof_lifetime')
+                        ->info('How long a proof stands, in seconds, from its "iat". A proof is a signature over one request being sent; a long window is a window a proof taken off the wire may be sent again in.')
+                        ->defaultValue(60)
+                        ->min(1)
+                    ->end()
+                    ->integerNode('allowed_time_drift')
+                        ->info('Allowed time drift in seconds for the "iat" of a proof, both ways.')
+                        ->defaultValue(5)
+                        ->min(0)
+                    ->end()
+                ->end()
+            ->end()
         ;
     }
 
@@ -183,7 +219,8 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $successHandler = isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)) : null;
         $failureHandler = isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null;
         $authenticatorId = \sprintf('security.authenticator.access_token.%s', $firewallName);
-        $extractorId = $this->createExtractor($container, $firewallName, $config['token_extractors']);
+        $senderConstraintId = $this->createSenderConstraint($container, $firewallName, $config['dpop'], array_keys($config['token_handler'])[0]);
+        $extractorId = $this->createExtractor($container, $firewallName, $config['token_extractors'], null !== $senderConstraintId);
         $tokenHandlerId = $this->createTokenHandler($container, $firewallName, $config['token_handler'], $userProviderId);
 
         $container
@@ -194,10 +231,11 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])
-            ->replaceArgument(6, $resourceMetadataUri = isset($config['resource_metadata']) ? $this->createResourceMetadata($container, $firewallName, $config['resource_metadata'], $config['token_extractors']) : null)
+            ->replaceArgument(6, $resourceMetadataUri = isset($config['resource_metadata']) ? $this->createResourceMetadata($container, $firewallName, $config['resource_metadata'], $config['token_extractors'], $config['dpop']) : null)
+            ->replaceArgument(7, $senderConstraintId ? new Reference($senderConstraintId) : null)
         ;
 
-        $this->createFallbackAccessDeniedHandler($container, $firewallName, $config['realm'], $resourceMetadataUri);
+        $this->createFallbackAccessDeniedHandler($container, $firewallName, $config['realm'], $resourceMetadataUri, $senderConstraintId);
 
         return $authenticatorId;
     }
@@ -206,21 +244,65 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
      * Registers the access denied handler the firewall falls back on, unless it configures one of its own,
      * so that a denial caused by a missing scope gets the RFC 6750 §3.1 "insufficient_scope" challenge.
      */
-    private function createFallbackAccessDeniedHandler(ContainerBuilder $container, string $firewallName, ?string $realm, ?string $resourceMetadataUri): void
+    private function createFallbackAccessDeniedHandler(ContainerBuilder $container, string $firewallName, ?string $realm, ?string $resourceMetadataUri, ?string $senderConstraintId): void
     {
         $container
             ->setDefinition(\sprintf('security.fallback_access_denied_handler.%s', $firewallName), new ChildDefinition('security.access_token.access_denied_handler'))
             ->replaceArgument(0, $realm)
             ->replaceArgument(2, $resourceMetadataUri)
+            ->replaceArgument(3, $senderConstraintId ? new Reference($senderConstraintId) : null)
         ;
     }
 
     /**
-     * @param array<string> $extractors
+     * Registers what a request has to prove possession of for the access token it presents to be accepted,
+     * and returns its service id; null when the firewall accepts bearer tokens, which is the default.
+     *
+     * @param string $tokenHandler The key of the configured token handler, which decides whether a bound
+     *                             token can be recognized for one at all
      */
-    private function createExtractor(ContainerBuilder $container, string $firewallName, array $extractors): string
+    private function createSenderConstraint(ContainerBuilder $container, string $firewallName, array $config, string $tokenHandler): ?string
     {
-        $extractors = array_map(static fn ($extractor) => self::EXTRACTOR_ALIASES[$extractor] ?? $extractor, $extractors);
+        if (!$config['enabled']) {
+            return null;
+        }
+
+        if (!ContainerBuilder::willBeAvailable('web-token/jwt-library', Algorithm::class, ['symfony/security-bundle'])) {
+            throw new InvalidConfigurationException('You cannot use the "dpop" option since "web-token/jwt-library" is not installed. Try running "composer require web-token/jwt-library".');
+        }
+
+        if (\in_array($tokenHandler, self::HANDLERS_READING_NOTHING_OF_THE_TOKEN, true)) {
+            throw new InvalidConfigurationException(\sprintf('The "dpop" option of the "%s" firewall cannot be used with the "%s" token handler: an access token bound to a key names it in its own "cnf" claim (RFC 7800, Section 3.1), which this handler never reads, so every request would be refused. Use the "oidc" or the "oauth2" token handler, or one of your own putting the claims of the token on the user badge.', $firewallName, $tokenHandler));
+        }
+
+        $senderConstraintId = \sprintf('security.authenticator.access_token.sender_constraint.dpop.%s', $firewallName);
+        $container
+            ->setDefinition($senderConstraintId, new ChildDefinition('security.authenticator.access_token.sender_constraint.dpop'))
+            ->replaceArgument(0, (new ChildDefinition('security.access_token_handler.oidc.signature'))->replaceArgument(0, $config['algorithms']))
+            ->replaceArgument(1, new Reference($config['cache']))
+            ->replaceArgument(3, $config['proof_lifetime'])
+            ->replaceArgument(4, $config['allowed_time_drift'])
+        ;
+
+        return $senderConstraintId;
+    }
+
+    /**
+     * @param array<string> $extractors
+     * @param bool          $senderConstrained Whether the tokens of this firewall are bound to what the request has to
+     *                                         prove possession of, which changes what the "header" extractor reads:
+     *                                         RFC 9449, Section 7.1 presents a bound token under the "DPoP" scheme
+     */
+    private function createExtractor(ContainerBuilder $container, string $firewallName, array $extractors, bool $senderConstrained = false): string
+    {
+        $aliases = self::EXTRACTOR_ALIASES;
+        if ($senderConstrained) {
+            // the header extractor of such a firewall reads the scheme a bound token is presented under,
+            // whether it was named by its alias or by the service id the default carries
+            $aliases['header'] = $aliases[self::EXTRACTOR_ALIASES['header']] = 'security.access_token_extractor.dpop_header';
+        }
+
+        $extractors = array_map(static fn ($extractor) => $aliases[$extractor] ?? $extractor, $extractors);
 
         if (1 === \count($extractors)) {
             return current($extractors);
@@ -240,7 +322,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
      *
      * @param array<string> $extractors
      */
-    private function createResourceMetadata(ContainerBuilder $container, string $firewallName, array $config, array $extractors): string
+    private function createResourceMetadata(ContainerBuilder $container, string $firewallName, array $config, array $extractors, array $dpop): string
     {
         $parts = null === $config['resource'] ? [] : parse_url($config['resource']);
         $origin = isset($parts['scheme'], $parts['host']) ? $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '') : null;
@@ -272,6 +354,8 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             'resource_documentation' => $config['resource_documentation'],
             'resource_policy_uri' => $config['resource_policy_uri'],
             'resource_tos_uri' => $config['resource_tos_uri'],
+            'dpop_signing_alg_values_supported' => $dpop['enabled'] ? $dpop['algorithms'] : null,
+            'dpop_bound_access_tokens_required' => $dpop['enabled'] ?: null,
         ];
 
         $controller = $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller');

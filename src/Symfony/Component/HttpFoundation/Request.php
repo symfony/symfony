@@ -1214,6 +1214,8 @@ class Request
             $this->isHostValid = false;
 
             throw new SuspiciousOperationException(\sprintf('Untrusted Host "%s".', $host));
+        } else {
+            trigger_deprecation('symfony/http-foundation', '8.2', 'trusted_hosts should be defined');
         }
 
         return $host;

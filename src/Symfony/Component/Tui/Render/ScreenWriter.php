@@ -441,7 +441,7 @@ final class ScreenWriter
                 $plainLine = preg_replace('/\x1b(?:\[[0-9;]*[a-zA-Z]|\][^\x07]*\x07)/', '', $line);
                 $preview = mb_substr($plainLine, 0, 100);
 
-                throw new RenderException(\sprintf("Rendered line %d exceeds terminal width (%d > %d).\nLine preview: %s%s.", $i, $lineWidth, $width, $preview, mb_strlen($plainLine) > 100 ? '...' : ''), $i, $lineWidth, $width);
+                throw new RenderException(\sprintf("Rendered line %d exceeds terminal width (%d > %d).\nLine preview: \"%s\"%s.", $i, $lineWidth, $width, $preview, mb_strlen($plainLine) > 100 ? '...' : ''), $i, $lineWidth, $width);
             }
 
             $buffer .= $line;
@@ -505,6 +505,10 @@ final class ScreenWriter
                 continue;
             }
 
+            if (str_contains($line, "\t")) {
+                $line = self::expandTabs($line);
+            }
+
             if (str_contains($line, "\x1b")) {
                 if ($oldLine === $line."\x1b[0m" || $oldLine === $line.AnsiUtils::SEGMENT_RESET) {
                     $lines[$row] = $oldLine;
@@ -552,6 +556,35 @@ final class ScreenWriter
             'first_changed' => $firstChanged,
             'last_changed' => $lastChanged,
         ];
+    }
+
+    /**
+     * Replace tabs outside escape sequences with the spaces the layout counted for them.
+     *
+     * A terminal moves a tab to its next tab stop instead, which can push the rest of the line past the right edge and make the terminal wrap it.
+     */
+    private static function expandTabs(string $line): string
+    {
+        $spaces = str_repeat(' ', AnsiUtils::TAB_WIDTH);
+        if (!str_contains($line, "\x1b")) {
+            return str_replace("\t", $spaces, $line);
+        }
+
+        $result = '';
+        $length = \strlen($line);
+        for ($i = 0; $i < $length;) {
+            if ("\x1b" === $line[$i] && null !== $code = AnsiUtils::extractAnsiCode($line, $i)) {
+                $result .= $code['code'];
+                $i += $code['length'];
+                continue;
+            }
+
+            $text = strcspn($line, "\x1b", $i + 1) + 1;
+            $result .= str_replace("\t", $spaces, substr($line, $i, $text));
+            $i += $text;
+        }
+
+        return $result;
     }
 
     /**

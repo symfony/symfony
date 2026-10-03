@@ -59,6 +59,7 @@ class MessengerPass implements CompilerPassInterface
         $this->registerHandlers($container, $busIds);
         $this->registerTypeMapping($container);
         $this->registerDebugCommandRouting($container);
+        $this->registerDebugCommandMiddleware($container, $busIds);
     }
 
     private function registerHandlers(ContainerBuilder $container, array $busIds): void
@@ -623,5 +624,42 @@ class MessengerPass implements CompilerPassInterface
             ->setArgument(4, $failureTransports)
             ->setArgument(5, $this->handlerTransports)
         ;
+    }
+
+    private function registerDebugCommandMiddleware(ContainerBuilder $container, array $busIds): void
+    {
+        if (!$container->hasDefinition('console.command.messenger_debug')) {
+            return;
+        }
+
+        $middlewareByBus = [];
+        foreach ($busIds as $busId) {
+            $middlewareByBus[$busId] = [];
+
+            $arguments = $container->getDefinition($busId)->getArguments();
+            $middleware = $arguments[0] ?? [];
+            if ($middleware instanceof IteratorArgument) {
+                $middleware = $middleware->getValues();
+            }
+            if (!\is_array($middleware)) {
+                continue;
+            }
+
+            foreach ($middleware as $reference) {
+                if (!$reference instanceof Reference) {
+                    continue;
+                }
+
+                $id = $class = (string) $reference;
+                do {
+                    $definition = $container->has($class) ? $container->findDefinition($class) : null;
+                    $class = $definition instanceof ChildDefinition && !$definition->getClass() ? $definition->getParent() : $definition?->getClass();
+                } while ($definition instanceof ChildDefinition && !$definition->getClass());
+
+                $middlewareByBus[$busId][] = [$id, $class];
+            }
+        }
+
+        $container->getDefinition('console.command.messenger_debug')->setArgument(6, $middlewareByBus);
     }
 }

@@ -1040,10 +1040,6 @@ class ScreenWriterTest extends TestCase
         ];
     }
 
-    /**
-     * Resizes like Termux does when only the height changes: on shrink, it drops the blank rows below the cursor first,
-     * then moves the top rows into the scrollback; on growth, it brings rows back from the scrollback first.
-     */
     private static function resizeLikeTermux(ScreenBuffer $screen, int $width, int $rows): ScreenBuffer
     {
         $lines = [...array_map(AnsiUtils::stripAnsiCodes(...), $screen->getScrollback()), ...$screen->getLines()];

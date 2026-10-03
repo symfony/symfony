@@ -120,6 +120,15 @@ trait ContentLoaderTrait
             $this->addHost($routes, $config['host']);
         }
 
+        $parameters = [];
+        foreach ($routes as $route) {
+            preg_match_all('#\{!?([\w\x80-\xFF]+)\}#', $route->getPath().$route->getHost(), $matches);
+            $parameters += array_fill_keys($matches[1], true);
+        }
+        foreach (array_keys(array_diff_key($requirements, $parameters)) as $parameter) {
+            trigger_deprecation('symfony/routing', '8.2', 'Defining a requirement for the "%s" parameter of route "%s" is deprecated because this parameter does not exist.', $parameter, $name);
+        }
+
         $collection->addCollection($routes);
     }
 

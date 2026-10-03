@@ -4,7 +4,7 @@ use Symfony\Component\Routing\Loader\Configurator\Routes;
 
 return Routes::config([
     'a' => [
-        'path' => '/a',
+        'path' => '/a/{slug}',
         'host' => 'example.com',
         'controller' => 'AppBundle:Blog:show',
         'locale' => 'en',

@@ -13,6 +13,7 @@ CHANGELOG
  * Allow defining default query parameters with the `_query` route default
  * Add `RequestContext::runWith()` to generate and match URLs for another host, scheme or base URL without leaking the change
  * Add `Route::addCondition()`, `RouteCollection::addCondition()` and the `add_condition` import key to combine a condition with the existing ones
+ * Deprecate defining a requirement for a parameter that does not exist in a route
 
 8.1
 ---

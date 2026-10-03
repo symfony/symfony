@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\FileLocatorInterface;
@@ -417,7 +418,7 @@ class PhpFileLoaderTest extends TestCase
         $routes = $loader->load('array_routes_full.php');
 
         $a = $routes->get('a');
-        $this->assertSame('/a', $a->getPath());
+        $this->assertSame('/a/{slug}', $a->getPath());
         $this->assertSame('example.com', $a->getHost());
         $this->assertSame('AppBundle:Blog:show', $a->getDefault('_controller'));
         $this->assertSame('en', $a->getDefault('_locale'));
@@ -428,6 +429,16 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('/b-fr', $routes->get('b.fr')->getPath());
 
         $this->assertSame('a', $routes->getAlias('c_alias')->getId());
+    }
+
+    #[IgnoreDeprecations]
+    public function testUnusedRequirement()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+
+        $this->expectUserDeprecationMessage('Since symfony/routing 8.2: Defining a requirement for the "client" parameter of route "foo_url" is deprecated because this parameter does not exist.');
+
+        $loader->load('unused_requirement.php');
     }
 
     public function testYamlImportsAreResolvedWhenProcessingPhpReturnedArrays()

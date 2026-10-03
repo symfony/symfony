@@ -46,6 +46,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MultipleDeprecate
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\NothingButNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrefixedActionLocalizedRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrefixedActionPathController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RequirementsOnClassController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RequirementsWithoutPlaceholderNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithEnv;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RouteWithPrefixController;
@@ -108,6 +109,16 @@ class AttributeClassLoaderTest extends TestCase
         $this->expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"');
 
         $this->loader->load(RequirementsWithoutPlaceholderNameController::class);
+    }
+
+    public function testRequirementsOnClass()
+    {
+        $routes = $this->loader->load(RequirementsOnClassController::class);
+
+        $this->assertSame('/api/v1/applications', $routes->get('api_v1_applications_create')->getPath());
+        $this->assertSame('/api/v1/applications/{id}', $routes->get('api_v1_applications_read')->getPath());
+        $this->assertSame('[0-9]+', $routes->get('api_v1_applications_create')->getRequirement('id'));
+        $this->assertSame('[0-9]+', $routes->get('api_v1_applications_read')->getRequirement('id'));
     }
 
     public function testInvokableControllerLoader()

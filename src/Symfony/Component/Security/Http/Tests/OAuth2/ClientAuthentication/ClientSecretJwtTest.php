@@ -15,9 +15,13 @@ use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\HS256;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\AbstractClientAssertion;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 class ClientSecretJwtTest extends TestCase
 {
@@ -137,9 +141,66 @@ class ClientSecretJwtTest extends TestCase
         $this->assertSame('client_secret_jwt', $this->createClientAuthentication()->getMethod());
     }
 
-    private function createClientAuthentication(): ClientSecretJwt
+    /**
+     * FAPI 2.0 Security Profile, Section 5.3.2.1 takes the issuer and nothing else: an assertion
+     * made for one endpoint of a provider authenticates the client at every other endpoint of
+     * that same provider.
+     */
+    public function testNamesTheIssuerTheProviderAnnouncesAsAudienceWhenOneIsGiven()
     {
-        return new ClientSecretJwt(self::CLIENT_SECRET, 'HS256', 60, new MockClock('2026-09-08 10:00:00'));
+        $clientAuthentication = $this->createClientAuthentication(self::createDiscovery('https://provider.example.com'));
+
+        $options = $clientAuthentication->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []]);
+
+        $claims = json_decode(self::decodeBase64Url(explode('.', $options['body']['client_assertion'])[1]), true, flags: \JSON_THROW_ON_ERROR);
+        $this->assertSame('https://provider.example.com', $claims['aud']);
+    }
+
+    /**
+     * draft-ietf-oauth-rfc7523bis: "Client authentication JWTs SHOULD be explicitly typed".
+     */
+    public function testTypesTheAssertionExplicitlyWhenItNamesTheIssuer()
+    {
+        $clientAuthentication = $this->createClientAuthentication(self::createDiscovery('https://provider.example.com'));
+
+        $options = $clientAuthentication->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []]);
+
+        $this->assertSame('client-authentication+jwt', self::decodeHeader($options['body']['client_assertion'])['typ']);
+    }
+
+    /**
+     * The type signals compliance with draft-ietf-oauth-rfc7523bis, which forbids the token endpoint as the audience.
+     */
+    public function testTypesNothingWhenTheAssertionNamesTheEndpoint()
+    {
+        $clientAuthentication = $this->createClientAuthentication();
+
+        $options = $clientAuthentication->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []]);
+
+        $this->assertArrayNotHasKey('typ', self::decodeHeader($options['body']['client_assertion']));
+    }
+
+    private static function createDiscovery(string $announcedIssuer): OidcDiscovery
+    {
+        return new OidcDiscovery(
+            new MockHttpClient(new JsonMockResponse(['issuer' => $announcedIssuer])),
+            new ArrayAdapter(),
+            'https://provider.example.com/.well-known/openid-configuration',
+            'https://provider.example.com',
+        );
+    }
+
+    private function createClientAuthentication(?OidcDiscovery $discovery = null): ClientSecretJwt
+    {
+        return new ClientSecretJwt(self::CLIENT_SECRET, 'HS256', 60, new MockClock('2026-09-08 10:00:00'), $discovery);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function decodeHeader(string $assertion): array
+    {
+        return json_decode(self::decodeBase64Url(explode('.', $assertion)[0]), true, flags: \JSON_THROW_ON_ERROR);
     }
 
     private static function decodeBase64Url(string $value): string

@@ -202,6 +202,34 @@ final class OidcDiscovery implements ResetInterface
     }
 
     /**
+     * Returns the issuer identifier the provider announces, the one a client assertion may
+     * name as its audience.
+     *
+     * It is the value the document itself carries, rather than the configured one, because
+     * the two are compared ignoring a trailing slash: what a provider verifies an audience
+     * against is what it announces, down to that slash.
+     *
+     * An expected issuer is required, as RFC 8414, Section 3.3 requires the client to validate the announced one: otherwise a document could name another provider as the audience of an assertion sent to a token endpoint the document controls.
+     *
+     * @throws \LogicException         If no expected issuer was given to the constructor
+     * @throws AuthenticationException If the discovery document cannot be fetched, or announces no issuer
+     */
+    public function getIssuer(): string
+    {
+        if (null === $this->issuer) {
+            throw new \LogicException(\sprintf('The issuer announced at "%s" cannot be trusted since no expected issuer was given to check it against: pass one to the constructor of "%s".', $this->openIdConfigurationUrl, self::class));
+        }
+
+        $issuer = $this->getConfiguration()['issuer'] ?? null;
+
+        if (!\is_string($issuer) || '' === $issuer) {
+            throw new AuthenticationException('The OIDC provider does not announce any "issuer".');
+        }
+
+        return $issuer;
+    }
+
+    /**
      * Tells whether the given URL provides the transport security the OIDC flow relies on.
      *
      * The authorization code, the PKCE verifier and the tokens it is exchanged for are only

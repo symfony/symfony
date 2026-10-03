@@ -36,8 +36,7 @@ interface ClientAuthenticationInterface
      * want it made with instead.
      *
      * @param string               $clientId      The client the request is made for
-     * @param string               $tokenEndpoint The endpoint the request is made to, which a signed
-     *                                            assertion names as its audience
+     * @param string               $tokenEndpoint The endpoint the request is made to
      * @param array<string, mixed> $options       The HttpClient options the request is about to be
      *                                            made with, carrying the token request body under
      *                                            the "body" key

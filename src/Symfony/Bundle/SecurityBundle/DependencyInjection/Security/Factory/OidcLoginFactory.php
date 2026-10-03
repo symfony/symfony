@@ -128,6 +128,11 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                                 ->defaultValue(60)
                                 ->info('How long an assertion is valid, in seconds. It is built for one request and sent right away, so keep it short: it is the window a provider that does not track the "jti" would accept a captured assertion in.')
                             ->end()
+                            ->enumNode('audience')
+                                ->values(['issuer', 'token_endpoint'])
+                                ->defaultValue('issuer')
+                                ->info('The audience of the assertion: the issuer of the provider, or its token endpoint for a provider that refuses the issuer.')
+                            ->end()
                         ->end()
                     ->end()
                     ->arrayNode('private_key_jwt')
@@ -152,6 +157,11 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                                 ->min(1)
                                 ->defaultValue(60)
                                 ->info('How long an assertion is valid, in seconds. It is built for one request and sent right away, so keep it short: it is the window a provider that does not track the "jti" would accept a captured assertion in.')
+                            ->end()
+                            ->enumNode('audience')
+                                ->values(['issuer', 'token_endpoint'])
+                                ->defaultValue('issuer')
+                                ->info('The audience of the assertion: the issuer of the provider, or its token endpoint for a provider that refuses the issuer.')
                             ->end()
                         ->end()
                     ->end()
@@ -289,7 +299,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
      * rules a public client cannot bend; anything else is the service the "id" option names,
      * whose method is only known once it is built.
      */
-    private function createClientAuthentication(ContainerBuilder $container, string $firewallName, array $config): string
+    private function createClientAuthentication(ContainerBuilder $container, string $firewallName, array $config, Reference $discovery): string
     {
         if (isset($config['id'])) {
             return $config['id'];
@@ -302,11 +312,13 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
 
         $method = array_key_first($config);
         $arguments = match ($method) {
-            'client_secret_jwt' => [$config[$method]['secret'], $config[$method]['algorithm'], $config[$method]['lifetime']],
+            // index 3, the clock, is left to the abstract definition
+            'client_secret_jwt' => [$config[$method]['secret'], $config[$method]['algorithm'], $config[$method]['lifetime'], 4 => self::createAssertionAudience($config[$method], $discovery)],
             'private_key_jwt' => [
                 (new ChildDefinition('security.oauth2.client_authentication.private_key_jwt.signing_key'))->replaceArgument(0, $config[$method]['key']),
                 $config[$method]['algorithm'],
                 $config[$method]['lifetime'],
+                4 => self::createAssertionAudience($config[$method], $discovery),
             ],
             default => [$config[$method]],
         };
@@ -318,6 +330,19 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
         }
 
         return $clientAuthenticationId;
+    }
+
+    /**
+     * What a client assertion names as its audience, or null for the endpoint the request is made to.
+     *
+     * The issuer is named by the discovery rather than by the configured "provider_uri", and so
+     * resolved when the assertion is signed rather than while the container compiles: the two are
+     * compared ignoring a trailing slash, and what a provider verifies an audience against is the
+     * spelling it announces itself.
+     */
+    private static function createAssertionAudience(array $config, Reference $discovery): ?Reference
+    {
+        return 'token_endpoint' === $config['audience'] ? null : $discovery;
     }
 
     public function getKey(): string
@@ -381,7 +406,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(0, $httpClient)
             ->replaceArgument(1, new Reference($discoveryId))
             ->replaceArgument(2, $config['client_id'])
-            ->replaceArgument(3, new Reference($this->createClientAuthentication($container, $firewallName, $config['client_authentication'])))
+            ->replaceArgument(3, new Reference($this->createClientAuthentication($container, $firewallName, $config['client_authentication'], new Reference($discoveryId))))
         ;
 
         $signatureVerifier = null;

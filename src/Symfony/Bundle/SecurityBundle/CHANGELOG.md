@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `audience` option to the `client_secret_jwt` and `private_key_jwt` client authentication methods of `oidc_login`, defaulting to `issuer`
  * Deprecate the `Symfony\Component\Security\Http\Firewall` autowiring alias
  * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session
  * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which now takes the logout URL generator there

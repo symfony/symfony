@@ -51,6 +51,58 @@ class OidcDiscoveryTest extends TestCase
         $this->assertSame(1, $requests);
     }
 
+    public function testGetIssuerReturnsTheAnnouncedIssuer()
+    {
+        $discovery = new OidcDiscovery(new MockHttpClient(new JsonMockResponse(self::CONFIGURATION)), new ArrayAdapter(), self::URL, self::ISSUER);
+
+        $issuer = $discovery->getIssuer();
+
+        $this->assertSame(self::ISSUER, $issuer);
+    }
+
+    /**
+     * The announced spelling and not the configured one.
+     *
+     * A trailing slash is ignored when the two are compared, so an assertion naming the
+     * configured issuer would not be the audience a provider announcing the other spelling
+     * verifies against.
+     */
+    public function testGetIssuerKeepsTheTrailingSlashTheProviderAnnounces()
+    {
+        $discovery = new OidcDiscovery(new MockHttpClient(new JsonMockResponse(['issuer' => self::ISSUER.'/'])), new ArrayAdapter(), self::URL, self::ISSUER);
+
+        $issuer = $discovery->getIssuer();
+
+        $this->assertSame(self::ISSUER.'/', $issuer);
+    }
+
+    /**
+     * RFC 8414, Section 3.3: an issuer nobody checked lets a document name another provider as the audience of an assertion sent to a token endpoint it controls.
+     */
+    public function testGetIssuerRequiresAnExpectedIssuer()
+    {
+        $discovery = new OidcDiscovery(new MockHttpClient(new JsonMockResponse(self::CONFIGURATION)), new ArrayAdapter(), self::URL);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The issuer announced at "https://provider.example.com/.well-known/openid-configuration" cannot be trusted since no expected issuer was given to check it against: pass one to the constructor of "Symfony\Component\Security\Http\Oidc\OidcDiscovery".');
+
+        $discovery->getIssuer();
+    }
+
+    public function testGetIssuerRejectsACachedDocumentAnnouncingNone()
+    {
+        // the issuer is only checked when the document is fetched, not when another writer of the key stored it
+        $cache = $this->createStub(CacheInterface::class);
+        $cache->method('get')->willReturn(['url' => self::URL, 'payload' => '{"token_endpoint":"https://provider.example.com/token"}']);
+
+        $discovery = new OidcDiscovery($this->createStub(HttpClientInterface::class), $cache, self::URL, self::ISSUER);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The OIDC provider does not announce any "issuer".');
+
+        $discovery->getIssuer();
+    }
+
     public function testGetConfigurationRejectsIssuerMismatch()
     {
         $httpClient = new MockHttpClient(new JsonMockResponse(['issuer' => 'https://attacker.example.com']));

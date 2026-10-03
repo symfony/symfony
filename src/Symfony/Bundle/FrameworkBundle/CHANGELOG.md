@@ -7,6 +7,7 @@ CHANGELOG
  * List deprecated aliases in `debug:autowiring` only when the `--all` option is passed
  * Register the security expression functions on `controller.expression_language`
  * Add the `configure_container` option to `WebTestCase::createClient()` to configure the container after every kernel reboot
+ * Add an "Inlined" column to `debug:container --env-vars`, telling which env vars are read while the container is compiled
  * Deprecate `Command\RouterMatchCommand`, use the one from the Routing component instead
  * Deprecate `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass`, `DependencyInjection\Compiler\AssetsContextPass` and `DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass`, use the ones from the Translation, Asset and Validator components instead
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead

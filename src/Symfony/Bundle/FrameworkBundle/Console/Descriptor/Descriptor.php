@@ -363,6 +363,8 @@ abstract class Descriptor implements DescriptorInterface
             }
         }
 
+        $inlined = $container->hasParameter('.debug.container.inlined_env_vars') ? array_flip($container->getParameter('.debug.container.inlined_env_vars')) : [];
+
         $bag = $container->getParameterBag();
         $getDefaultParameter = fn (string $name) => parent::get($name);
         $getDefaultParameter = $getDefaultParameter->bindTo($bag, $bag::class);
@@ -388,6 +390,7 @@ abstract class Descriptor implements DescriptorInterface
                 'runtime_value' => $runtimeValue,
                 'processed_value' => $processedValue,
                 'used' => isset($used[$name]),
+                'inlined' => isset($inlined[$env]),
             ];
         }
         ksort($envs);

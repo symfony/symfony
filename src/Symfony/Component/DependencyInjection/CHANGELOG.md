@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add an autowiring alias for `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`
  * Deprecate the `Symfony\Component\EventDispatcher\EventDispatcherInterface` autowiring alias, type the one from the EventDispatcher contracts instead
+ * Inline env vars while the container is compiled for the configuration nodes declared with `NodeDefinition::inlineEnvVars()`
  * Pass top-level extension values that are not arrays to the extension instead of replacing them with an empty array, so that a configuration tree can accept a scalar at its root
  * Add the `before` and `after` tag attributes and `#[AsTaggedItem]` arguments to order tagged services
  * Add `BeforeAfterSorter`

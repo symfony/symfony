@@ -124,6 +124,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private array $envCounters = [];
 
     /**
+     * @var array<string, true> the env vars resolved to their value
+     */
+    private array $inlinedEnvVars = [];
+
+    /**
      * @var string[] the list of vendor directories
      */
     private array $vendors;
@@ -725,6 +730,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $this->envCounters[$env] += $count;
             }
         }
+
+        $this->inlinedEnvVars += $container->inlinedEnvVars;
 
         foreach ($container->getAutoconfiguredInstanceof() as $interface => $childDefinition) {
             if (isset($this->autoconfiguredInstanceof[$interface])) {
@@ -1620,6 +1627,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 if (isset($usedPlaceholders[$placeholder])) {
                     if (true === $format) {
                         $resolved = $bag->escapeValue($this->getEnv($env));
+                        $this->inlinedEnvVars[$env] = true;
                     } else {
                         $resolved = \sprintf($format, $env);
                     }
@@ -1671,6 +1679,18 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $this->envCounters;
+    }
+
+    /**
+     * Returns the env vars resolved to their value while building the container.
+     *
+     * @return string[]
+     *
+     * @internal
+     */
+    public function getInlinedEnvVars(): array
+    {
+        return array_keys($this->inlinedEnvVars);
     }
 
     /**

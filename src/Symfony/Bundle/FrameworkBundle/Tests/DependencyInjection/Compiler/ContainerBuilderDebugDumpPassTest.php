@@ -13,12 +13,16 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -132,6 +136,40 @@ class ContainerBuilderDebugDumpPassTest extends TestCase
         $this->assertSame($a->getArgument(0), $a->getInstanceofConditionals()['AInterface']->getArgument(0));
     }
 
+    public function testEnvVarsResolvedWhileCompilingAreReportedAsInlined()
+    {
+        $_ENV['DUMP_NODE'] = 'a';
+        $_ENV['DUMP_EXT'] = 'b';
+        $_ENV['DUMP_DYNAMIC'] = 'c';
+        $_ENV['DUMP_DROPPED'] = 'd';
+
+        $container = new ContainerBuilder();
+        $container->setParameter('debug.container.dump', $this->tempDir.'/container.xml');
+        $container->registerExtension(new DebugDumpExtension());
+        $container->loadFromExtension('debug_dump', [
+            'node_inlined' => '%env(DUMP_NODE)%',
+            'ext_inlined' => '%env(DUMP_EXT)%',
+            'dynamic' => '%env(DUMP_DYNAMIC)%',
+            'dropped' => '%env(DUMP_DROPPED)%',
+        ]);
+        $container->register('runtime', \stdClass::class)->setArguments(['%env(DUMP_NODE)%'])->setPublic(true);
+        $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
+
+        try {
+            $container->compile();
+        } finally {
+            unset($_ENV['DUMP_NODE'], $_ENV['DUMP_EXT'], $_ENV['DUMP_DYNAMIC'], $_ENV['DUMP_DROPPED']);
+        }
+
+        $referenced = $container->getParameter('.debug.container.env_vars');
+        $inlined = $container->getParameter('.debug.container.inlined_env_vars');
+        sort($referenced);
+        sort($inlined);
+
+        $this->assertSame(['DUMP_DROPPED', 'DUMP_DYNAMIC', 'DUMP_EXT', 'DUMP_NODE'], $referenced);
+        $this->assertSame(['DUMP_EXT', 'DUMP_NODE'], $inlined);
+    }
+
     private function createContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder();
@@ -149,5 +187,44 @@ class ContainerBuilderDebugDumpPassTest extends TestCase
         $this->assertSame($originalDefinitions, serialize($container->getDefinitions()));
 
         return unserialize(file_get_contents($this->tempDir.'/container.ser'));
+    }
+}
+
+class DebugDumpConfiguration implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('debug_dump');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->scalarNode('node_inlined')->inlineEnvVars()->end()
+                ->scalarNode('ext_inlined')->end()
+                ->scalarNode('dynamic')->end()
+                ->scalarNode('dropped')->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+}
+
+class DebugDumpExtension extends Extension
+{
+    public function getAlias(): string
+    {
+        return 'debug_dump';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
+    {
+        return new DebugDumpConfiguration();
+    }
+
+    public function load(array $configs, ContainerBuilder $container): void
+    {
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+
+        $container->setParameter('debug_dump.node', $config['node_inlined']);
+        $container->setParameter('debug_dump.ext', strtoupper($container->resolveEnvPlaceholders($config['ext_inlined'], true)));
+        $container->register('debug_dump.service', \stdClass::class)->setArguments([$config['dynamic']])->setPublic(true);
     }
 }

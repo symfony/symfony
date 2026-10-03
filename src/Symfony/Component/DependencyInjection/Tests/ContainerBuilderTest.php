@@ -1168,6 +1168,27 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(['FOO' => 2, 'json:BAR' => 2, 'BAZ' => 0], $container->getEnvCounters());
     }
 
+    public function testInlinedEnvVarsAreTheOnesResolvedToTheirValue()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $foo = $bag->get('env(INLINED_FOO)');
+        $bar = $bag->get('env(INLINED_BAR)');
+        $extensionContainer = new ContainerBuilder($bag);
+
+        $_ENV['INLINED_FOO'] = 'foo';
+        try {
+            $this->assertSame('foo', $extensionContainer->resolveEnvPlaceholders($foo, true));
+        } finally {
+            unset($_ENV['INLINED_FOO']);
+        }
+        $this->assertSame('%env(INLINED_BAR)%', $extensionContainer->resolveEnvPlaceholders($bar));
+
+        $container = new ContainerBuilder();
+        $container->merge($extensionContainer);
+
+        $this->assertSame(['INLINED_FOO'], $container->getInlinedEnvVars());
+    }
+
     public function testCompileWithResolveEnv()
     {
         putenv('DUMMY_ENV_VAR=du%%y');

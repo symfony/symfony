@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-24T09:40:28Z
+
+The aliases are picked from the name of the client authentication method, but RFC 8705 §5 ties them to mutual TLS "for OAuth client authentication and/or to acquire or use certificate-bound tokens". So `private_key_jwt` with certificate-bound tokens, the other FAPI 2.0 combination, can't reach them: with a certificate on the client, requests still go to the plain `/token` and `/userinfo`.
+
+What about making the certificate a firewall option, applied with `withOptions()` to the HTTP client of `OidcClient` only, and using the aliases whenever it's set?
+
+```yaml
+oidc_login:
+    client_certificate: { certificate: '%kernel.project_dir%/config/oidc/client.pem', key: '...' }
+    client_authentication:
+        private_key_jwt: { key: '%env(OIDC_CLIENT_SIGNING_KEY)%' }
+```
+
+`tls_client_auth` and `self_signed_tls_client_auth` would then only report their name and require that option. It also removes the call to `authenticate()` for the UserInfo request, which is what welcoMattic's point on the interface is about.
+
+And `$preferMtlsAlias` becomes unneeded: `OidcClient` can read `mtls_endpoint_aliases` itself, while `OidcDiscovery` checks the aliases before caching the document, as it does for the other endpoints (an `http://` alias is cached today). WDYT?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-24T19:14:01Z
+
+Hi @nicolas-grekas,
+
+You are right. §4 is what settles it : "Mutual-TLS OAuth client authentication and certificate-bound access tokens can be used independently of each other". A credential a client with no client_authentication still needs cannot live under client_authentication, and picking the aliases from the method name is the same mistake seen from the other end.
+
+It also explains @welcoMattic's point: with the certificate under the method, authenticate() has to run for a UserInfo GET, on an interface documented for a token endpoint request. Moving the certificate out removes that call instead of documenting it.
+
+So I will go as you propose.
+I push that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T10:49:49Z
+
+The redesign works end to end: `private_key_jwt` with a certificate reaches the aliases, and discovery and JWKS carry none. Three things:
+
+- the alias check before caching runs for every `oidc_login` firewall and for the `authorization_endpoint` alias too, so a provider announcing a null or `http://` alias breaks firewalls that don't use mTLS, while RFC 8705 §5 says to ignore aliases of endpoints the client doesn't call. I'd check only the token and userinfo aliases, and only when `client_certificate` is set.
+- a scoped `http_client` with its own `local_cert`/`local_pk` silently overrides `client_certificate`, since `ScopingHttpClient` merges the scope options per request: worth a docs line, or a refusal.
+- `getSecureMutualTlsEndpoint()` doesn't need to be public: a private helper in `OidcClient` reading `getConfiguration()` does the same, and the public method also returns an `authorization_endpoint` alias.
+
+I pushed the rest: a test for the alias check, `local_pk`/`passphrase` no longer inherited from the HTTP client when only `certificate` is set, and shorter info texts and changelog entries. The description needs an update too (it still shows `tls_client_auth: { certificate, key }` and `$preferMtlsAlias`).
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-03T19:10:45Z
+
+Thanks,
+Reabsed on conflicts fixed.
+I considered the points you mentioned and they are now addressed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T19:44:58Z
+
+Thanks @Spomky, the three points are in. I squashed the branch into your commit with one more fix: `OidcClient` now checks an alias again when reading it, since a firewall on the same provider without a certificate caches the document without checking aliases, so the token request could go to a plain-HTTP alias. Plus one-line info texts, two missing tests, and a shorter description.

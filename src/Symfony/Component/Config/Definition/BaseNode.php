@@ -407,6 +407,11 @@ abstract class BaseNode implements NodeInterface
 
         // resolve placeholder value
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+            // the value is inlined before it is used, so there is no dynamic value to validate
+            if ($this->getAttribute('inline_env_vars', false)) {
+                return $value;
+            }
+
             // the types of the placeholder are not known yet, but no type fits a node that accepts no placeholder
             if (!$placeholders && !$this->allowPlaceholders()) {
                 $this->handlingPlaceholder = $value;
@@ -466,6 +471,10 @@ abstract class BaseNode implements NodeInterface
         }
 
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+            if ($this->getAttribute('inline_env_vars', false)) {
+                return $value;
+            }
+
             foreach ($placeholders as $placeholder) {
                 $this->handlingPlaceholder = $value;
                 try {
@@ -566,11 +575,6 @@ abstract class BaseNode implements NodeInterface
 
     private function doValidateType(mixed $value): void
     {
-        if (null !== $this->handlingPlaceholder && $this->getAttribute('inline_env_vars', false)) {
-            // the value is inlined before it is used, so there is no dynamic value to validate
-            return;
-        }
-
         if (null !== $this->handlingPlaceholder && !$this->allowPlaceholders()) {
             $e = new InvalidTypeException(\sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));
             $e->setPath($this->getPath());

@@ -569,6 +569,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(0, new Reference('security.user_checker.'.$id))
             ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
+        if ($firewall['stateless'] && ($firewall['oidc_login']['backchannel_logout']['enabled'] ?? false)) {
+            throw new InvalidConfigurationException(\sprintf('The OIDC "backchannel_logout" option of the "%s" firewall requires a stateful firewall, as a stateless one restores no token from a session and would record the end of a provider session without ever refusing a login for it.', $id));
+        }
+
         if ($firewall['user_checker_on_refresh']) {
             if ($firewall['stateless']) {
                 throw new InvalidConfigurationException(\sprintf('The "user_checker_on_refresh" option of the "%s" firewall requires a stateful firewall, as a stateless one never refreshes the user from a session.', $id));

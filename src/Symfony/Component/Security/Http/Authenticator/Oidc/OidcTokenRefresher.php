@@ -93,7 +93,7 @@ final class OidcTokenRefresher
      * Renews the access token, whatever its expiry, and stores the new tokens.
      *
      * The security token receives the access token and its expiry, the refresh token when the
-     * provider rotated it, and the ID token when it issued a new one.
+     * provider rotated it, and the ID token and its "sid" when it issued a new one.
      *
      * @throws OidcInvalidGrantException If the provider no longer honors the refresh token
      * @throws AuthenticationException   If the renewal fails for any other reason
@@ -114,8 +114,12 @@ final class OidcTokenRefresher
         // the whole response is validated before anything is stored, so that a rejected
         // ID token leaves the security token exactly as it was
         if (isset($tokenData['id_token'])) {
-            $this->verifyRefreshedIdToken($token, $tokenData['id_token']);
+            $sid = $this->verifyRefreshedIdToken($token, $tokenData['id_token'])['sid'] ?? null;
             $token->setAttribute('oidc_id_token', $tokenData['id_token']);
+
+            if (\is_string($sid) && '' !== $sid) {
+                $token->setAttribute('oidc_sid', $sid);
+            }
         }
 
         $token->setAttribute('oidc_access_token', $tokenData['access_token']);
@@ -136,9 +140,11 @@ final class OidcTokenRefresher
      * Neither a "nonce" nor a "max_age" is checked here: no authorization request was
      * made, and the "auth_time" claim still reports the original authentication.
      *
+     * @return array<string, mixed> The claims of the refreshed ID token
+     *
      * @throws AuthenticationException If the refreshed ID token does not describe the same authentication
      */
-    private function verifyRefreshedIdToken(TokenInterface $token, mixed $idToken): void
+    private function verifyRefreshedIdToken(TokenInterface $token, mixed $idToken): array
     {
         if (!\is_string($idToken) || '' === $idToken) {
             throw new AuthenticationException('The token endpoint response does not contain a valid "id_token".');
@@ -157,5 +163,7 @@ final class OidcTokenRefresher
         if (!\is_string($previousSubject) || !\is_string($claims['sub'] ?? null) || !hash_equals($previousSubject, $claims['sub'])) {
             throw new AuthenticationException('The "sub" claim of the refreshed ID token does not match the one of the ID token issued at authentication.');
         }
+
+        return $claims;
     }
 }

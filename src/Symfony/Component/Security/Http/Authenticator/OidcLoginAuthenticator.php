@@ -381,6 +381,9 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         // request asks for; it is compared as-is, so anything but a non-empty string is no class
         $acr = $idTokenClaims['acr'] ?? null;
         $passport->setAttribute('oidc_acr', \is_string($acr) && '' !== $acr ? $acr : null);
+        // "sid" names the provider session of this login (Back-Channel Logout 1.0, Section 2.1), which is what a logout token names
+        $sid = $idTokenClaims['sid'] ?? null;
+        $passport->setAttribute('oidc_sid', \is_string($sid) && '' !== $sid ? $sid : null);
 
         return $passport;
     }
@@ -401,6 +404,12 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         }
 
         $token->setAttribute('oidc_acr', $passport->getAttribute('oidc_acr'));
+
+        $token->setAttribute('oidc_sid', $passport->getAttribute('oidc_sid'));
+        // the firewall this login was made on, beside the provider session it belongs to: the
+        // back-channel logout listener runs on every firewall of the application, and this is
+        // what tells it the logins whose provider sessions it is the one recording
+        $token->setAttribute('oidc_firewall', $firewallName);
 
         $methods = $passport->getAttribute('oidc_amr');
         $methods = \is_array($methods) && $methods ? $methods : [AuthenticationMethod::UNSPECIFIED];

@@ -1519,6 +1519,45 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertNull($token->getAttribute('oidc_acr'));
     }
 
+    public function testCreateTokenRecordsTheSidClaim()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'sid' => 'session-42']),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame('session-42', $token->getAttribute('oidc_sid'));
+        $this->assertSame('main', $token->getAttribute('oidc_firewall'), 'the firewall is recorded beside the session, so the back-channel logout listener of another one leaves this login alone');
+    }
+
+    public function testCreateTokenReportsAnUnusableSidClaimAsNull()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce, 'sid' => 42]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertNull($token->getAttribute('oidc_sid'));
+    }
+
     public function testCreateTokenKeepsOnlyTheStringEntriesOfTheAmrClaim()
     {
         $nonce = bin2hex(random_bytes(16));

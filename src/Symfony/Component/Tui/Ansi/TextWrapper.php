@@ -20,6 +20,9 @@ namespace Symfony\Component\Tui\Ansi;
  */
 final class TextWrapper
 {
+    // A line can break between any two characters of these scripts, which are written without spaces between words
+    private const CJK_PATTERN = '/[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}\p{Bopomofo}]/u';
+
     /**
      * Wrap a single line into chunks with position tracking.
      *
@@ -65,6 +68,7 @@ final class TextWrapper
 
         $byteOffset = 0;
         $count = \count($graphemes);
+        $hasCjk = preg_match(self::CJK_PATTERN, $line);
 
         for ($i = 0; $i < $count; ++$i) {
             $grapheme = $graphemes[$i];
@@ -107,6 +111,11 @@ final class TextWrapper
             // after the last space, at the start of the next word.
             if ($isWs && $i + 1 < $count && ' ' !== $graphemes[$i + 1] && "\t" !== $graphemes[$i + 1]) {
                 $wrapOppIndex = $byteOffset; // byte position of the next grapheme
+                $wrapOppWidth = $currentWidth;
+            } elseif ($hasCjk && !$isWs && $i + 1 < $count && ' ' !== $graphemes[$i + 1] && "\t" !== $graphemes[$i + 1]
+                && (preg_match(self::CJK_PATTERN, $grapheme) || preg_match(self::CJK_PATTERN, $graphemes[$i + 1]))) {
+                // Or between two graphemes when either is CJK
+                $wrapOppIndex = $byteOffset;
                 $wrapOppWidth = $currentWidth;
             }
         }
@@ -369,7 +378,69 @@ final class TextWrapper
             ];
         }
 
-        return $tokens;
+        if (!preg_match(self::CJK_PATTERN, $text)) {
+            return $tokens;
+        }
+
+        $splitTokens = [];
+        foreach ($tokens as $token) {
+            array_push($splitTokens, ...($token['is_whitespace'] || !preg_match(self::CJK_PATTERN, $token['text']) ? [$token] : self::splitCjkToken($token['text'])));
+        }
+
+        return $splitTokens;
+    }
+
+    /**
+     * Split a word into one token per CJK grapheme, as a line can break between any two of them.
+     *
+     * @return list<array{text: string, width: int, is_whitespace: bool, has_ansi: bool}>
+     */
+    private static function splitCjkToken(string $word): array
+    {
+        $pieces = [];
+        $current = '';
+        $pendingAnsi = '';
+        $length = \strlen($word);
+
+        for ($i = 0; $i < $length;) {
+            if ("\x1b" === $word[$i] && null !== $ansi = AnsiUtils::extractAnsiCode($word, $i)) {
+                $pendingAnsi .= $ansi['code'];
+                $i += $ansi['length'];
+                continue;
+            }
+
+            $end = strpos($word, "\x1b", $i + 1);
+            $end = false === $end ? $length : $end;
+            $text = substr($word, $i, $end - $i);
+            $i = $end;
+
+            foreach (grapheme_str_split($text) ?: [$text] as $grapheme) {
+                if (preg_match(self::CJK_PATTERN, $grapheme)) {
+                    if ('' !== $current) {
+                        $pieces[] = $current;
+                        $current = '';
+                    }
+                    $pieces[] = $pendingAnsi.$grapheme;
+                } else {
+                    $current .= $pendingAnsi.$grapheme;
+                }
+                $pendingAnsi = '';
+            }
+        }
+
+        // Trailing ANSI codes stay attached to the last piece
+        if ('' !== $current || !$pieces) {
+            $pieces[] = $current.$pendingAnsi;
+        } else {
+            $pieces[array_key_last($pieces)] .= $pendingAnsi;
+        }
+
+        return array_map(static fn (string $piece): array => [
+            'text' => $piece,
+            'width' => AnsiUtils::visibleWidth($piece),
+            'is_whitespace' => false,
+            'has_ansi' => str_contains($piece, "\x1b"),
+        ], $pieces);
     }
 
     /**

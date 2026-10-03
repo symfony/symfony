@@ -62,9 +62,11 @@ final class WordNavigator
                 }
             } else {
                 // Skip word run
+                $cjk = self::isCjk($lastGrapheme);
                 while ($graphemes
                     && !AnsiUtils::isWhitespace(end($graphemes))
-                    && !AnsiUtils::isPunctuation(end($graphemes))) {
+                    && !AnsiUtils::isPunctuation(end($graphemes))
+                    && $cjk === self::isCjk(end($graphemes))) {
                     $newCursor -= \strlen(array_pop($graphemes));
                 }
             }
@@ -110,9 +112,10 @@ final class WordNavigator
                 }
             } else {
                 // Skip word run
+                $cjk = self::isCjk($graphemes[$index]);
                 while ($index < $count) {
                     $segment = $graphemes[$index];
-                    if (AnsiUtils::isWhitespace($segment) || AnsiUtils::isPunctuation($segment)) {
+                    if (AnsiUtils::isWhitespace($segment) || AnsiUtils::isPunctuation($segment) || $cjk !== self::isCjk($segment)) {
                         break;
                     }
                     $newCursor += \strlen($segment);
@@ -122,5 +125,15 @@ final class WordNavigator
         }
 
         return $newCursor;
+    }
+
+    /**
+     * A word written in a script without spaces between words ends where the text switches to another script.
+     *
+     * For instance, "hello世界" holds two words, as with Unicode word boundaries.
+     */
+    private static function isCjk(string $grapheme): bool
+    {
+        return preg_match('/^[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}\p{Bopomofo}]/u', $grapheme);
     }
 }

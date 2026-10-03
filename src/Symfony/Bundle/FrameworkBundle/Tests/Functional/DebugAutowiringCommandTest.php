@@ -167,6 +167,20 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $this->assertStringNotContainsString(AbstractDefinitionClass::class, $tester->getDisplay());
     }
 
+    public function testListingAliasesOfMissingServices()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:autowiring', '--all' => true], ['decorated' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\MissingServiceInterface → missing_service', $tester->getDisplay());
+    }
+
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {

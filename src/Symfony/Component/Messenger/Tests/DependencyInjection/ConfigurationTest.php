@@ -39,7 +39,7 @@ class ConfigurationTest extends TestCase
             'reject_redelivered_messages' => true,
             'identity_stamps' => false,
             'default_bus' => null,
-            'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]],
+            'buses' => ['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => [], 'messages' => [], 'unwrap_exceptions' => false]],
         ], $this->process([]));
     }
 
@@ -157,18 +157,24 @@ class ConfigurationTest extends TestCase
                     'middleware' => [
                         ['id' => 'existing_bus.middleware', 'arguments' => []],
                     ],
+                    'messages' => [],
+                    'unwrap_exceptions' => false,
                 ],
                 'common_bus' => [
                     'default_middleware' => ['enabled' => false, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'common_bus.new_middleware', 'arguments' => []],
                     ],
+                    'messages' => [],
+                    'unwrap_exceptions' => false,
                 ],
                 'new_bus' => [
                     'default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true],
                     'middleware' => [
                         ['id' => 'new_bus.middleware', 'arguments' => []],
                     ],
+                    'messages' => [],
+                    'unwrap_exceptions' => false,
                 ],
             ],
             $config['buses']

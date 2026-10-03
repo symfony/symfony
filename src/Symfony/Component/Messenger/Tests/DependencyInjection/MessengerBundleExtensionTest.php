@@ -855,6 +855,32 @@ class MessengerBundleExtensionTest extends TestCase
         ], $container->getParameter('messenger.bus.events.middleware'));
     }
 
+    public function testMessengerBusMessages()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'default_bus' => 'command.bus',
+                'buses' => [
+                    'command.bus' => ['messages' => DummyMessage::class],
+                    'event.bus' => [],
+                ],
+            ]);
+        });
+
+        $this->assertSame([DummyMessage::class], $container->getDefinition('command.bus')->getArgument('$messageTypes'));
+        $this->assertSame([[]], $container->getDefinition('event.bus')->getArguments());
+    }
+
+    public function testMessengerBusMessagesMustExist()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Invalid Messenger configuration: the class or interface "App\\Missing" listed in the "messages" of the "command.bus" bus does not exist.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', ['buses' => ['command.bus' => ['messages' => 'App\\Missing']]]);
+        });
+    }
+
     public function testMessengerWithMultipleBuses()
     {
         $container = $this->createContainerFromFile('messenger_multiple_buses');

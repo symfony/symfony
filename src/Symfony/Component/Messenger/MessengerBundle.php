@@ -235,7 +235,7 @@ class MessengerBundle extends AbstractBundle
                 ->end()
                 ->scalarNode('default_bus')->defaultNull()->end()
                 ->arrayNode('buses', 'bus')
-                    ->defaultValue(['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => []]])
+                    ->defaultValue(['messenger.bus.default' => ['default_middleware' => ['enabled' => true, 'allow_no_handlers' => false, 'allow_no_senders' => true], 'middleware' => [], 'messages' => [], 'unwrap_exceptions' => false]])
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
@@ -288,15 +288,23 @@ class MessengerBundle extends AbstractBundle
                                         ->arrayNode('arguments', 'argument')
                                             ->normalizeKeys(false)
                                             ->defaultValue([])
-                                            ->prototype('variable')
+                                            ->prototype('variable')->end()
                                         ->end()
                                     ->end()
                                 ->end()
                             ->end()
+                            ->arrayNode('messages', 'message')
+                                ->info('The classes or interfaces of the messages the application can dispatch on this bus, any message when empty.')
+                                ->acceptAndWrap(['string'])
+                                ->scalarPrototype()->end()
+                            ->end()
+                            ->booleanNode('unwrap_exceptions')
+                                ->info('Whether the application gets the exception of the failing handler instead of a HandlerFailedException when it dispatches a message.')
+                                ->defaultFalse()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
-            ->end()
         ;
     }
 
@@ -444,7 +452,21 @@ class MessengerBundle extends AbstractBundle
             }
 
             $container->setParameter($busId.'.middleware', $middleware);
-            $container->register($busId, MessageBus::class)->addArgument([])->addTag('messenger.bus');
+            $busDefinition = $container->register($busId, MessageBus::class)->addArgument([])->addTag('messenger.bus');
+
+            foreach ($bus['messages'] as $type) {
+                if (!class_exists($type) && !interface_exists($type)) {
+                    throw new LogicException(\sprintf('Invalid Messenger configuration: the class or interface "%s" listed in the "messages" of the "%s" bus does not exist.', $type, $busId));
+                }
+            }
+
+            if ($bus['messages']) {
+                $busDefinition->setArgument('$messageTypes', $bus['messages']);
+            }
+
+            if ($bus['unwrap_exceptions']) {
+                $busDefinition->setArgument('$unwrapExceptions', true);
+            }
 
             if ($busId === $config['default_bus']) {
                 $container->setAlias('messenger.default_bus', $busId)->setPublic(true);

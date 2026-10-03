@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -121,7 +122,7 @@ class SerializerPass implements CompilerPassInterface
             $definition = $container->getDefinition((string) $id);
 
             $context = $defaultContext;
-            if (is_a($definition->getClass(), ObjectNormalizer::class, true)) {
+            if (is_a($this->resolveClass($container, (string) $id), ObjectNormalizer::class, true)) {
                 if (null !== $circularReferenceHandler) {
                     $context += ['circular_reference_handler' => new Reference($circularReferenceHandler)];
                 }
@@ -217,9 +218,7 @@ class SerializerPass implements CompilerPassInterface
         foreach ($services as &$id) {
             $childId = $id.'.'.$serializerName;
 
-            $definition = $container->registerChild($childId, (string) $id)
-                ->setClass($container->getDefinition((string) $id)->getClass())
-            ;
+            $definition = $container->registerChild($childId, (string) $id);
 
             if (null !== $nameConverterIndex = $this->findNameConverterIndex($container, (string) $id)) {
                 $definition->replaceArgument($nameConverterIndex, new Reference($config['name_converter']));
@@ -240,5 +239,20 @@ class SerializerPass implements CompilerPassInterface
         }
 
         return null;
+    }
+
+    private function resolveClass(ContainerBuilder $container, string $id): ?string
+    {
+        $definition = $container->getDefinition($id);
+
+        while (
+            (null === $class = $definition->getClass())
+            && $definition instanceof ChildDefinition
+            && $container->has($parent = $definition->getParent())
+        ) {
+            $definition = $container->findDefinition($parent);
+        }
+
+        return $class;
     }
 }

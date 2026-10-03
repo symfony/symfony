@@ -53,6 +53,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\OidcAuthorizationRequestEvent;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\OAuth2\Dpop\DpopProofFactory;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -60,6 +61,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[AllowMockObjectsWithoutExpectations]
 class OidcLoginAuthenticatorTest extends TestCase
 {
+    private const DPOP_JWK = [
+        'kty' => 'EC',
+        'crv' => 'P-256',
+        'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+        'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+        'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
+    ];
+
     private OidcClientInterface $oidcClient;
     private OidcDiscovery $discovery;
     private AuthenticationSuccessHandlerInterface $successHandler;
@@ -1116,6 +1125,14 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->createAuthenticator(authorizationParams: ['state' => 'fixed', 'code_challenge' => '', 'prompt' => 'consent']);
     }
 
+    public function testTheDpopKeyIsNotTakenFromTheAuthorizationParams()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The authorization request parameter(s) "dpop_jkt" are managed by the authenticator');
+
+        $this->createAuthenticator(authorizationParams: ['dpop_jkt' => 'another-key-thumbprint']);
+    }
+
     public function testStartDispatchesTheAuthorizationRequestEvent()
     {
         $dispatcher = new EventDispatcher();
@@ -2049,7 +2066,47 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertInstanceOf(OidcLoginAuthenticator::class, $this->createAuthenticator(['pkce_enabled' => false]));
     }
 
-    private function createAuthenticator(array $options = [], ?UserProviderInterface $userProvider = null, array $authorizationParams = [], ?OidcSignatureVerifier $signatureVerifier = null, ?ClockInterface $clock = null, ?EventDispatcherInterface $eventDispatcher = null): OidcLoginAuthenticator
+    /**
+     * RFC 9449, Section 10: the code is bound to the key before it exists.
+     *
+     * The thumbprint names the key without carrying it, which is what lets it travel in a
+     * front channel, so that a code stolen from the redirect cannot be exchanged by whoever
+     * does not hold the key.
+     */
+    public function testStartNamesTheDpopKeyWhenTheFirewallBindsToOne()
+    {
+        // Given
+        $proofFactory = new DpopProofFactory(new JWK(self::DPOP_JWK), 'ES256');
+        $authenticator = $this->createAuthenticator(dpopProofFactory: $proofFactory);
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        // When
+        $response = $authenticator->start($request);
+
+        // Then
+        $params = [];
+        parse_str(parse_url($response->getTargetUrl(), \PHP_URL_QUERY), $params);
+        $this->assertSame($proofFactory->getKeyThumbprint(), $params['dpop_jkt']);
+    }
+
+    public function testStartNamesNoDpopKeyWhenTheFirewallBindsToNone()
+    {
+        // Given
+        $authenticator = $this->createAuthenticator();
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        // When
+        $response = $authenticator->start($request);
+
+        // Then
+        $params = [];
+        parse_str(parse_url($response->getTargetUrl(), \PHP_URL_QUERY), $params);
+        $this->assertArrayNotHasKey('dpop_jkt', $params);
+    }
+
+    private function createAuthenticator(array $options = [], ?UserProviderInterface $userProvider = null, array $authorizationParams = [], ?OidcSignatureVerifier $signatureVerifier = null, ?ClockInterface $clock = null, ?EventDispatcherInterface $eventDispatcher = null, ?DpopProofFactory $dpopProofFactory = null): OidcLoginAuthenticator
     {
         return new OidcLoginAuthenticator(
             new HttpUtils(),
@@ -2065,6 +2122,7 @@ class OidcLoginAuthenticatorTest extends TestCase
             $signatureVerifier,
             $clock ?? new Clock(),
             $eventDispatcher,
+            $dpopProofFactory,
         );
     }
 }

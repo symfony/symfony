@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Jose\Component\Core\JWK;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -204,6 +205,70 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
 
         $token = unserialize($client->getRequest()->getSession()->get('_security_oidc'));
         $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+    }
+
+    public function testTheStartRouteNamesTheDpopKey()
+    {
+        $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_dpop.yml']);
+        $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider([])));
+
+        $client->request('GET', '/oidc/start');
+
+        parse_str(parse_url($client->getResponse()->headers->get('Location'), \PHP_URL_QUERY), $query);
+        $this->assertSame(self::dpopKey()->thumbprint('sha256'), $query['dpop_jkt']);
+    }
+
+    public function testTheAccessTokenIsRenewedWithADpopProof()
+    {
+        $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_dpop.yml']);
+        $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
+            'oidc_access_token' => 'access-123',
+            'oidc_refresh_token' => 'refresh-123',
+            'oidc_access_token_expires_at' => time() - 1,
+        ]);
+        $proofs = [];
+        $provider = $this->mockProvider(['access_token' => 'access-456', 'token_type' => 'DPoP', 'expires_in' => 300]);
+        $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient(static function (string $method, string $url, array $options) use ($provider, &$proofs): MockResponse {
+            foreach ($options['headers'] ?? [] as $header) {
+                if (str_starts_with($header, 'DPoP: ')) {
+                    $proofs[] = substr($header, 6);
+                }
+            }
+
+            return $provider($method, $url);
+        }));
+        $client->getContainer()->get('security.token_storage')->setToken(null);
+
+        $client->request('GET', '/oidc/start');
+
+        $token = unserialize($client->getRequest()->getSession()->get('_security_oidc'));
+        $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
+        $this->assertCount(1, $proofs);
+        $header = json_decode(base64_decode(strtr(explode('.', $proofs[0])[0], '-_', '+/')), true);
+        $this->assertSame('dpop+jwt', $header['typ']);
+        $this->assertSame(self::dpopKey()->toPublic()->all(), $header['jwk']);
+    }
+
+    public function testARenewedAccessTokenTheProviderDidNotBindIsRefused()
+    {
+        $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_dpop.yml']);
+        $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
+            'oidc_access_token' => 'access-123',
+            'oidc_refresh_token' => 'refresh-123',
+            'oidc_access_token_expires_at' => time() - 1,
+        ]);
+        $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider(['access_token' => 'access-456', 'token_type' => 'Bearer', 'expires_in' => 300])));
+        $client->getContainer()->get('security.token_storage')->setToken(null);
+
+        $client->request('GET', '/oidc/start');
+
+        $token = unserialize($client->getRequest()->getSession()->get('_security_oidc'));
+        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+    }
+
+    private static function dpopKey(): JWK
+    {
+        return JWK::createFromJson('{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}');
     }
 
     /**

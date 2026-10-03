@@ -15,15 +15,6 @@ use Jose\Component\Checker;
 use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWKSet;
-use Jose\Component\Signature\Algorithm\ES256;
-use Jose\Component\Signature\Algorithm\ES384;
-use Jose\Component\Signature\Algorithm\ES512;
-use Jose\Component\Signature\Algorithm\PS256;
-use Jose\Component\Signature\Algorithm\PS384;
-use Jose\Component\Signature\Algorithm\PS512;
-use Jose\Component\Signature\Algorithm\RS256;
-use Jose\Component\Signature\Algorithm\RS384;
-use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
@@ -31,6 +22,7 @@ use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\OAuth2\JwsAlgorithms;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -49,24 +41,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class OidcSignatureVerifier
 {
-    /**
-     * The asymmetric algorithms the "oidc" access token handler supports too.
-     *
-     * No HMAC algorithm is part of them, so a public key published by the provider can never
-     * be turned into the shared secret of an "HS256" token (key confusion).
-     */
-    private const SIGNATURE_ALGORITHMS = [
-        'RS256' => RS256::class,
-        'RS384' => RS384::class,
-        'RS512' => RS512::class,
-        'ES256' => ES256::class,
-        'ES384' => ES384::class,
-        'ES512' => ES512::class,
-        'PS256' => PS256::class,
-        'PS384' => PS384::class,
-        'PS512' => PS512::class,
-    ];
-
     /**
      * How long a JWKS refetched for an unknown "kid" is kept before another one is allowed.
      */
@@ -175,12 +149,14 @@ final class OidcSignatureVerifier
 
     private function createAlgorithmManager(): AlgorithmManager
     {
+        // no MAC algorithm is accepted, so a public key published by the provider can never
+        // be turned into the shared secret of an "HS256" token (key confusion)
         return new AlgorithmManager(array_map(static function (string $name): Algorithm {
-            if (!isset(self::SIGNATURE_ALGORITHMS[$name])) {
-                throw new \LogicException(\sprintf('Unsupported OIDC ID token signature algorithm "%s". Supported algorithms are: "%s".', $name, implode('", "', array_keys(self::SIGNATURE_ALGORITHMS))));
+            if (!isset(JwsAlgorithms::ASYMMETRIC[$name])) {
+                throw new \LogicException(\sprintf('Unsupported OIDC ID token signature algorithm "%s". Supported algorithms are: "%s".', $name, implode('", "', array_keys(JwsAlgorithms::ASYMMETRIC))));
             }
 
-            return new (self::SIGNATURE_ALGORITHMS[$name])();
+            return new (JwsAlgorithms::ASYMMETRIC[$name])();
         }, $this->algorithms));
     }
 

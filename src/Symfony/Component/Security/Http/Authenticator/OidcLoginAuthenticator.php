@@ -406,6 +406,10 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         $token->setAttribute('oidc_acr', $passport->getAttribute('oidc_acr'));
 
         $token->setAttribute('oidc_sid', $passport->getAttribute('oidc_sid'));
+        // the firewall this login was made on, beside the provider session it belongs to: the
+        // back-channel logout listener runs on every firewall of the application, and this is
+        // what tells it the logins whose provider sessions it is the one recording
+        $token->setAttribute('oidc_firewall', $firewallName);
 
         $methods = $passport->getAttribute('oidc_amr');
         $methods = \is_array($methods) && $methods ? $methods : [AuthenticationMethod::UNSPECIFIED];

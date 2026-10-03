@@ -196,6 +196,7 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('ended sessions'),
+                abstract_arg('firewall name'),
             ])
 
         ->set('security.authenticator.oidc_login.token_refresher', OidcTokenRefresher::class)

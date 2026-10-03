@@ -31,7 +31,7 @@ class OidcBackChannelLogoutListenerTest extends TestCase
 
         $event = $this->createEvent($this->createToken('session-42'));
 
-        (new OidcBackChannelLogoutListener($endedSessions))($event);
+        (new OidcBackChannelLogoutListener($endedSessions, 'main'))($event);
 
         $this->assertTrue($event->isUserChanged());
         $this->assertInstanceOf(OidcSessionEndedException::class, $event->getException(), 'an application tells this deauthentication from any other by its class');
@@ -45,7 +45,7 @@ class OidcBackChannelLogoutListenerTest extends TestCase
 
         $event = $this->createEvent($this->createToken('session-42'));
 
-        (new OidcBackChannelLogoutListener($endedSessions))($event);
+        (new OidcBackChannelLogoutListener($endedSessions, 'main'))($event);
 
         $this->assertFalse($event->isUserChanged());
         $this->assertNull($event->getException());
@@ -65,10 +65,41 @@ class OidcBackChannelLogoutListenerTest extends TestCase
 
             $event = $this->createEvent($token);
 
-            (new OidcBackChannelLogoutListener(new OidcEndedSessions($cache, 'main', 86400)))($event);
+            (new OidcBackChannelLogoutListener(new OidcEndedSessions($cache, 'main', 86400), 'main'))($event);
 
             $this->assertFalse($event->isUserChanged(), $case);
         }
+    }
+
+    /**
+     * The listener runs on every firewall, so the one of a firewall only answers for its own.
+     *
+     * Two providers are free to mint the same opaque "sid", which without this would have the
+     * logout of one end the logins of the other.
+     */
+    public function testATokenMintedOnAnotherFirewallIsLeftAloneAndCostsNoLookup()
+    {
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cache->expects($this->never())->method('hasItem');
+
+        $event = $this->createEvent($this->createToken('session-42', 'admin'));
+
+        (new OidcBackChannelLogoutListener(new OidcEndedSessions($cache, 'main', 86400), 'main'))($event);
+
+        $this->assertFalse($event->isUserChanged());
+        $this->assertNull($event->getException());
+    }
+
+    public function testTheSameSessionEndedOnItsOwnFirewallIsRefused()
+    {
+        $endedSessions = new OidcEndedSessions(new ArrayAdapter(), 'main', 86400);
+        $endedSessions->record('session-42');
+
+        $event = $this->createEvent($this->createToken('session-42', 'main'));
+
+        (new OidcBackChannelLogoutListener($endedSessions, 'main'))($event);
+
+        $this->assertTrue($event->isUserChanged(), 'the very same sid, on the firewall that recorded its end');
     }
 
     public function testAVerdictThisListenerDoesNotShareIsLeftUntouched()
@@ -77,15 +108,16 @@ class OidcBackChannelLogoutListenerTest extends TestCase
 
         $event = $this->createEvent($this->createToken('session-42'), true);
 
-        (new OidcBackChannelLogoutListener($endedSessions))($event);
+        (new OidcBackChannelLogoutListener($endedSessions, 'main'))($event);
 
         $this->assertTrue($event->isUserChanged());
     }
 
-    private function createToken(?string $sid): TokenInterface
+    private function createToken(?string $sid, string $firewallName = 'main'): TokenInterface
     {
-        $token = new UsernamePasswordToken(new InMemoryUser('bob', null), 'main');
+        $token = new UsernamePasswordToken(new InMemoryUser('bob', null), $firewallName);
         $token->setAttribute('oidc_sid', $sid);
+        $token->setAttribute('oidc_firewall', $firewallName);
 
         return $token;
     }

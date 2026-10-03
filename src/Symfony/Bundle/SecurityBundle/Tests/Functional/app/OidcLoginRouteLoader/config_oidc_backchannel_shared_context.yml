@@ -38,3 +38,6 @@ services:
         class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\EventBundle\EventListener\OidcSessionEndedListener
         tags:
             - { name: kernel.event_listener, dispatcher: security.event_dispatcher.oidc }
+
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\EventBundle\Controller\ProtectedController:
+        public: true

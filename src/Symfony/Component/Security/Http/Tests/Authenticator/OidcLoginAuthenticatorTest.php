@@ -1536,6 +1536,7 @@ class OidcLoginAuthenticatorTest extends TestCase
         $token = $authenticator->createToken($passport, 'main');
 
         $this->assertSame('session-42', $token->getAttribute('oidc_sid'));
+        $this->assertSame('main', $token->getAttribute('oidc_firewall'), 'the firewall is recorded beside the session, so the back-channel logout listener of another one leaves this login alone');
     }
 
     public function testCreateTokenReportsAnUnusableSidClaimAsNull()

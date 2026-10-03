@@ -611,7 +611,12 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             $container
                 ->setDefinition('security.authenticator.oidc_login.backchannel_logout_listener.'.$firewallName, new ChildDefinition('security.authenticator.oidc_login.backchannel_logout_listener'))
                 ->replaceArgument(0, new Reference($endedSessionsId))
-                ->addTag('kernel.event_listener', ['dispatcher' => 'security.event_dispatcher.'.$firewallName, 'event' => CheckRefreshedUserEvent::class])
+                ->replaceArgument(1, $firewallName)
+                // on the global dispatcher, and not on the one of this firewall:
+                // RegisterGlobalSecurityEventListenersPass copies a global listener of
+                // CheckRefreshedUserEvent onto every firewall dispatcher, which is what has the
+                // login refused on a request to any firewall sharing the context it was made in
+                ->addTag('kernel.event_listener', ['event' => CheckRefreshedUserEvent::class])
             ;
 
             $logoutControllerLocator = $container->getDefinition('security.authenticator.oidc_login.backchannel_logout_controller')->getArgument(0);

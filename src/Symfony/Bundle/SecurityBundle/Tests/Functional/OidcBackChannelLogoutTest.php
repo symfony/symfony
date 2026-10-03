@@ -62,6 +62,26 @@ class OidcBackChannelLogoutTest extends AbstractWebTestCase
         yield 'context shared with a firewall declared first' => ['config_oidc_backchannel_shared_context.yml', 'shared'];
     }
 
+    /**
+     * Two firewalls of one context share the token the session holds, so a login the provider
+     * ended must be refused on every one of them, and not only on the firewall it was made on.
+     */
+    public function testTheLoginIsAlsoRefusedOnAnotherFirewallOfTheContext()
+    {
+        $client = $this->createLoggedInClient('config_oidc_backchannel_shared_context.yml', 'shared', 'session-42');
+        $sessionCookie = $client->getCookieJar()->get('MOCKSESSID');
+
+        $client->getCookieJar()->clear();
+        $client->request('POST', '/oidc/backchannel-logout', ['logout_token' => $this->buildLogoutToken('session-42')]);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        $client->getCookieJar()->set($sessionCookie);
+        $client->request('GET', '/admin/protected');
+
+        $this->assertNull($client->getRequest()->getSession()->get('_security_shared'));
+    }
+
     public function testTheLoginOfAnotherProviderSessionIsKept()
     {
         $client = $this->createLoggedInClient('config_oidc_backchannel.yml', 'oidc', 'session-43');
@@ -79,11 +99,39 @@ class OidcBackChannelLogoutTest extends AbstractWebTestCase
         $this->assertSame($sessionCookie->getValue(), $client->getCookieJar()->get('MOCKSESSID')?->getValue());
     }
 
+    /**
+     * The listener runs on every firewall, and still only ever refuses an OIDC login.
+     *
+     * A login made through another authenticator of the shared context carries no "oidc_sid",
+     * so there is nothing for a logout token to name, whatever it says.
+     */
+    public function testALoginOfAnotherAuthenticatorOfTheContextIsLeftAlone()
+    {
+        $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_backchannel_shared_context.yml']);
+        $client->disableReboot();
+        $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'shared');
+        $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider()));
+        $client->getContainer()->get('security.token_storage')->setToken(null);
+        $sessionCookie = $client->getCookieJar()->get('MOCKSESSID');
+
+        $client->getCookieJar()->clear();
+        $client->request('POST', '/oidc/backchannel-logout', ['logout_token' => $this->buildLogoutToken('session-42')]);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        $client->getCookieJar()->set($sessionCookie);
+        $client->request('GET', '/admin/protected');
+
+        $this->assertNotNull($client->getRequest()->getSession()->get('_security_shared'));
+        $this->assertSame('protected', $client->getResponse()->getContent());
+    }
+
     private function createLoggedInClient(string $rootConfig, string $firewallContext, string $sid): KernelBrowser
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => $rootConfig]);
         $client->disableReboot();
-        $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), $firewallContext, ['oidc_sid' => $sid]);
+        // the firewall is named "oidc" in both configurations, whatever the context it shares
+        $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), $firewallContext, ['oidc_sid' => $sid, 'oidc_firewall' => 'oidc']);
         $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider()));
         $client->getContainer()->get('security.token_storage')->setToken(null);
 

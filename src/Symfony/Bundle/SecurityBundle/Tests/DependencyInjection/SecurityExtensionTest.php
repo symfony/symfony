@@ -1499,8 +1499,9 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('security.user_checker.main', (string) $listener->getArgument(0));
         $this->assertSame('app.user_checker', (string) $container->getAlias('security.user_checker.main'));
         $this->assertSame(
-            [['dispatcher' => 'security.event_dispatcher.main', 'event' => CheckRefreshedUserEvent::class]],
+            [['event' => CheckRefreshedUserEvent::class]],
             $listener->getTag('kernel.event_listener'),
+            'on the global dispatcher, so that the login is refused on every firewall sharing the context it was made in',
         );
     }
 
@@ -2168,8 +2169,9 @@ class SecurityExtensionTest extends TestCase
         $listener = $container->getDefinition('security.authenticator.oidc_login.backchannel_logout_listener.main');
         $this->assertSame('security.authenticator.oidc_login.ended_sessions.main', (string) $listener->getArgument(0));
         $this->assertSame(
-            [['dispatcher' => 'security.event_dispatcher.main', 'event' => CheckRefreshedUserEvent::class]],
+            [['event' => CheckRefreshedUserEvent::class]],
             $listener->getTag('kernel.event_listener'),
+            'on the global dispatcher, so that the login is refused on every firewall sharing the context it was made in',
         );
     }
     public function testOidcLoginBackChannelLogoutTakesTheCachePoolOfTheApplication()

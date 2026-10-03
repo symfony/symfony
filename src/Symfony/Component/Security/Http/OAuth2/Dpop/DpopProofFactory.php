@@ -132,7 +132,7 @@ final class DpopProofFactory
         }
 
         $jws = (new JWSBuilder(new AlgorithmManager([$this->algorithm])))
-            ->withPayload(json_encode($claims, flags: \JSON_THROW_ON_ERROR))
+            ->withPayload(json_encode($claims, \JSON_THROW_ON_ERROR))
             ->addSignature($this->signingKey, [
                 'typ' => self::TYPE,
                 'alg' => $this->algorithm->name(),

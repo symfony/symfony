@@ -102,7 +102,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057');
         $stream = $response->toStream();
 
-        $this->assertSame("{\n    \"SER", fread($stream, 10));
+        $this->assertSame(substr("{\n    \"SERVER_PROTOCOL", 0, 10), fread($stream, 10));
         $this->assertSame('VER_PROTOCOL', fread($stream, 12));
         $this->assertFalse(feof($stream));
         $this->assertTrue(rewind($stream));
@@ -120,7 +120,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         stream_copy_to_stream($response->toStream(), $h);
 
         $this->assertTrue(rewind($h));
-        $this->assertSame("{\n    \"SER", fread($h, 10));
+        $this->assertSame(substr("{\n    \"SERVER_PROTOCOL", 0, 10), fread($h, 10));
         $this->assertSame('VER_PROTOCOL', fread($h, 12));
         $this->assertFalse(feof($h));
     }
@@ -131,7 +131,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057/404');
         $stream = $response->toStream(false);
 
-        $this->assertSame("{\n    \"SER", fread($stream, 10));
+        $this->assertSame(substr("{\n    \"SERVER_PROTOCOL", 0, 10), fread($stream, 10));
         $this->assertSame('VER_PROTOCOL', fread($stream, 12));
         $this->assertSame($response, stream_get_meta_data($stream)['wrapper_data']->getResponse());
         $this->assertSame(404, $response->getStatusCode());
@@ -272,14 +272,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057/');
 
         $time = microtime(true);
-        $response->getInfo('pause_handler')(1);
+        // The pause outlasts the stream timeout by far, so that a slow machine still sees the timeout first
+        $response->getInfo('pause_handler')(2);
 
         foreach ($client->stream($response, 0.5) as $chunk) {
             $this->assertTrue($chunk->isTimeout());
             $response->cancel();
         }
         $response = null;
-        $this->assertTrue(1.0 > microtime(true) - $time);
+        $this->assertTrue(2.0 > microtime(true) - $time);
         $this->assertTrue(0.5 <= microtime(true) - $time);
     }
 

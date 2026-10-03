@@ -50,6 +50,7 @@ use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\InteropSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Uid\Uuid;
@@ -815,6 +816,17 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertEquals(new Reference('serializer'), $serializerTransportDefinition->getArgument(0));
         $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));
         $this->assertSame(['enable_max_depth' => true], $serializerTransportDefinition->getArgument(2));
+    }
+
+    public function testMessengerInteropSerializer()
+    {
+        $container = $this->createContainerFromFile('messenger_transport');
+
+        $definition = $container->getDefinition('messenger.transport.interop_serializer');
+        $this->assertSame(InteropSerializer::class, $definition->getClass());
+        $this->assertEquals([new Reference('messenger.transport.symfony_serializer')], $definition->getArguments());
+
+        $this->assertFalse($this->createContainerFromFile('messenger_multiple_buses')->hasDefinition('messenger.transport.interop_serializer'));
     }
 
     public function testMessengerTransportSerializerConfiguration()

@@ -1038,6 +1038,13 @@ class ScreenWriterTest extends TestCase
             $lines(0, 10),
             [...$lines(11, 23), '', ...$lines(25, 30)],
         ];
+
+        yield 'content drawn after an empty frame' => [
+            [$lines(1, 15), 12, $lines(1, 30), [], ['M1', 'M2', 'M3', 'M4', 'M5'], 20],
+            true,
+            [],
+            ['M1', 'M2', 'M3', 'M4', 'M5', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        ];
     }
 
     private static function resizeLikeTermux(ScreenBuffer $screen, int $width, int $rows): ScreenBuffer

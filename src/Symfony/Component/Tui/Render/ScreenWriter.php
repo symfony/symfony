@@ -318,9 +318,9 @@ final class ScreenWriter
         $this->cursorRow = max(0, \count($newLines) - 1);
         $this->hardwareCursorRow = $this->cursorRow;
         $this->scrollbackMatchesLines = true;
+        $this->screenCleared = $clear;
 
         if ($clear) {
-            $this->screenCleared = true;
             $this->maxLinesRendered = \count($newLines);
         } else {
             $this->maxLinesRendered = max($this->maxLinesRendered, \count($newLines));

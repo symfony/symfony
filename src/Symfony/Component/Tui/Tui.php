@@ -364,22 +364,6 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         return $class;
     }
 
-    private function handleResize(): void
-    {
-        $columns = $this->terminal->getColumns();
-        $rows = $this->terminal->getRows();
-        $heightOnly = $columns === $this->resizeColumns && $rows !== $this->resizeRows;
-        $this->resizeColumns = $columns;
-        $this->resizeRows = $rows;
-
-        // A resize forces a full repaint: multiplexers (dtach, tmux) send
-        // SIGWINCH on reattach, when the previous screen content cannot be
-        // trusted, even at an unchanged size. Termux changes the height
-        // whenever its software keyboard shows or hides, though, and a full
-        // repaint each time would replay all the content.
-        $this->requestRender(!$heightOnly || false === getenv('TERMUX_VERSION'));
-    }
-
     /**
      * Get the event dispatcher.
      */
@@ -555,5 +539,18 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $suspension = $this->runSuspension;
         $this->runSuspension = null;
         $suspension->resume(null);
+    }
+
+    private function handleResize(): void
+    {
+        $columns = $this->terminal->getColumns();
+        $rows = $this->terminal->getRows();
+        $heightOnly = $columns === $this->resizeColumns && $rows !== $this->resizeRows;
+        $this->resizeColumns = $columns;
+        $this->resizeRows = $rows;
+
+        // A resize forces a full repaint: multiplexers (dtach, tmux) send SIGWINCH on reattach, when the previous screen content cannot be trusted, even at an unchanged size.
+        // Termux changes the height whenever its software keyboard shows or hides, though, and a full repaint each time would replay all the content.
+        $this->requestRender(!$heightOnly || false === getenv('TERMUX_VERSION'));
     }
 }

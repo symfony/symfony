@@ -621,9 +621,6 @@ class TuiTest extends TestCase
         $tui->stop();
     }
 
-    /**
-     * Termux changes the height whenever its software keyboard shows or hides.
-     */
     #[DataProvider('termuxResizeProvider')]
     public function testResizeRepaintsTheWholeScreenUnlessOnlyTheHeightChangedInTermux(?string $termuxVersion, int $columns, int $rows, bool $repaints)
     {
@@ -632,7 +629,7 @@ class TuiTest extends TestCase
 
         try {
             $terminal = new VirtualTerminal(40, 20);
-            $tui = new Tui(terminal: $terminal);
+            $tui = new Tui(null, $terminal);
             $tui->add(new TextWidget('Hello'));
             $tui->start();
             $tui->processRender();

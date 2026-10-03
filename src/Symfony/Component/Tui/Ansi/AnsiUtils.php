@@ -561,15 +561,17 @@ final class AnsiUtils
      */
     public static function isWhitespace(string $char): bool
     {
-        return preg_match('/\s/', $char);
+        return preg_match('/\s/u', $char);
     }
 
     /**
      * Check if a character is punctuation.
+     *
+     * Connector punctuation, such as "_", belongs to the word it joins.
      */
     public static function isPunctuation(string $char): bool
     {
-        return preg_match('/[(){}[\]<>.,;:\'"!?+\-=*\/\\\\|&%^$#@~`]/', $char);
+        return preg_match('/[(){}[\]<>.,;:\'"!?+\-=*\/\\\\|&%^$#@~`\p{Pd}\p{Ps}\p{Pe}\p{Pi}\p{Pf}\p{Po}]/u', $char);
     }
 
     /**

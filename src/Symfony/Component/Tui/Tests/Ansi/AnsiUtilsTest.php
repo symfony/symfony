@@ -209,7 +209,7 @@ class AnsiUtilsTest extends TestCase
         $styled = "\x1b[31mHello\x1b[0m";
         $result = AnsiUtils::sliceByColumn($styled, 0, 3);
 
-        // Should contain "Hel" with ANSI codes
+        // Should keep the first three columns with their ANSI codes
         $this->assertSame(3, AnsiUtils::visibleWidth($result));
     }
 
@@ -239,6 +239,8 @@ class AnsiUtilsTest extends TestCase
         yield 'space' => [' ', true];
         yield 'tab' => ["\t", true];
         yield 'newline' => ["\n", true];
+        yield 'ideographic space' => ["\u{3000}", true];
+        yield 'no-break space' => ["\u{00A0}", true];
         yield 'letter' => ['a', false];
     }
 
@@ -258,6 +260,14 @@ class AnsiUtilsTest extends TestCase
         yield 'exclamation' => ['!', true];
         yield 'letter' => ['a', false];
         yield 'space' => [' ', false];
+        yield 'ideographic comma' => ['，', true];
+        yield 'ideographic full stop' => ['。', true];
+        yield 'corner bracket' => ['「', true];
+        yield 'inverted question mark' => ['¿', true];
+        yield 'underscore' => ['_', false];
+        yield 'fullwidth low line' => ['＿', false];
+        yield 'CJK ideograph' => ['世', false];
+        yield 'emoji' => ['😀', false];
     }
 
     #[DataProvider('isPunctuationProvider')]

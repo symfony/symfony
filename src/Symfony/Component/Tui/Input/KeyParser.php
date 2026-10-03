@@ -440,8 +440,8 @@ final class KeyParser
                 if ($code >= 1 && $code <= 26) {
                     return $press('ctrl+alt+'.\chr($code + 96));
                 }
-                if (($code >= 48 && $code <= 57) || ($code >= 97 && $code <= 122)) {
-                    return $press('alt+'.\chr($code));
+                if (($code >= 48 && $code <= 57) || ($code >= 97 && $code <= 122) || \in_array($data[1], self::SYMBOL_KEYS, true)) {
+                    return $press('alt+'.$data[1]);
                 }
             }
         }
@@ -920,7 +920,7 @@ final class KeyParser
                 return true;
             }
 
-            if ($alt && !$ctrl && !$shift && !$this->kittyProtocolActive && (($key >= 'a' && $key <= 'z') || $isDigit)) {
+            if ($alt && !$ctrl && !$shift && !$this->kittyProtocolActive) {
                 if ("\x1b".$key === $data) {
                     return true;
                 }

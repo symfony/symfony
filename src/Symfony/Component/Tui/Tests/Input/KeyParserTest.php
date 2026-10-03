@@ -51,6 +51,9 @@ class KeyParserTest extends TestCase
         yield 'digit 1' => ['1', '1'];
         yield 'digit 9' => ['9', '9'];
         yield 'alt+1 legacy' => ["\x1b1", 'alt+1'];
+        yield 'alt+. legacy' => ["\x1b.", 'alt+.'];
+        yield 'alt+, legacy' => ["\x1b,", 'alt+,'];
+        yield 'alt++ legacy' => ["\x1b+", 'alt++'];
     }
 
     #[DataProvider('matchesKeyProvider')]
@@ -101,6 +104,10 @@ class KeyParserTest extends TestCase
         yield 'digit 9' => ['9', '9'];
         yield 'alt+1 legacy' => ["\x1b1", 'alt+1'];
         yield 'alt+9 legacy' => ["\x1b9", 'alt+9'];
+        yield 'alt+. legacy' => ["\x1b.", 'alt+.'];
+        yield 'alt+, legacy' => ["\x1b,", 'alt+,'];
+        yield 'alt+/ legacy' => ["\x1b/", 'alt+/'];
+        yield 'alt+= legacy' => ["\x1b=", 'alt+='];
         // ModifyOtherKeys
         yield 'shift+enter' => ["\x1b[27;2;13~", 'shift+enter'];
     }
@@ -172,6 +179,19 @@ class KeyParserTest extends TestCase
         yield 'escape' => ["\x1b[27u", null];
         yield 'C1 control' => ["\x1b[155u", null];
         yield 'not a kitty sequence' => ['1', null];
+    }
+
+    public function testMatchesLegacyAltSymbols()
+    {
+        $this->assertTrue($this->parser->matches("\x1b.", 'alt+.'));
+        $this->assertTrue($this->parser->matches("\x1b,", 'alt+,'));
+        $this->assertTrue($this->parser->matches("\x1b/", 'alt+/'));
+        $this->assertFalse($this->parser->matches("\x1b.", 'alt+,'));
+
+        // With the Kitty protocol, Alt+. is a CSI u sequence
+        $this->parser->setKittyProtocolActive(true);
+        $this->assertFalse($this->parser->matches("\x1b.", 'alt+.'));
+        $this->assertTrue($this->parser->matches("\x1b[46;3u", 'alt+.'));
     }
 
     public function testMatchesNormalizesModifierOrder()

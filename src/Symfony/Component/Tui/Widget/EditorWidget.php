@@ -562,7 +562,8 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
 
             // Text input
             'insert_space' => ['shift+space'],
-            'new_line' => ['shift+enter'],
+            // Without the Kitty protocol, Shift+Enter sends the same byte as Enter, and Ctrl+J is the key left to insert a newline
+            'new_line' => ['shift+enter', 'ctrl+j'],
             'submit' => [Key::ENTER],
             'select_cancel' => [Key::ESCAPE],
 

@@ -17,10 +17,25 @@ use Symfony\Component\Tui\Terminal\Terminal;
 
 class TerminalTest extends TestCase
 {
+    /** @var array<string, string|false> */
+    private array $env = [];
+
     protected function setUp(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('fireAndForget uses Unix shell syntax and is only invoked on macOS.');
+        }
+
+        foreach (['COLUMNS', 'LINES'] as $name) {
+            $this->env[$name] = getenv($name);
+            putenv($name);
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->env as $name => $value) {
+            putenv(false === $value ? $name : $name.'='.$value);
         }
     }
 
@@ -84,6 +99,24 @@ class TerminalTest extends TestCase
 
         $this->assertSame(120, $terminal->getColumns());
         $this->assertSame(40, $terminal->getRows());
+    }
+
+    public function testUsesTheSizeFromTheEnvironmentWhenSttyCannotTell()
+    {
+        $terminal = new Terminal();
+        (new \ReflectionProperty($terminal, 'cachedColumns'))->setValue($terminal, 0);
+        (new \ReflectionProperty($terminal, 'cachedRows'))->setValue($terminal, 0);
+
+        putenv('COLUMNS=132');
+        putenv('LINES=40');
+
+        $this->assertSame(132, $terminal->getColumns());
+        $this->assertSame(40, $terminal->getRows());
+
+        foreach (['0', '-1', 'wide', ''] as $invalid) {
+            putenv('COLUMNS='.$invalid);
+            $this->assertSame(80, $terminal->getColumns(), $invalid);
+        }
     }
 
     public function testAnEscapeSequenceThatNeverCompletesStopsHoldingInputBack()

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\OAuth2\Dpop;
 
 use Jose\Component\Core\JWK;
-use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\ES256;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -99,16 +98,11 @@ class DpopProofFactoryTest extends TestCase
 
     public function testCarriesNoOtherMemberOfTheKey()
     {
-        // Given
-        $privateKey = JWKFactory::createRSAKey(2048, ['kid' => 'key-1']);
-        // "oth" holds the other primes of a multi-prime RSA key (RFC 7518, Section 6.3.2.7), which are private
-        $factory = new DpopProofFactory(new JWK($privateKey->all() + ['oth' => [['r' => 'AQAB', 'd' => 'AQAB', 't' => 'AQAB']]]), 'RS256', new MockClock('2026-09-23 10:00:00'));
+        // "oth" holds the other primes of a multi-prime RSA key (RFC 7518, Section 6.3.2.7) and "toPublic()" keeps it, like any member it does not know
+        $key = new JWK(self::PRIVATE_JWK + ['kid' => 'key-1', 'oth' => [['r' => 'AQAB', 'd' => 'AQAB', 't' => 'AQAB']], 'x-secret' => 'hidden']);
+        $proof = (new DpopProofFactory($key, 'ES256', new MockClock('2026-09-23 10:00:00')))->createProof('POST', 'https://provider.example.com/token');
 
-        // When
-        $proof = $factory->createProof('POST', 'https://provider.example.com/token');
-
-        // Then
-        $this->assertEquals(['kty' => 'RSA', 'n' => $privateKey->get('n'), 'e' => $privateKey->get('e')], self::decodeHeader($proof)['jwk']);
+        $this->assertEquals(['kty' => 'EC', 'crv' => 'P-256', 'x' => self::PRIVATE_JWK['x'], 'y' => self::PRIVATE_JWK['y']], self::decodeHeader($proof)['jwk']);
     }
 
     public function testSignsTheProofWithThePrivateKey()

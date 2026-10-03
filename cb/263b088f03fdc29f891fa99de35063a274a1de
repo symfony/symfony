@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T08:53:00Z
+
+Thank you @X-Coder264, I reproduced the three cases. `ContainerBuilder` now records the env vars it resolves to their value, and the column reads that record instead of guessing from the placeholders left behind. A variable is reported as inlined as soon as one use is, as @stof described: that's enough to need a rebuild, so I didn't add a `partial` state.

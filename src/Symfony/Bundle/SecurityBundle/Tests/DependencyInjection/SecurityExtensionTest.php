@@ -1499,9 +1499,8 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('security.user_checker.main', (string) $listener->getArgument(0));
         $this->assertSame('app.user_checker', (string) $container->getAlias('security.user_checker.main'));
         $this->assertSame(
-            [['event' => CheckRefreshedUserEvent::class]],
+            [['dispatcher' => 'security.event_dispatcher.main', 'event' => CheckRefreshedUserEvent::class]],
             $listener->getTag('kernel.event_listener'),
-            'on the global dispatcher, so that the login is refused on every firewall sharing the context it was made in',
         );
     }
 
@@ -2029,12 +2028,20 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.route_loader'));
         $this->assertSame([], $container->getParameter('security.oidc_login.callback_uris'));
         $this->assertSame([], $container->getParameter('security.oidc_login.start_paths'));
+        $this->assertSame([], $container->getParameter('security.oidc_login.backchannel_logout_paths'));
 
         $loader = $container->getDefinition('security.authenticator.oidc_login.route_loader');
         $this->assertSame(OidcLoginRouteLoader::class, $loader->getClass());
         $this->assertArrayHasKey('routing.route_loader', $loader->getTags());
         // it declares no route as long as no firewall configures the OIDC authenticator
-        $this->assertCount(0, (new OidcLoginRouteLoader($container->getParameter('security.oidc_login.callback_uris'), 'security.oidc_login.callback_uris', $container->getParameter('security.oidc_login.start_paths'), 'security.oidc_login.start_paths'))());
+        $this->assertCount(0, (new OidcLoginRouteLoader(
+            $container->getParameter('security.oidc_login.callback_uris'),
+            'security.oidc_login.callback_uris',
+            $container->getParameter('security.oidc_login.start_paths'),
+            'security.oidc_login.start_paths',
+            $container->getParameter('security.oidc_login.backchannel_logout_paths'),
+            'security.oidc_login.backchannel_logout_paths',
+        ))());
     }
 
     public function testOidcLoginCallsTheProviderWithTheDefaultHttpClient()
@@ -2113,6 +2120,7 @@ class SecurityExtensionTest extends TestCase
 
         return $container;
     }
+
     public function testOidcLoginBackChannelLogoutIsNotWiredUnlessItIsEnabled()
     {
         $container = $this->getRawContainer();
@@ -2135,6 +2143,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.backchannel_logout_listener.main'));
         $this->assertSame([], $container->getParameter('security.oidc_login.backchannel_logout_paths'));
     }
+
     public function testOidcLoginBackChannelLogoutDeclaresItsEndpointAndRefusesTheSessionsThatEnded()
     {
         $container = $this->getRawContainer();
@@ -2174,6 +2183,7 @@ class SecurityExtensionTest extends TestCase
             'on the global dispatcher, so that the login is refused on every firewall sharing the context it was made in',
         );
     }
+
     public function testOidcLoginBackChannelLogoutTakesTheCachePoolOfTheApplication()
     {
         $container = $this->getRawContainer();
@@ -2196,6 +2206,7 @@ class SecurityExtensionTest extends TestCase
 
         $this->assertSame('app.shared_cache', (string) $container->getDefinition('security.authenticator.oidc_login.ended_sessions.main')->getArgument(0));
     }
+
     public function testOidcLoginBackChannelLogoutRemembersAnEndedSessionForTheConfiguredLifetime()
     {
         $container = $this->getRawContainer();
@@ -2217,6 +2228,7 @@ class SecurityExtensionTest extends TestCase
 
         $this->assertSame(604800, $container->getDefinition('security.authenticator.oidc_login.ended_sessions.main')->getArgument(2));
     }
+
     public function testOidcLoginBackChannelLogoutNeedsTheSignatureOfTheProvider()
     {
         $container = $this->getRawContainer();
@@ -2240,6 +2252,56 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
     }
+
+    /**
+     * A stateless firewall restores no token, so the listener acting on a recorded end never runs.
+     */
+    public function testOidcLoginBackChannelLogoutRequiresAStatefulFirewall()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'stateless' => true,
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['client_secret_post' => 'my-client-secret'],
+                        'backchannel_logout' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The OIDC "backchannel_logout" option of the "main" firewall requires a stateful firewall');
+
+        $container->compile();
+    }
+
+    public function testOidcLoginOnAStatelessFirewallWithoutBackChannelLogoutIsAllowed()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'stateless' => true,
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['client_secret_post' => 'my-client-secret'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.backchannel_logout_listener.main'));
+    }
+
     public function testOidcLoginBackChannelLogoutPathMustBeAPath()
     {
         $container = $this->getRawContainer();

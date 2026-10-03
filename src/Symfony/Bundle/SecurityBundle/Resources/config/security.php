@@ -147,8 +147,9 @@ return static function (ContainerConfigurator $container) {
             ->args([[]])
 
         ->set('security.delegating_csrf_token_manager', DelegatingCsrfTokenManager::class)
-            // outside SameOriginCsrfTokenManager (0), so that the manager a firewall configures for a token id wins
+            // around SameOriginCsrfTokenManager, so that the manager a firewall configures for a token id wins
             ->decorate('security.csrf.token_manager', null, -10, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+            ->tag('container.decoration_order', ['around' => 'security.csrf.same_origin_token_manager'])
             ->args([
                 service('.inner'),
                 service('security.csrf_token_manager_locator'),

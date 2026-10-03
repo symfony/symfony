@@ -61,6 +61,8 @@ trait ContentLoaderTrait
         'decoration_priority' => 'decoration_priority',
         'decoration_on_invalid' => 'decoration_on_invalid',
         'decorates_tag' => 'decorates_tag',
+        'decoration_within' => 'decoration_within',
+        'decoration_around' => 'decoration_around',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
@@ -342,7 +344,7 @@ trait ContentLoaderTrait
                 $stack[$k] = $definition;
             }
 
-            if ($diff = array_diff(array_keys($service), ['stack', 'public', 'deprecated', 'decorates', 'decorates_tag', 'decoration_inner_name', 'decoration_priority', 'decoration_on_invalid'])) {
+            if ($diff = array_diff(array_keys($service), ['stack', 'public', 'deprecated', 'decorates', 'decorates_tag', 'decoration_within', 'decoration_around', 'decoration_inner_name', 'decoration_priority', 'decoration_on_invalid'])) {
                 throw new InvalidArgumentException(\sprintf('Invalid attribute "%s"; supported ones are "public", "deprecated", "decorates", "decorates_tag" and "decoration_*" for service "%s" in "%s".', implode('", "', $diff), $id, $file));
             }
 
@@ -354,6 +356,8 @@ trait ContentLoaderTrait
                 'deprecated' => $service['deprecated'] ?? null,
                 'decorates' => $service['decorates'] ?? null,
                 'decorates_tag' => $service['decorates_tag'] ?? null,
+                'decoration_within' => $service['decoration_within'] ?? null,
+                'decoration_around' => $service['decoration_around'] ?? null,
                 'decoration_inner_name' => $service['decoration_inner_name'] ?? null,
                 'decoration_priority' => $service['decoration_priority'] ?? null,
                 'decoration_on_invalid' => $service['decoration_on_invalid'] ?? null,
@@ -649,6 +653,14 @@ trait ContentLoaderTrait
             }
 
             $definition->addResourceTag('container.tag_decorator', $tagAttributes);
+        }
+
+        if ((null !== $decorates || null !== $decoratesTag) && $constraints = array_filter(['within' => (array) ($service['decoration_within'] ?? []), 'around' => (array) ($service['decoration_around'] ?? [])])) {
+            if (!isset($service['decoration_priority'])) {
+                $constraints['priority'] = null;
+            }
+
+            $definition->addTag('container.decoration_order', $constraints);
         }
 
         if (isset($service['autowire'])) {

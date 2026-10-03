@@ -327,7 +327,7 @@ class RegisterListenersPass implements CompilerPassInterface
         try {
             $resolved = BeforeAfterSorter::sortWithPriorities($priorities, $constraints, $aliases);
         } catch (InvalidArgumentException $e) {
-            throw new InvalidArgumentException(\sprintf('Invalid "before"/"after" constraints for event "%s": ', $event).lcfirst($e->getMessage()), previous: $e);
+            throw new InvalidArgumentException(\sprintf('Cannot order the listeners of event "%s": ', $event).lcfirst($e->getMessage()), previous: $e);
         }
 
         $sorted = [];

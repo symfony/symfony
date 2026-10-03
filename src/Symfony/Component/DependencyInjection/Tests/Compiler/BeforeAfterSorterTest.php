@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\BeforeAfterSorter;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -233,5 +234,29 @@ class BeforeAfterSorterTest extends TestCase
         $this->assertSame(['a', 'b'], BeforeAfterSorter::sort(['a', 'b'], [
             'a' => ['before' => ['Some\\Class']],
         ], ['Some\\Class' => ['a']]));
+    }
+
+    public function testConstraintsCanBeNamedByTheCaller()
+    {
+        $this->assertSame(['c', 'a', 'b'], BeforeAfterSorter::sort(['a', 'b', 'c'], ['c' => ['within' => ['a']]], [], 'within', 'around'));
+        $this->assertSame(['b', 'a', 'c'], BeforeAfterSorter::sort(['a', 'b', 'c'], ['a' => ['around' => ['b']]], [], 'within', 'around'));
+        $this->assertSame(['a', 'b', 'c'], BeforeAfterSorter::sort(['a', 'b', 'c'], ['c' => ['before' => ['a']]], [], 'within', 'around'));
+    }
+
+    #[DataProvider('provideErrorsWithNamedConstraints')]
+    public function testErrorsUseTheNamesOfTheConstraints(string $expectedMessage, array $priorities, array $constraints)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        BeforeAfterSorter::sortWithPriorities($priorities, $constraints, [], 'within', 'around');
+    }
+
+    public static function provideErrorsWithNamedConstraints(): iterable
+    {
+        yield 'cycle' => ['Cycle detected in the "within"/"around" constraints: "a" -> "b" -> "a".', ['a' => null, 'b' => null], ['a' => ['within' => ['b']], 'b' => ['within' => ['a']]]];
+        yield 'raise' => ['The priority of "b" (0) contradicts its "within" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.', ['a' => 10, 'b' => 0], ['b' => ['within' => ['a']]]];
+        yield 'lower' => ['The priority of "a" (10) contradicts its "around" constraint on "b" (0): lower it to 0 or less, remove it, or drop the constraint.', ['a' => 10, 'b' => 0], ['a' => ['around' => ['b']]]];
+        yield 'bounds' => ['The "within"/"around" constraints on "f" cannot be satisfied: it would need a priority of at least 100 to run within "a" and at most 50 to run around "b".', ['a' => 100, 'b' => 50, 'f' => null], ['f' => ['around' => ['b'], 'within' => ['a']]]];
     }
 }

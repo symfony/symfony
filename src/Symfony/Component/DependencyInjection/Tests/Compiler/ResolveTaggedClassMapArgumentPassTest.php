@@ -86,7 +86,7 @@ class ResolveTaggedClassMapArgumentPassTest extends TestCase
         $container->register('service', 'stdClass')->setArguments([new TaggedClassMapArgument('my_tag', 'key')]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid "before"/"after" constraints on tag "my_tag": the priority of "'.FooTagClass::class.'" (0) contradicts its "before" constraint on "'.BarTagClass::class.'" (10)');
+        $this->expectExceptionMessage('Cannot order the services tagged "my_tag": the priority of "'.FooTagClass::class.'" (0) contradicts its "before" constraint on "'.BarTagClass::class.'" (10)');
 
         (new ResolveTaggedClassMapArgumentPass())->process($container);
     }

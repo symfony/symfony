@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Use the `prateekbhujel/php-terminal` extension 1.x for raw mode and terminal size when it is installed
  * Add `CollapsibleWidget` for collapsible detail/summary panels
  * Add `AbstractWidget::off()` to remove listeners registered with `AbstractWidget::on()`
  * Add `AnsiUtils::walkCells()` to iterate the cells and escape sequences of a rendered line

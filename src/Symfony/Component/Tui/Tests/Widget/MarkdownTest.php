@@ -348,6 +348,11 @@ class MarkdownTest extends TestCase
         yield 'tight list' => ["- a\n- b", ['• a', '• b']];
         yield 'loose list' => ["- a\n\n- b\n- c", ['• a', '', '• b', '', '• c']];
         yield 'loose ordered list' => ["1. a\n\n2. b", ['1. a', '', '2. b']];
+        yield 'paragraphs in a loose list item' => ["1. a\n\n   b\n\n   c\n2. d", ['1. a', '', '   b', '', '   c', '', '2. d']];
+        yield 'code block in a loose list item' => ["- a\n\n  ```\n  x\n  ```", ['• a', '', '  ──────────────────', '    x', '  ──────────────────']];
+        yield 'nested list in a loose list item' => ["- a\n\n  - b\n  - c", ['• a', '', '  • b', '  • c']];
+        yield 'paragraphs in a tight list item' => ["- a\n  b", ['• a', '  b']];
+        yield 'nested list in a tight list item' => ["- a\n  - b", ['• a', '  • b']];
     }
 
     /**

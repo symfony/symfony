@@ -354,7 +354,7 @@ class MarkdownWidget extends AbstractWidget
                 $lines[] = '';
             }
 
-            $content = $this->renderListItemContent($item, max(1, $columns - $markerWidth));
+            $content = $this->renderListItemContent($item, max(1, $columns - $markerWidth), $list->isTight());
             foreach ($content as $i => $line) {
                 $lines[] = (0 === $i ? $bullet : $continuation).$line;
             }
@@ -368,11 +368,15 @@ class MarkdownWidget extends AbstractWidget
     /**
      * @return string[]
      */
-    private function renderListItemContent(ListItem $item, int $columns): array
+    private function renderListItemContent(ListItem $item, int $columns, bool $isTight): array
     {
         $parts = [];
 
         foreach ($item->children() as $child) {
+            if ($parts && !$isTight) {
+                $parts[] = '';
+            }
+
             if ($child instanceof Paragraph) {
                 $text = $this->renderInlineNodes($child);
                 $childLines = TextWrapper::wrapTextWithAnsi($text, $columns);

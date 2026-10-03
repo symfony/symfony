@@ -22,11 +22,14 @@ use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Attribute\AsMessageMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\MessengerBundle;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\CausationStamp;
 use Symfony\Component\Messenger\Stamp\CorrelationStamp;
@@ -75,6 +78,17 @@ class MessengerBundleTest extends TestCase
 
         $bus->dispatch(new DummyMessage('hello'));
         $this->assertCount(1, $transport->getSent());
+    }
+
+    public function testMiddlewareDeclaredWithTheAttributeRunsInTheOrderOfItsConstraints()
+    {
+        $kernel = new TestAttributeMiddlewareKernel('test', true, $this->varDir);
+        $kernel->boot();
+        AttributeRecordingMiddleware::$calls = [];
+
+        $kernel->getContainer()->get('test.messenger.default_bus')->dispatch(new DummyMessage('hello'));
+
+        $this->assertSame([SecondAttributeMiddleware::class, FirstAttributeMiddleware::class], AttributeRecordingMiddleware::$calls);
     }
 
     public function testTheServicesNeedingAnotherBundleAreDropped()
@@ -640,4 +654,60 @@ class TestSignedFailureTransportKernel extends AbstractKernel
             ->alias('test.messenger.transport.serializer_locator', 'messenger.transport.serializer_locator')->public()
         ;
     }
+}
+
+class TestAttributeMiddlewareKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'transports' => ['async' => 'in-memory://'],
+            'routing' => [DummyMessage::class => 'async'],
+        ]);
+        $container->services()
+            ->set(FirstAttributeMiddleware::class)->autowire()->autoconfigure()
+            ->set(SecondAttributeMiddleware::class)->autowire()->autoconfigure()
+            ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
+        ;
+    }
+}
+
+abstract class AttributeRecordingMiddleware implements MiddlewareInterface
+{
+    /** @var list<class-string> */
+    public static array $calls = [];
+
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
+    {
+        self::$calls[] = static::class;
+
+        return $stack->next()->handle($envelope, $stack);
+    }
+}
+
+#[AsMessageMiddleware(bus: 'messenger.bus.default', after: SecondAttributeMiddleware::class)]
+class FirstAttributeMiddleware extends AttributeRecordingMiddleware
+{
+}
+
+#[AsMessageMiddleware(bus: 'messenger.bus.default')]
+class SecondAttributeMiddleware extends AttributeRecordingMiddleware
+{
 }

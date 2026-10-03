@@ -25,6 +25,7 @@ use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
@@ -35,14 +36,15 @@ use Symfony\Component\Uid\Uuid;
 /**
  * Keeps wrapped data keys in a Doctrine DBAL table.
  *
- * The table holds the five columns the contract actually needs and not one more, so an application
+ * The table holds the six columns the contract actually needs and not one more, so an application
  * is free to add its own; the queries below name only these:
  *
  *   - `id`, a UUIDv7 in binary form, primary key and reference recorded by every payload;
  *   - `scope`, the unit a data key is shared over;
  *   - `key_material`, the wrapped data key;
  *   - `master_key_id`, the master key that wrapped it, needed to rebuild a {@see Ciphertext};
- *   - `client`, the name of the configured KMS client able to unwrap it.
+ *   - `client`, the name of the configured KMS client able to unwrap it;
+ *   - `binding`, the proof that the key was minted for the reference and the scope the row states.
  *
  * There is deliberately no timestamp: a UUIDv7 carries its creation instant and orders
  * chronologically, so `ORDER BY id DESC` selects the current key of a scope and the retirement age
@@ -51,6 +53,9 @@ use Symfony\Component\Uid\Uuid;
  * `client` is what makes a provider migration possible. Both the old and the new client are
  * configured at once, each row says who can unwrap it, and
  * {@see RewrappableDataKeyStoreInterface::rewrap()} moves it over without touching a payload.
+ *
+ * Every key is bound to its reference and scope, {@see StoredDataKey::bindingFor()}, so a row edited or copied underneath it is refused once the key is open.
+ * The check is the store's and not the backend's, which lets a client that cannot enforce authenticated data hold one.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -138,7 +143,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
         }
 
         $row = $this->connection->createQueryBuilder()
-            ->select('id', 'scope', 'key_material', 'master_key_id', 'client')
+            ->select('id', 'scope', 'key_material', 'master_key_id', 'client', 'binding')
             ->from($this->table)
             ->where('scope = :scope')
             ->setParameter('scope', $scope)
@@ -160,10 +165,19 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
         return $this->handleFor($stored);
     }
 
+    /**
+     * A reference is resolved once and then remembered, the way a scope is.
+     *
+     * A row deleted, edited or copied elsewhere is then seen after the next {@see forget()}, not by the next value opened.
+     */
     public function get(string $reference): DataKeyHandle
     {
+        if (null !== $handle = $this->retained($reference)) {
+            return $handle;
+        }
+
         $row = $this->connection->fetchAssociative(
-            \sprintf('SELECT id, scope, key_material, master_key_id, client FROM %s WHERE id = ?', $this->table),
+            \sprintf('SELECT id, scope, key_material, master_key_id, client, binding FROM %s WHERE id = ?', $this->table),
             [$reference],
             [ParameterType::BINARY],
         );
@@ -173,7 +187,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
 
     public function all(?string $client = null): iterable
     {
-        $sql = \sprintf('SELECT id, scope, key_material, master_key_id, client FROM %s', $this->table);
+        $sql = \sprintf('SELECT id, scope, key_material, master_key_id, client, binding FROM %s', $this->table);
         $parameters = [];
 
         if (null !== $client) {
@@ -217,6 +231,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
 
         $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes);
         $reference = Uuid::v7()->toBinary();
+        $handle = new DataKeyHandle($reference, $dataKey);
 
         $this->connection->insert($this->table, [
             'id' => $reference,
@@ -224,9 +239,11 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             'key_material' => $dataKey->wrapped->blob,
             'master_key_id' => $dataKey->wrapped->keyId,
             'client' => $this->client,
+            'binding' => $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, $scope, $plaintext)),
         ], [
             'id' => ParameterType::BINARY,
             'key_material' => ParameterType::BINARY,
+            'binding' => ParameterType::BINARY,
         ]);
 
         if ($this->connection->isTransactionActive()) {
@@ -235,7 +252,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
 
         $this->current[$scope] = $reference;
 
-        return $this->handles[$reference] = new DataKeyHandle($reference, $dataKey);
+        return $this->handles[$reference] = $handle;
     }
 
     /**
@@ -243,8 +260,8 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
      *
      * The next resolution then goes back to the database and to the KMS. Worth calling between two
      * units of work in a long-running process, which is what the `kernel.reset` tag does in a
-     * Symfony application: the plaintexts are held for as long as the store is, and a rotation
-     * performed elsewhere is only seen afterwards.
+     * Symfony application: the plaintexts are held for as long as the store is, and whatever was
+     * done to a row elsewhere, a rotation, a destruction, an edited scope, is only seen afterwards.
      */
     public function forget(): void
     {
@@ -300,6 +317,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             ->addColumn(Column::editor()->setUnquotedName('key_material')->setTypeName('blob')->create())
             ->addColumn(Column::editor()->setUnquotedName('master_key_id')->setTypeName('string')->setLength(255)->create())
             ->addColumn(Column::editor()->setUnquotedName('client')->setTypeName('string')->setLength(64)->create())
+            ->addColumn(Column::editor()->setUnquotedName('binding')->setTypeName('binary')->setLength(32)->setFixed(true)->create())
             ->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true))
             ->addIndex(Index::editor()
                 ->setUnquotedName($this->table.'_scope_idx')
@@ -317,6 +335,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
         $table->addColumn('key_material', 'blob');
         $table->addColumn('master_key_id', 'string', ['length' => 255]);
         $table->addColumn('client', 'string', ['length' => 64]);
+        $table->addColumn('binding', 'binary', ['length' => 32, 'fixed' => true]);
         $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
         $table->addIndex(['scope', 'id'], $this->table.'_scope_idx');
     }
@@ -324,25 +343,47 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     /**
      * The remembered key of a scope, while it is still good to use.
      *
-     * That is as long as its plaintext is still held, its age has not caught up with it, and its
-     * row was not rolled back.
+     * That is {@see retained()}, plus an age that has not caught up with it.
      */
     private function remembered(string $scope): ?DataKeyHandle
     {
         $reference = $this->current[$scope] ?? null;
 
-        if (null === $reference || !isset($this->handles[$reference]) || $this->handles[$reference]->isReleased()) {
+        if (null === $reference) {
+            return null;
+        }
+
+        if (null === $handle = $this->retained($reference)) {
+            unset($this->current[$scope]);
+
+            return null;
+        }
+
+        return $this->isRetired($reference) ? null : $handle;
+    }
+
+    /**
+     * The retained plaintext of a reference, while it is still good to use.
+     *
+     * That is as long as the handle holds it and its row was not rolled back. Retirement is left
+     * out: it says what a scope encrypts with next, not whether a payload already written opens.
+     */
+    private function retained(string $reference): ?DataKeyHandle
+    {
+        $handle = $this->handles[$reference] ?? null;
+
+        if (null === $handle || $handle->isReleased()) {
             return null;
         }
 
         if (isset($this->uncommitted[$reference]) && !$this->rowStillExists($reference)) {
-            $this->handles[$reference]->release();
-            unset($this->handles[$reference], $this->current[$scope], $this->uncommitted[$reference], $this->retiresAt[$reference]);
+            $handle->release();
+            unset($this->handles[$reference], $this->uncommitted[$reference], $this->retiresAt[$reference]);
 
             return null;
         }
 
-        return $this->isRetired($reference) ? null : $this->handles[$reference];
+        return $handle;
     }
 
     /**
@@ -374,9 +415,15 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             return $this->handles[$row->reference];
         }
 
-        $dataKey = $this->clientFor($row->client)->unwrapDataKey($row->wrapped);
+        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped));
 
-        return $this->handles[$row->reference] = new DataKeyHandle($row->reference, $dataKey);
+        if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
+            $handle->release();
+
+            throw new DecryptionFailedException();
+        }
+
+        return $this->handles[$row->reference] = $handle;
     }
 
     /**
@@ -389,6 +436,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             $row['scope'],
             new Ciphertext(self::bytes($row['key_material']), $row['master_key_id']),
             $row['client'],
+            self::bytes($row['binding']),
         );
     }
 

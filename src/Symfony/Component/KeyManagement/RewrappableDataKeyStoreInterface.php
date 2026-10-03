@@ -42,6 +42,8 @@ interface RewrappableDataKeyStoreInterface extends DataKeyStoreInterface
      * Its reference and its scope are left untouched, so that payloads referring to it keep
      * resolving.
      *
+     * Only the wrapping moves: the binding of the row, {@see StoredDataKey::$binding}, stays valid since it is keyed by the data key, which rewrapping does not change.
+     *
      * @throws DataKeyNotFoundException If no stored key matches `$reference`
      */
     public function rewrap(string $reference, Ciphertext $wrapped, string $client): void;

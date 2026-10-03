@@ -61,14 +61,14 @@ class DataKeyStoreTest extends TestCase
         $this->assertSame($plaintext, self::plaintextOf($store->get($handle->reference)), 'the row must survive a round trip through the database.');
     }
 
-    public function testTheTableHoldsFiveColumnsAndNothingMore()
+    public function testTheTableHoldsSixColumnsAndNothingMore()
     {
         $store = $this->store();
         $store->current('user.email');
 
         $row = $this->connection->fetchAssociative(\sprintf('SELECT * FROM %s', DataKeyStore::DEFAULT_TABLE));
 
-        $this->assertSame(['id', 'scope', 'key_material', 'master_key_id', 'client'], array_keys($row));
+        $this->assertSame(['id', 'scope', 'key_material', 'master_key_id', 'client', 'binding'], array_keys($row));
     }
 
     public function testAScopeLongerThanItsColumnIsRefused()
@@ -203,20 +203,7 @@ class DataKeyStoreTest extends TestCase
     public function testAKeyMintedInATransactionIsTrustedOnceItsCommitWasSeen()
     {
         $queries = [];
-        $config = new Configuration();
-        $config->setMiddlewares([new Middleware(new class($queries) extends AbstractLogger {
-            public function __construct(private array &$queries)
-            {
-            }
-
-            public function log($level, $message, array $context = []): void
-            {
-                if (isset($context['sql'])) {
-                    $this->queries[] = $context['sql'];
-                }
-            }
-        })]);
-        $this->connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
+        $this->recordQueries($queries);
         $store = $this->store();
 
         $this->connection->beginTransaction();
@@ -232,6 +219,85 @@ class DataKeyStoreTest extends TestCase
         $store->current('user.email');
         $store->current('user.email');
         $this->assertSame([], $queries, 'a key seen committed is not looked up again.');
+    }
+
+    public function testAReferenceIsResolvedOncePerProcess()
+    {
+        $queries = [];
+        $this->recordQueries($queries);
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+        $store->forget();
+
+        $queries = [];
+        $store->get($reference);
+        $this->assertCount(1, $queries, 'the first read goes to the database.');
+
+        $queries = [];
+        $store->get($reference);
+        $store->get($reference);
+        $this->assertSame([], $queries, 'a reference already resolved is not looked up again for every value it opens.');
+    }
+
+    public function testTheKeyHeldForAScopeIsHandedBackByReferenceWithoutAQuery()
+    {
+        $queries = [];
+        $this->recordQueries($queries);
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+
+        $queries = [];
+        $this->assertSame(self::plaintextOf($store->current('user.email')), self::plaintextOf($store->get($reference)));
+        $this->assertSame([], $queries, 'the key a scope encrypts with is the same object its reference resolves to.');
+    }
+
+    public function testOpeningSeventeenValuesSealedUnderOneScopeReadsItsRowOnce()
+    {
+        $queries = [];
+        $this->recordQueries($queries);
+        $store = $this->store();
+        $encrypter = new StoredEnvelopeEncrypter($store);
+
+        $envelopes = [];
+        for ($i = 0; $i < 17; ++$i) {
+            $envelopes[] = $encrypter->encrypt('user', \sprintf('value %d', $i));
+        }
+        $store->forget();
+
+        $queries = [];
+        foreach ($envelopes as $i => $envelope) {
+            $this->assertSame(\sprintf('value %d', $i), $encrypter->decrypt($envelope));
+        }
+
+        $this->assertCount(1, $queries, 'a data key is read once per process, not once per sealed value opened.');
+    }
+
+    public function testAReferenceDestroyedUnderneathTheProcessIsOpenedUntilItIsForgotten()
+    {
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+        $plaintext = self::plaintextOf($store->get($reference));
+        $this->connection->executeStatement(\sprintf('DELETE FROM %s', DataKeyStore::DEFAULT_TABLE));
+
+        $this->assertSame($plaintext, self::plaintextOf($store->get($reference)), 'a process already holding the plaintext keeps it, the way a remembered scope does.');
+
+        $store->forget();
+
+        $this->expectException(DataKeyNotFoundException::class);
+        $store->get($reference);
+    }
+
+    public function testAKeyMintedInARolledBackTransactionIsNotOpenedByReferenceEither()
+    {
+        $store = $this->store();
+
+        $this->connection->beginTransaction();
+        $reference = $store->current('user.email')->reference;
+        $store->get($reference);
+        $this->connection->rollBack();
+
+        $this->expectException(DataKeyNotFoundException::class);
+        $store->get($reference);
     }
 
     public function testAZeroMaxAgeRotatesOnEveryCall()
@@ -255,7 +321,7 @@ class DataKeyStoreTest extends TestCase
         $store = new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => new InMemoryKms()]), 'default', 'app');
         $store->createTable();
 
-        $aged = $this->age($store->current('user.email')->reference, DataKeyStore::DEFAULT_MAX_AGE_SECONDS + 86400);
+        $aged = $this->age($store, 'user.email', DataKeyStore::DEFAULT_MAX_AGE_SECONDS + 86400);
         $store->forget();
 
         $this->assertNotSame($aged, $store->current('user.email')->reference);
@@ -266,7 +332,7 @@ class DataKeyStoreTest extends TestCase
     {
         $store = $this->store();
 
-        $kept = $this->age($store->current('user.email')->reference, DataKeyStore::DEFAULT_MAX_AGE_SECONDS - 86400);
+        $kept = $this->age($store, 'user.email', DataKeyStore::DEFAULT_MAX_AGE_SECONDS - 86400);
         $store->forget();
 
         $this->assertSame($kept, $store->current('user.email')->reference);
@@ -277,7 +343,7 @@ class DataKeyStoreTest extends TestCase
     {
         $store = $this->store(maxAgeSeconds: null);
 
-        $kept = $this->age($store->current('user.email')->reference, 10 * DataKeyStore::DEFAULT_MAX_AGE_SECONDS);
+        $kept = $this->age($store, 'user.email', 10 * DataKeyStore::DEFAULT_MAX_AGE_SECONDS);
         $store->forget();
 
         $this->assertSame($kept, $store->current('user.email')->reference);
@@ -355,6 +421,46 @@ class DataKeyStoreTest extends TestCase
         $store->get($reference);
     }
 
+    public function testARowCopiedUnderAFreshReferenceNoLongerUnwraps()
+    {
+        $store = $this->store();
+        $store->current('user.email');
+        $row = iterator_to_array($store->all(), false)[0];
+
+        $this->connection->insert(DataKeyStore::DEFAULT_TABLE, [
+            'id' => Uuid::v7()->toBinary(),
+            'scope' => $row->scope,
+            'key_material' => $row->wrapped->blob,
+            'master_key_id' => $row->wrapped->keyId,
+            'client' => $row->client,
+            'binding' => $row->binding,
+        ], [
+            'id' => ParameterType::BINARY,
+            'key_material' => ParameterType::BINARY,
+            'binding' => ParameterType::BINARY,
+        ]);
+        $store->forget();
+
+        $this->expectException(DecryptionFailedException::class);
+        $store->current('user.email');
+    }
+
+    public function testAKeyMovedToAnotherScopeNoLongerUnwraps()
+    {
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+        $store->forget();
+
+        $this->connection->executeStatement(
+            \sprintf('UPDATE %s SET scope = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),
+            ['user.phone', $reference],
+            [ParameterType::STRING, ParameterType::BINARY],
+        );
+
+        $this->expectException(DecryptionFailedException::class);
+        $store->get($reference);
+    }
+
     public function testAMissingClientIsReportedLoudly()
     {
         $store = $this->store(client: 'typo');
@@ -372,13 +478,13 @@ class DataKeyStoreTest extends TestCase
         $this->assertTrue($this->connection->createSchemaManager()->tablesExist(['app_deks']));
     }
 
-    public function testConfigureSchemaDescribesTheFiveColumnsTheQueriesName()
+    public function testConfigureSchemaDescribesTheSixColumnsTheQueriesName()
     {
         $schema = $this->storeWithoutTable()->configureSchema(new Schema(), static fn (): bool => true);
 
         $table = $schema->getTable(DataKeyStore::DEFAULT_TABLE);
         $columns = [];
-        foreach (['id', 'scope', 'key_material', 'master_key_id', 'client'] as $name) {
+        foreach (['id', 'scope', 'key_material', 'master_key_id', 'client', 'binding'] as $name) {
             $column = $table->getColumn($name);
             $type = method_exists($column, 'getTypeName') ? Type::getType($column->getTypeName()) : $column->getType();
             $columns[$name] = [$type::class, $column->getLength()];
@@ -390,8 +496,9 @@ class DataKeyStoreTest extends TestCase
             'key_material' => [BlobType::class, null],
             'master_key_id' => [StringType::class, 255],
             'client' => [StringType::class, 64],
+            'binding' => [BinaryType::class, 32],
         ], $columns);
-        $this->assertCount(5, $table->getColumns(), 'the queries name these five columns and no other.');
+        $this->assertCount(6, $table->getColumns(), 'the queries name these six columns and no other.');
     }
 
     public function testConfigureSchemaKeysTheTableOnItsReferenceAndIndexesTheScopeLookup()
@@ -457,17 +564,41 @@ class DataKeyStoreTest extends TestCase
         return new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', $table);
     }
 
-    private function age(string $reference, int $seconds): string
+    private function age(DataKeyStore $store, string $scope, int $seconds): string
     {
+        $handle = $store->current($scope);
         $backdated = Uuid::fromString(UuidV7::generate(new \DateTimeImmutable(\sprintf('@%d', time() - $seconds))))->toBinary();
+        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($backdated, $scope, $plaintext));
 
         $this->connection->executeStatement(
-            \sprintf('UPDATE %s SET id = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),
-            [$backdated, $reference],
-            [ParameterType::BINARY, ParameterType::BINARY],
+            \sprintf('UPDATE %s SET id = ?, binding = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),
+            [$backdated, $binding, $handle->reference],
+            [ParameterType::BINARY, ParameterType::BINARY, ParameterType::BINARY],
         );
 
         return $backdated;
+    }
+
+    /**
+     * @param list<string> $queries
+     */
+    private function recordQueries(array &$queries): void
+    {
+        $config = new Configuration();
+        $config->setMiddlewares([new Middleware(new class($queries) extends AbstractLogger {
+            public function __construct(private array &$queries)
+            {
+            }
+
+            public function log($level, $message, array $context = []): void
+            {
+                if (isset($context['sql'])) {
+                    $this->queries[] = $context['sql'];
+                }
+            }
+        })]);
+
+        $this->connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
     }
 
     private function rowCount(): int

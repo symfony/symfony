@@ -15,6 +15,7 @@ use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
 use Symfony\Component\KeyManagement\StoredDataKey;
@@ -96,7 +97,7 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     {
         $row = $this->rows[$reference] ?? throw new DataKeyNotFoundException($reference);
 
-        $this->rows[$reference] = new StoredDataKey($reference, $row->scope, $wrapped, $client);
+        $this->rows[$reference] = new StoredDataKey($reference, $row->scope, $wrapped, $client, $row->binding);
     }
 
     /**
@@ -109,10 +110,12 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     {
         $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes);
         $reference = Uuid::v7()->toBinary();
+        $handle = new DataKeyHandle($reference, $dataKey);
+        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, $scope, $plaintext));
 
-        $this->rows[$reference] = new StoredDataKey($reference, $scope, $dataKey->wrapped, $this->client);
+        $this->rows[$reference] = new StoredDataKey($reference, $scope, $dataKey->wrapped, $this->client, $binding);
 
-        return $this->handles[$reference] = new DataKeyHandle($reference, $dataKey);
+        return $this->handles[$reference] = $handle;
     }
 
     /**
@@ -135,9 +138,15 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
             return $this->handles[$row->reference];
         }
 
-        $dataKey = $this->clientFor($row->client)->unwrapDataKey($row->wrapped);
+        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped));
 
-        return $this->handles[$row->reference] = new DataKeyHandle($row->reference, $dataKey);
+        if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
+            $handle->release();
+
+            throw new DecryptionFailedException();
+        }
+
+        return $this->handles[$row->reference] = $handle;
     }
 
     private function newest(string $scope): ?StoredDataKey

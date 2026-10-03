@@ -53,6 +53,9 @@ interface DataKeyStoreInterface
     /**
      * Returns the data key a previously written payload refers to.
      *
+     * An implementation may hand back a key it already holds without looking at the store again, so that one round trip serves every value a row seals.
+     * A key deleted from the store is then still handed back to a process that holds it, until that process drops it.
+     *
      * @throws DataKeyNotFoundException  If no stored key matches `$reference`
      * @throws DecryptionFailedException If the stored key cannot be unwrapped
      */

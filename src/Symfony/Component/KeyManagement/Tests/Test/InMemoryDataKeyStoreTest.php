@@ -182,6 +182,21 @@ class InMemoryDataKeyStoreTest extends TestCase
         $store->get($row->reference);
     }
 
+    #[RequiresPhpExtension('openssl')]
+    public function testARowWhoseKeyMaterialWasSwappedIsRefused()
+    {
+        $azure = new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32)]));
+        $store = self::migratingStore($azure);
+        $store->current('user.email');
+        $row = self::rowOf($store);
+
+        $store->rewrap($row->reference, $azure->encrypt('app', random_bytes(32)), 'azure');
+        $store->forget();
+
+        $this->expectException(DecryptionFailedException::class);
+        $store->get($row->reference);
+    }
+
     private static function migratingStore(OpenSslKms $azure): InMemoryDataKeyStore
     {
         return new InMemoryDataKeyStore([

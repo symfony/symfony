@@ -164,6 +164,7 @@ The table holds exactly what the store needs and nothing else:
 | `key_material` | `BLOB` | The wrapped data key |
 | `master_key_id` | `VARCHAR(255)` | The master key that wrapped it |
 | `client` | `VARCHAR(64)` | The configured KMS client able to unwrap it |
+| `binding` | `BINARY(32)` | Proof that the key was minted for this reference and scope, checked once the key is unwrapped |
 
 There is no timestamp column on purpose: a UUIDv7 carries its creation instant
 and sorts chronologically, so the newest row of a scope is its current key and
@@ -195,29 +196,25 @@ becomes what `EnvelopeEncrypterInterface` injects, with the default client's
 encrypter behind it so the payloads written before the store keep being read. The
 per-client encrypters stay available through `#[Target('<name>')]`.
 
-A scope is resolved once and then held, unwrapped, for as long as the store
-lives, which is what spares the round trips. A key created inside a transaction
-is the one exception: its row is looked up again on every use until the
-transaction is seen committed, so that a rollback taking the row away is noticed
-rather than encrypted with. Holding the keys also means the store holds
-plaintext key material in memory: `forget()` drops it, and the Symfony wiring
-calls it between two units of work through the `kernel.reset` tag, so a
-long-running worker starts each request with nothing retained.
+A scope, or a reference read back from a payload, is resolved once and then held, unwrapped, for as long as the store lives, which is what spares the round trips.
+A key created inside a transaction is the one exception: its row is looked up again on every use until the transaction is seen committed, so that a rollback taking the row away is noticed rather than encrypted with.
+A row deleted, edited or copied elsewhere is likewise seen only after the next `forget()`.
+Holding the keys also means the store holds plaintext key material in memory: `forget()` drops it, and the Symfony wiring calls it between two units of work through the `kernel.reset` tag, so a long-running worker starts each request with nothing retained.
 
 Adding your own columns
 -----------------------
 
-Every query names those five columns explicitly, so extra columns are invisible
+Every query names those six columns explicitly, so extra columns are invisible
 to the store, provided they are nullable or have a default: nothing fills them
 on insert. How you declare them depends on who owns the table.
 
 **You own the table.** Skip `createTable()`, leave `configureSchema()` unwired,
-and declare the five columns plus yours in your own migration. Simplest route,
+and declare the six columns plus yours in your own migration. Simplest route,
 and the one to prefer as soon as the table carries anything the store does not
 know about.
 
 **Doctrine owns the schema.** If the schema listener calls `configureSchema()`,
-the assembled schema declares five columns while the database holds more, so
+the assembled schema declares six columns while the database holds more, so
 `doctrine:schema:update` will offer to drop the extra ones. Add them to the same
 table from your own `postGenerateSchema` listener, so both sides agree.
 

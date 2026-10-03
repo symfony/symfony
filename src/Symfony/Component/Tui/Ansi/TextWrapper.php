@@ -141,17 +141,17 @@ final class TextWrapper
 
         // Guard against invalid width - return text as-is split by newlines
         if ($width <= 0) {
-            return explode("\n", $text);
+            return self::splitLines($text);
         }
 
         // Fast path: single line (no newlines), skip explode/tracker overhead
-        if (!str_contains($text, "\n")) {
+        if (!str_contains($text, "\n") && !str_contains($text, "\r")) {
             return self::wrapSingleLine($text, $width);
         }
 
         // Handle newlines by processing each line separately
         // Track ANSI state across lines so styles carry over after literal newlines
-        $inputLines = explode("\n", $text);
+        $inputLines = self::splitLines($text);
         $result = [];
         $tracker = new AnsiCodeTracker();
 
@@ -449,5 +449,17 @@ final class TextWrapper
         }
 
         return ['lines' => $lines, 'last_width' => $currentWidth];
+    }
+
+    /**
+     * Split text into lines at CRLF, CR and LF line endings.
+     *
+     * A CR left in a line would move the cursor back to the start of the row and let the rest of the line overwrite it.
+     *
+     * @return string[]
+     */
+    private static function splitLines(string $text): array
+    {
+        return preg_split('/\r\n|\r|\n/', $text) ?: [$text];
     }
 }

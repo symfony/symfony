@@ -70,6 +70,38 @@ class ScreenWriterTest extends TestCase
         $this->assertStringContainsString(self::SYNC_END, $output);
     }
 
+    public function testTabsAreWrittenAsTheSpacesTheLayoutCounted()
+    {
+        $terminal = new VirtualTerminal(80, 24);
+        $writer = new ScreenWriter($terminal);
+
+        $writer->writeLines(["a\tb", "\x1b[31m\tc\x1b[0m", "\x1b]8;;https://example.com/?q=\t\x07\tlink\x1b]8;;\x07"]);
+
+        $output = $terminal->getOutput();
+        $spaces = str_repeat(' ', AnsiUtils::TAB_WIDTH);
+
+        $this->assertStringContainsString('a'.$spaces.'b', $output);
+        $this->assertStringContainsString("\x1b[31m".$spaces.'c', $output);
+        // A tab inside an escape sequence is not the tab of a cell
+        $this->assertStringContainsString("\x1b]8;;https://example.com/?q=\t\x07".$spaces.'link', $output);
+    }
+
+    public function testUnchangedLinesWithTabsAreNotRewritten()
+    {
+        $terminal = new VirtualTerminal(80, 24);
+        $writer = new ScreenWriter($terminal);
+
+        $writer->writeLines(["tab\tline", "\x1b[31m\tred", 'Line A']);
+        $terminal->clearOutput();
+
+        $writer->writeLines(["tab\tline", "\x1b[31m\tred", 'Line X']);
+
+        $output = $terminal->getOutput();
+        $this->assertStringContainsString('Line X', $output);
+        $this->assertStringNotContainsString('line', $output);
+        $this->assertStringNotContainsString('red', $output);
+    }
+
     // --- No-op (identical lines produce no output) ---
 
     public function testIdenticalLinesProduceNoContentOutput()

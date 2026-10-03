@@ -128,7 +128,7 @@ class TextWidget extends AbstractWidget
 
         // Either truncate or wrap based on mode
         if ($this->truncate) {
-            $lines = explode("\n", $normalizedText);
+            $lines = preg_split('/\r\n|\r|\n/', $normalizedText) ?: [$normalizedText];
             $processedLines = [];
             foreach ($lines as $line) {
                 $processedLines[] = AnsiUtils::truncateToWidth($line, $contentColumns);

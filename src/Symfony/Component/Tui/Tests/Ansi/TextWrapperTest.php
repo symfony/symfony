@@ -36,6 +36,10 @@ class TextWrapperTest extends TestCase
         yield 'empty string' => ['', 20, ['']];
         yield 'long line wraps at word boundary' => ['Hello World', 5, ['Hello', 'World']];
         yield 'newlines preserved' => ["Hello\nWorld", 20, ['Hello', 'World']];
+        yield 'CRLF line endings' => ["Hello\r\nWorld", 20, ['Hello', 'World']];
+        yield 'CR line endings' => ["Hello\rWorld\r", 20, ['Hello', 'World', '']];
+        yield 'mixed line endings' => ["a\r\nb\rc\nd", 20, ['a', 'b', 'c', 'd']];
+        yield 'CR line endings with invalid width' => ["Hello\r\nWorld", 0, ['Hello', 'World']];
         yield 'multiple spaces preserved' => ['Hello   World', 20, ['Hello   World']];
     }
 

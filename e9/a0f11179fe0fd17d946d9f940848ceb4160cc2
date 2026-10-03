@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-22T21:16:48Z
+
+The CI failed, but it was unrelated to my changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-28T17:24:31Z
+
+I simplified the option to a boolean: the callable made it hard to use (5 arguments, union types as soon as `group_by` is used, special cases without intl), listing some choices first is covered by `preferred_choices`, and a callable can still be added later without breaking anything. `true` now uses `Collator::asort()` and the sorted lists are cached per choice list, so a 50-row collection sorting 249 countries takes 12 ms instead of 43 ms.

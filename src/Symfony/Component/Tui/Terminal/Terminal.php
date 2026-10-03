@@ -170,7 +170,7 @@ final class Terminal implements TerminalInterface
             $this->refreshDimensions();
         }
 
-        return $this->cachedColumns ?: 80;
+        return $this->cachedColumns ?: self::getSizeFromEnv('COLUMNS') ?? 80;
     }
 
     public function getRows(): int
@@ -179,7 +179,7 @@ final class Terminal implements TerminalInterface
             $this->refreshDimensions();
         }
 
-        return $this->cachedRows ?: 24;
+        return $this->cachedRows ?: self::getSizeFromEnv('LINES') ?? 24;
     }
 
     public function isKittyProtocolActive(): bool
@@ -285,9 +285,9 @@ final class Terminal implements TerminalInterface
             $this->cachedRows = (int) $matches[1];
             $this->cachedColumns = (int) $matches[2];
         } else {
-            // Default fallback
-            $this->cachedColumns = 80;
-            $this->cachedRows = 24;
+            // Unknown without a terminal on stdin, like the "0 0" of a pseudo-terminal whose size was never set
+            $this->cachedColumns = 0;
+            $this->cachedRows = 0;
         }
     }
 
@@ -389,5 +389,12 @@ final class Terminal implements TerminalInterface
     private function getEscapeTimeout(): float
     {
         return false !== getenv('SSH_CONNECTION') || false !== getenv('SSH_TTY') ? self::SSH_ESCAPE_TIMEOUT : self::ESCAPE_TIMEOUT;
+    }
+
+    private static function getSizeFromEnv(string $name): ?int
+    {
+        $size = getenv($name);
+
+        return false !== $size && ctype_digit($size) && 0 < (int) $size ? (int) $size : null;
     }
 }

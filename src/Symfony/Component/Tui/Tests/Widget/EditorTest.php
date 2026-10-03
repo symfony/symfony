@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\ChangeEvent;
+use Symfony\Component\Tui\Event\SubmitEvent;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Render\Renderer;
 use Symfony\Component\Tui\Style\Style;
@@ -181,6 +182,32 @@ class EditorTest extends TestCase
         $this->assertSame('12x+', $editor->getText());
 
         $tui->stop();
+    }
+
+    #[DataProvider('ctrlJProvider')]
+    public function testCtrlJInsertsANewLine(bool $kitty, string $ctrlJ)
+    {
+        [$editor, $tui] = $this->createEditorWithTui();
+        $tui->start();
+        $tui->setFocus($editor);
+        $editor->getKeybindings()->setKittyProtocolActive($kitty);
+        $submitted = null;
+        $editor->onSubmit(static function (SubmitEvent $event) use (&$submitted) { $submitted = $event->getValue(); });
+
+        foreach (['a', $ctrlJ, 'b'] as $data) {
+            $tui->handleInput($data);
+        }
+
+        $this->assertSame("a\nb", $editor->getText());
+        $this->assertNull($submitted);
+
+        $tui->stop();
+    }
+
+    public static function ctrlJProvider(): iterable
+    {
+        yield 'legacy' => [false, "\n"];
+        yield 'Kitty protocol' => [true, "\x1b[106;5u"];
     }
 
     public function testDeleteLine()

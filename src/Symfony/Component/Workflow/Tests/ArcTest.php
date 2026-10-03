@@ -37,4 +37,39 @@ class ArcTest extends TestCase
         $arc = new Arc('0', 1);
         $this->assertEquals('0', $arc->place);
     }
+
+    public function testConstructorWithEnumCase()
+    {
+        $arc = new Arc(ArcPlace::Foo, 2);
+
+        $this->assertSame('foo', $arc->place);
+        $this->assertSame(2, $arc->weight);
+    }
+
+    public function testConstructorWithIntBackedEnumCase()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only string-backed enums can be used as places, "Symfony\Component\Workflow\Tests\ArcIntPlace" is not.');
+
+        new Arc(ArcIntPlace::Foo, 1);
+    }
+
+    public function testConstructorWithEmptyEnumCase()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The place name cannot be empty.');
+
+        new Arc(ArcPlace::Empty, 1);
+    }
+}
+
+enum ArcPlace: string
+{
+    case Foo = 'foo';
+    case Empty = '';
+}
+
+enum ArcIntPlace: int
+{
+    case Foo = 1;
 }

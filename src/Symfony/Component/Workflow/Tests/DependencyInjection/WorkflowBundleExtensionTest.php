@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Definition as WorkflowDefinition;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowAttributePass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
@@ -393,6 +394,7 @@ class WorkflowBundleExtensionTest extends TestCase
         $passes = array_map(get_class(...), $container->getCompilerPassConfig()->getBeforeOptimizationPasses());
         $this->assertContains(AddEventAliasesPass::class, $passes);
         $this->assertContains(WorkflowGuardListenerPass::class, $passes);
+        $this->assertContains(WorkflowAttributePass::class, $passes);
         $this->assertContains(WorkflowValidatorPass::class, $passes);
         $this->assertNotContains(WorkflowDebugPass::class, $passes);
 

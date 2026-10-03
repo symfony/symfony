@@ -140,6 +140,41 @@ abstract class AbstractAsciiTestCase extends TestCase
                 '-',
                 true,
             ],
+            [
+                "hello\nworld\n",
+                "hello world\n",
+                5,
+                "\n",
+                true,
+            ],
+            [
+                "ab cd\n",
+                "ab cd\n",
+                5,
+                "\n",
+                true,
+            ],
+            [
+                "abc\ndef\n",
+                "abcdef\n",
+                3,
+                "\n",
+                true,
+            ],
+            [
+                "abc\ndef\n\n",
+                "abcdef\n\n",
+                3,
+                "\n",
+                true,
+            ],
+            [
+                'a b ',
+                'a b ',
+                1,
+                ' ',
+                true,
+            ],
         ];
     }
 

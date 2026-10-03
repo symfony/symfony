@@ -218,10 +218,11 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
                 return;
             }
 
-            if (\ord($data[0]) >= 32 && !str_starts_with($data, "\x1b")) {
+            $char = $kb->getParser()->decodePrintable($data) ?? $data;
+            if (\ord($char[0]) >= 32 && !str_starts_with($char, "\x1b")) {
                 $direction = $this->document->getJumpMode();
                 $this->document->setJumpMode(null);
-                if ($this->document->jumpToChar($data, $direction)) {
+                if ($this->document->jumpToChar($char, $direction)) {
                     $this->invalidate();
                 }
 
@@ -468,6 +469,7 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
         }
 
         // Regular character input
+        $data = $kb->getParser()->decodePrintable($data) ?? $data;
         if (!StringUtils::hasControlChars($data)) {
             $data = StringUtils::sanitizeUtf8($data);
             if ('' === $data) {

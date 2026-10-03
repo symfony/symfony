@@ -167,6 +167,22 @@ class EditorTest extends TestCase
         $this->assertSame('Hello', $editor->getText());
     }
 
+    public function testTypeKittyKeypadKeys()
+    {
+        [$editor, $tui] = $this->createEditorWithTui();
+        $tui->start();
+        $tui->setFocus($editor);
+
+        // Keypad 1, 2, +, a key release, then Left before typing x
+        foreach (["\x1b[57400u", "\x1b[57401u", "\x1b[57413u", "\x1b[57413;1:3u", "\x1b[57417u", 'x'] as $data) {
+            $tui->handleInput($data);
+        }
+
+        $this->assertSame('12x+', $editor->getText());
+
+        $tui->stop();
+    }
+
     public function testDeleteLine()
     {
         [$editor, $tui] = $this->createEditorWithTui();
@@ -634,6 +650,11 @@ class EditorTest extends TestCase
             '😀 hello 😀 world',
             ["\x1b[H", "\x1d", '😀'],
             '😀 hello X😀 world',
+        ];
+        yield 'forward to a Kitty keypad digit' => [
+            'a5b5',
+            ["\x1b[H", "\x1d", "\x1b[57404u"],
+            'aX5b5',
         ];
     }
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T15:05:32Z
+
+I added a test case for the other effect of this bug: a last line that fits was wrapped anyway, eg `u("ab cd\n")->wordwrap(5, "\n", true)` returned `"ab\ncd\n"`. Console sees it too, so I updated the description.

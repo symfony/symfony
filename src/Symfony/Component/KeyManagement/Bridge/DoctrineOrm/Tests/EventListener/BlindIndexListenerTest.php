@@ -51,8 +51,8 @@ class BlindIndexListenerTest extends TestCase
         $kms = new InMemoryKms();
         $wrappedKey = $kms->generateDataKey('app')->wrapped;
 
-        $this->email = new BlindIndex($kms, $wrappedKey, new Email());
-        $this->domain = new BlindIndex($kms, $wrappedKey, new EmailDomain());
+        $this->email = new BlindIndex($kms, $wrappedKey, 'email', new Email());
+        $this->domain = new BlindIndex($kms, $wrappedKey, 'email-domain', new EmailDomain());
 
         $config = ORMSetup::createConfiguration(true);
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Fixtures'], true));
@@ -61,9 +61,9 @@ class BlindIndexListenerTest extends TestCase
 
         $eventManager = new EventManager();
         $eventManager->addEventListener(Events::onFlush, new BlindIndexListener(new ServiceLocator([
-            Verbatim::class => static fn (): BlindIndexInterface => new BlindIndex($kms, $wrappedKey, new Verbatim()),
-            Email::class => fn (): BlindIndexInterface => $this->email,
-            EmailDomain::class => fn (): BlindIndexInterface => $this->domain,
+            'account-number' => static fn (): BlindIndexInterface => new BlindIndex($kms, $wrappedKey, 'account-number', new Verbatim()),
+            'email' => fn (): BlindIndexInterface => $this->email,
+            'email-domain' => fn (): BlindIndexInterface => $this->domain,
         ])));
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config, $eventManager);
@@ -211,7 +211,7 @@ class BlindIndexListenerTest extends TestCase
         $this->entityManager->persist((new BlindIndexedEntity())->setEmail('ada@example.org'));
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(\sprintf('No blind index over the projection "%s" is registered, as "%s::$emailIndex" requires.', Email::class, BlindIndexedEntity::class));
+        $this->expectExceptionMessage(\sprintf('No blind index named "email" is registered, as "%s::$emailIndex" requires.', BlindIndexedEntity::class));
 
         $listener->onFlush(new OnFlushEventArgs($this->entityManager));
     }

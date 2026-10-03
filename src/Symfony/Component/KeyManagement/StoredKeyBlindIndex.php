@@ -21,7 +21,8 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
  * A {@see BlindIndexInterface} over a data key a {@see DataKeyStoreInterface} holds.
  *
  * The store opens the key once for every index over it, and for whatever else encrypts under it, so
- * two indexed columns of one key cost one opening instead of one each.
+ * two indexed columns of one key cost one opening instead of one each. Each index names itself, so
+ * sharing the key does not make them tag a value alike.
  *
  * By reference and not by scope, because {@see DataKeyStoreInterface::current()} is free to retire
  * a key and mint another, which for an index means every tag already written stops matching. Take
@@ -36,15 +37,17 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 final class StoredKeyBlindIndex extends AbstractBlindIndex
 {
     /**
-     * @param string $reference Reference of the stored data key the tags are derived under, dedicated to this index and never rotated
+     * @param string $reference Reference of the stored data key the tags are derived under, which may serve other indexes but never rotates
+     * @param string $name      Names this index among those over that key, and keys its derivation
      */
     public function __construct(
         private readonly DataKeyStoreInterface $store,
         private readonly string $reference,
+        string $name,
         ProjectionInterface $projection,
         ?AlgorithmInterface $algorithm = null,
     ) {
-        parent::__construct($projection, $algorithm);
+        parent::__construct($name, $projection, $algorithm);
     }
 
     /**

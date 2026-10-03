@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\BlindIndexInterface;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\DataKeyStoreInterface;
+use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 
 /**
@@ -30,6 +31,19 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  */
 abstract class AbstractBlindIndex implements BlindIndexInterface
 {
+    /**
+     * Tells this derivation from any other use of the same data key, and leaves room for a second.
+     */
+    private const string TAG_INFO = 'symfony/key-management/blind-index/v1/';
+
+    /**
+     * Width of the subkey handed to the algorithm, which {@see AlgorithmInterface::tag()} states.
+     *
+     * Not {@see AlgorithmInterface::TAG_BYTES}: what goes in and what comes out happen to be the
+     * same width here, and nothing says they have to stay that way.
+     */
+    private const int KEY_BYTES = 32;
+
     private readonly AlgorithmInterface $algorithm;
 
     /**
@@ -41,13 +55,37 @@ abstract class AbstractBlindIndex implements BlindIndexInterface
      */
     private ?DataKeyHandle $handle = null;
 
+    /**
+     * @param string $name Names this index among those over the same data key, and keys its derivation
+     *
+     * @throws InvalidArgumentException If the name is empty
+     */
     public function __construct(
+        private readonly string $name,
         private readonly ProjectionInterface $projection,
         ?AlgorithmInterface $algorithm = null,
     ) {
+        if ('' === $name) {
+            throw new InvalidArgumentException('A blind index must be named, since the name is what separates its tags from those of every other index over the same data key.');
+        }
+
         $this->algorithm = $algorithm ?? new HmacSha256();
     }
 
+    /**
+     * The tags are derived under a subkey of the data key, and not under the data key itself.
+     *
+     * A store opens one key for every index over it, which is the point of
+     * {@see \Symfony\Component\KeyManagement\StoredKeyBlindIndex}, so two indexes commonly hold the
+     * same plaintext. Keyed by it directly, they would hand out the same tag for the same value:
+     * anyone reading the two columns would learn which rows of one hold a value of the other, which
+     * is a correlation neither column was meant to allow. The name makes the subkeys differ, and
+     * separates them from anything else encrypting under that key.
+     *
+     * The subkey is derived per call rather than kept: holding it would leave usable key material
+     * outside the handle, which exists so that `forget()` wipes it. Two HMACs over 32 bytes is also
+     * what the derivation costs, which is the tag's own order of magnitude.
+     */
     final public function of(#[\SensitiveParameter] string $value): string
     {
         $value = $this->projection->project($value);
@@ -56,7 +94,7 @@ abstract class AbstractBlindIndex implements BlindIndexInterface
             $this->handle = $this->open();
         }
 
-        $tag = $this->handle->use(fn (#[\SensitiveParameter] string $key): string => $this->algorithm->tag($value, $key));
+        $tag = $this->handle->use(fn (#[\SensitiveParameter] string $key): string => $this->algorithm->tag($value, hash_hkdf('sha256', $key, self::KEY_BYTES, self::TAG_INFO.$this->name)));
 
         if (AlgorithmInterface::TAG_BYTES !== \strlen($tag)) {
             throw new LogicException(\sprintf('The blind index algorithm "%s" returned a %d-byte tag instead of %d.', get_debug_type($this->algorithm), \strlen($tag), AlgorithmInterface::TAG_BYTES));

@@ -34,15 +34,17 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 final class BlindIndex extends AbstractBlindIndex
 {
     /**
-     * @param Ciphertext $wrappedKey Wrapped data key the tags are derived under, dedicated to this index and never rotated
+     * @param Ciphertext $wrappedKey Wrapped data key the tags are derived under, which may serve other indexes but never rotates
+     * @param string     $name       Names this index among those over that key, and keys its derivation
      */
     public function __construct(
         private readonly DataKeyGeneratorInterface $kms,
         private readonly Ciphertext $wrappedKey,
+        string $name,
         ProjectionInterface $projection,
         ?AlgorithmInterface $algorithm = null,
     ) {
-        parent::__construct($projection, $algorithm);
+        parent::__construct($name, $projection, $algorithm);
     }
 
     /**

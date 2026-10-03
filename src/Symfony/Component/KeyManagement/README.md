@@ -63,43 +63,36 @@ Searching an encrypted column
 
 Encryption is randomized, so two encryptions of the same value differ and
 `WHERE email = ?` never matches. A blind index keeps a searchable trace in a
-sibling column: a keyed digest of the value, equal for equal values.
+sibling column: a keyed digest of the value, equal for equal values. It takes a
+data key of its own, a name, and what of the value to index.
 
 ```php
 use Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\Email;
 
-// Minted once with "key-management:generate-data-key", kept wrapped in the configuration.
-$index = new BlindIndex($kms, $wrappedIndexKey, new Email());
+$index = new BlindIndex($kms, $wrappedIndexKey, 'user-email', new Email());
 
-$user->setEmail($email);
 $user->setEmailIndex($index->of($email));                      // on the way in
 $repository->findOneBy(['emailIndex' => $index->of($email)]);  // and on the way out
 ```
 
-The tags are keyed HMACs over a data key of its own, unwrapped once, so every
-backend can drive an index and the KMS is not reached per value. That key must
-never rotate: every index already written was derived under it.
-`StoredKeyBlindIndex` names a key a store holds instead, which the store opens
-once for every index over it.
+The key is minted once with `key-management:generate-data-key` and kept wrapped
+in the configuration, unwrapped once per process rather than reached for per
+value. It must never rotate: every tag already written was derived under it.
+`StoredKeyBlindIndex` names a key a store holds instead. Tags are derived under
+a subkey named by the index, so one key serves several indexes and no two of
+them tag a value alike.
 
-Which part of the value is indexed is the projection.
-`BlindIndex\Projection\Email` folds the domain and leaves the local part alone,
-which is what RFC 5321 says about each; `BlindIndex\Projection\EmailDomain`
-keeps the domain only; `BlindIndex\Projection\Verbatim` folds nothing, and
-anything else implements `BlindIndex\ProjectionInterface`.
-That is also how far a partial search goes here: rather than making one index
-searchable by pieces, name the question and index the answer in a column of its
-own.
+The projection says what of the value is indexed: `Projection\Verbatim` folds
+nothing, `Projection\Email` and `Projection\EmailDomain` ship as well, and
+anything else implements `ProjectionInterface`.
 
 Equal values give equal tags, so the column tells anyone reading it which rows
 share a value and how often each occurs. Index what is high-entropy and looked
 up by equality, and leave the rest to a decrypted scan.
 
 On a Doctrine entity, `symfony/doctrine-orm-key-management` writes the tag
-itself: the column says where it comes from, and a listener fills it on every
-flush. The query side is unchanged, since it has no entity to read the attribute
-on.
+itself on every flush:
 
 ```php
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
@@ -108,12 +101,9 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 private string $email = '';
 
 #[ORM\Column(length: 64)]
-#[BlindIndexed('email', Email::class)]
+#[BlindIndexed('email', 'user-email')]
 private string $emailIndex = '';
 ```
-
-The attribute names the projection, which is how the index service is reached:
-tag it with `key_management.blind_index` and `projection: Email::class`.
 
 Resources
 ---------

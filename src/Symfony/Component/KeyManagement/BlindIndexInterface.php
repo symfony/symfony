@@ -34,9 +34,10 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * comes from is the implementation: {@see BlindIndex} unwraps a wrapped key through the KMS, and
  * {@see StoredKeyBlindIndex} names one a store holds.
  *
- * The key is a data key of its own, which nothing else uses and which **never rotates**: every
- * index already written was derived under it, and a new key matches none of them. Rotating it
- * means reindexing, which means reading every row.
+ * The tags are derived under a subkey of that data key, named by the index, so one key serves as
+ * many indexes as an application has without any two of them tagging a value alike. The key itself
+ * **never rotates**: every index already written was derived under it, and a new key matches none
+ * of them. Rotating it means reindexing, which means reading every row.
  *
  * **What this leaks.** Equal values give equal tags, so anyone reading the column learns which rows
  * share a value, and how often each occurs. On a column with few distinct values, or one whose

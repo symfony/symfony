@@ -20,9 +20,6 @@ namespace Symfony\Component\KeyManagement\BlindIndex;
  * {@see Projection\EmailDomain}; anything more specific to a domain, a national identifier or an
  * account number, is a handful of lines in an application.
  *
- * It is also how the `BlindIndexed` attribute of `symfony/doctrine-orm-key-management` names an
- * index, so two indexes of one application have two projections.
- *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental

@@ -16,13 +16,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\BlindIndex\AlgorithmInterface;
 use Symfony\Component\KeyManagement\BlindIndex\Blake2b;
+use Symfony\Component\KeyManagement\BlindIndex\HmacSha256;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\Email;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\EmailDomain;
-use Symfony\Component\KeyManagement\BlindIndex\HmacSha256;
-use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\Verbatim;
+use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
 use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
@@ -45,7 +46,7 @@ class BlindIndexTest extends TestCase
 
     public function testEqualValuesGiveEqualTags()
     {
-        $index = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim());
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim());
 
         $this->assertSame($index->of('ada@example.org'), $index->of('ada@example.org'));
         $this->assertNotSame($index->of('ada@example.org'), $index->of('bob@example.org'));
@@ -53,7 +54,7 @@ class BlindIndexTest extends TestCase
 
     public function testTheTagIsAlwaysTheSameWidth()
     {
-        $index = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim());
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim());
 
         $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $index->of(''));
         $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $index->of(str_repeat('x', 10_000)));
@@ -61,18 +62,53 @@ class BlindIndexTest extends TestCase
 
     public function testTheTagCannotBeReproducedWithoutTheKey()
     {
-        $tag = (new BlindIndex($this->kms, $this->wrappedKey, new Verbatim()))->of('ada@example.org');
+        $tag = (new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim()))->of('ada@example.org');
 
         $this->assertNotSame(hash('sha256', 'ada@example.org'), $tag);
         $this->assertNotSame(bin2hex(hash_hmac('sha256', 'ada@example.org', 'app', true)), $tag);
 
-        $another = new BlindIndex($this->kms, $this->kms->generateDataKey('app')->wrapped, new Verbatim());
+        $another = new BlindIndex($this->kms, $this->kms->generateDataKey('app')->wrapped, 'email', new Verbatim());
         $this->assertNotSame($tag, $another->of('ada@example.org'), 'another index key gives another tag');
+    }
+
+    public function testTheNameSeparatesTwoIndexesOverOneKey()
+    {
+        $user = new BlindIndex($this->kms, $this->wrappedKey, 'user-email', new Verbatim());
+        $contact = new BlindIndex($this->kms, $this->wrappedKey, 'contact-email', new Verbatim());
+
+        $this->assertNotSame($user->of('ada@example.org'), $contact->of('ada@example.org'), 'two columns over one key must not tell each other which rows hold a value of the other');
+        $this->assertSame($user->of('ada@example.org'), $user->of('ada@example.org'));
+    }
+
+    /**
+     * The tag is part of the stored format, so the derivation is pinned rather than left to drift.
+     *
+     * Changing the info string, the hash or the subkey width means every tag already written stops
+     * matching, which is a reindex of every row and not a refactoring.
+     */
+    public function testTheTagsAreDerivedUnderASubkeyAndNotUnderTheDataKey()
+    {
+        $indexKey = $this->kms->unwrapDataKey($this->wrappedKey)->use(static fn (#[\SensitiveParameter] string $key): string => $key);
+        $tag = (new BlindIndex($this->kms, $this->wrappedKey, 'user-email', new Verbatim()))->of('ada@example.org');
+
+        $this->assertNotSame(bin2hex(hash_hmac('sha256', 'ada@example.org', $indexKey, true)), $tag, 'the data key itself keys nothing');
+        $this->assertSame(
+            bin2hex(hash_hmac('sha256', 'ada@example.org', hash_hkdf('sha256', $indexKey, 32, 'symfony/key-management/blind-index/v1/user-email'), true)),
+            $tag,
+        );
+    }
+
+    public function testAnIndexWithoutANameIsRefused()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A blind index must be named');
+
+        new BlindIndex($this->kms, $this->wrappedKey, '', new Verbatim());
     }
 
     public function testTheVerbatimProjectionFoldsNothing()
     {
-        $index = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim());
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim());
 
         $this->assertNotSame($index->of('Ada'), $index->of('ada'));
         $this->assertNotSame($index->of(' ada'), $index->of('ada'));
@@ -80,7 +116,7 @@ class BlindIndexTest extends TestCase
 
     public function testAnEmailIsFoldedTheWayTheStandardSaysAndNoFurther()
     {
-        $index = new BlindIndex($this->kms, $this->wrappedKey, new Email());
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Email());
 
         $this->assertSame($index->of('ada@example.org'), $index->of('  ada@Example.ORG '));
         $this->assertNotSame($index->of('ada@example.org'), $index->of('Ada@example.org'));
@@ -89,7 +125,7 @@ class BlindIndexTest extends TestCase
 
     public function testSomethingThatIsNotAnAddressIsIndexedTrimmedAndWhole()
     {
-        $index = new BlindIndex($this->kms, $this->wrappedKey, new Email());
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Email());
 
         $this->assertSame($index->of('not-an-address'), $index->of('  not-an-address '));
         $this->assertNotSame($index->of('not-an-address'), $index->of('NOT-AN-ADDRESS'));
@@ -97,8 +133,8 @@ class BlindIndexTest extends TestCase
 
     public function testTheDomainProjectionGroupsAddressesOfOneCompany()
     {
-        $domain = new BlindIndex($this->kms, $this->wrappedKey, new EmailDomain());
-        $address = new BlindIndex($this->kms, $this->wrappedKey, new Email());
+        $domain = new BlindIndex($this->kms, $this->wrappedKey, 'email-domain', new EmailDomain());
+        $address = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Email());
 
         $this->assertSame($domain->of('ada@example.org'), $domain->of('BOB@Example.org'));
         $this->assertNotSame($domain->of('ada@example.org'), $domain->of('ada@other.org'));
@@ -107,7 +143,7 @@ class BlindIndexTest extends TestCase
 
     public function testTheDomainIsIndexedFromAnAddressOrFromItself()
     {
-        $domain = new BlindIndex($this->kms, $this->wrappedKey, new EmailDomain());
+        $domain = new BlindIndex($this->kms, $this->wrappedKey, 'email-domain', new EmailDomain());
 
         $this->assertSame($domain->of('ada@example.org'), $domain->of('example.org'));
         $this->assertSame($domain->of('ada@example.org'), $domain->of('  Example.ORG '));
@@ -117,7 +153,7 @@ class BlindIndexTest extends TestCase
 
     public function testAnApplicationIndexesItsOwnProjection()
     {
-        $index = new BlindIndex($this->kms, $this->wrappedKey, new class implements ProjectionInterface {
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new class implements ProjectionInterface {
             public function project(string $value): string
             {
                 return substr(preg_replace('/\D+/', '', $value), -4);
@@ -131,8 +167,8 @@ class BlindIndexTest extends TestCase
     #[RequiresPhpExtension('sodium')]
     public function testTheAlgorithmChangesTheTagAndIsThereforePartOfTheFormat()
     {
-        $hmac = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim(), new HmacSha256());
-        $blake = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim(), new Blake2b());
+        $hmac = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim(), new HmacSha256());
+        $blake = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim(), new Blake2b());
 
         $this->assertNotSame($hmac->of('ada@example.org'), $blake->of('ada@example.org'));
         $this->assertSame($blake->of('ada@example.org'), $blake->of('ada@example.org'));
@@ -141,8 +177,8 @@ class BlindIndexTest extends TestCase
 
     public function testTheDefaultAlgorithmIsTheKeyedHmac()
     {
-        $given = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim(), new HmacSha256());
-        $omitted = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim());
+        $given = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim(), new HmacSha256());
+        $omitted = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim());
 
         $this->assertSame($given->of('ada@example.org'), $omitted->of('ada@example.org'));
     }
@@ -158,7 +194,7 @@ class BlindIndexTest extends TestCase
 
     public function testAnAlgorithmReturningAnotherWidthIsRefused()
     {
-        $index = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim(), new class implements AlgorithmInterface {
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim(), new class implements AlgorithmInterface {
             public function tag(#[\SensitiveParameter] string $value, #[\SensitiveParameter] string $key): string
             {
                 return hash_hmac('sha512', $value, $key, true);
@@ -175,7 +211,7 @@ class BlindIndexTest extends TestCase
     {
         $counting = new CountingKms($this->kms);
 
-        $index = new BlindIndex($counting, $this->wrappedKey, new Verbatim());
+        $index = new BlindIndex($counting, $this->wrappedKey, 'email', new Verbatim());
         for ($i = 0; $i < 50; ++$i) {
             $index->of('value-'.$i);
         }
@@ -187,8 +223,8 @@ class BlindIndexTest extends TestCase
     {
         $counting = new CountingKms($this->kms);
 
-        (new BlindIndex($counting, $this->wrappedKey, new Verbatim()))->of('ada@example.org');
-        (new BlindIndex($counting, $this->wrappedKey, new Email()))->of('ada@example.org');
+        (new BlindIndex($counting, $this->wrappedKey, 'email', new Verbatim()))->of('ada@example.org');
+        (new BlindIndex($counting, $this->wrappedKey, 'email-address', new Email()))->of('ada@example.org');
 
         $this->assertSame(2, $counting->unwrapped, 'a wrapped key leaves every index to unwrap it for itself');
     }
@@ -196,7 +232,7 @@ class BlindIndexTest extends TestCase
     public function testTheIndexKeyDoesNotReachStackTraces()
     {
         $indexKey = $this->kms->unwrapDataKey($this->wrappedKey)->use(static fn (string $key): string => $key);
-        $index = new BlindIndex($this->kms, $this->wrappedKey, new Verbatim(), new class implements AlgorithmInterface {
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Verbatim(), new class implements AlgorithmInterface {
             public function tag(#[\SensitiveParameter] string $value, #[\SensitiveParameter] string $key): string
             {
                 throw new \RuntimeException('The algorithm is unavailable.');
@@ -210,7 +246,7 @@ class BlindIndexTest extends TestCase
 
     public function testAnIndexKeyThatCannotBeUnwrappedIsReported()
     {
-        $index = new BlindIndex($this->kms, new Ciphertext('not a wrapped key', 'app'), new Verbatim());
+        $index = new BlindIndex($this->kms, new Ciphertext('not a wrapped key', 'app'), 'email', new Verbatim());
 
         $this->expectException(DecryptionFailedException::class);
         $index->of('ada@example.org');

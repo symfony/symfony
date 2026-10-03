@@ -42,8 +42,8 @@ class StoredKeyBlindIndexTest extends TestCase
         $reference = $store->current('blind-index')->reference;
         $store->forget();
 
-        (new StoredKeyBlindIndex($store, $reference, new Verbatim()))->of('ada@example.org');
-        (new StoredKeyBlindIndex($store, $reference, new Email()))->of('ada@example.org');
+        (new StoredKeyBlindIndex($store, $reference, 'account-number', new Verbatim()))->of('ada@example.org');
+        (new StoredKeyBlindIndex($store, $reference, 'email', new Email()))->of('ada@example.org');
 
         $this->assertSame(1, $counting->unwrapped);
     }
@@ -55,9 +55,21 @@ class StoredKeyBlindIndexTest extends TestCase
         $stored = iterator_to_array($store->all())[0];
 
         $this->assertSame(
-            (new BlindIndex($this->kms, $stored->wrapped, new Email()))->of('  Ada@Example.ORG '),
-            (new StoredKeyBlindIndex($store, $reference, new Email()))->of('Ada@example.org'),
+            (new BlindIndex($this->kms, $stored->wrapped, 'email', new Email()))->of('  Ada@Example.ORG '),
+            (new StoredKeyBlindIndex($store, $reference, 'email', new Email()))->of('Ada@example.org'),
+            'one key under one name gives one tag, whichever implementation holds it',
         );
+    }
+
+    public function testTwoIndexesSharingAStoredKeyStillTagAValueApart()
+    {
+        $store = new InMemoryDataKeyStore(['default' => $this->kms]);
+        $reference = $store->current('blind-index')->reference;
+
+        $user = new StoredKeyBlindIndex($store, $reference, 'user-email', new Verbatim());
+        $contact = new StoredKeyBlindIndex($store, $reference, 'contact-email', new Verbatim());
+
+        $this->assertNotSame($user->of('ada@example.org'), $contact->of('ada@example.org'), 'sharing the opening of a key is not sharing its tags');
     }
 
     public function testTheStoreIsAskedOnceAndNotOncePerValue()
@@ -84,7 +96,7 @@ class StoredKeyBlindIndexTest extends TestCase
             }
         };
 
-        $index = new StoredKeyBlindIndex($counting, $reference, new Verbatim());
+        $index = new StoredKeyBlindIndex($counting, $reference, 'email', new Verbatim());
         for ($i = 0; $i < 50; ++$i) {
             $index->of('value-'.$i);
         }
@@ -98,7 +110,7 @@ class StoredKeyBlindIndexTest extends TestCase
         $store = new InMemoryDataKeyStore(['default' => $counting]);
         $reference = $store->current('blind-index')->reference;
 
-        $index = new StoredKeyBlindIndex($store, $reference, new Verbatim());
+        $index = new StoredKeyBlindIndex($store, $reference, 'email', new Verbatim());
         $tag = $index->of('ada@example.org');
         $store->forget();
 
@@ -108,7 +120,7 @@ class StoredKeyBlindIndexTest extends TestCase
 
     public function testAnIndexKeyTheStoreDoesNotHoldIsReported()
     {
-        $index = new StoredKeyBlindIndex(new InMemoryDataKeyStore(), 'no-such-reference', new Verbatim());
+        $index = new StoredKeyBlindIndex(new InMemoryDataKeyStore(), 'no-such-reference', 'email', new Verbatim());
 
         $this->expectException(DataKeyNotFoundException::class);
         $index->of('ada@example.org');

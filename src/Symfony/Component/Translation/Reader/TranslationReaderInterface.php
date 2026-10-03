@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Reader;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * TranslationReader reads translation messages from translation files.
+ * Reads translation messages from translation files.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */

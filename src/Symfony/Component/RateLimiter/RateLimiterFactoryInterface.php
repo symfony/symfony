@@ -12,6 +12,8 @@
 namespace Symfony\Component\RateLimiter;
 
 /**
+ * Creates rate limiters, one per key such as a user id or an IP address.
+ *
  * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 interface RateLimiterFactoryInterface

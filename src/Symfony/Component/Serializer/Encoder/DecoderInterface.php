@@ -14,6 +14,8 @@ namespace Symfony\Component\Serializer\Encoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
+ * Decodes strings in a format such as JSON or XML into PHP data.
+ *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface DecoderInterface

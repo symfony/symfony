@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Authentication\Token\Storage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * The TokenStorageInterface.
+ * Holds the security token of the current user.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

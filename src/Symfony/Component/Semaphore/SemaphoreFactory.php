@@ -15,7 +15,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
- * Factory provides method to create semaphores.
+ * Creates semaphores, to limit how many processes access a shared resource at the same time.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>

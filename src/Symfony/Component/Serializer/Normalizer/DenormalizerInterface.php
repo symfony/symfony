@@ -20,6 +20,8 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
+ * Turns arrays and scalars back into objects of a given type.
+ *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface DenormalizerInterface

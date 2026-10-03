@@ -14,7 +14,8 @@ namespace Symfony\Component\Translation\Extractor;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * Extracts translation messages from a directory or files to the catalogue.
+ * Extracts translation messages from source files into a catalogue.
+ *
  * New found messages are injected to the catalogue using the prefix.
  *
  * @author Michel Salib <michelsalib@hotmail.com>

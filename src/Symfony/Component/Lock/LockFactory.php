@@ -15,7 +15,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
- * Factory provides method to create locks.
+ * Creates locks, to give a process exclusive access to a shared resource.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>

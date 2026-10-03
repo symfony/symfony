@@ -15,7 +15,7 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * TranslationWriter writes translation messages.
+ * Writes translation messages to translation files.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */

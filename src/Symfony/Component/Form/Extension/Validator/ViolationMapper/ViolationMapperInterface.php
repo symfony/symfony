@@ -15,6 +15,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
+ * Maps constraint violations to the form fields they belong to.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ViolationMapperInterface

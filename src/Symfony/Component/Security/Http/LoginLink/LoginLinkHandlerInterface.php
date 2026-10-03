@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * A class that is able to create and handle "magic" login links.
+ * Creates and consumes "magic" login links.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */

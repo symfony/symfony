@@ -15,7 +15,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
- * Interface for the Notifier system.
+ * Sends notifications to recipients through channels such as email, chat or SMS.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -17,7 +17,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\RawMessage;
 
 /**
- * Interface for all mailer transports.
+ * Sends emails synchronously and returns information about the sent message.
  *
  * When sending emails, you should prefer MailerInterface implementations
  * as they allow asynchronous sending.

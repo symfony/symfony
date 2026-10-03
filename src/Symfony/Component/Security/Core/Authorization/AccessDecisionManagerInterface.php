@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * AccessDecisionManagerInterface makes authorization decisions.
+ * Decides whether a security token is granted access, by asking the voters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

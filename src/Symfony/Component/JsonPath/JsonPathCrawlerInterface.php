@@ -12,6 +12,8 @@
 namespace Symfony\Component\JsonPath;
 
 /**
+ * Creates crawlers that query JSON data with JSONPath expressions.
+ *
  * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
 interface JsonPathCrawlerInterface

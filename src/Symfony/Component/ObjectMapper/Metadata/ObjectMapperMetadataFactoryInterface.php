@@ -12,7 +12,7 @@
 namespace Symfony\Component\ObjectMapper\Metadata;
 
 /**
- * Factory to create Mapper metadata.
+ * Returns the mappings configured for an object or one of its properties.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */

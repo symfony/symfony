@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 /**
- * RouterInterface is the interface that all Router classes must implement.
+ * Matches URL paths to routes and generates URLs from routes.
  *
  * This interface is the concatenation of UrlMatcherInterface and UrlGeneratorInterface.
  *

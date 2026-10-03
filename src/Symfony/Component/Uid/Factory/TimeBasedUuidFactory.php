@@ -14,6 +14,9 @@ namespace Symfony\Component\Uid\Factory;
 use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * Creates time-based UUIDs, optionally for a given time.
+ */
 class TimeBasedUuidFactory
 {
     /**

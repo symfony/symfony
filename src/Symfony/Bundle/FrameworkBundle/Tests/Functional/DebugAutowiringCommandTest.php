@@ -47,7 +47,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(['command' => 'debug:autowiring'], ['decorated' => false]);
+        $tester->run(['command' => 'debug:autowiring', '--all' => true], ['decorated' => false]);
 
         // The legacy ServicesResetterInterface alias is deprecated; running the
         // command must not autoload its file (which would trigger a deprecation).
@@ -56,6 +56,24 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
             'debug:autowiring should not autoload deprecated alias classes.'
         );
         $this->assertStringContainsString('[deprecated]', $tester->getDisplay());
+    }
+
+    public function testDeprecatedAliasesAreListedOnlyWithAll()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:autowiring', 'search' => 'ServicesResetterInterface'], ['decorated' => false]);
+
+        $this->assertStringNotContainsString('[deprecated]', $tester->getDisplay());
+        $this->assertStringContainsString('1 deprecated alias would be displayed when adding the "--all" option.', $tester->getDisplay());
+
+        $tester->run(['command' => 'debug:autowiring', 'search' => 'ServicesResetterInterface', '--all' => true], ['decorated' => false]);
+
+        $this->assertStringContainsString('Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface → services_resetter [deprecated]', $tester->getDisplay());
     }
 
     public function testSearchArgument()
@@ -108,7 +126,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:autowiring', 'search' => 'redirect']);
 
-        $this->assertStringContainsString(' more concrete service would be displayed when adding the "--all" option.', $tester->getDisplay());
+        $this->assertStringContainsString('1 more concrete service and 1 deprecated alias would be displayed when adding the "--all" option.', $tester->getDisplay());
     }
 
     public function testSearchNotAliasedServiceWithAll()

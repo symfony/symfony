@@ -12,6 +12,8 @@
 namespace Symfony\Component\Mime;
 
 /**
+ * Maps MIME types to file extensions and back, and guesses the MIME type of files.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface MimeTypesInterface extends MimeTypeGuesserInterface

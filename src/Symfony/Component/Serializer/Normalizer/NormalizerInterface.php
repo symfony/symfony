@@ -17,6 +17,8 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 
 /**
+ * Turns objects and other values into arrays and scalars.
+ *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface NormalizerInterface

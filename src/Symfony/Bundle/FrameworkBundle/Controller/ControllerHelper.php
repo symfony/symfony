@@ -53,7 +53,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 
 /**
- * Provides the helpers from AbstractControler as a standalone service.
+ * Provides the helpers from AbstractController as a standalone service.
  *
  * Best used together with #[AutowireMethodOf] to remove any coupling.
  */

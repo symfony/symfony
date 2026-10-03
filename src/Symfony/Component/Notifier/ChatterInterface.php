@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * Interface for classes able to send chat messages synchronously and/or asynchronously.
+ * Sends chat messages, synchronously or through a message bus.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

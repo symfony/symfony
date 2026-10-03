@@ -14,6 +14,8 @@ namespace Symfony\Component\Clock;
 use Psr\Clock\ClockInterface as PsrClockInterface;
 
 /**
+ * Returns the current time and sleeps, in a way that tests can mock.
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 interface ClockInterface extends PsrClockInterface

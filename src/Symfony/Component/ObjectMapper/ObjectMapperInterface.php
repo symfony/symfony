@@ -16,7 +16,7 @@ use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchPropertyException;
 
 /**
- * Object to object mapper.
+ * Maps an object to another object, as configured by #[Map] attributes.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */

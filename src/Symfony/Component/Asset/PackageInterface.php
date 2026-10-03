@@ -12,7 +12,7 @@
 namespace Symfony\Component\Asset;
 
 /**
- * Asset package interface.
+ * Returns the public URL and the version of the assets of a package.
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */

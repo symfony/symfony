@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
- * Returns a {@see ClassMetadataInterface}.
+ * Returns the serialization metadata of a class, such as its groups and serialized names.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

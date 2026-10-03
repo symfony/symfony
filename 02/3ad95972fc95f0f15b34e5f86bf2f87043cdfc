@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T10:48:17Z
+
+I pushed the review fixes, one commit each: `getIssuer()` now throws a `LogicException` when the discovery has no expected issuer (see my inline comment), the FAPI sections are 5.3.2.1 and 5.3.3.1 rather than 5.2.2, the `audience` info and the changelog entries are shorter, and `$issuerAudience` is now `$discovery` since it holds the discovery. The description needs an update for `typ` and the providers that need `token_endpoint`.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-03T15:42:04Z
+
+Thanks for the review and for pushing the fixes.
+Rebased and the description updated to cover the two missing things
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T15:55:30Z
+
+Thanks @Spomky. I squashed the branch into your commit, with the message covering `typ`, the `getIssuer()` guard and the providers that need `token_endpoint`, and I rewrote the description, which still cited FAPI 5.2.2 and didn't mention them.

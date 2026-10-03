@@ -12,6 +12,7 @@
 namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\HttpBrowser;
@@ -84,6 +85,98 @@ class HttpBrowserTest extends AbstractBrowserTest
             ['HEAD', 'http://example.com/jsonrpc', [], [], ['CONTENT_TYPE' => 'application/json'], '["content"]'],
             ['HEAD', 'http://example.com/jsonrpc', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
         ];
+    }
+
+    public function testBrowserCompatibleCookieJarSendsMatchingCookiesWithTheSameName()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $client
+            ->expects($this->once())
+            ->method('request')
+            ->with('GET', 'https://example.com/account', $this->callback(function (array $options): bool {
+                $this->assertSame('foo=root; foo=account', $options['headers']['cookie']);
+
+                return true;
+            }))
+            ->willReturn($this->createStub(ResponseInterface::class));
+
+        $cookieJar = CookieJar::createBrowserCompatible();
+        $cookieJar->set(new Cookie('foo', 'root', path: '/', domain: 'example.com'));
+        $cookieJar->set(new Cookie('foo', 'account', path: '/account', domain: 'example.com'));
+
+        $browser = new HttpBrowser($client, cookieJar: $cookieJar);
+        $browser->request('GET', 'https://example.com/account');
+    }
+
+    public function testBrowserCompatibleCookieJarExtractsAndReplaysCookiesAcrossRedirect()
+    {
+        $requestCount = 0;
+        $client = new MockHttpClient(function (string $method, string $url, array $options) use (&$requestCount): MockResponse {
+            ++$requestCount;
+            $this->assertSame('GET', $method);
+            $this->assertSame(0, $options['max_redirects']);
+
+            if (1 === $requestCount) {
+                $this->assertSame('https://app.example.com/account/login', $url);
+
+                return new MockResponse('', [
+                    'http_code' => 302,
+                    'response_headers' => [
+                        'location: https://app.example.com/account/profile',
+                        'set-cookie: host=h; Path=/',
+                        'set-cookie: foo=root; Path=/',
+                        'set-cookie: foo=account; Path=/account',
+                        'set-cookie: secure=s; Secure; Path=/',
+                        'set-cookie: gone=x; Max-Age=0; Path=/',
+                    ],
+                ]);
+            }
+
+            $this->assertSame('https://app.example.com/account/profile', $url);
+            $this->assertSame(['cookie: host=h; foo=root; foo=account; secure=s'], $options['normalized_headers']['cookie']);
+
+            return new MockResponse();
+        });
+
+        $browser = new HttpBrowser($client, cookieJar: CookieJar::createBrowserCompatible());
+        $browser->request('GET', 'https://app.example.com/account/login');
+
+        $this->assertSame(2, $requestCount);
+    }
+
+    public function testBrowserCompatibleCookieJarScopesCookiesAcrossCrossHostDowngradeRedirect()
+    {
+        $requestCount = 0;
+        $client = new MockHttpClient(function (string $method, string $url, array $options) use (&$requestCount): MockResponse {
+            ++$requestCount;
+            $this->assertSame('GET', $method);
+            $this->assertSame(0, $options['max_redirects']);
+
+            if (1 === $requestCount) {
+                $this->assertSame('https://app.example.com/account/login', $url);
+
+                return new MockResponse('', [
+                    'http_code' => 302,
+                    'response_headers' => [
+                        'location: http://api.example.com/other',
+                        'set-cookie: host=h; Path=/',
+                        'set-cookie: domain=d; Domain=example.com; Path=/other',
+                        'set-cookie: secure=s; Domain=example.com; Secure; Path=/',
+                        'set-cookie: path=p; Domain=example.com; Path=/account',
+                    ],
+                ]);
+            }
+
+            $this->assertSame('http://api.example.com/other', $url);
+            $this->assertSame(['cookie: domain=d'], $options['normalized_headers']['cookie']);
+
+            return new MockResponse();
+        });
+
+        $browser = new HttpBrowser($client, cookieJar: CookieJar::createBrowserCompatible());
+        $browser->request('GET', 'https://app.example.com/account/login');
+
+        $this->assertSame(2, $requestCount);
     }
 
     public function testMultiPartRequestWithSingleFile()

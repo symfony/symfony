@@ -18,6 +18,8 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Render\Renderer;
 use Symfony\Component\Tui\Style\Style;
+use Symfony\Component\Tui\Style\StyleSheet;
+use Symfony\Component\Tui\Terminal\ScreenBuffer;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\MarkdownWidget;
@@ -203,6 +205,149 @@ class MarkdownTest extends TestCase
                 \sprintf('Line %d exceeds width: %d > %d (code block with long line)', $i, $lineWidth, $width),
             );
         }
+    }
+
+    public function testRenderTaskListCheckboxes()
+    {
+        $md = $this->createMarkdown("- [x] done\n- [ ] todo that wraps onto a second line\n1. [x] first");
+        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $md->render(new RenderContext(24, 24)));
+
+        $this->assertSame([
+            '• [x] done',
+            '• [ ] todo that wraps',
+            '      onto a second line',
+            '',
+            '1. [x] first',
+        ], array_map(rtrim(...), $lines));
+    }
+
+    public function testRenderSingleTildesAsText()
+    {
+        $md = $this->createMarkdown('range 5~10 and 20~30 ok, ~~gone~~');
+        $line = $md->render(new RenderContext(60, 24))[0];
+
+        $this->assertSame('range 5~10 and 20~30 ok, gone', AnsiUtils::stripAnsiCodes($line));
+        $this->assertSame(1, substr_count($line, "\x1b[9m"), 'Only the double tilde strikes text through');
+        $this->assertStringContainsString("\x1b[9mgone", $line);
+    }
+
+    #[DataProvider('blockStyleAfterInlineStyleProvider')]
+    public function testBlockStyleIsRestoredAfterAnInlineStyle(string $markdown, string $char, string $blockStyle)
+    {
+        $lines = (new MarkdownWidget($markdown))->render(new RenderContext(40, 24));
+        $screen = new ScreenBuffer(40, 3);
+        $screen->write($lines[0]);
+
+        $cells = $screen->getCells()[0];
+        $column = array_search($char, array_column($cells, 'char'), true);
+
+        $this->assertSame($blockStyle, $cells[$column]['style']);
+    }
+
+    public static function blockStyleAfterInlineStyleProvider(): iterable
+    {
+        yield 'heading color after inline code' => ['# Use `foo` now', 'w', "\x1b[1;36m"];
+        yield 'heading bold after strong' => ['# **A** b', 'b', "\x1b[1;36m"];
+        yield 'quote italic after emphasis' => ['> a *b* c', 'c', "\x1b[3m"];
+    }
+
+    public function testWrappedTableCellStyleDoesNotLeakIntoTheRestOfTheRow()
+    {
+        $lines = (new MarkdownWidget("| a | b |\n|---|---|\n| **bold text that wraps a lot here** | x |"))->render(new RenderContext(30, 24));
+        $screen = new ScreenBuffer(30, \count($lines));
+        $screen->write(implode("\r\n", $lines));
+        $cells = $screen->getCells()[3];
+
+        $this->assertSame('│ bold text that wraps a │ x │', implode('', array_column($cells, 'char')));
+        $this->assertSame("\x1b[1m", $cells[2]['style'], 'The wrapped text is bold');
+        $this->assertSame('', $cells[24]['style'], 'The padding is not bold');
+        $this->assertSame('', $cells[25]['style'], 'The border is not bold');
+        $this->assertSame('', $cells[27]['style'], 'The next cell is not bold');
+    }
+
+    public function testWrappedTableCellBackgroundDoesNotLeakIntoTheRestOfTheRow()
+    {
+        $md = new MarkdownWidget("| a | b |\n|---|---|\n| `code text that wraps a lot here` | x |");
+        $tui = new Tui(new StyleSheet([MarkdownWidget::class.'::code' => new Style()->withBackground('blue')]), new VirtualTerminal(30, 24));
+        $tui->add($md);
+        $lines = $md->render(new RenderContext(30, 24));
+        $screen = new ScreenBuffer(30, \count($lines));
+        $screen->write(implode("\r\n", $lines));
+        $cells = $screen->getCells()[3];
+
+        $this->assertSame('│ code text that wraps a │ x │', implode('', array_column($cells, 'char')));
+        $this->assertSame("\x1b[44m", $cells[2]['style'], 'The wrapped code has a background');
+        $this->assertSame('', $cells[24]['style'], 'The padding has no background');
+        $this->assertSame('', $cells[27]['style'], 'The next cell has no background');
+        $this->assertSame('', $screen->getCells()[4][0]['style'], 'The next line has no background');
+    }
+
+    public function testWrappedTableCellInABlockquoteKeepsTheQuoteStyleForTheRestOfTheRow()
+    {
+        $lines = (new MarkdownWidget("> | a | b |\n> |---|---|\n> | **bold text that wraps a lot here** | x |"))->render(new RenderContext(30, 24));
+        $screen = new ScreenBuffer(30, \count($lines));
+        $screen->write(implode("\r\n", $lines));
+        $cells = $screen->getCells()[3];
+
+        $this->assertSame('│ │ bold text that wraps │ x │', implode('', array_column($cells, 'char')));
+        $this->assertSame("\x1b[1;3m", $cells[4]['style'], 'The wrapped text is bold and in the quote style');
+        $this->assertSame("\x1b[3m", $cells[25]['style'], 'The border is in the quote style');
+        $this->assertSame("\x1b[3m", $cells[27]['style'], 'The next cell is in the quote style');
+    }
+
+    /**
+     * While the text is streamed, the closing fence of a code block arrives one character at a time.
+     */
+    #[DataProvider('partialClosingFenceProvider')]
+    public function testPartialClosingFenceIsNotRenderedAsCode(string $markdown, string $complete)
+    {
+        $render = static fn (string $text): array => array_map(rtrim(...), array_map(AnsiUtils::stripAnsiCodes(...), (new MarkdownWidget($text))->render(new RenderContext(20, 24))));
+
+        $this->assertSame($render($complete), $render($markdown));
+    }
+
+    public static function partialClosingFenceProvider(): iterable
+    {
+        yield 'one backtick' => ["```\necho 1;\n`", "```\necho 1;\n```"];
+        yield 'two backticks' => ["```php\necho 1;\n``", "```php\necho 1;\n```"];
+        yield 'tildes' => ["~~~~\nx\n~~~", "~~~~\nx\n~~~~"];
+        yield 'in a list item' => ["- a\n\n  ```\n  x\n  ``", "- a\n\n  ```\n  x\n  ```"];
+        yield 'in a blockquote' => ["> ```\n> x\n> ``", "> ```\n> x\n> ```"];
+    }
+
+    #[DataProvider('codeEndingWithFenceCharactersProvider')]
+    public function testCodeEndingWithFenceCharactersIsKept(string $markdown, string $lastCodeLine)
+    {
+        $lines = (new MarkdownWidget($markdown))->render(new RenderContext(20, 24));
+
+        $this->assertContains($lastCodeLine, array_map(rtrim(...), array_map(AnsiUtils::stripAnsiCodes(...), $lines)));
+    }
+
+    public static function codeEndingWithFenceCharactersProvider(): iterable
+    {
+        yield 'closed, followed by a paragraph' => ["```\nx\n``\n```\n\nafter", '  ``'];
+        yield 'closed, last block' => ["```\nx\n``\n```", '  ``'];
+        yield 'closed by a longer fence' => ["```\nx\n``\n````", '  ``'];
+        yield 'shorter fence in a longer one' => ["````md\n```php\necho 1;\n```\n````", '  ```'];
+        yield 'closed tildes' => ["~~~\nx\n~~\n~~~", '  ~~'];
+        yield 'closed in a list item' => ["- a\n\n  ```\n  x\n  ``\n  ```", '    ``'];
+        yield 'followed by a link reference definition' => ["```\nx\n``\n```\n\n[a]: https://example.com", '  ``'];
+        yield 'unclosed, line complete' => ["```\nx\n``\n", '  ``'];
+    }
+
+    #[DataProvider('listSpacingProvider')]
+    public function testLooseListItemsAreSeparatedByABlankLine(string $markdown, array $expected)
+    {
+        $lines = (new MarkdownWidget($markdown))->render(new RenderContext(20, 24));
+
+        $this->assertSame($expected, array_map(rtrim(...), array_map(AnsiUtils::stripAnsiCodes(...), $lines)));
+    }
+
+    public static function listSpacingProvider(): iterable
+    {
+        yield 'tight list' => ["- a\n- b", ['• a', '• b']];
+        yield 'loose list' => ["- a\n\n- b\n- c", ['• a', '', '• b', '', '• c']];
+        yield 'loose ordered list' => ["1. a\n\n2. b", ['1. a', '', '2. b']];
     }
 
     /**

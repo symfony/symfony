@@ -370,6 +370,41 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
+    public function testInlinedEnvVarsAreValidatedByTheirValue()
+    {
+        $_ENV['INLINED_MODE'] = 'safe';
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension(new ConfigurationWithInlinedEnvVars()));
+        $container->prependExtensionConfig('env_extension', ['mode' => '%env(INLINED_MODE)%']);
+
+        try {
+            $this->doProcess($container);
+        } finally {
+            unset($_ENV['INLINED_MODE']);
+        }
+
+        $this->assertSame('safe', $ext->getConfig()['mode']);
+    }
+
+    public function testInlinedEnvVarsAreRejectedByTheirValue()
+    {
+        $_ENV['INLINED_MODE'] = 'fast';
+
+        $container = new ContainerBuilder();
+        $container->registerExtension(new EnvExtension(new ConfigurationWithInlinedEnvVars()));
+        $container->prependExtensionConfig('env_extension', ['mode' => '%env(INLINED_MODE)%']);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Not that fast.');
+
+        try {
+            $this->doProcess($container);
+        } finally {
+            unset($_ENV['INLINED_MODE']);
+        }
+    }
+
     public function testOverriddenValuesOfInlinedEnvVarsAreNotResolved()
     {
         $container = new ContainerBuilder();
@@ -536,6 +571,11 @@ class ConfigurationWithInlinedEnvVars implements ConfigurationInterface
         $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('level')->attribute('inline_env_vars', true)->end()
+                ->enumNode('mode')
+                    ->attribute('inline_env_vars', true)
+                    ->values(['fast', 'safe'])
+                    ->validate()->ifTrue(static fn ($v) => 'fast' === $v)->thenInvalid('Not that fast.')->end()
+                ->end()
                 ->scalarNode('dynamic')->end()
                 ->arrayNode('locales')
                     ->attribute('inline_env_vars', true)

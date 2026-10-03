@@ -128,6 +128,28 @@ class BaseNodeTest extends TestCase
         $this->assertSame(['static' => 'bar'], $config);
     }
 
+    public function testInlinedEnvVarsAreNotValidatedAsPlaceholders()
+    {
+        $tree = (new TreeBuilder('root'))
+            ->getRootNode()
+                ->children()
+                    ->enumNode('mode')->values(['fast', 'safe'])->inlineEnvVars()->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        BaseNode::setPlaceholder('env_test_FOO', ['string' => '']);
+
+        try {
+            $finalized = $tree->finalize($tree->normalize(['mode' => 'env_test_FOO']));
+        } finally {
+            BaseNode::resetPlaceholders();
+        }
+
+        $this->assertSame(['mode' => 'env_test_FOO'], $finalized);
+    }
+
     public function testInlinedEnvVarsCanBeArrays()
     {
         $tree = (new TreeBuilder('root'))

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `InteropSerializer` to exchange messages with another application: it sends no stamps and ignores the stamps it does not know
  * Add `RedispatchStamp` to make a worker send a received message to its senders instead of handling it
  * Deprecate `RedispatchMessageHandler`, dispatch the message wrapped in the `RedispatchMessage` with a `TransportNamesStamp` instead
  * `messenger:consume` and `messenger:failed:retry` add the listeners of a run to a `ScopedEventDispatcher` instead of to the event dispatcher of the application

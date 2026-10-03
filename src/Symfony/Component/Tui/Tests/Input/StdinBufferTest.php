@@ -463,6 +463,25 @@ class StdinBufferTest extends TestCase
         $this->assertSame(['é', '€', '🎉'], $sequences);
     }
 
+    public function testBinaryChunksPreserveUtf8SplitAtEveryByte()
+    {
+        $buffer = new StdinBuffer();
+        $sequences = [];
+
+        $buffer->onData(static function (string $data) use (&$sequences) {
+            $sequences[] = $data;
+        });
+
+        $buffer->process("\xE2", true);
+        $this->assertSame([], $sequences);
+
+        $buffer->process("\x82", true);
+        $this->assertSame([], $sequences);
+
+        $buffer->process("\xAC", true);
+        $this->assertSame(['€'], $sequences);
+    }
+
     public function testIncompleteUtf8WaitsForMoreData()
     {
         $buffer = new StdinBuffer();

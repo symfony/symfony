@@ -127,6 +127,19 @@ class Terminal
         return self::$stty = (bool) @shell_exec('stty 2> '.('\\' === \DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null'));
     }
 
+    /**
+     * Tells whether ext-terminal is loaded in a version this component knows how to call.
+     *
+     * The extension promises its public signatures only within 1.x, so a future major is
+     * treated like a missing extension instead of being called blindly.
+     *
+     * @internal
+     */
+    public static function hasExtTerminal(): bool
+    {
+        return \extension_loaded('terminal') && version_compare(phpversion('terminal'), '1.0.0', '>=') && version_compare(phpversion('terminal'), '2.0.0', '<') && class_exists(\Io\Terminal\Terminal::class, false);
+    }
+
     public static function supportsKittyGraphics(): bool
     {
         if (null !== self::$kittyGraphics) {
@@ -179,6 +192,13 @@ class Terminal
 
     private static function initDimensions(): void
     {
+        if (self::hasExtTerminal() && false !== $size = \Io\Terminal\Terminal::create()->getSize()) {
+            self::$width = $size->cols;
+            self::$height = $size->rows;
+
+            return;
+        }
+
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $ansicon = getenv('ANSICON');
             if (false !== $ansicon && preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim($ansicon), $matches)) {

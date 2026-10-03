@@ -73,14 +73,14 @@ final class StdinBuffer
     /**
      * Process incoming data and emit individual sequences.
      */
-    public function process(string $data): void
+    public function process(string $data, bool $binaryChunk = false): void
     {
         // Handle high-byte meta encoding: some terminals (e.g. macOS Terminal.app
         // with "Use Option as Meta key") send Alt+key as a single byte with the
         // high bit set (byte | 0x80) instead of the standard ESC + key sequence.
-        // Convert single high bytes to ESC + (byte & 0x7F) to normalize input.
-        // This matches the Pi reference implementation.
-        if (1 === \strlen($data) && \ord($data) > 127) {
+        // Native readEvent() chunks are arbitrary byte boundaries, so a one-byte
+        // chunk can also be the first byte of a split UTF-8 codepoint.
+        if (!$binaryChunk && 1 === \strlen($data) && \ord($data) > 127) {
             $data = "\x1b".\chr(\ord($data) - 128);
         }
 

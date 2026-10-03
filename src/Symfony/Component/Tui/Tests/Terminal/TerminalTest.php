@@ -84,4 +84,135 @@ class TerminalTest extends TestCase
         $this->assertSame(120, $terminal->getColumns());
         $this->assertSame(40, $terminal->getRows());
     }
+
+    public function testDimensionsComeFromThePseudoTerminal()
+    {
+        if (!\function_exists('proc_open')) {
+            $this->markTestSkipped('proc_open is required.');
+        }
+
+        $descriptors = [0 => ['pty'], 1 => ['pty'], 2 => ['pipe', 'w'], 3 => ['pipe', 'r']];
+        $process = @proc_open([\PHP_BINARY, __DIR__.'/../Fixtures/terminal_dimensions.php'], $descriptors, $pipes);
+        if (!\is_resource($process)) {
+            $this->markTestSkipped('Cannot allocate a pseudo terminal.');
+        }
+
+        try {
+            $this->stty($pipes[1], ['cols', '113', 'rows', '37']);
+            fwrite($pipes[3], "go\n");
+            stream_set_blocking($pipes[1], false);
+
+            $output = '';
+            $deadline = microtime(true) + 5;
+            do {
+                $output .= $this->readPty($pipes[1]);
+                $status = proc_get_status($process);
+                if (!$status['running']) {
+                    break;
+                }
+                usleep(10000);
+            } while (microtime(true) < $deadline);
+
+            if ($status['running']) {
+                proc_terminate($process, 9);
+                $this->fail('Terminal child did not finish: '.$output);
+            }
+            $output .= $this->readPty($pipes[1]);
+            $error = stream_get_contents($pipes[2]);
+            $this->assertSame(0, $status['exitcode'], $output.$error);
+
+            $this->assertSame([113, 37], json_decode($output, true, flags: \JSON_THROW_ON_ERROR));
+        } finally {
+            foreach ($pipes as $pipe) {
+                fclose($pipe);
+            }
+            proc_close($process);
+        }
+    }
+
+    public function testNativeWindowsKeyRecordsPreserveModifiersRepeatsAndRelease()
+    {
+        $terminal = new Terminal();
+        $method = new \ReflectionMethod($terminal, 'nativeKeySequences');
+
+        $event = [
+            'keyDown' => true,
+            'repeatCount' => 2,
+            'virtualKeyCode' => 0x25,
+            'unicodeCodeUnit' => 0,
+            'text' => null,
+            'ctrl' => true,
+            'alt' => false,
+            'shift' => false,
+        ];
+
+        $this->assertSame(
+            ["\x1b[1;5:1D", "\x1b[1;5:2D"],
+            $method->invoke($terminal, $event),
+        );
+
+        $event['keyDown'] = false;
+        $event['repeatCount'] = 1;
+
+        $this->assertSame(["\x1b[1;5:3D"], $method->invoke($terminal, $event));
+    }
+
+    public function testNativeWindowsCtrlCharacterUsesKittyEncoding()
+    {
+        $terminal = new Terminal();
+        $method = new \ReflectionMethod($terminal, 'nativeKeySequences');
+
+        $this->assertSame(
+            ["\x1b[97;5:1u"],
+            $method->invoke($terminal, [
+                'keyDown' => true,
+                'repeatCount' => 1,
+                'virtualKeyCode' => 0x41,
+                'unicodeCodeUnit' => 1,
+                'text' => "\x01",
+                'ctrl' => true,
+                'alt' => false,
+                'shift' => false,
+            ]),
+        );
+    }
+
+    public function testNativeWindowsSurrogatePairIsReassembled()
+    {
+        $terminal = new Terminal();
+        $method = new \ReflectionMethod($terminal, 'nativeKeySequences');
+
+        $base = [
+            'keyDown' => true,
+            'repeatCount' => 1,
+            'virtualKeyCode' => 0,
+            'text' => null,
+            'ctrl' => false,
+            'alt' => false,
+            'shift' => false,
+        ];
+
+        $this->assertSame([], $method->invoke($terminal, $base + ['unicodeCodeUnit' => 0xD83D]));
+        $this->assertSame(['😀'], $method->invoke($terminal, $base + ['unicodeCodeUnit' => 0xDE00]));
+    }
+
+    private function readPty($stream): string
+    {
+        // Linux reports EIO when the last PTY slave closes.
+        set_error_handler(static fn ($severity, $message) => str_contains($message, 'errno=5 '));
+        try {
+            return (string) stream_get_contents($stream);
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    private function stty($stream, array $arguments): void
+    {
+        $process = proc_open(['stty', ...$arguments], [0 => $stream, 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+        $error = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $this->assertSame(0, proc_close($process), $error);
+    }
 }

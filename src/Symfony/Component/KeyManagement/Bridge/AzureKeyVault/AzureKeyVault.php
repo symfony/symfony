@@ -31,25 +31,26 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * KMS backend powered by Azure Key Vault (and Managed HSM) over its REST API.
  *
  * Crypto operations stay server-side: the master key never leaves the vault.
- * The caller passes a {@see HttpClientInterface} scoped to the vault base URI
- * (e.g. `https://my-vault.vault.azure.net/`) and a {@see TokenProviderInterface}
- * that provides Azure AD bearer tokens for the `https://vault.azure.net`
- * audience.
+ * The caller passes a {@see HttpClientInterface} scoped to the vault or Managed HSM
+ * base URI (e.g. `https://my-vault.vault.azure.net/`) and a {@see TokenProviderInterface}
+ * for its audience.
  *
  * Algorithm matrix:
  *   - RSA keys: `RSA-OAEP-256` (default), `RSA-OAEP`, `RSA1_5`. Suited to
  *     small payloads (config secrets, DEK wrapping). RSA does not support
  *     AAD, so a non-empty `$aad` triggers {@see UnsupportedOperationException}.
- *   - Symmetric AES keys (Managed HSM only): `A256GCM` / `A192GCM` / `A128GCM`
- *     are AEAD and accept AAD natively; CBC variants do not.
+ *   - Symmetric AES keys (Managed HSM or Key Vault Premium in preview):
+ *     `A256GCM` / `A192GCM` / `A128GCM` are AEAD and accept AAD natively;
+ *     CBC variants do not.
  *
  * `generateDataKey()` is implemented locally (Azure has no `GenerateDataKey`
  * primitive): a fresh DEK is drawn with `random_bytes()` and wrapped via
  * `wrapKey`, mirroring the GCP / Managed HSM pattern.
  *
- * Key identifier format: `$keyId` is the key name. To pin to a specific
- * version, append it with a `/` separator (`mykey/abc123def`); without a
- * version, the latest enabled version is used.
+ * Key identifier format: `$keyId` is the key name. To select a specific
+ * version for a write, append it with a `/` separator (`mykey/abc123def`).
+ * A versionless write uses the latest version. The returned ciphertext
+ * always records the version that Azure used.
  *
  * On the decrypt path, HTTP 400 and 404 are masked as
  * {@see DecryptionFailedException} so that an unknown key id or a tampered
@@ -108,7 +109,7 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             $blob = $this->encryptAlgorithm.'.'.$data['iv'].'.'.$data['tag'].'.'.$data['value'];
         }
 
-        return new Ciphertext($blob, $keyId);
+        return new Ciphertext($blob, $this->resolvedKeyId($data, $keyId));
     }
 
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
@@ -166,7 +167,7 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             $blob = $this->wrapAlgorithm.'.'.$data['iv'].'.'.$data['tag'].'.'.$data['value'];
         }
 
-        return new DataKey($plaintext, new Ciphertext($blob, $keyId));
+        return new DataKey($plaintext, new Ciphertext($blob, $this->resolvedKeyId($data, $keyId)));
     }
 
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
@@ -206,6 +207,28 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
     private static function isKeyId(string $keyId): bool
     {
         return 1 === preg_match(self::KEY_ID_PATTERN, $keyId);
+    }
+
+    private function resolvedKeyId(array $data, string $requestedKeyId): string
+    {
+        $parts = isset($data['kid']) && \is_string($data['kid']) ? parse_url($data['kid']) : false;
+        if (false === $parts || 'https' !== strtolower($parts['scheme'] ?? '') || !isset($parts['host']) || isset($parts['user']) || isset($parts['pass']) || isset($parts['query']) || isset($parts['fragment'])) {
+            throw new RuntimeException('Azure Key Vault returned a malformed key identifier.');
+        }
+
+        $path = $parts['path'] ?? '';
+        $keyId = substr($path, 6);
+        if (0 !== strncasecmp($path, '/keys/', 6) || !str_contains($keyId, '/') || !self::isKeyId($keyId)) {
+            throw new RuntimeException('Azure Key Vault returned an unexpected key identifier.');
+        }
+
+        [$requestedName, $requestedVersion] = array_pad(explode('/', $requestedKeyId, 2), 2, null);
+        [$name, $version] = explode('/', $keyId, 2);
+        if (0 !== strcasecmp($name, $requestedName) || (null !== $requestedVersion && 0 !== strcasecmp($version, $requestedVersion))) {
+            throw new RuntimeException('Azure Key Vault returned an unexpected key identifier.');
+        }
+
+        return $keyId;
     }
 
     /**

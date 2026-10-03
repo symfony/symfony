@@ -131,10 +131,23 @@ class Connection
     }
 
     /**
+     * Returns the next available message, claimed with an atomic lock.
+     *
+     * The queues are served in FIFO order (sorted by availableAt), with no
+     * priority between them.
+     *
+     * @param list<string>|null $queueNames Defaults to the configured queue
+     *
      * @throws TransportException
      */
-    public function get(): ?BSONDocument
+    public function get(?array $queueNames = null): ?BSONDocument
     {
+        $queueNames ??= [$this->queueName];
+
+        if (!$queueNames) {
+            throw new InvalidArgumentException('At least one queue name is required.');
+        }
+
         $options = $this->getWriteOptions();
         $options['returnDocument'] = FindOneAndUpdate::RETURN_DOCUMENT_AFTER;
         $options['sort'] = [
@@ -150,7 +163,7 @@ class Connection
         ];
 
         try {
-            $updatedDocument = $this->collection->findOneAndUpdate($this->createAvailableMessagesQuery(), $updateStatement, $options);
+            $updatedDocument = $this->collection->findOneAndUpdate($this->createAvailableMessagesQuery($queueNames), $updateStatement, $options);
         } catch (MongoDriverException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -169,13 +182,14 @@ class Connection
 
     /**
      * @param array<string, string> $headers
-     * @param int                   $delay   The delay in milliseconds
+     * @param int                   $delay     The delay in milliseconds
+     * @param string|null           $queueName The queue to send to, defaults to the configured queue
      *
      * @return ObjectId The inserted id
      *
      * @throws TransportException
      */
-    public function send(string $body, array $headers = [], int $delay = 0, ?Session $session = null): ObjectId
+    public function send(string $body, array $headers = [], int $delay = 0, ?Session $session = null, ?string $queueName = null): ObjectId
     {
         $now = $this->now();
         $availableAt = $now->modify(\sprintf('+%d milliseconds', $delay));
@@ -183,7 +197,7 @@ class Connection
         $document = new BSONDocument();
         $document['body'] = $body;
         $document['headers'] = new BSONDocument($headers);
-        $document['queueName'] = $this->queueName;
+        $document['queueName'] = $queueName ?? $this->queueName;
         $document['createdAt'] = new UTCDateTime($now);
         $document['availableAt'] = new UTCDateTime($availableAt);
 
@@ -304,10 +318,14 @@ class Connection
     }
 
     /**
+     * @param list<string>|null $queueNames Defaults to the configured queue
+     *
      * @return array<string, mixed>
      */
-    private function createAvailableMessagesQuery(): array
+    private function createAvailableMessagesQuery(?array $queueNames = null): array
     {
+        $queueNames ??= [$this->queueName];
+
         $now = $this->now();
         $redeliverLimit = $now->modify(\sprintf('-%d seconds', $this->redeliverTimeout));
 
@@ -319,7 +337,7 @@ class Connection
                 ]],
             ],
             'availableAt' => ['$lte' => new UTCDateTime($now)],
-            'queueName' => $this->queueName,
+            'queueName' => ['$in' => $queueNames],
         ];
     }
 

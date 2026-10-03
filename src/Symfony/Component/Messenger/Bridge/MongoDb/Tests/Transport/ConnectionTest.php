@@ -162,7 +162,7 @@ class ConnectionTest extends TestCase
                         ]],
                     ],
                     'availableAt' => ['$lte' => new UTCDateTime($clock->now())],
-                    'queueName' => 'foobar',
+                    'queueName' => ['$in' => ['foobar']],
                 ]),
                 $this->equalTo([
                     '$set' => [
@@ -180,6 +180,84 @@ class ConnectionTest extends TestCase
             ->willReturn($document);
 
         $this->assertSame($document, $connection->get());
+    }
+
+    public function testGetClaimsAcrossSeveralQueuesWithASingleRequest()
+    {
+        $collection = $this->createMock(Collection::class);
+
+        $clock = new MockClock();
+        $connection = new Connection($collection, 'foobar', 100, $clock);
+        $document = $this->createDocumentDeliveredTo($connection->getUniqueId());
+
+        $collection->expects($this->once())
+            ->method('findOneAndUpdate')
+            ->with(
+                $this->equalTo([
+                    '$or' => [
+                        ['deliveredAt' => null],
+                        ['deliveredAt' => [
+                            '$lt' => new UTCDateTime($clock->now()->modify('-100 seconds')),
+                        ]],
+                    ],
+                    'availableAt' => ['$lte' => new UTCDateTime($clock->now())],
+                    'queueName' => ['$in' => ['foo', 'bar']],
+                ]),
+                $this->equalTo([
+                    '$set' => [
+                        'deliveredTo' => $connection->getUniqueId(),
+                        'deliveredAt' => new UTCDateTime($clock->now()),
+                    ],
+                ]),
+                $this->equalTo([
+                    'writeConcern' => new WriteConcern(WriteConcern::MAJORITY),
+                    'returnDocument' => FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
+                    'sort' => ['availableAt' => 1],
+                    'typeMap' => ['root' => BSONDocument::class],
+                ])
+            )
+            ->willReturn($document);
+
+        $this->assertSame($document, $connection->get(['foo', 'bar']));
+    }
+
+    public function testGetSupportsASingleQueue()
+    {
+        $collection = $this->createMock(Collection::class);
+
+        $clock = new MockClock();
+        $connection = new Connection($collection, 'default', 100, $clock);
+        $document = $this->createDocumentDeliveredTo($connection->getUniqueId());
+
+        $collection->expects($this->once())
+            ->method('findOneAndUpdate')
+            ->with(
+                $this->equalTo([
+                    '$or' => [
+                        ['deliveredAt' => null],
+                        ['deliveredAt' => [
+                            '$lt' => new UTCDateTime($clock->now()->modify('-100 seconds')),
+                        ]],
+                    ],
+                    'availableAt' => ['$lte' => new UTCDateTime($clock->now())],
+                    'queueName' => ['$in' => ['foobar']],
+                ]),
+                $this->anything(),
+                $this->anything()
+            )
+            ->willReturn($document);
+
+        $this->assertSame($document, $connection->get(['foobar']));
+    }
+
+    public function testGetThrowsWhenNoQueueIsGiven()
+    {
+        $connection = new Connection($this->createStub(Collection::class), 'foobar', 100);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('At least one queue name is required.');
+
+        $connection->get([]);
     }
 
     public function testGetWrapsMongoExceptions()
@@ -278,6 +356,31 @@ class ConnectionTest extends TestCase
         $this->assertSame($objectId, $connection->send('serializedEnvelope', [], 100_000));
     }
 
+    public function testSendWithAnExplicitQueue()
+    {
+        $insertOneResult = $this->createStub(InsertOneResult::class);
+        $insertOneResult->method('getInsertedId')
+            ->willReturn(new ObjectId());
+
+        $clock = new MockClock();
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())
+            ->method('insertOne')
+            ->with(
+                $this->callback(static function (BSONDocument $document): bool {
+                    self::assertSame('bar', $document->queueName);
+
+                    return true;
+                }),
+                ['writeConcern' => new WriteConcern(WriteConcern::MAJORITY)]
+            )
+            ->willReturn($insertOneResult);
+
+        $connection = new Connection($collection, 'foobar', 3_600, $clock);
+
+        $connection->send('serializedEnvelope', [], 0, null, 'bar');
+    }
+
     public function testSendWrapsMongoExceptions()
     {
         $collection = $this->createStub(Collection::class);
@@ -344,12 +447,13 @@ class ConnectionTest extends TestCase
         $deleteResult = $this->createStub(DeleteResult::class);
         $deleteResult->method('getDeletedCount')
             ->willReturn($deletedCount);
+
+        $connection = new Connection($collection, 'queueName', 100);
+
         $collection->expects($this->once())
             ->method('deleteOne')
             ->with($this->equalTo(['_id' => $objectId]), $this->anything())
             ->willReturn($deleteResult);
-
-        $connection = new Connection($collection, 'queueName', 100);
 
         $this->assertSame($expectedResult, $connection->reject((string) $objectId));
     }

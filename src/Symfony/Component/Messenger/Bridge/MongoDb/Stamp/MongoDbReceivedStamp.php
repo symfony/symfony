@@ -18,12 +18,23 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 final class MongoDbReceivedStamp implements NonSendableStampInterface
 {
-    public function __construct(private string $id)
-    {
+    public function __construct(
+        private string $id,
+        private ?string $queueName = null,
+    ) {
     }
 
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * The queue the message was claimed from, which can differ from the
+     * transport's own queue when a worker listens to several queues.
+     */
+    public function getQueueName(): ?string
+    {
+        return $this->queueName;
     }
 }

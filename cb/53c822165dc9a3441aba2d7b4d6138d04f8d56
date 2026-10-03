@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-23T14:27:51Z
+
+Renamed `inside`/`outside` to `within`/`around`: `within: X` means X wraps this decorator, `around: X` means it wraps X. The YAML keys are now `decoration_within` and `decoration_around`, and symfony/symfony-docs#23091 updates the docs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-01T14:16:38Z
+
+Any opinion about @symfony/mergers ? I'm wondering if we should prefer before/after 🤔
+
+---------------------------------------------------------------------------
+
+by wachterjohannes at 2026-10-01T19:20:39Z
+
+The constraints match the priorities, and the core decorators keep theirs. A few small things:
+
+1. `AutowireAsDecoratorPass::setOrderConstraints()` always clears `container.decoration_order`, even when the attribute has no `within`/`around`. A tag set by hand on the definition is lost silently. Clear it only when the attribute adds its own constraints?
+2. In `DecoratorServicePass::sortByOrderConstraints()`, `$keysById + $aliases` lets an id shadow a class name. With decorator A (id `App\Foo`) and decorator B (class `App\Foo`), `within: App\Foo` only targets A.
+3. The error message repeats itself: `Invalid "within"/"around" constraints ...: cycle detected in the "within"/"around" constraints`.
+
+Questions: is it intended that XML and `decorate()` have no counterpart to the new keys? And is the `?int` change of `AsDecorator::$priority` fine in a minor?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T09:05:19Z
+
+Thanks @wachterjohannes, PR updated.
+
+1. Done: the attribute now replaces the tag only when it declares `within` or `around`.
+2. That's on purpose, same as `before`/`after` in #66012: when a name is both an id and another service's class, the id wins instead of mixing both meanings.
+3. Done: the prefix is now `Cannot order the decorators of "foo": `, and the third commit rewords the ones of #66012 the same way.
+
+XML config is gone in 8.x, and `decorate()` belongs to the fluent DSL, which doesn't get new options anymore: fluent config can write the tag instead, as the second commit does. The `?int` change is the same as on `AsEventListener::$priority` in #66012, with its UPGRADE note: only code reading the property can see `null`.

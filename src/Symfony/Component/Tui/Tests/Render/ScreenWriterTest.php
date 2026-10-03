@@ -913,6 +913,26 @@ class ScreenWriterTest extends TestCase
         $this->assertSame(['L4', 'L5', 'L6', 'L7', 'L8'], array_map(rtrim(...), $screen->getLines()));
     }
 
+    public function testCursorMarkerAboveTheViewportDoesNotMoveTheCursorOffTheScreen()
+    {
+        $screen = new ScreenBuffer(20, 5);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+
+        $lines = array_map(static fn (int $i): string => 'L'.$i, range(0, 9));
+        $lines[2] .= AnsiUtils::cursorMarker();
+
+        $writer = new ScreenWriter($terminal);
+        $writer->writeLines($lines);
+        $lines[9] = 'L9x';
+        $writer->writeLines($lines);
+
+        $this->assertSame(['L5', 'L6', 'L7', 'L8', 'L9x'], array_map(rtrim(...), $screen->getLines()));
+    }
+
     #[DataProvider('provideOverflowingContentChanges')]
     public function testChangingOverflowingContentOnlyWritesTheChangedLines(bool $virtual, array $frames, string $written)
     {

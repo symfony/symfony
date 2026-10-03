@@ -594,7 +594,8 @@ final class ScreenWriter
      */
     private function positionHardwareCursor(?array $cursorPos, int $totalLines): void
     {
-        if (null === $cursorPos || $totalLines <= 0) {
+        // A cursor-up sequence stops at the first row of the screen, so a marker in the lines above it cannot be reached
+        if (null === $cursorPos || $totalLines <= 0 || $cursorPos['row'] < $totalLines - $this->terminal->getRows()) {
             $this->terminal->hideCursor();
 
             return;

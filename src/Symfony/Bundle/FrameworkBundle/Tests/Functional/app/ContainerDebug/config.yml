@@ -32,6 +32,9 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\AbstractDefinitionClass:
         alias: abstract_definition
         public: false
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\MissingServiceInterface:
+        alias: missing_service
+        public: false
     env:
         class: stdClass
         arguments:

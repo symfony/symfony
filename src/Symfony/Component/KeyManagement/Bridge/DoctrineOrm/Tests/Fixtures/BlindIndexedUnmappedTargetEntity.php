@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
-use Symfony\Component\KeyManagement\BlindIndex\Email;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 
 #[Entity]
@@ -27,6 +26,6 @@ class BlindIndexedUnmappedTargetEntity
     #[Column(type: 'string')]
     public string $email = '';
 
-    #[BlindIndexed('email', Email::class)]
+    #[BlindIndexed('email', 'email')]
     public string $emailIndex = '';
 }

@@ -18,14 +18,21 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 
 /**
- * Hands the blind indexes of the application to the listener, keyed by class name.
+ * Hands the blind indexes of the application to the listener, keyed by the name each one carries.
  *
  * The listener is {@see \Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener}.
  *
- * Keyed by class rather than by service id, because that is what {@see BlindIndexed} names: an
- * entity says `Email::class`, which an application reads and a typo in which is a fatal error
- * rather than a tag nobody ever matches. Two services of the same class are refused for the same
- * reason, since the attribute would have no way of telling them apart.
+ * Keyed by name rather than by service id, because that is what {@see BlindIndexed} names, and
+ * because the name is already what the index derives its tags under: an entity and the key material
+ * behind it then agree on one identifier instead of two. The name comes from the tag and not from
+ * the service, since nothing of a `BlindIndex` or a `StoredKeyBlindIndex` is visible from the
+ * outside. Two indexes under one name are refused: they would tag a value alike over a shared key,
+ * and the attribute would have no way of telling them apart either.
+ *
+ * A service carries two entries of the tag when it is autoconfigured and tagged by hand, since
+ * `ResolveInstanceofConditionalsPass` adds the bare one beside the explicit one rather than in its
+ * place. Only the entries naming an index count, and a service naming none is what the
+ * autoconfigured tag alone looks like: the application registered an index and never named it.
  *
  * The listener is removed when no index is registered, so that a flush does not walk its entities
  * for nothing.
@@ -50,13 +57,28 @@ final class RegisterBlindIndexesPass implements CompilerPassInterface
 
         $indexes = [];
         foreach ($container->findTaggedServiceIds($this->tag) as $id => $tags) {
-            $class = $container->getParameterBag()->resolveValue($container->getDefinition($id)->getClass());
-
-            if (isset($indexes[$class])) {
-                throw new \InvalidArgumentException(\sprintf('Services "%s" and "%s" are both blind indexes of class "%s", which the "%s" attribute cannot tell apart. Give one of them a class of its own.', $indexes[$class], $id, $class, BlindIndexed::class));
+            $declared = [];
+            foreach ($tags as $attributes) {
+                if (isset($attributes['index'])) {
+                    $declared[] = $container->getParameterBag()->resolveValue($attributes['index']);
+                }
             }
 
-            $indexes[$class] = $id;
+            if (!$declared) {
+                throw new \InvalidArgumentException(\sprintf('The "%s" tag of service "%s" must carry an "index", the name an entity states in its "%s" attribute to reach that index.', $this->tag, $id, BlindIndexed::class));
+            }
+
+            if (1 < \count($declared)) {
+                throw new \InvalidArgumentException(\sprintf('Service "%s" is tagged "%s" under the names "%s", but an index derives its tags under one: a second name is a second index.', $id, $this->tag, implode('", "', $declared)));
+            }
+
+            $name = $declared[0];
+
+            if (isset($indexes[$name])) {
+                throw new \InvalidArgumentException(\sprintf('Services "%s" and "%s" are both blind indexes named "%s", which the "%s" attribute cannot tell apart. Give one of them a name of its own.', $indexes[$name], $id, $name, BlindIndexed::class));
+            }
+
+            $indexes[$name] = $id;
         }
 
         if (!$indexes) {

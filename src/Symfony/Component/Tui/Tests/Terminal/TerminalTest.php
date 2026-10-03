@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Tests\Terminal;
 
 use PHPUnit\Framework\TestCase;
+use Revolt\EventLoop;
 use Symfony\Component\Tui\Terminal\Terminal;
 
 class TerminalTest extends TestCase
@@ -83,5 +84,81 @@ class TerminalTest extends TestCase
 
         $this->assertSame(120, $terminal->getColumns());
         $this->assertSame(40, $terminal->getRows());
+    }
+
+    public function testAnEscapeSequenceThatNeverCompletesStopsHoldingInputBack()
+    {
+        [$terminal, $processInput, $received] = $this->startInputProcessing();
+
+        // A legacy terminal sends Alt+] as ESC ], which opens an OSC sequence
+        $processInput->invoke($terminal, "\x1b]");
+        $processInput->invoke($terminal, "abc\x03");
+
+        $this->assertSame([], $received->getArrayCopy());
+
+        EventLoop::run();
+
+        $this->assertSame(["\x1b]", 'a', 'b', 'c', "\x03"], $received->getArrayCopy());
+    }
+
+    public function testAnEscapeSequenceSplitAcrossReadsIsNotTakenForTheEscapeKey()
+    {
+        [$terminal, $processInput, $received] = $this->startInputProcessing();
+
+        $processInput->invoke($terminal, "\x1b");
+        $processInput->invoke($terminal, '[A');
+
+        $this->assertSame(["\x1b[A"], $received->getArrayCopy());
+    }
+
+    public function testALoneEscapeIsTheEscapeKeyOnceNothingFollows()
+    {
+        [$terminal, $processInput, $received] = $this->startInputProcessing();
+
+        $processInput->invoke($terminal, "\x1b");
+
+        $this->assertSame([], $received->getArrayCopy());
+
+        EventLoop::run();
+
+        $this->assertSame(["\x1b"], $received->getArrayCopy());
+    }
+
+    public function testALoneEscapeWaitsLongerOverSsh()
+    {
+        $terminal = new Terminal();
+        $getEscapeTimeout = new \ReflectionMethod($terminal, 'getEscapeTimeout');
+        $sshConnection = getenv('SSH_CONNECTION');
+        $sshTty = getenv('SSH_TTY');
+
+        try {
+            putenv('SSH_CONNECTION');
+            putenv('SSH_TTY');
+            $this->assertSame(0.01, $getEscapeTimeout->invoke($terminal));
+
+            putenv('SSH_CONNECTION=192.0.2.1 50000 192.0.2.2 22');
+            $this->assertSame(0.1, $getEscapeTimeout->invoke($terminal));
+
+            putenv('SSH_CONNECTION');
+            putenv('SSH_TTY=/dev/ttys001');
+            $this->assertSame(0.1, $getEscapeTimeout->invoke($terminal));
+        } finally {
+            putenv(false === $sshConnection ? 'SSH_CONNECTION' : 'SSH_CONNECTION='.$sshConnection);
+            putenv(false === $sshTty ? 'SSH_TTY' : 'SSH_TTY='.$sshTty);
+        }
+    }
+
+    /**
+     * @return array{Terminal, \ReflectionMethod, \ArrayObject<int, string>}
+     */
+    private function startInputProcessing(): array
+    {
+        $terminal = new Terminal();
+        $received = new \ArrayObject();
+        (new \ReflectionProperty($terminal, 'onInput'))->setValue($terminal, static function (string $data) use ($received) { $received[] = $data; });
+        (new \ReflectionProperty($terminal, 'started'))->setValue($terminal, true);
+        (new \ReflectionMethod($terminal, 'setupStdinBuffer'))->invoke($terminal);
+
+        return [$terminal, new \ReflectionMethod($terminal, 'processInput'), $received];
     }
 }

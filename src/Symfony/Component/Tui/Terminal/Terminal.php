@@ -23,6 +23,12 @@ use Symfony\Component\Tui\Input\StdinBuffer;
  */
 final class Terminal implements TerminalInterface
 {
+    // How long an incomplete escape sequence waits for the rest of its bytes, in seconds
+    private const float PENDING_INPUT_TIMEOUT = 0.05;
+    // How long a lone ESC waits for the rest of an escape sequence, locally and over SSH, in seconds
+    private const float ESCAPE_TIMEOUT = 0.01;
+    private const float SSH_ESCAPE_TIMEOUT = 0.1;
+
     private ?StdinBuffer $stdinBuffer = null;
 
     private string $initialSttyState = '';
@@ -30,6 +36,7 @@ final class Terminal implements TerminalInterface
     private bool $started = false;
     private ?string $stdinCallbackId = null;
     private ?string $signalCallbackId = null;
+    private ?string $pendingInputTimerId = null;
 
     /** @var (\Closure(string): void)|null */
     private ?\Closure $onInput = null;
@@ -96,14 +103,8 @@ final class Terminal implements TerminalInterface
         // Register STDIN watcher with Revolt's event loop for non-blocking input
         $this->stdinCallbackId = EventLoop::onReadable(\STDIN, function (): void {
             $data = fread(\STDIN, 4096);
-            if (false !== $data && '' !== $data && null !== $this->stdinBuffer) {
-                $this->stdinBuffer->process($data);
-                // Flush any pending lone ESC byte. OS terminals deliver
-                // complete escape sequences atomically, so a lone \x1b
-                // remaining after process() can only mean the Escape key.
-                // Use nullsafe because an InputEvent listener may call
-                // stop(), which sets stdinBuffer to null during process().
-                $this->stdinBuffer?->flush();
+            if (false !== $data && '' !== $data) {
+                $this->processInput($data);
             }
         });
     }
@@ -119,6 +120,11 @@ final class Terminal implements TerminalInterface
         if (null !== $this->stdinCallbackId) {
             EventLoop::cancel($this->stdinCallbackId);
             $this->stdinCallbackId = null;
+        }
+
+        if (null !== $this->pendingInputTimerId) {
+            EventLoop::cancel($this->pendingInputTimerId);
+            $this->pendingInputTimerId = null;
         }
 
         // Cancel signal watcher
@@ -343,5 +349,45 @@ final class Terminal implements TerminalInterface
         }
 
         return $available = (bool) shell_exec('stty 2>/dev/null');
+    }
+
+    private function processInput(string $data): void
+    {
+        if (null !== $this->pendingInputTimerId) {
+            EventLoop::cancel($this->pendingInputTimerId);
+            $this->pendingInputTimerId = null;
+        }
+
+        if (null === $stdinBuffer = $this->stdinBuffer) {
+            return;
+        }
+
+        $stdinBuffer->process($data);
+
+        // An InputEvent listener may call stop() during process()
+        if (!$this->started) {
+            return;
+        }
+
+        // Give up on a pending escape sequence when the rest of it does not arrive in time, so that input is not held back behind a sequence that never completes.
+        // A lone ESC is the Escape key unless the rest of a sequence follows: a read can end right after it, over SSH in particular, so it waits too.
+        $pending = $stdinBuffer->getBuffer();
+        if ('' !== $pending) {
+            $timeout = "\x1b" === $pending ? $this->getEscapeTimeout() : self::PENDING_INPUT_TIMEOUT;
+            $this->pendingInputTimerId = EventLoop::delay($timeout, function (): void {
+                $this->pendingInputTimerId = null;
+                $this->stdinBuffer?->flushPending();
+            });
+        }
+    }
+
+    /**
+     * How long a lone ESC waits for the rest of an escape sequence before it is the Escape key, in seconds.
+     *
+     * Legacy Alt+key input is ESC followed by the key, so a high-latency connection needs a longer window to reassemble it.
+     */
+    private function getEscapeTimeout(): float
+    {
+        return false !== getenv('SSH_CONNECTION') || false !== getenv('SSH_TTY') ? self::SSH_ESCAPE_TIMEOUT : self::ESCAPE_TIMEOUT;
     }
 }

@@ -21,6 +21,7 @@ CHANGELOG
  * Add support for reading objects properties with `Unique` constraint `fields` option
  * Add an optional `$mappedClasses` argument to `Mapping\Loader\LoaderChain::__construct()`, to declare which classes each loader maps
  * Add `ValidatorBuilder::addMappedClasses()`, to declare which classes each mapping file maps
+ * Add support for validation pipes: `$email = ('test@email.com' |> new Email())->validOrFail();`
 
 8.1
 ---

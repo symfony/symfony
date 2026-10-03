@@ -52,6 +52,13 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
     ];
 
     /**
+     * The token handlers that read nothing of the access token itself, so that the "cnf" claim a
+     * sender-constrained token names its key in never reaches the sender constraint: "oidc_user_info"
+     * reads the claims a provider answers about the user, "cas" the ticket it validates.
+     */
+    private const HANDLERS_READING_NOTHING_OF_THE_TOKEN = ['oidc_user_info', 'cas'];
+
+    /**
      * @param array<TokenHandlerFactoryInterface> $tokenHandlerFactories
      */
     public function __construct(private readonly array $tokenHandlerFactories)
@@ -212,7 +219,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $successHandler = isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)) : null;
         $failureHandler = isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)) : null;
         $authenticatorId = \sprintf('security.authenticator.access_token.%s', $firewallName);
-        $senderConstraintId = $this->createSenderConstraint($container, $firewallName, $config['dpop']);
+        $senderConstraintId = $this->createSenderConstraint($container, $firewallName, $config['dpop'], array_keys($config['token_handler'])[0]);
         $extractorId = $this->createExtractor($container, $firewallName, $config['token_extractors'], null !== $senderConstraintId);
         $tokenHandlerId = $this->createTokenHandler($container, $firewallName, $config['token_handler'], $userProviderId);
 
@@ -250,8 +257,11 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
     /**
      * Registers what a request has to prove possession of for the access token it presents to be accepted,
      * and returns its service id; null when the firewall accepts bearer tokens, which is the default.
+     *
+     * @param string $tokenHandler The key of the configured token handler, which decides whether a bound
+     *                             token can be recognized for one at all
      */
-    private function createSenderConstraint(ContainerBuilder $container, string $firewallName, array $config): ?string
+    private function createSenderConstraint(ContainerBuilder $container, string $firewallName, array $config, string $tokenHandler): ?string
     {
         if (!$config['enabled']) {
             return null;
@@ -259,6 +269,10 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
 
         if (!ContainerBuilder::willBeAvailable('web-token/jwt-library', Algorithm::class, ['symfony/security-bundle'])) {
             throw new InvalidConfigurationException('You cannot use the "dpop" option since "web-token/jwt-library" is not installed. Try running "composer require web-token/jwt-library".');
+        }
+
+        if (\in_array($tokenHandler, self::HANDLERS_READING_NOTHING_OF_THE_TOKEN, true)) {
+            throw new InvalidConfigurationException(\sprintf('The "dpop" option of the "%s" firewall cannot be used with the "%s" token handler: an access token bound to a key names it in its own "cnf" claim (RFC 7800, Section 3.1), which this handler never reads, so every request would be refused. Use the "oidc" or the "oauth2" token handler, or one of your own putting the claims of the token on the user badge.', $firewallName, $tokenHandler));
         }
 
         $senderConstraintId = \sprintf('security.authenticator.access_token.sender_constraint.dpop.%s', $firewallName);

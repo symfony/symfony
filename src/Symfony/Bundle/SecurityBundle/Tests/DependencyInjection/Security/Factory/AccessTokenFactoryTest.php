@@ -1021,6 +1021,50 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertSame($senderConstraintId, (string) $container->getDefinition('security.fallback_access_denied_handler.firewall1')->getArgument(3));
     }
 
+    /**
+     * A token handler reading nothing of the access token never hands over a "cnf" claim, so a bound
+     * token cannot be recognized for one and every request would be refused.
+     */
+    #[DataProvider('provideTokenHandlersReadingNothingOfTheToken')]
+    public function testDpopIsRefusedWithATokenHandlerThatReadsNothingOfTheToken(array $tokenHandler, string $key)
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig(['token_handler' => $tokenHandler, 'dpop' => true], $factory);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(\sprintf('The "dpop" option of the "firewall1" firewall cannot be used with the "%s" token handler', $key));
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+    }
+
+    public static function provideTokenHandlersReadingNothingOfTheToken(): iterable
+    {
+        yield 'the claims of the user the provider answers' => [['oidc_user_info' => ['base_uri' => 'https://www.example.com/userinfo', 'client' => 'oidc.client']], 'oidc_user_info'];
+        yield 'the ticket a CAS server validates' => [['cas' => ['validation_url' => 'https://www.example.com/cas/validate']], 'cas'];
+    }
+
+    /**
+     * The two handlers that read the claims of the token itself, the "cnf" of a bound one among them.
+     */
+    #[DataProvider('provideTokenHandlersReadingTheToken')]
+    public function testDpopIsAcceptedWithATokenHandlerReadingTheToken(array $tokenHandler)
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig(['token_handler' => $tokenHandler, 'dpop' => true], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.access_token.sender_constraint.dpop.firewall1'));
+    }
+
+    public static function provideTokenHandlersReadingTheToken(): iterable
+    {
+        yield 'the signed token itself' => [['oidc' => ['algorithms' => ['ES256'], 'issuers' => ['https://www.example.com'], 'audience' => 'audience', 'keyset' => 'keyset', 'enforce_at_jwt_type' => true]]];
+        yield 'the introspection response' => [['oauth2' => true]];
+    }
+
     public function testADpopBoundTokenIsReadFromTheSchemeItIsPresentedUnder()
     {
         $container = $this->createContainerBuilder();

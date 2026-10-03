@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Definition as WorkflowDefinition;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
+use Symfony\Component\Workflow\DependencyInjection\WorkflowDefinitionPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
@@ -232,16 +233,65 @@ class WorkflowBundleExtensionTest extends TestCase
                     'a_to_b' => ['from' => ['a'], 'to' => ['b']],
                 ],
             ],
+            'workflow_c' => [
+                'type' => 'workflow',
+                'marking_store' => ['type' => 'method'],
+                'supports' => [self::class],
+                'places' => ['a', 'b'],
+                'transitions' => [
+                    'a_to_b' => ['from' => ['a'], 'to' => ['b']],
+                ],
+            ],
         ]);
         $container->compile();
 
         $argumentsA = $container->getDefinition('state_machine.workflow_a')->getArguments();
         $this->assertArrayHasKey('index_1', $argumentsA, 'workflow_a has a marking_store argument');
         $this->assertNotNull($argumentsA['index_1'], 'workflow_a marking_store argument is not null');
+        $this->assertTrue($argumentsA['index_1']->getArgument(0));
+        $this->assertSame('status', $argumentsA['index_1']->getArgument(1));
 
         $argumentsB = $container->getDefinition('state_machine.workflow_b')->getArguments();
         $this->assertArrayHasKey('index_1', $argumentsB, 'workflow_b has a marking_store argument');
         $this->assertNull($argumentsB['index_1'], 'workflow_b marking_store argument is null');
+
+        $argumentsC = $container->getDefinition('workflow.workflow_c')->getArguments();
+        $this->assertFalse($argumentsC['index_1']->getArgument(0));
+        $this->assertSame('marking', $argumentsC['index_1']->getArgument(1));
+    }
+
+    public function testWorkflowSharedRegistrarOptions()
+    {
+        $container = $this->createContainer();
+        $container->register('custom.support_strategy', \stdClass::class);
+        $container->loadFromExtension('workflow', [
+            'with_audit_trail' => [
+                'supports' => [self::class],
+                'audit_trail' => ['enabled' => true],
+                'places' => ['a'],
+                'transitions' => ['stay' => ['from' => 'a', 'to' => 'a']],
+            ],
+            'with_support_strategy' => [
+                'support_strategy' => 'custom.support_strategy',
+                'places' => ['a'],
+                'transitions' => ['stay' => ['from' => 'a', 'to' => 'a']],
+            ],
+        ]);
+        $container->compile();
+
+        $auditTrail = $container->getDefinition('.state_machine.with_audit_trail.listener.audit_trail');
+        $this->assertSame([
+            'monolog.logger' => [['channel' => 'workflow']],
+            'kernel.event_listener' => [
+                ['event' => 'workflow.with_audit_trail.leave', 'method' => 'onLeave'],
+                ['event' => 'workflow.with_audit_trail.transition', 'method' => 'onTransition'],
+                ['event' => 'workflow.with_audit_trail.enter', 'method' => 'onEnter'],
+            ],
+        ], $auditTrail->getTags());
+        $this->assertSame('logger', (string) $auditTrail->getArgument(0));
+
+        $registryCalls = $container->getDefinition('workflow.registry')->getMethodCalls();
+        $this->assertSame('custom.support_strategy', (string) $registryCalls[1][1][1]);
     }
 
     public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()
@@ -392,6 +442,7 @@ class WorkflowBundleExtensionTest extends TestCase
 
         $passes = array_map(get_class(...), $container->getCompilerPassConfig()->getBeforeOptimizationPasses());
         $this->assertContains(AddEventAliasesPass::class, $passes);
+        $this->assertContains(WorkflowDefinitionPass::class, $passes);
         $this->assertContains(WorkflowGuardListenerPass::class, $passes);
         $this->assertContains(WorkflowValidatorPass::class, $passes);
         $this->assertNotContains(WorkflowDebugPass::class, $passes);

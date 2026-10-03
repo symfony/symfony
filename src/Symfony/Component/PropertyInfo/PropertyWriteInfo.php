@@ -23,6 +23,7 @@ final class PropertyWriteInfo
     public const TYPE_PROPERTY = 'property';
     public const TYPE_ADDER_AND_REMOVER = 'adder_and_remover';
     public const TYPE_CONSTRUCTOR = 'constructor';
+    public const TYPE_COLLECTION_ADDER_AND_REMOVER = 'collection_adder_and_remover';
 
     public const VISIBILITY_PUBLIC = 'public';
     public const VISIBILITY_PROTECTED = 'protected';

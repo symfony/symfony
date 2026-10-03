@@ -45,6 +45,10 @@ final class ScreenWriter
     private int $maxLinesRendered = 0;
     /** Number of leading lines whose current content already reached the scrollback */
     private int $scrollbackLineCount = 0;
+    /** Whether the screen was cleared, so that the content starts on its first row */
+    private bool $screenCleared = false;
+    /** Whether the scrollback ends with the lines above the screen, without stale or repeated rows */
+    private bool $scrollbackMatchesLines = false;
     private bool $showHardwareCursor = true;
     private int $scrollOffset = 0;
 
@@ -144,6 +148,52 @@ final class ScreenWriter
         $this->cursorRow = 0;
         $this->hardwareCursorRow = 0;
         $this->maxLinesRendered = 0;
+    }
+
+    /**
+     * Follows the rows that Termux moves between the screen and the scrollback when only its height changes.
+     *
+     * On shrink, Termux first drops the blank rows below the cursor, then moves the top rows into the scrollback.
+     * On growth, it brings rows back from the scrollback, then adds blank rows at the bottom.
+     * When the rows it moves cannot be known, the next write repaints the whole screen.
+     */
+    public function followTermuxHeightChange(int $previousRows, int $rows): void
+    {
+        // Lines above the screen; until the content fills the screen, the rows above it are unknown unless the screen was cleared
+        $top = $this->maxLinesRendered - $previousRows;
+        if ($top < 0 && $this->screenCleared) {
+            $top = 0;
+        }
+
+        if (!$this->previousLines || $top < 0 || !$this->scrollbackMatchesLines || $this->hardwareCursorRow < $top || (!$this->screenCleared && $rows - $previousRows > $top)) {
+            $this->reset();
+
+            return;
+        }
+
+        if ($rows < $previousRows) {
+            $shift = $previousRows - $rows;
+            for ($row = $previousRows - 1; $row > $this->hardwareCursorRow - $top; --$row) {
+                $line = $this->previousLines[$top + $row] ?? '';
+                if ('' === trim(AnsiUtils::stripAnsiCodes($line), ' ') && !AnsiUtils::containsImage($line) && 0 === --$shift) {
+                    break;
+                }
+            }
+            $top += $shift;
+            // A cursor moved above the screen is put back on its first row
+            $this->hardwareCursorRow = max($this->hardwareCursorRow, $top);
+        } else {
+            $top -= min($rows - $previousRows, $top);
+        }
+
+        $this->maxLinesRendered = $top + $rows;
+        $this->scrollbackLineCount = $top;
+
+        // Lines dropped below the screen have to be written again
+        if (\count($this->previousLines) > $this->maxLinesRendered) {
+            $this->previousLines = \array_slice($this->previousLines, 0, $this->maxLinesRendered);
+            $this->previousRawLines = [];
+        }
     }
 
     /**
@@ -267,8 +317,10 @@ final class ScreenWriter
         $this->terminal->write($buffer);
         $this->cursorRow = max(0, \count($newLines) - 1);
         $this->hardwareCursorRow = $this->cursorRow;
+        $this->scrollbackMatchesLines = true;
 
         if ($clear) {
+            $this->screenCleared = true;
             $this->maxLinesRendered = \count($newLines);
         } else {
             $this->maxLinesRendered = max($this->maxLinesRendered, \count($newLines));
@@ -305,6 +357,7 @@ final class ScreenWriter
         }
 
         $this->terminal->write($buffer);
+        $this->scrollbackMatchesLines = false;
         $this->cursorRow = max(0, $lineCount - 1);
         $this->hardwareCursorRow = $this->cursorRow;
         $this->maxLinesRendered = $lineCount;

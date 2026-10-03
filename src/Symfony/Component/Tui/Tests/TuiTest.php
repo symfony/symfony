@@ -622,15 +622,17 @@ class TuiTest extends TestCase
     }
 
     #[DataProvider('termuxResizeProvider')]
-    public function testResizeRepaintsTheWholeScreenUnlessOnlyTheHeightChangedInTermux(?string $termuxVersion, int $columns, int $rows, bool $repaints)
+    public function testResizeRepaintsTheWholeScreenUnlessOnlyTheHeightChangedInTermux(?string $termuxVersion, ?string $tmux, int $columns, int $rows, bool $repaints)
     {
-        $previous = getenv('TERMUX_VERSION');
+        $previousTermuxVersion = getenv('TERMUX_VERSION');
+        $previousTmux = getenv('TMUX');
         putenv(null === $termuxVersion ? 'TERMUX_VERSION' : 'TERMUX_VERSION='.$termuxVersion);
+        putenv(null === $tmux ? 'TMUX' : 'TMUX='.$tmux);
 
         try {
             $terminal = new VirtualTerminal(40, 20);
             $tui = new Tui(null, $terminal);
-            $tui->add(new TextWidget('Hello'));
+            $tui->add(new TextWidget(implode("\n", range(1, 30))));
             $tui->start();
             $tui->processRender();
             $terminal->clearOutput();
@@ -640,15 +642,17 @@ class TuiTest extends TestCase
 
             $this->assertSame($repaints, str_contains($terminal->getOutput(), "\x1b[2J"));
         } finally {
-            putenv(false === $previous ? 'TERMUX_VERSION' : 'TERMUX_VERSION='.$previous);
+            putenv(false === $previousTermuxVersion ? 'TERMUX_VERSION' : 'TERMUX_VERSION='.$previousTermuxVersion);
+            putenv(false === $previousTmux ? 'TMUX' : 'TMUX='.$previousTmux);
         }
     }
 
     public static function termuxResizeProvider(): iterable
     {
-        yield 'height change in Termux' => ['0.118', 40, 12, false];
-        yield 'width change in Termux' => ['0.118', 30, 20, true];
-        yield 'same size in Termux' => ['0.118', 40, 20, true];
-        yield 'height change elsewhere' => [null, 40, 12, true];
+        yield 'height change in Termux' => ['0.118', null, 40, 12, false];
+        yield 'width change in Termux' => ['0.118', null, 30, 20, true];
+        yield 'same size in Termux' => ['0.118', null, 40, 20, true];
+        yield 'height change in tmux in Termux' => ['0.118', '/tmp/tmux-10123/default,1234,0', 40, 12, true];
+        yield 'height change elsewhere' => [null, null, 40, 12, true];
     }
 }

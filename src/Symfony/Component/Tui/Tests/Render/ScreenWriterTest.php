@@ -962,4 +962,109 @@ class ScreenWriterTest extends TestCase
         yield 'grown on a virtual terminal' => [true, [$lines, [...$lines, 'L7']], 'L7'];
         yield 'last line edited after shrinking' => [false, [$lines, \array_slice($lines, 0, 6), ['L0', 'L1', 'L2', 'L3', 'L4', 'L5x']], 'L5x'];
     }
+
+    #[DataProvider('provideTermuxHeightChanges')]
+    public function testFollowsTheRowsTermuxMovesOnAHeightChange(array $steps, bool $repaints, array $expectedScrollback, array $expectedScreen)
+    {
+        $rows = 20;
+        $screen = new ScreenBuffer(20, $rows);
+        $output = '';
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturnCallback(static function () use (&$rows): int {
+            return $rows;
+        });
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static function (string $data) use (&$screen, &$output): void {
+            $screen->write($data);
+            $output .= $data;
+        });
+
+        $writer = new ScreenWriter($terminal);
+        $writer->writeLines($lines = array_shift($steps));
+        $output = '';
+        foreach ($steps as $step) {
+            if (\is_int($step)) {
+                $screen = self::resizeLikeTermux($screen, 20, $step);
+                $writer->followTermuxHeightChange($rows, $step);
+                $rows = $step;
+            } else {
+                $lines = $step;
+            }
+            $writer->writeLines($lines);
+        }
+
+        $this->assertSame($repaints, str_contains($output, "\x1b[2J"));
+        $this->assertSame($expectedScrollback, array_map(rtrim(...), $screen->getScrollback()));
+        $this->assertSame($expectedScreen, array_map(rtrim(...), $screen->getLines()));
+    }
+
+    public static function provideTermuxHeightChanges(): iterable
+    {
+        $lines = static fn (int $from, int $to): array => array_map(static fn (int $i): string => 'L'.$i, range($from, $to));
+        $cursor = AnsiUtils::cursorMarker();
+
+        yield 'line removed while the screen is shorter' => [
+            [$lines(1, 15), 12, $lines(1, 14), 20],
+            true,
+            [],
+            [...$lines(1, 14), '', '', '', '', '', ''],
+        ];
+
+        yield 'content taller than the screen' => [
+            [$lines(0, 29), 12, 20, $lines(0, 30), 12, [...$lines(0, 27), 'L28x', ...$lines(29, 30)], 20, $lines(0, 28), 12, 20],
+            true,
+            $lines(0, 8),
+            $lines(9, 28),
+        ];
+
+        yield 'content taller than the screen shrunk while the screen is shorter' => [
+            [$lines(0, 29), 12, $lines(0, 24), 20, $lines(0, 25)],
+            true,
+            $lines(0, 5),
+            $lines(6, 25),
+        ];
+
+        yield 'blank rows below the cursor dropped on shrink' => [
+            [[...$lines(0, 23), '', ...$lines(25, 29)], 12, [...$lines(0, 23), '', ...$lines(25, 28), 'L29x'], 20, [...$lines(0, 23), '', ...$lines(25, 30)]],
+            false,
+            $lines(0, 10),
+            [...$lines(11, 23), '', ...$lines(25, 30)],
+        ];
+
+        yield 'blank rows below the cursor marker dropped on shrink' => [
+            [[...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 29)], 12, [...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 28), 'L29x'], 20, [...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 30)]],
+            false,
+            $lines(0, 10),
+            [...$lines(11, 23), '', ...$lines(25, 30)],
+        ];
+    }
+
+    /**
+     * Resizes like Termux does when only the height changes: on shrink, it drops the blank rows below the cursor first,
+     * then moves the top rows into the scrollback; on growth, it brings rows back from the scrollback first.
+     */
+    private static function resizeLikeTermux(ScreenBuffer $screen, int $width, int $rows): ScreenBuffer
+    {
+        $lines = [...array_map(AnsiUtils::stripAnsiCodes(...), $screen->getScrollback()), ...$screen->getLines()];
+        $height = $screen->getHeight();
+        $top = \count($lines) - $height;
+        $cursorRow = (new \ReflectionProperty(ScreenBuffer::class, 'cursorRow'))->getValue($screen);
+
+        if (0 < $shift = $height - $rows) {
+            for ($row = $height - 1; $row > $cursorRow; --$row) {
+                if ('' === trim($lines[$top + $row]) && 0 === --$shift) {
+                    break;
+                }
+            }
+        } else {
+            $shift = -min($rows - $height, $top);
+        }
+
+        $resized = new ScreenBuffer($width, $rows);
+        $resized->write(implode("\r\n", array_pad(\array_slice($lines, 0, $top + $shift + $rows), $top + $shift + $rows, '')));
+        $resized->write("\x1b[".(max(0, $cursorRow - $shift) + 1).';1H');
+
+        return $resized;
+    }
 }

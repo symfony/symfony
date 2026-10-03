@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-02T15:48:42Z
+
+Hi @nicolas-grekas,
+
+I will update this PR for the AAD part.
+Note that the key store only asks for a key wrap, so for example with Azure only A256KW is suitable. And A256KW does not use any AAD.
+We do not want a store to refuse every client that cannot enforce one.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-02T19:08:16Z
+
+I found a performance issue with the current design of this bridge: the row of a data key is read again for every value decrypted. one row with seventeen encrypted columns costs seventeen queries for a single key.
+I propose to fix it here (see https://github.com/symfony/symfony/pull/66527/changes/7368a24028c53e7ab4f07dd0164ed5f3226abb05)

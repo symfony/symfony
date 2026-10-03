@@ -39,6 +39,7 @@ class HttpException extends \RuntimeException implements HttpExceptionInterface
             410 => new GoneHttpException($message, $previous, $code, $headers),
             411 => new LengthRequiredHttpException($message, $previous, $code, $headers),
             412 => new PreconditionFailedHttpException($message, $previous, $code, $headers),
+            413 => new ContentTooLargeHttpException($message, $previous, $code, $headers),
             423 => new LockedHttpException($message, $previous, $code, $headers),
             415 => new UnsupportedMediaTypeHttpException($message, $previous, $code, $headers),
             422 => new UnprocessableEntityHttpException($message, $previous, $code, $headers),

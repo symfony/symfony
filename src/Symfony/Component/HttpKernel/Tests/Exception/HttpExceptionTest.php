@@ -80,6 +80,7 @@ class HttpExceptionTest extends TestCase
             [410],
             [411],
             [412],
+            [413],
             [418],
             [423],
             [415],

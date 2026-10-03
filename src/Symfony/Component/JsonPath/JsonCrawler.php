@@ -241,7 +241,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
             $index = \count($value) + (int) $expr;
 
-            return isset($value[$index]) ? [$value[$index]] : [];
+            return \array_key_exists($index, $value) ? [$value[$index]] : [];
         }
 
         // single positive index
@@ -257,7 +257,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
             $index = (int) $expr;
 
-            return isset($value[$index]) ? [$value[$index]] : [];
+            return \array_key_exists($index, $value) ? [$value[$index]] : [];
         }
 
         // start and end index
@@ -279,7 +279,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 if ($index < 0) {
                     $index = \count($value) + $index;
                 }
-                if (isset($value[$index])) {
+                if (\array_key_exists($index, $value)) {
                     $result[] = $value[$index];
                 }
             }
@@ -354,7 +354,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
             $result = [];
             for ($i = $start; $step > 0 ? $i < $end : $i > $end; $i += $step) {
-                if (isset($value[$i])) {
+                if (\array_key_exists($i, $value)) {
                     $result[] = $value[$i];
                 }
             }
@@ -794,7 +794,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             },
             'count' => $nodelistSize,
             'match' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/^%s$/u', $this->transformJsonPathRegex($argList[1])), $value),
+                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/\A(?:%s)\z/u', $this->transformJsonPathRegex($argList[1])), $value),
                 default => false,
             },
             'search' => match (true) {
@@ -1219,6 +1219,8 @@ final class JsonCrawler implements JsonCrawlerInterface
                 case ']': $inCharClass = false;
                     break;
                 case '.': $inCharClass || $char = '[^\r\n]';
+                    break;
+                case '/': $char = '\/';
                     break;
             }
 

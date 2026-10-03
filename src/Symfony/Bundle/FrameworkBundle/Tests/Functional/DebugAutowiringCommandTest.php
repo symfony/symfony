@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\AbstractDefinitionClass;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -133,6 +134,19 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:autowiring', 'search' => 'ClassAlias']);
         $this->assertStringContainsString(ClassAliasExampleClass::class, $tester->getDisplay());
+    }
+
+    public function testNotListingAliasesOfAbstractServices()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:autowiring', '--all' => true]);
+
+        $this->assertStringNotContainsString(AbstractDefinitionClass::class, $tester->getDisplay());
     }
 
     #[DataProvider('provideCompletionSuggestions')]

@@ -29,16 +29,16 @@ class FragmentRendererPassTest extends TestCase
      */
     public function testContentRendererWithoutInterface()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
-        $fragmentHandlerDefinition = $builder->register('fragment.handler');
+        $builder->register('fragment.handler');
         $builder->register('my_content_renderer', 'Symfony\Component\DependencyInjection\Definition')
             ->addTag('kernel.fragment_renderer', ['alias' => 'foo']);
 
         $pass = new FragmentRendererPass();
-        $pass->process($builder);
 
-        $this->assertEquals([['addRendererService', ['foo', 'my_content_renderer']]], $fragmentHandlerDefinition->getMethodCalls());
+        $this->expectException(\InvalidArgumentException::class);
+
+        $pass->process($builder);
     }
 
     public function testValidContentRenderer()

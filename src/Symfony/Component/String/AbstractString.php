@@ -688,7 +688,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         $string = '';
         $j = 0;
         $b = $i = -1;
-        $mask = wordwrap($mask, $width, '#', $cut);
+        // wordwrap() does not recognize a break at the very end of its input and counts it as part of the last line
+        $wrapped = rtrim($mask, '#');
+        $mask = wordwrap($wrapped, $width, '#', $cut).substr($mask, \strlen($wrapped));
 
         while (false !== $b = strpos($mask, '#', $b + 1)) {
             for (++$i; $i < $b; ++$i) {

@@ -20,7 +20,7 @@ namespace Symfony\Component\Tui\Ansi;
  */
 final class TextWrapper
 {
-    // A line can break between any two characters of these scripts, which are written without spaces between words
+    // Unicode line breaking allows a break between any two characters of these scripts
     private const CJK_PATTERN = '/[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}\p{Bopomofo}]/u';
 
     /**

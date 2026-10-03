@@ -128,9 +128,9 @@ final class WordNavigator
     }
 
     /**
-     * A word written in a script without spaces between words ends where the text switches to another script.
+     * A CJK word ends where the text switches to another script.
      *
-     * For instance, "hello世界" holds two words, as with Unicode word boundaries.
+     * For instance, "hello世界" and "API를" both hold two words, as with Unicode word boundaries.
      */
     private static function isCjk(string $grapheme): bool
     {

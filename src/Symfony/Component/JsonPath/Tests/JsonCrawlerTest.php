@@ -499,6 +499,28 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
+    public function testMatchFunctionAnchorsWholeAlternation()
+    {
+        $crawler = new JsonCrawler(json_encode(['abc', 'xb', 'a', 'b']));
+
+        $this->assertSame(['a', 'b'], $crawler->find("$[?match(@, 'a|b')]"));
+    }
+
+    public function testMatchFunctionDoesNotMatchBeforeTrailingNewline()
+    {
+        $crawler = new JsonCrawler(json_encode(['a', "a\n"]));
+
+        $this->assertSame(['a'], $crawler->find("$[?match(@, 'a')]"));
+    }
+
+    public function testMatchAndSearchFunctionsWithSlash()
+    {
+        $crawler = new JsonCrawler(json_encode(['a/b', 'ab']));
+
+        $this->assertSame(['a/b'], $crawler->find("$[?match(@, 'a/b')]"));
+        $this->assertSame(['a/b'], $crawler->find("$[?search(@, '/')]"));
+    }
+
     public function testValueFunction()
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?value(@.price) == 8.95]');

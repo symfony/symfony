@@ -782,7 +782,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             },
             'count' => $nodelistSize,
             'match' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/^%s$/u', $this->transformJsonPathRegex($argList[1])), $value),
+                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/\A(?:%s)\z/u', $this->transformJsonPathRegex($argList[1])), $value),
                 default => false,
             },
             'search' => match (true) {
@@ -1193,6 +1193,8 @@ final class JsonCrawler implements JsonCrawlerInterface
                 case ']': $inCharClass = false;
                     break;
                 case '.': $inCharClass || $char = '[^\r\n]';
+                    break;
+                case '/': $char = '\/';
                     break;
             }
 

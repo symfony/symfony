@@ -17,8 +17,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\AbstractBlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\Projection\Verbatim;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener;
+use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\StoredKeyBlindIndex;
 
 class RegisterBlindIndexesPassTest extends TestCase
@@ -178,6 +181,20 @@ class RegisterBlindIndexesPassTest extends TestCase
         $this->assertSame([], $container->getDefinition('app.email_index')->getArguments());
     }
 
+    /**
+     * An index of the application's own, whatever it extends: a "$name" argument it has no reason
+     * to declare is not this pass's to read.
+     */
+    public function testAnIndexExtendingTheAbstractOneIsLeftAlone()
+    {
+        $container = $this->createContainer();
+        $container->register('app.email_index', FixedNameIndex::class)->addTag('key_management.blind_index', ['index' => 'email']);
+
+        (new RegisterBlindIndexesPass())->process($container);
+
+        $this->assertSame([], $container->getDefinition('app.email_index')->getArguments());
+    }
+
     public function testTheListenerIsRemovedWhenNoIndexIsRegistered()
     {
         $container = $this->createContainer();
@@ -214,5 +231,21 @@ class RegisterBlindIndexesPassTest extends TestCase
             ->setArguments([new ServiceLocator([])]);
 
         return $container;
+    }
+}
+
+/**
+ * An index naming itself, whose constructor therefore takes no name.
+ */
+final class FixedNameIndex extends AbstractBlindIndex
+{
+    public function __construct()
+    {
+        parent::__construct('user-email', new Verbatim());
+    }
+
+    protected function open(): DataKeyHandle
+    {
+        throw new \LogicException('not reached');
     }
 }

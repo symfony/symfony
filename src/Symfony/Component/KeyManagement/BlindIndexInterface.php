@@ -56,9 +56,23 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
 interface BlindIndexInterface
 {
     /**
+     * The tag of a value, which an equality search needs.
+     *
      * @return string 64 lowercase hexadecimal characters, whatever the algorithm and the length of the value
+     *
+     * @throws LogicException If the projection of this index is a {@see BlindIndex\CoveringProjectionInterface},
+     *                        whose forms {@see allOf()} returns, or if the algorithm returns a tag of any other width
+     */
+    public function of(#[\SensitiveParameter] string $value): string;
+
+    /**
+     * A tag per form a {@see BlindIndex\CoveringProjectionInterface} covers, for a column holding
+     * them all: a `text[]` with a GIN index on PostgreSQL, which the application writes and
+     * intersects itself. The one tag of {@see of()} for any other projection.
+     *
+     * @return list<string> one tag per form, each 64 lowercase hexadecimal characters
      *
      * @throws LogicException If the algorithm returns a tag of any other width
      */
-    public function of(#[\SensitiveParameter] string $value): string;
+    public function allOf(#[\SensitiveParameter] string $value): array;
 }

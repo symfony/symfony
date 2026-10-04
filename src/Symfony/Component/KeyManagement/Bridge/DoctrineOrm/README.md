@@ -88,7 +88,8 @@ services:
 ```
 
 `APP_INDEX_KEY` holds the `wrapped` value `key-management:generate-data-key app-key`
-prints.
+prints, and the second argument the `key_id` it prints beside it, which a client
+resolving the identifier it was given may spell otherwise.
 
 Resources
 ---------

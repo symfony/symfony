@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-02T12:57:10Z
+
+Last minute changes : [hardened alg length verification](https://github.com/symfony/symfony/pull/66531/changes/edbb4d8e193be1782b90e2b35b7694afd157ff5a)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-04T10:31:25Z
+
+I squashed your commits into one, rebased on 8.2, and added a commit on top: the name was stated twice in a service definition, as the `$name` argument and in the tag, and `RegisterBlindIndexesPass` only checked the tag, so two services tagged apart but deriving under one name would tag a value alike again. The pass now hands the name of the tag to the `$name` argument and refuses a service stating another one. The bridge README states the name once, and builds the wrapped key as a `Ciphertext`, which the `%env()%` string it passed is not. I also updated the description.

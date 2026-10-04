@@ -192,6 +192,26 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                     ->end()
                 ->end()
             ->end()
+            ->arrayNode('dpop')
+                ->info('Binds the tokens the provider issues to a key held by this client (DPoP); a token the provider did not bind is refused.')
+                ->example(['key' => '%env(OIDC_DPOP_KEY)%', 'algorithm' => 'ES256'])
+                ->beforeNormalization()
+                    ->ifString()
+                    ->then(static fn (string $v): array => ['key' => $v])
+                ->end()
+                ->children()
+                    ->scalarNode('key')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                        ->info('The private key the proofs are signed with, as a JSON-encoded JWK.')
+                    ->end()
+                    ->enumNode('algorithm')
+                        ->values(['ES256', 'ES384', 'ES512', 'PS256', 'PS384', 'PS512', 'RS256', 'RS384', 'RS512'])
+                        ->defaultValue('ES256')
+                        ->info('The algorithm the proofs are signed with, among the "dpop_signing_alg_values_supported" of the provider.')
+                    ->end()
+                ->end()
+            ->end()
             ->arrayNode('scope')
                 ->beforeNormalization()->castToArray()->end()
                 ->scalarPrototype()->end()
@@ -271,8 +291,8 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                 ->defaultValue([])
                 ->info('Additional parameters of the authorization request (e.g. "prompt", "display", "ui_locales", "acr_values", "login_hint"). Listen to OidcAuthorizationRequestEvent to compute them per request.')
                 ->validate()
-                    ->ifTrue(static fn ($v): bool => (bool) array_intersect_key($v, array_flip(['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'max_age'])))
-                    ->thenInvalid('The OIDC "authorization_params" option cannot set "response_type", "client_id", "redirect_uri", "scope", "state", "nonce", "code_challenge", "code_challenge_method" nor "max_age": the authenticator manages these; use the dedicated "scope" and "max_age" options.')
+                    ->ifTrue(static fn ($v): bool => (bool) array_intersect_key($v, array_flip(['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'max_age', 'dpop_jkt'])))
+                    ->thenInvalid('The OIDC "authorization_params" option cannot set "response_type", "client_id", "redirect_uri", "scope", "state", "nonce", "code_challenge", "code_challenge_method", "max_age" nor "dpop_jkt": the authenticator manages these; use the dedicated "scope", "max_age" and "dpop" options.')
                 ->end()
             ->end()
             ->arrayNode('refresh_access_token')
@@ -482,6 +502,17 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ];
         }
 
+        $dpopProofFactory = null;
+        if (isset($config['dpop'])) {
+            $dpopProofFactoryId = 'security.authenticator.oidc_login.dpop.'.$firewallName;
+            $container
+                ->setDefinition($dpopProofFactoryId, new ChildDefinition('security.oauth2.dpop.proof_factory'))
+                ->replaceArgument(0, (new ChildDefinition('security.oauth2.dpop.signing_key'))->replaceArgument(0, $config['dpop']['key']))
+                ->replaceArgument(1, $config['dpop']['algorithm'])
+            ;
+            $dpopProofFactory = new Reference($dpopProofFactoryId);
+        }
+
         $oidcClientId = 'security.authenticator.oidc_login.client.'.$firewallName;
         $container
             ->setDefinition($oidcClientId, new ChildDefinition('security.authenticator.oidc_login.client'))
@@ -490,6 +521,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(2, $config['client_id'])
             ->replaceArgument(3, new Reference($this->createClientAuthentication($container, $firewallName, $config['client_authentication'], new Reference($discoveryId))))
             ->replaceArgument(4, $certificateOptions)
+            ->replaceArgument(5, $dpopProofFactory)
         ;
 
         $signatureVerifier = null;
@@ -541,6 +573,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(9, $config['authorization_params'])
             ->replaceArgument(10, $signatureVerifier)
             ->replaceArgument(12, new Reference('security.event_dispatcher.'.$firewallName))
+            ->replaceArgument(13, $dpopProofFactory)
         ;
 
         if ($config['enable_end_session']) {

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-04T13:47:28Z
+
+Thanks for catching the `ReflectionParameter` one, that was ours.
+
+On the projection list:
+
+- `of()` refuses per value, not per index: with a prefix projection, `of('A')` returns a tag and `of('Ada')` throws, so behind `#[BlindIndexed]` a flush works for one-character values and fails for every other one. Whether a projection covers several forms is a property of the projection, so what about keeping `project(): string` and adding an interface for the projections that cover several forms? `of()` could then refuse such an index whatever the value, and `allOf()` would serve both.
+- the subkey is the same for every form but derived again for each: `hash_hkdf()` sits in the closure `array_map()` runs. Deriving it before the `array_map()` saves two HMACs per form.
+- the README offers every prefix of a name as an example without what it leaks: the number of tags is the length of the value, and rows sharing a prefix share a tag. A clause pointing at the "What this leaks" note would do.
+
+The data collector test and the README fixes look good to me.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-04T13:50:40Z
+
+Thanks. I update right now!

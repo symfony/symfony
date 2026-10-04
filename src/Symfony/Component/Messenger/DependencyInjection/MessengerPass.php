@@ -14,11 +14,13 @@ namespace Symfony\Component\Messenger\DependencyInjection;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\BeforeAfterSorter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
@@ -40,10 +42,17 @@ class MessengerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $busIds = array_keys($container->findTaggedServiceIds('messenger.bus'));
+        $taggedMiddleware = $this->findTaggedMiddleware($container, $busIds);
 
         foreach ($busIds as $busId) {
             if ($container->hasParameter($busMiddlewareParameter = $busId.'.middleware')) {
-                $this->registerBusMiddleware($container, $busId, $container->getParameter($busMiddlewareParameter));
+                $middleware = $container->getParameter($busMiddlewareParameter);
+
+                if (isset($taggedMiddleware[$busId]) || isset($taggedMiddleware['*'])) {
+                    $middleware = $this->addTaggedMiddleware($container, $busId, $middleware, $taggedMiddleware[$busId] ?? [], $taggedMiddleware['*'] ?? []);
+                }
+
+                $this->registerBusMiddleware($container, $busId, $middleware);
 
                 $container->getParameterBag()->remove($busMiddlewareParameter);
             }
@@ -477,6 +486,116 @@ class MessengerPass implements CompilerPassInterface
         );
 
         $container->getDefinition('data_collector.messenger')->addMethodCall('registerBus', [$busId, new Reference($tracedBusId)]);
+    }
+
+    /**
+     * @param list<string> $busIds
+     *
+     * @return array<string, array<string, array{before?: list<string>, after?: list<string>}>> The constraints of the tagged middleware, by bus ("*" for all buses) and service id
+     */
+    private function findTaggedMiddleware(ContainerBuilder $container, array $busIds): array
+    {
+        $knownBusIds = array_values(array_filter($busIds, static fn ($busId) => $container->hasParameter($busId.'.middleware')));
+        $middlewareByBus = [];
+
+        foreach ($container->findTaggedServiceIds('messenger.middleware', true) as $serviceId => $tags) {
+            foreach ($tags as $tag) {
+                if (null === $busId = $tag['bus'] ?? null) {
+                    throw new RuntimeException(\sprintf('Invalid middleware service "%s": the "messenger.middleware" tag requires a "bus" attribute.', $serviceId));
+                }
+
+                if ('*' !== $busId && !\in_array($busId, $knownBusIds, true)) {
+                    throw new RuntimeException(\sprintf('Invalid middleware service "%s": bus "%s" specified on the tag "messenger.middleware" does not exist (known ones are: "%s").', $serviceId, $busId, implode('", "', $knownBusIds)));
+                }
+
+                if (isset($middlewareByBus[$busId][$serviceId])) {
+                    throw new RuntimeException(\sprintf('Invalid middleware service "%s": it is tagged "messenger.middleware" more than once for bus "%s".', $serviceId, $busId));
+                }
+
+                $middlewareByBus[$busId][$serviceId] = array_filter(['before' => (array) ($tag['before'] ?? []), 'after' => (array) ($tag['after'] ?? [])]);
+            }
+        }
+
+        return $middlewareByBus;
+    }
+
+    /**
+     * @param list<array{id: string, arguments?: array}>                        $middleware
+     * @param array<string, array{before?: list<string>, after?: list<string>}> $tagged            The middleware tagged for this bus
+     * @param array<string, array{before?: list<string>, after?: list<string>}> $taggedForAllBuses The middleware tagged for all buses
+     *
+     * @return list<array{id: string, arguments?: array}>
+     */
+    private function addTaggedMiddleware(ContainerBuilder $container, string $busId, array $middleware, array $tagged, array $taggedForAllBuses): array
+    {
+        $items = $names = $constraints = $byId = $byClass = [];
+        $insertAt = null;
+
+        foreach ($middleware as $item) {
+            $serviceId = $container->has('messenger.middleware.'.$item['id']) ? 'messenger.middleware.'.$item['id'] : $item['id'];
+
+            // tags are on definitions, so a middleware configured through an alias is compared by the definition it points to
+            for ($definitionId = $serviceId, $seen = []; $container->hasAlias($definitionId) && !isset($seen[$definitionId]); $seen[$definitionId] = true) {
+                $definitionId = (string) $container->getAlias($definitionId);
+            }
+
+            if (isset($tagged[$definitionId])) {
+                throw new RuntimeException(\sprintf('Invalid middleware service "%s": it is both listed in the configuration of bus "%s" and tagged "messenger.middleware" for it.', $definitionId, $busId));
+            }
+
+            // a middleware tagged for all buses keeps the position the configuration of a bus gives it
+            unset($taggedForAllBuses[$definitionId]);
+
+            for ($n = 0, $key = $item['id']; isset($items[$key]); ++$n) {
+                $key = $item['id'].'#'.$n;
+            }
+
+            // tagged middleware go after the configured ones, in front of the ones that send and handle the message
+            if (null === $insertAt && \in_array($serviceId, ['messenger.middleware.send_message', 'messenger.middleware.chain', 'messenger.middleware.handle_message'], true)) {
+                $insertAt = \count($items);
+            }
+
+            $items[$key] = $item;
+            $names[$key] = [$item['id'], $serviceId, $definitionId];
+        }
+
+        $seed = array_keys($items);
+        $taggedKeys = [];
+
+        foreach ($tagged + $taggedForAllBuses as $serviceId => $serviceConstraints) {
+            for ($n = 0, $key = $serviceId; isset($items[$key]); ++$n) {
+                $key = $serviceId.'#'.$n;
+            }
+
+            $items[$key] = ['id' => $serviceId];
+            $taggedKeys[] = $key;
+
+            if ($serviceConstraints) {
+                $constraints[$key] = $serviceConstraints;
+            }
+
+            $names[$key] = [$serviceId];
+        }
+
+        array_splice($seed, $insertAt ?? \count($seed), 0, $taggedKeys);
+
+        foreach ($names as $key => $ids) {
+            foreach (array_unique($ids) as $id) {
+                $byId[$id][] = $key;
+            }
+
+            if ($container->has($serviceId = end($ids)) && \is_string($class = $container->getParameterBag()->resolveValue($container->findDefinition($serviceId)->getClass()))) {
+                $byClass[$class][] = $key;
+            }
+        }
+
+        try {
+            $sorted = BeforeAfterSorter::sort($seed, $constraints, $byId + $byClass);
+        } catch (InvalidArgumentException $e) {
+            throw new RuntimeException(\sprintf('Cannot order the middleware of bus "%s": ', $busId).lcfirst($e->getMessage()), 0, $e);
+        }
+
+        return array_map(static fn ($key) => $items[$key], $sorted);
     }
 
     private function registerBusMiddleware(ContainerBuilder $container, string $busId, array $middlewareCollection): void

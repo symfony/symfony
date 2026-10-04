@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T08:32:49Z
+
+The laziness is a nice catch: on 8.2, a worker stopping in the middle of a `get()` batch leaves the rest locked until `redeliver_timeout`.
+
+Retrying in place needs `reject()` to match `deliveredTo`, and that breaks the commands of the failure transport: the messages they list were never claimed, so `messenger:failed:remove` reports success and deletes nothing, and `messenger:failed:retry` never ends (with `--force` and a handler that keeps failing, I stopped it after 12 passes and 13 documents). What about putting the queue name on `MongoDbReceivedStamp` and having the sender insert the retry into that queue? `reject()` then stays by `_id`, and a retry still lands in the queue it came from.
+
+Also worth documenting: with `foo --queues=bar`, the messages of `bar` are decoded, retried and sent to the failure transport with the settings of `foo`.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-09-30T09:48:06Z
+
+The in-place retry is dropped in favour of your suggestion. It was actually the initial implementation before I opened this PR; I found the in-place redeliver more elegant, but it cannot work, as you showed. I reproduced the failure: `messenger:failed:remove` deleted nothing while reporting success, and `messenger:failed:retry` looped for the same reason, since the document it lists was never claimed. The queue name is back on `MongoDbReceivedStamp`, the retry is inserted into that queue, and `reject()` stays a plain delete by `_id`. A test now asserts that a message listed without ever being claimed is removable, which is what both commands rely on. The `foo --queues=bar` settings caveat is documented in the README and the description.

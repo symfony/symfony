@@ -65,7 +65,7 @@ class FlockStoreTest extends AbstractStoreTestCase
     {
         $store = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
+        $resource = __METHOD__;
         $key1 = new Key($resource);
         $key2 = new Key($resource);
 

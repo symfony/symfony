@@ -174,7 +174,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $store1 = $this->getStore();
         $store2 = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
+        $resource = __METHOD__;
         $key1 = new Key($resource);
         $key2 = new Key($resource);
 
@@ -200,7 +200,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $store1 = new DoctrineDbalPostgreSqlStore($conn);
         $store2 = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
+        $resource = __METHOD__;
         $key1 = new Key($resource);
         $key2 = new Key($resource);
 
@@ -230,7 +230,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $conn = $this->createPostgreSqlConnection();
         $store = new DoctrineDbalPostgreSqlStore($conn);
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $store->save($key);
 
         $waiter = pg_connect('host='.getenv('POSTGRES_HOST').' user=postgres password=password', \PGSQL_CONNECT_FORCE_NEW);

@@ -165,7 +165,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $store1 = $this->getStore();
         $store2 = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
+        $resource = __METHOD__;
         $key1 = new Key($resource);
         $key2 = new Key($resource);
 
@@ -192,7 +192,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $store1 = new PostgreSqlStore($pdo);
         $store2 = $this->getStore();
 
-        $resource = uniqid(__METHOD__, true);
+        $resource = __METHOD__;
         $key1 = new Key($resource);
         $key2 = new Key($resource);
 
@@ -223,7 +223,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $store = new PostgreSqlStore($pdo);
 
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $store->save($key);
 
         $waiter = pg_connect('host='.$this->getPostgresHost().' user=postgres password=password', \PGSQL_CONNECT_FORCE_NEW);

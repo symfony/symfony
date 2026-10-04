@@ -301,7 +301,7 @@ class LockTest extends TestCase
     public function testReleaseOnDestructionAfterFailedPromotion()
     {
         $store = new InMemoryStore();
-        $resource = uniqid(__METHOD__, true);
+        $resource = __METHOD__;
         $lock = new Lock(new Key($resource), $store);
         $other = new Lock(new Key($resource), $store);
 
@@ -316,7 +316,7 @@ class LockTest extends TestCase
 
     public function testReleaseOnDestructionAfterFailedDemotion()
     {
-        $key = new Key(uniqid(__METHOD__, true));
+        $key = new Key(__METHOD__);
         $store = $this->createMock(SharedLockStoreInterface::class);
         $lock = new Lock($key, $store);
 

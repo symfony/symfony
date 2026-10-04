@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-03T17:20:47Z
+
+Thanks, confirmed and fixed in 9ef8af2. I measured every case against the real emulators: Termux's `terminal-emulator` (v0.118.3; its same-width resize is identical on master), tmux 3.7c and xterm.js. I replayed the bytes `ScreenWriter` writes together with the matching resizes.
+
+- **Stale viewport state**: reproduced your case (`line 01`–`03` twice) and the scrollback duplicates with taller content. `ScreenWriter::followTermuxHeightChange()` now applies Termux's resize rule to its state: it updates `maxLinesRendered` / `scrollbackLineCount` instead of keeping them.
+- **Blank rows below the cursor**: on shrink, Termux first drops the rows below the cursor that hold only spaces (styles are ignored). When those rows sit above non-blank ones, the lines below them are cut off the bottom of the screen. Before, this left a gap (one case lost `line 11`). The model counts those rows the same way, truncates `previousLines` to what is still on screen, and the next frame writes the cut lines again. Two more Termux details are modelled: a cursor pushed above the screen is reset to its first row, and growth pulls rows back from the scrollback.
+- **Fallback**: when the rows Termux moves cannot be known, it repaints in full, as before. That covers content that never filled the screen and was not drawn after a clear (rows above it unknown), a scrollback that holds stale or repeated rows after `redrawViewport()`, and a cursor above the screen.
+- **tmux**: yes. tmux deletes the content rows below the cursor on shrink. With an editor-like cursor, 3 lines were lost, and in another case 9. `TMUX` now disables the skip, so tmux in Termux repaints in full again.
+- Your fallback to `fullRender()` after a rows change fixed those cases, but a sequence of keyboard toggles with edits in between still left lines shown twice on screen.
+
+Results: 16 scenarios × {Termux, tmux, xterm.js}, plus 1000 random scenarios in Termux (frames with appends, removals, inserts, edits, blank and styled-blank lines, a cursor marker, shell lines above, heights between 8 and 24). None shows a wrong screen or a missing line that the full repaint doesn't also show. Compared with the full repaint, resizes write 58% fewer bytes, and 58% of them cost less than 60 bytes instead of 6%.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T19:31:53Z
+
+Thanks, that's convincing. I pushed three small commits: an empty frame left `screenCleared` set, so a later growth pulled stale scrollback rows back on screen; GNU screen (`STY`) and zellij (`ZELLIJ`) inside Termux are now excluded like tmux, since they move rows their own way on shrink; and a test helper docblock is gone.
+
+One question: when the keyboard shows, does Android send one resize, or several during its animation? Two SIGWINCH arriving before the handler runs are seen as one, and the model then diverges from Termux once blank rows are involved.
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-03T22:14:56Z
+
+Thanks for the commits. I measured both on Android and offline.
+
+**On the device** (Android 14 emulator, Pixel 3a, Gboard, Termux v0.118.3, a `trap WINCH` logger polling every 5 ms):
+- **One SIGWINCH per keyboard show or hide.** The height jumps straight between 29 and 49 rows, with no intermediate size, over 20 toggles. Termux only calls `updateSize()` from `onSizeChanged()` and uses `SOFT_INPUT_ADJUST_RESIZE`, so it never sees the animation frames.
+- **Even a hide immediately followed by a show** gives two SIGWINCH 370 to 1800 ms apart (median 407 ms), so the handler doesn't coalesce them in practice. Real phones may differ, so I didn't rely on it.
+
+**Coalescing, offline** (Termux's own emulator code, two resizes reported by one handler call):
+- You're right. 21 of 1000 random scenarios diverged, including 12 of 1000 with monotone pairs only.
+- The cause: Termux counts the blank rows below the cursor but cuts the bottom rows. When a non-blank row lies below a blank one, the counted blank rows stay on screen and a second shrink counts them again.
+- 04682c2 repaints in full in that case. When the blank rows below the cursor sit at the bottom only, as with an input line at the bottom or content shorter than the screen, shrinks and growths compose exactly. With this change, 0 of 1000 diverge, with coalesced pairs or without.
+
+**Another ordering issue I measured.** Termux sends SIGWINCH and resizes on its UI thread before appending output it has already read.
+- I measured it with a cursor position request written every 20 ms. On 13 of 13 toggles, the requests written 3 to 20 ms before the signal were answered at the new height.
+- Termux's processing latency reaches 271 ms at p99 and 384 ms at most during the keyboard animation.
+- So a frame rendered just before the SIGWINCH is applied after the resize, which the model can't know about.
+- For chat-like output (lines appended or changed at the bottom, input line last), this is harmless: 0 of 1000 scenarios diverged with every resize raced. With adversarial frames that edit lines leaving the screen, 8 of 1000 show a wrong screen.
+- I left that residual as is: guarding it would mean a time-based heuristic that also repaints on every toggle while output is streaming. A real Tui streaming in Termux on the emulator, with toggles during output, kept a correct screen.
+
+Also rebased on 8.1: the static-analysis failures came from `composer.json` differing from the base, which makes the workflow install PHPUnit 9.

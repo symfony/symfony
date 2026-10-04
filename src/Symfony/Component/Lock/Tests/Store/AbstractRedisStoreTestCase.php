@@ -51,7 +51,11 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
         $this->assertTrue($oldStore->exists($key1));
 
         $this->expectException(LockConflictedException::class);
-        $newStore->save($key2);
+        try {
+            $newStore->save($key2);
+        } finally {
+            $this->getRedisConnection()->del((string) $key1);
+        }
     }
 
     public function testWriteMemberIsNotOwnedByTheKeyThatNamesIt()

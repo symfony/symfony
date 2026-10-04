@@ -1,0 +1,28 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+framework:
+    http_client: ~
+
+security:
+    providers:
+        in_memory:
+            memory:
+                users:
+                    john: { password: test, roles: [ROLE_USER] }
+
+    firewalls:
+        oidc:
+            pattern: ^/oidc
+            provider: in_memory
+            oidc_login:
+                provider_uri: 'https://accounts.example.com'
+                client_id: client_id
+                client_authentication:
+                    client_secret_post: client_secret
+                refresh_access_token: true
+                dpop:
+                    key: '{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}'
+        main:
+            http_basic: ~
+            stateless: true

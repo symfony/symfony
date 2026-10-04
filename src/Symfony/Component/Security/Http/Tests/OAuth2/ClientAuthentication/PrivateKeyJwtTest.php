@@ -161,6 +161,30 @@ class PrivateKeyJwtTest extends TestCase
         new PrivateKeyJwt(new JWK(self::FOREIGN_PUBLIC_JWK), 'ES256');
     }
 
+    public function testRejectsAKeyOfTheWrongType()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "ES256" algorithm signs with a key of the "EC" type, and the given JWK is of the "RSA" type.');
+
+        new PrivateKeyJwt(new JWK(['kty' => 'RSA', 'n' => 'xGkQ', 'e' => 'AQAB', 'd' => 'Vh6-Q']), 'ES256');
+    }
+
+    public function testRejectsAKeyOnTheWrongCurve()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "ES256" algorithm signs with a key on the "P-256" curve (RFC 7518, Section 3.4), and the given JWK is on the "P-384" curve.');
+
+        new PrivateKeyJwt(new JWK(['crv' => 'P-384'] + self::PRIVATE_JWK), 'ES256');
+    }
+
+    public function testRejectsASymmetricKeyForWhatItIs()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "RS256" algorithm signs with a key of the "RSA" type, and the given JWK is of the "oct" type.');
+
+        new PrivateKeyJwt(new JWK(['kty' => 'oct', 'k' => 'c2VjcmV0']), 'RS256');
+    }
+
     public function testRejectsALifetimeThatIsNotPositive()
     {
         $this->expectException(\InvalidArgumentException::class);

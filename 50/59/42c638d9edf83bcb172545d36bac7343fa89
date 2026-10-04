@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-03T22:21:28Z
+
+The failing `x86 / minimal-exts / lowest-php` job is unrelated to this change. HttpClient's tests pass in it (`OK src\Symfony/Component/HttpClient`). The only error comes from PropertyInfo:
+
+```
+1) Symfony\Component\PropertyInfo\Tests\AbstractPropertyInfoExtractorTest::testGetTypes
+UnexpectedValueException: RecursiveDirectoryIterator::__construct(D:\a\symfony\symfony\src\Symfony\Component\AssetMapper\Tests\Fixtures\.!!kQM\cache\test\Container8Vx0orI): The system cannot find the path specified (code: 3)
+```
+
+It's a race between components that run in parallel:
+- The job runs `php phpunit src\Symfony`, so all components run at the same time with the root `phpunit.xml`, whose `<source>` includes all of `./src/Symfony/`.
+- `testGetTypes()` calls the deprecated `PropertyInfoExtractor::getTypes()`. On the first deprecation, PHPUnit 11.5's `SourceMapper` walks every `<source>` directory through `phpunit/php-file-iterator`.
+- Meanwhile, an AssetMapper test in another process deletes the test kernel's cache directory under `AssetMapper/Tests/Fixtures`. The walk enters that directory just as it disappears, and php-file-iterator 5.x aborts the whole traversal with this exception.
+
+php-file-iterator fixed this in 6.0.2 and 7.0.2 (sebastianbergmann/php-file-iterator@d63fd0c, "Do not abort a traversal because of a directory that cannot be opened"). PHPUnit 11.5 requires `^5.1.1`, though, and 5.1.1 is the latest 5.x release. A backport to 5.x is requested in sebastianbergmann/php-file-iterator#193. Until it's released, this job will keep failing now and then on Windows. A re-run should pass.

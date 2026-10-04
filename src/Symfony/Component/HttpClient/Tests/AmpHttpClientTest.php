@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use Amp\Dns;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -18,6 +19,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[Group('dns-sensitive')]
 class AmpHttpClientTest extends HttpClientTestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        // amphp/dns loads the system configuration on first use, which runs PowerShell on Windows and can outlast the timeout of the first test
+        Dns\resolve('localhost');
+    }
+
     #[Group('transient')]
     public function testNonBlockingStream()
     {

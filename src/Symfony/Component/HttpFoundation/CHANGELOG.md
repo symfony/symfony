@@ -17,6 +17,8 @@ CHANGELOG
  * Add `Request::getStructuredSuffixFormat()` to resolve a mime type to the format of its structured syntax suffix, e.g. `application/vnd.api+json` to `json`
  * Accept a list of secrets in `UriSigner::__construct()` to rotate them
  * `StreamedResponse::__construct()` now accepts a `ResponseHeaderBag` as its third argument
+ * Add arguments `$isolate` and `$debug` to `AttributeBag::__construct()`, and `$attributeBagFactory` to `SessionFactory::__construct()`
+ * Deprecate saving changes made to session attributes without calling `set()` afterwards
 
 8.1
 ---

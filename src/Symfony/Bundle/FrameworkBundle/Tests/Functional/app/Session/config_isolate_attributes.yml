@@ -1,0 +1,6 @@
+imports:
+    - { resource: config.yml }
+
+framework:
+    session:
+        isolate_attributes: true

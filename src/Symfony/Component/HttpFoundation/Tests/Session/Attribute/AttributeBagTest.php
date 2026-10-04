@@ -189,4 +189,109 @@ class AttributeBagTest extends TestCase
 
         $this->assertSame(['123', 'bar'], $keys);
     }
+
+    public function testGetDoesNotIsolateValuesByDefault()
+    {
+        $object = new \stdClass();
+        $array = ['obj' => $object];
+        $bag = new AttributeBag();
+        $bag->initialize($array);
+
+        $this->assertSame($object, $bag->get('obj'));
+    }
+
+    public function testIsolatedGetReturnsTheSameCopyEveryTime()
+    {
+        $object = new \stdClass();
+        $object->foo = 'bar';
+        $array = ['obj' => $object, 'list' => [$object], 'scalars' => ['a' => 1], 'scalar' => 'value'];
+        $bag = new AttributeBag('_sf2_attributes', true);
+        $bag->initialize($array);
+
+        $copy = $bag->get('obj');
+        $this->assertEquals($object, $copy);
+        $this->assertNotSame($object, $copy);
+        $this->assertSame($copy, $bag->get('obj'));
+
+        $copy->foo = 'baz';
+        $bag->get('list')[0]->foo = 'baz';
+
+        $this->assertSame('bar', $array['obj']->foo);
+        $this->assertSame('bar', $array['list'][0]->foo);
+        $this->assertSame('baz', $bag->get('obj')->foo);
+        $this->assertSame('baz', $bag->get('list')[0]->foo);
+        $this->assertSame(['a' => 1], $bag->get('scalars'));
+        $this->assertSame('value', $bag->get('scalar'));
+    }
+
+    public function testIsolatedSetSavesTheValueAsPassed()
+    {
+        $array = [];
+        $bag = new AttributeBag('_sf2_attributes', true);
+        $bag->initialize($array);
+
+        $object = new \stdClass();
+        $object->foo = 'bar';
+        $bag->set('obj', $object);
+        $bag->set('list', [$object]);
+        $object->foo = 'baz';
+
+        $this->assertSame($object, $bag->get('obj'));
+        $this->assertSame([$object], $bag->get('list'));
+        $this->assertSame('bar', $array['obj']->foo);
+        $this->assertSame('bar', $array['list'][0]->foo);
+
+        $bag->set('obj', $object);
+
+        $this->assertSame('baz', $array['obj']->foo);
+        $this->assertNotSame($object, $array['obj']);
+    }
+
+    public function testIsolatedAllRemoveAndClearReturnTheIsolatedValues()
+    {
+        $object = new \stdClass();
+        $array = ['obj' => $object, 'scalar' => 'value'];
+        $bag = new AttributeBag('_sf2_attributes', true);
+        $bag->initialize($array);
+
+        $copy = $bag->get('obj');
+        $this->assertNotSame($object, $copy);
+        $this->assertSame(['obj' => $copy, 'scalar' => 'value'], $bag->all());
+        $this->assertSame(['obj' => $copy, 'scalar' => 'value'], iterator_to_array($bag));
+        $this->assertSame($copy, $bag->remove('obj'));
+        $this->assertSame(['scalar' => 'value'], $array);
+
+        $bag->set('obj', $object);
+        $this->assertSame(['scalar' => 'value', 'obj' => $object], $bag->clear());
+        $this->assertSame([], $array);
+    }
+
+    public function testIsolatedAllCopiesValuesNotReadYet()
+    {
+        $object = new \stdClass();
+        $array = ['obj' => $object];
+        $bag = new AttributeBag('_sf2_attributes', true);
+        $bag->initialize($array);
+
+        $all = $bag->all();
+        $this->assertNotSame($object, $all['obj']);
+        $this->assertSame($all['obj'], $bag->get('obj'));
+    }
+
+    public function testIsolatedReplaceAndInitializeDropPreviousValues()
+    {
+        $array = [];
+        $bag = new AttributeBag('_sf2_attributes', true);
+        $bag->initialize($array);
+
+        $object = new \stdClass();
+        $bag->set('obj', $object);
+        $bag->replace(['other' => $object]);
+        $this->assertNull($bag->get('obj'));
+        $this->assertSame($object, $bag->get('other'));
+
+        $newArray = ['other' => $object];
+        $bag->initialize($newArray);
+        $this->assertNotSame($object, $bag->get('other'));
+    }
 }

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `expression_language.compiled` tag, to decorate an expression language with `CompiledExpressionLanguage`; its `attributes`, `string_expressions` and `expressions` attributes list the expressions to compile when warming up the cache, and `variables` the ones the listed expressions can read
+ * Add the `framework.session.isolate_attributes` option to deep-clone the values read from and passed to session attributes
  * List deprecated aliases in `debug:autowiring` only when the `--all` option is passed
  * Register the security expression functions on `controller.expression_language`
  * Add the `configure_container` option to `WebTestCase::createClient()` to configure the container after every kernel reboot

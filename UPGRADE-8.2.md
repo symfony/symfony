@@ -253,6 +253,24 @@ HttpFoundation
    matched against a single combined regexp, and will be removed in 9.0. Populating it makes `getHost()`
    trigger a deprecation; reading it is not reported, since PHP provides no way to intercept access to a
    static property
+ * Deprecate saving changes made to the value of a session attribute without calling `set()` afterwards.
+   In 9.0, objects read from the session will be copies and only the values passed to `set()` will be saved.
+   These changes are reported when the `$debug` argument of `AttributeBag::__construct()` is `true`, which
+   FrameworkBundle does when `kernel.debug` is enabled. Set the `framework.session.isolate_attributes` option
+   to `true`, or pass `true` as the `$isolate` argument of `AttributeBag::__construct()`, to opt in to the new
+   behavior.
+
+   *Before*
+   ```php
+   $session->get('cart')->add($item);
+   ```
+
+   *After*
+   ```php
+   $cart = $session->get('cart');
+   $cart->add($item);
+   $session->set('cart', $cart);
+   ```
 
 HttpKernel
 ----------

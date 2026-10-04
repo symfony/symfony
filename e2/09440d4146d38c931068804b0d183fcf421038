@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-21T15:14:22Z
+
+Before the detailed pass, a question on the registry while it's still cheap to change.
+
+Rather than mapping each provider session to a local session id and ending it from the back channel, we could record the `sid` that ended and refuse it on the user's next request. `CheckRefreshedUserEvent` landed last week for that exact shape, and the token already carries `oidc_sid` thanks to this PR:
+
+```php
+public function __invoke(CheckRefreshedUserEvent $event): void
+{
+    $token = $event->getToken();
+    $sid = $token->hasAttribute('oidc_sid') ? $token->getAttribute('oidc_sid') : null;
+
+    if (null !== $sid && $this->endedSessions->has($sid)) {
+        $event->setException(new AuthenticationException('The OIDC provider ended this session.'));
+    }
+}
+```
+
+What it avoids: `CacheOidcSessionRegistry::destroy()` calls `session_set_save_handler()` and `session_start()` on the process, and leaves `session.use_cookies` at `0` and `cache_limiter` empty behind it. Harmless under php-fpm, where ini resets per request, not under a worker runtime until something builds the next `NativeSessionStorage`. It also keeps raw session ids, which are credentials, out of `cache.app`, works with a storage that has no `SessionHandlerInterface`, and drops the "no session may be active here" constraint on the endpoint.
+
+The cost is one cache lookup per request carrying an `oidc_sid`, and the session data lingering until gc instead of being wiped at once. The user can't use it meanwhile, which is what the spec is protecting.
+
+It answers the options too: `session_registry` has nothing left to swap, and `session_ttl` is always `session.gc_maxlifetime`, since remembering an ended sid for longer than a session can live buys nothing. That leaves `backchannel_logout: true`, plus `path`, plus `cache` when `cache.app` isn't shared. WDYT?
+
+Three points that hold either way:
+
+- `jti` is required present but never remembered, `iat` is only checked against the future and `exp` is optional, so a captured logout token stays valid forever. Small in practice, since the `sid` it names is consumed on first use, but Section 2.6 lists the replay check for a reason.
+- `verify(string $token, string $tokenType = 'ID token')` carries a public parameter for a whole major version to vary an error message, and it makes the common one read `Invalid "ID token" format.`, with quotes around prose. I'd drop it and leave the messages as they were.
+- Is there a second implementation in mind for `OidcBackChannelLogoutInterface`? The swappable part looks like the storage rather than the orchestration.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-22T22:10:09Z
+
+Thanks @nicolas-grekas . All three taken, rebased and pushed.
+`OidcEndedSessions` records the ended `sid` and `OidcBackChannelLogoutListener` refuses it on `CheckRefreshedUserEvent`, so no session is touched from the endpoint and the config is down to enabled + path + cache.
+
+One open question: deauthenticating does not destroy the session, so anything the app keeps there outside security survives until gc. Fine for you or should the listener invalidate too?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-23T13:10:37Z
+
+I'd keep it a deauthentication, as it is. That path already does the security part: `ContextListener` drops the firewall's token, `RememberMeListener` clears the remember-me cookie on `TokenDeauthenticatedEvent`, and `RememberMeAuthenticator` won't log back in from a cookie being cleared in the same request. That's also what happens on a password change. Invalidating would additionally log the user out of other firewalls sharing the session, which this provider has no say over, and `CheckRefreshedUserEvent` asks for side-effect-free listeners.
+
+What I'd add is a dedicated `AuthenticationException` subclass instead of a plain one, so that an app wanting parity with its front-channel logout (`invalidate_session` defaults to true there) can do it from `TokenDeauthenticatedEvent::getException()`:
+
+```php
+if ($event->getException() instanceof OidcSessionEndedException) {
+    $event->getRequest()->getSession()->invalidate();
+}
+```
+
+Name is yours of course :)
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-09-23T14:20:39Z
+
+> I'd keep it a deauthentication, as it is. That path already does the security part: `ContextListener` drops the firewall's token, `RememberMeListener` clears the remember-me cookie on `TokenDeauthenticatedEvent`, and `RememberMeAuthenticator` won't log back in from a cookie being cleared in the same request. That's also what happens on a password change. Invalidating would additionally log the user out of other firewalls sharing the session, which this provider has no say over, and `CheckRefreshedUserEvent` asks for side-effect-free listeners.
+>
+> What I'd add is a dedicated `AuthenticationException` subclass instead of a plain one, so that an app wanting parity with its front-channel logout (`invalidate_session` defaults to true there) can do it from `TokenDeauthenticatedEvent::getException()`:
+>
+> ```
+> if ($event->getException() instanceof OidcSessionEndedException) {
+>     $event->getRequest()->getSession()->invalidate();
+> }
+> ```
+>
+> Name is yours of course :)
+
+IIUC, this mechanism means the user is deauthenticated by the POST request from the OIDC Provider, but the session is invalidated on the next incoming Request from the User? What if this Request is long to come (before session expiration)? Any risk of reactivation?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-24T08:51:34Z
+
+@welcoMattic right, the logout lands on the user's next request, and the risk is the record expiring first. It's kept for `session.gc_maxlifetime` as read by the process handling the provider's POST, and on a lazy firewall nothing builds the session there, so that's the php.ini value (1440s) even when `framework.session.gc_maxlifetime` or the handler's `ttl` says a day. Past that, the user comes back to a working login. I was wrong in my first comment when I said this lifetime is always `session.gc_maxlifetime`.
+
+@Spomky I'd restore an explicit lifetime option then, documented as "at least how long your sessions can stay idle". WDYT?
+
+Also, `exp` is REQUIRED by Section 2.4 and 2.6 validates it the way it does for ID tokens. That's what bounds a captured token, and `jti` can then stay unremembered.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-03T15:07:44Z
+
+Hi @nicolas-grekas ,
+
+The last 2 commits address the remarks you raised.
+Rebased and conflicts fixed. Let me know if there is something else I should take care.
+
+BR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T15:48:56Z
+
+Thanks @Spomky, all three are in. I squashed the branch into your commit with a few more fixes: refused logout tokens are now logged (a `sub`-only one was a silent 400), `oidc_sid` follows a refreshed ID token, `path` must start with `/`, an array `logout_token` gets the JSON 400, plus section citations, shorter info texts and changelog entries, and an end-to-end test through the real `ContextListener`. I also updated the description.
+
+One thing left: in a context shared with other firewalls, the logout only applies on requests to the oidc_login firewall, since the listener is registered on its dispatcher only, so a request to another firewall of the context keeps the login. Registering it globally (`CheckRefreshedUserEvent` bubbles to every firewall) and checking `$token->getFirewallName()` would cover them. Also, `backchannel_logout` on a stateless firewall does nothing, since no token is ever restored there: worth refusing at compile time, as `user_checker_on_refresh` does. WDYT?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-03T19:36:49Z
+
+Yes. I will update this PR.
+By the way I noted something else: the sid should be prefixed with the firewall name. Just in case we have multiple firewalls and a similar sid (not sure if it could be a real situation though)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-04T06:55:24Z
+
+Thanks, both points are in. I squashed it into one commit rebased on #66239 and #66465, and the listener now reads `getFirewallName()` instead of a new `oidc_firewall` attribute, which only repeated what the token already says: the functional test stores a token named after its firewall instead of going through `loginUser()`, which names it after the context.

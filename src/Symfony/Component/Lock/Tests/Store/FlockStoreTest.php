@@ -34,7 +34,7 @@ class FlockStoreTest extends AbstractStoreTestCase
     public function testConstructWhenRepositoryCannotBeCreated()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
+        $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exist and cannot be created.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
         }

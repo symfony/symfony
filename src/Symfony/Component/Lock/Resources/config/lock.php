@@ -40,6 +40,13 @@ return static function (ContainerConfigurator $container) {
                 inline_service('string')->factory('hash')->args(['xxh64', '%kernel.project_dir%']),
             ]])])
 
+        ->set('.lock.flock+remove.store', FlockStore::class)
+            ->args([inline_service('string')->factory('implode')->args(['/', [
+                inline_service('string')->factory('sys_get_temp_dir'),
+                'symfony-lock',
+                inline_service('string')->factory('hash')->args(['xxh64', '%kernel.project_dir%']),
+            ]]), true])
+
         ->set('.lock.semaphore.store', SemaphoreStore::class)
             ->args(['%kernel.project_dir%'])
     ;

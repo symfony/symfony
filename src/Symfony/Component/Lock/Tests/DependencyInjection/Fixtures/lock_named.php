@@ -10,4 +10,5 @@ $container->loadFromExtension('lock', [
     'corge' => 'in-memory',
     'grault' => 'mysql:host=localhost;dbname=test',
     'garply' => 'null',
+    'waldo' => 'flock+remove',
 ]);

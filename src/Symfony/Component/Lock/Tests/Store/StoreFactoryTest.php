@@ -144,6 +144,19 @@ class StoreFactoryTest extends TestCase
         $this->assertSame('my project/id', (new \ReflectionProperty(SemaphoreStore::class, 'projectId'))->getValue($store));
     }
 
+    public function testCreateFlockStoreRemovingTheLockFileOnRelease()
+    {
+        $removeOnRelease = new \ReflectionProperty(FlockStore::class, 'removeOnRelease');
+
+        $this->assertFalse($removeOnRelease->getValue(StoreFactory::createStore('flock')));
+        $this->assertTrue($removeOnRelease->getValue(StoreFactory::createStore('flock+remove')));
+
+        $store = StoreFactory::createStore('flock+remove://'.sys_get_temp_dir());
+
+        $this->assertTrue($removeOnRelease->getValue($store));
+        $this->assertSame(sys_get_temp_dir(), (new \ReflectionProperty(FlockStore::class, 'lockPath'))->getValue($store));
+    }
+
     public static function validConnections(): \Generator
     {
         if (class_exists(\Redis::class)) {
@@ -201,7 +214,9 @@ class StoreFactoryTest extends TestCase
         yield ['in-memory', InMemoryStore::class];
 
         yield ['flock', FlockStore::class];
+        yield ['flock+remove', FlockStore::class];
         yield ['flock://'.sys_get_temp_dir(), FlockStore::class];
+        yield ['flock+remove://'.sys_get_temp_dir(), FlockStore::class];
 
         yield ['null', NullStore::class];
     }

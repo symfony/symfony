@@ -519,6 +519,38 @@ class AccessTokenTest extends AbstractWebTestCase
     }
 
     #[RequiresPhpExtension('openssl')]
+    public function testDpopBoundTokenIsAcceptedOnceWithItsProof()
+    {
+        $key = self::createDpopKey();
+        $token = self::createDpopBoundToken($key);
+        $server = ['HTTP_AUTHORIZATION' => 'DPoP '.$token, 'HTTP_DPOP' => self::createDpopProof($key, $token, 'http://localhost/foo')];
+
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_dpop.yml']);
+        $client->request('GET', '/foo', [], [], $server);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($client->getResponse()->getContent(), true));
+
+        $client->request('GET', '/foo', [], [], $server);
+
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('DPoP realm="My API",error="invalid_dpop_proof",error_description="Invalid credentials.",algs="ES256 PS256 RS256"', $client->getResponse()->headers->get('WWW-Authenticate'));
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testDpopFirewallDoesNotReadABearerToken()
+    {
+        $key = self::createDpopKey();
+        $token = self::createDpopBoundToken($key);
+
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_dpop.yml']);
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => 'Bearer '.$token, 'HTTP_DPOP' => self::createDpopProof($key, $token, 'http://localhost/foo')]);
+
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('DPoP realm="My API",algs="ES256 PS256 RS256"', $client->getResponse()->headers->get('WWW-Authenticate'));
+    }
+
+    #[RequiresPhpExtension('openssl')]
     public function testOidcFailureWithJweEnforced()
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc_jwe.yml']);
@@ -696,6 +728,46 @@ class AccessTokenTest extends AbstractWebTestCase
             [static fn () => self::createJws($claims, ['typ' => 'JWT'])],
             [static fn () => self::createJws($claims, [])],
         ];
+    }
+
+    private static function createDpopKey(): JWK
+    {
+        return new JWK([
+            'kty' => 'EC',
+            'crv' => 'P-256',
+            'x' => 'WVnRsXoNEpNEzsNLkmDjaEtKkhpcP-KkihslW781L-I',
+            'y' => '2KbDKglsg62x9FWBk740sp1etkmwoD_Dv416SQG3_mA',
+            'd' => 'dYp0PmjMg_xzq-J3Srfzpghejc38uVOaoOOHQXgEhpw',
+        ]);
+    }
+
+    private static function createDpopBoundToken(JWK $key): string
+    {
+        return self::createJws([
+            'iat' => time() - 1,
+            'nbf' => time() - 1,
+            'exp' => time() + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => 'Symfony OIDC',
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'username' => 'dunglas',
+            'cnf' => ['jkt' => $key->toPublic()->thumbprint('sha256')],
+        ]);
+    }
+
+    private static function createDpopProof(JWK $key, string $token, string $url): string
+    {
+        return (new JwsCompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([new ES256()])))
+            ->withPayload(json_encode([
+                'jti' => bin2hex(random_bytes(16)),
+                'htm' => 'GET',
+                'htu' => $url,
+                'iat' => time(),
+                'ath' => rtrim(strtr(base64_encode(hash('sha256', $token, true)), '+/', '-_'), '='),
+            ]))
+            ->addSignature($key, ['typ' => 'dpop+jwt', 'alg' => 'ES256', 'jwk' => $key->toPublic()->all()])
+            ->build()
+        );
     }
 
     private static function createJws(array $claims, array $header = ['typ' => 'at+jwt']): string

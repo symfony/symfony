@@ -569,6 +569,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(0, new Reference('security.user_checker.'.$id))
             ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
+        if (($firewall['access_token']['dpop']['enabled'] ?? false) && !$firewall['stateless']) {
+            throw new InvalidConfigurationException(\sprintf('The "dpop" option of the "access_token" authenticator requires the "%s" firewall to be stateless, as a stateful one stores the authenticated token in the session: the session cookie alone would then be accepted for an access token bound to a key, which is what the binding is there to prevent.', $id));
+        }
+
         if ($firewall['user_checker_on_refresh']) {
             if ($firewall['stateless']) {
                 throw new InvalidConfigurationException(\sprintf('The "user_checker_on_refresh" option of the "%s" firewall requires a stateful firewall, as a stateless one never refreshes the user from a session.', $id));

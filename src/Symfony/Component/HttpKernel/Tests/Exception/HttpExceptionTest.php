@@ -13,7 +13,30 @@ namespace Symfony\Component\HttpKernel\Tests\Exception;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\ContentTooLargeHttpException;
+use Symfony\Component\HttpKernel\Exception\ExpectationFailedHttpException;
+use Symfony\Component\HttpKernel\Exception\FailedDependencyHttpException;
+use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\LockedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\NotImplementedHttpException;
+use Symfony\Component\HttpKernel\Exception\PaymentRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\RangeNotSatisfiableHttpException;
+use Symfony\Component\HttpKernel\Exception\RequestTimeoutHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\HttpKernel\Exception\TooEarlyHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\HttpKernel\Exception\UnavailableForLegalReasonsHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 class HttpExceptionTest extends TestCase
 {
@@ -61,33 +84,41 @@ class HttpExceptionTest extends TestCase
     }
 
     #[DataProvider('provideStatusCode')]
-    public function testFromStatusCode(int $statusCode)
+    public function testFromStatusCode(int $statusCode, string $class)
     {
         $exception = HttpException::fromStatusCode($statusCode);
-        $this->assertInstanceOf(HttpException::class, $exception);
+        $this->assertSame($class, $exception::class);
         $this->assertSame($statusCode, $exception->getStatusCode());
     }
 
     public static function provideStatusCode()
     {
         return [
-            [400],
-            [401],
-            [403],
-            [404],
-            [406],
-            [409],
-            [410],
-            [411],
-            [412],
-            [413],
-            [418],
-            [423],
-            [415],
-            [422],
-            [428],
-            [429],
-            [503],
+            [400, BadRequestHttpException::class],
+            [401, HttpException::class],
+            [402, PaymentRequiredHttpException::class],
+            [403, AccessDeniedHttpException::class],
+            [404, NotFoundHttpException::class],
+            [406, NotAcceptableHttpException::class],
+            [408, RequestTimeoutHttpException::class],
+            [409, ConflictHttpException::class],
+            [410, GoneHttpException::class],
+            [411, LengthRequiredHttpException::class],
+            [412, PreconditionFailedHttpException::class],
+            [413, ContentTooLargeHttpException::class],
+            [415, UnsupportedMediaTypeHttpException::class],
+            [416, RangeNotSatisfiableHttpException::class],
+            [417, ExpectationFailedHttpException::class],
+            [418, HttpException::class],
+            [422, UnprocessableEntityHttpException::class],
+            [423, LockedHttpException::class],
+            [424, FailedDependencyHttpException::class],
+            [425, TooEarlyHttpException::class],
+            [428, PreconditionRequiredHttpException::class],
+            [429, TooManyRequestsHttpException::class],
+            [451, UnavailableForLegalReasonsHttpException::class],
+            [501, NotImplementedHttpException::class],
+            [503, ServiceUnavailableHttpException::class],
         ];
     }
 

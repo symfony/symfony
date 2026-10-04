@@ -22,7 +22,7 @@ CHANGELOG
  * Make `#[MapRequestPayload]` deserialize any media type carrying a structured syntax suffix with the encoder of the suffix format, e.g. `application/vnd.api+json` with the `json` encoder
  * Add the `$exposeHeaders` argument to `#[RateLimit]`
  * Instantiate on demand the bundles that have nothing to do when the kernel boots
- * Add `ContentTooLargeHttpException`
+ * Add `PaymentRequiredHttpException`, `RequestTimeoutHttpException`, `ContentTooLargeHttpException`, `RangeNotSatisfiableHttpException`, `ExpectationFailedHttpException`, `FailedDependencyHttpException`, `TooEarlyHttpException`, `UnavailableForLegalReasonsHttpException` and `NotImplementedHttpException`
 
 8.1
 ---

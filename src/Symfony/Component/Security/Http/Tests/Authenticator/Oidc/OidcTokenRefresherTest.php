@@ -154,6 +154,26 @@ class OidcTokenRefresherTest extends TestCase
         $this->assertSame($previousIdToken, $token->getAttribute('oidc_id_token'));
     }
 
+    public function testRefreshStoresTheSidOfARefreshedIdToken()
+    {
+        $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456', 'id_token' => $this->buildIdToken(['sid' => 'session-43'])]));
+        $token = $this->createToken(['oidc_sid' => 'session-42']);
+
+        $refresher->refresh($token);
+
+        $this->assertSame('session-43', $token->getAttribute('oidc_sid'));
+    }
+
+    public function testRefreshKeepsThePreviousSidWhenTheRefreshedIdTokenCarriesNone()
+    {
+        $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456', 'id_token' => $this->buildIdToken()]));
+        $token = $this->createToken(['oidc_sid' => 'session-42']);
+
+        $refresher->refresh($token);
+
+        $this->assertSame('session-42', $token->getAttribute('oidc_sid'));
+    }
+
     public function testRefreshRejectsARefreshedIdTokenOfAnotherSubject()
     {
         // OIDC Core 1.0 Section 12.2: the refreshed ID token describes the very same

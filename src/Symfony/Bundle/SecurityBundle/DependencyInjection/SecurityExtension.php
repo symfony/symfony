@@ -573,6 +573,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             throw new InvalidConfigurationException(\sprintf('The "dpop" option of the "access_token" authenticator requires the "%s" firewall to be stateless, as a stateful one stores the authenticated token in the session: the session cookie alone would then be accepted for an access token bound to a key, which is what the binding is there to prevent.', $id));
         }
 
+        if ($firewall['stateless'] && ($firewall['oidc_login']['backchannel_logout']['enabled'] ?? false)) {
+            throw new InvalidConfigurationException(\sprintf('The OIDC "backchannel_logout" option of the "%s" firewall requires a stateful firewall, as a stateless one restores no token from a session and would record the end of a provider session without ever refusing a login for it.', $id));
+        }
+
         if ($firewall['user_checker_on_refresh']) {
             if ($firewall['stateless']) {
                 throw new InvalidConfigurationException(\sprintf('The "user_checker_on_refresh" option of the "%s" firewall requires a stateful firewall, as a stateless one never refreshes the user from a session.', $id));

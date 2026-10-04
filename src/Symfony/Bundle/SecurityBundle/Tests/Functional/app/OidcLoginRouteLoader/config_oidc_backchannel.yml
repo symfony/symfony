@@ -1,0 +1,34 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+framework:
+    http_client: ~
+
+security:
+    providers:
+        in_memory:
+            memory:
+                users:
+                    john: { password: test, roles: [ROLE_USER] }
+
+    firewalls:
+        oidc:
+            pattern: ^/oidc
+            provider: in_memory
+            oidc_login:
+                provider_uri: 'https://accounts.example.com'
+                client_id: client_id
+                client_authentication:
+                    client_secret_post: client_secret
+                id_token_signature:
+                    algorithms: [ES256]
+                backchannel_logout: true
+        main:
+            http_basic: ~
+            stateless: true
+
+services:
+    oidc_session_ended_listener:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\EventBundle\EventListener\OidcSessionEndedListener
+        tags:
+            - { name: kernel.event_listener, dispatcher: security.event_dispatcher.oidc }

@@ -2196,6 +2196,23 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('closure.php', $dumper->dump());
     }
 
+    public function testClosureOfStaticMethodString()
+    {
+        $container = new ContainerBuilder();
+        $container->register('closure', 'Closure')
+            ->setPublic(true)
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([BarTagClass::class.'::getDefaultFooName']);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Closure_Of_Static_Method_String']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Closure_Of_Static_Method_String();
+
+        $this->assertSame('bar_tag_class', $container->get('closure')());
+    }
+
     public function testAutowireClosure()
     {
         $container = new ContainerBuilder();

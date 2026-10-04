@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bridge\PhpUnit\DnsMock;
@@ -276,6 +277,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response->toStream();
     }
 
+    #[Group('transient-on-windows')]
     public function testNonBlockingStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);

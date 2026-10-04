@@ -406,14 +406,13 @@ abstract class AdapterTestCase extends CachePoolTest
     public function testNumericKeysWorkAfterMemoryLeakPrevention()
     {
         $cache = $this->createCachePool(0, __FUNCTION__);
+        $cache->save($cache->getItem('50')->set('value-50'));
 
         for ($i = 0; $i < 1001; ++$i) {
-            $cacheItem = $cache->getItem((string) $i);
-            $cacheItem->set('value-'.$i);
-            $cache->save($cacheItem);
+            $cache->getItem((string) $i);
         }
 
-        $this->assertEquals('value-50', $cache->getItem((string) 50)->get());
+        $this->assertEquals('value-50', $cache->getItem('50')->get());
     }
 
     public function testErrorsDontInvalidate()

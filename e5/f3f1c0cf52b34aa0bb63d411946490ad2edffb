@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-10-03T16:53:24Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "7.4".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-04T07:46:32Z
+
+I added three commits: a test that covers the reported error, the `name_converter` of a named serializer applied to child definitions (it was ignored, and an `index_1` override crashed), and a stop on circular parent chains, which looped forever.

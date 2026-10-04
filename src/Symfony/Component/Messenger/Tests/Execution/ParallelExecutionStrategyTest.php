@@ -30,10 +30,23 @@ use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 
 class ParallelExecutionStrategyTest extends TestCase
 {
+    private array $fakeChannels = [];
+
     protected function setUp(): void
     {
         if (!class_exists(ContextWorkerFactory::class)) {
             $this->markTestSkipped(ContextWorkerFactory::class.' is not available.');
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        // A receive still pending when the test ends leaves its fiber suspended, and destroying a suspended fiber while an exception unwinds makes PHP skip the catch block that should handle that exception.
+        // Collect it now, instead of in whatever later test the garbage collector happens to run.
+        gc_collect_cycles();
+
+        foreach ($this->fakeChannels as $channel) {
+            $this->assertNull($channel->get());
         }
     }
 
@@ -302,7 +315,7 @@ class ParallelExecutionStrategyTest extends TestCase
 
     private function createFakeChannel(array $responses = [], array $flushResponses = []): Channel
     {
-        return new class($responses, $flushResponses) implements Channel {
+        $channel = new class($responses, $flushResponses) implements Channel {
             public array $sent = [];
             private array $queue;
             private ?DeferredFuture $waiter = null;
@@ -379,6 +392,9 @@ class ParallelExecutionStrategyTest extends TestCase
             {
             }
         };
+        $this->fakeChannels[] = \WeakReference::create($channel);
+
+        return $channel;
     }
 
     private function setPrivateProperty(object $object, string $property, mixed $value)

@@ -6,3 +6,8 @@ _security_oidc_login:
 _security_logout:
     resource: security.route_loader.logout
     type: service
+
+# only the shared-context configuration registers the controller behind it
+_admin_protected:
+    path: /admin/protected
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\EventBundle\Controller\ProtectedController::__invoke }

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `backchannel_logout` option to `oidc_login`
  * Add the `dpop` option to the `access_token` authenticator, to accept only the access tokens bound to a key the request proves it holds (RFC 9449)
  * Add the `dpop` option to the `oidc_login` authenticator, to bind the tokens the provider issues to a key the client holds (RFC 9449)
  * Add the `audience` option to the `client_secret_jwt` and `private_key_jwt` client authentication methods of `oidc_login`, defaulting to `issuer`

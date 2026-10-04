@@ -59,22 +59,45 @@ class MongoDbReceiverTest extends TestCase
         $this->assertSame([], $receiver->get());
     }
 
-    public function testItRejectsTheMessageIfItCannotBeDecoded()
+    public function testItReturnsTheEncodedEnvelopeWhenDecodingFails()
+    {
+        $document = $this->createDocument(['body' => 'foo', 'headers' => ['type' => 'App\Missing']]);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('get')->willReturn($document);
+        $connection->expects($this->never())->method('reject');
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('decode')->willThrowException(new MessageDecodingFailedException('Class not found.'));
+
+        $receiver = new MongoDbReceiver($connection, $serializer);
+        $envelopes = iterator_to_array($receiver->get());
+
+        $this->assertCount(1, $envelopes);
+        $failure = $envelopes[0]->getMessage();
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame('Class not found.', $failure->getMessage());
+        $this->assertSame(['body' => 'foo', 'headers' => ['type' => 'App\Missing']], $failure->encodedEnvelope);
+        $this->assertSame((string) $document->_id, $envelopes[0]->last(MongoDbReceivedStamp::class)->getId());
+        $this->assertSame((string) $document->_id, $envelopes[0]->last(TransportMessageIdStamp::class)->getId());
+    }
+
+    public function testListingKeepsTheMessagesThatCannotBeDecoded()
     {
         $document = $this->createDocument(['body' => 'foo']);
 
         $connection = $this->createMock(Connection::class);
-        $connection->method('get')->willReturn($document);
-        $connection->expects($this->once())->method('reject')->with((string) $document->_id);
+        $connection->method('findAll')->willReturn([$document]);
+        $connection->method('find')->willReturn($document);
+        $connection->expects($this->never())->method('reject');
 
         $serializer = $this->createStub(SerializerInterface::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $receiver = new MongoDbReceiver($connection, $serializer);
 
-        $this->expectException(MessageDecodingFailedException::class);
-
-        $receiver->get();
+        $this->assertInstanceOf(MessageDecodingFailedException::class, iterator_to_array($receiver->all())[0]->getMessage());
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $receiver->find((string) $document->_id)->getMessage());
     }
 
     public function testAck()

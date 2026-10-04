@@ -100,15 +100,15 @@ class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInt
             $headers = null;
         }
 
-        try {
-            $envelope = $this->serializer->decode([
-                'body' => $document['body'] ?? null,
-                'headers' => $headers,
-            ]);
-        } catch (MessageDecodingFailedException $exception) {
-            $this->connection->reject($documentId);
+        $encodedEnvelope = [
+            'body' => $document['body'] ?? null,
+            'headers' => $headers,
+        ];
 
-            throw $exception;
+        try {
+            $envelope = $this->serializer->decode($encodedEnvelope);
+        } catch (MessageDecodingFailedException $exception) {
+            $envelope = MessageDecodingFailedException::wrap($encodedEnvelope, $exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return $envelope->with(

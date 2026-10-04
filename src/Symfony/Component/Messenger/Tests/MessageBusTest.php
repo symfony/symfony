@@ -14,15 +14,23 @@ namespace Symfony\Component\Messenger\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 
 class MessageBusTest extends TestCase
 {
@@ -164,6 +172,76 @@ class MessageBusTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Hello'));
         $newEnvelope = $bus->dispatch($envelope);
         $this->assertSame($envelope->getMessage(), $newEnvelope->getMessage());
+    }
+
+    public function testItDispatchesTheMessagesOfItsTypes()
+    {
+        $bus = new MessageBus([], [DummyMessageInterface::class]);
+
+        $this->assertSame($message = new ChildDummyMessage('Hello'), $bus->dispatch($message)->getMessage());
+    }
+
+    public function testItRejectsTheMessagesOfOtherTypes()
+    {
+        $bus = new MessageBus([], [DummyMessageInterface::class, DummyCommand::class]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('This bus only dispatches messages of type "%s" or "%s", "stdClass" given.', DummyMessageInterface::class, DummyCommand::class));
+
+        $bus->dispatch(new \stdClass());
+    }
+
+    public function testItDispatchesReceivedMessagesOfAnyType()
+    {
+        $bus = new MessageBus([], [DummyMessageInterface::class]);
+        $envelope = new Envelope(new \stdClass(), [new ReceivedStamp('transport')]);
+
+        $this->assertSame($envelope->getMessage(), $bus->dispatch($envelope)->getMessage());
+    }
+
+    public function testItThrowsTheExceptionOfTheFailingHandler()
+    {
+        $exception = new \DomainException('Not found.');
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static fn () => throw $exception]]))], [], true);
+
+        try {
+            $bus->dispatch(new DummyMessage('Hello'));
+            $this->fail('The exception of the handler is thrown.');
+        } catch (\DomainException $e) {
+            $this->assertSame($exception, $e);
+        }
+    }
+
+    public function testANestedDispatchThrowsTheExceptionOfTheInnerHandler()
+    {
+        $exception = new \DomainException('Not found.');
+        $innerBus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyCommand::class => [static fn () => throw $exception]]))], [], true);
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static fn () => $innerBus->dispatch(new DummyCommand())]]))], [], true);
+
+        try {
+            $bus->dispatch(new DummyMessage('Hello'));
+            $this->fail('The exception of the inner handler is thrown.');
+        } catch (\DomainException $e) {
+            $this->assertSame($exception, $e);
+        }
+    }
+
+    #[DataProvider('provideFailuresThatKeepHandlerFailedException')]
+    public function testHandlerFailedExceptionIsKept(bool $unwrapExceptions, array $handlerNames, array $stamps)
+    {
+        $handlers = array_map(static fn ($name) => new HandlerDescriptor(static fn () => throw new \DomainException('Not found.'), ['alias' => $name]), $handlerNames);
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => $handlers]))], [], $unwrapExceptions);
+
+        $this->expectException(HandlerFailedException::class);
+
+        $bus->dispatch(new DummyMessage('Hello'), $stamps);
+    }
+
+    public static function provideFailuresThatKeepHandlerFailedException(): iterable
+    {
+        yield 'unwrapping disabled' => [false, ['first'], []];
+        yield 'several failing handlers' => [true, ['first', 'second'], []];
+        yield 'received message' => [true, ['first'], [new ReceivedStamp('transport')]];
     }
 }
 

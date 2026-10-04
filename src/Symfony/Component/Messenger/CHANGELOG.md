@@ -5,6 +5,9 @@ CHANGELOG
 ---
 
  * Add `#[AsMessageMiddleware]` and the `messenger.middleware` tag to add a middleware to a bus, placed with `before` and `after`
+ * Add the `messages` option of buses, to restrict the types of the messages the application can dispatch on them
+ * Add the `unwrap_exceptions` option of buses, to throw the exception of the failing handler instead of `HandlerFailedException` when the application dispatches a message
+ * Add the `$messageTypes` and `$unwrapExceptions` arguments to `MessageBus`
  * Add `RedispatchStamp` to make a worker send a received message to its senders instead of handling it
  * Deprecate `RedispatchMessageHandler`, dispatch the message wrapped in the `RedispatchMessage` with a `TransportNamesStamp` instead
  * `messenger:consume` and `messenger:failed:retry` add the listeners of a run to a `ScopedEventDispatcher` instead of to the event dispatcher of the application

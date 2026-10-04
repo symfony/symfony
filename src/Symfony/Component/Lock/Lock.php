@@ -103,7 +103,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
 
             return true;
         } catch (LockConflictedException $e) {
-            $this->dirty = false;
             $this->logger?->info('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', ['resource' => $this->key]);
 
             if ($blocking) {
@@ -161,7 +160,6 @@ final class Lock implements SharedLockInterface, LoggerAwareInterface
 
             return true;
         } catch (LockConflictedException $e) {
-            $this->dirty = false;
             $this->logger?->info('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', ['resource' => $this->key]);
 
             if ($blocking) {

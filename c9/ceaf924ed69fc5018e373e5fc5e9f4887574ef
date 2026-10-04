@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-24T10:45:00Z
+
+Three things before the details:
+
+- `token_type` isn't checked: when the provider ignores DPoP and answers `Bearer`, UserInfo still gets `DPoP <token>` and fails with a 401, and with `user_data_source: id_token` the login succeeds with an unbound token. RFC 9449 §5 says to discard such a response when the binding matters, which it does once `dpop` is configured, so I'd refuse it with a message saying the provider didn't bind the token.
+- one `$dpopNonce` holds the nonces of both the provider and UserInfo, while §9 says a nonce is only accepted by the server that issued it. It works, at the cost of a round trip each time the server changes; keying them by origin would fix it.
+- the key isn't checked against the algorithm until the first proof is signed, on the callback, after the user logged in at the provider: an RSA key with ES256 is a 500 there, and a P-384 key with ES256 signs something that isn't valid ES256. I'd check `kty` and `crv` in the constructor.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-24T19:14:41Z
+
+Hi @nicolas-grekas,
+
+All three taken. I update the PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T10:51:21Z
+
+I pushed the review fixes, one commit each. The main ones: the `jwk` of the proof header still carried `oth` and custom members (`toPublic()` only strips the standard private ones), `wantsNonce()` now reads the `error` parameter only, `dpop_jkt` is managed, and `private_key_jwt` gets the same key/algorithm check (it had the bug on base).
+
+I also made the token types `@internal`: no config lets an app plug its own type, and a public interface would freeze the retry protocol, so `OidcClient` takes the `DpopProofFactory` instead. The DPoP constants are private here and on #66465, so none needs an owner.
+
+The description needs an update: it misses the token types, and that a non-`Bearer` `token_type` is now refused when DPoP is off, and it still cites §10.1 and §7.1.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-03T21:15:52Z
+
+ok rebased. Description up to date
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-04T06:39:52Z
+
+Thanks for the rebase. I squashed it into one commit, removed the Given/When/Then comments from the tests, shortened the `info()` texts of the `dpop` options (what they no longer say is in the documentation points of the description), and rewrote the description.

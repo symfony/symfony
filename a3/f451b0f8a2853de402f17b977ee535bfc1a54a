@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by wachterjohannes at 2026-10-03T17:04:28Z
+
+Tests pass. Found by running the pass:
+
+1. `canDispatch()` drops a handler when its type and the bus type are unrelated but can meet in one class. Bus `messages: [I]`, handler for interface `J`, message class implements both: the bus handler map is empty, though that message passes the bus check.
+2. A handler that matches no bus is dropped silently. The first sign is a `NoHandlerForMessageException` at runtime. Could this fail at compile time?
+3. Internal dispatches (Mailer and others) on the default bus break once `messages` is set on it. Is there an escape hatch?
+4. The unwrapped exception loses `getEnvelope()` and the handler name. Worth a docs line.
+
+Missing tests: `messages` as string vs list, nested dispatch inside a handler.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-03T18:25:44Z
+
+Thanks @wachterjohannes, PR updated.
+
+1. and 2. Good catch: binding handlers by type can't see two interfaces meeting in one class, and the dispatch check already keeps other messages off the bus, so the binding is gone. Handlers stay on every bus as before, and `messages` only restricts what the application dispatches.
+3. Declare the default bus under `buses`, then point `framework.mailer.message_bus` and the others to another bus, or list their messages. symfony/symfony-docs#23168 says so.
+4. That's what the option is for: the caller gets the exception of the handler as is.
+
+Nested dispatches now have a test; `messages` as a string and as a list are both in `MessengerBundleTest`.

@@ -79,6 +79,27 @@ class SessionDataStorageTest extends TestCase
         self::assertSame('original', $reloaded->nested->value);
     }
 
+    public function testLoadReturnsCopyOfObjectNotWrappedInDeepCloner()
+    {
+        $data = new \stdClass();
+        $data->name = 'John';
+        $data->nested = new \stdClass();
+        $data->nested->value = 'original';
+
+        $this->session->set('test_key', $data);
+
+        $loaded = $this->storage->load();
+
+        self::assertEquals($data, $loaded);
+        self::assertNotSame($data, $loaded);
+
+        $loaded->name = 'Modified';
+        $loaded->nested->value = 'modified';
+
+        self::assertSame('John', $this->session->get('test_key')->name);
+        self::assertSame('original', $this->session->get('test_key')->nested->value);
+    }
+
     public function testSaveDecouplesDataFromCallerReference()
     {
         $data = new \stdClass();

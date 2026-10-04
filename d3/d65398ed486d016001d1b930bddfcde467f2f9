@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-04T17:56:19Z
+
+I rebased it on 8.2, shortened the CHANGELOG entry, passed the test helpers their arguments positionally, and rewrote the description.

@@ -28,9 +28,12 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 private string $email = '';
 
 #[ORM\Column(length: 64)]
-#[BlindIndexed('email', Email::class)]
+#[BlindIndexed('email', 'user-email')]
 private string $emailIndex = '';
 ```
+
+Its second argument names the index, which is also what the tags are derived
+under, so two columns holding an address have an index each.
 
 The query side is unchanged, since it has no entity to read the attribute on:
 
@@ -38,16 +41,17 @@ The query side is unchanged, since it has no entity to read the attribute on:
 $repository->findOneBy(['emailIndex' => $index->of($email)]);
 ```
 
-The listener is given the blind indexes of the application, keyed by the class
-the attribute names:
+The listener is given the indexes of the application keyed by that same name:
 
 ```php
 use Doctrine\ORM\Events;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\Projection\Email;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener;
 
 $eventManager->addEventListener(Events::onFlush, new BlindIndexListener(new ServiceLocator([
-    Email::class => static fn (): Email => new Email($kms, $wrappedKey),
+    'user-email' => static fn () => new BlindIndex($kms, $wrappedKey, 'user-email', new Email()),
 ])));
 ```
 
@@ -63,16 +67,28 @@ converts one property into one column and this writes a second one.
 With the FrameworkBundle
 ------------------------
 
-Nothing has to be registered by hand: every `BlindIndex` service is tagged
-`key_management.blind_index` by autoconfiguration, the listener is wired on
-`onFlush` and removed when the application registers no index, and the data key
-table joins the schema `doctrine:schema:update` and the migrations diff against.
+Every index service is tagged `key_management.blind_index` by autoconfiguration,
+the listener is wired on `onFlush` and removed when the application registers no
+index, and the data key table joins the schema `doctrine:schema:update` and the
+migrations diff against. Only the name is left to state, in the tag, which hands
+it to the `$name` argument of the index:
 
 ```yaml
 services:
-    App\Security\Email:
-        arguments: ['@key_management.app', '%env(APP_INDEX_KEY)%']
+    app.index.user_email:
+        class: Symfony\Component\KeyManagement\BlindIndex
+        arguments:
+            $kms: '@key_management.app'
+            $wrappedKey: !service
+                class: Symfony\Component\KeyManagement\Ciphertext
+                arguments: ['%env(base64:APP_INDEX_KEY)%', 'app-key']
+            $projection: !service { class: Symfony\Component\KeyManagement\BlindIndex\Projection\Email }
+        tags:
+            - { name: key_management.blind_index, index: 'user-email' }
 ```
+
+`APP_INDEX_KEY` holds the `wrapped` value `key-management:generate-data-key app-key`
+prints.
 
 Resources
 ---------

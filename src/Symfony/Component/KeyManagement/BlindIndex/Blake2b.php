@@ -34,6 +34,6 @@ final class Blake2b implements AlgorithmInterface
 
     public function tag(#[\SensitiveParameter] string $value, #[\SensitiveParameter] string $key): string
     {
-        return sodium_crypto_generichash($value, $key, 32);
+        return sodium_crypto_generichash($value, $key, self::TAG_BYTES);
     }
 }

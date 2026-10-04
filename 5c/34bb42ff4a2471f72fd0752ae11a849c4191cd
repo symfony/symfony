@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-04T09:36:21Z
+
+PR updated: the `nlink` check is now a dev/ino comparison with the path, which also catches the `.nfsXXXX` renames of NFS, and removal stays enabled on Windows, where the concurrency tests now run thanks to `proc_open()` children instead of `pcntl_fork()`. I also wired the `flock+remove` keyword in LockBundle.

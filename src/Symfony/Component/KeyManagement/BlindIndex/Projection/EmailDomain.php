@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\KeyManagement\BlindIndex;
+namespace Symfony\Component\KeyManagement\BlindIndex\Projection;
 
-use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
 
 /**
  * Indexes the domain of an email address rather than the address itself.
@@ -32,9 +32,9 @@ use Symfony\Component\KeyManagement\BlindIndex;
  *
  * @experimental
  */
-final class EmailDomain extends BlindIndex
+final class EmailDomain implements ProjectionInterface
 {
-    protected function project(#[\SensitiveParameter] string $value): string
+    public function project(#[\SensitiveParameter] string $value): string
     {
         $value = trim($value);
         $at = strrpos($value, '@');

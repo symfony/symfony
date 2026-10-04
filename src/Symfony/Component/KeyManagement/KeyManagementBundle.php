@@ -205,7 +205,11 @@ class KeyManagementBundle extends AbstractBundle
         $container->registerForAutoconfiguration(KmsFactoryInterface::class)
             ->addTag('key_management.factory');
 
-        $container->registerForAutoconfiguration(BlindIndex::class)
+        // The tag carries the name the index derives under, which nothing here can guess, so
+        // RegisterBlindIndexesPass refuses one without it. Tagging every index all the same is
+        // what makes that refusal happen: an index nobody tagged would leave the listener removed
+        // and every indexed column silently empty.
+        $container->registerForAutoconfiguration(BlindIndexInterface::class)
             ->addTag('key_management.blind_index');
 
         $clients = $config['clients'];

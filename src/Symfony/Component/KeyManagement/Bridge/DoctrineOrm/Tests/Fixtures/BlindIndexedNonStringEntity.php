@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
-use Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
 
 #[Entity]
@@ -28,6 +27,6 @@ class BlindIndexedNonStringEntity
     public ?int $accountNumber = null;
 
     #[Column(type: 'string', nullable: true)]
-    #[BlindIndexed('accountNumber', BlindIndex::class)]
+    #[BlindIndexed('accountNumber', 'account-number')]
     public ?string $accountNumberIndex = null;
 }

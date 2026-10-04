@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\KeyManagement\BlindIndex;
+namespace Symfony\Component\KeyManagement\BlindIndex\Projection;
 
-use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
 
 /**
  * Indexes an email address, so that a row can be found by one the database does not hold.
@@ -25,16 +25,16 @@ use Symfony\Component\KeyManagement\BlindIndex;
  * practice, so an application that lets someone register as `Ada@example.org` and sign in as
  * `ada@example.org` will not find the row. The fix is not here: fold the address once, where it
  * enters the application, and store the folded form. An application that would rather have the
- * index do it subclasses {@see BlindIndex} with a projection of its own, and knowingly indexes
+ * index do it writes a {@see ProjectionInterface} of its own, and knowingly indexes
  * two addresses the standard considers distinct as one.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental
  */
-final class Email extends BlindIndex
+final class Email implements ProjectionInterface
 {
-    protected function project(#[\SensitiveParameter] string $value): string
+    public function project(#[\SensitiveParameter] string $value): string
     {
         $value = trim($value);
         $at = strrpos($value, '@');

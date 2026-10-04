@@ -83,6 +83,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
     public function save(Key $key)
     {
         // prevent concurrency within the same connection
+        $isPromotion = $this->getInternalStore()->exists($key);
         $this->getInternalStore()->save($key);
 
         $lockAcquired = false;
@@ -105,7 +106,11 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             }
         } finally {
             if (!$lockAcquired) {
-                $this->getInternalStore()->delete($key);
+                if ($isPromotion) {
+                    $this->getInternalStore()->saveRead($key);
+                } else {
+                    $this->getInternalStore()->delete($key);
+                }
             }
         }
 
@@ -118,6 +123,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
     public function saveRead(Key $key)
     {
         // prevent concurrency within the same connection
+        $isDemotion = $this->getInternalStore()->exists($key);
         $this->getInternalStore()->saveRead($key);
 
         $lockAcquired = false;
@@ -140,7 +146,11 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             }
         } finally {
             if (!$lockAcquired) {
-                $this->getInternalStore()->delete($key);
+                if ($isDemotion) {
+                    $this->getInternalStore()->save($key);
+                } else {
+                    $this->getInternalStore()->delete($key);
+                }
             }
         }
 
@@ -206,6 +216,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
     {
         // prevent concurrency within the same connection
         // Internal store does not allow blocking mode, because there is no way to acquire one in a single process
+        $isPromotion = $this->getInternalStore()->exists($key);
         $this->getInternalStore()->save($key);
 
         $lockAcquired = false;
@@ -217,7 +228,11 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             $lockAcquired = true;
         } finally {
             if (!$lockAcquired) {
-                $this->getInternalStore()->delete($key);
+                if ($isPromotion) {
+                    $this->getInternalStore()->saveRead($key);
+                } else {
+                    $this->getInternalStore()->delete($key);
+                }
             }
         }
 

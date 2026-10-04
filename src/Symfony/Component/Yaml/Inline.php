@@ -198,7 +198,7 @@ class Inline
                 $doubleQuoted = Escaper::escapeWithDoubleQuotes($value);
 
                 return \strlen($doubleQuoted) < \strlen($singleQuoted) ? $doubleQuoted : $singleQuoted;
-            case Parser::preg_match('{^[0-9]+[_0-9]*$}', $value):
+            case Parser::preg_match('{^[+-]?[0-9][0-9_]*(\.[0-9_]+)?$}', $value):
             case Parser::preg_match('{^[+-]?0o[0-7_]++$}', $value):
             case Parser::preg_match(self::getHexRegex(), $value):
             case Parser::preg_match(self::getTimestampRegex(), $value):

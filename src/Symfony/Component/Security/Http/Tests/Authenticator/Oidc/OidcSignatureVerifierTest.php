@@ -26,6 +26,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -251,7 +252,7 @@ class OidcSignatureVerifierTest extends TestCase
         $verifier = $this->createVerifier(configuration: ['issuer' => 'https://provider.example.com']);
 
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('announces no "jwks_uri"');
+        $this->expectExceptionMessage('does not announce any "jwks_uri"');
 
         $verifier->verify($this->buildJws(json_encode(['sub' => 'user-42'])));
     }
@@ -346,15 +347,16 @@ class OidcSignatureVerifierTest extends TestCase
             'https://provider.example.com/.well-known/openid-configuration',
         );
 
-        return new OidcSignatureVerifier(
+        $providerKeys = new OidcProviderKeys(
             $discovery,
-            $jwksCache ?? new ArrayAdapter(),
             $httpClient ?? new MockHttpClient(array_map(static fn (array $jwkSet): JsonMockResponse => new JsonMockResponse($jwkSet), $jwks)),
-            $algorithms,
+            $jwksCache ?? new ArrayAdapter(),
+            $clock ?? new MockClock(),
             3600,
             $enforceKeyUsageVerification,
-            clock: $clock ?? new MockClock(),
         );
+
+        return new OidcSignatureVerifier($providerKeys, $algorithms);
     }
 
     private function buildJws(string $payload, string|array $kid = 'signing-key'): string

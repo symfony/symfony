@@ -4,6 +4,9 @@ CHANGELOG
 8.2
 ---
 
+ * Add `OidcProviderKeys`, to read the keys an OIDC provider publishes, cached once for every reader of that provider, which requires the announced `jwks_uri` to be an absolute URL
+ * Read the signing keys of the `oidc` and `oauth2` token handlers through `OidcProviderKeys`, which refetches them when a token announces an unknown `kid` and expires them after an hour when the provider advertises no lifetime
+ * Fetch the key set of only the provider whose issuer a token names in the `oidc` token handler
  * Add `OidcClientInterface::request()`, to make a client-authenticated request to an endpoint of the OIDC provider
  * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in and the denied attribute kept in the session
  * Add `AuthenticationUtils::getReAuthenticationAttribute()`, the security attribute the current request is asking a re-authentication for

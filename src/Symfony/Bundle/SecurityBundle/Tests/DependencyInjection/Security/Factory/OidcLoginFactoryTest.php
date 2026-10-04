@@ -579,11 +579,15 @@ class OidcLoginFactoryTest extends TestCase
 
         $verifier = $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main');
         $this->assertSame('security.authenticator.oidc_login.signature_verifier', $verifier->getParent());
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.provider_keys.main'), $verifier->getArgument(0));
+        $this->assertSame(['RS256'], $verifier->getArgument(1));
+
+        $providerKeys = $container->getDefinition('security.authenticator.oidc_login.provider_keys.main');
+        $this->assertSame('security.authenticator.oidc_login.provider_keys', $providerKeys->getParent());
         // the firewall discovery document is where the JWKS URI is announced
-        $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $verifier->getArgument(0));
-        $this->assertSame(['RS256'], $verifier->getArgument(3));
-        $this->assertSame(3600, $verifier->getArgument(4));
-        $this->assertTrue($verifier->getArgument(5));
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $providerKeys->getArgument(0));
+        $this->assertSame(3600, $providerKeys->getArgument(4));
+        $this->assertTrue($providerKeys->getArgument(5));
 
         $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
         $this->assertEquals(new Reference('security.authenticator.oidc_login.signature_verifier.main'), $authenticator->getArgument(10));
@@ -626,10 +630,12 @@ class OidcLoginFactoryTest extends TestCase
         $factory->createAuthenticator($container, 'main', $config, 'userprovider');
 
         $verifier = $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main');
-        $this->assertSame(['ES256', 'PS256'], $verifier->getArgument(3));
+        $this->assertSame(['ES256', 'PS256'], $verifier->getArgument(1));
+
+        $providerKeys = $container->getDefinition('security.authenticator.oidc_login.provider_keys.main');
         // the JWKS falls back to the discovery TTL when the provider advertises none
-        $this->assertSame(60, $verifier->getArgument(4));
-        $this->assertFalse($verifier->getArgument(5));
+        $this->assertSame(60, $providerKeys->getArgument(4));
+        $this->assertFalse($providerKeys->getArgument(5));
     }
 
     public function testASingleIdTokenSignatureAlgorithmCanBeGivenAsAString()
@@ -1581,7 +1587,7 @@ class OidcLoginFactoryTest extends TestCase
 
         $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
         $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
-        $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
+        $this->assertEquals(new Reference('oidc.client'), $container->getDefinition('security.authenticator.oidc_login.provider_keys.main')->getArgument(1));
     }
 
     public function testTheConfiguredHttpClientIsUsedWhenTheIdTokenSignatureIsNotVerified()

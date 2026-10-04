@@ -32,6 +32,7 @@ use Symfony\Component\Security\Http\Authenticator\Oidc\OidcTokenRefresher;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 
 class OidcTokenRefresherTest extends TestCase
 {
@@ -365,19 +366,21 @@ class OidcTokenRefresherTest extends TestCase
     private function createSignatureVerifier(): OidcSignatureVerifier
     {
         return new OidcSignatureVerifier(
-            $this->discovery,
-            new ArrayAdapter(),
-            new MockHttpClient(new JsonMockResponse(['keys' => [[
-                'kid' => 'signing-key',
-                'kty' => 'EC',
-                'crv' => 'P-256',
-                'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
-                'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
-                'use' => 'sig',
-                'alg' => 'ES256',
-            ]]])),
+            new OidcProviderKeys(
+                $this->discovery,
+                new MockHttpClient(new JsonMockResponse(['keys' => [[
+                    'kid' => 'signing-key',
+                    'kty' => 'EC',
+                    'crv' => 'P-256',
+                    'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+                    'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+                    'use' => 'sig',
+                    'alg' => 'ES256',
+                ]]])),
+                new ArrayAdapter(),
+                $this->clock,
+            ),
             ['ES256'],
-            clock: $this->clock,
         );
     }
 }

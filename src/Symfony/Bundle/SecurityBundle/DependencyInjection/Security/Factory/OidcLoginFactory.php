@@ -556,14 +556,20 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
 
         $signatureVerifier = null;
         if ($config['id_token_signature']['required']) {
+            $providerKeysId = 'security.authenticator.oidc_login.provider_keys.'.$firewallName;
+            $container
+                ->setDefinition($providerKeysId, new ChildDefinition('security.authenticator.oidc_login.provider_keys'))
+                ->replaceArgument(0, new Reference($discoveryId))
+                ->replaceArgument(1, $httpClient)
+                ->replaceArgument(4, $config['discovery_cache_ttl'])
+                ->replaceArgument(5, $config['id_token_signature']['enforce_key_usage_verification'])
+            ;
+
             $signatureVerifierId = 'security.authenticator.oidc_login.signature_verifier.'.$firewallName;
             $container
                 ->setDefinition($signatureVerifierId, new ChildDefinition('security.authenticator.oidc_login.signature_verifier'))
-                ->replaceArgument(0, new Reference($discoveryId))
-                ->replaceArgument(2, $httpClient)
-                ->replaceArgument(3, $config['id_token_signature']['algorithms'])
-                ->replaceArgument(4, $config['discovery_cache_ttl'])
-                ->replaceArgument(5, $config['id_token_signature']['enforce_key_usage_verification'])
+                ->replaceArgument(0, new Reference($providerKeysId))
+                ->replaceArgument(1, $config['id_token_signature']['algorithms'])
             ;
             $signatureVerifier = new Reference($signatureVerifierId);
         }

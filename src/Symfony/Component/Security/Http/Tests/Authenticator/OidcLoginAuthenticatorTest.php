@@ -55,6 +55,7 @@ use Symfony\Component\Security\Http\Event\OidcAuthorizationRequestEvent;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\OAuth2\Dpop\DpopProofFactory;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -2039,17 +2040,19 @@ class OidcLoginAuthenticatorTest extends TestCase
     private function createSignatureVerifier(): OidcSignatureVerifier
     {
         return new OidcSignatureVerifier(
-            $this->discovery,
-            new ArrayAdapter(),
-            new MockHttpClient(new JsonMockResponse(['keys' => [[
-                'kid' => 'signing-key',
-                'kty' => 'EC',
-                'crv' => 'P-256',
-                'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
-                'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
-                'use' => 'sig',
-                'alg' => 'ES256',
-            ]]])),
+            new OidcProviderKeys(
+                $this->discovery,
+                new MockHttpClient(new JsonMockResponse(['keys' => [[
+                    'kid' => 'signing-key',
+                    'kty' => 'EC',
+                    'crv' => 'P-256',
+                    'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+                    'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+                    'use' => 'sig',
+                    'alg' => 'ES256',
+                ]]])),
+                new ArrayAdapter(),
+            ),
             ['ES256'],
         );
     }

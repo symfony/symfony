@@ -25,9 +25,9 @@ use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OAuth2User;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
-use Symfony\Component\Security\Http\Authenticator\Oidc\OidcJwks;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -84,10 +84,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
     private ?AlgorithmManager $signatureAlgorithms = null;
     private ?JWKSet $signatureKeyset = null;
     private bool $enforceSignedResponse = true;
-    private ?OidcDiscovery $metadata = null;
-    private ?CacheInterface $metadataCache = null;
-    private ?string $metadataCacheKey = null;
-    private ?HttpClientInterface $metadataClient = null;
+    private ?OidcProviderKeys $metadataKeys = null;
 
     /**
      * @var list<string>
@@ -177,10 +174,10 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
             throw new \LogicException('The "issuer" of the authorization server is required to read its metadata, since RFC 8414 §3 derives the metadata URL from it.');
         }
 
-        $this->metadataCache = $cache;
-        $this->metadataClient = $client;
-        $this->metadataCacheKey = $cacheKey;
-        $this->metadata = new OidcDiscovery($client, $cache, self::metadataUrl($this->issuer), $this->issuer, cacheKey: $cacheKey.'.document', checkedEndpoints: ['jwks_uri']);
+        $metadata = new OidcDiscovery($client, $cache, self::metadataUrl($this->issuer), $this->issuer, 3600, $cacheKey.'.document', ['jwks_uri']);
+        // the keys go under a key derived from the "jwks_uri" that served them, shared with
+        // every other reader of this authorization server
+        $this->metadataKeys = new OidcProviderKeys($metadata, $client, $cache, $this->clock);
     }
 
     /**
@@ -212,7 +209,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
      */
     public function getUserBadgeFrom(string $accessToken): UserBadge
     {
-        if ((null !== $this->signatureKeyset || null !== $this->metadata) && (!class_exists(JWSVerifier::class) || !class_exists(Checker\HeaderCheckerManager::class))) {
+        if ($this->verifiesSignedResponses() && (!class_exists(JWSVerifier::class) || !class_exists(Checker\HeaderCheckerManager::class))) {
             throw new \LogicException('You cannot verify signed introspection responses since "web-token/jwt-library" is not installed. Try running "composer require web-token/jwt-library".');
         }
 
@@ -318,34 +315,16 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
 
     private function verifiesSignedResponses(): bool
     {
-        return null !== $this->signatureKeyset || null !== $this->metadata;
+        return null !== $this->signatureKeyset || null !== $this->metadataKeys;
     }
 
     /**
      * The keys the introspection response is verified against: the configured set, or the one the
      * authorization server publishes at the "jwks_uri" its metadata announces.
      */
-    private function resolveSignatureKeyset(): JWKSet
+    private function resolveSignatureKeyset(?string $kid): JWKSet
     {
-        if (null !== $this->signatureKeyset) {
-            return $this->signatureKeyset;
-        }
-
-        return JWKSet::createFromKeyData(['keys' => $this->metadataCache->get($this->metadataCacheKey, $this->computeMetadataKeys(...))]);
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    private function computeMetadataKeys(ItemInterface $item): array
-    {
-        [$keys, $ttl] = OidcJwks::fromResponse($this->metadataClient->request('GET', $this->metadata->getConfiguration()['jwks_uri'], ['max_redirects' => 0]), true);
-
-        if (0 < ($ttl ?? -1)) {
-            $item->expiresAfter(min($ttl, OidcJwks::MAX_TTL));
-        }
-
-        return $keys;
+        return $this->signatureKeyset ?? $this->metadataKeys->getSignatureKeySet($kid);
     }
 
     /**
@@ -371,7 +350,8 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
             throw new BadCredentialsException('The introspection response is not a valid JWT.', previous: $e);
         }
 
-        $keyset = $this->resolveSignatureKeyset();
+        $kid = $jws->getSignature(0)->hasProtectedHeaderParameter('kid') ? $jws->getSignature(0)->getProtectedHeaderParameter('kid') : null;
+        $keyset = $this->resolveSignatureKeyset(\is_string($kid) ? $kid : null);
         $jwsVerifier = new JWSVerifier($this->signatureAlgorithms);
 
         if (method_exists($jwsVerifier, 'verify')) { // @phpstan-ignore function.alreadyNarrowedType

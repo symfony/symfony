@@ -29,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -37,6 +38,8 @@ use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 use Symfony\Contracts\Cache\ItemInterface;
 
 #[RequiresPhpExtension('openssl')]
@@ -465,7 +468,10 @@ class OidcTokenHandlerTest extends TestCase
 
         $this->assertInstanceOf(UserBadge::class, $userBadge);
         $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
-        $this->assertTrue($cache->hasItem('oidc_config'));
+        $this->assertTrue($cache->hasItem('oidc_config.document.0'));
+        // the key set is cached under the "jwks_uri" that served it and not under the base key,
+        // so that every reader of this provider shares the entry
+        $this->assertTrue($cache->hasItem(self::jwksCacheKey('https://www.example.com/.well-known/jwks.json')));
     }
 
     public function testSingleDiscoveryEndpointDoesNotBindKeysToTheAnnouncedIssuer()
@@ -623,7 +629,8 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertInstanceOf(UserBadge::class, $userBadge2);
         $this->assertSame('user-from-provider2', $userBadge2->getUserIdentifier());
 
-        $this->assertTrue($cache->hasItem('oidc_config.issuer_keysets'));
+        $this->assertTrue($cache->hasItem(self::jwksCacheKey('https://provider1.example.com/.well-known/jwks.json')));
+        $this->assertTrue($cache->hasItem(self::jwksCacheKey('https://provider2.example.com/.well-known/jwks.json')));
     }
 
     public function testDiscoveryKeysAreBoundToIssuers()
@@ -770,11 +777,13 @@ class OidcTokenHandlerTest extends TestCase
             'sub' => 'user-from-provider1',
         ]), self::getJWK()));
 
+        // every document is read, since the issuer of the token is only known to be the one of
+        // a single provider once they have all announced theirs; only the key set of that one
+        // provider is then fetched
         $this->assertSame([
             'https://provider1.example.com/.well-known/openid-configuration',
             'https://provider2.example.com/.well-known/openid-configuration',
             'https://provider1.example.com/jwks.json',
-            'https://provider2.example.com/jwks.json',
         ], $requestedUrls);
     }
 
@@ -1060,13 +1069,13 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame(1, $countConfigurationRequests());
 
         // expired JWKS and document entries alone recompute the keys from the memoized document
-        $cache->deleteItems(['oidc_config', 'oidc_config.document.0']);
+        $cache->deleteItems([self::jwksCacheKey('https://www.example.com/jwks.json'), 'oidc_config.document.0']);
         $handler->getUserBadgeFrom($token);
         $this->assertSame(1, $countConfigurationRequests());
 
         // after reset(), recomputing the keys fetches the discovery document again
         $handler->reset();
-        $cache->deleteItems(['oidc_config', 'oidc_config.document.0']);
+        $cache->deleteItems([self::jwksCacheKey('https://www.example.com/jwks.json'), 'oidc_config.document.0']);
         $handler->getUserBadgeFrom($token);
         $this->assertSame(2, $countConfigurationRequests());
     }
@@ -1671,5 +1680,145 @@ class OidcTokenHandlerTest extends TestCase
         yield 'an empty string' => ['', 'must be a non-empty string or a list of non-empty strings'];
         yield 'an empty string among others' => [['https://api.example.com', ''], 'must be a non-empty string or a list of non-empty strings'];
         yield 'a non-string' => [[42], 'must be a non-empty string or a list of non-empty strings'];
+    }
+
+    /**
+     * The document is not shared: this handler names its entry itself, the URL it reads it from
+     * being relative to a "base_uri" it never resolves.
+     */
+    public function testDiscoverySharesTheKeySetWithAnotherReaderOfTheSameProvider()
+    {
+        $requests = [];
+        $httpClient = new MockHttpClient(static function (string $method, string $url) use (&$requests): JsonMockResponse {
+            $requests[] = $url;
+
+            if (str_contains($url, 'openid-configuration')) {
+                return new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']);
+            }
+
+            return new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]);
+        }, 'https://www.example.com');
+
+        $cache = new ArrayAdapter();
+
+        // what the "oidc_login" authenticator reads, through a discovery of its own
+        $providerKeys = new OidcProviderKeys(
+            new OidcDiscovery($httpClient, $cache, 'https://www.example.com/.well-known/openid-configuration'),
+            $httpClient,
+            $cache,
+        );
+        $providerKeys->getSignatureKeys();
+        $this->assertSame([
+            'https://www.example.com/.well-known/openid-configuration',
+            'https://www.example.com/jwks.json',
+        ], $requests);
+
+        $time = time();
+        $token = self::buildJWS(json_encode([
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'user-sharing-the-keys',
+        ]));
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_config');
+
+        $this->assertSame('user-sharing-the-keys', $handler->getUserBadgeFrom($token)->getUserIdentifier());
+        // one request more, for the document this handler names its own entry for, and no
+        // second request to the JWKS endpoint
+        $this->assertSame([
+            'https://www.example.com/.well-known/openid-configuration',
+            'https://www.example.com/jwks.json',
+            'https://www.example.com/.well-known/openid-configuration',
+        ], $requests);
+    }
+
+    /**
+     * The token announcing an unknown "kid" is what asks for the key set to be read again, and
+     * that refetch is throttled.
+     */
+    public function testDiscoveryRefetchesTheKeySetWhenTheTokenAnnouncesAnUnknownKid()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig', 'kid' => 'old-key'])]]),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig', 'kid' => 'rotated-key'])]]),
+        ]);
+
+        $clock = new MockClock();
+        $time = $clock->now()->getTimestamp();
+        $token = self::buildJWS(json_encode([
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'user-after-rotation',
+        ]), ['typ' => 'at+jwt', 'kid' => 'rotated-key']);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com'], 'sub', null, $clock, 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_config');
+
+        // the key set was just fetched, so the unknown "kid" does not get to trigger another request
+        try {
+            $handler->getUserBadgeFrom($token);
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException) {
+        }
+        $this->assertSame(2, $httpClient->getRequestsCount());
+
+        $clock->sleep(120);
+
+        $this->assertSame('user-after-rotation', $handler->getUserBadgeFrom($token)->getUserIdentifier());
+        $this->assertSame(3, $httpClient->getRequestsCount());
+    }
+
+    /**
+     * A relative "jwks_uri" names one endpoint per HTTP client that resolves it, so it cannot
+     * identify the key set of one provider among several: two providers announcing the same one
+     * would otherwise share an entry, and the keys of whichever filled it first would verify the
+     * tokens of the other.
+     */
+    public function testDiscoveryRefusesAJwksUriThatNamesNoHost()
+    {
+        $providerKeys = static fn (string $host, JWK $key): MockHttpClient => new MockHttpClient(static function (string $method, string $url) use ($host, $key): JsonMockResponse {
+            if (str_contains($url, 'openid-configuration')) {
+                return new JsonMockResponse(['issuer' => $host, 'jwks_uri' => '/jwks.json']);
+            }
+
+            return new JsonMockResponse(['keys' => [array_merge($key->all(), ['use' => 'sig'])]]);
+        }, $host);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://p1.example.com', 'https://p2.example.com'], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), [
+            $providerKeys('https://p1.example.com', self::getJWK()),
+            $providerKeys('https://p2.example.com', self::getSecondJWK()),
+        ], 'oidc_config');
+
+        $time = time();
+        $claims = ['iat' => $time, 'nbf' => $time, 'exp' => $time + 3600, 'aud' => self::AUDIENCE, 'sub' => 'user-of-p2'];
+
+        // neither the token of a provider signed with its own key
+        try {
+            $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode($claims + ['iss' => 'https://p2.example.com']), self::getSecondJWK()));
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertStringContainsString('names no host', $e->getPrevious()?->getMessage() ?? '');
+        }
+
+        // nor one claiming that provider while signed with the key of the other
+        $this->expectException(BadCredentialsException::class);
+        $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode($claims + ['iss' => 'https://p2.example.com']), self::getJWK()));
+    }
+
+    /**
+     * The cache key {@see OidcProviderKeys} stores the signing keys of a provider under.
+     */
+    private static function jwksCacheKey(string $jwksUri, int $defaultCacheTtl = 3600): string
+    {
+        return 'oidc_jwks.'.$defaultCacheTtl.'.'.hash('xxh128', $jwksUri);
     }
 }

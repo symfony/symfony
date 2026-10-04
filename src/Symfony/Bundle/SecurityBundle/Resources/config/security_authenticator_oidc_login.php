@@ -34,6 +34,7 @@ use Symfony\Component\Security\Http\Oidc\OidcBackChannelLogout;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Component\Security\Http\Oidc\OidcEndedSessions;
 use Symfony\Component\Security\Http\Oidc\OidcLogoutToken;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -61,13 +62,19 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authenticator.oidc_login.signature_verifier', OidcSignatureVerifier::class)
             ->abstract()
             ->args([
-                abstract_arg('OIDC discovery'),
-                service('cache.app'),
-                service('http_client'),
+                abstract_arg('OIDC provider keys'),
                 abstract_arg('signature algorithms'),
+            ])
+
+        ->set('security.authenticator.oidc_login.provider_keys', OidcProviderKeys::class)
+            ->abstract()
+            ->args([
+                abstract_arg('OIDC discovery'),
+                service('http_client'),
+                service('cache.app'),
+                service('clock'),
                 abstract_arg('default JWKS cache TTL'),
                 abstract_arg('enforce key usage verification'),
-                service('clock'),
             ])
 
         ->set('security.authenticator.oidc_login.id_token', OidcIdToken::class)

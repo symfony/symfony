@@ -1867,7 +1867,8 @@ class SecurityExtensionTest extends TestCase
 
         $verifier = $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main');
         $this->assertSame(OidcSignatureVerifier::class, $verifier->getClass());
-        $this->assertSame(['RS256'], $verifier->getArgument(3));
+        $this->assertSame(['RS256'], $verifier->getArgument(1));
+        $this->assertSame('security.authenticator.oidc_login.provider_keys.main', (string) $verifier->getArgument(0));
         $this->assertSame('security.authenticator.oidc_login.signature_verifier.main', (string) $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(10));
     }
 
@@ -2101,7 +2102,7 @@ class SecurityExtensionTest extends TestCase
 
         $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
         $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
-        $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
+        $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.provider_keys.main')->getArgument(1));
     }
 
     public function testOidcLoginCallsTheProviderWithTheConfiguredHttpClient()
@@ -2126,7 +2127,7 @@ class SecurityExtensionTest extends TestCase
 
         $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
         $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
-        $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
+        $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.provider_keys.main')->getArgument(1));
     }
 
     protected function getRawContainer()

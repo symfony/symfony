@@ -29,6 +29,7 @@ use Symfony\Component\Security\Http\Oidc\OidcBackChannelLogout;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Component\Security\Http\Oidc\OidcEndedSessions;
 use Symfony\Component\Security\Http\Oidc\OidcLogoutToken;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 
 #[RequiresPhpExtension('openssl')]
 class OidcBackChannelLogoutTest extends TestCase
@@ -132,13 +133,13 @@ class OidcBackChannelLogoutTest extends TestCase
 
         return new OidcBackChannelLogout(
             new OidcSignatureVerifier(
-                $discovery,
-                new ArrayAdapter(),
-                new MockHttpClient(new JsonMockResponse(['keys' => [self::PUBLIC_JWK]])),
+                new OidcProviderKeys(
+                    $discovery,
+                    new MockHttpClient(new JsonMockResponse(['keys' => [self::PUBLIC_JWK]])),
+                    new ArrayAdapter(),
+                    $clock,
+                ),
                 ['ES256'],
-                3600,
-                true,
-                $clock,
             ),
             new OidcLogoutToken($clock),
             $discovery,

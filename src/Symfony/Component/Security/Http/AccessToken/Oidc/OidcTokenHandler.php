@@ -31,9 +31,9 @@ use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\MissingClaimException;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
-use Symfony\Component\Security\Http\Authenticator\Oidc\OidcJwks;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -55,7 +55,6 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
     private ?AlgorithmManager $decryptionAlgorithms = null;
     private bool $enforceEncryption = false;
 
-    private bool $enforceKeyUsageVerification = true;
     private bool $enforceAtJwtType;
 
     /**
@@ -63,16 +62,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
      */
     private array $audiences;
 
-    private ?CacheInterface $discoveryCache = null;
-    private ?string $oidcConfigurationCacheKey = null;
-
     /**
-     * @var list<HttpClientInterface>
-     */
-    private array $discoveryClients = [];
-
-    /**
-     * The issuers that the discovery documents fetched through $discoveryClients must announce, or null to accept any allowed one.
+     * The issuers that the discovery documents must announce, or null to accept any allowed one.
      *
      * @var list<string|null>
      */
@@ -84,6 +75,13 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
      * @var OidcDiscovery[]
      */
     private array $discoveries = [];
+
+    /**
+     * The signing keys of each provider, kept aligned with $discoveries.
+     *
+     * @var list<OidcProviderKeys>
+     */
+    private array $providerKeys = [];
 
     /**
      * @param string|list<string> $audience         The identifiers of this resource server, one of which the "aud" of
@@ -138,7 +136,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
 
     /**
      * @param HttpClientInterface|HttpClientInterface[] $client                      A client keyed by a string requires the discovery document it fetches to announce that issuer, a trailing slash aside
-     * @param string                                    $oidcConfigurationCacheKey   Base cache key; with several clients or a keyed one, issuer-indexed key sets are cached below its ".issuer_keysets" suffix
+     * @param string                                    $oidcConfigurationCacheKey   Base cache key, under which each discovery document is cached below a ".document.N" suffix. The signing keys are not cached under it: they go under a key derived from the "jwks_uri" that served them, so that every reader of one provider shares the entry
      * @param bool                                      $enforceKeyUsageVerification When true (default, strict), only JWKs whose `use` is "sig" or whose
      *                                                                               `key_ops` contains "sign"/"verify" are accepted for signature verification.
      *                                                                               When false (lax), JWKs missing both `use` and `key_ops` are also accepted;
@@ -149,27 +147,25 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
     public function enableDiscovery(CacheInterface $cache, array|HttpClientInterface $client, string $oidcConfigurationCacheKey, bool $enforceKeyUsageVerification = true): void
     {
         $clients = \is_array($client) ? $client : [$client];
-        $this->discoveryCache = $cache;
-        $this->discoveryClients = array_values($clients);
         $this->discoveryIssuers = array_map(static fn ($key) => \is_string($key) ? $key : null, array_keys($clients));
         $pinned = array_filter($this->discoveryIssuers, \is_string(...));
         $this->bindKeysToIssuers = 1 < \count($clients) || $pinned;
-        $this->oidcConfigurationCacheKey = $this->bindKeysToIssuers ? $oidcConfigurationCacheKey.'.issuer_keysets' : $oidcConfigurationCacheKey;
-        $this->enforceKeyUsageVerification = $enforceKeyUsageVerification;
 
-        if ($pinned) {
-            // setting or changing an expected issuer must discard the key sets cached without checking it
-            $this->oidcConfigurationCacheKey .= '.'.substr(hash('xxh128', serialize($this->discoveryIssuers)), 0, 8);
-        }
-
-        // the discovery documents get their own cache entries: $oidcConfigurationCacheKey
-        // keeps holding the JWKS, whose lifetime is driven by the JWKS response headers
+        // the document and the keys of each provider get their own cache entries, so that the
+        // lifetime the provider advertises on each applies to it alone, and so that a reader
+        // of one provider never invalidates the keys of another
         $discoveries = [];
-        foreach ($this->discoveryClients as $i => $discoveryClient) {
-            // the keys are kept aligned with $discoveryClients, which computeDiscoveryKeys() indexes back into
-            $discoveries[$i] = new OidcDiscovery($discoveryClient, $cache, cacheKey: $oidcConfigurationCacheKey.'.document.'.$i, checkedEndpoints: ['jwks_uri']);
+        $providerKeys = [];
+        foreach (array_values($clients) as $i => $discoveryClient) {
+            // the keys are kept aligned, which announcedIssuers() indexes back into
+            $discoveries[$i] = new OidcDiscovery($discoveryClient, $cache, '.well-known/openid-configuration', null, 3600, $oidcConfigurationCacheKey.'.document.'.$i, ['jwks_uri']);
+            // the "jwks_uri" is checked against the URL that served the document, by the
+            // $checkedEndpoints above, rather than required to be HTTPS outright: this handler
+            // has always accepted the plain-HTTP key set of a provider served over plain HTTP
+            $providerKeys[$i] = new OidcProviderKeys($discoveries[$i], $discoveryClient, $cache, $this->clock, 3600, $enforceKeyUsageVerification, false);
         }
         $this->discoveries = $discoveries;
+        $this->providerKeys = $providerKeys;
     }
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
@@ -178,20 +174,13 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
             throw new \LogicException('You cannot use the "oidc" token handler since "web-token/jwt-signature" and "web-token/jwt-checker" are not installed. Try running "composer require web-token/jwt-signature web-token/jwt-checker".');
         }
 
-        if (!$this->discoveryClients && !$this->signatureKeyset) {
+        if (!$this->providerKeys && !$this->signatureKeyset) {
             throw new \LogicException('You cannot use the "oidc" token handler without JWKSet nor "discovery". Please configure JWKSet in the constructor, or call "enableDiscovery" method.');
-        }
-
-        $jwkset = $this->signatureKeyset;
-        if ($this->discoveryClients) {
-            $keys = $this->discoveryCache->get($this->oidcConfigurationCacheKey, [$this, 'computeDiscoveryKeys']);
-
-            $jwkset = $this->bindKeysToIssuers ? $keys : JWKSet::createFromKeyData(['keys' => $keys]);
         }
 
         try {
             $accessToken = $this->decryptIfNeeded($accessToken);
-            $claims = $this->loadAndVerifyJws($accessToken, $jwkset);
+            $claims = $this->loadAndVerifyJws($accessToken);
             $this->verifyClaims($claims);
 
             if (empty($claims[$this->claim])) {
@@ -216,12 +205,10 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
     }
 
     /**
-     * Computes the JWKS and sets the cache item TTL from provider headers.
+     * Warms the signing keys of every configured provider, indexed by the issuer each announces
+     * when the keys are bound to issuers, as the verification reads them.
      *
-     * With several providers, or when one is expected to announce a given issuer, keys are indexed by the issuer each provider announces, so that a token can only be verified with the keys of its own issuer.
-     *
-     * The cache entry lifetime is automatically adjusted based on the lowest TTL
-     * advertised by the providers (via "Cache-Control: max-age" or "Expires" headers).
+     * Each provider caches its own keys, so $item is left untouched and only kept for BC.
      *
      * @return list<array<string, mixed>>|array<string, list<array<string, mixed>>>
      *
@@ -229,68 +216,23 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
      */
     public function computeDiscoveryKeys(ItemInterface $item): array
     {
-        if (!$this->discoveries) {
+        if (!$this->providerKeys) {
             throw new \LogicException('No OIDC discovery client configured.');
         }
-        $logger = $this->logger;
+
         try {
-            $discoveredKeys = [];
-            $minTtl = null;
-            $jwkSetResponses = [];
-
-            // the ".well-known" requests are sent first, so that they travel concurrently:
-            // the responses are lazy, and only consumed by getConfiguration() below
-            foreach ($this->discoveries as $discovery) {
-                $discovery->prefetch();
+            if (!$this->bindKeysToIssuers) {
+                return $this->providerKeys[0]->getSignatureKeys();
             }
 
-            foreach ($this->discoveries as $i => $discovery) {
-                $configuration = $discovery->getConfiguration();
-                $issuer = '';
-
-                if ($this->bindKeysToIssuers) {
-                    $issuer = $configuration['issuer'] ?? null;
-                    $expectedIssuer = $this->discoveryIssuers[$i];
-
-                    if (null !== $expectedIssuer && (!\is_string($issuer) || rtrim($issuer, '/') !== rtrim($expectedIssuer, '/'))) {
-                        throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which does not match the expected issuer "%s".', \is_string($issuer) ? $issuer : get_debug_type($issuer), $expectedIssuer));
-                    }
-
-                    if (!\is_string($issuer) || !\in_array($issuer, $this->issuers, true)) {
-                        throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which is not allowed.', \is_string($issuer) ? $issuer : get_debug_type($issuer)));
-                    }
-
-                    // a provider claiming the issuer of another one would get its keys trusted for that issuer
-                    if (isset($jwkSetResponses[$issuer])) {
-                        throw new \RuntimeException(\sprintf('The OIDC issuer "%s" is announced by more than one discovery document.', $issuer));
-                    }
-                }
-
-                // the scheme was checked against the URL that served the document before
-                // the configuration was cached, so only the announcement is enforced here
-                $jwksUri = self::checkDiscoveredEndpoint($configuration['jwks_uri'] ?? null, 'jwks_uri', null);
-
-                $jwkSetResponses[$issuer] = $this->discoveryClients[$i]->request('GET', $jwksUri, ['max_redirects' => 0]);
+            $keys = [];
+            foreach ($this->announcedIssuers() as $issuer => $i) {
+                $keys[$issuer] = $this->providerKeys[$i]->getSignatureKeys();
             }
 
-            foreach ($jwkSetResponses as $issuer => $response) {
-                [$keys, $currentTtl] = OidcJwks::fromResponse($response, $this->enforceKeyUsageVerification);
-
-                // Apply the lowest TTL found to ensure all keys in the set are still valid
-                if (null !== $currentTtl && (null === $minTtl || $currentTtl < $minTtl)) {
-                    $minTtl = $currentTtl;
-                }
-
-                $discoveredKeys[$issuer] = $keys;
-            }
-
-            if (0 < ($minTtl ?? -1)) {
-                $item->expiresAfter(min($minTtl, OidcJwks::MAX_TTL));
-            }
-
-            return $this->bindKeysToIssuers ? $discoveredKeys : $discoveredKeys[''] ?? [];
+            return $keys;
         } catch (\Exception $e) {
-            $logger?->error('An error occurred while requesting OIDC certs.', [
+            $this->logger?->error('An error occurred while requesting OIDC certs.', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -299,7 +241,79 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         }
     }
 
-    private function loadAndVerifyJws(string $accessToken, array|JWKSet $jwkset): array
+    /**
+     * The three checks are what keeps the keys of one provider from verifying the tokens of
+     * another, so every document is read even to resolve one issuer.
+     *
+     * @return array<string, int>
+     */
+    private function announcedIssuers(): array
+    {
+        foreach ($this->providerKeys as $providerKeys) {
+            $providerKeys->prefetch();
+        }
+
+        $issuers = [];
+        foreach ($this->providerKeys as $i => $providerKeys) {
+            $issuer = $providerKeys->getAnnouncedIssuer();
+            $expectedIssuer = $this->discoveryIssuers[$i];
+
+            if (null !== $expectedIssuer && (null === $issuer || rtrim($issuer, '/') !== rtrim($expectedIssuer, '/'))) {
+                throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which does not match the expected issuer "%s".', $this->describeAnnouncedIssuer($i), $expectedIssuer));
+            }
+
+            if (null === $issuer || !\in_array($issuer, $this->issuers, true)) {
+                throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which is not allowed.', $this->describeAnnouncedIssuer($i)));
+            }
+
+            if (isset($issuers[$issuer])) {
+                throw new \RuntimeException(\sprintf('The OIDC issuer "%s" is announced by more than one discovery document.', $issuer));
+            }
+
+            $issuers[$issuer] = $i;
+        }
+
+        return $issuers;
+    }
+
+    /**
+     * Names the issuer a document announces, by its type when it is not a string.
+     */
+    private function describeAnnouncedIssuer(int $i): string
+    {
+        $issuer = $this->discoveries[$i]->getConfiguration()['issuer'] ?? null;
+
+        return \is_string($issuer) ? $issuer : get_debug_type($issuer);
+    }
+
+    /**
+     * Nothing of the token is trusted here: the "iss" read from the payload only selects the keys
+     * of that very issuer, and the "kid" is only a hint that the provider may have rotated its own.
+     *
+     * @param array<string, mixed>|mixed $claims
+     */
+    private function resolveDiscoveredKeySet(?string $kid, mixed $claims): JWKSet
+    {
+        if (!$this->bindKeysToIssuers) {
+            return $this->providerKeys[0]->getSignatureKeySet($kid);
+        }
+
+        $issuer = \is_array($claims) ? ($claims['iss'] ?? null) : null;
+
+        if (!\is_string($issuer)) {
+            throw new InvalidSignatureException();
+        }
+
+        $issuers = $this->announcedIssuers();
+
+        if (!isset($issuers[$issuer])) {
+            throw new InvalidSignatureException();
+        }
+
+        return $this->providerKeys[$issuers[$issuer]]->getSignatureKeySet($kid);
+    }
+
+    private function loadAndVerifyJws(string $accessToken): array
     {
         // Decode the token
         $jwsVerifier = new JWSVerifier($this->signatureAlgorithm);
@@ -307,13 +321,12 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         $jws = $serializerManager->unserialize($accessToken);
 
         $claims = json_decode($jws->getPayload(), true);
-        if (\is_array($jwkset)) {
-            $issuer = \is_array($claims) ? ($claims['iss'] ?? null) : null;
-            if (!\is_string($issuer) || !\is_array($jwkset[$issuer] ?? null)) {
-                throw new InvalidSignatureException();
-            }
 
-            $jwkset = JWKSet::createFromKeyData(['keys' => $jwkset[$issuer]]);
+        if ($this->providerKeys) {
+            $kid = $jws->getSignature(0)->hasProtectedHeaderParameter('kid') ? $jws->getSignature(0)->getProtectedHeaderParameter('kid') : null;
+            $jwkset = $this->resolveDiscoveredKeySet(\is_string($kid) ? $kid : null, $claims);
+        } else {
+            $jwkset = $this->signatureKeyset;
         }
 
         // Verify the signature

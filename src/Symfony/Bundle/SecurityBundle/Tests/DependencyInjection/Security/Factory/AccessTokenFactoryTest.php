@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenGenerator;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -467,8 +468,10 @@ class AccessTokenFactoryTest extends TestCase
 
         $handler->enableDiscovery(...$callArgs);
 
-        $reflectedProperty = new \ReflectionProperty(OidcTokenHandler::class, 'enforceKeyUsageVerification');
-        $this->assertSame($enforceKeyUsageVerification, $reflectedProperty->getValue($handler));
+        // the flag reaches the object that filters the keys the signature is verified against
+        $providerKeys = (new \ReflectionProperty(OidcTokenHandler::class, 'providerKeys'))->getValue($handler);
+        $this->assertCount(1, $providerKeys);
+        $this->assertSame($enforceKeyUsageVerification, (new \ReflectionProperty(OidcProviderKeys::class, 'enforceKeyUsageVerification'))->getValue($providerKeys[0]));
     }
 
     public static function provideEnforceKeyUsageVerification(): iterable

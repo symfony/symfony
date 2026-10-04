@@ -14,60 +14,35 @@ namespace Symfony\Component\Security\Http\Authenticator\Oidc;
 use Jose\Component\Checker;
 use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\AlgorithmManager;
-use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
-use Psr\Clock\ClockInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\OAuth2\JwsAlgorithms;
-use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Security\Http\Oidc\OidcProviderKeys;
 
 /**
- * Verifies the signature of an OIDC ID token against the provider's JWKS.
+ * Verifies the signature of an OIDC ID token against the keys of the provider.
  *
- * The signing keys are discovered from the "jwks_uri" of the discovery document
- * and cached, as the "oidc" access token handler does. Verifying the signature is
- * what OIDC Core 1.0, Section 3.1.3.7, item 6 allows to replace by the transport
- * security of the token endpoint request: doing it anyway keeps the guarantee
- * independent of the TLS configuration of the HTTP client in use.
+ * Which keys those are, and for how long they are cached, is the job of
+ * {@see OidcProviderKeys}, which an application acting as a resource server reads the
+ * same key set from. Verifying the signature is what OIDC Core 1.0, Section 3.1.3.7,
+ * item 6 allows to replace by the transport security of the token endpoint request:
+ * doing it anyway keeps the guarantee independent of the TLS configuration of the
+ * HTTP client in use.
  *
  * @author Mathieu Santostefano <msantostefano@proton.me>
  */
 final class OidcSignatureVerifier
 {
     /**
-     * How long a JWKS refetched for an unknown "kid" is kept before another one is allowed.
-     */
-    private const ROTATION_COOLDOWN = 60;
-
-    private readonly ClockInterface $clock;
-
-    /**
-     * @param list<string> $algorithms                  The signature algorithms accepted to verify the ID token (e.g. ["RS256"])
-     * @param int          $jwksCacheTtl                The JWKS cache lifetime used when the provider advertises none
-     * @param bool         $enforceKeyUsageVerification Whether to only accept keys explicitly designated for signature,
-     *                                                  see {@see OidcJwks::fromResponse()}
+     * @param list<string> $algorithms The signature algorithms accepted to verify the ID token (e.g. ["RS256"])
      */
     public function __construct(
-        private readonly OidcDiscovery $discovery,
-        private readonly CacheInterface $jwksCache,
-        private readonly HttpClientInterface $httpClient,
+        private readonly OidcProviderKeys $providerKeys,
         private readonly array $algorithms = ['RS256'],
-        private readonly int $jwksCacheTtl = 3600,
-        private readonly bool $enforceKeyUsageVerification = true,
-        ?ClockInterface $clock = null,
     ) {
-        if (null === $clock && !class_exists(Clock::class)) {
-            throw new \LogicException(\sprintf('The "symfony/clock" component is required to build "%s" without a clock. Try running "composer require symfony/clock", or pass any PSR-20 clock to the constructor.', self::class));
-        }
-
-        $this->clock = $clock ?? new Clock();
     }
 
     /**
@@ -109,13 +84,12 @@ final class OidcSignatureVerifier
             throw new AuthenticationException('The ID token "kid" header must be a string.');
         }
 
-        $keys = $this->getKeys($kid);
-        if (!$keys) {
+        $jwkSet = $this->providerKeys->getSignatureKeySet($kid);
+        if (!\count($jwkSet)) {
             throw new AuthenticationException('The OIDC provider published no signing key usable to verify the ID token signature.');
         }
 
         $jwsVerifier = new JWSVerifier($algorithms);
-        $jwkSet = JWKSet::createFromKeyData(['keys' => $keys]);
 
         try {
             // the component supports web-token/jwt-library 3.x too, where verify() does not
@@ -158,65 +132,5 @@ final class OidcSignatureVerifier
 
             return new (JwsAlgorithms::ASYMMETRIC[$name])();
         }, $this->algorithms));
-    }
-
-    /**
-     * Returns the cached signing keys of the provider.
-     *
-     * They are refetched when the ID token announces a "kid" none of them holds.
-     *
-     * A provider that rotated its keys signs with one the cached JWKS does not know yet.
-     * The refetch is throttled, so that tokens carrying an unknown "kid" cannot drive
-     * one outbound request each.
-     *
-     * @return list<array<string, mixed>>
-     */
-    private function getKeys(?string $kid): array
-    {
-        $jwksUri = $this->discovery->getConfiguration()['jwks_uri'] ?? null;
-        if (!\is_string($jwksUri) || '' === $jwksUri) {
-            throw new AuthenticationException('The OIDC provider announces no "jwks_uri", which is required to verify the ID token signature.');
-        }
-
-        // the JWKS carries the very keys the verification relies on, so a discovery
-        // document downgrading its transport to plain HTTP must not be honored
-        $jwksUri = $this->discovery->getSecureEndpoint('jwks_uri');
-
-        // strict and lax filters yield different key sets, so each gets its own entry;
-        // the strictness is kept out of the hash, where a "jwks_uri" ending with the
-        // marker would collide with the other strictness of the same endpoint
-        $cacheKey = 'oidc_jwks.'.($this->enforceKeyUsageVerification ? '' : 'lax.').hash('xxh128', $jwksUri);
-        $compute = fn (ItemInterface $item): array => [
-            'keys' => OidcJwks::fetchKeys($this->httpClient, $jwksUri, $item, $this->jwksCacheTtl, $this->enforceKeyUsageVerification),
-            // the JWKS is stored with the time it was fetched, so that the rotation
-            // refetch below can be throttled without a second cache entry
-            'fetched_at' => $this->clock->now()->getTimestamp(),
-        ];
-
-        /** @var array{keys: list<array<string, mixed>>, fetched_at: int} $jwks */
-        $jwks = $this->jwksCache->get($cacheKey, $compute);
-
-        if (null !== $kid
-            && !$this->hasKey($jwks['keys'], $kid)
-            && ($jwks['fetched_at'] ?? 0) <= $this->clock->now()->getTimestamp() - self::ROTATION_COOLDOWN
-        ) {
-            $jwks = $this->jwksCache->get($cacheKey, $compute, \INF);
-        }
-
-        return $jwks['keys'];
-    }
-
-    /**
-     * @param list<array<string, mixed>> $keys
-     */
-    private function hasKey(array $keys, string $kid): bool
-    {
-        foreach ($keys as $key) {
-            if (isset($key['kid']) && hash_equals($kid, (string) $key['kid'])) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

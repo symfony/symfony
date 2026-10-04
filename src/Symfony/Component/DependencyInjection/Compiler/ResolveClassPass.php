@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -25,7 +26,24 @@ class ResolveClassPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $acyclic = [];
+
         foreach ($container->getDefinitions() as $id => $definition) {
+            // Passes that run before ResolveChildDefinitionsPass may walk the parents of a definition: report a circular chain before they loop forever
+            $path = [];
+            $parentDefinition = $definition;
+            while ($parentDefinition instanceof ChildDefinition && !isset($acyclic[$parent = $parentDefinition->getParent()]) && $container->has($parent)) {
+                $i = array_search($parent, $path, true);
+                $path[] = $parent;
+
+                if (false !== $i) {
+                    throw new ServiceCircularReferenceException($parent, \array_slice($path, $i));
+                }
+
+                $parentDefinition = $container->findDefinition($parent);
+            }
+            $acyclic += array_fill_keys($path, true);
+
             if ($definition->isSynthetic()
                 || $definition->hasErrors()
                 || null !== $definition->getClass()

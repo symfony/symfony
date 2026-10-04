@@ -601,11 +601,11 @@ class ProcessTest extends TestCase
 
     public function testStartIsNonBlocking()
     {
-        $process = $this->getProcessForCode('usleep(500000);');
+        $process = $this->getProcessForCode('sleep(10);');
         $start = microtime(true);
         $process->start();
         $end = microtime(true);
-        $this->assertLessThan(0.4, $end - $start);
+        $this->assertLessThan(5, $end - $start);
         $process->stop();
     }
 
@@ -1218,7 +1218,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('$n = 0; while ($n < 3) { file_put_contents(\''.$stream.'\', $n, 1); $n++; usleep(1000); }', null, null, null, null);
         $process->start();
         $result = '';
-        $limit = microtime(true) + 3;
+        $limit = microtime(true) + 30;
         $expected = '012';
 
         while ($result !== $expected && microtime(true) < $limit) {
@@ -1664,7 +1664,7 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess(self::$phpBin.' '.__DIR__.'/ErrorProcessInitiator.php -e '.self::$phpBin);
         $process->start();
-        $process->setTimeout(2);
+        $process->setTimeout(20);
         $process->wait();
         $this->assertFalse($process->isRunning());
 

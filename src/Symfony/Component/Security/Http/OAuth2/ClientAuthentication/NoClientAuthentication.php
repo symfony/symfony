@@ -20,7 +20,8 @@ namespace Symfony\Component\Security\Http\OAuth2\ClientAuthentication;
  *
  * Nothing else then binds the authorization code to the client, so PKCE (RFC 7636) is
  * what protects the exchange: a code intercepted on the redirect cannot be redeemed
- * without the code verifier. Exchanging a code without one is therefore refused here.
+ * without the code verifier. Exchanging a code without one is therefore refused here,
+ * which is the one request of a public client this refuses.
  *
  * @see https://datatracker.ietf.org/doc/html/rfc6749#section-2.1 OAuth 2.0 client types
  * @see https://datatracker.ietf.org/doc/html/rfc7636             PKCE
@@ -30,17 +31,17 @@ namespace Symfony\Component\Security\Http\OAuth2\ClientAuthentication;
 final class NoClientAuthentication implements ClientAuthenticationInterface
 {
     /**
-     * Refuses every grant but the refresh token one when no PKCE verifier is given.
-     *
-     * The refresh token grant of RFC 6749, Section 6 carries neither a code nor a verifier, so
-     * it is the one exempted; a grant added later never reaches the token endpoint
-     * unprotected.
+     * Refuses an authorization code redeemed without a PKCE verifier, the presence of the code
+     * being checked next to the grant naming it. What a public client sends otherwise carries a
+     * secret of its own that no interception of the redirect yields: a refresh token, a device
+     * code, or the token it asks a provider to revoke.
      */
     public function authenticate(string $clientId, string $tokenEndpoint, array $options): array
     {
         $body = $options['body'] ?? [];
+        $redeemsACode = 'authorization_code' === ($body['grant_type'] ?? null) || isset($body['code']);
 
-        if ('refresh_token' !== ($body['grant_type'] ?? null) && '' === ($body['code_verifier'] ?? '')) {
+        if ($redeemsACode && '' === ($body['code_verifier'] ?? '')) {
             throw new \LogicException('A public OAuth2 client must exchange the authorization code with PKCE, as it sends no client secret. Pass the code verifier to "exchangeCode()", or authenticate the client with a secret.');
         }
 

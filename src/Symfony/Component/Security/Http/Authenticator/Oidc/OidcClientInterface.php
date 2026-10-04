@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Authenticator\Oidc;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * The OpenID Connect protocol operations the login flow needs from a provider.
@@ -24,6 +25,23 @@ use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
  */
 interface OidcClientInterface
 {
+    /**
+     * Makes a client-authenticated POST to an endpoint the provider announces, which the grants
+     * below are written on, as is anything this interface does not name: revoking a token,
+     * introspecting one, pushing an authorization request, or running a grant of its own.
+     *
+     * The raw response is returned, an endpoint being free to answer a JSON object, a signed JWT,
+     * or nothing at all, as RFC 7009, Section 2.2 makes the answer of a revocation.
+     *
+     * @param string               $endpoint The metadata member naming the endpoint, e.g. "revocation_endpoint"
+     * @param array<string, mixed> $body     The form body, which the "client_id" is added to
+     * @param array<string, mixed> $options  The HttpClient options, over which the body, the
+     *                                       redirects and what the registration contributes win
+     *
+     * @throws AuthenticationException If the endpoint is not announced by the provider, or does not use HTTPS
+     */
+    public function request(string $endpoint, array $body = [], array $options = []): ResponseInterface;
+
     /**
      * Exchanges an authorization code for tokens at the token endpoint.
      *

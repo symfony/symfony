@@ -45,6 +45,13 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class OidcClient implements OidcClientInterface
 {
+    private const TOKEN_ENDPOINT = 'token_endpoint';
+
+    /**
+     * The endpoints RFC 9449 carries a proof to, its Section 5 and its Section 10.1.
+     */
+    private const PROOF_ENDPOINTS = [self::TOKEN_ENDPOINT, 'pushed_authorization_request_endpoint'];
+
     private readonly AccessTokenTypeInterface $accessTokenType;
 
     /**
@@ -66,15 +73,36 @@ final class OidcClient implements OidcClientInterface
         return $this->clientAuthentication->getMethod();
     }
 
+    /**
+     * The client is authenticated again on each attempt: a client assertion carries a "jti" a
+     * provider remembers (RFC 7523, Section 3), so sending the same one twice is a replay.
+     */
+    public function request(string $endpoint, array $body = [], array $options = []): ResponseInterface
+    {
+        $url = $this->endpoint($endpoint);
+        // the client authentication is told the token endpoint whatever is requested: an
+        // assertion names the audience its registration says, not the endpoint being called
+        $tokenEndpoint = self::TOKEN_ENDPOINT === $endpoint ? $url : $this->endpoint(self::TOKEN_ENDPOINT);
+
+        return $this->send($url, function () use ($endpoint, $url, $tokenEndpoint, $body, $options): ResponseInterface {
+            $options['body'] = ['client_id' => $this->clientId] + $body;
+            $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, $options);
+            $options['max_redirects'] = 0;
+
+            if (\in_array($endpoint, self::PROOF_ENDPOINTS, true)) {
+                $options = $this->accessTokenType->prepareTokenRequest($url, $options);
+            }
+
+            return $this->httpClient->request('POST', $url, $this->certificateOptions + $options);
+        });
+    }
+
     public function exchangeCode(string $code, string $redirectUri, ?string $codeVerifier = null): array
     {
-        $tokenEndpoint = $this->endpoint('token_endpoint');
-
         $body = [
             'grant_type' => 'authorization_code',
             'code' => $code,
             'redirect_uri' => $redirectUri,
-            'client_id' => $this->clientId,
         ];
 
         if (null !== $codeVerifier) {
@@ -82,7 +110,7 @@ final class OidcClient implements OidcClientInterface
         }
 
         try {
-            $tokenResponse = $this->requestToken($tokenEndpoint, $body)->toArray();
+            $tokenResponse = $this->request(self::TOKEN_ENDPOINT, $body)->toArray();
         } catch (HttpClientExceptionInterface $e) {
             throw new AuthenticationException(\sprintf('The OIDC token endpoint request failed: "%s"', $e->getMessage()), previous: $e);
         }
@@ -94,12 +122,9 @@ final class OidcClient implements OidcClientInterface
 
     public function refreshToken(#[\SensitiveParameter] string $refreshToken, array $scopes = []): array
     {
-        $tokenEndpoint = $this->endpoint('token_endpoint');
-
         $body = [
             'grant_type' => 'refresh_token',
             'refresh_token' => $refreshToken,
-            'client_id' => $this->clientId,
         ];
 
         if ($scopes) {
@@ -107,7 +132,7 @@ final class OidcClient implements OidcClientInterface
         }
 
         try {
-            $response = $this->requestToken($tokenEndpoint, $body);
+            $response = $this->request(self::TOKEN_ENDPOINT, $body);
 
             // RFC 6749, Section 5.2: "invalid_grant" is the one error saying the refresh
             // token itself is gone, where every other failure only means the request may
@@ -160,26 +185,6 @@ final class OidcClient implements OidcClientInterface
         }
 
         return $alias;
-    }
-
-    /**
-     * Makes a token endpoint request, with a fresh client authentication each time it is sent.
-     *
-     * A request that has to be sent again is authenticated again rather than repeated: a
-     * client assertion carries a "jti" a provider remembers until it expires (RFC 7523,
-     * Section 3), so sending the same one twice is a replay of it.
-     *
-     * @param array<string, string> $body
-     */
-    private function requestToken(string $tokenEndpoint, array $body): ResponseInterface
-    {
-        return $this->send($tokenEndpoint, function () use ($tokenEndpoint, $body): ResponseInterface {
-            $options = $this->clientAuthentication->authenticate($this->clientId, $tokenEndpoint, ['body' => $body]);
-            $options['max_redirects'] = 0;
-            $options = $this->accessTokenType->prepareTokenRequest($tokenEndpoint, $options);
-
-            return $this->httpClient->request('POST', $tokenEndpoint, $this->certificateOptions + $options);
-        });
     }
 
     /**

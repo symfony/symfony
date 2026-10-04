@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `OidcClientInterface::request()`, to make a client-authenticated request to an endpoint of the OIDC provider
  * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in and the denied attribute kept in the session
  * Add `AuthenticationUtils::getReAuthenticationAttribute()`, the security attribute the current request is asking a re-authentication for
  * Add `SenderConstraintInterface` and `DpopSenderConstraint`, to accept only the access tokens bound to a key the request proves it holds (RFC 9449)

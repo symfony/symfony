@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -25,6 +26,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientAuthenticationInterface;
+use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretPost;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
@@ -815,6 +817,172 @@ class OidcClientTest extends TestCase
         $this->assertArrayNotHasKey('nonce', self::decodePayload($this->sentProofs[0]));
         $this->assertSame('provider-nonce', self::decodePayload($this->sentProofs[1])['nonce']);
         $this->assertArrayNotHasKey('nonce', self::decodePayload($this->sentProofs[2]));
+    }
+
+    public function testRequestPostsAClientAuthenticatedFormToTheAnnouncedEndpoint()
+    {
+        $discovery = $this->createDiscovery([
+            'token_endpoint' => 'https://provider.example.com/token',
+            'revocation_endpoint' => 'https://provider.example.com/revoke',
+        ]);
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('POST', 'https://provider.example.com/revoke', $this->callback(function (array $options): bool {
+                $this->assertSame(['client_id' => 'test-client-id', 'token' => 'a-refresh-token', 'token_type_hint' => 'refresh_token', 'client_secret' => 'test-client-secret'], $options['body']);
+                $this->assertSame(0, $options['max_redirects']);
+
+                return true;
+            }))
+            ->willReturn(new MockResponse('', ['http_code' => 200]));
+
+        $response = $this->createClient(null, $discovery)->request('revocation_endpoint', ['token' => 'a-refresh-token', 'token_type_hint' => 'refresh_token']);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testRequestThrowsWhenTheProviderAnnouncesNoSuchEndpoint()
+    {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('does not announce any "revocation_endpoint"');
+
+        $this->createClient()->request('revocation_endpoint', ['token' => 'a-refresh-token']);
+    }
+
+    public function testRequestRejectsAnInsecureEndpoint()
+    {
+        $discovery = $this->createDiscovery(['token_endpoint' => 'https://provider.example.com/token', 'revocation_endpoint' => 'http://provider.example.com/revoke']);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('must use HTTPS');
+
+        $this->createClient(null, $discovery)->request('revocation_endpoint', ['token' => 'a-refresh-token']);
+    }
+
+    /**
+     * RFC 9449, Section 5 carries a proof on a token request and on no other.
+     */
+    public function testRequestCarriesNoProofOutsideTheTokenEndpoint()
+    {
+        $discovery = $this->createDiscovery([
+            'token_endpoint' => 'https://provider.example.com/token',
+            'revocation_endpoint' => 'https://provider.example.com/revoke',
+        ]);
+        $client = $this->createDpopClient([new MockResponse('', ['http_code' => 200]), new JsonMockResponse(['access_token' => 'access-123', 'token_type' => 'DPoP'])], null, new ClientSecretPost('test-client-secret'), $discovery);
+
+        $client->request('revocation_endpoint', ['token' => 'a-refresh-token']);
+        $this->assertNull($this->sentProofs[0]);
+
+        $client->request('token_endpoint', ['grant_type' => 'client_credentials']);
+        $this->assertNotNull($this->sentProofs[1]);
+    }
+
+    public function testRequestIsMadeToTheMutualTlsAliasOfTheEndpoint()
+    {
+        $discovery = $this->createDiscovery([
+            'token_endpoint' => 'https://provider.example.com/token',
+            'revocation_endpoint' => 'https://provider.example.com/revoke',
+            'mtls_endpoint_aliases' => ['revocation_endpoint' => 'https://mtls.provider.example.com/revoke'],
+        ]);
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('POST', 'https://mtls.provider.example.com/revoke', $this->anything())
+            ->willReturn(new MockResponse('', ['http_code' => 200]));
+
+        $client = new OidcClient($this->httpClient, $discovery, 'test-client-id', new TlsClientAuth(), self::CERTIFICATE);
+
+        $client->request('revocation_endpoint', ['token' => 'a-refresh-token']);
+    }
+
+    /**
+     * RFC 9701, Section 4: a signed introspection response is only served to a request
+     * announcing it.
+     */
+    public function testRequestIsMadeWithTheOptionsItIsGiven()
+    {
+        $discovery = $this->createDiscovery(['token_endpoint' => 'https://provider.example.com/token', 'introspection_endpoint' => 'https://provider.example.com/introspect']);
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('POST', 'https://provider.example.com/introspect', $this->callback(function (array $options): bool {
+                $this->assertSame(['Accept' => 'application/token-introspection+jwt'], $options['headers']);
+
+                return true;
+            }))
+            ->willReturn(new JsonMockResponse(['active' => true]));
+
+        $this->createClient(null, $discovery)->request('introspection_endpoint', ['token' => 'a-token'], ['headers' => ['Accept' => 'application/token-introspection+jwt']]);
+    }
+
+    public function testRequestKeepsItsOwnBodyOverTheOneTheOptionsCarry()
+    {
+        $discovery = $this->createDiscovery(['token_endpoint' => 'https://provider.example.com/token', 'revocation_endpoint' => 'https://provider.example.com/revoke']);
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('POST', 'https://provider.example.com/revoke', $this->callback(function (array $options): bool {
+                $this->assertSame(['client_id' => 'test-client-id', 'token' => 'a-token', 'client_secret' => 'test-client-secret'], $options['body']);
+                $this->assertSame(0, $options['max_redirects']);
+
+                return true;
+            }))
+            ->willReturn(new MockResponse('', ['http_code' => 200]));
+
+        $this->createClient(null, $discovery)->request('revocation_endpoint', ['token' => 'a-token'], ['body' => ['token' => 'another-token'], 'max_redirects' => 5]);
+    }
+
+    /**
+     * RFC 9449, Section 10.1: a pushed authorization request may carry a proof.
+     */
+    public function testRequestCarriesAProofToThePushedAuthorizationRequestEndpoint()
+    {
+        $discovery = $this->createDiscovery(['token_endpoint' => 'https://provider.example.com/token', 'pushed_authorization_request_endpoint' => 'https://provider.example.com/par']);
+        $client = $this->createDpopClient(new JsonMockResponse(['request_uri' => 'urn:ietf:params:oauth:request_uri:x', 'expires_in' => 60]), null, new ClientSecretPost('test-client-secret'), $discovery);
+
+        $client->request('pushed_authorization_request_endpoint', ['response_type' => 'code']);
+
+        $this->assertNotNull($this->sentProofs[0]);
+    }
+
+    /**
+     * A public client holds the token it revokes and the device code it redeems.
+     */
+    public function testAPublicClientReachesAnEndpointThatRedeemsNoAuthorizationCode()
+    {
+        $discovery = $this->createDiscovery([
+            'token_endpoint' => 'https://provider.example.com/token',
+            'revocation_endpoint' => 'https://provider.example.com/revoke',
+        ]);
+        $this->httpClient->expects($this->exactly(2))
+            ->method('request')
+            ->willReturn(new MockResponse('', ['http_code' => 200]), new JsonMockResponse(['access_token' => 'access-123']));
+
+        $client = $this->createClient(new NoClientAuthentication(), $discovery);
+
+        $client->request('revocation_endpoint', ['token' => 'refresh-123', 'token_type_hint' => 'refresh_token']);
+        $client->request('token_endpoint', ['grant_type' => 'urn:ietf:params:oauth:grant-type:device_code', 'device_code' => 'device-123']);
+    }
+
+    /**
+     * Keyed on the endpoint being called, a revocation would name the revocation URL as its
+     * audience, which a provider checking it against its token endpoint refuses.
+     */
+    public function testTheAssertionOfARequestNamesTheTokenEndpointWhateverIsRequested()
+    {
+        $discovery = $this->createDiscovery([
+            'token_endpoint' => 'https://provider.example.com/token',
+            'revocation_endpoint' => 'https://provider.example.com/revoke',
+        ]);
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('POST', 'https://provider.example.com/revoke', $this->callback(function (array $options): bool {
+                $this->assertSame('https://provider.example.com/token', self::decodePayload($options['body']['client_assertion'])['aud']);
+
+                return true;
+            }))
+            ->willReturn(new MockResponse('', ['http_code' => 200]));
+
+        // no discovery given to the assertion, which is the "audience: token_endpoint" option
+        $client = $this->createClient(new ClientSecretJwt('a-client-secret-long-enough-for-hs256', 'HS256', 60, new MockClock()), $discovery);
+
+        $client->request('revocation_endpoint', ['token' => 'a-token']);
     }
 
     /**

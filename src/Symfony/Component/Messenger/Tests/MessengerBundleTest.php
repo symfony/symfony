@@ -695,11 +695,7 @@ class TestSignedFailureTransportKernel extends AbstractKernel
     }
 }
 
-<<<<<<< HEAD
 class TestAttributeMiddlewareKernel extends AbstractKernel
-=======
-class TestTypedBusesKernel extends AbstractKernel
->>>>>>> d37dc2876a9 ([Messenger] Add the `messages` and `unwrap_exceptions` options of buses)
 {
     use KernelTrait;
 
@@ -721,7 +717,6 @@ class TestTypedBusesKernel extends AbstractKernel
     private function configureContainer(ContainerConfigurator $container): void
     {
         $container->extension('messenger', [
-<<<<<<< HEAD
             'transports' => ['async' => 'in-memory://'],
             'routing' => [DummyMessage::class => 'async'],
         ]);
@@ -729,7 +724,32 @@ class TestTypedBusesKernel extends AbstractKernel
             ->set(FirstAttributeMiddleware::class)->autowire()->autoconfigure()
             ->set(SecondAttributeMiddleware::class)->autowire()->autoconfigure()
             ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
-=======
+        ;
+    }
+}
+
+class TestTypedBusesKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
             'default_bus' => 'command.bus',
             'buses' => [
                 'command.bus' => ['messages' => DummyCommand::class, 'unwrap_exceptions' => true],
@@ -740,12 +760,10 @@ class TestTypedBusesKernel extends AbstractKernel
             ->set(TypedBusesHandler::class)->autoconfigure()
             ->alias('test.command.bus', 'command.bus')->public()
             ->alias('test.query.bus', 'query.bus')->public()
->>>>>>> d37dc2876a9 ([Messenger] Add the `messages` and `unwrap_exceptions` options of buses)
         ;
     }
 }
 
-<<<<<<< HEAD
 abstract class AttributeRecordingMiddleware implements MiddlewareInterface
 {
     /** @var list<class-string> */
@@ -766,7 +784,9 @@ class FirstAttributeMiddleware extends AttributeRecordingMiddleware
 
 #[AsMessageMiddleware(bus: 'messenger.bus.default')]
 class SecondAttributeMiddleware extends AttributeRecordingMiddleware
-=======
+{
+}
+
 class TypedBusesHandler
 {
     #[AsMessageHandler]
@@ -792,6 +812,5 @@ interface AuditedMessage
 }
 
 class AuditedDummyMessage extends DummyMessage implements AuditedMessage
->>>>>>> d37dc2876a9 ([Messenger] Add the `messages` and `unwrap_exceptions` options of buses)
 {
 }

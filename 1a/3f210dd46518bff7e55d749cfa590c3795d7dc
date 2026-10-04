@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T08:38:12Z
+
+Three things before the details:
+
+- `dpop` on a firewall that isn't stateless turns the session cookie into a bearer credential: after one request with a valid proof, the cookie alone gets a 200. `stateless` defaults to false, so I'd refuse the combination at compile time, the way `user_checker_on_refresh` refuses a stateless firewall.
+- the replay cache fails open: the result of `save()` isn't checked, so a pool that can't write (read-only filesystem, Redis down) accepts a replayed proof. I'd refuse the proof when `save()` fails.
+- `oidc_user_info`, `cas` and any handler that doesn't put the claims on the `UserBadge` can't work with `dpop`: every token gets a generic 401 and the reason only shows in the log. Refusing them at compile time would say it upfront.
+
+Also, `TYPE` and `SCHEME` are declared again next to the ones of #66239: one place should own them before 8.2.0.
+
+I pushed fixes for the rest, one commit each: `oth` and `priv` refused in the proof key, the replay expiry computed on the injected clock (the test didn't reuse the `jti`), an out-of-range `iat`, the DPoP members of the RFC 9728 metadata, and functional tests. WDYT about the three points above?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-30T10:42:23Z
+
+Following up on the constants: I made them private here and on #66239, so none needs an owner; the bundle uses the literal `'DPoP'`.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-10-03T21:09:38Z
+
+Thanks for the review. `dpop` on a stateful firewall is now refused.
+One detail: `oidc_user_info` puts claims on the `UserBadge` but they are the ones the provider answers about the user and never the ones of the token. So no `cnf` reaches the constraint either way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-04T06:46:54Z
+
+Thanks, the three points are in. I squashed it into one commit rebased on #66239, shortened the `info()` texts and CHANGELOG entries (what they no longer say is in the documentation points of the description), and rewrote the description.

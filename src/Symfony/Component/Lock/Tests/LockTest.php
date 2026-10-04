@@ -301,6 +301,44 @@ class LockTest extends TestCase
         unset($lock);
     }
 
+    public function testReleaseOnDestructionAfterFailedPromotion()
+    {
+        $store = new InMemoryStore();
+        $resource = __METHOD__;
+        $lock = new Lock(new Key($resource), $store);
+        $other = new Lock(new Key($resource), $store);
+
+        $this->assertTrue($lock->acquireRead());
+        $this->assertTrue($other->acquireRead());
+        $this->assertFalse($lock->acquire());
+
+        unset($lock);
+
+        $this->assertTrue($other->acquire());
+    }
+
+    public function testReleaseOnDestructionAfterFailedDemotion()
+    {
+        $key = new Key(__METHOD__);
+        $store = $this->createMock(SharedLockStoreInterface::class);
+        $lock = new Lock($key, $store);
+
+        $store
+            ->method('saveRead')
+            ->willThrowException(new LockConflictedException());
+        $store
+            ->method('exists')
+            ->willReturn(true, false);
+        $store
+            ->expects($this->once())
+            ->method('delete');
+
+        $this->assertTrue($lock->acquire());
+        $this->assertFalse($lock->acquireRead());
+
+        unset($lock);
+    }
+
     public function testReleaseThrowsExceptionWhenDeletionFail()
     {
         $this->expectException(LockReleasingException::class);

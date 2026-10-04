@@ -156,4 +156,88 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
 
         $this->assertTrue($store2->exists($store2Key));
     }
+
+    public function testFailedPromotionKeepsTheReadLock()
+    {
+        $store1 = $this->getStore();
+        $store2 = $this->getStore();
+
+        $resource = __METHOD__;
+        $key1 = new Key($resource);
+        $key2 = new Key($resource);
+
+        $store1->saveRead($key1);
+        $store2->saveRead($key2);
+
+        try {
+            $store1->save($key1);
+            $this->fail('The store shouldn\'t promote a read lock shared with another connection');
+        } catch (LockConflictedException) {
+        }
+
+        $this->assertTrue($store1->exists($key1));
+
+        $store1->delete($key1);
+        $store2->save($key2);
+        $this->assertTrue($store2->exists($key2));
+    }
+
+    public function testFailedBlockingPromotionKeepsTheReadLock()
+    {
+        $pdo = new \PDO('pgsql:host='.$this->getPostgresHost(), 'postgres', 'password');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $store1 = new PostgreSqlStore($pdo);
+        $store2 = $this->getStore();
+
+        $resource = __METHOD__;
+        $key1 = new Key($resource);
+        $key2 = new Key($resource);
+
+        $store1->saveRead($key1);
+        $store2->saveRead($key2);
+
+        $pdo->exec('SET statement_timeout = 1');
+        try {
+            $store1->waitAndSave($key1);
+            $this->fail('The store shouldn\'t promote a read lock shared with another connection');
+        } catch (\PDOException) {
+        }
+        $pdo->exec('SET statement_timeout = 0');
+
+        $this->assertTrue($store1->exists($key1));
+
+        $store1->delete($key1);
+        $store2->save($key2);
+        $this->assertTrue($store2->exists($key2));
+    }
+
+    #[RequiresPhpExtension('pgsql')]
+    public function testFailedDemotionKeepsTheWriteLock()
+    {
+        $pdo = new \PDO('pgsql:host='.$this->getPostgresHost(), 'postgres', 'password');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $store = new PostgreSqlStore($pdo);
+
+        $key = new Key(__METHOD__);
+        $store->save($key);
+
+        $waiter = pg_connect('host='.$this->getPostgresHost().' user=postgres password=password', \PGSQL_CONNECT_FORCE_NEW);
+        pg_query($waiter, 'SET lock_timeout = 5000');
+        pg_send_query($waiter, 'SELECT pg_advisory_lock('.crc32((string) $key).')');
+        while (pg_connection_busy($waiter) && !$pdo->query('SELECT count(*) FROM pg_locks WHERE NOT granted AND pid = '.pg_get_pid($waiter))->fetchColumn()) {
+            usleep(10000);
+        }
+
+        try {
+            $store->saveRead($key);
+            $this->fail('The store shouldn\'t demote a write lock while another connection waits for it');
+        } catch (LockConflictedException) {
+        }
+
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $this->assertSame(\PGSQL_TUPLES_OK, pg_result_status(pg_get_result($waiter)));
+        pg_close($waiter);
+    }
 }

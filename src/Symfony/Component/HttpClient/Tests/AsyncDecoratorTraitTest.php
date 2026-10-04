@@ -71,12 +71,6 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         parent::testTimeoutIsNotAFatalError();
     }
 
-    #[Group('transient-on-windows')]
-    public function testTimeoutWithActiveConcurrentStream()
-    {
-        parent::testTimeoutWithActiveConcurrentStream();
-    }
-
     public function testRetry404()
     {
         $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {

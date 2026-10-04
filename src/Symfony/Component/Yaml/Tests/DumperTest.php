@@ -854,6 +854,12 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($yaml));
     }
 
+    public function testDumpDocumentMarkersAsTopLevelStrings()
+    {
+        $this->assertSame('---', $this->parser->parse($this->dumper->dump('---')));
+        $this->assertSame('...', $this->parser->parse($this->dumper->dump('...')));
+    }
+
     public function testTopLevelMultiLineStringLiteral()
     {
         $data = "a\nb\n";

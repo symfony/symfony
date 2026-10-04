@@ -54,7 +54,7 @@ class OidcBackChannelLogoutTest extends AbstractWebTestCase
         $client->request('GET', '/oidc/start');
 
         $this->assertNull($client->getRequest()->getSession()->get('_security_'.$firewallContext));
-        $this->assertNotSame($sessionCookie->getValue(), $client->getCookieJar()->get('MOCKSESSID')?->getValue(), 'The listener of TokenDeauthenticatedEvent invalidates the session on an OidcSessionEndedException.');
+        $this->assertNotSame($sessionCookie->getValue(), $client->getRequest()->getSession()->getId(), 'The listener of TokenDeauthenticatedEvent invalidates the session on an OidcSessionEndedException.');
     }
 
     public static function provideFirewallContexts(): iterable
@@ -97,7 +97,7 @@ class OidcBackChannelLogoutTest extends AbstractWebTestCase
         $client->request('GET', '/oidc/start');
 
         $this->assertNotNull($client->getRequest()->getSession()->get('_security_oidc'));
-        $this->assertSame($sessionCookie->getValue(), $client->getCookieJar()->get('MOCKSESSID')?->getValue());
+        $this->assertSame($sessionCookie->getValue(), $client->getRequest()->getSession()->getId());
     }
 
     /**

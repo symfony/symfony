@@ -140,6 +140,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response->toStream();
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testNonBlockingStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);

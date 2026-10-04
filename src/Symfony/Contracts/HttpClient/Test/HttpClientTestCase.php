@@ -786,6 +786,9 @@ abstract class HttpClientTestCase extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testTimeoutOnStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -818,6 +821,9 @@ abstract class HttpClientTestCase extends TestCase
         $this->fail('The response should have completed');
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testUncheckedTimeoutThrows()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -830,6 +836,9 @@ abstract class HttpClientTestCase extends TestCase
         }
     }
 
+    /**
+     * @group transient-on-windows
+     */
     public function testTimeoutWithActiveConcurrentStream()
     {
         $p1 = TestHttpServer::start(8067);

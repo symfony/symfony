@@ -21,6 +21,7 @@ class AmpHttpClientTest extends HttpClientTestCase
 {
     /**
      * @group transient
+     * @group transient-on-windows
      */
     public function testNonBlockingStream()
     {

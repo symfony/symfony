@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 
 class ResolveClassPassTest extends TestCase
@@ -93,6 +94,40 @@ class ResolveClassPassTest extends TestCase
         $container->setDefinition('App\Foo\Child', new ChildDefinition('App\Foo'));
 
         (new ResolveClassPass())->process($container);
+    }
+
+    public function testCircularParentDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $container->setDefinition('a', new ChildDefinition('b'));
+        $container->setDefinition('b', (new ChildDefinition('a'))->setClass(CaseSensitiveClass::class));
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "b", path: "b -> a -> b".');
+
+        (new ResolveClassPass())->process($container);
+    }
+
+    public function testSelfParentDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container->setDefinition('a', new ChildDefinition('a'));
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "a", path: "a -> a".');
+
+        (new ResolveClassPass())->process($container);
+    }
+
+    public function testMissingParentDefinitionIsLeftToResolveChildDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $container->setDefinition('a', new ChildDefinition('b'));
+        $container->setDefinition('b', new ChildDefinition('missing'));
+
+        (new ResolveClassPass())->process($container);
+
+        $this->assertNull($container->getDefinition('a')->getClass());
     }
 
     public function testSkipsDefinitionsWithErrors()

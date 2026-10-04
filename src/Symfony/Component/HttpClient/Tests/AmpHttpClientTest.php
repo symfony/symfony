@@ -19,6 +19,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class AmpHttpClientTest extends HttpClientTestCase
 {
     #[Group('transient')]
+    #[Group('transient-on-windows')]
     public function testNonBlockingStream()
     {
         parent::testNonBlockingStream();
@@ -40,12 +41,6 @@ class AmpHttpClientTest extends HttpClientTestCase
     public function testTimeoutIsNotAFatalError()
     {
         parent::testTimeoutIsNotAFatalError();
-    }
-
-    #[Group('transient-on-windows')]
-    public function testTimeoutOnStream()
-    {
-        parent::testTimeoutOnStream();
     }
 
     #[Group('transient-on-windows')]

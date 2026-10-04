@@ -563,6 +563,8 @@ class InlineTest extends TestCase
 
             ["'-dash'", '-dash'],
             ["'-'", '-'],
+            ["'---'", '---'],
+            ["'...'", '...'],
 
             // Pre-YAML-1.2 booleans
             ["'y'", 'y'],

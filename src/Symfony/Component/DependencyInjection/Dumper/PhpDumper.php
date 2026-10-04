@@ -1199,6 +1199,8 @@ class PhpDumper extends Dumper
 
                 if ($callable instanceof Reference || $callable instanceof Definition) {
                     $callable = [$callable, '__invoke'];
+                } elseif (\is_string($callable) && str_contains($callable, '::')) {
+                    $callable = explode('::', $callable, 2);
                 }
             }
 

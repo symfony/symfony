@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -67,7 +66,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), [], new NullLogger());
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
-        $this->assertEquals(new RedirectResponse('https://localhost/login'), $result);
+        $this->assertSame('https://localhost/login', $result->getTargetUrl());
     }
 
     public function testExceptionIsPersistedInSession()
@@ -140,7 +139,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), $options, new NullLogger());
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
-        $this->assertEquals(new RedirectResponse('https://localhost/auth/login'), $result);
+        $this->assertSame('https://localhost/auth/login', $result->getTargetUrl());
     }
 
     public function testFailurePathCanBeOverwrittenWithRequest()
@@ -150,7 +149,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), [], new NullLogger());
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
-        $this->assertEquals(new RedirectResponse('https://localhost/auth/login'), $result);
+        $this->assertSame('https://localhost/auth/login', $result->getTargetUrl());
     }
 
     public function testFailurePathCanBeOverwrittenWithNestedAttributeInRequest()
@@ -160,7 +159,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), ['failure_path_parameter' => '_failure_path[value]'], new NullLogger());
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
-        $this->assertEquals(new RedirectResponse('https://localhost/auth/login'), $result);
+        $this->assertSame('https://localhost/auth/login', $result->getTargetUrl());
     }
 
     public function testFailurePathParameterCanBeOverwritten()
@@ -172,7 +171,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), $options, new NullLogger());
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
-        $this->assertEquals(new RedirectResponse('https://localhost/auth/login'), $result);
+        $this->assertSame('https://localhost/auth/login', $result->getTargetUrl());
     }
 
     public function testFailurePathFromRequestWithInvalidUrl()
@@ -208,7 +207,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), $options, new NullLogger());
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
 
-        $this->assertEquals(new RedirectResponse('https://localhost/some-path'), $result);
+        $this->assertSame('https://localhost/some-path', $result->getTargetUrl());
     }
 
     public function testFailurePathFromRequestIsIgnoredOnForward()

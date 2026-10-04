@@ -136,11 +136,11 @@
             </trans-unit>
             <trans-unit id="129">
                 <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">有効なUUIDを入力してください。</target>
+                <target>有効なUUIDを入力してください。</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>
-                <target state="needs-review-translation">下限は上限より大きくすることはできません。</target>
+                <target>下限は上限より大きくてはなりません。</target>
             </trans-unit>
         </body>
     </file>

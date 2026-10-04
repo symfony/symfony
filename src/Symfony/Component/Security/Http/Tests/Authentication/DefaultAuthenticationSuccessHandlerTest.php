@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Http\Tests\Authentication;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -167,6 +166,6 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $handler = new DefaultAuthenticationSuccessHandler(new HttpUtils($this->createStub(UrlGeneratorInterface::class)), $options);
         $response = $handler->onAuthenticationSuccess($request, new NullToken());
 
-        $this->assertEquals(new RedirectResponse('https://localhost/some-path'), $response);
+        $this->assertSame('https://localhost/some-path', $response->getTargetUrl());
     }
 }

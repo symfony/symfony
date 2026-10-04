@@ -160,6 +160,9 @@ trait SharedLockStoreTestTrait
             $this->fail('The store shouldn\'t save the second key');
         } catch (LockConflictedException $e) {
         }
+
+        $store->delete($key1);
+        $store->delete($key2);
     }
 
     public function testSharedLockPromoteAllowed()
@@ -184,6 +187,8 @@ trait SharedLockStoreTestTrait
         $store->saveRead($key2);
         $this->assertFalse($store->exists($key1));
         $this->assertTrue($store->exists($key2));
+
+        $store->delete($key2);
     }
 
     public function testSharedLockDemote()
@@ -199,5 +204,8 @@ trait SharedLockStoreTestTrait
 
         $this->assertTrue($store->exists($key1));
         $this->assertTrue($store->exists($key2));
+
+        $store->delete($key1);
+        $store->delete($key2);
     }
 }

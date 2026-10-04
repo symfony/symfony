@@ -37,7 +37,7 @@ class SessionDataStorage implements DataStorageInterface
             return $default;
         }
 
-        return $data instanceof DeepCloner ? $data->clone() : $data;
+        return $data instanceof DeepCloner ? $data->clone() : DeepCloner::deepClone($data);
     }
 
     public function clear(): void

@@ -62,7 +62,7 @@ abstract class AbstractBlindIndex implements BlindIndexInterface
      */
     public function __construct(
         private readonly string $name,
-        private readonly ProjectionInterface $projection,
+        private readonly ProjectionInterface|CoveringProjectionInterface $projection,
         ?AlgorithmInterface $algorithm = null,
     ) {
         if ('' === $name) {
@@ -70,6 +70,15 @@ abstract class AbstractBlindIndex implements BlindIndexInterface
         }
 
         $this->algorithm = $algorithm ?? new HmacSha256();
+    }
+
+    final public function of(#[\SensitiveParameter] string $value): string
+    {
+        if ($this->projection instanceof CoveringProjectionInterface) {
+            throw new LogicException(\sprintf('The projection "%s" covers several forms of a value, which "%s::of()" cannot answer with one tag: read them with "allOf()".', get_debug_type($this->projection), static::class));
+        }
+
+        return $this->allOf($value)[0];
     }
 
     /**
@@ -84,23 +93,34 @@ abstract class AbstractBlindIndex implements BlindIndexInterface
      *
      * The subkey is derived per call rather than kept: holding it would leave usable key material
      * outside the handle, which exists so that `forget()` wipes it. Two HMACs over 32 bytes is also
-     * what the derivation costs, which is the tag's own order of magnitude.
+     * what the derivation costs, which is the tag's own order of magnitude. One subkey serves every
+     * form of a value, an index having one name, so it is derived once for them all.
+     *
+     * @return list<string>
      */
-    final public function of(#[\SensitiveParameter] string $value): string
+    final public function allOf(#[\SensitiveParameter] string $value): array
     {
-        $value = $this->projection->project($value);
+        $forms = $this->projection instanceof CoveringProjectionInterface
+            ? $this->projection->cover($value)
+            : [$this->projection->project($value)];
 
         if (null === $this->handle || $this->handle->isReleased()) {
             $this->handle = $this->open();
         }
 
-        $tag = $this->handle->use(fn (#[\SensitiveParameter] string $key): string => $this->algorithm->tag($value, hash_hkdf('sha256', $key, self::KEY_BYTES, self::TAG_INFO.$this->name)));
+        $tags = $this->handle->use(function (#[\SensitiveParameter] string $key) use ($forms): array {
+            $subkey = hash_hkdf('sha256', $key, self::KEY_BYTES, self::TAG_INFO.$this->name);
 
-        if (AlgorithmInterface::TAG_BYTES !== \strlen($tag)) {
-            throw new LogicException(\sprintf('The blind index algorithm "%s" returned a %d-byte tag instead of %d.', get_debug_type($this->algorithm), \strlen($tag), AlgorithmInterface::TAG_BYTES));
+            return array_map(fn (string $form): string => $this->algorithm->tag($form, $subkey), $forms);
+        });
+
+        foreach ($tags as $tag) {
+            if (AlgorithmInterface::TAG_BYTES !== \strlen($tag)) {
+                throw new LogicException(\sprintf('The blind index algorithm "%s" returned a %d-byte tag instead of %d.', get_debug_type($this->algorithm), \strlen($tag), AlgorithmInterface::TAG_BYTES));
+            }
         }
 
-        return bin2hex($tag);
+        return array_values(array_map('bin2hex', $tags));
     }
 
     /**

@@ -77,15 +77,20 @@ $repository->findOneBy(['emailIndex' => $index->of($email)]);  // and on the way
 ```
 
 The key is minted once with `key-management:generate-data-key` and kept wrapped
-in the configuration, unwrapped once per process rather than reached for per
-value. It must never rotate: every tag already written was derived under it.
+in the configuration, a `Ciphertext` of the `key_id` and `wrapped` values that
+command prints, unwrapped once per process rather than reached for per value.
+It must never rotate: every tag already written was derived under it.
 `StoredKeyBlindIndex` names a key a store holds instead. Tags are derived under
 a subkey named by the index, so one key serves several indexes and no two of
 them tag a value alike.
 
 The projection says what of the value is indexed: `Projection\Verbatim` folds
 nothing, `Projection\Email` and `Projection\EmailDomain` ship as well, and
-anything else implements `ProjectionInterface`.
+anything else implements `ProjectionInterface`. A `CoveringProjectionInterface`
+covers several forms of one value, every bucket a number falls in or every
+prefix of a name, and `allOf()` then gives a tag per form for a column that
+holds them all. It leaks more than the note below: the number of tags is the
+number of forms, and rows sharing a form share a tag.
 
 Equal values give equal tags, so the column tells anyone reading it which rows
 share a value and how often each occurs. Index what is high-entropy and looked

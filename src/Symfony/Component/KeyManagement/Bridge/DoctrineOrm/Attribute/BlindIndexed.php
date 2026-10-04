@@ -42,7 +42,7 @@ namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute;
  * columns holding an address each have an index of their own. The index service states its name in
  * its `key_management.blind_index` tag.
  *
- * Four things it does not do, each of which leaves a tag that does not match its value.
+ * Five things it does not do, each of which leaves a tag that does not match its value.
  *
  * It covers the write path only. A query has no entity to hang the attribute on, so it keeps
  * calling `of()`, and on the index this attribute names.
@@ -54,6 +54,10 @@ namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute;
  * It only sees a property it can read. A value the entity computes on the way out, or holds in
  * anything other than a string, has to be projected by the application into a string property of
  * its own.
+ *
+ * It fills one column, so it refuses an index whose projection is a `CoveringProjectionInterface`:
+ * the forms such an index covers need a column holding them all, which the application writes
+ * itself.
  *
  * And it cannot be done by a DBAL type, which is why it is a listener: a type converts one
  * property into one column, and this writes a second one.

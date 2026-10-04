@@ -13,6 +13,7 @@ namespace Symfony\Component\KeyManagement;
 
 use Symfony\Component\KeyManagement\BlindIndex\AbstractBlindIndex;
 use Symfony\Component\KeyManagement\BlindIndex\AlgorithmInterface;
+use Symfony\Component\KeyManagement\BlindIndex\CoveringProjectionInterface;
 use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 
@@ -41,7 +42,7 @@ final class BlindIndex extends AbstractBlindIndex
         private readonly DataKeyGeneratorInterface $kms,
         private readonly Ciphertext $wrappedKey,
         string $name,
-        ProjectionInterface $projection,
+        ProjectionInterface|CoveringProjectionInterface $projection,
         ?AlgorithmInterface $algorithm = null,
     ) {
         parent::__construct($name, $projection, $algorithm);

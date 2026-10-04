@@ -16,8 +16,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\KeyManagement\BlindIndex\AbstractBlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
+use Symfony\Component\KeyManagement\StoredKeyBlindIndex;
 
 /**
  * Hands the blind indexes of the application to the listener, keyed by the name each one carries.
@@ -33,7 +34,8 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
  *
  * That refusal only holds if the tag names what the index derives under, so the tag hands its name
  * to the `$name` argument of a `BlindIndex` or a `StoredKeyBlindIndex` that leaves it out, and one
- * stating another name is refused.
+ * stating another name is refused. Those two classes and no other: what an index of the
+ * application's own derives under is its own business.
  *
  * A service carries two entries of the tag when it is autoconfigured and tagged by hand, since
  * `ResolveInstanceofConditionalsPass` adds the bare one beside the explicit one rather than in its
@@ -103,9 +105,10 @@ final class RegisterBlindIndexesPass implements CompilerPassInterface
         $definition = $container->getDefinition($id);
         $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
-        // a child definition receives its arguments from its parent later on, and an index of the
-        // application's own derives its tags however it chooses
-        if ($definition instanceof ChildDefinition || !\is_string($class) || !is_subclass_of($class, AbstractBlindIndex::class)) {
+        // a child definition receives its arguments from its parent later on, and the two indexes
+        // of the component are the two whose "$name" argument this knows how to fill: anything
+        // else is an index of the application's own, which derives its tags however it chooses
+        if ($definition instanceof ChildDefinition || !\in_array($class, [BlindIndex::class, StoredKeyBlindIndex::class], true)) {
             return;
         }
 

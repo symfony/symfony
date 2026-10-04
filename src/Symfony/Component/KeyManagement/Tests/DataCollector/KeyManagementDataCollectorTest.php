@@ -80,20 +80,24 @@ class KeyManagementDataCollectorTest extends TestCase
     #[RequiresPhpExtension('openssl')]
     public function testWhatIsHeldIsBoundedByTheCallSitesAndTheKeys()
     {
-        $held = static function (int $calls): int {
-            $collector = new KeyManagementDataCollector();
-            $encrypter = new TraceableEnvelopeEncrypter(new EnvelopeEncrypter(TraceableKms::wrap(new InMemoryKms(), $collector, 'default')), $collector, 'default');
+        $collector = new KeyManagementDataCollector();
+        $encrypter = new TraceableEnvelopeEncrypter(new EnvelopeEncrypter(TraceableKms::wrap(new InMemoryKms(), $collector, 'default')), $collector, 'default');
+        $encrypter->encrypt('app', 'hello');
+        $before = memory_get_usage();
+
+        for ($i = 0; $i < 20000; ++$i) {
             $encrypter->encrypt('app', 'hello');
-            $before = memory_get_usage();
+        }
 
-            for ($i = 0; $i < $calls; ++$i) {
-                $encrypter->encrypt('app', 'hello');
-            }
+        $collector->lateCollect();
 
-            return memory_get_usage() - $before;
-        };
-
-        $this->assertLessThanOrEqual($held(200) + 1024, $held(20000), 'what the collector holds must not grow with the number of calls.');
+        // a ceiling rather than the growth of a smaller run: the first measure of a process is
+        // taken on a cold heap, which makes it read low and the one that follows read high. What
+        // is bounded is held here in a few kilobytes, where a row per call would be megabytes
+        $this->assertLessThan(64 * 1024, memory_get_usage() - $before, 'what the collector holds must not grow with the number of calls.');
+        $this->assertCount(2, $collector->getCallers(), 'the two call sites of those calls.');
+        $this->assertCount(1, $collector->getKeys(), 'the one data key they share.');
+        $this->assertSame(40002, $collector->getOperationCount(), 'the two layers of each of those calls, counted in a number and not in a row per call.');
     }
 
     #[RequiresPhpExtension('openssl')]

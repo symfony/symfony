@@ -25,6 +25,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\BlindIndex\CoveringProjectionInterface;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\Email;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\EmailDomain;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\Verbatim;
@@ -203,6 +204,35 @@ class BlindIndexListenerTest extends TestCase
         $this->expectExceptionMessage(\sprintf('The property "%s::$emailIndex" carries "%s" but is not a mapped column, so the tag it holds would never be persisted.', BlindIndexedUnmappedTargetEntity::class, BlindIndexed::class));
 
         $this->entityManager->flush();
+    }
+
+    /**
+     * The listener fills one column, so an index covering several forms of a value is not for it.
+     */
+    public function testAnIndexCoveringSeveralFormsIsRefused()
+    {
+        $kms = new InMemoryKms();
+        $projection = new class implements CoveringProjectionInterface {
+            /**
+             * @return list<string>
+             */
+            public function cover(#[\SensitiveParameter] string $value): array
+            {
+                return [$value, strrev($value)];
+            }
+        };
+
+        $wrappedKey = $kms->generateDataKey('app')->wrapped;
+        $listener = new BlindIndexListener(new ServiceLocator([
+            'email' => static fn (): BlindIndexInterface => new BlindIndex($kms, $wrappedKey, 'email', $projection),
+            'email-domain' => static fn (): BlindIndexInterface => new BlindIndex($kms, $wrappedKey, 'email-domain', new EmailDomain()),
+        ]));
+        $this->entityManager->persist((new BlindIndexedEntity())->setEmail('ada@example.org'));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('covers several forms of a value, which "Symfony\\Component\\KeyManagement\\BlindIndex::of()" cannot answer with one tag: read them with "allOf()"');
+
+        $listener->onFlush(new OnFlushEventArgs($this->entityManager));
     }
 
     public function testAnIndexThatIsNotRegisteredIsRefused()

@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\KeyManagement\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\BlindIndex;
 use Symfony\Component\KeyManagement\BlindIndex\AlgorithmInterface;
 use Symfony\Component\KeyManagement\BlindIndex\Blake2b;
+use Symfony\Component\KeyManagement\BlindIndex\CoveringProjectionInterface;
 use Symfony\Component\KeyManagement\BlindIndex\HmacSha256;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\Email;
 use Symfony\Component\KeyManagement\BlindIndex\Projection\EmailDomain;
@@ -164,6 +166,69 @@ class BlindIndexTest extends TestCase
         $this->assertNotSame($index->of('+33 6 12 34 56 78'), $index->of('1234'));
     }
 
+    public function testAValueCoveredBySeveralFormsIsTaggedOncePerForm()
+    {
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'name-prefix', new Prefixes());
+
+        $tags = $index->allOf('ada');
+
+        $this->assertCount(3, $tags, 'one tag per prefix of the value.');
+        $this->assertSame($tags, array_values(array_unique($tags)), 'two forms of one value do not tag alike.');
+        foreach ($tags as $tag) {
+            $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $tag);
+        }
+    }
+
+    /**
+     * Every form is tagged under the subkey of the index, and not under one of its own.
+     */
+    public function testAFormIsTaggedAsTheWholeValueWouldBeUnderTheSameIndex()
+    {
+        $prefixes = new BlindIndex($this->kms, $this->wrappedKey, 'name', new Prefixes());
+        $verbatim = new BlindIndex($this->kms, $this->wrappedKey, 'name', new Verbatim());
+
+        $this->assertSame([$verbatim->of('a'), $verbatim->of('ad'), $verbatim->of('ada')], $prefixes->allOf('ada'));
+    }
+
+    public function testAValueCoveredByOneFormGivesThatOneTagEitherWay()
+    {
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Email());
+
+        $this->assertSame([$index->of('  Ada@Example.ORG ')], $index->allOf('Ada@example.org'), 'the projection folds the same way on either path.');
+    }
+
+    /**
+     * Whatever the value: a covering projection is refused by its type, so a flush behind
+     * "#[BlindIndexed]" fails on every row rather than on the rows of more than one form.
+     */
+    #[DataProvider('provideValuesOfAnyLength')]
+    public function testAnIndexCoveringSeveralFormsHasNoSingleTag(string $value)
+    {
+        $index = new BlindIndex($this->kms, $this->wrappedKey, 'name-prefix', new Prefixes());
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The projection "Symfony\\Component\\KeyManagement\\Tests\\Prefixes" covers several forms of a value, which "Symfony\\Component\\KeyManagement\\BlindIndex::of()" cannot answer with one tag: read them with "allOf()"');
+
+        $index->of($value);
+    }
+
+    public static function provideValuesOfAnyLength(): iterable
+    {
+        yield 'one form' => ['a'];
+        yield 'several forms' => ['ada'];
+        yield 'none at all' => [''];
+    }
+
+    public function testTheFormsOfAValueCostOneOpeningOfTheKey()
+    {
+        $counting = new CountingKms($this->kms);
+        $index = new BlindIndex($counting, $this->wrappedKey, 'name-prefix', new Prefixes());
+
+        $index->allOf('ada');
+
+        $this->assertSame(1, $counting->unwrapped, 'the forms of a value are tagged under one opening of the index key.');
+    }
+
     #[RequiresPhpExtension('sodium')]
     public function testTheAlgorithmChangesTheTagAndIsThereforePartOfTheFormat()
     {
@@ -250,5 +315,24 @@ class BlindIndexTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         $index->of('ada@example.org');
+    }
+}
+
+/**
+ * Every prefix of a value, the shape a "starts with" search is made of.
+ */
+final class Prefixes implements CoveringProjectionInterface
+{
+    /**
+     * @return list<string>
+     */
+    public function cover(#[\SensitiveParameter] string $value): array
+    {
+        $forms = [];
+        for ($length = 1; $length <= \strlen($value); ++$length) {
+            $forms[] = substr($value, 0, $length);
+        }
+
+        return $forms;
     }
 }

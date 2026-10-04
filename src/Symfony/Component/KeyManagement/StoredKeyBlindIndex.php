@@ -13,6 +13,7 @@ namespace Symfony\Component\KeyManagement;
 
 use Symfony\Component\KeyManagement\BlindIndex\AbstractBlindIndex;
 use Symfony\Component\KeyManagement\BlindIndex\AlgorithmInterface;
+use Symfony\Component\KeyManagement\BlindIndex\CoveringProjectionInterface;
 use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
@@ -44,7 +45,7 @@ final class StoredKeyBlindIndex extends AbstractBlindIndex
         private readonly DataKeyStoreInterface $store,
         private readonly string $reference,
         string $name,
-        ProjectionInterface $projection,
+        ProjectionInterface|CoveringProjectionInterface $projection,
         ?AlgorithmInterface $algorithm = null,
     ) {
         parent::__construct($name, $projection, $algorithm);

@@ -90,6 +90,8 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
             if ($stateRead === $read) {
                 return;
             }
+
+            $key->removeState(__CLASS__);
         }
 
         if (!$handle) {

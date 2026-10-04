@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Make the `OidcClientInterface` of each `oidc_login` firewall autowirable, as `$<firewall>OidcClient` or with `#[Target('<firewall>')]`
  * Add the `backchannel_logout` option to `oidc_login`
  * Add the `dpop` option to the `access_token` authenticator, to accept only the access tokens bound to a key the request proves it holds (RFC 9449)
  * Add the `dpop` option to the `oidc_login` authenticator, to bind the tokens the provider issues to a key the client holds (RFC 9449)

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClientInterface;
 use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -553,6 +554,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(4, $certificateOptions)
             ->replaceArgument(5, $dpopProofFactory)
         ;
+        $container->registerAliasForArgument($oidcClientId, OidcClientInterface::class, $firewallName.'.oidc_client', $firewallName);
 
         $signatureVerifier = null;
         if ($config['id_token_signature']['required']) {

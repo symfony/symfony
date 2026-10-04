@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClientInterface;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthentication;
 
 class OidcLoginFactoryTest extends TestCase
@@ -665,6 +666,23 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $client->getArgument(1));
         $this->assertSame('my-client-id', $client->getArgument(2));
         $this->assertEquals(new Reference('app.client_authentication'), $client->getArgument(3));
+    }
+
+    public function testTheClientOfTheFirewallIsAutowirable()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertSame('security.authenticator.oidc_login.client.main', (string) $container->getAlias(OidcClientInterface::class.' $mainOidcClient'));
+        $this->assertSame(OidcClientInterface::class.' $mainOidcClient', (string) $container->getAlias('.'.OidcClientInterface::class.' $main'));
     }
 
     /**

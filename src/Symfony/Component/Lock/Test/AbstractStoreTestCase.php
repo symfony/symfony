@@ -122,5 +122,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $store->delete($key2);
         $this->assertTrue($store->exists($key1));
         $this->assertFalse($store->exists($key2));
+
+        $store->delete($key1);
     }
 }

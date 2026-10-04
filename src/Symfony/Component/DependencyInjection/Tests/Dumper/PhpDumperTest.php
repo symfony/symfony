@@ -60,6 +60,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainerInterface;
@@ -2132,6 +2133,23 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/closure.php', $dumper->dump());
+    }
+
+    public function testClosureOfStaticMethodString()
+    {
+        $container = new ContainerBuilder();
+        $container->register('closure', 'Closure')
+            ->setPublic(true)
+            ->setFactory(['Closure', 'fromCallable'])
+            ->setArguments([BarTagClass::class.'::getDefaultFooName']);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Closure_Of_Static_Method_String']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Closure_Of_Static_Method_String();
+
+        $this->assertSame('bar_tag_class', $container->get('closure')());
     }
 
     public function testAutowireClosure()

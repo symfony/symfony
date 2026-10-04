@@ -256,6 +256,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
             }
 
             // Regular character input
+            $data = $kb->getParser()->decodePrintable($data) ?? $data;
             if (!StringUtils::hasControlChars($data)) {
                 $this->line->insert($data);
                 $this->notifyChange();
@@ -444,7 +445,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
     {
         // Pasted bytes are untrusted: a paste can carry escape sequences that
         // would be replayed verbatim to the terminal on the next render.
-        $cleanText = StringUtils::sanitizeUtf8($text);
+        $cleanText = StringUtils::decodeCtrlLetterKeys(StringUtils::sanitizeUtf8($text));
         // Clean pasted text - remove newlines
         $cleanText = str_replace(["\r\n", "\r", "\n"], '', $cleanText);
         $cleanText = StringUtils::stripControlBytes($cleanText);

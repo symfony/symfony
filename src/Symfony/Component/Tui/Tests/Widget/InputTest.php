@@ -89,6 +89,18 @@ class InputTest extends TestCase
         $this->assertStringContainsString('ello', $lines[0]);
     }
 
+    public function testTypeKittyKeypadKeys()
+    {
+        $input = new InputWidget();
+
+        // Keypad 4, 2, a key release, then keypad Home before typing x
+        foreach (["\x1b[57403u", "\x1b[57401u", "\x1b[57401;1:3u", "\x1b[57423u", 'x'] as $data) {
+            $input->handleInput($data);
+        }
+
+        $this->assertSame('x42', $input->getValue());
+    }
+
     public function testTypeCharacter()
     {
         $input = new InputWidget();
@@ -508,6 +520,14 @@ class InputTest extends TestCase
         $this->assertStringNotContainsString("\x1b", $input->getValue());
         $this->assertStringNotContainsString("\x07", $input->getValue());
         $this->assertStringNotContainsString("\x1b", $input->render(new RenderContext(80, 24))[0]);
+    }
+
+    public function testPastedCtrlLetterKeysAreDecodedBeforeBeingRemoved()
+    {
+        $input = new InputWidget();
+        $input->handleInput("\x1b[200~a\x1b[106;5ub\x1b[201~");
+
+        $this->assertSame('ab', $input->getValue());
     }
 
     public function testPastedNewlinesAndControlBytesAreRemoved()

@@ -33,10 +33,18 @@ final class WordNavigatorTest extends TestCase
         yield 'mixed punctuation: bar' => ['foo->bar', 8, 5];
         yield 'mixed punctuation: ->' => ['foo->bar', 5, 3];
         yield 'mixed punctuation: foo' => ['foo->bar', 3, 0];
-        yield 'multibyte: skips world' => ["caf\xC3\xA9 world", 11, 6];
-        yield 'multibyte: skips café' => ["caf\xC3\xA9 world", 6, 0];
+        yield 'underscore inside a word' => ['foo_bar', 7, 0];
+        yield 'multibyte: skips world' => ['café world', 11, 6];
+        yield 'multibyte: skips café' => ['café world', 6, 0];
         yield 'empty string' => ['', 0, 0];
         yield 'whitespace only' => ['   ', 3, 0];
+        yield 'CJK: skips word after CJK punctuation' => ['你好，世界', 15, 9];
+        yield 'CJK: skips CJK punctuation' => ['你好，世界', 9, 6];
+        yield 'CJK: stops where the script changes' => ['hello你好，world世界', 25, 19];
+        yield 'CJK: skips Latin word before CJK' => ['hello你好，world世界', 19, 14];
+        yield 'CJK: keeps kanji and kana together' => ['食べる', 9, 0];
+        yield 'ideographic space' => ["a\u{3000}b", 5, 4];
+        yield 'ideographic space then word' => ["a\u{3000}b", 4, 0];
     }
 
     #[DataProvider('skipWordBackwardProvider')]
@@ -60,10 +68,15 @@ final class WordNavigatorTest extends TestCase
         yield 'mixed punctuation: foo' => ['foo->bar', 0, 3];
         yield 'mixed punctuation: ->' => ['foo->bar', 3, 5];
         yield 'mixed punctuation: bar' => ['foo->bar', 5, 8];
-        yield 'multibyte: skips café' => ["caf\xC3\xA9 world", 0, 5];
-        yield 'multibyte: skips world' => ["caf\xC3\xA9 world", 5, 11];
+        yield 'underscore inside a word' => ['foo_bar', 0, 7];
+        yield 'multibyte: skips café' => ['café world', 0, 5];
+        yield 'multibyte: skips world' => ['café world', 5, 11];
         yield 'empty string' => ['', 0, 0];
         yield 'whitespace only' => ['   ', 0, 3];
+        yield 'CJK: skips word before CJK punctuation' => ['你好，世界', 0, 6];
+        yield 'CJK: stops where the script changes' => ['hello你好，world世界', 0, 5];
+        yield 'CJK: skips CJK word before punctuation' => ['hello你好，world世界', 5, 11];
+        yield 'ideographic space' => ["a\u{3000}b", 0, 1];
     }
 
     #[DataProvider('skipWordForwardProvider')]

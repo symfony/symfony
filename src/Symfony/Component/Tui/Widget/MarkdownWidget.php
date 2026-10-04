@@ -32,6 +32,7 @@ use League\CommonMark\Extension\Table\Table;
 use League\CommonMark\Extension\Table\TableCell;
 use League\CommonMark\Extension\Table\TableRow;
 use League\CommonMark\Extension\Table\TableSection;
+use League\CommonMark\Extension\TaskList\TaskListItemMarker;
 use League\CommonMark\Node\Block\Document;
 use League\CommonMark\Node\Block\Paragraph;
 use League\CommonMark\Node\Inline\Newline;
@@ -69,6 +70,11 @@ class MarkdownWidget extends AbstractWidget
      * re-applies the context's formatting after each inline style.
      */
     private string $restoreContext = '';
+
+    /**
+     * ANSI codes to restore the style of the block being rendered (a heading, a blockquote) after inline style overrides, which reset it otherwise.
+     */
+    private string $restoreBlock = '';
 
     public function __construct(
         private string $text = '',
@@ -141,6 +147,7 @@ class MarkdownWidget extends AbstractWidget
 
         // Parse markdown to AST
         $document = $this->parser->parse($this->text);
+        self::trimPartialClosingFence($document, $this->text);
 
         // Render AST to styled lines
         $renderedLines = $this->renderDocument($document, $contentColumns);
@@ -200,9 +207,17 @@ class MarkdownWidget extends AbstractWidget
      */
     private function renderHeading(Heading $heading, int $columns): array
     {
-        $text = $this->renderInlineNodes($heading);
+        $headingStyle = $this->resolveElement('heading');
 
-        $styledText = $this->resolveElement('heading')->apply($text);
+        $previousRestoreBlock = $this->restoreBlock;
+        $this->restoreBlock .= $headingStyle->getAnsiRestore();
+        try {
+            $text = $this->renderInlineNodes($heading);
+        } finally {
+            $this->restoreBlock = $previousRestoreBlock;
+        }
+
+        $styledText = $headingStyle->apply($text);
 
         return TextWrapper::wrapTextWithAnsi($styledText, $columns);
     }
@@ -292,7 +307,13 @@ class MarkdownWidget extends AbstractWidget
         $quoteBorderStyle = $this->resolveElement('quote-border');
 
         foreach ($quote->children() as $child) {
-            $childLines = $this->renderNode($child, $quoteColumns);
+            $previousRestoreBlock = $this->restoreBlock;
+            $this->restoreBlock .= $quoteStyle->getAnsiRestore();
+            try {
+                $childLines = $this->renderNode($child, $quoteColumns);
+            } finally {
+                $this->restoreBlock = $previousRestoreBlock;
+            }
             foreach ($childLines as $line) {
                 $styledLine = $quoteStyle->apply($line);
                 $border = $quoteBorderStyle->apply('│ ').$this->restoreContext;
@@ -322,11 +343,18 @@ class MarkdownWidget extends AbstractWidget
             // reaching 10 needs four, and the content has to be wrapped and
             // indented to whatever this item's marker actually takes.
             $marker = $isOrdered ? $index.'. ' : '• ';
+            if (null !== $taskMarker = $this->detachTaskListItemMarker($item)) {
+                $marker .= $taskMarker->isChecked() ? '[x] ' : '[ ] ';
+            }
             $markerWidth = AnsiUtils::visibleWidth($marker);
             $bullet = $listBulletStyle->apply($marker).$this->restoreContext;
             $continuation = str_repeat(' ', $markerWidth);
 
-            $content = $this->renderListItemContent($item, max(1, $columns - $markerWidth));
+            if ($lines && !$list->isTight()) {
+                $lines[] = '';
+            }
+
+            $content = $this->renderListItemContent($item, max(1, $columns - $markerWidth), $list->isTight());
             foreach ($content as $i => $line) {
                 $lines[] = (0 === $i ? $bullet : $continuation).$line;
             }
@@ -340,11 +368,15 @@ class MarkdownWidget extends AbstractWidget
     /**
      * @return string[]
      */
-    private function renderListItemContent(ListItem $item, int $columns): array
+    private function renderListItemContent(ListItem $item, int $columns, bool $isTight): array
     {
         $parts = [];
 
         foreach ($item->children() as $child) {
+            if ($parts && !$isTight) {
+                $parts[] = '';
+            }
+
             if ($child instanceof Paragraph) {
                 $text = $this->renderInlineNodes($child);
                 $childLines = TextWrapper::wrapTextWithAnsi($text, $columns);
@@ -542,7 +574,17 @@ class MarkdownWidget extends AbstractWidget
      */
     private function wrapCellText(string $text, int $maxWidth): array
     {
-        return TextWrapper::wrapTextWithAnsi($text, max(1, $maxWidth));
+        $lines = TextWrapper::wrapTextWithAnsi($text, max(1, $maxWidth));
+        $last = \count($lines) - 1;
+
+        // A style that wraps onto the next line of the cell is still open at the end of this one: close it before the padding and the border
+        foreach ($lines as $i => $line) {
+            if ($i < $last && str_contains($line, "\x1b")) {
+                $lines[$i] = $line."\x1b[22;23;24;25;27;28;29;39;49m".$this->restoreContext.$this->restoreBlock;
+            }
+        }
+
+        return $lines;
     }
 
     /**
@@ -574,16 +616,64 @@ class MarkdownWidget extends AbstractWidget
 
     private function renderInlineNode(Node $node): string
     {
+        $restore = $this->restoreContext.$this->restoreBlock;
+
         return match (true) {
             $node instanceof Text => $node->getLiteral(),
-            $node instanceof Strong => $this->resolveElement('bold')->apply($this->renderInlineNodes($node)).$this->restoreContext,
-            $node instanceof Emphasis => $this->resolveElement('italic')->apply($this->renderInlineNodes($node)).$this->restoreContext,
-            $node instanceof Strikethrough => $this->resolveElement('strikethrough')->apply($this->renderInlineNodes($node)).$this->restoreContext,
-            $node instanceof Code => $this->resolveElement('code')->apply($node->getLiteral()).$this->restoreContext,
-            $node instanceof HtmlInline => $this->resolveElement('code')->apply($node->getLiteral()).$this->restoreContext,
-            $node instanceof Link => $this->resolveElement('link')->apply($this->renderInlineNodes($node)).$this->restoreContext.' '.$this->resolveElement('link-url')->apply('('.$node->getUrl().')').$this->restoreContext,
+            $node instanceof Strong => $this->resolveElement('bold')->apply($this->renderInlineNodes($node)).$restore,
+            $node instanceof Emphasis => $this->resolveElement('italic')->apply($this->renderInlineNodes($node)).$restore,
+            // A single tilde is too common in text ("5~10") to strike it through
+            $node instanceof Strikethrough && '~' === $node->getOpeningDelimiter() => '~'.$this->renderInlineNodes($node).'~',
+            $node instanceof Strikethrough => $this->resolveElement('strikethrough')->apply($this->renderInlineNodes($node)).$restore,
+            $node instanceof Code => $this->resolveElement('code')->apply($node->getLiteral()).$restore,
+            $node instanceof HtmlInline => $this->resolveElement('code')->apply($node->getLiteral()).$restore,
+            $node instanceof Link => $this->resolveElement('link')->apply($this->renderInlineNodes($node)).$restore.' '.$this->resolveElement('link-url')->apply('('.$node->getUrl().')').$restore,
             $node instanceof Newline => "\n",
             default => $this->renderInlineNodes($node), // For nested structures
         };
+    }
+
+    /**
+     * Drop the start of a closing fence from a code block that the text ends in.
+     *
+     * While the text is streamed, the closing fence arrives one character at a time: until it is complete, it would be shown as a line of code, and the block would shrink once it is.
+     */
+    private static function trimPartialClosingFence(Document $document, string $text): void
+    {
+        $node = $document->lastChild();
+        while ($node instanceof ListBlock || $node instanceof ListItem || $node instanceof BlockQuote) {
+            $node = $node->lastChild();
+        }
+
+        if (!$node instanceof FencedCode) {
+            return;
+        }
+
+        $literal = rtrim($node->getLiteral(), "\n");
+        $lastLine = substr($literal, (int) strrpos("\n".$literal, "\n"));
+
+        // The text must end with that line: a closing fence or a line break after it means it is code
+        if ('' !== $lastLine && \strlen($lastLine) < $node->getLength() && str_repeat($node->getChar(), \strlen($lastLine)) === $lastLine && \strlen($lastLine) === \strlen($text) - \strlen(rtrim($text, $node->getChar()))) {
+            $node->setLiteral(substr($literal, 0, -\strlen($lastLine)));
+        }
+    }
+
+    /**
+     * Take the checkbox of a task list item out of its text, to render it with the list marker.
+     */
+    private function detachTaskListItemMarker(ListItem $item): ?TaskListItemMarker
+    {
+        $paragraph = $item->firstChild();
+        if (!$paragraph instanceof Paragraph || !($marker = $paragraph->firstChild()) instanceof TaskListItemMarker) {
+            return null;
+        }
+
+        $text = $marker->next();
+        $marker->detach();
+        if ($text instanceof Text) {
+            $text->setLiteral(ltrim($text->getLiteral(), ' '));
+        }
+
+        return $marker;
     }
 }

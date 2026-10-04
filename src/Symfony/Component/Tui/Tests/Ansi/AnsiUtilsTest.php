@@ -209,7 +209,7 @@ class AnsiUtilsTest extends TestCase
         $styled = "\x1b[31mHello\x1b[0m";
         $result = AnsiUtils::sliceByColumn($styled, 0, 3);
 
-        // Should contain "Hel" with ANSI codes
+        // Should keep the first three columns with their ANSI codes
         $this->assertSame(3, AnsiUtils::visibleWidth($result));
     }
 
@@ -239,6 +239,8 @@ class AnsiUtilsTest extends TestCase
         yield 'space' => [' ', true];
         yield 'tab' => ["\t", true];
         yield 'newline' => ["\n", true];
+        yield 'ideographic space' => ["\u{3000}", true];
+        yield 'no-break space' => ["\u{00A0}", true];
         yield 'letter' => ['a', false];
     }
 
@@ -258,6 +260,14 @@ class AnsiUtilsTest extends TestCase
         yield 'exclamation' => ['!', true];
         yield 'letter' => ['a', false];
         yield 'space' => [' ', false];
+        yield 'ideographic comma' => ['，', true];
+        yield 'ideographic full stop' => ['。', true];
+        yield 'corner bracket' => ['「', true];
+        yield 'inverted question mark' => ['¿', true];
+        yield 'underscore' => ['_', false];
+        yield 'fullwidth low line' => ['＿', false];
+        yield 'CJK ideograph' => ['世', false];
+        yield 'emoji' => ['😀', false];
     }
 
     #[DataProvider('isPunctuationProvider')]
@@ -974,5 +984,63 @@ class AnsiUtilsTest extends TestCase
         $this->assertStringStartsWith("ab\xC3\u{0301}", $truncated);
         $this->assertStringEndsWith('...', $truncated);
         $this->assertLessThanOrEqual(6, AnsiUtils::visibleWidth($truncated));
+    }
+
+    #[DataProvider('truncatedHyperlinkProvider')]
+    public function testTruncateClosesTheHyperlinkItCuts(string $text, string $expected)
+    {
+        $this->assertSame($expected, AnsiUtils::truncateToWidth($text, 10));
+    }
+
+    public static function truncatedHyperlinkProvider(): iterable
+    {
+        yield 'BEL terminator' => ["\x1b]8;;https://example.com\x07click here please\x1b]8;;\x07", "\x1b]8;;https://example.com\x07click h\x1b]8;;\x07\x1b[0m..."];
+        yield 'ST terminator' => ["\x1b]8;;https://example.com\x1b\\click here please\x1b]8;;\x1b\\", "\x1b]8;;https://example.com\x1b\\click h\x1b]8;;\x1b\\\x1b[0m..."];
+        yield 'link already closed' => ["\x1b]8;;https://example.com\x07ab\x1b]8;;\x07 then more", "\x1b]8;;https://example.com\x07ab\x1b]8;;\x07 then\x1b[0m..."];
+    }
+
+    #[DataProvider('largeLineProvider')]
+    public function testMeasuringAndTruncatingALargeLineDoesNotSplitAllOfIt(string $text)
+    {
+        gc_collect_cycles();
+        memory_reset_peak_usage();
+        $before = memory_get_usage();
+
+        $truncated = AnsiUtils::truncateToWidth($text, 10);
+        $width = AnsiUtils::visibleWidth($text);
+
+        $this->assertLessThan(\strlen($text), memory_get_peak_usage() - $before);
+        $this->assertLessThanOrEqual(10, AnsiUtils::visibleWidth($truncated));
+        $this->assertGreaterThan(10, $width);
+    }
+
+    public static function largeLineProvider(): iterable
+    {
+        yield 'CJK' => [str_repeat('中文汉字', 200_000)];
+        yield 'combining marks' => [str_repeat("e\u{301}x", 400_000)];
+    }
+
+    public function testMeasuringAndTruncatingKeepGraphemesWholeAcrossChunks()
+    {
+        // 5 columns per unit: a with two combining marks, a family emoji, an ideograph
+        $unit = "a\u{301}\u{302}\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}中";
+        $text = str_repeat($unit, 2000);
+
+        $this->assertSame(10000, AnsiUtils::visibleWidth($text));
+        // The last ideograph does not fit in the last column
+        $this->assertSame(str_repeat($unit, 1999)."a\u{301}\u{302}\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}\x1b[0m", AnsiUtils::truncateToWidth($text, 9999, ''));
+    }
+
+    public function testMeasuringAndTruncatingKeepZwjSequencesWholeAcrossChunks()
+    {
+        $family = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}";
+
+        // Each iteration moves the end of the first 8192 bytes one byte further into the sequence
+        for ($i = 0; $i < \strlen($family); ++$i) {
+            $text = str_repeat('x', 8192 - $i).$family.'yz';
+
+            $this->assertSame(8196 - $i, AnsiUtils::visibleWidth($text));
+            $this->assertSame(str_repeat('x', 8192 - $i).$family."y\x1b[0m", AnsiUtils::truncateToWidth($text, 8195 - $i, ''));
+        }
     }
 }

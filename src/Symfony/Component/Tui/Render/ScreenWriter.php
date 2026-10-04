@@ -44,6 +44,10 @@ final class ScreenWriter
     private int $maxLinesRendered = 0;
     /** Number of leading lines whose current content already reached the scrollback */
     private int $scrollbackLineCount = 0;
+    /** Whether the screen was cleared, so that the content starts on its first row */
+    private bool $screenCleared = false;
+    /** Whether the scrollback ends with the lines above the screen, without stale or repeated rows */
+    private bool $scrollbackMatchesLines = false;
     private bool $showHardwareCursor = true;
     private int $scrollOffset = 0;
 
@@ -141,6 +145,66 @@ final class ScreenWriter
         $this->previousWidth = -1; // -1 triggers widthChanged
         $this->hardwareCursorRow = 0;
         $this->maxLinesRendered = 0;
+    }
+
+    /**
+     * Follows the rows that Termux moves between the screen and the scrollback when only its height changes.
+     *
+     * On shrink, Termux first drops the blank rows below the cursor, then moves the top rows into the scrollback.
+     * On growth, it brings rows back from the scrollback, then adds blank rows at the bottom.
+     * When the rows it moves cannot be known, the next write repaints the whole screen.
+     */
+    public function followTermuxHeightChange(int $previousRows, int $rows): void
+    {
+        // Lines above the screen; until the content fills the screen, the rows above it are unknown unless the screen was cleared
+        $top = $this->maxLinesRendered - $previousRows;
+        if ($top < 0 && $this->screenCleared) {
+            $top = 0;
+        }
+
+        if (null === $this->previousLines || $top < 0 || !$this->scrollbackMatchesLines || $this->hardwareCursorRow < $top || (!$this->screenCleared && $rows - $previousRows > $top)) {
+            $this->reset();
+
+            return;
+        }
+
+        // Termux drops the blank rows below the cursor first on shrink, but cuts the bottom rows: when a non-blank row lies below a blank one,
+        // two height changes coalesced into one SIGWINCH would not move the same rows as the single change seen here
+        $blankRows = 0;
+        $lineCount = \count($this->previousLines);
+        $nonBlankBelow = false;
+        for ($row = $previousRows - 1; $row > $this->hardwareCursorRow - $top; --$row) {
+            $line = $top + $row < $lineCount ? $this->previousLines->getLine($top + $row) : '';
+            if ('' !== trim(AnsiUtils::stripAnsiCodes($line), ' ') || AnsiUtils::containsImage($line)) {
+                $nonBlankBelow = true;
+            } elseif ($nonBlankBelow) {
+                $this->reset();
+
+                return;
+            } else {
+                ++$blankRows;
+            }
+        }
+
+        if ($rows < $previousRows) {
+            $shift = max(0, $previousRows - $rows - $blankRows);
+            $top += $shift;
+            // A cursor moved above the screen is put back on its first row, away from the cursor position kept for an unchanged frame
+            if ($this->hardwareCursorRow < $top) {
+                $this->hardwareCursorRow = $top;
+                $this->previousCursorPos = null;
+            }
+        } else {
+            $top -= min($rows - $previousRows, $top);
+        }
+
+        $this->maxLinesRendered = $top + $rows;
+        $this->scrollbackLineCount = $top;
+
+        // Lines dropped below the screen have to be written again
+        if (\count($this->previousLines) > $this->maxLinesRendered) {
+            $this->previousLines = new ArrayLineBuffer($this->previousLines->slice(0, $this->maxLinesRendered));
+        }
     }
 
     /**
@@ -260,6 +324,8 @@ final class ScreenWriter
 
         $this->terminal->write($buffer);
         $this->hardwareCursorRow = max(0, \count($newLines) - 1);
+        $this->scrollbackMatchesLines = true;
+        $this->screenCleared = $clear;
 
         if ($clear) {
             $this->maxLinesRendered = \count($newLines);
@@ -297,6 +363,7 @@ final class ScreenWriter
         }
 
         $this->terminal->write($buffer);
+        $this->scrollbackMatchesLines = false;
         $this->hardwareCursorRow = max(0, $lineCount - 1);
         $this->maxLinesRendered = $lineCount;
         $this->scrollbackLineCount = max($this->scrollbackLineCount, $lineCount - $rows);
@@ -417,7 +484,7 @@ final class ScreenWriter
                 $plainLine = preg_replace('/\x1b(?:\[[0-9;]*[a-zA-Z]|\][^\x07]*\x07)/', '', $line);
                 $preview = mb_substr($plainLine, 0, 100);
 
-                throw new RenderException(\sprintf("Rendered line %d exceeds terminal width (%d > %d).\nLine preview: %s%s.", $i, $lineWidth, $width, $preview, mb_strlen($plainLine) > 100 ? '...' : ''), $i, $lineWidth, $width);
+                throw new RenderException(\sprintf("Rendered line %d exceeds terminal width (%d > %d).\nLine preview: \"%s\"%s.", $i, $lineWidth, $width, $preview, mb_strlen($plainLine) > 100 ? '...' : ''), $i, $lineWidth, $width);
             }
 
             $buffer .= $line;
@@ -468,6 +535,10 @@ final class ScreenWriter
 
     private function prepareLine(string $line): string
     {
+        if (str_contains($line, "\t")) {
+            $line = self::expandTabs($line);
+        }
+
         if (!str_contains($line, "\x1b")) {
             return $line;
         }
@@ -482,6 +553,35 @@ final class ScreenWriter
         }
 
         return str_contains($line, "\x1b]8;") ? $line.AnsiUtils::SEGMENT_RESET : $line."\x1b[0m";
+    }
+
+    /**
+     * Replace tabs outside escape sequences with the spaces the layout counted for them.
+     *
+     * A terminal moves a tab to its next tab stop instead, which can push the rest of the line past the right edge and make the terminal wrap it.
+     */
+    private static function expandTabs(string $line): string
+    {
+        $spaces = str_repeat(' ', AnsiUtils::TAB_WIDTH);
+        if (!str_contains($line, "\x1b")) {
+            return str_replace("\t", $spaces, $line);
+        }
+
+        $result = '';
+        $length = \strlen($line);
+        for ($i = 0; $i < $length;) {
+            if ("\x1b" === $line[$i] && null !== $code = AnsiUtils::extractAnsiCode($line, $i)) {
+                $result .= $code['code'];
+                $i += $code['length'];
+                continue;
+            }
+
+            $text = strcspn($line, "\x1b", $i + 1) + 1;
+            $result .= str_replace("\t", $spaces, substr($line, $i, $text));
+            $i += $text;
+        }
+
+        return $result;
     }
 
     /**

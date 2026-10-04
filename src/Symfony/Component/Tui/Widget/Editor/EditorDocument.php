@@ -599,7 +599,7 @@ final class EditorDocument
      */
     public function handlePaste(string $content): void
     {
-        $content = str_replace(["\r\n", "\r"], "\n", StringUtils::sanitizeUtf8($content));
+        $content = str_replace(["\r\n", "\r"], "\n", StringUtils::decodeCtrlLetterKeys(StringUtils::sanitizeUtf8($content)));
         $content = StringUtils::stripControlBytes($content);
 
         if ('' === $content) {

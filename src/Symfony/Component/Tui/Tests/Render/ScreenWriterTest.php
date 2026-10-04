@@ -72,6 +72,38 @@ class ScreenWriterTest extends TestCase
         $this->assertStringContainsString(self::SYNC_END, $output);
     }
 
+    public function testTabsAreWrittenAsTheSpacesTheLayoutCounted()
+    {
+        $terminal = new VirtualTerminal(80, 24);
+        $writer = new ScreenWriter($terminal);
+
+        $writer->writeFrame(new ArrayLineBuffer(["a\tb", "\x1b[31m\tc\x1b[0m", "\x1b]8;;https://example.com/?q=\t\x07\tlink\x1b]8;;\x07"]));
+
+        $output = $terminal->getOutput();
+        $spaces = str_repeat(' ', AnsiUtils::TAB_WIDTH);
+
+        $this->assertStringContainsString('a'.$spaces.'b', $output);
+        $this->assertStringContainsString("\x1b[31m".$spaces.'c', $output);
+        // A tab inside an escape sequence is not the tab of a cell
+        $this->assertStringContainsString("\x1b]8;;https://example.com/?q=\t\x07".$spaces.'link', $output);
+    }
+
+    public function testUnchangedLinesWithTabsAreNotRewritten()
+    {
+        $terminal = new VirtualTerminal(80, 24);
+        $writer = new ScreenWriter($terminal);
+
+        $writer->writeFrame(new ArrayLineBuffer(["tab\tline", "\x1b[31m\tred", 'Line A']));
+        $terminal->clearOutput();
+
+        $writer->writeFrame(new ArrayLineBuffer(["tab\tline", "\x1b[31m\tred", 'Line X']));
+
+        $output = $terminal->getOutput();
+        $this->assertStringContainsString('Line X', $output);
+        $this->assertStringNotContainsString('line', $output);
+        $this->assertStringNotContainsString('red', $output);
+    }
+
     // --- No-op (identical lines produce no output) ---
 
     public function testIdenticalLinesProduceNoContentOutput()
@@ -946,6 +978,26 @@ class ScreenWriterTest extends TestCase
         $this->assertSame(['L4', 'L5', 'L6', 'L7', 'L8'], array_map(rtrim(...), $screen->getLines()));
     }
 
+    public function testCursorMarkerAboveTheViewportDoesNotMoveTheCursorOffTheScreen()
+    {
+        $screen = new ScreenBuffer(20, 5);
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturn(5);
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static fn (string $data) => $screen->write($data));
+
+        $lines = array_map(static fn (int $i): string => 'L'.$i, range(0, 9));
+        $lines[2] .= AnsiUtils::cursorMarker();
+
+        $writer = new ScreenWriter($terminal);
+        $writer->writeFrame(new ArrayLineBuffer($lines));
+        $lines[9] = 'L9x';
+        $writer->writeFrame(new ArrayLineBuffer($lines));
+
+        $this->assertSame(['L5', 'L6', 'L7', 'L8', 'L9x'], array_map(rtrim(...), $screen->getLines()));
+    }
+
     #[DataProvider('provideOverflowingContentChanges')]
     public function testChangingOverflowingContentOnlyWritesTheChangedLines(bool $virtual, array $frames, string $written)
     {
@@ -974,5 +1026,140 @@ class ScreenWriterTest extends TestCase
         yield 'grown' => [false, [$lines, [...$lines, 'L7']], 'L7'];
         yield 'grown on a virtual terminal' => [true, [$lines, [...$lines, 'L7']], 'L7'];
         yield 'last line edited after shrinking' => [false, [$lines, \array_slice($lines, 0, 6), ['L0', 'L1', 'L2', 'L3', 'L4', 'L5x']], 'L5x'];
+    }
+
+    #[DataProvider('provideTermuxHeightChanges')]
+    public function testFollowsTheRowsTermuxMovesOnAHeightChange(array $steps, bool $repaints, array $expectedScrollback, array $expectedScreen)
+    {
+        $rows = 20;
+        $screen = new ScreenBuffer(20, $rows);
+        $output = '';
+        $terminal = $this->createStub(TerminalInterface::class);
+        $terminal->method('getColumns')->willReturn(20);
+        $terminal->method('getRows')->willReturnCallback(static function () use (&$rows): int {
+            return $rows;
+        });
+        $terminal->method('isVirtual')->willReturn(false);
+        $terminal->method('write')->willReturnCallback(static function (string $data) use (&$screen, &$output): void {
+            $screen->write($data);
+            $output .= $data;
+        });
+
+        $writer = new ScreenWriter($terminal);
+        $writer->writeFrame(new ArrayLineBuffer($lines = array_shift($steps)));
+        $output = '';
+        foreach ($steps as $step) {
+            if (\is_int($step)) {
+                $screen = self::resizeLikeTermux($screen, 20, $step);
+                $writer->followTermuxHeightChange($rows, $step);
+                $rows = $step;
+            } elseif (\is_string($step)) {
+                // Two height changes, "16>12", reported by a single SIGWINCH
+                [$intermediate, $step] = array_map(intval(...), explode('>', $step));
+                $screen = self::resizeLikeTermux(self::resizeLikeTermux($screen, 20, $intermediate), 20, $step);
+                $writer->followTermuxHeightChange($rows, $step);
+                $rows = $step;
+            } else {
+                $lines = $step;
+            }
+            $writer->writeFrame(new ArrayLineBuffer($lines));
+        }
+
+        $this->assertSame($repaints, str_contains($output, "\x1b[2J"));
+        $this->assertSame($expectedScrollback, array_map(rtrim(...), $screen->getScrollback()));
+        $this->assertSame($expectedScreen, array_map(rtrim(...), $screen->getLines()));
+    }
+
+    public static function provideTermuxHeightChanges(): iterable
+    {
+        $lines = static fn (int $from, int $to): array => array_map(static fn (int $i): string => 'L'.$i, range($from, $to));
+        $cursor = AnsiUtils::cursorMarker();
+
+        yield 'line removed while the screen is shorter' => [
+            [$lines(1, 15), 12, $lines(1, 14), 20],
+            true,
+            [],
+            [...$lines(1, 14), '', '', '', '', '', ''],
+        ];
+
+        yield 'content taller than the screen' => [
+            [$lines(0, 29), 12, 20, $lines(0, 30), 12, [...$lines(0, 27), 'L28x', ...$lines(29, 30)], 20, $lines(0, 28), 12, 20],
+            true,
+            $lines(0, 8),
+            $lines(9, 28),
+        ];
+
+        yield 'content taller than the screen shrunk while the screen is shorter' => [
+            [$lines(0, 29), 12, $lines(0, 24), 20, $lines(0, 25)],
+            true,
+            $lines(0, 5),
+            $lines(6, 25),
+        ];
+
+        yield 'blank rows below the cursor dropped on shrink' => [
+            [[...$lines(0, 23), '', ...$lines(25, 29)], 12, [...$lines(0, 23), '', ...$lines(25, 28), 'L29x'], 20, [...$lines(0, 23), '', ...$lines(25, 30)]],
+            false,
+            $lines(0, 10),
+            [...$lines(11, 23), '', ...$lines(25, 30)],
+        ];
+
+        yield 'blank row between non-blank rows below the cursor marker' => [
+            [[...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 29)], 12, [...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 28), 'L29x'], 20, [...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 30)]],
+            true,
+            $lines(0, 10),
+            [...$lines(11, 23), '', ...$lines(25, 30)],
+        ];
+
+        yield 'cursor pushed above the screen on shrink' => [
+            [['L0', 'L1'.$cursor, ...$lines(2, 19)], 12, ['L0', 'L1'.$cursor, ...$lines(2, 18), 'L19x']],
+            false,
+            $lines(0, 7),
+            [...$lines(8, 18), 'L19x'],
+        ];
+
+        yield 'coalesced shrinks with a blank row between non-blank rows below the cursor marker' => [
+            [[...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 29)], '16>12', [...$lines(0, 19), 'L20'.$cursor, ...$lines(21, 23), '', ...$lines(25, 28), 'L29x'], 20],
+            true,
+            $lines(0, 9),
+            [...$lines(10, 23), '', ...$lines(25, 28), 'L29x'],
+        ];
+
+        yield 'coalesced shrinks with blank rows at the bottom only' => [
+            [[...$lines(0, 25), 'L26'.$cursor, '', '', ''], '16>12', [...$lines(0, 25), 'L26x'.$cursor, '', '', ''], 20],
+            false,
+            $lines(0, 9),
+            [...$lines(10, 25), 'L26x', '', '', ''],
+        ];
+
+        yield 'content drawn after an empty frame' => [
+            [$lines(1, 15), 12, $lines(1, 30), [], ['M1', 'M2', 'M3', 'M4', 'M5'], 20],
+            true,
+            [],
+            ['M1', 'M2', 'M3', 'M4', 'M5', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        ];
+    }
+
+    private static function resizeLikeTermux(ScreenBuffer $screen, int $width, int $rows): ScreenBuffer
+    {
+        $lines = [...array_map(AnsiUtils::stripAnsiCodes(...), $screen->getScrollback()), ...$screen->getLines()];
+        $height = $screen->getHeight();
+        $top = \count($lines) - $height;
+        $cursorRow = (new \ReflectionProperty(ScreenBuffer::class, 'cursorRow'))->getValue($screen);
+
+        if (0 < $shift = $height - $rows) {
+            for ($row = $height - 1; $row > $cursorRow; --$row) {
+                if ('' === trim($lines[$top + $row]) && 0 === --$shift) {
+                    break;
+                }
+            }
+        } else {
+            $shift = -min($rows - $height, $top);
+        }
+
+        $resized = new ScreenBuffer($width, $rows);
+        $resized->write(implode("\r\n", array_pad(\array_slice($lines, 0, $top + $shift + $rows), $top + $shift + $rows, '')));
+        $resized->write("\x1b[".(max(0, $cursorRow - $shift) + 1).';1H');
+
+        return $resized;
     }
 }

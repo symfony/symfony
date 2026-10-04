@@ -1884,17 +1884,20 @@ class CachingHttpClientTest extends TestCase
 
     public function testRevalidationRetainsStoredFreshnessWhen304OmitsCacheDirectives()
     {
-        $mockClient = new MockHttpClient([
-            new MockResponse('foo', [
+        $mockClient = new MockHttpClient((static function () {
+            yield new MockResponse('foo', [
                 'http_code' => 200,
                 'response_headers' => ['ETag' => '"abc123"', 'Cache-Control' => 'max-age=60'],
-            ]),
-            new MockResponse('', [
+            ]);
+            // MockResponse reads the start time from the real clock otherwise: once the real
+            // clock crosses a second, the request seems to have taken the whole max-age
+            yield new MockResponse('', [
                 'http_code' => 304,
                 'response_headers' => ['ETag' => '"abc123"'],
-            ]),
-            new MockResponse('should not be served'),
-        ]);
+                'start_time' => microtime(true),
+            ]);
+            yield new MockResponse('should not be served');
+        })());
 
         $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
 

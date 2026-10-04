@@ -273,6 +273,79 @@ class StdinBufferTest extends TestCase
         $this->assertSame(['a'], $sequences);
     }
 
+    #[DataProvider('provideUnterminatedSequenceIntroducers')]
+    public function testFlushPendingEmitsAnUnterminatedSequenceIntroducerAsAnAltKey(string $altKey)
+    {
+        $buffer = new StdinBuffer();
+        $sequences = [];
+
+        $buffer->onData(static function (string $data) use (&$sequences) { $sequences[] = $data; });
+
+        // Legacy Alt+], Alt+Shift+P and Alt+_ open an OSC, DCS or APC sequence that no terminator will ever close
+        $buffer->process($altKey);
+        $buffer->process("abc\x03");
+
+        $this->assertSame([], $sequences);
+
+        $buffer->flushPending();
+
+        $this->assertSame([$altKey, 'a', 'b', 'c', "\x03"], $sequences);
+        $this->assertSame('', $buffer->getBuffer());
+    }
+
+    public static function provideUnterminatedSequenceIntroducers(): iterable
+    {
+        yield 'Alt+]' => ["\x1b]"];
+        yield 'Alt+Shift+P' => ["\x1bP"];
+        yield 'Alt+_' => ["\x1b_"];
+    }
+
+    public function testFlushPendingEmitsEveryUnterminatedSequenceIntroducer()
+    {
+        $buffer = new StdinBuffer();
+        $sequences = [];
+
+        $buffer->onData(static function (string $data) use (&$sequences) { $sequences[] = $data; });
+
+        $buffer->process("\x1b]a\x1b_b");
+        $buffer->flushPending();
+
+        $this->assertSame(["\x1b]", 'a', "\x1b_", 'b'], $sequences);
+        $this->assertSame('', $buffer->getBuffer());
+    }
+
+    public function testFlushPendingDoesNothingWithoutPendingEscape()
+    {
+        $buffer = new StdinBuffer();
+        $sequences = [];
+
+        $buffer->onData(static function (string $data) use (&$sequences) { $sequences[] = $data; });
+
+        $buffer->process("a\xc3");
+        $buffer->flushPending();
+
+        $this->assertSame(['a'], $sequences);
+        $this->assertSame("\xc3", $buffer->getBuffer());
+    }
+
+    public function testFlushPendingKeepsAnOpenPaste()
+    {
+        $buffer = new StdinBuffer();
+        $sequences = [];
+        $pastes = [];
+
+        $buffer->onData(static function (string $data) use (&$sequences) { $sequences[] = $data; });
+        $buffer->onPaste(static function (string $data) use (&$pastes) { $pastes[] = $data; });
+
+        // The held ESC is the start of the end marker, not an Alt key
+        $buffer->process("\x1b[200~AA\x1b");
+        $buffer->flushPending();
+        $buffer->process('[201~x');
+
+        $this->assertSame(['AA'], $pastes);
+        $this->assertSame(['x'], $sequences);
+    }
+
     public function testClearResetsAllState()
     {
         $buffer = new StdinBuffer();

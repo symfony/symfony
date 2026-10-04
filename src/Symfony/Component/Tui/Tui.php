@@ -80,6 +80,8 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private bool $ticking = false;
     private ?float $lastTickAt = null;
     private ?bool $lastTickBusyHint = null;
+    private int $resizeColumns = 0;
+    private int $resizeRows = 0;
 
     /** @var Suspension<mixed>|null */
     private ?Suspension $runSuspension = null;
@@ -218,10 +220,9 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->stopped = false;
         $this->lastTickAt = null;
         $this->lastTickBusyHint = null;
-        // A resize forces a full repaint: multiplexers (dtach, tmux) send
-        // SIGWINCH on reattach, when the previous screen content cannot be
-        // trusted, even at an unchanged size
-        $this->terminal->start($this->handleInput(...), fn () => $this->requestRender(true), function (): void {
+        $this->resizeColumns = $this->terminal->getColumns();
+        $this->resizeRows = $this->terminal->getRows();
+        $this->terminal->start($this->handleInput(...), $this->handleResize(...), function (): void {
             $this->keybindings->setKittyProtocolActive(true);
         });
         $this->terminal->hideCursor();
@@ -557,5 +558,27 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $suspension = $this->runSuspension;
         $this->runSuspension = null;
         $suspension->resume(null);
+    }
+
+    private function handleResize(): void
+    {
+        $columns = $this->terminal->getColumns();
+        $rows = $this->terminal->getRows();
+        $heightOnly = $columns === $this->resizeColumns && $rows !== $this->resizeRows;
+        $previousRows = $this->resizeRows;
+        $this->resizeColumns = $columns;
+        $this->resizeRows = $rows;
+
+        // Termux changes the height whenever its software keyboard shows or hides, and a full repaint each time would replay all the content.
+        // Multiplexers inherit TERMUX_VERSION but move rows their own way on shrink (tmux deletes the rows below the cursor), so they are excluded.
+        if ($heightOnly && false !== getenv('TERMUX_VERSION') && false === getenv('TMUX') && false === getenv('STY') && false === getenv('ZELLIJ')) {
+            $this->screenWriter->followTermuxHeightChange($previousRows, $rows);
+            $this->requestRender();
+
+            return;
+        }
+
+        // A resize forces a full repaint: multiplexers (dtach, tmux) send SIGWINCH on reattach, when the previous screen content cannot be trusted, even at an unchanged size.
+        $this->requestRender(true);
     }
 }

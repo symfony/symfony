@@ -235,6 +235,26 @@ final class StdinBuffer
     }
 
     /**
+     * Emit an escape sequence that is still incomplete once no more bytes are expected for it.
+     *
+     * A legacy terminal sends Alt+key as ESC followed by the key, so Alt+], Alt+Shift+P and Alt+_ look like the start of an OSC, DCS or APC sequence that never gets its terminator.
+     * The ESC and the byte after it are emitted as the bytes of that Alt key, and the bytes behind them are processed as input again.
+     */
+    public function flushPending(): void
+    {
+        if ($this->inPaste || null === $this->onData || !str_starts_with($this->buffer, "\x1b")) {
+            return;
+        }
+
+        $sequence = substr($this->buffer, 0, 2);
+        $this->buffer = substr($this->buffer, 2);
+        ($this->onData)($sequence);
+
+        $this->process('');
+        $this->flushPending();
+    }
+
+    /**
      * Extract a complete sequence from the buffer.
      */
     private function extractSequence(): ?string

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-05T04:35:07Z
+
+I rebased on 6.4, where the bug is too, and updated the PR: deterministic tests, the callback restored on every exit path but not after `close()` released it (iterating the process after a `waitUntil()` timeout never ended), and `testWaitUntilSpecificOutput()` back in the Windows runs.

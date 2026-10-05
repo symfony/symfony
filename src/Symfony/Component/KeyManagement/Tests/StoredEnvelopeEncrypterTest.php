@@ -149,7 +149,7 @@ class StoredEnvelopeEncrypterTest extends TestCase
         $legacy = (new EnvelopeEncrypter(new InMemoryKms()))->encrypt('app', 'hello');
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('carries its own data key');
+        $this->expectExceptionMessage('which is what the "key_management.store.read_self_contained" option does.');
         $this->encrypter->decrypt($legacy);
     }
 
@@ -185,6 +185,37 @@ class StoredEnvelopeEncrypterTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The data key must be 32 bytes long for "aes-256-gcm", 16 given.');
         (new StoredEnvelopeEncrypter($store))->decrypt($foreign);
+    }
+
+    /**
+     * The envelope is assembled out of pieces on purpose: a row's master key id and wrapped data key,
+     * then a stored payload's iv, tag and ciphertext.
+     */
+    public function testAPayloadConvertedToTheOtherFormatIsRefusedWithoutAFallback()
+    {
+        $envelope = $this->encrypter->encrypt('user.email', 'jane@example.com');
+        $row = iterator_to_array($this->store->all(), false)[0];
+        $converted = Envelope::selfContained($row->wrapped->keyId, $row->wrapped->blob, $envelope->iv, $envelope->tag, $envelope->ciphertext);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The envelope carries its own data key');
+        $this->encrypter->decrypt($converted);
+    }
+
+    public function testAFallbackDoesNotReadAPayloadConvertedToTheOtherFormat()
+    {
+        $kms = new InMemoryKms();
+        $store = new InMemoryDataKeyStore(['default' => $kms]);
+        $encrypter = new StoredEnvelopeEncrypter($store, new EnvelopeEncrypter($kms));
+
+        $envelope = $encrypter->encrypt('user.email', 'jane@example.com');
+        $row = iterator_to_array($store->all(), false)[0];
+        $converted = Envelope::selfContained($row->wrapped->keyId, $row->wrapped->blob, $envelope->iv, $envelope->tag, $envelope->ciphertext);
+
+        $this->assertSame('jane@example.com', $encrypter->decrypt($envelope), 'the payload the pieces come from reads, so the refusal below is the format binding and not a broken fixture.');
+
+        $this->expectException(DecryptionFailedException::class);
+        $encrypter->decrypt($converted);
     }
 
     public function testAnEnvelopeRePointedAtAnotherScopesKeyDoesNotDecrypt()

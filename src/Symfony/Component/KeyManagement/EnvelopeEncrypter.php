@@ -63,7 +63,8 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
  * index (an HMAC of the plaintext) in a sibling column.
  *
  * AAD handling: the `$aad` argument is forwarded BOTH to the KMS (binding
- * the wrapped data key) and to the local AEAD (binding the bulk ciphertext).
+ * the wrapped data key) and to the local AEAD (binding the bulk ciphertext),
+ * which prefixes it with the id of the format it frames.
  * The double binding is defense in depth: the local AEAD always catches
  * AAD mismatches even on backends where the KMS can't enforce them. Note
  * that some backends require a specific key shape for KMS-side AAD: e.g.

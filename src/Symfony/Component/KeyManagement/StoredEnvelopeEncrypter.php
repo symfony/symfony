@@ -36,6 +36,10 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * through the KMS. Without that fallback, a self-contained envelope is refused rather than
  * silently mishandled.
  *
+ * The fallback reads what was written in that format, and nothing more: the local AEAD commits to
+ * the id of the format, so the pieces of a stored payload reassembled as a self-contained frame
+ * fail their tag check here as they do anywhere else.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental
@@ -88,6 +92,6 @@ final class StoredEnvelopeEncrypter implements EnvelopeEncrypterInterface, Envel
         }
 
         return $this->selfContained?->decrypt($envelope, $aad)
-            ?? throw new LogicException(\sprintf('The envelope carries its own data key; give "%s" a decrypter for that format to read it.', self::class));
+            ?? throw new LogicException(\sprintf('The envelope carries its own data key; give "%s" a decrypter for that format to read it, which is what the "key_management.store.read_self_contained" option does.', self::class));
     }
 }

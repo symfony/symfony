@@ -3166,6 +3166,35 @@ class ParserTest extends TestCase
         $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
+    public function testMergeKeysInFlowMappingsWhenMappingsAreParsedAsObjects()
+    {
+        $yaml = <<<YAML
+            foo: &FOO { bar: 1 }
+            bar: &BAR { baz: 2, <<: *FOO }
+            baz: { baz_foo: 3, <<: { baz_bar: 4 } }
+            foobar: { bar: ~, <<: [*FOO, *BAR] }
+            YAML;
+        $expected = (object) [
+            'foo' => (object) [
+                'bar' => 1,
+            ],
+            'bar' => (object) [
+                'baz' => 2,
+                'bar' => 1,
+            ],
+            'baz' => (object) [
+                'baz_foo' => 3,
+                'baz_bar' => 4,
+            ],
+            'foobar' => (object) [
+                'bar' => null,
+                'baz' => 2,
+            ],
+        ];
+
+        $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+    }
+
     public function testFilenamesAreParsedAsStringsWithoutFlag()
     {
         $file = __DIR__.'/Fixtures/index.yml';
@@ -3232,6 +3261,27 @@ class ParserTest extends TestCase
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function testParseQuotedMergeKeyAsRegularKey()
+    {
+        $this->assertSame([
+            'base' => ['a' => 'foo'],
+            'derived' => ['<<' => ['a' => 'foo'], 'b' => 'bar'],
+            'scalar' => ['<<' => 'foo'],
+            'tagged' => ['<<' => 'foo'],
+        ], $this->parser->parse(<<<'EOF'
+            base: &base
+                a: foo
+            derived:
+                '<<': *base
+                b: bar
+            scalar:
+                "<<": foo
+            tagged:
+                !!str <<: foo
+            EOF
+        ));
+    }
+
     public function testParseMergeKeyAliasFollowedByAComment()
     {
         $this->assertSame([
@@ -3242,6 +3292,21 @@ class ParserTest extends TestCase
                 a: foo
             derived:
                 <<: *base # a comment
+                b: bar
+            EOF
+        ));
+    }
+
+    public function testParseMergeKeyFollowedByATab()
+    {
+        $this->assertSame([
+            'base' => ['a' => 'foo'],
+            'derived' => ['a' => 'foo', 'b' => 'bar'],
+        ], $this->parser->parse(<<<EOF
+            base: &base
+                a: foo
+            derived:
+                <<\t: *base
                 b: bar
             EOF
         ));

@@ -137,6 +137,52 @@ class UidValueResolverTest extends TestCase
         $this->assertSame('01ARZ3NDEKTSV4RRFFQ69G5FAV', (string) $result[0]);
     }
 
+    public function testResolveVariadicUidArgument()
+    {
+        $resolver = new UidValueResolver();
+
+        $input = new ArrayInput(['ids' => ['550e8400-e29b-41d4-a716-446655440000', '6ba7b810-9dad-11d1-80b4-00c04fd430c8']], new InputDefinition([
+            new InputArgument('ids', InputArgument::IS_ARRAY),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[Argument]
+                Uuid ...$ids,
+            ) {
+            }
+        };
+        $member = new ReflectionMember((new \ReflectionMethod($command, '__invoke'))->getParameters()[0]);
+
+        $result = iterator_to_array($resolver->resolve('ids', $input, $member));
+
+        $this->assertSame(['550e8400-e29b-41d4-a716-446655440000', '6ba7b810-9dad-11d1-80b4-00c04fd430c8'], array_map('strval', $result));
+        $this->assertContainsOnlyInstancesOf(Uuid::class, $result);
+    }
+
+    public function testResolveVariadicUidOption()
+    {
+        $resolver = new UidValueResolver();
+
+        $input = new ArrayInput(['--ids' => ['550e8400-e29b-41d4-a716-446655440000', '6ba7b810-9dad-11d1-80b4-00c04fd430c8']], new InputDefinition([
+            new InputOption('ids', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[Option]
+                Uuid ...$ids,
+            ) {
+            }
+        };
+        $member = new ReflectionMember((new \ReflectionMethod($command, '__invoke'))->getParameters()[0]);
+
+        $result = iterator_to_array($resolver->resolve('ids', $input, $member));
+
+        $this->assertSame(['550e8400-e29b-41d4-a716-446655440000', '6ba7b810-9dad-11d1-80b4-00c04fd430c8'], array_map('strval', $result));
+        $this->assertContainsOnlyInstancesOf(Uuid::class, $result);
+    }
+
     public function testArgumentThrowsOnInvalidUid()
     {
         $this->expectException(InvalidArgumentException::class);

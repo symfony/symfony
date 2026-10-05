@@ -49,6 +49,7 @@ class EventStreamResponse extends StreamedResponse
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'private, no-cache, no-store, must-revalidate, max-age=0',
             'X-Accel-Buffering' => 'no',
+            'Incremental' => '?1',
             'Pragma' => 'no-cache',
             'Expires' => '0',
         ];

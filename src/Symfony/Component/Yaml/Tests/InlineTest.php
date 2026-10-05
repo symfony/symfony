@@ -1338,4 +1338,27 @@ class InlineTest extends TestCase
             Inline::parse('{ <<: &a { k: v }, bar: 2 }'),
         );
     }
+
+    public function testParseQuotedMergeKeyAsRegularKey()
+    {
+        $this->assertSame(['<<' => 'foo', 'bar' => 2], Inline::parse("{ '<<': foo, bar: 2 }"));
+        $this->assertSame(['<<' => ['k' => 'v']], Inline::parse('{ "<<": { k: v } }'));
+        $this->assertSame(['<<' => ['foo']], Inline::parse("{ '<<': [foo] }"));
+    }
+
+    public function testParseMergeKeyWithScalarValueThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('YAML merge keys used with a scalar value instead of an array');
+
+        Inline::parse('{ <<: foo }');
+    }
+
+    public function testParseMergeKeyWithSequenceOfScalarsThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Merge items must be arrays');
+
+        Inline::parse('{ <<: [foo] }');
+    }
 }

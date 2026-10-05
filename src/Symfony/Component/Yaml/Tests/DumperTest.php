@@ -1465,6 +1465,14 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($actual));
     }
 
+    public function testDumpedMergeKeyStringCanBeParsedBack()
+    {
+        $data = ['<<' => 'foo', 'nested' => ['<<' => ['a' => 1]], 'list' => [['<<' => 'bar']]];
+
+        $this->assertSame($data, Yaml::parse($this->dumper->dump($data, 0)));
+        $this->assertSame($data, Yaml::parse($this->dumper->dump($data, 10)));
+    }
+
     private function assertSameData($expected, $actual)
     {
         $this->assertEquals($expected, $actual);

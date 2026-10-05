@@ -76,15 +76,7 @@ final class HttpClientKernel implements HttpKernelInterface
             return new StreamedResponse($this->streamContent($response), $response->getStatusCode(), $headers);
         }
 
-        try {
-            return new Response($response->getContent(!$catch), $response->getStatusCode(), $headers);
-        } catch (\TypeError) {
-            // BC with Symfony < 8.1
-            $response = new Response($response->getContent(!$catch), $response->getStatusCode());
-            $response->headers = $headers;
-
-            return $response;
-        }
+        return new Response($response->getContent(!$catch), $response->getStatusCode(), $headers);
     }
 
     private function getBody(Request $request): ?AbstractPart

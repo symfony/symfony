@@ -447,6 +447,9 @@ Security
  * [BC BREAK] `ContextListener` does not register its `onKernelResponse()` method on the event dispatcher
    anymore. An application built on the Security component alone must register it on the `kernel.response`
    event; SecurityBundle already registers it and is not affected
+ * [BC BREAK] An `#[IsGranted]` attribute whose subject reads an argument mapped with `#[MapRequestPayload]`, `#[MapQueryString]` or `#[MapUploadedFile]` now maps and validates that argument before voting.
+   Voters receive the mapped value instead of the attribute, and the attributes declared before it still run before the request is mapped.
+   A voter that read the attribute, for instance its `metadata` property, to vote before the request is mapped needs a subject that does not read the mapped argument instead
 
 SecurityBundle
 --------------

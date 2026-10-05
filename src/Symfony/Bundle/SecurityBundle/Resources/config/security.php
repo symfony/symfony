@@ -366,6 +366,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.authorization_checker'),
                 service('security.is_granted_attribute_expression_language')->nullOnInvalid(),
+                closure([service('argument_resolver.request_payload'), 'onKernelControllerArguments'])->lazy(),
             ])
             ->tag('kernel.event_subscriber')
 

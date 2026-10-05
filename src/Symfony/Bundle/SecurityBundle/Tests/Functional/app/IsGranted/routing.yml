@@ -1,0 +1,18 @@
+create_post:
+    path: /post
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\IsGrantedPostController::create
+    methods: POST
+
+closed_post:
+    path: /post/closed
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\IsGrantedPostController::closed
+    methods: POST
+
+closed_post_after_mapping:
+    path: /post/closed-after-mapping
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\IsGrantedPostController::closedAfterMapping
+    methods: POST
+
+list_posts:
+    path: /posts
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\IsGrantedPostController::list

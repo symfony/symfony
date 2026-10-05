@@ -1,0 +1,5 @@
+imports:
+    - { resource: ./config.yml }
+
+framework:
+    serializer: { enabled: false }

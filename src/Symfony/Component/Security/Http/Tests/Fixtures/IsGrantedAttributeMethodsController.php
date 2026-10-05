@@ -85,6 +85,26 @@ class IsGrantedAttributeMethodsController
     {
     }
 
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: 'post')]
+    public function withMappedSubject($post)
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: new Expression('args["post"]'))]
+    public function withMappedSubjectExpression($post)
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: ['post', 'arg2Name'])]
+    public function withMappedSubjectArray($post, $arg2Name)
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: 'files')]
+    public function withMappedVariadicSubject(...$files)
+    {
+    }
+
     #[IsGranted(attribute: 'ROLE_ADMIN', methods: 'get')]
     public function adminWithMethodGet(): void
     {

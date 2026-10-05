@@ -158,8 +158,9 @@ class AzureKeyVaultFactoryTest extends TestCase
         });
 
         $kms = (new AzureKeyVaultFactory($client))->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t'));
-        $kms->encrypt('app', 'hello');
+        $ciphertext = $kms->encrypt('app', 'hello');
 
+        $this->assertSame('app/v1', $ciphertext->keyId);
         $this->assertCount(2, $urls);
         $this->assertStringStartsWith('https://login.microsoftonline.com/t/oauth2/', $urls[0]);
         $this->assertStringStartsWith('https://my-vault.vault.azure.net/keys/app/encrypt', $urls[1]);

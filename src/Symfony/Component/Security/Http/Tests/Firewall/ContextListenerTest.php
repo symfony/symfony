@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -228,6 +229,34 @@ class ContextListenerTest extends TestCase
 
         $listener = new ContextListener($tokenStorage, [], 'key123');
         $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+    }
+
+    #[DataProvider('provideSessionValuesHoldingSecrets')]
+    public function testInvalidTokenInSessionIsNotCopiedIntoTheLogs(string $sessionValue)
+    {
+        $session = new Session(new MockArraySessionStorage('SESSIONNAME'));
+        $session->set('_security_key123', $sessionValue);
+        $request = new Request([], [], [], ['SESSIONNAME' => true]);
+        $request->setSession($session);
+
+        $logged = [];
+        $logger = $this->createStub(LoggerInterface::class);
+        $logger->method('warning')->willReturnCallback(static function (string $message, array $context) use (&$logged) {
+            unset($context['exception']);
+            $logged[] = $context;
+        });
+
+        $listener = new ContextListener(new TokenStorage(), [], 'key123', $logger);
+        $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertCount(1, $logged);
+        $this->assertStringNotContainsString('$2y$13$hash', json_encode($logged));
+    }
+
+    public static function provideSessionValuesHoldingSecrets()
+    {
+        yield 'not unserializable' => ['O:8:"NotFound":1:{s:8:"password";s:11:"$2y$13$hash";}'];
+        yield 'not a token' => [serialize(['password' => '$2y$13$hash'])];
     }
 
     public static function provideInvalidToken()

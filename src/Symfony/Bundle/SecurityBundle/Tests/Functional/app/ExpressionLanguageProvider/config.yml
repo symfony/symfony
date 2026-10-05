@@ -18,6 +18,14 @@ services:
         alias: controller.expression_language
         public: true
 
+    test.security.is_granted_attribute_expression_language:
+        alias: security.is_granted_attribute_expression_language
+        public: true
+
+    test.security.is_csrf_token_valid_attribute_expression_language:
+        alias: security.is_csrf_token_valid_attribute_expression_language
+        public: true
+
 security:
     providers:
         main:

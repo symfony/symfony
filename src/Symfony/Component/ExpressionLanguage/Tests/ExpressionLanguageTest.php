@@ -12,6 +12,8 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -83,36 +85,57 @@ class ExpressionLanguageTest extends TestCase
     public static function basicPhpFunctionProvider()
     {
         return [
-            ['constant("PHP_VERSION")', \PHP_VERSION, '\constant("PHP_VERSION")'],
             ['min(1,2,3)', 1, '\min(1, 2, 3)'],
             ['max(1,2,3)', 3, '\max(1, 2, 3)'],
         ];
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testConstantFunction()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/expression-language 8.2: Using the built-in "constant()" expression function is deprecated, register a "Symfony\Component\ExpressionLanguage\ConstantFunctionProvider" listing the allowed constants instead.');
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertSame(\PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
+        $this->assertSame('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testEnumFunctionWithConstantThrows()
     {
+        $this->expectUserDeprecationMessage('Since symfony/expression-language 8.2: Using the built-in "enum()" expression function is deprecated, register a "Symfony\Component\ExpressionLanguage\ConstantFunctionProvider" listing the allowed constants instead.');
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('The string "PHP_VERSION" is not the name of a valid enum case.');
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->evaluate('enum("PHP_VERSION")');
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testCompiledEnumFunctionWithConstantThrows()
     {
+        $this->expectUserDeprecationMessage('Since symfony/expression-language 8.2: Using the built-in "enum()" expression function is deprecated, register a "Symfony\Component\ExpressionLanguage\ConstantFunctionProvider" listing the allowed constants instead.');
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('The string "PHP_VERSION" is not the name of a valid enum case.');
         $expressionLanguage = new ExpressionLanguage();
         eval($expressionLanguage->compile('enum("PHP_VERSION")').';');
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testEnumFunction()
     {
+        $this->expectUserDeprecationMessage('Since symfony/expression-language 8.2: Using the built-in "enum()" expression function is deprecated, register a "Symfony\Component\ExpressionLanguage\ConstantFunctionProvider" listing the allowed constants instead.');
         $expressionLanguage = new ExpressionLanguage();
         $this->assertSame(FooEnum::Foo, $expressionLanguage->evaluate('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooEnum::Foo")'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testCompiledEnumFunction()
     {
+        $this->expectUserDeprecationMessage('Since symfony/expression-language 8.2: Using the built-in "enum()" expression function is deprecated, register a "Symfony\Component\ExpressionLanguage\ConstantFunctionProvider" listing the allowed constants instead.');
         $result = null;
         $expressionLanguage = new ExpressionLanguage();
         eval(\sprintf('$result = %s;', $expressionLanguage->compile('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooEnum::Foo")')));
@@ -120,20 +143,42 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame(FooEnum::Foo, $result);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testBackedEnumFunction()
     {
+        $this->expectUserDeprecationMessage('Since symfony/expression-language 8.2: Using the built-in "enum()" expression function is deprecated, register a "Symfony\Component\ExpressionLanguage\ConstantFunctionProvider" listing the allowed constants instead.');
         $expressionLanguage = new ExpressionLanguage();
         $this->assertSame(FooBackedEnum::Bar, $expressionLanguage->evaluate('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooBackedEnum::Bar")'));
         $this->assertSame('Foo', $expressionLanguage->evaluate('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooBackedEnum::Bar").value'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testCompiledEnumFunctionWithBackedEnum()
     {
+        $this->expectUserDeprecationMessage('Since symfony/expression-language 8.2: Using the built-in "enum()" expression function is deprecated, register a "Symfony\Component\ExpressionLanguage\ConstantFunctionProvider" listing the allowed constants instead.');
         $result = null;
         $expressionLanguage = new ExpressionLanguage();
         eval(\sprintf('$result = %s;', $expressionLanguage->compile('enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooBackedEnum::Bar")')));
 
         $this->assertSame(FooBackedEnum::Bar, $result);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideBuiltinConstantFunctions')]
+    public function testLintingBuiltinConstantFunctionsIsDeprecated(string $function)
+    {
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/expression-language 8.2: Using the built-in "%s()" expression function is deprecated, register a "Symfony\Component\ExpressionLanguage\ConstantFunctionProvider" listing the allowed constants instead.', $function));
+
+        (new ExpressionLanguage())->lint($function.'("PHP_VERSION")', []);
+    }
+
+    public static function provideBuiltinConstantFunctions(): iterable
+    {
+        yield ['constant'];
+        yield ['enum'];
     }
 
     #[DataProvider('providerTestCases')]

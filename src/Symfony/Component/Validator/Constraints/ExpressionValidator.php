@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -53,7 +54,7 @@ class ExpressionValidator extends ConstraintValidator
     private function getExpressionLanguage(): ExpressionLanguage
     {
         if (!isset($this->expressionLanguage)) {
-            $this->expressionLanguage = new ExpressionLanguage();
+            $this->expressionLanguage = new ExpressionLanguage(null, class_exists(ConstantFunctionProvider::class) ? [new ConstantFunctionProvider(['*', '*::*'])] : []);
             $this->expressionLanguage->registerProvider(new ExpressionLanguageProvider());
         }
 

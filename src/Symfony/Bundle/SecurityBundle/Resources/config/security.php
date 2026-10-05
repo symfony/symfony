@@ -22,6 +22,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
@@ -375,7 +376,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.is_granted_attribute_expression_language', BaseExpressionLanguage::class)
             ->lazy()
-            ->args([service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid()])
+            ->args([
+                service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid(),
+                class_exists(ConstantFunctionProvider::class) ? [inline_service(ConstantFunctionProvider::class)->args([['*', '*::*']])] : [],
+            ])
             ->tag('expression_language.compiled', ['attributes' => [IsGranted::class => ['subject']]])
 
         ->set('cache.security_is_granted_attribute_expression_language')
@@ -386,7 +390,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.is_csrf_token_valid_attribute_expression_language', BaseExpressionLanguage::class)
             ->lazy()
-            ->args([service('cache.security_is_csrf_token_valid_attribute_expression_language')->nullOnInvalid()])
+            ->args([
+                service('cache.security_is_csrf_token_valid_attribute_expression_language')->nullOnInvalid(),
+                class_exists(ConstantFunctionProvider::class) ? [inline_service(ConstantFunctionProvider::class)->args([['*', '*::*']])] : [],
+            ])
             ->tag('expression_language.compiled', ['attributes' => [IsCsrfTokenValid::class => ['id']]])
 
         ->set('cache.security_is_csrf_token_valid_attribute_expression_language')

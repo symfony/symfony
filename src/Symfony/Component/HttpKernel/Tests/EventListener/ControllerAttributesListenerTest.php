@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -237,6 +238,20 @@ class ControllerAttributesListenerTest extends TestCase
         $listener->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $dispatcher);
 
         $this->assertContains(KernelEvents::CONTROLLER_ARGUMENTS.'.'.Qux::class, $dispatchedEvents);
+    }
+
+    public function testDefaultExpressionLanguageAllowsAnyConstant()
+    {
+        $result = null;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::CONTROLLER.'.'.Buz::class, static function (ControllerAttributeEvent $event) use (&$result) {
+            $result = $event->evaluate(new Expression('constant("PHP_VERSION")'));
+        });
+
+        $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), [new ControllerAttributesController(), 'buzAction'], new Request(), HttpKernelInterface::MAIN_REQUEST);
+        $this->createListener()->beforeController($event, KernelEvents::CONTROLLER, $dispatcher);
+
+        $this->assertSame(\PHP_VERSION, $result);
     }
 
     private function createListener(?array $attributesWithListenersByEvent = null): ControllerAttributesListener

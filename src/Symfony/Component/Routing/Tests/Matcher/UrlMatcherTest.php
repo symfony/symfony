@@ -510,6 +510,16 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
+    public function testConstantCondition()
+    {
+        $coll = new RouteCollection();
+        $route = new Route('/foo');
+        $route->setCondition('context.getMethod() == constant("Symfony\\\\Component\\\\HttpFoundation\\\\Request::METHOD_GET")');
+        $coll->add('foo', $route);
+
+        $this->assertSame(['_route' => 'foo'], $this->getUrlMatcher($coll)->match('/foo'));
+    }
+
     public function testRequestCondition()
     {
         $coll = new RouteCollection();

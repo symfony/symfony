@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\CacheWarmer\ValidatorCacheWarmer;
@@ -94,7 +95,10 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('validator.expression_language', ExpressionLanguage::class)
-            ->args([service('cache.validator_expression_language')->nullOnInvalid()])
+            ->args([
+                service('cache.validator_expression_language')->nullOnInvalid(),
+                class_exists(ConstantFunctionProvider::class) ? [inline_service(ConstantFunctionProvider::class)->args([['*', '*::*']])] : [],
+            ])
             ->call('registerProvider', [
                 service('validator.expression_language_provider')->ignoreOnInvalid(),
             ])

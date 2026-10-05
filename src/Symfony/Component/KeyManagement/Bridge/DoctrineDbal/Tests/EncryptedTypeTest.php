@@ -32,6 +32,7 @@ use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
+use Symfony\Component\KeyManagement\Exception\UnexpectedEnvelopeException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
 use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
@@ -159,6 +160,29 @@ class EncryptedTypeTest extends TestCase
         $this->assertSame('written after', $migrating->convertToPHPValue($after, $this->platform));
     }
 
+    public function testAValueOfAnotherColumnIsRefused()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $notes = new EncryptedType(new StringType(), $encrypter, 'user.notes');
+        $roles = new EncryptedType(new StringType(), $encrypter, 'user.roles');
+
+        $written = $notes->convertToDatabaseValue('a note', $this->platform);
+
+        $this->expectException(UnexpectedEnvelopeException::class);
+        $this->expectExceptionMessage('The payload was written under "user.notes", while "user.roles" was expected.');
+        $roles->convertToPHPValue($written, $this->platform);
+    }
+
+    public function testAValueReadInItsOwnColumnIsUnchanged()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $notes = new EncryptedType(new StringType(), $encrypter, 'user.notes');
+
+        $written = $notes->convertToDatabaseValue('a note', $this->platform);
+
+        $this->assertSame('a note', $notes->convertToPHPValue($written, $this->platform));
+    }
+
     public function testAColumnIsMovedToAnotherKms()
     {
         $target = new EnvelopeEncrypter(new OpenSslKms(new InMemoryKeyLoader(['next' => random_bytes(32)])));
@@ -229,7 +253,7 @@ class EncryptedTypeTest extends TestCase
                 throw new \RuntimeException('The backend is down.');
             }
 
-            public function decrypt(Envelope $envelope, string $aad = ''): string
+            public function decrypt(Envelope $envelope, string $aad = '', ?string $key = null): string
             {
                 throw new \RuntimeException('The backend is down.');
             }
@@ -292,9 +316,9 @@ class EncryptedTypeTest extends TestCase
                 return $this->target->encrypt($key, $plaintext, $aad);
             }
 
-            public function decrypt(Envelope $envelope, string $aad = ''): string
+            public function decrypt(Envelope $envelope, string $aad = '', ?string $key = null): string
             {
-                return 'app' === $envelope->keyId ? $this->legacy->decrypt($envelope, $aad) : $this->target->decrypt($envelope, $aad);
+                return 'app' === $envelope->keyId ? $this->legacy->decrypt($envelope, $aad, 'app') : $this->target->decrypt($envelope, $aad, $key);
             }
         };
     }

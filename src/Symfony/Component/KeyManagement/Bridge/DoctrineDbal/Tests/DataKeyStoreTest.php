@@ -470,6 +470,16 @@ class DataKeyStoreTest extends TestCase
         $store->current('user.email');
     }
 
+    public function testAHandleStatesTheScopeOfTheRowItCameFrom()
+    {
+        $store = $this->store();
+        $handle = $store->current('user.email');
+        $store->forget();
+
+        $this->assertSame('user.email', $handle->scope);
+        $this->assertSame('user.email', $store->get($handle->reference)->scope, 'read back from the row, not remembered from the call that minted it.');
+    }
+
     public function testACustomTableNameIsHonoured()
     {
         $store = $this->store(table: 'app_deks');

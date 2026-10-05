@@ -19,6 +19,7 @@ use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\UnexpectedEnvelopeException;
 use Symfony\Component\KeyManagement\SelfContainedFormat;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\RedactedTraceAssertionsTrait;
@@ -189,5 +190,34 @@ class EnvelopeEncrypterTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The data key must be 32 bytes long for "aes-256-gcm", 16 given.');
         $decrypter->decrypt($envelope);
+    }
+
+    public function testAPayloadWrappedByAnotherMasterKeyIsRefused()
+    {
+        $envelope = $this->encrypter->encrypt('app-key', 'jane@example.com');
+
+        $this->expectException(UnexpectedEnvelopeException::class);
+        $this->expectExceptionMessage('The payload was written under "app-key", while "other-key" was expected.');
+        $this->encrypter->decrypt($envelope, '', 'other-key');
+    }
+
+    public function testAPayloadReadUnderItsOwnMasterKeyIsUnchanged()
+    {
+        $envelope = $this->encrypter->encrypt('app-key', 'jane@example.com');
+
+        $this->assertSame('jane@example.com', $this->encrypter->decrypt($envelope, '', 'app-key'));
+    }
+
+    public function testTheMasterKeyIsCheckedBeforeTheKmsIsAskedAnything()
+    {
+        $envelope = $this->encrypter->encrypt('app-key', 'jane@example.com');
+        $calls = $this->kms->calls;
+
+        try {
+            $this->encrypter->decrypt($envelope, '', 'other-key');
+        } catch (UnexpectedEnvelopeException) {
+        }
+
+        $this->assertSame($calls, $this->kms->calls, 'a payload that does not belong is refused without spending an unwrap on it.');
     }
 }

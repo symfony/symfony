@@ -76,11 +76,11 @@ final class TraceableEnvelopeEncrypter implements EnvelopeEncrypterInterface, En
         }
     }
 
-    public function decrypt(Envelope $envelope, string $aad = ''): string
+    public function decrypt(Envelope $envelope, string $aad = '', ?string $key = null): string
     {
         $start = $this->enter();
         $call = [
-            'key' => $envelope->keyId,
+            'key' => $key ?? $envelope->keyId,
             'reference' => $envelope->reference,
             'format' => self::format($envelope),
             'aad' => $aad,
@@ -88,7 +88,7 @@ final class TraceableEnvelopeEncrypter implements EnvelopeEncrypterInterface, En
         ];
 
         try {
-            $plaintext = $this->encrypter->decrypt($envelope, $aad);
+            $plaintext = $this->encrypter->decrypt($envelope, $aad, $key);
             $call['out'] = \strlen($plaintext);
 
             return $plaintext;

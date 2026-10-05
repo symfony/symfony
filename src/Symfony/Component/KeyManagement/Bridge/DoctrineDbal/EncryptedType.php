@@ -53,6 +53,10 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * once per data key and per process, and that key can later be rewrapped under
  * another provider without rewriting a single row.
  *
+ * The key, or scope, this type was registered with is named on the read path as well as
+ * on the write path: without it, a payload written for another column or another tenant
+ * is one this column reads, since the payload itself names the key that opens it.
+ *
  * Needs the `Type` constructor that DBAL 4.3 unsealed, so that a subclass may
  * declare its own parameters.
  *
@@ -124,7 +128,7 @@ class EncryptedType extends Type
             throw new ValueNotConvertible('Stored value is not a valid KeyManagement envelope.', 0, $e);
         }
 
-        return $this->parentType->convertToPHPValue($this->envelopes->decrypt($envelope), $platform);
+        return $this->parentType->convertToPHPValue($this->envelopes->decrypt($envelope, '', $this->key), $platform);
     }
 
     public function getBindingType(): ParameterType

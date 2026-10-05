@@ -97,6 +97,7 @@ class Connection
     private \AMQPExchange $amqpDelayExchange;
     private int $lastActivityTime = 0;
     private int $inFlightMessages = 0;
+    private int $publishSeqNo = 0;
     private int $prefetchCount = 0;
     private int $appliedPrefetchCount = 0;
 
@@ -411,7 +412,14 @@ class Connection
         );
 
         if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
-            $this->channel()->waitForConfirm((float) $this->connectionOptions['confirm_timeout']);
+            $seqNo = ++$this->publishSeqNo;
+            $channel = $this->channel();
+            // the confirm of a message published before this one, which timed out, keeps the wait going
+            $channel->setConfirmCallback(
+                static fn (int $confirmedSeqNo): bool => $confirmedSeqNo < $seqNo,
+                static fn (int $confirmedSeqNo): bool => $confirmedSeqNo < $seqNo ?: throw new TransportException('Message publication failed due to a negative acknowledgment (nack) from the broker.'),
+            );
+            $channel->waitForConfirm((float) $this->connectionOptions['confirm_timeout']);
         }
     }
 
@@ -714,6 +722,7 @@ class Connection
 
             if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
                 $this->amqpChannel->confirmSelect();
+                $this->publishSeqNo = 0;
                 $this->amqpChannel->setConfirmCallback(
                     static fn (): bool => false,
                     static fn () => throw new TransportException('Message publication failed due to a negative acknowledgment (nack) from the broker.'),

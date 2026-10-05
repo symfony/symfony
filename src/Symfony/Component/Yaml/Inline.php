@@ -539,7 +539,9 @@ class Inline
                     throw new ParseException('Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}").', self::$parsedLineNumber + 1, $mapping);
                 }
 
-                if ('<<' === $key) {
+                $isMergeKey = !$isKeyQuoted && '<<' === $key;
+
+                if ($isMergeKey) {
                     $allowOverwrite = true;
                 }
 
@@ -559,7 +561,7 @@ class Inline
                     if (null !== $anchorRef && (!isset($mapping[$i]) || \in_array($mapping[$i], [',', '}', "\n"], true))) {
                         $value = null;
                         $references[$anchorRef] = $value;
-                        if ('<<' !== $key) {
+                        if (!$isMergeKey) {
                             if ($allowOverwrite || !isset($output[$key])) {
                                 $output[$key] = null !== $tag ? new TaggedValue($tag, $value) : $value;
                             } elseif (isset($output[$key])) {
@@ -584,8 +586,16 @@ class Inline
                             // Parser cannot abort this mapping earlier, since lines
                             // are processed sequentially.
                             // But overwriting is allowed when a merge node is used in current block.
-                            if ('<<' === $key) {
+                            if ($isMergeKey) {
                                 foreach ($value as $parsedValue) {
+                                    if (self::$objectForMap && $parsedValue instanceof \stdClass) {
+                                        $parsedValue = (array) $parsedValue;
+                                    }
+
+                                    if (!\is_array($parsedValue)) {
+                                        throw new ParseException('Merge items must be arrays.', self::$parsedLineNumber + 1, $mapping);
+                                    }
+
                                     $output += $parsedValue;
                                 }
                             } elseif ($allowOverwrite || !isset($output[$key])) {
@@ -608,8 +618,8 @@ class Inline
                             // Parser cannot abort this mapping earlier, since lines
                             // are processed sequentially.
                             // But overwriting is allowed when a merge node is used in current block.
-                            if ('<<' === $key) {
-                                $output += $value;
+                            if ($isMergeKey) {
+                                $output += (array) $value;
                             } elseif ($allowOverwrite || !isset($output[$key])) {
                                 if (null !== $tag) {
                                     $output[$key] = new TaggedValue($tag, $value);
@@ -629,7 +639,15 @@ class Inline
                             // Parser cannot abort this mapping earlier, since lines
                             // are processed sequentially.
                             // But overwriting is allowed when a merge node is used in current block.
-                            if ('<<' === $key) {
+                            if ($isMergeKey) {
+                                if (self::$objectForMap && $value instanceof \stdClass) {
+                                    $value = (array) $value;
+                                }
+
+                                if (!\is_array($value)) {
+                                    throw new ParseException('YAML merge keys used with a scalar value instead of an array.', self::$parsedLineNumber + 1, $mapping);
+                                }
+
                                 $output += $value;
                             } elseif ($allowOverwrite || !isset($output[$key])) {
                                 if (null !== $tag) {

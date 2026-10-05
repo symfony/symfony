@@ -79,6 +79,14 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
+    public function testConstantFunction()
+    {
+        $constraint = new NotNull();
+        $this->expectValidateValue(0, 'Foo', [$constraint]);
+
+        $this->validate('Foo', new When(expression: 'constant("PHP_INT_SIZE") > 0', constraints: $constraint));
+    }
+
     public function testOtherwiseIsExecutedWhenFalse()
     {
         $constraint = new NotNull();

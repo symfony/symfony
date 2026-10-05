@@ -112,6 +112,20 @@ EventDispatcher
    `AsControllerAttributeListener` and of the Workflow `As*Listener` attributes. Code that read the
    property as an `int` should read `$attribute->priority ?? 0`
 
+ExpressionLanguage
+------------------
+
+ * Deprecate the built-in `constant()` and `enum()` functions, register a `ConstantFunctionProvider` listing
+   the constants that expressions may read instead. The deprecation is triggered when an expression using them
+   is parsed. Each entry is a constant name in which `*` matches any sequence of characters except `::`:
+
+   ```php
+   $expressionLanguage = new ExpressionLanguage(null, [new ConstantFunctionProvider(['App\Security\Roles::ROLE_*', 'App\Enum\*::*'])]);
+   ```
+
+   Pass `['*', '*::*']` to keep allowing every constant. The expression languages created by Symfony itself
+   do so already
+
 Filesystem
 ----------
 

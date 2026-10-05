@@ -157,6 +157,10 @@ class ExpressionLanguage
                 return $value;
             }
         ));
+
+        foreach (['constant', 'enum'] as $name) {
+            $this->functions[$name]['deprecation'] = ['symfony/expression-language', '8.2', \sprintf('Using the built-in "%s()" expression function is deprecated, register a "%s" listing the allowed constants instead.', $name, ConstantFunctionProvider::class)];
+        }
     }
 
     private function getLexer(): Lexer

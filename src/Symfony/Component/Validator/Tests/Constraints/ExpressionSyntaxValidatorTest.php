@@ -58,6 +58,14 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testConstantFunctionWithDefaultExpressionLanguage()
+    {
+        $this->validator = new ExpressionSyntaxValidator();
+        $this->validate('constant("PHP_VERSION")', new ExpressionSyntax());
+
+        $this->assertNoViolation();
+    }
+
     public function testExpressionWithoutNames()
     {
         $this->validate('1 + 1', new ExpressionSyntax(null, 'myMessage', null, []));

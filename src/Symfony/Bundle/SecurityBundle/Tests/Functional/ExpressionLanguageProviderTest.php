@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,6 +60,13 @@ class ExpressionLanguageProviderTest extends AbstractWebTestCase
         $this->assertSame($user, $expressionLanguage->evaluate('current_user()', $variables));
         $this->assertSame('chalasr', $expressionLanguage->evaluate('current_user().getUserIdentifier()', $variables));
         $this->assertTrue($expressionLanguage->evaluate('is_granted("ROLE_FOO")', $variables));
+    }
+
+    #[TestWith(['test.security.is_granted_attribute_expression_language'])]
+    #[TestWith(['test.security.is_csrf_token_valid_attribute_expression_language'])]
+    public function testConstantFunctionAllowsAnyConstant(string $id)
+    {
+        $this->assertSame(\PHP_VERSION, $this->bootTestKernel()->get($id)->evaluate('constant("PHP_VERSION")'));
     }
 
     private function createExpressionLanguage(ContainerInterface $container): ExpressionLanguage

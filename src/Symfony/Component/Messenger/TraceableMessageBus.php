@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger;
 
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Transport\Sender\BatchCollector;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -81,9 +82,13 @@ class TraceableMessageBus implements MessageBusInterface
         $file = $trace[1]['file'] ?? null;
         $line = $trace[1]['line'] ?? null;
 
-        $helperFiles = [(new \ReflectionClass(HandleTrait::class))->getFileName(), (new \ReflectionClass(BatchDispatcher::class))->getFileName()];
+        $helperFiles = [(new \ReflectionClass(HandleTrait::class))->getFileName(), (new \ReflectionClass(BatchDispatcher::class))->getFileName(), (new \ReflectionClass(BatchCollector::class))->getFileName()];
         $found = false;
         for ($i = 1; $i < 8; ++$i) {
+            while (isset($trace[$i]['file'], $trace[$i + 1]['file']) && \in_array($trace[$i]['file'], $helperFiles, true) && \in_array($trace[$i + 1]['file'], $helperFiles, true)) {
+                ++$i;
+            }
+
             if (isset($trace[$i]['file'], $trace[$i + 1]['file'], $trace[$i + 1]['line']) && \in_array($trace[$i]['file'], $helperFiles, true)) {
                 $file = $trace[$i + 1]['file'];
                 $line = $trace[$i + 1]['line'];

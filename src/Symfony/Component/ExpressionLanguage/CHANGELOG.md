@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `CompiledExpressionLanguage`, a decorator that evaluates and lints the expressions compiled by its `dumpCompiled()` method without parsing them
  * Add `count()` function to ExpressionLanguage
+ * Add `ConstantFunctionProvider` to restrict the `constant()` and `enum()` functions to a list of allowed constants
 
 8.1
 ---

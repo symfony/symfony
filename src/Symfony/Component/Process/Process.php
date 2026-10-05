@@ -454,35 +454,51 @@ class Process implements \IteratorAggregate
     public function waitUntil(callable $callback): bool
     {
         $this->requireProcessIsStarted(__FUNCTION__);
-        $this->updateStatus(false);
-
-        if (!$this->processPipes->haveReadSupport()) {
-            $this->stop(0);
-            throw new LogicException('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::waitUntil".');
-        }
-        $callback = $this->buildCallback($callback);
 
         $ready = false;
-        while (true) {
-            $this->checkTimeout();
-            $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
-            $output = $this->processPipes->readAndWrite($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+        $previousCallback = $this->callback;
+        // updateStatus() and isRunning() read the pipes and pass the output to $this->callback: forward it to $callback too so that no output is missed
+        $this->callback = $waitUntilCallback = static function (string $type, string $data) use ($previousCallback, $callback, &$ready): bool {
+            $previousCallback($type, $data);
 
-            foreach ($output as $type => $data) {
-                if (3 !== $type) {
-                    $ready = $callback(self::STDOUT === $type ? self::OUT : self::ERR, $data) || $ready;
-                } elseif (!isset($this->fallbackStatus['signaled'])) {
-                    $this->fallbackStatus['exitcode'] = (int) $data;
+            return $ready = $callback($type, $data) || $ready;
+        };
+
+        try {
+            $this->updateStatus(false);
+
+            if (!$this->processPipes->haveReadSupport()) {
+                $this->stop(0);
+                throw new LogicException('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::waitUntil".');
+            }
+            $callback = $this->buildCallback($callback);
+
+            while (true) {
+                $this->checkTimeout();
+                $running = '\\' === \DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
+                $output = $this->processPipes->readAndWrite($running && !$ready, '\\' !== \DIRECTORY_SEPARATOR || !$running);
+
+                foreach ($output as $type => $data) {
+                    if (3 !== $type) {
+                        $ready = $callback(self::STDOUT === $type ? self::OUT : self::ERR, $data) || $ready;
+                    } elseif (!isset($this->fallbackStatus['signaled'])) {
+                        $this->fallbackStatus['exitcode'] = (int) $data;
+                    }
                 }
-            }
-            if ($ready) {
-                return true;
-            }
-            if (!$running) {
-                return false;
-            }
+                if ($ready) {
+                    return true;
+                }
+                if (!$running) {
+                    return false;
+                }
 
-            usleep(1000);
+                usleep(1000);
+            }
+        } finally {
+            // close() unsets the callback once the process is terminated
+            if ($waitUntilCallback === $this->callback) {
+                $this->callback = $previousCallback;
+            }
         }
     }
 

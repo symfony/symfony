@@ -37,13 +37,13 @@ class AzureKeyVaultTest extends TestCase
         $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$captured): MockResponse {
             $captured = [$method, $url, json_decode($options['body'], true), $options['headers']];
 
-            return new MockResponse(json_encode(['kid' => 'https://my-vault.vault.azure.net/keys/app/v1', 'value' => 'CipherFromAzure']));
+            return new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/v1', 'value' => 'CipherFromAzure']));
         }, self::VAULT);
 
         $kms = new AzureKeyVault($client, $this->staticToken('TOKEN'));
         $ciphertext = $kms->encrypt('app-key', 'hello');
 
-        $this->assertSame('app-key', $ciphertext->keyId);
+        $this->assertSame('app-key/v1', $ciphertext->keyId);
         $this->assertSame('CipherFromAzure', $ciphertext->blob);
 
         [$method, $url, $body, $headers] = $captured;
@@ -52,6 +52,159 @@ class AzureKeyVaultTest extends TestCase
         $this->assertSame('RSA-OAEP-256', $body['alg']);
         $this->assertSame(Base64UrlSafe::encode('hello'), $body['value']);
         $this->assertContains('Authorization: Bearer TOKEN', $headers);
+    }
+
+    public function testCiphertextStaysReadableAfterTheKeyIsRotated()
+    {
+        $latestVersion = 'v1';
+        $urls = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$latestVersion, &$urls): MockResponse {
+            $urls[] = $url;
+            $version = self::addressedVersion($url, $latestVersion);
+
+            if (str_contains($url, '/encrypt?')) {
+                return new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/'.$version, 'value' => 'ciphertext-under-'.$version]));
+            }
+
+            if ('ciphertext-under-'.$version !== json_decode($options['body'], true)['value']) {
+                return new MockResponse(json_encode(['error' => ['message' => 'the ciphertext was produced by another key version']]), ['http_code' => 400]);
+            }
+
+            return new MockResponse(json_encode(['value' => Base64UrlSafe::encode('hello')]));
+        }, self::VAULT);
+
+        $kms = new AzureKeyVault($client, $this->staticToken('T'));
+        $ciphertext = $kms->encrypt('app-key', 'hello');
+        $latestVersion = 'v2';
+
+        $this->assertSame('hello', $kms->decrypt($ciphertext));
+        $this->assertSame(self::VAULT.'keys/app-key/v1/decrypt?api-version=7.4', $urls[1]);
+    }
+
+    public function testWrappedDataKeyStaysUnwrappableAfterTheKeyIsRotated()
+    {
+        $latestVersion = 'v1';
+        $urls = [];
+        $wrapped = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$latestVersion, &$urls, &$wrapped): MockResponse {
+            $urls[] = $url;
+            $version = self::addressedVersion($url, $latestVersion);
+            $value = json_decode($options['body'], true)['value'];
+
+            if (str_contains($url, '/wrapkey?')) {
+                $wrapped[$version] = $value;
+
+                return new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/'.$version, 'value' => 'wrapped-under-'.$version]));
+            }
+
+            if ('wrapped-under-'.$version !== $value) {
+                return new MockResponse(json_encode(['error' => ['message' => 'the wrapped key was produced by another key version']]), ['http_code' => 400]);
+            }
+
+            return new MockResponse(json_encode(['value' => $wrapped[$version]]));
+        }, self::VAULT);
+
+        $kms = new AzureKeyVault($client, $this->staticToken('T'));
+        $dataKey = $kms->generateDataKey('app-key');
+        $latestVersion = 'v2';
+
+        $this->assertSame($dataKey->use(static fn (string $key): string => $key), $kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key));
+        $this->assertSame(self::VAULT.'keys/app-key/v1/unwrapkey?api-version=7.4', $urls[1]);
+    }
+
+    public function testTheRecordedKeyIdKeepsTheRequestedNameAndAddsTheReportedVersion()
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode(['kid' => self::VAULT.'keys/App-Key/abc123', 'value' => 'ciphertext'])), self::VAULT);
+
+        $ciphertext = (new AzureKeyVault($client, $this->staticToken('T')))->encrypt('app-key', 'hello');
+
+        $this->assertSame('app-key/abc123', $ciphertext->keyId);
+    }
+
+    public function testTheRecordedKeyIdOfAPinnedRequestKeepsItsSpelling()
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode(['kid' => 'https://MY-VAULT.VAULT.AZURE.NET/KEYS/APP-KEY/V1', 'value' => 'ciphertext'])), self::VAULT);
+
+        $ciphertext = (new AzureKeyVault($client, $this->staticToken('T')))->encrypt('app-key/v1', 'hello');
+
+        $this->assertSame('app-key/v1', $ciphertext->keyId);
+    }
+
+    public static function provideUnusableOperationKeyIds(): iterable
+    {
+        yield 'missing' => [null];
+        yield 'non-string' => [123];
+        yield 'versionless' => [self::VAULT.'keys/app-key'];
+        yield 'unexpected path' => [self::VAULT.'secrets/app-key/v1'];
+        yield 'extra segment' => [self::VAULT.'keys/app-key/v1/extra'];
+        yield 'malformed version' => [self::VAULT.'keys/app-key/v_1'];
+    }
+
+    #[DataProvider('provideUnusableOperationKeyIds')]
+    public function testEncryptFailsWhenAVersionlessRequestGetsNoUsableKeyId(mixed $kid)
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode(['kid' => $kid, 'value' => 'ciphertext'])), self::VAULT);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Azure Key Vault did not report the version of the key it used.');
+        (new AzureKeyVault($client, $this->staticToken('T')))->encrypt('app-key', 'hello');
+    }
+
+    #[DataProvider('provideUnusableOperationKeyIds')]
+    public function testGenerateDataKeyFailsWhenAVersionlessRequestGetsNoUsableKeyId(mixed $kid)
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode(['kid' => $kid, 'value' => 'wrapped'])), self::VAULT);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Azure Key Vault did not report the version of the key it used.');
+        (new AzureKeyVault($client, $this->staticToken('T')))->generateDataKey('app-key');
+    }
+
+    #[DataProvider('provideUnusableOperationKeyIds')]
+    public function testEncryptKeepsAPinnedRequestWhenItGetsNoUsableKeyId(mixed $kid)
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode(['kid' => $kid, 'value' => 'ciphertext'])), self::VAULT);
+
+        $ciphertext = (new AzureKeyVault($client, $this->staticToken('T')))->encrypt('app-key/abc123', 'hello');
+
+        $this->assertSame('app-key/abc123', $ciphertext->keyId);
+    }
+
+    #[DataProvider('provideUnusableOperationKeyIds')]
+    public function testGenerateDataKeyKeepsAPinnedRequestWhenItGetsNoUsableKeyId(mixed $kid)
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode(['kid' => $kid, 'value' => 'wrapped'])), self::VAULT);
+
+        $dataKey = (new AzureKeyVault($client, $this->staticToken('T')))->generateDataKey('app-key/abc123');
+
+        $this->assertSame('app-key/abc123', $dataKey->wrapped->keyId);
+    }
+
+    public static function provideMismatchedOperationKeyIds(): iterable
+    {
+        yield 'another key' => [self::VAULT.'keys/other/v1', 'app-key'];
+        yield 'another key, pinned request' => [self::VAULT.'keys/other/v1', 'app-key/v1'];
+        yield 'another version' => [self::VAULT.'keys/app-key/v2', 'app-key/v1'];
+    }
+
+    #[DataProvider('provideMismatchedOperationKeyIds')]
+    public function testEncryptRejectsAKeyIdNamingAnotherKeyOrVersion(string $kid, string $requestedKeyId)
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode(['kid' => $kid, 'value' => 'ciphertext'])), self::VAULT);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Azure Key Vault returned an unexpected key identifier.');
+        (new AzureKeyVault($client, $this->staticToken('T')))->encrypt($requestedKeyId, 'hello');
+    }
+
+    #[DataProvider('provideMismatchedOperationKeyIds')]
+    public function testGenerateDataKeyRejectsAKeyIdNamingAnotherKeyOrVersion(string $kid, string $requestedKeyId)
+    {
+        $client = new MockHttpClient(new MockResponse(json_encode(['kid' => $kid, 'value' => 'wrapped'])), self::VAULT);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Azure Key Vault returned an unexpected key identifier.');
+        (new AzureKeyVault($client, $this->staticToken('T')))->generateDataKey($requestedKeyId);
     }
 
     public function testRejectedCachedTokenIsRefreshedAndRetried()
@@ -67,7 +220,7 @@ class AzureKeyVaultTest extends TestCase
 
             return 2 === \count($kmsHeaders)
                 ? new MockResponse(json_encode(['error' => ['message' => 'expired token']]), ['http_code' => 401])
-                : new MockResponse(json_encode(['value' => 'ciphertext']));
+                : new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/v1', 'value' => 'ciphertext']));
         }, self::VAULT);
 
         $kms = new AzureKeyVault($client, new ClientCredentialsTokenProvider($client, 'tenant', 'client', 'secret'));
@@ -117,7 +270,7 @@ class AzureKeyVaultTest extends TestCase
         $client = $this->mockClient([
             new MockResponse(json_encode(['error' => ['message' => 'expired']]), ['http_code' => 401]),
             new MockResponse(json_encode(['error' => ['message' => 'replacement rejected']]), ['http_code' => 401]),
-            new MockResponse(json_encode(['value' => 'ciphertext'])),
+            new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/v1', 'value' => 'ciphertext'])),
         ], ['T1', 'T2', 'T3'], $tokenRequests, $kmsRequests);
         $kms = new AzureKeyVault($client, new ClientCredentialsTokenProvider($client, 'tenant', 'client', 'secret'));
 
@@ -182,7 +335,7 @@ class AzureKeyVaultTest extends TestCase
         $kmsRequests = [];
         $client = $this->mockClient([
             new MockResponse(json_encode(['error' => ['message' => 'request denied']]), ['http_code' => $status]),
-            new MockResponse(json_encode(['value' => 'ciphertext'])),
+            new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/v1', 'value' => 'ciphertext'])),
         ], ['T1'], $tokenRequests, $kmsRequests);
         $kms = new AzureKeyVault($client, new ClientCredentialsTokenProvider($client, 'tenant', 'client', 'secret'));
 
@@ -207,7 +360,7 @@ class AzureKeyVaultTest extends TestCase
         $kmsRequests = [];
         $client = $this->mockClient([
             new MockResponse(json_encode(['error' => ['message' => 'expired']]), ['http_code' => 401]),
-            new MockResponse(json_encode(['value' => 'ciphertext'])),
+            new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/v1', 'value' => 'ciphertext'])),
         ], ['T1', 'T1', 'T2'], $tokenRequests, $kmsRequests);
         $kms = new AzureKeyVault($client, new ClientCredentialsTokenProvider($client, 'tenant', 'client', 'secret'));
 
@@ -233,7 +386,7 @@ class AzureKeyVaultTest extends TestCase
         $canceledResponses = 0;
         $client = $this->mockClient([
             new MockResponse(json_encode(['error' => ['message' => 'expired']]), ['http_code' => 401]),
-            new MockResponse(json_encode(['value' => 'wrapped'])),
+            new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/v1', 'value' => 'wrapped'])),
         ], ['T1', 'T2'], $tokenRequests, $kmsRequests)->withOptions(['on_progress' => static function (int $downloaded, int $downloadSize, array $info) use (&$canceledResponses): void {
             if ($info['canceled'] ?? false) {
                 ++$canceledResponses;
@@ -422,11 +575,12 @@ class AzureKeyVaultTest extends TestCase
         $client = new MockHttpClient(static function (string $method, string $url) use (&$captured): MockResponse {
             $captured = $url;
 
-            return new MockResponse(json_encode(['value' => 'ct']));
+            return new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/abc123', 'value' => 'ct']));
         }, self::VAULT);
 
-        (new AzureKeyVault($client, $this->staticToken('T')))->encrypt('app-key/abc123', 'hello');
+        $ciphertext = (new AzureKeyVault($client, $this->staticToken('T')))->encrypt('app-key/abc123', 'hello');
 
+        $this->assertSame('app-key/abc123', $ciphertext->keyId);
         $this->assertSame(self::VAULT.'keys/app-key/abc123/encrypt?api-version=7.4', $captured);
     }
 
@@ -480,6 +634,7 @@ class AzureKeyVaultTest extends TestCase
             $captured = json_decode($options['body'], true);
 
             return new MockResponse(json_encode([
+                'kid' => self::VAULT.'keys/app-key/v1',
                 'value' => 'CTVAL',
                 'iv' => 'IV',
                 'tag' => 'TAG',
@@ -489,6 +644,7 @@ class AzureKeyVaultTest extends TestCase
         $kms = new AzureKeyVault($client, $this->staticToken('T'), 'A256GCM', 'A256GCM');
         $ciphertext = $kms->encrypt('app-key', 'hello', 'tenant=acme');
 
+        $this->assertSame('app-key/v1', $ciphertext->keyId);
         $this->assertSame('A256GCM.IV.TAG.CTVAL', $ciphertext->blob);
         $this->assertSame(Base64UrlSafe::encode('tenant=acme'), $captured['aad']);
     }
@@ -649,7 +805,7 @@ class AzureKeyVaultTest extends TestCase
         $client = new MockHttpClient(static function ($method, $url, $options) use (&$captured): MockResponse {
             $captured = [$url, json_decode($options['body'], true)];
 
-            return new MockResponse(json_encode(['value' => 'WrappedDek']));
+            return new MockResponse(json_encode(['kid' => self::VAULT.'keys/app-key/v1', 'value' => 'WrappedDek']));
         }, self::VAULT);
 
         $dataKey = (new AzureKeyVault($client, $this->staticToken('T')))->generateDataKey('app-key', 32);
@@ -657,8 +813,50 @@ class AzureKeyVaultTest extends TestCase
         [$url, $body] = $captured;
         $this->assertSame(self::VAULT.'keys/app-key/wrapkey?api-version=7.4', $url);
         $this->assertSame('RSA-OAEP-256', $body['alg']);
-        $this->assertSame('app-key', $dataKey->wrapped->keyId);
+        $this->assertSame('app-key/v1', $dataKey->wrapped->keyId);
         $this->assertSame('WrappedDek', $dataKey->wrapped->blob);
+    }
+
+    public function testAeadDataKeyWrapPinsTheVersionAndUnwrapsAfterRotation()
+    {
+        $version = 'v1';
+        $requests = [];
+        $wrapped = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$version, &$requests, &$wrapped): MockResponse {
+            $body = json_decode($options['body'], true);
+            $requests[] = [$url, $body];
+            $addressed = self::addressedVersion($url, $version);
+
+            if (str_contains($url, '/wrapkey?')) {
+                $wrapped[$addressed] = $body['value'];
+
+                return new MockResponse(json_encode([
+                    'kid' => self::VAULT.'keys/app-key/'.$addressed,
+                    'value' => 'CTVAL',
+                    'iv' => 'IV',
+                    'tag' => 'TAG',
+                ]));
+            }
+
+            if (!isset($wrapped[$addressed])) {
+                return new MockResponse(json_encode(['error' => ['message' => 'the wrapped key was produced by another key version']]), ['http_code' => 400]);
+            }
+
+            return new MockResponse(json_encode(['value' => $wrapped[$addressed]]));
+        }, self::VAULT);
+
+        $kms = new AzureKeyVault($client, $this->staticToken('T'), 'RSA-OAEP-256', 'A256GCM');
+        $dataKey = $kms->generateDataKey('app-key', 32, 'tenant=acme');
+        $version = 'v2';
+        $unwrapped = $kms->unwrapDataKey($dataKey->wrapped, 'tenant=acme');
+
+        $this->assertSame('A256GCM.IV.TAG.CTVAL', $dataKey->wrapped->blob);
+        $this->assertSame($dataKey->use(static fn (string $key): string => $key), $unwrapped->use(static fn (string $key): string => $key));
+        $this->assertSame(self::VAULT.'keys/app-key/wrapkey?api-version=7.4', $requests[0][0]);
+        $this->assertSame(self::VAULT.'keys/app-key/v1/unwrapkey?api-version=7.4', $requests[1][0]);
+        $this->assertSame('A256GCM', $requests[0][1]['alg']);
+        $this->assertSame(Base64UrlSafe::encode('tenant=acme'), $requests[0][1]['aad']);
+        $this->assertSame(['alg' => 'A256GCM', 'iv' => 'IV', 'tag' => 'TAG', 'value' => 'CTVAL', 'aad' => Base64UrlSafe::encode('tenant=acme')], $requests[1][1]);
     }
 
     public function testGenerateDataKeyRejectsTooShortLengths()
@@ -787,5 +985,12 @@ class AzureKeyVaultTest extends TestCase
             {
             }
         };
+    }
+
+    private static function addressedVersion(string $url, string $latestVersion): string
+    {
+        $segments = explode('/', parse_url($url, \PHP_URL_PATH));
+
+        return 5 === \count($segments) ? $segments[3] : $latestVersion;
     }
 }

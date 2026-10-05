@@ -17,7 +17,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * Acquires Azure AD bearer tokens for the Azure Key Vault audience.
+ * Acquires Azure AD bearer tokens for a configured Key Vault or Managed HSM audience.
  *
  * It uses the OAuth2 `client_credentials` grant: tenant id + client id +
  * client secret.

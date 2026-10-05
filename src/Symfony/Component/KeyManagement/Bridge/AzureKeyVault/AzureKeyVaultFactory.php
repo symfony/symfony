@@ -25,12 +25,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  *     azure-keyvault://<clientId>:<clientSecret>@<vault-name>.vault.azure.net?tenant=<tenantId>[&algorithm=...&wrap_algorithm=...&api_version=...&audience=...]
  *
- * The host is the full vault DNS name (`<name>.vault.azure.net`,
- * `<name>.managedhsm.azure.net` for Managed HSM, or the equivalent in a
- * sovereign cloud). The audience for token acquisition is inferred from the
- * host suffix and falls back to the standard `https://vault.azure.net/.default`
- * scope; pass `audience` explicitly to target a sovereign cloud (US gov,
- * China, ...) or to override the heuristic.
+ * The host is the full vault DNS name (`<name>.vault.azure.net`, or `<name>.managedhsm.azure.net` for Managed HSM).
+ * The audience comes from the host suffix and the `audience` option overrides it, but the authority is always the public Microsoft Entra one:
+ * a sovereign cloud needs another, so wire {@see AzureKeyVault} manually there with a suitable token provider.
  *
  * Users that need Managed Identity, Workload Identity, or any other Azure AD
  * flow should wire {@see AzureKeyVault} manually with a custom

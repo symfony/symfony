@@ -16,7 +16,7 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
 /**
  * Returns a bearer token usable against the Azure Key Vault REST API.
  *
- * The audience is `https://vault.azure.net`.
+ * The audience depends on the Azure cloud and on whether the endpoint is a vault or Managed HSM.
  *
  * Implementations are expected to cache the token until it expires or is invalidated, and to refresh it transparently.
  * {@see ClientCredentialsTokenProvider} ships the common server-to-server case (tenant + clientId + clientSecret).

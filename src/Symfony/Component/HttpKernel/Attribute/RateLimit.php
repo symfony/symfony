@@ -20,6 +20,11 @@ use Symfony\Component\ExpressionLanguage\Expression;
  * rejecting, out of those with $exposeHeaders enabled. A rejecting limiter always wins; when it
  * does not expose its state, the response carries no `X-RateLimit-*` headers at all.
  *
+ * Tokens are consumed once the controller arguments are resolved. With $beforeArguments, they are
+ * consumed as soon as the controller is known instead, so that a rejected request never pays for
+ * resolving its arguments, e.g. the database queries that mapping an entity performs. The $key is
+ * then evaluated without any controller argument available.
+ *
  * @see https://symfony.com/doc/current/rate_limiter.html
  *
  * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
@@ -31,11 +36,12 @@ final class RateLimit
     public readonly array $methods;
 
     /**
-     * @param string                          $limiter       The configured limiter name
-     * @param string|Expression|\Closure|null $key           A literal string key, an Expression, or a Closure (defaults to client IP + method + path)
-     * @param int                             $tokens        The number of tokens to consume
-     * @param string[]|string                 $methods       HTTP methods to rate limit; empty means all methods
-     * @param bool                            $exposeHeaders Whether this limiter's state may be exposed via the `X-RateLimit-*` response headers, opt-in
+     * @param string                          $limiter         The configured limiter name
+     * @param string|Expression|\Closure|null $key             A literal string key, an Expression, or a Closure (defaults to client IP + method + path)
+     * @param int                             $tokens          The number of tokens to consume
+     * @param string[]|string                 $methods         HTTP methods to rate limit; empty means all methods
+     * @param bool                            $exposeHeaders   Whether this limiter's state may be exposed via the `X-RateLimit-*` response headers, opt-in
+     * @param bool                            $beforeArguments Whether to consume tokens before the controller arguments are resolved, so that a rejected request never pays for resolving them
      */
     public function __construct(
         public readonly string $limiter,
@@ -43,6 +49,7 @@ final class RateLimit
         public readonly int $tokens = 1,
         array|string $methods = [],
         public readonly bool $exposeHeaders = false,
+        public readonly bool $beforeArguments = false,
     ) {
         if ($this->tokens < 1) {
             throw new \InvalidArgumentException(\sprintf('The "$tokens" argument of "%s" must be greater than 0, "%d" given.', self::class, $this->tokens));

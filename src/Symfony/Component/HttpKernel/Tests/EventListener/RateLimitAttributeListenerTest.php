@@ -21,9 +21,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
@@ -93,6 +95,16 @@ class RateLimitAttributeListenerTest extends TestCase
             $this->createStub(HttpKernelInterface::class),
             static fn () => null,
             [],
+            $request,
+            null,
+        ), $el);
+    }
+
+    private function makeControllerEvent(RateLimit $attribute, Request $request, ?ExpressionLanguage $el = null): ControllerAttributeEvent
+    {
+        return new ControllerAttributeEvent($attribute, new ControllerEvent(
+            $this->createStub(HttpKernelInterface::class),
+            static fn () => null,
             $request,
             null,
         ), $el);
@@ -388,6 +400,7 @@ class RateLimitAttributeListenerTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new ControllerAttributesListener([
+            KernelEvents::CONTROLLER => [RateLimit::class => true],
             KernelEvents::CONTROLLER_ARGUMENTS => [RateLimit::class => true],
         ]));
         $dispatcher->addSubscriber(new RateLimitAttributeListener($locator));
@@ -759,6 +772,110 @@ class RateLimitAttributeListenerTest extends TestCase
         $listener = new RateLimitAttributeListener($locator);
         $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api', methods: ['POST']), Request::create('/', 'GET')));
     }
+
+    public function testBeforeArgumentsConsumesOnTheControllerEvent()
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+
+        $listener->onKernelControllerAttribute($this->makeControllerEvent(
+            new RateLimit('api', beforeArguments: true),
+            Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']),
+        ));
+
+        $this->assertSame('1.2.3.4~GET~/', $usedKey);
+    }
+
+    private function makeListenerThatMustNotConsume(): RateLimitAttributeListener
+    {
+        $factory = $this->createMock(RateLimiterFactoryInterface::class);
+        $factory->expects($this->never())->method('create');
+
+        $locator = $this->createStub(ServiceProviderInterface::class);
+        $locator->method('has')->willReturn(true);
+        $locator->method('get')->willReturn($factory);
+        $locator->method('getProvidedServices')->willReturn(['api' => RateLimiterFactoryInterface::class]);
+
+        return new RateLimitAttributeListener($locator);
+    }
+
+    public function testBeforeArgumentsSkipsTheControllerArgumentsEvent()
+    {
+        $this->makeListenerThatMustNotConsume()->onKernelControllerAttribute(
+            $this->makeEvent(new RateLimit('api', beforeArguments: true), Request::create('/')),
+        );
+    }
+
+    public function testWithoutBeforeArgumentsTheControllerEventIsSkipped()
+    {
+        $this->makeListenerThatMustNotConsume()->onKernelControllerAttribute(
+            $this->makeControllerEvent(new RateLimit('api'), Request::create('/')),
+        );
+    }
+
+    public function testBeforeArgumentsEvaluatesTheKeyWithoutAnyArgument()
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+
+        $listener->onKernelControllerAttribute($this->makeControllerEvent(
+            new RateLimit('api', key: static fn (array $args, Request $request) => $request->getClientIp().'~'.\count($args), beforeArguments: true),
+            Request::create('/', server: ['REMOTE_ADDR' => '5.6.7.8']),
+        ));
+
+        $this->assertSame('5.6.7.8~0', $usedKey);
+    }
+
+    private function makeRealKernelRejecting(ArgumentResolverInterface $argumentResolver): HttpKernel
+    {
+        $limiter = $this->createStub(LimiterInterface::class);
+        $limiter->method('consume')->willReturn(new RateLimitResult(0, new \DateTimeImmutable('+1 minute'), false, 5, new \DateTimeImmutable('+1 minute')));
+
+        $factory = $this->createStub(RateLimiterFactoryInterface::class);
+        $factory->method('create')->willReturn($limiter);
+
+        $locator = $this->createStub(ServiceProviderInterface::class);
+        $locator->method('has')->willReturn(true);
+        $locator->method('get')->willReturn($factory);
+        $locator->method('getProvidedServices')->willReturn(['api' => RateLimiterFactoryInterface::class]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ControllerAttributesListener([
+            KernelEvents::CONTROLLER => [RateLimit::class => true],
+            KernelEvents::CONTROLLER_ARGUMENTS => [RateLimit::class => true],
+        ]));
+        $dispatcher->addSubscriber(new RateLimitAttributeListener($locator));
+
+        return new HttpKernel($dispatcher, new ControllerResolver(), null, $argumentResolver);
+    }
+
+    public function testBeforeArgumentsRejectsBeforeTheArgumentsAreResolved()
+    {
+        $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
+        $argumentResolver->expects($this->never())->method('getArguments');
+
+        $this->expectException(TooManyRequestsHttpException::class);
+
+        $this->handleThrough($this->makeRealKernelRejecting($argumentResolver), new EarlyRateLimitedController());
+    }
+
+    public function testWithoutBeforeArgumentsTheArgumentsAreResolvedBeforeTheRejection()
+    {
+        $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
+        $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);
+
+        $this->expectException(TooManyRequestsHttpException::class);
+
+        $this->handleThrough($this->makeRealKernelRejecting($argumentResolver), new RateLimitedController());
+    }
+
+    public function testBeforeArgumentsStillExposesTheHeadersThroughARealKernel()
+    {
+        $kernel = $this->makeRealKernel(['policy' => 'fixed_window', 'limit' => 5, 'interval' => '1 minute']);
+        $response = $this->handleThrough($kernel, new EarlyRateLimitedController());
+
+        $this->assertSame('ok', $response->getContent());
+        $this->assertSame('5', $response->headers->get('X-RateLimit-Limit'));
+        $this->assertSame('4', $response->headers->get('X-RateLimit-Remaining'));
+    }
 }
 
 class RateLimitedController
@@ -839,6 +956,15 @@ class StackedTokenCostController
 {
     #[RateLimit('cheap', key: 'k', exposeHeaders: true)]
     #[RateLimit('pricey', key: 'k', tokens: 10, exposeHeaders: true)]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+class EarlyRateLimitedController
+{
+    #[RateLimit('api', exposeHeaders: true, beforeArguments: true)]
     public function __invoke(): Response
     {
         return new Response('ok');

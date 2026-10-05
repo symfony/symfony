@@ -24,6 +24,7 @@ CHANGELOG
  * Instantiate on demand the bundles that have nothing to do when the kernel boots
  * Add `PaymentRequiredHttpException`, `RequestTimeoutHttpException`, `ContentTooLargeHttpException`, `RangeNotSatisfiableHttpException`, `ExpectationFailedHttpException`, `FailedDependencyHttpException`, `TooEarlyHttpException`, `UnavailableForLegalReasonsHttpException` and `NotImplementedHttpException`
  * Make `HttpClientKernel` forward the responses that carry the RFC 10036 `Incremental: ?1` header without buffering them
+ * Add the `$beforeArguments` argument to `#[RateLimit]` to reject a request before its controller arguments are resolved
 
 8.1
 ---

@@ -24,6 +24,7 @@ class EventStreamResponseTest extends TestCase
         $this->assertSame('text/event-stream', $response->headers->get('content-type'));
         $this->assertSame('max-age=0, must-revalidate, no-cache, no-store, private', $response->headers->get('cache-control'));
         $this->assertSame('keep-alive', $response->headers->get('connection'));
+        $this->assertSame('?1', $response->headers->get('incremental'));
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertNull($response->getRetry());

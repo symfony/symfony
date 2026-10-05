@@ -144,7 +144,6 @@ class ProcessTest extends TestCase
         $this->assertLessThan(15, microtime(true) - $start);
     }
 
-    #[Group('transient-on-windows')]
     public function testWaitUntilSpecificOutput()
     {
         $p = $this->getProcess([self::$phpBin, __DIR__.'/KillableProcessWithOutput.php']);
@@ -167,6 +166,93 @@ class ProcessTest extends TestCase
         $p = $this->getProcess('echo foo');
         $p->start();
         $this->assertFalse($p->waitUntil(static fn () => false));
+    }
+
+    public function testWaitUntilSeesOutputWrittenBeforeItIsCalled()
+    {
+        $marker = tempnam(sys_get_temp_dir(), 'sf_process_');
+        unlink($marker);
+
+        $p = $this->getProcessForCode('echo "ready"; touch(getenv("MARKER")); sleep(1);', null, ['MARKER' => $marker]);
+        $p->start();
+
+        $limit = microtime(true) + 30;
+        while (!is_file($marker) && microtime(true) < $limit) {
+            usleep(10000);
+        }
+        $this->assertFileExists($marker);
+        unlink($marker);
+
+        $this->assertTrue($p->waitUntil(static fn (string $type, string $output): bool => str_contains($output, 'ready')));
+
+        $p->stop();
+    }
+
+    public function testWaitUntilSeesOutputWrittenWhileItsCallbackRuns()
+    {
+        $p = $this->getProcessForCode('echo "first"; usleep(500000); echo "second"; sleep(1);');
+        $p->start();
+
+        $this->assertTrue($p->waitUntil(static function (string $type, string $output): bool {
+            if (str_contains($output, 'first')) {
+                usleep(1000000);
+            }
+
+            return str_contains($output, 'second');
+        }));
+
+        $p->stop();
+    }
+
+    public function testWaitUntilCallbackIsNotCalledAnymoreAfterItThrew()
+    {
+        $marker = tempnam(sys_get_temp_dir(), 'sf_process_');
+        unlink($marker);
+
+        $p = $this->getProcessForCode('echo "foo"; touch(getenv("MARKER")); usleep(500000); echo "bar";', null, ['MARKER' => $marker]);
+        $p->start();
+
+        $limit = microtime(true) + 30;
+        while (!is_file($marker) && microtime(true) < $limit) {
+            usleep(10000);
+        }
+        $this->assertFileExists($marker);
+        unlink($marker);
+
+        $calls = 0;
+        try {
+            $p->waitUntil(static function () use (&$calls): bool {
+                ++$calls;
+
+                throw new \RuntimeException('Callback failure.');
+            });
+            $this->fail('The exception thrown by the callback should be propagated.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Callback failure.', $e->getMessage());
+        }
+
+        $p->wait();
+
+        $this->assertSame(1, $calls);
+        $this->assertSame('foobar', $p->getOutput());
+    }
+
+    public function testIteratorEndsAfterWaitUntilTimedOut()
+    {
+        $p = $this->getProcessForCode('sleep(5);');
+        $p->setTimeout(0.5);
+        $p->start();
+
+        try {
+            $p->waitUntil(static fn (): bool => false);
+            $this->fail('A ProcessTimedOutException should have been thrown.');
+        } catch (ProcessTimedOutException) {
+        }
+
+        $iterations = 0;
+        foreach ($p->getIterator($p::ITER_NON_BLOCKING) as $data) {
+            $this->assertLessThan(10, ++$iterations, 'The iterator should end once the process is terminated.');
+        }
     }
 
     public function testAllOutputIsActuallyReadOnTermination()

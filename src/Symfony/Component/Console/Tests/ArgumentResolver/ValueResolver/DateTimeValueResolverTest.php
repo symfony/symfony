@@ -319,6 +319,47 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertEquals('2016-09-08 00:00:00', $results[0]->format('Y-m-d H:i:s'));
     }
 
+    public function testVariadic()
+    {
+        date_default_timezone_set('UTC');
+        $resolver = new DateTimeValueResolver();
+
+        $input = new ArrayInput(['dates' => ['2016-09-08', '2016-09-09']], new InputDefinition([
+            new InputArgument('dates', InputArgument::IS_ARRAY),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                \DateTimeImmutable ...$dates,
+            ) {
+            }
+        };
+        $member = new ReflectionMember((new \ReflectionMethod($command, '__invoke'))->getParameters()[0]);
+
+        $results = $resolver->resolve('dates', $input, $member);
+
+        $this->assertSame(['2016-09-08', '2016-09-09'], array_map(static fn (\DateTimeImmutable $date) => $date->format('Y-m-d'), $results));
+    }
+
+    public function testEmptyVariadic()
+    {
+        $resolver = new DateTimeValueResolver();
+
+        $input = new ArrayInput([], new InputDefinition([
+            new InputArgument('dates', InputArgument::IS_ARRAY),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                \DateTimeImmutable ...$dates,
+            ) {
+            }
+        };
+        $member = new ReflectionMember((new \ReflectionMethod($command, '__invoke'))->getParameters()[0]);
+
+        $this->assertSame([], $resolver->resolve('dates', $input, $member));
+    }
+
     public static function provideInvalidDates()
     {
         return [

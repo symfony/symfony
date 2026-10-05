@@ -190,6 +190,16 @@ class EncryptedTypeTest extends TestCase
         $type->convertToPHPValue($asStream ? self::asStream('') : '', $this->platform);
     }
 
+    public function testAColumnInAnUnknownFormatIsRejectedLikeAMalformedOne()
+    {
+        $type = $this->makeType(new StringType());
+        $written = $type->convertToDatabaseValue('hello@example.com', $this->platform);
+
+        $this->expectException(ValueNotConvertible::class);
+        $this->expectExceptionMessage('not a valid KeyManagement envelope');
+        $type->convertToPHPValue(\chr(0x2A).substr((string) $written, 1), $this->platform);
+    }
+
     public function testAnEmptyPlaintextRoundTripsThroughAnEnvelope()
     {
         $type = $this->makeType(new StringType());
@@ -215,7 +225,7 @@ class EncryptedTypeTest extends TestCase
 
         $this->expectException(ValueNotConvertible::class);
         $this->expectExceptionMessage('not a valid KeyManagement envelope');
-        $type->convertToPHPValue('not-an-envelope', $this->platform);
+        $type->convertToPHPValue("\x01\xff\xff", $this->platform);
     }
 
     public function testTheColumnValueDoesNotReachStackTraces()

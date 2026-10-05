@@ -15,12 +15,14 @@ use Doctrine\Persistence\Proxy;
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -244,6 +246,37 @@ class ContextListenerTest extends TestCase
 
         $listener = new ContextListener($tokenStorage, [], 'key123');
         $listener(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+    }
+
+    /**
+     * @dataProvider provideSessionValuesHoldingSecrets
+     */
+    public function testInvalidTokenInSessionIsNotCopiedIntoTheLogs(string $sessionValue)
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $session->method('getName')->willReturn('SESSIONNAME');
+        $session->method('get')->with('_security_key123')->willReturn($sessionValue);
+        $request = new Request([], [], [], ['SESSIONNAME' => true]);
+        $request->setSession($session);
+
+        $logged = [];
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->method('warning')->willReturnCallback(static function (string $message, array $context) use (&$logged) {
+            unset($context['exception']);
+            $logged[] = $context;
+        });
+
+        $listener = new ContextListener(new TokenStorage(), [], 'key123', $logger);
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertCount(1, $logged);
+        $this->assertStringNotContainsString('$2y$13$hash', json_encode($logged));
+    }
+
+    public static function provideSessionValuesHoldingSecrets()
+    {
+        yield 'not unserializable' => ['O:8:"NotFound":1:{s:8:"password";s:11:"$2y$13$hash";}'];
+        yield 'not a token' => [serialize(['password' => '$2y$13$hash'])];
     }
 
     public static function provideInvalidToken()

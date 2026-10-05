@@ -139,7 +139,7 @@ class ContextListener extends AbstractListener
                 $this->dispatcher?->dispatch(new TokenDeauthenticatedEvent($originalToken, $request));
             }
         } elseif (null !== $token) {
-            $this->logger?->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);
+            $this->logger?->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => get_debug_type($token)]);
 
             $token = null;
         }
@@ -293,7 +293,7 @@ class ContextListener extends AbstractListener
             if (0x37313BC !== $e->getCode()) {
                 throw $e;
             }
-            $this->logger?->warning('Failed to unserialize the security token from the session.', ['key' => $this->sessionKey, 'received' => $serializedToken, 'exception' => $e]);
+            $this->logger?->warning('Failed to unserialize the security token from the session.', ['key' => $this->sessionKey, 'exception' => $e]);
         } finally {
             restore_error_handler();
             ini_set('unserialize_callback_func', $prevUnserializeHandler);

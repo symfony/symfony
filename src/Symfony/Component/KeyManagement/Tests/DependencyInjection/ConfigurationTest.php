@@ -266,7 +266,14 @@ class ConfigurationTest extends TestCase
     {
         $config = $this->process(['doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone']]]]);
 
-        $this->assertSame(['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone']]], $config['doctrine_dbal']);
+        $this->assertSame(['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone', 'context' => true]]], $config['doctrine_dbal']);
+    }
+
+    public function testADoctrineDbalTypeMayAuthenticateNoContext()
+    {
+        $config = $this->process(['doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone', 'context' => false]]]]);
+
+        $this->assertFalse($config['doctrine_dbal']['types']['encrypted_phone']['context']);
     }
 
     public function testADoctrineDbalTypeNeedsAKey()

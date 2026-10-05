@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
  * Envelope encryption over a {@see DataKeyStoreInterface}, in {@see StoredFormat}.
@@ -79,9 +80,10 @@ final class StoredEnvelopeEncrypter implements EnvelopeEncrypterInterface, Envel
     }
 
     /**
-     * @throws LogicException            If the envelope carries its own data key and no fallback decrypter was given
-     * @throws DataKeyNotFoundException  If the store no longer holds the data key the envelope refers to
-     * @throws DecryptionFailedException If the payload is invalid, tampered, or `$aad` does not match
+     * @throws LogicException                If the envelope carries its own data key and no fallback decrypter was given
+     * @throws DataKeyNotFoundException      If the store no longer holds the data key the envelope refers to
+     * @throws DecryptionFailedException     If the payload is invalid, tampered, or `$aad` does not match
+     * @throws UnsupportedOperationException If `$aad` is non-empty and the fallback decrypter cannot enforce it
      */
     public function decrypt(Envelope $envelope, string $aad = ''): string
     {

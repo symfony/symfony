@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
  * Decrypts an {@see Envelope} produced by an {@see EnvelopeEncrypterInterface}.
@@ -39,9 +40,10 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
 interface EnvelopeDecrypterInterface
 {
     /**
-     * @throws DecryptionFailedException If the envelope is invalid, tampered, names an unknown key, or `$aad` does not match
-     * @throws DataKeyNotFoundException  If the envelope refers to a stored data key that the store no longer holds
-     * @throws LogicException            If the envelope is in a format this decrypter has no means to resolve
+     * @throws DecryptionFailedException     If the envelope is invalid, tampered, names an unknown key, or `$aad` does not match
+     * @throws DataKeyNotFoundException      If the envelope refers to a stored data key that the store no longer holds
+     * @throws LogicException                If the envelope is in a format this decrypter has no means to resolve
+     * @throws UnsupportedOperationException If `$aad` is non-empty and a backend cannot enforce it
      */
     public function decrypt(Envelope $envelope, string $aad = ''): string;
 }

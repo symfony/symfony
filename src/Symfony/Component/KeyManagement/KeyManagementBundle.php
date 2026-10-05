@@ -237,6 +237,10 @@ class KeyManagementBundle extends AbstractBundle
                                         ->isRequired()
                                         ->cannotBeEmpty()
                                     ->end()
+                                    ->booleanNode('context')
+                                        ->info('Whether the name of the type is authenticated with every value. Set it to false when "store" is not configured and the KMS does not support authenticated data.')
+                                        ->defaultTrue()
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -471,7 +475,7 @@ class KeyManagementBundle extends AbstractBundle
      * With the Doctrine ORM bridge, they are registered even when none is configured.
      * RegisterEncryptedColumnsPass then adds the types of the columns marked with #[Encrypted], and removes the service when there is none.
      *
-     * @param array<string, array{type: string, key: string}> $types
+     * @param array<string, array{type: string, key: string, context: bool}> $types
      */
     private function registerDoctrineDbalTypes(array $types, ?string $encrypter, ContainerBuilder $container): void
     {

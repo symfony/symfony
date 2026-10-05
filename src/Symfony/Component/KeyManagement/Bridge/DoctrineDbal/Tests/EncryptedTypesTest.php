@@ -20,6 +20,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
@@ -84,6 +85,41 @@ class EncryptedTypesTest extends TestCase
 
         $this->assertNotSame($first, self::type($name));
         $this->assertSame('x', self::type($name)->convertToPHPValue(self::type($name)->convertToDatabaseValue('x', new SQLitePlatform()), new SQLitePlatform()));
+    }
+
+    public function testTypesSharingAKeyRefuseEachOtherSValues()
+    {
+        $notes = self::uniqueName();
+        $roles = self::uniqueName();
+
+        (new EncryptedTypes($this->envelopes, [
+            $notes => ['type' => 'string', 'key' => 'app'],
+            $roles => ['type' => 'string', 'key' => 'app'],
+        ]))->register();
+
+        $written = self::type($notes)->convertToDatabaseValue('a note', new SQLitePlatform());
+
+        $this->expectException(DecryptionFailedException::class);
+        self::type($roles)->convertToPHPValue($written, new SQLitePlatform());
+    }
+
+    public function testATypeDeclaredWithoutContextAuthenticatesNothing()
+    {
+        $name = self::uniqueName();
+
+        (new EncryptedTypes($this->envelopes, [$name => ['type' => 'string', 'key' => 'app', 'context' => false]]))->register();
+
+        $written = self::type($name)->convertToDatabaseValue('a note', new SQLitePlatform());
+
+        $this->assertSame('a note', $this->envelopes->decrypt(Envelope::fromBytes($written)));
+    }
+
+    public function testAContextThatIsNotABooleanIsReported()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The encrypted type "app_email" must declare its "context" as a boolean.');
+
+        (new EncryptedTypes($this->envelopes, ['app_email' => ['type' => 'string', 'key' => 'app', 'context' => 'no']]))->register();
     }
 
     public function testADeclarationWithoutAKeyIsReported()

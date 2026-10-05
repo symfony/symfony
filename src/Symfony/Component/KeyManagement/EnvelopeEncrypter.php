@@ -13,7 +13,7 @@ namespace Symfony\Component\KeyManagement;
 
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
-use Symfony\Component\KeyManagement\Exception\RuntimeException;
+use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
  * High-level envelope encryption helper.
@@ -65,13 +65,11 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
  * AAD handling: the `$aad` argument is forwarded BOTH to the KMS (binding
  * the wrapped data key) and to the local AEAD (binding the bulk ciphertext),
  * which prefixes it with the id of the format it frames.
- * The double binding is defense in depth: the local AEAD always catches
- * AAD mismatches even on backends where the KMS can't enforce them. Note
- * that some backends require a specific key shape for KMS-side AAD: e.g.
- * Vault Transit only accepts a `context` for keys created with
- * `derived=true` and rejects it on plain symmetric keys. Passing a
- * non-empty `$aad` to a non-derived Vault key will surface as a
- * RuntimeException at encrypt time.
+ * The double binding is defense in depth. The local AEAD catches an AAD mismatch, whatever the KMS does with the AAD.
+ * A backend that cannot enforce a non-empty `$aad` refuses it with an {@see UnsupportedOperationException}, when encrypting and when decrypting.
+ * Among the shipped backends, the sealed box always refuses it.
+ * Azure Key Vault refuses it under any algorithm other than `A128GCM`, `A192GCM` or `A256GCM`.
+ * Vault Transit refuses it for a key not created with `derived=true`, because Vault silently ignores the context on such a key.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -105,8 +103,9 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
     }
 
     /**
-     * @throws LogicException            If the envelope refers to a stored data key, which this encrypter has no store to resolve
-     * @throws DecryptionFailedException If the payload is invalid, tampered, or `$aad` does not match
+     * @throws LogicException                If the envelope refers to a stored data key, which this encrypter has no store to resolve
+     * @throws DecryptionFailedException     If the payload is invalid, tampered, or `$aad` does not match
+     * @throws UnsupportedOperationException If `$aad` is non-empty and the backend cannot enforce it
      */
     public function decrypt(Envelope $envelope, string $aad = ''): string
     {

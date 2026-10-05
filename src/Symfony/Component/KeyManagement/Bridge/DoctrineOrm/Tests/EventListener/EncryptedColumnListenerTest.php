@@ -58,7 +58,7 @@ class EncryptedColumnListenerTest extends TestCase
         $envelopes = new EnvelopeEncrypter(new InMemoryKms());
         foreach (self::TYPES as $key => $types) {
             foreach ($types as $type => $name) {
-                $encryptedType = new EncryptedType($registry->get($type), $envelopes, $key);
+                $encryptedType = new EncryptedType($registry->get($type), $envelopes, $key, $name);
                 $registry->has($name) ? $registry->override($name, $encryptedType) : $registry->register($name, $encryptedType);
             }
         }

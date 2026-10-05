@@ -19,6 +19,7 @@ use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
+use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
  * Doctrine DBAL Type that decorates another Type with column-level envelope encryption.
@@ -53,6 +54,14 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * once per data key and per process, and that key can later be rewrapped under
  * another provider without rewriting a single row.
  *
+ * The name this type is registered under is authenticated as the AAD of both paths, so
+ * that two types sharing a key refuse each other's values. The key itself is deliberately
+ * left out of that AAD, where it would make moving a column to another key or scope a
+ * rewrite of every value instead of a change of configuration. Row identity is out of
+ * reach either way: a DBAL type never sees which row it is converting. A `null` name
+ * turns it off for a backend that refuses authenticated data, which the self-contained
+ * encrypter hands to the KMS as well as to the local cipher.
+ *
  * Needs the `Type` constructor that DBAL 4.3 unsealed, so that a subclass may
  * declare its own parameters.
  *
@@ -67,6 +76,7 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  *         Type::getTypeRegistry()->get('string'),
  *         $container->get(EnvelopeEncrypterInterface::class),
  *         'alias/app-key',
+ *         'app_user_email',
  *     );
  *     Type::getTypeRegistry()->register('app_user_email', $type);
  *
@@ -83,11 +93,29 @@ class EncryptedType extends Type
 {
     use BinaryColumn;
 
+    /**
+     * Tells this context from anything else authenticated under the same key.
+     */
+    private const string CONTEXT_LABEL = 'symfony/key-management/doctrine-dbal/encrypted-type/v1';
+
+    private readonly string $context;
+
+    /**
+     * @param string|null $name What tells this type from another one sharing its key, usually the name it is registered under, authenticated with every value; `null` authenticates nothing
+     *
+     * @throws InvalidArgumentException If the name is longer than its two-byte length prefix can tell
+     */
     public function __construct(
         private readonly Type $parentType,
         private readonly EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $envelopes,
         private readonly string $key,
+        private readonly ?string $name,
     ) {
+        if (null !== $name && 0xFFFF < $length = \strlen($name)) {
+            throw new InvalidArgumentException(\sprintf('The name of an encrypted type is at most 65535 bytes long, %d given.', $length));
+        }
+
+        $this->context = null !== $name ? self::CONTEXT_LABEL.pack('n', \strlen($name)).$name : '';
     }
 
     public function convertToDatabaseValue(#[\SensitiveParameter] mixed $value, AbstractPlatform $platform): mixed
@@ -107,7 +135,11 @@ class EncryptedType extends Type
             $plaintext = var_export($plaintext, true);
         }
 
-        return $this->envelopes->encrypt($this->key, self::bytes($plaintext));
+        try {
+            return $this->envelopes->encrypt($this->key, self::bytes($plaintext), $this->context);
+        } catch (UnsupportedOperationException $e) {
+            throw $this->refusedContext($e);
+        }
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
@@ -124,7 +156,13 @@ class EncryptedType extends Type
             throw new ValueNotConvertible('Stored value is not a valid KeyManagement envelope.', 0, $e);
         }
 
-        return $this->parentType->convertToPHPValue($this->envelopes->decrypt($envelope), $platform);
+        try {
+            $plaintext = $this->envelopes->decrypt($envelope, $this->context);
+        } catch (UnsupportedOperationException $e) {
+            throw $this->refusedContext($e);
+        }
+
+        return $this->parentType->convertToPHPValue($plaintext, $platform);
     }
 
     public function getBindingType(): ParameterType
@@ -137,5 +175,14 @@ class EncryptedType extends Type
         unset($column['length']);
 
         return $platform->getBlobTypeDeclarationSQL($column);
+    }
+
+    private function refusedContext(UnsupportedOperationException $e): UnsupportedOperationException
+    {
+        if (null === $this->name) {
+            return $e;
+        }
+
+        return new UnsupportedOperationException(\sprintf('The encrypted type "%s" authenticates its name with every value, which its encrypter refuses: %s Declare it with "context: false", or give it a null name, to authenticate nothing.', $this->name, $e->getMessage()), 0, $e);
     }
 }

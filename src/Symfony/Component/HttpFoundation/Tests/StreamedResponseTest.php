@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StreamedResponseTest extends TestCase
@@ -23,6 +24,15 @@ class StreamedResponseTest extends TestCase
 
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals('text/plain', $response->headers->get('Content-Type'));
+    }
+
+    public function testConstructorWithResponseHeaderBag()
+    {
+        $headers = new ResponseHeaderBag(['Content-Type' => 'text/plain']);
+
+        $response = new StreamedResponse(static function () {}, 200, $headers);
+
+        $this->assertSame($headers, $response->headers);
     }
 
     public function testConstructorWithChunks()

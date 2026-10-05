@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-05T06:43:31Z
+
+Thanks for working on this. I'd rather not add a `class` parameter: `#[Argument] Role ...$roles` is already accepted, like `#[MapQueryParameter] Suit ...$suits` in controllers, but it fails at runtime because `BackedEnumValueResolver` reads the array as one value (8.1 bug). For array members and `#[MapInput]` properties, `@param list<Role> $roles` could be read the way `InputFileType` reads `InputFile[]`. WDYT of reworking the PR this way?
+
+(please also revert the quotes added by the last push: `%s` there is "parameter" or "property", so `The "parameter" "$roles"` reads wrong)
+
+---------------------------------------------------------------------------
+
+by KalimeroMK at 2026-10-05T07:46:25Z
+
+Reworked as suggested: variadic arguments and PHPDoc-narrowed arrays (`@param list<Role>`) instead of a `class` parameter, with the PHPDoc reading shared with `InputFileType` via the new internal `DocBlockTypeResolver`. Quotes are reverted too.
+
+A note on the two red checks: Fabbot fails only on its "exception messages" step, which wants to quote the `%s` placeholders on pre-existing lines of `Option.php`/`Argument.php` — left as is per your review. The PHPStan failure (`TooManyLoginAttemptsAuthenticationException` in Security/Core) is pre-existing on 8.2 and unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-05T08:24:06Z
+
+I finished the PR on top of #66626, which fixed variadics on 8.1, options included: this keeps the PHPDoc part, and `MapInputValueResolver` now asks the enum resolver instead of duplicating its check.

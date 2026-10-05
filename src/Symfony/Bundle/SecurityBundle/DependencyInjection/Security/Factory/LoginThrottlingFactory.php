@@ -98,6 +98,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
         $container
             ->setDefinition('security.listener.login_throttling.'.$firewallName, new ChildDefinition('security.listener.login_throttling'))
             ->replaceArgument(1, new Reference($config['limiter']))
+            ->replaceArgument(2, $config['limiter'])
             ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName]);
 
         return [];

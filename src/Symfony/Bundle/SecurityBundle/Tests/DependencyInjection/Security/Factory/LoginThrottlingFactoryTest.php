@@ -76,7 +76,7 @@ class LoginThrottlingFactoryTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.secret', 's3cr3t');
         $container->setDefinition('limiter', (new Definition(RateLimiterFactory::class))->setAbstract(true)->setArguments([null, null, null]));
-        $container->setDefinition('security.listener.login_throttling', (new Definition(LoginThrottlingListener::class))->setAbstract(true)->setArguments([null, null]));
+        $container->setDefinition('security.listener.login_throttling', (new Definition(LoginThrottlingListener::class))->setAbstract(true)->setArguments([null, null, null]));
         $container->register('cache.rate_limiter');
 
         if ($withLockFactory) {

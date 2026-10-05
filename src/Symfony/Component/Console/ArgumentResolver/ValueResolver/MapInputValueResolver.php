@@ -110,8 +110,8 @@ final class MapInputValueResolver implements ValueResolverInterface
             return iterator_to_array($this->inputFileResolver->resolve($property->name, $input, $member))[0] ?? null;
         }
 
-        if (is_subclass_of($argument->typeName, \BackedEnum::class)) {
-            return iterator_to_array($this->backedEnumResolver->resolve($property->name, $input, new ReflectionMember($property)))[0] ?? null;
+        if ($enums = iterator_to_array($this->backedEnumResolver->resolve($property->name, $input, new ReflectionMember($property)))) {
+            return $enums[0];
         }
 
         if (is_a($argument->typeName, \DateTimeInterface::class, true)) {
@@ -129,8 +129,8 @@ final class MapInputValueResolver implements ValueResolverInterface
             return iterator_to_array($this->inputFileResolver->resolve($property->name, $input, $member))[0] ?? null;
         }
 
-        if (is_subclass_of($option->typeName, \BackedEnum::class)) {
-            return iterator_to_array($this->backedEnumResolver->resolve($property->name, $input, new ReflectionMember($property)))[0] ?? null;
+        if ($enums = iterator_to_array($this->backedEnumResolver->resolve($property->name, $input, new ReflectionMember($property)))) {
+            return $enums[0];
         }
 
         if (is_a($option->typeName, \DateTimeInterface::class, true)) {

@@ -184,6 +184,107 @@ class BackedEnumValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('status', $input, $member));
     }
 
+    public function testResolveBackedEnumListArgument()
+    {
+        $resolver = new BackedEnumValueResolver();
+
+        $input = new ArrayInput(['statuses' => ['pending', 'completed']], new InputDefinition([
+            new InputArgument('statuses', InputArgument::IS_ARRAY),
+        ]));
+
+        $command = new class {
+            /** @param list<BackedEnumTestStatus> $statuses */
+            public function __invoke(
+                #[Argument]
+                array $statuses = [],
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $result = iterator_to_array($resolver->resolve('statuses', $input, $member));
+
+        $this->assertSame([[BackedEnumTestStatus::Pending, BackedEnumTestStatus::Completed]], $result);
+    }
+
+    public function testResolveBackedEnumListOption()
+    {
+        $resolver = new BackedEnumValueResolver();
+
+        $input = new ArrayInput(['--statuses' => ['pending', 'completed']], new InputDefinition([
+            new InputOption('statuses', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY),
+        ]));
+
+        $command = new class {
+            /** @param list<BackedEnumTestStatus> $statuses */
+            public function __invoke(
+                #[Option]
+                array $statuses = [],
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $result = iterator_to_array($resolver->resolve('statuses', $input, $member));
+
+        $this->assertSame([[BackedEnumTestStatus::Pending, BackedEnumTestStatus::Completed]], $result);
+    }
+
+    public function testResolveNullableBackedEnumListOption()
+    {
+        $resolver = new BackedEnumValueResolver();
+
+        $input = new ArrayInput([], new InputDefinition([
+            new InputOption('statuses', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY),
+        ]));
+
+        $command = new class {
+            /** @param list<BackedEnumTestStatus>|null $statuses */
+            public function __invoke(
+                #[Option]
+                ?array $statuses = null,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $result = iterator_to_array($resolver->resolve('statuses', $input, $member));
+
+        $this->assertSame([null], $result);
+    }
+
+    public function testBackedEnumListOptionThrowsOnInvalidValue()
+    {
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage('The value "invalid" is not valid for the "statuses" option. Supported values are "pending", "completed", "failed".');
+
+        $resolver = new BackedEnumValueResolver();
+
+        $input = new ArrayInput(['--statuses' => ['pending', 'invalid']], new InputDefinition([
+            new InputOption('statuses', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY),
+        ]));
+
+        $command = new class {
+            /** @param list<BackedEnumTestStatus> $statuses */
+            public function __invoke(
+                #[Option]
+                array $statuses = [],
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        iterator_to_array($resolver->resolve('statuses', $input, $member));
+    }
+
     public function testDoesNotResolveNonEnumArgument()
     {
         $resolver = new BackedEnumValueResolver();

@@ -125,6 +125,34 @@ class MapInputValueResolverTest extends TestCase
         $this->assertSame(DummyStatus::Active, $result[0]->status);
     }
 
+    public function testResolvesBackedEnumList()
+    {
+        $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver());
+
+        $input = new ArrayInput([
+            '--statuses' => ['active', 'pending'],
+        ], new InputDefinition([
+            new InputOption('statuses', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[MapInput]
+                DummyInputWithEnumList $input,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $result = $resolver->resolve('input', $input, $member);
+
+        $this->assertCount(1, $result);
+        $this->assertInstanceOf(DummyInputWithEnumList::class, $result[0]);
+        $this->assertSame([DummyStatus::Active, DummyStatus::Pending], $result[0]->statuses);
+    }
+
     public function testValidationPassesWithValidInput()
     {
         $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
@@ -275,6 +303,13 @@ class DummyInputWithDateTimeAndEnum
 
     #[Option]
     public DummyStatus $status = DummyStatus::Pending;
+}
+
+class DummyInputWithEnumList
+{
+    /** @var list<DummyStatus> */
+    #[Option]
+    public array $statuses = [];
 }
 
 enum DummyStatus: string

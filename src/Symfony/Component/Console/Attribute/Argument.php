@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Attribute;
 
+use Symfony\Component\Console\Attribute\Reflection\DocBlockTypeResolver;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\Suggestion;
@@ -91,6 +92,10 @@ class Argument
 
         if (is_subclass_of($self->typeName, \BackedEnum::class) && !$self->suggestedValues) {
             $self->suggestedValues = array_column($self->typeName::cases(), 'value');
+        }
+
+        if ('array' === $self->typeName && !$self->suggestedValues && null !== ($itemClass = DocBlockTypeResolver::resolveArrayItemClass($member)) && is_subclass_of($itemClass, \BackedEnum::class)) {
+            $self->suggestedValues = array_column($itemClass::cases(), 'value');
         }
 
         $self->interactiveAttribute = Ask::tryFrom($member, $self->name) ?? AskChoice::tryFrom($member, $self->name);

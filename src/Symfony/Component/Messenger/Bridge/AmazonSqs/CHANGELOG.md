@@ -9,6 +9,7 @@ CHANGELOG
  * Add `AmazonSqsFairQueueStamp` to set a `MessageGroupId` on standard queues, enabling SQS fair queues
  * Add the `ssl` DSN option, superseding `sslmode`
  * Add `AmazonSqsReceivedStamp::getSystemAttributes()` exposing the SQS system attributes of received messages
+ * Make `AmazonSqsSender` and `AmazonSqsTransport` implement `BatchSenderInterface`, sending up to 10 messages per request
 
 7.4
 ---

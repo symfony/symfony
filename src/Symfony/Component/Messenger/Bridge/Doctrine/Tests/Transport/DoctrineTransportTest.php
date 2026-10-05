@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -115,6 +116,20 @@ class DoctrineTransportTest extends TestCase
             ->with('1');
 
         $transport->keepalive($envelope);
+    }
+
+    public function testSendBatch()
+    {
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => '...']);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('sendBatch')->with([['...', [], 0], ['...', [], 0]])->willReturn([1 => '16']);
+
+        $envelopes = $this->getTransport($serializer, $connection)->sendBatch([new Envelope(new DummyMessage('a')), new Envelope(new DummyMessage('b'))]);
+
+        $this->assertNull($envelopes[0]->last(TransportMessageIdStamp::class));
+        $this->assertSame('16', $envelopes[1]->last(TransportMessageIdStamp::class)?->getId());
     }
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): DoctrineTransport

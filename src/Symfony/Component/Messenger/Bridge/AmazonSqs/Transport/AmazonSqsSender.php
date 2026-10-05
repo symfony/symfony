@@ -14,15 +14,16 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 use AsyncAws\Core\Exception\Exception as AsyncAwsException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsSender implements SenderInterface
+class AmazonSqsSender implements BatchSenderInterface
 {
     public function __construct(
         private Connection $connection,
@@ -32,6 +33,39 @@ class AmazonSqsSender implements SenderInterface
     }
 
     public function send(Envelope $envelope): Envelope
+    {
+        $message = $this->getMessage($envelope);
+
+        try {
+            $this->connection->send(...$message);
+        } catch (AsyncAwsException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        return $envelope;
+    }
+
+    public function sendBatch(array $envelopes): array
+    {
+        $messages = array_map($this->getMessage(...), $envelopes);
+
+        try {
+            $exceptions = $this->connection->sendBatch($messages);
+        } catch (AsyncAwsException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if ($exceptions) {
+            throw new BatchSendFailedException(array_diff_key($envelopes, $exceptions), $exceptions);
+        }
+
+        return $envelopes;
+    }
+
+    /**
+     * @return array{string, array, ?int, ?string, ?string, ?string} The arguments of Connection::send()
+     */
+    private function getMessage(Envelope $envelope): array
     {
         $encodedMessage = $this->serializer->encode($envelope);
         $encodedMessage = $this->complyWithAmazonSqsRequirements($encodedMessage);
@@ -65,22 +99,8 @@ class AmazonSqsSender implements SenderInterface
 
         /** @var AmazonSqsXrayTraceHeaderStamp|null $amazonSqsXrayTraceHeaderStamp */
         $amazonSqsXrayTraceHeaderStamp = $envelope->last(AmazonSqsXrayTraceHeaderStamp::class);
-        $xrayTraceId = $amazonSqsXrayTraceHeaderStamp?->getTraceId();
 
-        try {
-            $this->connection->send(
-                $encodedMessage['body'],
-                $encodedMessage['headers'] ?? [],
-                $delay,
-                $messageGroupId,
-                $messageDeduplicationId,
-                $xrayTraceId
-            );
-        } catch (AsyncAwsException $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
-
-        return $envelope;
+        return [$encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay, $messageGroupId, $messageDeduplicationId, $amazonSqsXrayTraceHeaderStamp?->getTraceId()];
     }
 
     /**

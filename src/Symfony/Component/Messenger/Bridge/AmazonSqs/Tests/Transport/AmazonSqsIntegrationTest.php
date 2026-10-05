@@ -38,6 +38,24 @@ class AmazonSqsIntegrationTest extends TestCase
         $this->execute(getenv('MESSENGER_SQS_DSN'));
     }
 
+    public function testConnectionSendBatchAndGet()
+    {
+        if (!getenv('MESSENGER_SQS_DSN')) {
+            $this->markTestSkipped('The "MESSENGER_SQS_DSN" environment variable is required.');
+        }
+
+        $this->executeBatch(getenv('MESSENGER_SQS_DSN'));
+    }
+
+    public function testConnectionSendBatchToFifoQueueAndGet()
+    {
+        if (!getenv('MESSENGER_SQS_FIFO_QUEUE_DSN')) {
+            $this->markTestSkipped('The "MESSENGER_SQS_FIFO_QUEUE_DSN" environment variable is required.');
+        }
+
+        $this->executeBatch(getenv('MESSENGER_SQS_FIFO_QUEUE_DSN'));
+    }
+
     private function execute(string $dsn): void
     {
         $connection = Connection::fromDsn($dsn, ['visibility_timeout' => 1]);
@@ -61,6 +79,37 @@ class AmazonSqsIntegrationTest extends TestCase
         $this->waitUntilElapsed(seconds: 2.0, since: $messageSentAt);
         $this->assertSame(0, $connection->getMessageCount(), 'The queue should be empty since visibility timeout was extended');
         $connection->delete($encoded[0]['id']);
+    }
+
+    private function executeBatch(string $dsn): void
+    {
+        $connection = Connection::fromDsn($dsn);
+        $connection->setup();
+        $this->clearSqs($dsn);
+
+        $messages = [];
+        for ($i = 0; $i < 12; ++$i) {
+            $messages[] = ['{"message": "Hi '.$i.'"}', ['type' => DummyMessage::class, DummyMessage::class => 'special']];
+        }
+
+        $this->assertSame([], $connection->sendBatch($messages));
+        $this->assertSame(12, $connection->getMessageCount());
+
+        $bodies = [];
+        $wait = 0;
+        while (\count($bodies) < 12 && $wait++ < 200) {
+            foreach ($connection->get() ?? [] as $encoded) {
+                $this->assertEquals(['type' => DummyMessage::class, DummyMessage::class => 'special'], $encoded['headers']);
+                $bodies[] = $encoded['body'];
+                $connection->delete($encoded['id']);
+            }
+        }
+
+        if (!str_ends_with($dsn, '.fifo') && !str_contains($dsn, '.fifo?')) {
+            sort($bodies, \SORT_NATURAL);
+        }
+
+        $this->assertSame(array_column($messages, 0), $bodies);
     }
 
     private function waitUntilElapsed(float $seconds, float $since): void

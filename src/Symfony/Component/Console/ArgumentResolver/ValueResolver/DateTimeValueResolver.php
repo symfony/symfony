@@ -53,6 +53,10 @@ final class DateTimeValueResolver implements ValueResolverInterface
         /** @var class-string<\DateTimeImmutable>|class-string<\DateTime> $class */
         $class = \DateTimeInterface::class === $type->getName() ? \DateTimeImmutable::class : $type->getName();
 
+        if ($member->isVariadic()) {
+            return array_map(fn ($value) => $this->resolveDate($value, $class, $attribute?->format, $argumentName), (array) $value);
+        }
+
         if (!$value) {
             if ($member->isNullable()) {
                 return [null];
@@ -63,11 +67,17 @@ final class DateTimeValueResolver implements ValueResolverInterface
             $value = $this->clock->now();
         }
 
-        if ($value instanceof \DateTimeInterface) {
-            return [$value instanceof $class ? $value : $class::createFromInterface($value)];
-        }
+        return [$this->resolveDate($value, $class, $attribute?->format, $argumentName)];
+    }
 
-        $format = $attribute?->format;
+    /**
+     * @param class-string<\DateTimeImmutable>|class-string<\DateTime> $class
+     */
+    private function resolveDate(mixed $value, string $class, ?string $format, string $argumentName): \DateTimeInterface
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value instanceof $class ? $value : $class::createFromInterface($value);
+        }
 
         if (null !== $format) {
             $date = $class::createFromFormat($format, $value, $this->clock?->now()->getTimeZone());
@@ -96,6 +106,6 @@ final class DateTimeValueResolver implements ValueResolverInterface
             throw new \RuntimeException($message);
         }
 
-        return [$date];
+        return $date;
     }
 }

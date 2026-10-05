@@ -243,6 +243,39 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--enum' => 'incorrect']), new NullOutput());
     }
 
+    public function testVariadicEnumArgument()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (#[Argument] StringEnum ...$enums) use (&$received): int {
+            $received = $enums;
+
+            return 0;
+        });
+
+        $command->run(new ArrayInput(['enums' => ['video', 'image']]), new NullOutput());
+
+        self::assertSame([StringEnum::Video, StringEnum::Image], $received);
+    }
+
+    public function testVariadicEnumOption()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (#[Option] StringEnum ...$enums) use (&$received): int {
+            $received = $enums;
+
+            return 0;
+        });
+
+        $command->run(new ArrayInput(['--enums' => ['image']]), new NullOutput());
+
+        self::assertSame([StringEnum::Image], $received);
+
+        self::expectException(InvalidOptionException::class);
+        self::expectExceptionMessage('The value "incorrect" is not valid for the "enums" option. Supported values are "image", "video".');
+
+        $command->run(new ArrayInput(['--enums' => ['image', 'incorrect']]), new NullOutput());
+    }
+
     public function testNumericArgumentIsConvertedOrRejected()
     {
         $command = new Command('foo');

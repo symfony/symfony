@@ -34,7 +34,9 @@ final class BackedEnumValueResolver implements ValueResolverInterface
                 return [];
             }
 
-            return [$this->resolveArgument($argument, $input)];
+            $value = $input->getArgument($argument->name);
+
+            return $member->isVariadic() ? array_map(fn ($value) => $this->resolveArgument($argument, $value), (array) $value) : [$this->resolveArgument($argument, $value)];
         }
 
         if ($option = Option::tryFrom($member->getMember())) {
@@ -42,16 +44,16 @@ final class BackedEnumValueResolver implements ValueResolverInterface
                 return [];
             }
 
-            return [$this->resolveOption($option, $input)];
+            $value = $input->getOption($option->name);
+
+            return $member->isVariadic() ? array_map(fn ($value) => $this->resolveOption($option, $value), (array) $value) : [$this->resolveOption($option, $value)];
         }
 
         return [];
     }
 
-    private function resolveArgument(Argument $argument, InputInterface $input): ?\BackedEnum
+    private function resolveArgument(Argument $argument, mixed $value): ?\BackedEnum
     {
-        $value = $input->getArgument($argument->name);
-
         if (null === $value) {
             return null;
         }
@@ -68,10 +70,8 @@ final class BackedEnumValueResolver implements ValueResolverInterface
             ?? throw InvalidArgumentException::fromEnumValue($argument->name, $value, $argument->suggestedValues);
     }
 
-    private function resolveOption(Option $option, InputInterface $input): ?\BackedEnum
+    private function resolveOption(Option $option, mixed $value): ?\BackedEnum
     {
-        $value = $input->getOption($option->name);
-
         if (null === $value) {
             return null;
         }

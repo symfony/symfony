@@ -56,6 +56,7 @@ use Symfony\Component\Uid\Uuid;
  *
  * Every key is bound to its reference and scope, {@see StoredDataKey::bindingFor()}, so a row edited or copied underneath it is refused once the key is open.
  * The check is the store's and not the backend's, which lets a client that cannot enforce authenticated data hold one.
+ * A store whose backend can authenticate the wrapping itself says so, and the same pair is then bound as the authenticated data of every wrap and unwrap, {@see StoredDataKey::wrappingContextFor()}.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -105,11 +106,12 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     private array $retiresAt = [];
 
     /**
-     * @param ContainerInterface $clients       KMS clients, each a {@see DataKeyGeneratorInterface}, indexed by name
-     * @param string             $client        Name of the client wrapping the keys this store creates
-     * @param string             $masterKeyId   Master key wrapping the keys this store creates
-     * @param positive-int       $keyBytes      Length of the data keys to generate
-     * @param int<0, max>|null   $maxAgeSeconds Age past which {@see current()} rotates; `null` never rotates, which leaves the bound {@see DEFAULT_MAX_AGE_SECONDS} describes to whoever asked for it
+     * @param ContainerInterface $clients             KMS clients, each a {@see DataKeyGeneratorInterface}, indexed by name
+     * @param string             $client              Name of the client wrapping the keys this store creates
+     * @param string             $masterKeyId         Master key wrapping the keys this store creates
+     * @param positive-int       $keyBytes            Length of the data keys to generate
+     * @param int<0, max>|null   $maxAgeSeconds       Age past which {@see current()} rotates; `null` never rotates, which leaves the bound {@see DEFAULT_MAX_AGE_SECONDS} describes to whoever asked for it
+     * @param bool               $bindWrappingContext Whether the wrapping of a data key is authenticated by the backend, {@see StoredDataKey::wrappingContextFor()}
      */
     public function __construct(
         private readonly Connection $connection,
@@ -119,6 +121,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
         private readonly string $table = self::DEFAULT_TABLE,
         private readonly int $keyBytes = 32,
         private readonly ?int $maxAgeSeconds = self::DEFAULT_MAX_AGE_SECONDS,
+        private readonly bool $bindWrappingContext = false,
     ) {
     }
 
@@ -229,8 +232,8 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     {
         $this->checkScope($scope);
 
-        $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes);
         $reference = Uuid::v7()->toBinary();
+        $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes, $this->wrappingContext($reference, $scope));
         $handle = new DataKeyHandle($reference, $dataKey);
 
         $this->connection->insert($this->table, [
@@ -263,6 +266,11 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
      * Symfony application: the plaintexts are held for as long as the store is, and whatever was
      * done to a row elsewhere, a rotation, a destruction, an edited scope, is only seen afterwards.
      */
+    public function wrappingContextOf(StoredDataKey $row): string
+    {
+        return $this->wrappingContext($row->reference, $row->scope);
+    }
+
     public function forget(): void
     {
         foreach ($this->handles as $handle) {
@@ -415,7 +423,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             return $this->handles[$row->reference];
         }
 
-        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped));
+        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
 
         if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
             $handle->release();
@@ -452,6 +460,17 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
         }
 
         return $client;
+    }
+
+    /**
+     * The context the backend authenticates the wrapping with, empty for a store that was not told to bind one.
+     *
+     * It is asked for rather than always bound because a backend unable to authenticate data refuses to wrap at all when given some: the sealed box, Azure Key Vault under `RSA-OAEP-256` or the `A*KW` family, and every Vault Transit key not created with `derived=true`.
+     * {@see StoredDataKey::bindingFor()} states the same pair in a way every backend can carry, so the default leaves the choice of backend open.
+     */
+    private function wrappingContext(string $reference, string $scope): string
+    {
+        return $this->bindWrappingContext ? StoredDataKey::wrappingContextFor($reference, $scope) : '';
     }
 
     /**

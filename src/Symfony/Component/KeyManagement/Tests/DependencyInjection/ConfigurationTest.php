@@ -219,6 +219,7 @@ class ConfigurationTest extends TestCase
             'key_id' => 'alias/app-key',
             'connection' => 'doctrine.dbal.default_connection',
             'table' => 'key_management_data_keys',
+            'bind_wrapping_context' => false,
             'max_age' => 2592000,
         ], $config['store']);
     }

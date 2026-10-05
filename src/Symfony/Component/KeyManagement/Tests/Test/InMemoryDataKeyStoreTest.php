@@ -17,10 +17,12 @@ use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\RuntimeException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
 use Symfony\Component\KeyManagement\StoredDataKey;
 use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
+use Symfony\Component\KeyManagement\Tests\Fixtures\DerivedKeyKms;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV7;
 
@@ -195,6 +197,35 @@ class InMemoryDataKeyStoreTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         $store->get($row->reference);
+    }
+
+    public function testAKeyThatDerivesCannotBackAStoreBindingNoContext()
+    {
+        $store = new InMemoryDataKeyStore(['vault' => new DerivedKeyKms()], 'vault');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("missing 'context' for key derivation");
+        $store->current('user.email');
+    }
+
+    public function testAKeyThatDerivesBacksAStoreBindingItsWrappingContext()
+    {
+        $store = new InMemoryDataKeyStore(['vault' => new DerivedKeyKms()], 'vault', 'app', 32, null, true);
+        $handle = $store->current('user.email');
+        $plaintext = self::plaintextOf($handle);
+        $store->forget();
+
+        $this->assertSame($plaintext, self::plaintextOf($store->get($handle->reference)));
+    }
+
+    public function testTheContextAStoreWrapsWithIsWhatItStates()
+    {
+        $bound = new InMemoryDataKeyStore([], 'default', 'app', 32, null, true);
+        $reference = $bound->current('user.email')->reference;
+        $row = self::rowOf($bound);
+
+        $this->assertSame(StoredDataKey::wrappingContextFor($reference, 'user.email'), $bound->wrappingContextOf($row));
+        $this->assertSame('', (new InMemoryDataKeyStore())->wrappingContextOf($row));
     }
 
     private static function migratingStore(OpenSslKms $azure): InMemoryDataKeyStore

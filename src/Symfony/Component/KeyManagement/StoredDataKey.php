@@ -37,6 +37,11 @@ final class StoredDataKey
      */
     private const string BINDING_INFO = 'symfony/key-management/data-key-binding/v1';
 
+    /**
+     * Tells this context from anything else the same master key is asked to authenticate.
+     */
+    private const string WRAPPING_LABEL = 'symfony/key-management/data-key-wrapping/v1';
+
     public function __construct(
         public readonly string $reference,
         public readonly string $scope,
@@ -59,5 +64,16 @@ final class StoredDataKey
     public static function bindingFor(string $reference, string $scope, #[\SensitiveParameter] string $plaintext): string
     {
         return hash_hmac('sha256', pack('n', \strlen($reference)).$reference.$scope, hash_hkdf('sha256', $plaintext, 32, self::BINDING_INFO), true);
+    }
+
+    /**
+     * The context a store binds the wrapping of a data key to, where its backend can authenticate one.
+     *
+     * Passed as the `$aad` of {@see DataKeyGeneratorInterface::generateDataKey()} and of {@see DataKeyGeneratorInterface::unwrapDataKey()}, it has the KMS refuse a key presented under another reference or scope, which {@see bindingFor()} only refuses once the key is open.
+     * A key created for derivation requires one, HashiCorp Vault Transit `derived=true` for instance, and a backend refusing authenticated data cannot carry one at all.
+     */
+    public static function wrappingContextFor(string $reference, string $scope): string
+    {
+        return self::WRAPPING_LABEL.pack('n', \strlen($reference)).$reference.$scope;
     }
 }

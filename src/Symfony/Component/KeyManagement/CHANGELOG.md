@@ -5,3 +5,4 @@ CHANGELOG
 ---
 
  * Add the component as experimental
+ * Add `StoredDataKey::wrappingContextFor()` and `RewrappableDataKeyStoreInterface::wrappingContextOf()`

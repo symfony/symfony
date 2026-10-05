@@ -27,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
+use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
@@ -470,6 +471,80 @@ class DataKeyStoreTest extends TestCase
         $store->current('user.email');
     }
 
+    public function testAStoreThatWasNotToldToBindAContextWrapsWithNone()
+    {
+        $store = $this->store(clients: ['default' => new InMemoryKms('aws')]);
+        $store->current('user.email');
+
+        $this->assertStringContainsString('/'.bin2hex('').'/', self::keyMaterialOf($this->connection), 'the default is the one every backend can wrap under.');
+    }
+
+    public function testAContextBindingStoreWrapsItsKeysUnderTheReferenceAndTheScope()
+    {
+        $store = $this->store(clients: ['default' => new InMemoryKms('aws')], bindWrappingContext: true);
+        $reference = $store->current('user.email')->reference;
+
+        $this->assertStringContainsString(
+            '/'.bin2hex(StoredDataKey::wrappingContextFor($reference, 'user.email')).'/',
+            self::keyMaterialOf($this->connection),
+        );
+    }
+
+    public function testAContextBindingStoreUnwrapsUnderTheSameContext()
+    {
+        $store = $this->store(clients: ['default' => new InMemoryKms('aws')], bindWrappingContext: true);
+        $handle = $store->current('user.email');
+        $plaintext = self::plaintextOf($handle);
+        $store->forget();
+
+        $this->assertSame($plaintext, self::plaintextOf($store->get($handle->reference)));
+    }
+
+    /**
+     * The binding is recomputed for the scope the row now states on purpose, so that the row is
+     * self-consistent and only the backend is left to refuse it.
+     */
+    public function testAContextBindingStoreIsRefusedAKeyWrappedForAnotherScope()
+    {
+        $store = $this->store(clients: ['default' => new InMemoryKms('aws')], bindWrappingContext: true);
+        $handle = $store->current('user.email');
+        $reference = $handle->reference;
+        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, 'user.phone', $plaintext));
+        $store->forget();
+
+        $this->connection->executeStatement(
+            \sprintf('UPDATE %s SET scope = ?, binding = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),
+            ['user.phone', $binding, $reference],
+            [ParameterType::STRING, ParameterType::BINARY, ParameterType::BINARY],
+        );
+
+        $this->expectException(DecryptionFailedException::class);
+        $store->get($reference);
+    }
+
+    public function testTheContextAStoreWrapsWithIsWhatItStates()
+    {
+        $bound = $this->store(clients: ['default' => new InMemoryKms('aws')], bindWrappingContext: true);
+        $reference = $bound->current('user.email')->reference;
+        $row = iterator_to_array($bound->all(), false)[0];
+
+        $this->assertSame(StoredDataKey::wrappingContextFor($reference, 'user.email'), $bound->wrappingContextOf($row));
+        $this->assertSame('', $this->storeWithoutTable()->wrappingContextOf($row), 'a store binding nothing says so, which is what keeps a rewrap from inventing a context.');
+    }
+
+    public function testARowWrittenBeforeTheContextIsMovedOverByAnUnboundRewrap()
+    {
+        $kms = new InMemoryKms('aws');
+        $plaintext = self::plaintextOf($this->store(clients: ['default' => $kms])->current('user.email'));
+
+        $bound = new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', DataKeyStore::DEFAULT_TABLE, 32, DataKeyStore::DEFAULT_MAX_AGE_SECONDS, true);
+        $row = iterator_to_array($bound->all(), false)[0];
+        $context = $bound->wrappingContextOf($row);
+        $bound->rewrap($row->reference, $kms->unwrapDataKey($row->wrapped)->use(static fn (#[\SensitiveParameter] string $dek): Ciphertext => $kms->encrypt('app', $dek, $context)), 'default');
+
+        $this->assertSame($plaintext, self::plaintextOf($bound->get($row->reference)));
+    }
+
     public function testACustomTableNameIsHonoured()
     {
         $store = $this->store(table: 'app_deks');
@@ -544,14 +619,14 @@ class DataKeyStoreTest extends TestCase
     /**
      * @param array<string, object>|null $clients
      */
-    private function store(?array $clients = null, string $client = 'default', string $table = DataKeyStore::DEFAULT_TABLE, ?int $maxAgeSeconds = DataKeyStore::DEFAULT_MAX_AGE_SECONDS): DataKeyStore
+    private function store(?array $clients = null, string $client = 'default', string $table = DataKeyStore::DEFAULT_TABLE, ?int $maxAgeSeconds = DataKeyStore::DEFAULT_MAX_AGE_SECONDS, bool $bindWrappingContext = false): DataKeyStore
     {
         $factories = [];
         foreach ($clients ?? ['default' => new InMemoryKms()] as $name => $kms) {
             $factories[$name] = static fn (): object => $kms;
         }
 
-        $store = new DataKeyStore($this->connection, new ServiceLocator($factories), $client, 'app', $table, maxAgeSeconds: $maxAgeSeconds);
+        $store = new DataKeyStore($this->connection, new ServiceLocator($factories), $client, 'app', $table, 32, $maxAgeSeconds, $bindWrappingContext);
         $store->createTable();
 
         return $store;
@@ -604,6 +679,13 @@ class DataKeyStoreTest extends TestCase
     private function rowCount(): int
     {
         return (int) $this->connection->fetchOne(\sprintf('SELECT COUNT(*) FROM %s', DataKeyStore::DEFAULT_TABLE));
+    }
+
+    private static function keyMaterialOf(Connection $connection): string
+    {
+        $material = $connection->fetchOne(\sprintf('SELECT key_material FROM %s', DataKeyStore::DEFAULT_TABLE));
+
+        return \is_resource($material) ? stream_get_contents($material) : (string) $material;
     }
 
     private static function plaintextOf(DataKeyHandle $handle): string

@@ -52,9 +52,10 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     private readonly array $clients;
 
     /**
-     * @param array<string, DataKeyGeneratorInterface> $clients       KMS clients indexed by name; defaults to a single {@see InMemoryKms} under `$client`
-     * @param positive-int                             $keyBytes      Length of the data keys to generate
-     * @param int<0, max>|null                         $maxAgeSeconds Age past which {@see current()} rotates; `0` rotates on every call, `null` never
+     * @param array<string, DataKeyGeneratorInterface> $clients             KMS clients indexed by name; defaults to a single {@see InMemoryKms} under `$client`
+     * @param positive-int                             $keyBytes            Length of the data keys to generate
+     * @param int<0, max>|null                         $maxAgeSeconds       Age past which {@see current()} rotates; `0` rotates on every call, `null` never
+     * @param bool                                     $bindWrappingContext Whether the wrapping of a data key is authenticated by the backend, {@see StoredDataKey::wrappingContextFor()}
      */
     public function __construct(
         array $clients = [],
@@ -62,6 +63,7 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
         private readonly string $masterKeyId = 'app',
         private readonly int $keyBytes = 32,
         private readonly ?int $maxAgeSeconds = null,
+        private readonly bool $bindWrappingContext = false,
     ) {
         $this->clients = $clients ?: [$this->client => new InMemoryKms()];
     }
@@ -100,6 +102,11 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
         $this->rows[$reference] = new StoredDataKey($reference, $row->scope, $wrapped, $client, $row->binding);
     }
 
+    public function wrappingContextOf(StoredDataKey $row): string
+    {
+        return $this->wrappingContext($row->reference, $row->scope);
+    }
+
     /**
      * The plaintext is deliberately taken out of the {@see DataKey} and retained.
      *
@@ -108,8 +115,8 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
      */
     public function rotate(string $scope): DataKeyHandle
     {
-        $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes);
         $reference = Uuid::v7()->toBinary();
+        $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes, $this->wrappingContext($reference, $scope));
         $handle = new DataKeyHandle($reference, $dataKey);
         $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, $scope, $plaintext));
 
@@ -138,7 +145,7 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
             return $this->handles[$row->reference];
         }
 
-        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped));
+        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
 
         if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
             $handle->release();
@@ -182,6 +189,11 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
         // keep the ordering, which can land ahead of the clock read here. Clamping the age at zero
         // keeps such a key from counting as not yet born, so a max age of zero still rotates.
         return max(0, time() - $uid->getDateTime()->getTimestamp()) >= $this->maxAgeSeconds;
+    }
+
+    private function wrappingContext(string $reference, string $scope): string
+    {
+        return $this->bindWrappingContext ? StoredDataKey::wrappingContextFor($reference, $scope) : '';
     }
 
     private function clientFor(string $name): DataKeyGeneratorInterface

@@ -82,4 +82,39 @@ class StoredDataKeyTest extends TestCase
             StoredDataKey::bindingFor(self::REFERENCE, 'user.email', $key),
         );
     }
+
+    public function testTwoScopesGetTheirOwnWrappingContext()
+    {
+        $this->assertNotSame(StoredDataKey::wrappingContextFor(self::REFERENCE, 'tenant-a.user'), StoredDataKey::wrappingContextFor(self::REFERENCE, 'tenant-b.user'));
+    }
+
+    public function testTwoReferencesGetTheirOwnWrappingContext()
+    {
+        $this->assertNotSame(StoredDataKey::wrappingContextFor(self::REFERENCE, 'user.email'), StoredDataKey::wrappingContextFor(str_repeat("\x22", 16), 'user.email'));
+    }
+
+    public function testAReferenceDoesNotRunIntoTheScopeItIsWrappedWith()
+    {
+        $this->assertNotSame(StoredDataKey::wrappingContextFor('ab', 'cd'), StoredDataKey::wrappingContextFor('abc', 'd'));
+    }
+
+    public function testTheWrappingContextIsRebuiltFromWhatTheRowStates()
+    {
+        $this->assertSame(StoredDataKey::wrappingContextFor(self::REFERENCE, 'user.email'), StoredDataKey::wrappingContextFor(self::REFERENCE, 'user.email'), 'the context is a pure function of what the row states, so a rewrap rebuilds it.');
+    }
+
+    public function testTheWrappingContextIsNamespacedAndVersioned()
+    {
+        $this->assertSame(
+            'symfony/key-management/data-key-wrapping/v1'.pack('n', 16).self::REFERENCE.'user.email',
+            StoredDataKey::wrappingContextFor(self::REFERENCE, 'user.email'),
+        );
+    }
+
+    public function testTheWrappingContextIsNotTheBinding()
+    {
+        $key = str_repeat('k', 32);
+
+        $this->assertNotSame(StoredDataKey::bindingFor(self::REFERENCE, 'user.email', $key), StoredDataKey::wrappingContextFor(self::REFERENCE, 'user.email'), 'the two statements are made under their own label, so neither can be replayed as the other.');
+    }
 }

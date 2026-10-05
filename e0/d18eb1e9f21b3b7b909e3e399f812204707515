@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-09-25T08:32:39Z
+
+The security concern is real, thanks for spotting it before the release.
+
+Instead of having a `retired` list of KMS; each client configuration could have a `encrypt:false` config that disable encryption using it. The DIC would wrap it in a class that only implements the decryption interfaces.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-09-25T09:56:44Z
+
+Thanks for the suggestion. The purpose of `retired` is to make read permission explicit for a particular composite. The client names in a ciphertext are untrusted, so `main` should read only through clients it explicitly authorizes. When replacing `old` with `new`, it must stop creating wrappings with `old` while still reading historical ciphertexts that may have only an `old` wrapping. `members: {new: ~}` with `retired: [old]` expresses both decisions for `main`.
+
+A per-client `encrypt: false` option could also work if `old` remained listed in `main` and `CompositeKms` learned to skip it on writes. Currently, the composite writes through every client in `members` and requires each member to support encryption, decryption, and data-key generation even on reads.
+
+Reading a wrapped data key is different from ordinary `decrypt()`. For data keys created by the composite, the first member creates its wrapping with `generateDataKey()`, so reading that wrapping later requires `unwrapDataKey()`; some providers cannot read it with `decrypt()`. Both methods belong to `DataKeyGeneratorInterface`. A wrapper implementing only decryption interfaces would therefore be unable to read those old wrappings. Implementing `DataKeyGeneratorInterface` to retain unwrapping would also expose `generateDataKey()` to callers. A read-only wrapper would need a separate unwrapping capability, or the composite would need another way to handle read-only members.
+
+For this fix, I prefer `retired` because it keeps read and write membership explicit per composite without changing how `old` behaves elsewhere.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-09-28T07:58:26Z
+
+Hi,
+
+I really like the idea, and it's true that a service should be placed in a state so that no exception is thrown while keeping the possibility to decrypt the data.
+The term retired is fine to me. I will dig into this PR by the end of the week.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-09-28T10:16:49Z
+
+Thanks, @nicolas-grekas. I dropped the reentry guard and its dedicated exception and tests. I added a regression test for an independent read during a member call, while keeping the configured-member filtering and `retired` handling.
+
+I also removed the rewrap-command caveat and `testAFirstMemberWithSeparateOperationsCannotUnwrapWhatEncryptWrote` from this PR for a separate follow-up, and updated the description.

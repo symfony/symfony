@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-05T05:39:13Z
+
+I took this over with the scope suggested above: AES-GCM on KMIP 1.4 and 2.0, tested against PyKMIP, with `KmipKms` and `KmipKmsFactory` as the only public classes. The ciphertext header now stores the algorithm, the mode and the IV length, IVs default to 12 bytes, `encrypt()` checks the returned key identifier, and the tests that passed for another reason now check theirs. Thanks for the groundwork @X-Coder264; ChaCha20-Poly1305, AES-GCM-SIV and KMIP 2.1 can come in follow-ups.

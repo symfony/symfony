@@ -27,7 +27,7 @@ final class BatchStamp implements NonSendableStampInterface
 {
     public function __construct(
         private BatchCollector $collector,
-        private int $index,
+        private int $id,
     ) {
     }
 
@@ -38,6 +38,6 @@ final class BatchStamp implements NonSendableStampInterface
      */
     public function defer(Envelope $envelope, array $senders, ?EventDispatcherInterface $eventDispatcher): bool
     {
-        return $this->collector->defer($this->index, $envelope, $senders, $eventDispatcher);
+        return $this->collector->defer($this->id, $envelope, $senders, $eventDispatcher);
     }
 }

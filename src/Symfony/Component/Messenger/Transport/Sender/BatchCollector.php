@@ -15,35 +15,66 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\MessageSentToTransportsEvent;
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\BatchStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 
 /**
- * Collects the messages of a batch while they go through the bus, then sends them.
+ * Dispatches the messages of a batch, deferring their sending until the batch is flushed.
  *
  * @author Joppe De Cuyper <hello@joppe.dev>
  *
  * @internal
  */
-final class BatchCollector
+final class BatchCollector implements MessageBusInterface
 {
     private bool $closed = false;
+    private int $nextId = 0;
+
+    /**
+     * @var array<int, Envelope>
+     */
+    private array $envelopes = [];
 
     /**
      * @var array<int, array{Envelope, array<SenderInterface>, ?EventDispatcherInterface}>
      */
     private array $pending = [];
 
+    public function __construct(
+        private MessageBusInterface $bus,
+    ) {
+    }
+
+    public function dispatch(object $message, array $stamps = []): Envelope
+    {
+        if ($this->closed) {
+            return $this->bus->dispatch($message, $stamps);
+        }
+
+        $id = $this->nextId++;
+
+        try {
+            $envelope = $this->bus->dispatch($message, [...$stamps, new BatchStamp($this, $id)]);
+        } catch (\Throwable $e) {
+            unset($this->pending[$id]);
+
+            throw $e;
+        }
+
+        return $this->envelopes[$id] = $envelope->withoutAll(BatchStamp::class);
+    }
+
     /**
      * @param array<SenderInterface> $senders
      */
-    public function defer(int $index, Envelope $envelope, array $senders, ?EventDispatcherInterface $eventDispatcher): bool
+    public function defer(int $id, Envelope $envelope, array $senders, ?EventDispatcherInterface $eventDispatcher): bool
     {
         if ($this->closed) {
             return false;
         }
 
-        $this->pending[$index] = [$envelope, $senders, $eventDispatcher];
+        $this->pending[$id] = [$envelope, $senders, $eventDispatcher];
 
         return true;
     }
@@ -56,28 +87,37 @@ final class BatchCollector
     /**
      * Sends the deferred messages, each sender getting all its messages at once.
      *
-     * @param list<Envelope> $envelopes The envelopes returned by the bus
-     *
-     * @return list<Envelope>
+     * @return list<Envelope> The envelopes, in the order the messages were dispatched
      *
      * @throws BatchSendFailedException
      */
-    public function flush(array $envelopes): array
+    public function flush(): array
     {
-        $batches = [];
+        ksort($this->envelopes);
+        $envelopes = $pending = $targets = $batches = [];
+        $i = -1;
 
-        foreach ($this->pending as $index => [$envelope, $senders]) {
-            $envelopes[$index] = $envelope->withoutAll(BatchStamp::class);
+        // a message whose dispatch threw has an id but no envelope, so positions in the returned list are counted apart
+        foreach ($this->envelopes as $id => $envelope) {
+            $envelopes[++$i] = $envelope;
+
+            if (!isset($this->pending[$id])) {
+                continue;
+            }
+
+            [$envelope, $senders] = $pending[$i] = $this->pending[$id];
+            $envelopes[$i] = $envelope->withoutAll(BatchStamp::class);
 
             foreach ($senders as $alias => $sender) {
-                $batches[$alias.'@'.spl_object_id($sender)] ??= [$sender, \is_string($alias) ? $alias : null, []];
-                $batches[$alias.'@'.spl_object_id($sender)][2][] = $index;
+                $targets[$target = $alias.'@'.spl_object_id($sender)] ??= [$sender, \is_string($alias) ? $alias : null];
+                $batches[$target][] = $i;
             }
         }
 
         $exceptions = [];
 
-        foreach ($batches as [$sender, $alias, $indexes]) {
+        foreach ($batches as $target => $indexes) {
+            [$sender, $alias] = $targets[$target];
             $batch = [];
 
             // like when sending a single message, a message that failed is not sent to its next transports
@@ -104,7 +144,7 @@ final class BatchCollector
             }
         }
 
-        foreach ($this->pending as $index => [, $senders, $eventDispatcher]) {
+        foreach ($pending as $index => [, $senders, $eventDispatcher]) {
             if (!isset($exceptions[$index])) {
                 $eventDispatcher?->dispatch(new MessageSentToTransportsEvent($envelopes[$index], $senders));
             }

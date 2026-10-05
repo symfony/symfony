@@ -92,6 +92,24 @@ class TraceableMessageBusTest extends TestCase
         ], $traceableBus->getDispatchedMessages()[0]['caller']);
     }
 
+    public function testItTracesTheCallerOfTheBatchDispatcherBus()
+    {
+        $message = new DummyMessage('Hello');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->willReturn(new Envelope($message));
+
+        $traceableBus = new TraceableMessageBus($bus);
+        $line = __LINE__ + 1;
+        (new BatchDispatcher($traceableBus))->run(static fn (MessageBusInterface $bus) => $bus->dispatch($message));
+
+        $this->assertSame([
+            'name' => 'TraceableMessageBusTest.php',
+            'file' => __FILE__,
+            'line' => $line,
+        ], $traceableBus->getDispatchedMessages()[0]['caller']);
+    }
+
     public function testItTracesDispatchWithEnvelope()
     {
         $message = new DummyMessage('Hello');

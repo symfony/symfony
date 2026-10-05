@@ -22,9 +22,12 @@ use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\BatchStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
@@ -230,7 +233,7 @@ class BatchDispatcherTest extends TestCase
                 (new BatchDispatcher($bus))->dispatch([new DummyMessage('a')], [new DispatchAfterCurrentBusStamp()]);
                 $attemptsWhileHandling = $sender->attempts;
             }],
-        ], null, true);
+        ], null, [new DispatchAfterCurrentBusMiddleware()]);
 
         $bus->dispatch(new SecondMessage());
 
@@ -249,14 +252,102 @@ class BatchDispatcherTest extends TestCase
                 } catch (NoHandlerForMessageException) {
                 }
             }],
-        ], null, true);
+        ], null, [new DispatchAfterCurrentBusMiddleware()]);
 
         $bus->dispatch(new SecondMessage());
 
         $this->assertSame(['a'], $sender->attempts);
     }
 
-    private function createBus(array $routing, array $senders, array $handlers = [], ?EventDispatcher $eventDispatcher = null, bool $dispatchAfterCurrentBus = false): MessageBus
+    public function testRunSendsTheMessagesTheCallbackDispatched()
+    {
+        $sender = new BatchDispatcherTestBatchSender();
+        $bus = $this->createBus([DummyMessage::class => ['batch']], ['batch' => $sender]);
+        $dispatched = [];
+
+        $envelopes = (new BatchDispatcher($bus))->run(static function (MessageBusInterface $bus) use (&$dispatched) {
+            $dispatched[] = $bus->dispatch(new DummyMessage('a'));
+            $dispatched[] = $bus->dispatch(new DummyMessage('b'), [new DelayStamp(1000)]);
+        });
+
+        $this->assertNotNull($dispatched[0]->last(SentStamp::class));
+        $this->assertNull($dispatched[0]->last(TransportMessageIdStamp::class), 'the bus returns the envelopes before they are sent');
+        $this->assertNull($dispatched[0]->last(BatchStamp::class));
+        $this->assertCount(1, $sender->batches);
+        $this->assertSame(1000, $sender->batches[0][1]->last(DelayStamp::class)?->getDelay());
+        $this->assertSame(['batch-a', 'batch-b'], array_map(static fn (Envelope $envelope) => $envelope->last(TransportMessageIdStamp::class)?->getId(), $envelopes));
+    }
+
+    public function testRunSendsNothingWhenTheCallbackThrows()
+    {
+        $sender = new BatchDispatcherTestBatchSender();
+        $bus = $this->createBus([DummyMessage::class => ['batch']], ['batch' => $sender]);
+        $exception = new \RuntimeException('Failed.');
+
+        try {
+            (new BatchDispatcher($bus))->run(static function (MessageBusInterface $bus) use ($exception) {
+                $bus->dispatch(new DummyMessage('a'));
+
+                throw $exception;
+            });
+            $this->fail('An exception should have been thrown.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $this->assertSame([], $sender->batches);
+    }
+
+    public function testRunLeavesOutTheMessagesThatFailedToGoThroughTheBus()
+    {
+        $sender = new BatchDispatcherTestBatchSender();
+        $failOnTheWayBack = new class implements MiddlewareInterface {
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                $envelope = $stack->next()->handle($envelope, $stack);
+
+                if ('boom' === $envelope->getMessage()->getMessage()) {
+                    throw new \RuntimeException('Failed after sending was deferred.');
+                }
+
+                return $envelope;
+            }
+        };
+        $bus = $this->createBus([DummyMessage::class => ['batch']], ['batch' => $sender], [], null, [$failOnTheWayBack]);
+
+        $envelopes = (new BatchDispatcher($bus))->run(static function (MessageBusInterface $bus) {
+            $bus->dispatch(new DummyMessage('a'));
+
+            try {
+                $bus->dispatch(new DummyMessage('boom'));
+            } catch (\RuntimeException) {
+            }
+
+            $bus->dispatch(new DummyMessage('b'));
+        });
+
+        $this->assertSame(['a', 'b'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), $sender->batches[0]));
+        $this->assertSame([0, 1], array_keys($sender->batches[0]));
+        $this->assertSame(['batch-a', 'batch-b'], array_map(static fn (Envelope $envelope) => $envelope->last(TransportMessageIdStamp::class)?->getId(), $envelopes));
+    }
+
+    public function testTheBusGivenToTheCallbackSendsRightAwayOnceTheBatchIsOver()
+    {
+        $sender = new BatchDispatcherTestSender();
+        $bus = $this->createBus([DummyMessage::class => ['one']], ['one' => $sender]);
+        $batchBus = null;
+
+        (new BatchDispatcher($bus))->run(static function (MessageBusInterface $bus) use (&$batchBus) {
+            $batchBus = $bus;
+        });
+
+        $envelope = $batchBus->dispatch(new DummyMessage('late'));
+
+        $this->assertSame(['late'], $sender->attempts);
+        $this->assertSame('one-late', $envelope->last(TransportMessageIdStamp::class)?->getId());
+    }
+
+    private function createBus(array $routing, array $senders, array $handlers = [], ?EventDispatcher $eventDispatcher = null, array $middleware = []): MessageBus
     {
         $container = new Container();
         foreach ($senders as $alias => $sender) {
@@ -264,7 +355,7 @@ class BatchDispatcherTest extends TestCase
         }
 
         return new MessageBus([
-            ...$dispatchAfterCurrentBus ? [new DispatchAfterCurrentBusMiddleware()] : [],
+            ...$middleware,
             new SendMessageMiddleware(new SendersLocator($routing, $container), $eventDispatcher),
             new HandleMessageMiddleware(new HandlersLocator($handlers)),
         ]);

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger;
 
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
-use Symfony\Component\Messenger\Stamp\BatchStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\Sender\BatchCollector;
 
@@ -43,19 +42,36 @@ final class BatchDispatcher
      */
     public function dispatch(iterable $messages, array $stamps = []): array
     {
-        $collector = new BatchCollector();
-        $envelopes = [];
+        return $this->run(static function (MessageBusInterface $bus) use ($messages, $stamps) {
+            foreach ($messages as $message) {
+                $bus->dispatch($message, $stamps);
+            }
+        });
+    }
+
+    /**
+     * Calls the callback with a bus whose messages are sent in a batch once the callback returns.
+     *
+     * The bus returns the envelopes before they are sent, so they carry no TransportMessageIdStamp yet.
+     * When the callback throws, none of the messages is sent. Once the callback returned, the bus sends its messages right away.
+     *
+     * @param callable(MessageBusInterface): mixed $callback
+     *
+     * @return list<Envelope> The envelopes, in the order the callback dispatched them
+     *
+     * @throws BatchSendFailedException When some messages could not be sent, to tell which ones were
+     */
+    public function run(callable $callback): array
+    {
+        $collector = new BatchCollector($this->bus);
 
         try {
-            foreach ($messages as $message) {
-                $index = \count($envelopes);
-                $envelopes[$index] = $this->bus->dispatch($message, [...$stamps, new BatchStamp($collector, $index)])->withoutAll(BatchStamp::class);
-            }
+            $callback($collector);
         } finally {
             // a message that reaches its senders later, like one queued by DispatchAfterCurrentBusMiddleware, is sent on its own
             $collector->close();
         }
 
-        return $collector->flush($envelopes);
+        return $collector->flush();
     }
 }

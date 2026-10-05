@@ -189,6 +189,10 @@ class KeyManagementBundle extends AbstractBundle
                             ->defaultValue('key_management_data_keys')
                             ->cannotBeEmpty()
                         ->end()
+                        ->booleanNode('read_self_contained')
+                            ->info('Whether a payload carrying its own wrapped data key is still read, through the default client. On while migrating to the stored format, off afterwards: such a payload resolves no row, so nothing the store checks applies to it.')
+                            ->defaultFalse()
+                        ->end()
                         ->variableNode('max_age')
                             ->info('Seconds after which the current data key of a scope is retired in favour of a fresh one; the default of 30 days keeps what one key seals under the collision bound of the random 96-bit IV each payload carries. 0 retires the key on every call, null never retires it.')
                             ->defaultValue(2592000)
@@ -333,8 +337,9 @@ class KeyManagementBundle extends AbstractBundle
      * Makes the store-backed encrypter the one the envelope interfaces resolve to.
      *
      * Configuring a store is what an application does to stop carrying a wrapped data key in every
-     * payload. Nothing is lost by that: the encrypter is given the default client's encrypter as a
-     * fallback, so it reads the payloads written before it as well as the ones it writes. The
+     * payload. The payloads written before it are read by turning on "read_self_contained", which is
+     * a statement rather than a consequence of having a default client: that format carries its own
+     * wrapped data key, so it resolves no row and nothing the store checks applies to it. The
      * per-client encrypters stay reachable under their own name for whoever wants the other regime
      * explicitly.
      *
@@ -359,6 +364,10 @@ class KeyManagementBundle extends AbstractBundle
             throw new LogicException(\sprintf('The KMS client "%s" set on "key_management.store" is not registered in "key_management.clients".', $client));
         }
 
+        if ($config['read_self_contained'] && null === $defaultName) {
+            throw new LogicException('The "key_management.store.read_self_contained" option needs a client to read those payloads with: set "key_management.default_client", or turn the option off.');
+        }
+
         $container->register('key_management.store', DataKeyStore::class)
             ->setArguments([
                 new Reference($config['connection']),
@@ -374,7 +383,7 @@ class KeyManagementBundle extends AbstractBundle
         $container->register('key_management.stored_envelope_encrypter', StoredEnvelopeEncrypter::class)
             ->setArguments([
                 new Reference('key_management.store'),
-                null !== $defaultName ? new Reference('key_management.envelope_encrypter.'.$defaultName) : null,
+                $config['read_self_contained'] ? new Reference('key_management.envelope_encrypter.'.$defaultName) : null,
             ]);
 
         $container->setAlias(DataKeyStoreInterface::class, 'key_management.store');

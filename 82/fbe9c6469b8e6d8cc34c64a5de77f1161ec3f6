@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-05T04:38:41Z
+
+I updated the PR: a `<<` key followed by a tab before its colon is a merge key again, merge keys in flow mappings now work with `PARSE_OBJECT_FOR_MAP` (the new checks reported a mapping as a scalar there), and `!!str <<` is covered.

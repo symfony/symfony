@@ -35,7 +35,7 @@ class StreamedResponse extends Response
      * @param callable|iterable<string>|null $callbackOrChunks
      * @param int                            $status           The HTTP status code (200 "OK" by default)
      */
-    public function __construct(callable|iterable|null $callbackOrChunks = null, int $status = 200, array $headers = [])
+    public function __construct(callable|iterable|null $callbackOrChunks = null, int $status = 200, array|ResponseHeaderBag $headers = [])
     {
         parent::__construct(null, $status, $headers);
 

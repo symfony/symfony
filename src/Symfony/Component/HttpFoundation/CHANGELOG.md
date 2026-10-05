@@ -16,6 +16,7 @@ CHANGELOG
  * Add `ClearableSessionHandlerInterface` for clearing all session data
  * Add `Request::getStructuredSuffixFormat()` to resolve a mime type to the format of its structured syntax suffix, e.g. `application/vnd.api+json` to `json`
  * Accept a list of secrets in `UriSigner::__construct()` to rotate them
+ * `StreamedResponse::__construct()` now accepts a `ResponseHeaderBag` as its third argument
 
 8.1
 ---

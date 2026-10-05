@@ -23,6 +23,7 @@ CHANGELOG
  * Add the `$exposeHeaders` argument to `#[RateLimit]`
  * Instantiate on demand the bundles that have nothing to do when the kernel boots
  * Add `PaymentRequiredHttpException`, `RequestTimeoutHttpException`, `ContentTooLargeHttpException`, `RangeNotSatisfiableHttpException`, `ExpectationFailedHttpException`, `FailedDependencyHttpException`, `TooEarlyHttpException`, `UnavailableForLegalReasonsHttpException` and `NotImplementedHttpException`
+ * Make `HttpClientKernel` forward the responses that carry the RFC 10036 `Incremental: ?1` header without buffering them
 
 8.1
 ---

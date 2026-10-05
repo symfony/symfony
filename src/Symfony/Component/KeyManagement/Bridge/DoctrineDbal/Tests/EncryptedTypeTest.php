@@ -31,6 +31,7 @@ use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
@@ -125,7 +126,7 @@ class EncryptedTypeTest extends TestCase
     public function testAStoreBackedEncrypterMakesTheThirdArgumentAScope()
     {
         $store = new InMemoryDataKeyStore();
-        $type = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($store), 'user.email');
+        $type = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($store), 'user.email', 'encrypted_email');
 
         $stored = $type->convertToDatabaseValue('jane@example.com', $this->platform);
         $store->forget();
@@ -138,7 +139,7 @@ class EncryptedTypeTest extends TestCase
     public function testRowsOfAScopeShareOneDataKey()
     {
         $store = new InMemoryDataKeyStore();
-        $type = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($store), 'user.email');
+        $type = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($store), 'user.email', 'encrypted_email');
 
         $first = Envelope::fromBytes($type->convertToDatabaseValue('one', $this->platform));
         $second = Envelope::fromBytes($type->convertToDatabaseValue('two', $this->platform));
@@ -149,26 +150,75 @@ class EncryptedTypeTest extends TestCase
 
     public function testAColumnMayHoldBothFormatsDuringAMigration()
     {
-        $legacy = new EncryptedType(new StringType(), $this->envelopes, 'app');
+        $legacy = new EncryptedType(new StringType(), $this->envelopes, 'app', 'encrypted_email');
         $before = $legacy->convertToDatabaseValue('written before', $this->platform);
 
-        $migrating = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter(new InMemoryDataKeyStore(), $this->envelopes), 'user.email');
+        $migrating = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter(new InMemoryDataKeyStore(), $this->envelopes), 'user.email', 'encrypted_email');
         $after = $migrating->convertToDatabaseValue('written after', $this->platform);
 
         $this->assertSame('written before', $migrating->convertToPHPValue($before, $this->platform));
         $this->assertSame('written after', $migrating->convertToPHPValue($after, $this->platform));
     }
 
+    public function testAValueOfAnotherColumnOfTheSameScopeIsRefused()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $notes = new EncryptedType(new StringType(), $encrypter, 'user.data', 'encrypted_notes');
+        $roles = new EncryptedType(new StringType(), $encrypter, 'user.data', 'encrypted_roles');
+
+        $written = $notes->convertToDatabaseValue('a note', $this->platform);
+
+        $this->expectException(DecryptionFailedException::class);
+        $roles->convertToPHPValue($written, $this->platform);
+    }
+
+    public function testAValueOfTheSameColumnOfTheSameScopeIsRead()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $notes = new EncryptedType(new StringType(), $encrypter, 'user.data', 'encrypted_notes');
+        $sameColumnElsewhere = new EncryptedType(new StringType(), $encrypter, 'user.data', 'encrypted_notes');
+
+        $written = $notes->convertToDatabaseValue('a note', $this->platform);
+
+        $this->assertSame('a note', $sameColumnElsewhere->convertToPHPValue($written, $this->platform));
+    }
+
+    public function testATypeThatBindsNoContextIsReadByOneThatBindsNone()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $unbound = new EncryptedType(new StringType(), $encrypter, 'user.data', 'encrypted_notes', false);
+
+        $written = $unbound->convertToDatabaseValue('a note', $this->platform);
+
+        $this->assertSame('a note', $unbound->convertToPHPValue($written, $this->platform));
+        $this->assertSame('a note', (new EncryptedType(new StringType(), $encrypter, 'user.data', 'anything', false))->convertToPHPValue($written, $this->platform), 'nothing of the column is authenticated when the backend cannot carry it.');
+    }
+
+    public function testADecoratingEncrypterAddsItsOwnContextToTheTypes()
+    {
+        $seen = [];
+        $decorated = self::appendingToTheAad(new StoredEnvelopeEncrypter(new InMemoryDataKeyStore()), '/row-42', $seen);
+        $type = new EncryptedType(new StringType(), $decorated, 'user.data', 'encrypted_notes');
+
+        $written = $type->convertToDatabaseValue('a note', $this->platform);
+
+        $this->assertSame('a note', $type->convertToPHPValue($written, $this->platform));
+        $this->assertCount(2, $seen);
+        $this->assertSame($seen[0], $seen[1], 'the write and the read must hand the same bytes down.');
+        $this->assertStringEndsWith('/row-42', $seen[0]);
+        $this->assertStringStartsWith('symfony/key-management/doctrine-dbal/encrypted-type/v1', $seen[0], 'the type context is what the decorator was given to add to.');
+    }
+
     public function testAColumnIsMovedToAnotherKms()
     {
         $target = new EnvelopeEncrypter(new OpenSslKms(new InMemoryKeyLoader(['next' => random_bytes(32)])));
-        $written = (new EncryptedType(new StringType(), $this->envelopes, 'app'))->convertToDatabaseValue('jane@example.com', $this->platform);
+        $written = (new EncryptedType(new StringType(), $this->envelopes, 'app', 'encrypted_email'))->convertToDatabaseValue('jane@example.com', $this->platform);
 
-        $migrating = new EncryptedType(new StringType(), $this->routingOnKeyId($target), 'next');
+        $migrating = new EncryptedType(new StringType(), $this->routingOnKeyId($target), 'next', 'encrypted_email');
         $rewritten = $migrating->convertToDatabaseValue($migrating->convertToPHPValue($written, $this->platform), $this->platform);
 
         $this->assertSame('next', Envelope::fromBytes($rewritten)->keyId);
-        $this->assertSame('jane@example.com', (new EncryptedType(new StringType(), $target, 'next'))->convertToPHPValue($rewritten, $this->platform));
+        $this->assertSame('jane@example.com', (new EncryptedType(new StringType(), $target, 'next', 'encrypted_email'))->convertToPHPValue($rewritten, $this->platform));
     }
 
     public function testAColumnHandedBackAsAStreamIsRead()
@@ -233,7 +283,7 @@ class EncryptedTypeTest extends TestCase
             {
                 throw new \RuntimeException('The backend is down.');
             }
-        }, 'app');
+        }, 'app', 'encrypted_email');
 
         try {
             $type->convertToDatabaseValue('hello@example.com', $this->platform);
@@ -275,7 +325,7 @@ class EncryptedTypeTest extends TestCase
 
     private function makeType(Type $parent): EncryptedType
     {
-        return new EncryptedType($parent, $this->envelopes, 'app');
+        return new EncryptedType($parent, $this->envelopes, 'app', 'encrypted_email');
     }
 
     private function routingOnKeyId(EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $target): EnvelopeEncrypterInterface&EnvelopeDecrypterInterface
@@ -295,6 +345,38 @@ class EncryptedTypeTest extends TestCase
             public function decrypt(Envelope $envelope, string $aad = ''): string
             {
                 return 'app' === $envelope->keyId ? $this->legacy->decrypt($envelope, $aad) : $this->target->decrypt($envelope, $aad);
+            }
+        };
+    }
+
+    /**
+     * @param list<string> $seen
+     */
+    private static function appendingToTheAad(EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $inner, string $own, array &$seen): EnvelopeEncrypterInterface&EnvelopeDecrypterInterface
+    {
+        return new class($inner, $own, $seen) implements EnvelopeEncrypterInterface, EnvelopeDecrypterInterface {
+            /**
+             * @param list<string> $seen
+             */
+            public function __construct(
+                private EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $inner,
+                private string $own,
+                private array &$seen,
+            ) {
+            }
+
+            public function encrypt(string $key, #[\SensitiveParameter] string $plaintext, string $aad = ''): Envelope
+            {
+                $this->seen[] = $aad.$this->own;
+
+                return $this->inner->encrypt($key, $plaintext, $aad.$this->own);
+            }
+
+            public function decrypt(Envelope $envelope, string $aad = ''): string
+            {
+                $this->seen[] = $aad.$this->own;
+
+                return $this->inner->decrypt($envelope, $aad.$this->own);
             }
         };
     }

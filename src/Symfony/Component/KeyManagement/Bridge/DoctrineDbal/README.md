@@ -142,8 +142,14 @@ Type::getTypeRegistry()->register('app_user_email', new EncryptedType(
     Type::getTypeRegistry()->get('string'),
     $encrypter,
     'user.email',
+    'app_user_email',
 ));
 ```
+
+A type authenticates its own name with every value, so a value written for another column
+is refused instead of read. Renaming a registered type therefore makes the values written
+under the former name unreadable, and `context: false` turns that off for a backend
+refusing authenticated data.
 
 Rows of that column then share one data key and carry a 16-byte reference to
 it. To migrate a column that already holds self-contained envelopes, give the

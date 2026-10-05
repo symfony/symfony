@@ -14,12 +14,14 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 use AsyncAws\Core\Exception\Exception as AsyncAwsException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -30,7 +32,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ResetInterface
+class AmazonSqsTransport implements TransportInterface, BatchSenderInterface, KeepaliveReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ResetInterface
 {
     private SerializerInterface $serializer;
 
@@ -85,6 +87,27 @@ class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterfa
         }
 
         return $this->getSender()->send($envelope);
+    }
+
+    public function sendBatch(array $envelopes): array
+    {
+        $sender = $this->getSender();
+
+        if ($sender instanceof BatchSenderInterface && ($this->handleRetries || !array_filter($envelopes, $this->isRedelivered(...)))) {
+            return $sender->sendBatch($envelopes);
+        }
+
+        $sent = [];
+
+        foreach ($envelopes as $key => $envelope) {
+            try {
+                $sent[$key] = $this->send($envelope);
+            } catch (\Throwable $e) {
+                throw new BatchSendFailedException($sent, array_fill_keys(array_keys(array_diff_key($envelopes, $sent)), $e));
+            }
+        }
+
+        return $sent;
     }
 
     public function setup(): void

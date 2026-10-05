@@ -18,9 +18,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceivedStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsSender;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransport;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
@@ -130,6 +132,41 @@ class AmazonSqsTransportTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(1)]);
         $sender->expects($this->never())->method('send')->with($envelope)->willReturn($envelope);
         $this->assertSame($envelope, $transport->send($envelope));
+    }
+
+    public function testItCanSendABatchViaTheSender()
+    {
+        $sender = $this->createMock(AmazonSqsSender::class);
+        $transport = $this->getTransport(null, null, null, $sender);
+        $envelopes = [new Envelope(new \stdClass()), new Envelope(new \stdClass())];
+        $sender->expects($this->once())->method('sendBatch')->with($envelopes)->willReturn($envelopes);
+        $this->assertSame($envelopes, $transport->sendBatch($envelopes));
+    }
+
+    public function testItSendsABatchOneByOneWhenTheSenderCannotSendBatches()
+    {
+        $sender = $this->createMock(SenderInterface::class);
+        $transport = $this->getTransport(null, null, null, $sender);
+        $envelopes = ['a' => new Envelope(new \stdClass()), 'b' => new Envelope(new \stdClass()), 'c' => new Envelope(new \stdClass())];
+        $sender->expects($this->exactly(2))->method('send')->willReturnOnConsecutiveCalls($envelopes['a'], $this->throwException($exception = new TransportException('Down.')));
+
+        try {
+            $transport->sendBatch($envelopes);
+            $this->fail('An exception should have been thrown.');
+        } catch (BatchSendFailedException $e) {
+            $this->assertSame(['a' => $envelopes['a']], $e->getEnvelopes());
+            $this->assertSame(['b' => $exception, 'c' => $exception], $e->getExceptions());
+        }
+    }
+
+    public function testItDoesNotSendRedeliveredMessagesOfABatchWhenNotHandlingRetries()
+    {
+        $sender = $this->createMock(AmazonSqsSender::class);
+        $transport = $this->getTransport(null, null, null, $sender, false);
+        $envelopes = [new Envelope(new \stdClass()), new Envelope(new \stdClass(), [new RedeliveryStamp(1)])];
+        $sender->expects($this->never())->method('sendBatch');
+        $sender->expects($this->once())->method('send')->with($envelopes[0])->willReturn($envelopes[0]);
+        $this->assertSame($envelopes, $transport->sendBatch($envelopes));
     }
 
     public function testItCanSetUpTheConnection()

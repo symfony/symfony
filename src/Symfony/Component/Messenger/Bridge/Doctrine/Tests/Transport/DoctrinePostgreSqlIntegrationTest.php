@@ -65,6 +65,15 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->assertNull($this->connection->get());
     }
 
+    public function testSendBatchReturnsTheIds()
+    {
+        $ids = $this->connection->sendBatch(['a' => ['{"message": "a"}', []], 'b' => ['{"message": "b"}', []]]);
+
+        $this->assertSame(['a', 'b'], array_keys($ids));
+        $this->assertSame($ids['a'], (string) $this->connection->get()[0]['id']);
+        $this->assertSame($ids['b'], (string) $this->connection->get()[0]['id']);
+    }
+
     public function testSkipLocked()
     {
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table', 'skip_locked' => true], $this->driverConnection);

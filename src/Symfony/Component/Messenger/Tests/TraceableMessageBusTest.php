@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\BatchDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -71,6 +72,24 @@ class TraceableMessageBusTest extends TestCase
                 'line' => (new \ReflectionMethod(TestTracesWithHandleTraitAction::class, '__invoke'))->getStartLine() + 2,
             ],
         ], $actualTracedMessage);
+    }
+
+    public function testItTracesTheCallerOfTheBatchDispatcher()
+    {
+        $message = new DummyMessage('Hello');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->willReturn(new Envelope($message));
+
+        $traceableBus = new TraceableMessageBus($bus);
+        $line = __LINE__ + 1;
+        (new BatchDispatcher($traceableBus))->dispatch([$message]);
+
+        $this->assertSame([
+            'name' => 'TraceableMessageBusTest.php',
+            'file' => __FILE__,
+            'line' => $line,
+        ], $traceableBus->getDispatchedMessages()[0]['caller']);
     }
 
     public function testItTracesDispatchWithEnvelope()

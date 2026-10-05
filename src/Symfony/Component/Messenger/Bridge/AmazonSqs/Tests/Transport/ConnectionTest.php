@@ -22,9 +22,12 @@ use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\GetQueueUrlResult;
 use AsyncAws\Sqs\Result\QueueExistsWaiter;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
+use AsyncAws\Sqs\Result\SendMessageBatchResult;
 use AsyncAws\Sqs\Result\SendMessageResult;
 use AsyncAws\Sqs\SqsClient;
+use AsyncAws\Sqs\ValueObject\BatchResultErrorEntry;
 use AsyncAws\Sqs\ValueObject\Message;
+use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
 use Composer\InstalledVersions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -780,6 +783,114 @@ class ConnectionTest extends TestCase
         $this->assertNotSame($sent[0]['MessageDeduplicationId'], $sent[1]['MessageDeduplicationId']);
         $this->assertSame('explicit-id', $sent[2]['MessageDeduplicationId']);
         $this->assertSame([Connection::class.'::send', Connection::class.'::send', Connection::class.'::send'], array_column($sent, 'MessageGroupId'));
+    }
+
+    public function testSendBatchSendsUpToTenMessagesPerRequest()
+    {
+        $requests = [];
+        $client = $this->createMock(SqsClient::class);
+        $client->method('getQueueUrl')->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
+        $client->expects($this->exactly(2))->method('sendMessageBatch')->willReturnCallback(static function (array $input) use (&$requests) {
+            $requests[] = $input;
+
+            return ResultMockFactory::create(SendMessageBatchResult::class, ['Successful' => [], 'Failed' => []]);
+        });
+
+        $messages = [];
+        for ($i = 0; $i < 12; ++$i) {
+            $messages['m'.$i] = ['body '.$i, ['type' => 'foo'], 0 === $i ? 10 : null];
+        }
+
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client);
+
+        $this->assertSame([], $connection->sendBatch($messages));
+        $this->assertSame('https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue', $requests[0]['QueueUrl']);
+        $this->assertSame(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], array_column($requests[0]['Entries'], 'Id'));
+        $this->assertSame(['0', '1'], array_column($requests[1]['Entries'], 'Id'));
+        $this->assertSame(['body 10', 'body 11'], array_column($requests[1]['Entries'], 'MessageBody'));
+        $this->assertSame(10, $requests[0]['Entries'][0]['DelaySeconds']);
+        $this->assertArrayNotHasKey('DelaySeconds', $requests[0]['Entries'][1]);
+        $this->assertEquals(['type' => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => 'foo'])], $requests[0]['Entries'][0]['MessageAttributes']);
+    }
+
+    public function testSendBatchSplitsTheMessagesThatExceedThePayloadLimit()
+    {
+        $requests = [];
+        $client = $this->createMock(SqsClient::class);
+        $client->method('getQueueUrl')->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
+        $client->expects($this->exactly(3))->method('sendMessageBatch')->willReturnCallback(static function (array $input) use (&$requests) {
+            $requests[] = array_column($input['Entries'], 'MessageBody');
+
+            return ResultMockFactory::create(SendMessageBatchResult::class, ['Successful' => [], 'Failed' => []]);
+        });
+
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client);
+
+        $this->assertSame([], $connection->sendBatch([
+            [$a = str_repeat('a', 100000), []],
+            [$b = str_repeat('b', 100000), []],
+            [$c = str_repeat('c', 100000), []],
+            [$d = str_repeat('d', 300000), []],
+        ]));
+        $this->assertSame([[$a, $b], [$c], [$d]], $requests);
+    }
+
+    public function testSendBatchReportsTheMessagesSqsRefused()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->method('getQueueUrl')->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
+        $client->expects($this->once())->method('sendMessageBatch')->willReturn(ResultMockFactory::create(SendMessageBatchResult::class, [
+            'Successful' => [],
+            'Failed' => [new BatchResultErrorEntry(['Id' => '1', 'SenderFault' => true, 'Code' => 'InvalidParameterValue', 'Message' => 'Invalid body.'])],
+        ]));
+
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client);
+        $exceptions = $connection->sendBatch(['a' => ['body a', []], 'b' => ['body b', []], 'c' => ['body c', []]]);
+
+        $this->assertSame(['b'], array_keys($exceptions));
+        $this->assertInstanceOf(TransportException::class, $exceptions['b']);
+        $this->assertSame('InvalidParameterValue: Invalid body.', $exceptions['b']->getMessage());
+    }
+
+    public function testSendBatchStopsAtTheFirstFailedRequest()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->method('getQueueUrl')->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
+        $client->expects($this->exactly(2))->method('sendMessageBatch')->willReturnOnConsecutiveCalls(ResultMockFactory::create(SendMessageBatchResult::class, ['Successful' => [], 'Failed' => []]), ResultMockFactory::createFailing(SendMessageBatchResult::class, 500, 'SQS is down.'));
+
+        $messages = [];
+        for ($i = 0; $i < 25; ++$i) {
+            $messages[] = ['body '.$i, []];
+        }
+
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client);
+        $exceptions = $connection->sendBatch($messages);
+
+        $this->assertSame(range(10, 24), array_keys($exceptions));
+        $this->assertInstanceOf(TransportException::class, $exceptions[10]);
+        $this->assertInstanceOf(HttpException::class, $exceptions[10]->getPrevious());
+        $this->assertSame($exceptions[10], $exceptions[24]);
+    }
+
+    public function testSendBatchOnFifoQueue()
+    {
+        $entries = [];
+        $client = $this->createMock(SqsClient::class);
+        $client->method('getQueueUrl')->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue.fifo']));
+        $client->expects($this->once())->method('sendMessageBatch')->willReturnCallback(static function (array $input) use (&$entries) {
+            $entries = $input['Entries'];
+
+            return ResultMockFactory::create(SendMessageBatchResult::class, ['Successful' => [], 'Failed' => []]);
+        });
+
+        $connection = new Connection(['queue_name' => 'queue.fifo', 'auto_setup' => false], $client);
+        $connection->sendBatch([['body', [], 10], ['body', []], ['body', [], null, 'group', 'explicit-id']]);
+
+        $this->assertSame([Connection::class.'::send', Connection::class.'::send', 'group'], array_column($entries, 'MessageGroupId'));
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $entries[0]['MessageDeduplicationId']);
+        $this->assertNotSame($entries[0]['MessageDeduplicationId'], $entries[1]['MessageDeduplicationId']);
+        $this->assertSame('explicit-id', $entries[2]['MessageDeduplicationId']);
+        $this->assertArrayNotHasKey('DelaySeconds', $entries[0]);
     }
 
     #[RequiresPhpExtension('pcntl')]

@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\MessageSentToTransportsEvent;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
+use Symfony\Component\Messenger\Stamp\BatchStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -85,6 +86,15 @@ class SendMessageMiddleware implements MiddlewareInterface
             if ($relayStamp && $relayStamp !== $envelope->last(OutboxStamp::class)) {
                 $envelope = $envelope->withoutAll(OutboxStamp::class)->with($relayStamp);
             }
+        }
+
+        if ($envelope->last(BatchStamp::class)?->defer($envelope, $senders, $this->eventDispatcher)) {
+            foreach ($senders as $alias => $sender) {
+                $this->logger?->info('Batching message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => $sender::class]);
+                $envelope = $envelope->with(new SentStamp($sender::class, \is_string($alias) ? $alias : null));
+            }
+
+            return $envelope;
         }
 
         foreach ($senders as $alias => $sender) {

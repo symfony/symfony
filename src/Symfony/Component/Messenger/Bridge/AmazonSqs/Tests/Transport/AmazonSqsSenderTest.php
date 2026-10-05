@@ -21,7 +21,9 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsSender;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsXrayTraceHeaderStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class AmazonSqsSenderTest extends TestCase
@@ -132,6 +134,64 @@ class AmazonSqsSenderTest extends TestCase
 
         $sender = new AmazonSqsSender($connection, $serializer, $logger);
         $sender->send($envelope);
+    }
+
+    public function testSendBatch()
+    {
+        $envelopes = [
+            'a' => new Envelope(new DummyMessage('a'), [new DelayStamp(2500)]),
+            'b' => new Envelope(new DummyMessage('b'), [new AmazonSqsFifoStamp('group', 'dedup'), new AmazonSqsXrayTraceHeaderStamp('trace')]),
+        ];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('sendBatch')->with([
+            'a' => ['body a', ['type' => DummyMessage::class], 3, null, null, null],
+            'b' => ['body b', ['type' => DummyMessage::class], null, 'group', 'dedup', 'trace'],
+        ])->willReturn([]);
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturnCallback(static fn (Envelope $envelope) => ['body' => 'body '.$envelope->getMessage()->getMessage(), 'headers' => ['type' => DummyMessage::class]]);
+
+        $sender = new AmazonSqsSender($connection, $serializer);
+
+        $this->assertSame($envelopes, $sender->sendBatch($envelopes));
+    }
+
+    public function testSendBatchTellsWhichMessagesWereSent()
+    {
+        $envelopes = ['a' => new Envelope(new DummyMessage('a')), 'b' => new Envelope(new DummyMessage('b'))];
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('sendBatch')->willReturn(['b' => $exception = new TransportException('Refused.')]);
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => '...']);
+
+        $sender = new AmazonSqsSender($connection, $serializer);
+
+        try {
+            $sender->sendBatch($envelopes);
+            $this->fail('An exception should have been thrown.');
+        } catch (BatchSendFailedException $e) {
+            $this->assertSame(['a' => $envelopes['a']], $e->getEnvelopes());
+            $this->assertSame(['b' => $exception], $e->getExceptions());
+        }
+    }
+
+    public function testItConvertsNetworkExceptionDuringSendBatchIntoTransportException()
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('sendBatch')->willThrowException(new NetworkException('Could not contact remote server.'));
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => '...']);
+
+        $sender = new AmazonSqsSender($connection, $serializer);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not contact remote server.');
+
+        $sender->sendBatch([new Envelope(new DummyMessage('Oy'))]);
     }
 
     public function testItConvertsNetworkExceptionDuringSendIntoTransportException()

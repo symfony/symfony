@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-05T06:03:08Z
+
+I finished the PR as discussed above: rebased, the event names the limiter service and carries no key, its `RateLimit` is not accepted anymore, and a functional test covers the wiring.

@@ -34,6 +34,9 @@ try {
     unlink($lockPath.'/owner');
     $store->delete($key);
     echo "released\n";
+
+    // On Windows, exiting resets the socket, which discards the output the parent did not read yet, so wait for proc_close() to close the input
+    fgets(\STDIN);
 } catch (Throwable $e) {
     fwrite(\STDERR, $e."\n");
     exit(1);

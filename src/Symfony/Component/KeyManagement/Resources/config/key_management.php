@@ -17,6 +17,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexL
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKmsFactory;
+use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKmsFactory;
 use Symfony\Component\KeyManagement\Factory\FactoryRegistry;
 use Symfony\Component\KeyManagement\Local\OpenSslKmsFactory;
 use Symfony\Component\KeyManagement\Local\SealedBoxKmsFactory;
@@ -65,6 +66,10 @@ return static function (ContainerConfigurator $container) {
             ->args([service('http_client')->nullOnInvalid()])
             ->tag('key_management.factory')
             ->tag('container.remove_if_missing', ['class' => GoogleCloudKmsFactory::class, 'package' => 'symfony/google-cloud-key-management', 'parent_packages' => ['symfony/key-management']])
+
+        ->set('key_management.factory.kmip', KmipKmsFactory::class)
+            ->tag('key_management.factory')
+            ->tag('container.remove_if_missing', ['class' => KmipKmsFactory::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => ['symfony/key-management']])
 
         ->set('serializer.normalizer.key_management_envelope', EnvelopeNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])

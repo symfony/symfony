@@ -264,8 +264,52 @@ jobs:
       - name: Start MySQL
         run: sudo systemctl start mysql.service
 
+      - name: Start PyKMIP
+        run: |
+          fixture="$RUNNER_TEMP/pykmip"
+          src/Symfony/Component/KeyManagement/Bridge/Kmip/Tests/Fixtures/pykmip/generate-certs.sh "$fixture"
+          docker run -d --name kmip-server -p 127.0.0.1:5696:5696 \
+            -v "$fixture/certs:/kmip/certs:ro" \
+            -v "$fixture/data:/kmip/data" \
+            -v "$fixture/policies:/kmip/policies:ro" \
+            -v "$fixture/server.conf:/kmip/server.conf:ro" \
+            --entrypoint pykmip-server \
+            biska/pykmip@sha256:b8790203e68ee512fc8d5d9e7ebaec137aae29d8a4683be5f6563131d770e36c \
+            -f /kmip/server.conf -l /tmp/server.log
+          ready=0
+          for attempt in {1..20}; do
+            if timeout 15 env KMIP_TEST_HOST=127.0.0.1 KMIP_TEST_PORT=5696 KMIP_TEST_PEER_NAME=localhost \
+              KMIP_TEST_CA="$fixture/certs/ca.crt" KMIP_TEST_CERT="$fixture/certs/client.crt" KMIP_TEST_KEY="$fixture/certs/client.key" \
+              KMIP_TEST_REQUIRED=1 \
+              ./phpunit src/Symfony/Component/KeyManagement/Bridge/Kmip/Tests/KmipIntegrationTest.php \
+              --filter testServerAdvertisesSupportedVersion --fail-on-empty-test-suite > "$RUNNER_TEMP/kmip-pykmip-readiness.log" 2>&1; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [[ "$ready" -ne 1 ]]; then
+            cat "$RUNNER_TEMP/kmip-pykmip-readiness.log"
+            docker ps -a --filter name=kmip-server
+            docker exec kmip-server cat /tmp/server.log || true
+            exit 1
+          fi
+          echo "KMIP_TEST_HOST=127.0.0.1" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_PORT=5696" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_PEER_NAME=localhost" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_CA=$fixture/certs/ca.crt" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_CERT=$fixture/certs/client.crt" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_KEY=$fixture/certs/client.key" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_OTHER_CERT=$fixture/certs/other.crt" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_OTHER_KEY=$fixture/certs/other.key" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_NO_EKU_CERT=$fixture/certs/no-eku.crt" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_NO_EKU_KEY=$fixture/certs/no-eku.key" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_ENCRYPTED_KEY=$fixture/certs/client-encrypted.key" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_KEY_PASSPHRASE=test-passphrase" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_REQUIRED=1" >> "$GITHUB_ENV"
+
       - name: Run tests
-        run: ./phpunit --group integration
+        run: ./phpunit --group integration --exclude-group kmip-integration
         env:
           INTEGRATION_FTP_URL: 'ftp://test:test@localhost'
           LOCK_DYNAMODB_DSN: "dynamodb://localhost:4566/lock_keys?sslmode=disable"
@@ -289,3 +333,20 @@ jobs:
           MYSQL_HOST: 127.0.0.1
           MYSQL_USERNAME: root
           MYSQL_PASSWORD: root
+
+      - name: Run KMIP integration tests
+        run: |
+          tests=$(./phpunit --group kmip-integration --list-tests)
+          grep -Fq 'KmipIntegrationTest::testVersionedOperations"1.4"' <<< "$tests"
+          grep -Fq 'KmipIntegrationTest::testVersionedOperations"2.0"' <<< "$tests"
+          ./phpunit --group kmip-integration --fail-on-empty-test-suite
+
+      - name: Stop PyKMIP
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [[ "$JOB_STATUS" != 'success' ]]; then
+            docker exec kmip-server cat /tmp/server.log || true
+          fi
+          docker rm -f kmip-server || true

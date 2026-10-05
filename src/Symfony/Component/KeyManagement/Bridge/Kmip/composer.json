@@ -1,0 +1,30 @@
+{
+    "name": "symfony/kmip-key-management",
+    "type": "symfony-key-management-bridge",
+    "description": "Symfony KMIP Key Management Bridge",
+    "keywords": ["kms", "kmip", "encryption"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Antonio Pauletich",
+            "email": "antonio.pauletich95@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "ext-openssl": "*",
+        "symfony/key-management": "^8.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\KeyManagement\\Bridge\\Kmip\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

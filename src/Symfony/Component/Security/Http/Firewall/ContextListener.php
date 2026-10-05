@@ -151,7 +151,7 @@ class ContextListener extends AbstractListener
             }
         } elseif (null !== $token) {
             if (null !== $this->logger) {
-                $this->logger->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);
+                $this->logger->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => get_debug_type($token)]);
             }
 
             $token = null;
@@ -315,7 +315,7 @@ class ContextListener extends AbstractListener
                 throw $e;
             }
             if ($this->logger) {
-                $this->logger->warning('Failed to unserialize the security token from the session.', ['key' => $this->sessionKey, 'received' => $serializedToken, 'exception' => $e]);
+                $this->logger->warning('Failed to unserialize the security token from the session.', ['key' => $this->sessionKey, 'exception' => $e]);
             }
         } finally {
             restore_error_handler();

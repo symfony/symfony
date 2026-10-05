@@ -14,14 +14,17 @@ namespace Symfony\Component\KeyManagement\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\AbstractLogger;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\Command\RewrapDataKeysCommand;
 use Symfony\Component\KeyManagement\CompositeKms;
+use Symfony\Component\KeyManagement\DataCollector\KeyManagementDataCollector;
 use Symfony\Component\KeyManagement\DataKey;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
+use Symfony\Component\KeyManagement\Debug\TraceableKms;
 use Symfony\Component\KeyManagement\DecrypterInterface;
 use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Envelope;
@@ -75,7 +78,7 @@ class CompositeKmsTest extends TestCase
         $this->assertSame(['encrypt' => 1], $this->gcp->calls);
     }
 
-    public function testACiphertextIsReadThroughTheNextMemberWhenTheFirstIsDown()
+    public function testACiphertextFallsBackPastUnavailableMembers()
     {
         $kms = $this->kms();
         $ciphertext = $kms->encrypt('app', 'secret');
@@ -116,7 +119,7 @@ class CompositeKmsTest extends TestCase
                 $this->records[] = [$level, $message, $context['client'], $context['exception']->getMessage()];
             }
         };
-        $kms = new CompositeKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), ['aws' => null, 'azure' => 'backup'], $logger);
+        $kms = new CompositeKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), ['aws' => null, 'azure' => 'backup'], [], $logger);
         $ciphertext = $kms->encrypt('app', 'secret');
 
         $this->aws->down = true;
@@ -139,14 +142,276 @@ class CompositeKmsTest extends TestCase
         $kms->decrypt($ciphertext);
     }
 
-    public function testACiphertextNoRegisteredMemberWroteIsReportedLoudly()
+    public function testACiphertextWithoutAConfiguredMemberFailsDecryption()
     {
         $ciphertext = $this->kms()->encrypt('app', 'secret');
         $stranger = new CompositeKms(self::locator(['vault' => new InMemoryKms('vault'), 'local' => new InMemoryKms('local')]), ['vault' => null, 'local' => null]);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('None of the KMS clients that wrapped the ciphertext ("aws", "azure", "gcp") is registered');
+        $this->expectException(DecryptionFailedException::class);
+        $this->expectExceptionMessage('Decryption failed.');
         $stranger->decrypt($ciphertext);
+    }
+
+    public function testAFrameWithoutAConfiguredMemberIsLoggedWithoutItsNames()
+    {
+        $logger = new class extends AbstractLogger {
+            public array $records = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->records[] = [$level, $message, $context];
+            }
+        };
+        $rogue = "evil\n\x1B[31mINJECT";
+        $writer = new CompositeKms(self::locator([$rogue => new InMemoryKms('rogue')]), [$rogue => null]);
+        $reader = new CompositeKms(self::locator(['new' => new InMemoryKms('new'), 'old' => new InMemoryKms('old')]), ['new' => null], ['old'], $logger);
+
+        try {
+            $reader->decrypt($writer->encrypt('app', 'secret'));
+            $this->fail('The unconfigured client must not be asked to decrypt.');
+        } catch (DecryptionFailedException) {
+        }
+
+        $this->assertSame([['warning', 'A ciphertext carries no wrapping from a member of the composite client, which reads through "{members}".', ['members' => 'new", "old']]], $logger->records);
+        $this->assertStringNotContainsString('INJECT', json_encode($logger->records));
+    }
+
+    public function testAnUnregisteredConfiguredMemberIsReportedWhenAskedToRead()
+    {
+        $writer = new CompositeKms(self::locator(['aws' => $this->aws, 'rogue' => new InMemoryKms('rogue')]), ['aws' => null, 'rogue' => null]);
+        $reader = new CompositeKms(self::locator([]), ['aws' => null]);
+
+        try {
+            $reader->decrypt($writer->encrypt('app', 'secret'));
+            $this->fail('The configured member is not registered.');
+        } catch (LogicException $e) {
+            $this->assertSame('None of the KMS clients that wrapped the ciphertext ("aws") is registered on the composite client.', $e->getMessage());
+        }
+    }
+
+    public function testAFrameNameDoesNotAppearInTheDecryptionError()
+    {
+        $name = "evil\n\x1B[31mINJECT";
+        $writer = new CompositeKms(self::locator([$name => new InMemoryKms('rogue')]), [$name => null]);
+        $reader = new CompositeKms(self::locator(['good' => new InMemoryKms('good')]), ['good' => null]);
+
+        try {
+            $reader->decrypt($writer->encrypt('app', 'secret'));
+            $this->fail('The unconfigured client must not be asked to decrypt.');
+        } catch (DecryptionFailedException $e) {
+            $this->assertSame('Decryption failed.', $e->getMessage());
+        }
+    }
+
+    public function testAFrameCannotSelectARegisteredClientOutsideTheMembers()
+    {
+        $rogue = new SwitchableKms(new InMemoryKms('rogue'));
+        $writer = new CompositeKms(self::locator(['rogue' => $rogue]), ['rogue' => null]);
+        $reader = new CompositeKms(self::locator(['good' => new InMemoryKms('good'), 'rogue' => $rogue]), ['good' => null]);
+        $ciphertext = $writer->encrypt('app', 'chosen plaintext');
+
+        try {
+            $reader->decrypt($ciphertext);
+            $this->fail('The unconfigured client must not be asked to decrypt.');
+        } catch (DecryptionFailedException $e) {
+            $this->assertSame('Decryption failed.', $e->getMessage());
+        }
+
+        $this->assertSame(['encrypt' => 1], $rogue->calls);
+    }
+
+    public function testARetiredMemberReadsOldFramesWithoutWrappingNewOnes()
+    {
+        $old = new SwitchableKms(new InMemoryKms('old'));
+        $new = new SwitchableKms(new InMemoryKms('new'));
+        $original = new CompositeKms(self::locator(['old' => $old]), ['old' => null]);
+        $ciphertext = $original->encrypt('app', 'before the rename');
+        $dataKey = $original->generateDataKey('app');
+        $plaintext = $dataKey->use(static fn (string $key): string => $key);
+        $renamed = new CompositeKms(self::locator(['old' => $old, 'new' => $new]), ['new' => null], ['old']);
+
+        $this->assertSame('before the rename', $renamed->decrypt($ciphertext));
+        $this->assertSame($plaintext, $renamed->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key));
+        $this->assertSame('before the composite', $renamed->decrypt($old->encrypt('app', 'before the composite')));
+        $this->assertSame('after the rename', $renamed->decrypt($renamed->encrypt('app', 'after the rename')));
+        $this->assertSame(['encrypt' => 2, 'generateDataKey' => 1, 'decrypt' => 2, 'unwrapDataKey' => 1], $old->calls);
+        $this->assertSame(['decrypt' => 2, 'encrypt' => 1], $new->calls);
+    }
+
+    public function testARetiredMemberCannotAlsoBeActive()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The KMS client "old" cannot be both an active and a retired member.');
+
+        new CompositeKms(self::locator([]), ['old' => null], ['old']);
+    }
+
+    public function testARetiredMemberCannotBeListedTwice()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The retired KMS client "old" is listed more than once.');
+
+        new CompositeKms(self::locator([]), ['new' => null], ['old', 'old']);
+    }
+
+    #[DataProvider('provideInvalidRetiredMembers')]
+    public function testRetiredMembersMustBeAListOfValidNames(array $retired)
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new CompositeKms(self::locator([]), ['new' => null], $retired);
+    }
+
+    public static function provideInvalidRetiredMembers(): iterable
+    {
+        yield 'map' => [['old' => 'old']];
+        yield 'non-string' => [[1]];
+        yield 'empty' => [['']];
+        yield 'too long' => [[str_repeat('x', 256)]];
+    }
+
+    public function testAnUnconfiguredClientIsNotAskedWhenAConfiguredMemberFails()
+    {
+        $good = new SwitchableKms(new InMemoryKms('good'));
+        $rogue = new SwitchableKms(new InMemoryKms('rogue'));
+        $writer = new CompositeKms(self::locator(['good' => $good, 'rogue' => $rogue]), ['good' => null, 'rogue' => null]);
+        $ciphertext = $writer->encrypt('app', 'chosen plaintext');
+        $reader = new CompositeKms(self::locator(['good' => $good, 'rogue' => $rogue]), ['good' => null]);
+        $good->down = true;
+
+        try {
+            $reader->decrypt($ciphertext);
+            $this->fail('The unconfigured client must not be used as a fallback.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('The backend is down.', $e->getMessage());
+        }
+
+        $this->assertSame(['encrypt' => 1], $rogue->calls);
+    }
+
+    public function testADataKeyCannotBeUnwrappedThroughAnUnconfiguredClient()
+    {
+        $rogue = new SwitchableKms(new InMemoryKms('rogue'));
+        $writer = new CompositeKms(self::locator(['rogue' => $rogue]), ['rogue' => null]);
+        $reader = new CompositeKms(self::locator(['good' => new InMemoryKms('good'), 'rogue' => $rogue]), ['good' => null]);
+        $wrapped = $writer->generateDataKey('app')->wrapped;
+
+        try {
+            $reader->unwrapDataKey($wrapped);
+            $this->fail('The unconfigured client must not be asked to unwrap the data key.');
+        } catch (DecryptionFailedException $e) {
+            $this->assertSame('Decryption failed.', $e->getMessage());
+        }
+
+        $this->assertSame(['generateDataKey' => 1], $rogue->calls);
+    }
+
+    public function testADirectCompositeMemberIsRejectedOnRead()
+    {
+        $nested = new CompositeKms(self::locator(['good' => new InMemoryKms('good')]), ['good' => null]);
+        $writer = new CompositeKms(self::locator(['nested' => new InMemoryKms('nested')]), ['nested' => null]);
+        $reader = new CompositeKms(self::locator(['nested' => $nested]), ['nested' => null]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('A composite KMS client cannot be a member of another composite client.');
+        $reader->decrypt($writer->encrypt('app', 'secret'));
+    }
+
+    #[DataProvider('provideSelfMemberDecorators')]
+    public function testASelfMemberIsRejectedOnReadWhenDirectOrTraceable(string $decorator)
+    {
+        $clients = new class implements ContainerInterface {
+            public CompositeKms $self;
+            public string $decorator = 'direct';
+            public int $reads = 0;
+
+            public function get(string $id)
+            {
+                if (1 < ++$this->reads) {
+                    throw new \RuntimeException('Recursive read.');
+                }
+
+                return match ($this->decorator) {
+                    'traceable' => TraceableKms::wrap($this->self, new KeyManagementDataCollector(), 'self'),
+                    'real' => new InMemoryKms('self'),
+                    default => $this->self,
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return 'self' === $id;
+            }
+        };
+        $clients->self = new CompositeKms($clients, ['self' => null]);
+        $clients->decorator = $decorator;
+        $writer = new CompositeKms(self::locator(['self' => new InMemoryKms('self')]), ['self' => null]);
+        $ciphertext = $writer->encrypt('app', 'secret');
+
+        try {
+            $clients->self->decrypt($ciphertext);
+            $this->fail('The composite must not read through itself.');
+        } catch (LogicException $e) {
+            $this->assertSame('A composite KMS client cannot be a member of another composite client.', $e->getMessage());
+        }
+
+        $this->assertSame(1, $clients->reads);
+        $clients->decorator = 'real';
+        $clients->reads = 0;
+        $this->assertSame('secret', $clients->self->decrypt($ciphertext), 'a rejected composite member must not block later reads.');
+    }
+
+    public static function provideSelfMemberDecorators(): iterable
+    {
+        yield 'direct' => ['direct'];
+        yield 'traceable' => ['traceable'];
+    }
+
+    public function testAnIndependentReadCanRunDuringAMemberCall()
+    {
+        $member = new class(new InMemoryKms('member')) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
+            public ?\Closure $onDecrypt = null;
+
+            public function __construct(private InMemoryKms $inner)
+            {
+            }
+
+            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+            {
+                return $this->inner->encrypt($keyId, $plaintext, $aad, $deterministic);
+            }
+
+            public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
+            {
+                if (null !== $this->onDecrypt) {
+                    $onDecrypt = $this->onDecrypt;
+                    $this->onDecrypt = null;
+                    $onDecrypt();
+                }
+
+                return $this->inner->decrypt($ciphertext, $aad);
+            }
+
+            public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
+            {
+                return $this->inner->generateDataKey($keyId, $length, $aad);
+            }
+
+            public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
+            {
+                return $this->inner->unwrapDataKey($wrapped, $aad);
+            }
+        };
+        $kms = new CompositeKms(self::locator(['member' => $member]), ['member' => null]);
+        $first = $kms->encrypt('app', 'first');
+        $second = $kms->encrypt('app', 'second');
+        $independent = null;
+        $member->onDecrypt = static function () use ($kms, $second, &$independent): void {
+            $independent = $kms->decrypt($second);
+        };
+
+        $this->assertSame('first', $kms->decrypt($first));
+        $this->assertSame('second', $independent);
     }
 
     public function testAMemberThatCannotWrapFailsTheWrite()
@@ -204,6 +469,9 @@ class CompositeKmsTest extends TestCase
         $this->aws->down = true;
 
         $this->assertSame($plaintext, $kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key));
+        $this->assertSame(['generateDataKey' => 1, 'unwrapDataKey' => 1], $this->aws->calls);
+        $this->assertSame(['encrypt' => 1, 'decrypt' => 1], $this->azure->calls);
+        $this->assertSame(['encrypt' => 1], $this->gcp->calls);
     }
 
     public function testTheMintedDataKeyIsConsumed()
@@ -283,11 +551,13 @@ class CompositeKmsTest extends TestCase
     {
         $kms = new CompositeKms(self::locator(['aws' => $this->aws, 'azure' => $this->azure]), ['aws' => null, 'azure' => null]);
 
-        $ciphertext = $kms->encrypt('app', 'secret');
+        $first = $kms->encrypt('app', 'secret');
+        $second = $kms->encrypt('other', 'another secret');
         $survivor = new CompositeKms(self::locator(['azure' => $this->azure, 'gcp' => $this->gcp]), ['azure' => null, 'gcp' => null]);
 
-        $this->assertSame('secret', $survivor->decrypt($ciphertext));
-        $this->assertSame('app', $this->azure->keyIds[0]);
+        $this->assertSame('secret', $survivor->decrypt($first));
+        $this->assertSame('another secret', $survivor->decrypt($second));
+        $this->assertSame(['app', 'other'], $this->azure->keyIds);
     }
 
     public function testAMemberNameHasToFitInTheCiphertext()
@@ -308,7 +578,7 @@ class CompositeKmsTest extends TestCase
     }
 
     #[DataProvider('provideMalformedBlobs')]
-    public function testABlobThatDoesNotParseIsAnUnreadableCiphertext(string $blob)
+    public function testMalformedBlobsAreUnreadable(string $blob)
     {
         $this->expectException(DecryptionFailedException::class);
 
@@ -358,7 +628,7 @@ class CompositeKmsTest extends TestCase
     }
 
     #[RequiresPhpExtension('openssl')]
-    public function testAStoreIsRewrappedUnderNewMembersThroughTheCommand()
+    public function testAStoreIsRewrappedUnderAReplacementMemberThroughTheCommand()
     {
         $aws = new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32)]));
         $azure = new OpenSslKms(new InMemoryKeyLoader(['backup' => random_bytes(32)]));
@@ -402,6 +672,50 @@ class CompositeKmsTest extends TestCase
 
         $redundant->members = new CompositeKms(self::locator(['gcp' => $gcp, 'vault' => new InMemoryKms('vault')]), ['gcp' => null, 'vault' => null]);
         $this->assertSame('survives the loss of aws', $encrypter->decrypt($envelope));
+    }
+
+    public function testAStoredKeyCanBeMigratedAwayFromARetiredMember()
+    {
+        $old = new InMemoryKms('old');
+        $new = new InMemoryKms('new');
+        $main = new class(new CompositeKms(self::locator(['old' => $old]), ['old' => null])) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
+            public function __construct(public CompositeKms $members)
+            {
+            }
+
+            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+            {
+                return $this->members->encrypt($keyId, $plaintext, $aad, $deterministic);
+            }
+
+            public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
+            {
+                return $this->members->decrypt($ciphertext, $aad);
+            }
+
+            public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
+            {
+                return $this->members->generateDataKey($keyId, $length, $aad);
+            }
+
+            public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
+            {
+                return $this->members->unwrapDataKey($wrapped, $aad);
+            }
+        };
+        $store = new InMemoryDataKeyStore(['main' => $main], 'main', 'app');
+        $encrypter = new StoredEnvelopeEncrypter($store);
+        $envelope = $encrypter->encrypt('user.email', 'before the rename');
+        $store->forget();
+
+        $main->members = new CompositeKms(self::locator(['old' => $old, 'new' => $new]), ['new' => null], ['old']);
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, self::locator(['main' => $main])));
+        $tester->execute(['--from' => 'main', '--to' => 'main', '--key-id' => 'app']);
+        $tester->assertCommandIsSuccessful();
+        $store->forget();
+
+        $main->members = new CompositeKms(self::locator(['new' => $new]), ['new' => null]);
+        $this->assertSame('before the rename', $encrypter->decrypt($envelope));
     }
 
     public function testACiphertextAMemberWroteOnItsOwnIsRead()
@@ -537,9 +851,9 @@ class CompositeKmsTest extends TestCase
         return new ServiceLocator($factories);
     }
 
-    public function testAMemberIsPassedOverWhateverItThrows()
+    public function testMemberExceptionsArePassedOver()
     {
-        foreach ([new \DomainException('down.'), new \Exception('down.'), new \InvalidArgumentException('down.')] as $failure) {
+        foreach ([new \DomainException('down.'), new \Exception('down.'), new \InvalidArgumentException('down.'), new LogicException('down.')] as $failure) {
             $first = new SwitchableKms(new InMemoryKms(), $failure);
             $kms = new CompositeKms(self::locator(['aws' => $first, 'azure' => new InMemoryKms()]), ['aws' => null, 'azure' => null]);
             $ciphertext = $kms->encrypt('app', 'secret');

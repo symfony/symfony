@@ -672,8 +672,9 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('key_management.client', $definition->getArgument(0)->getTaggedIteratorArgument()->getTag(), 'the members are resolved lazily through the locator of the tagged clients.');
         $this->assertSame('key', $definition->getArgument(0)->getTaggedIteratorArgument()->getIndexAttribute());
         $this->assertSame(['aws' => null, 'azure' => 'backup'], $definition->getArgument(1));
-        $this->assertSame('logger', (string) $definition->getArgument(2), 'a member passed over is only ever reported to the logger.');
-        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $definition->getArgument(2)->getInvalidBehavior());
+        $this->assertSame([], $definition->getArgument(2), 'nothing is retired until a member is replaced.');
+        $this->assertSame('logger', (string) $definition->getArgument(3), 'a member passed over is only ever reported to the logger.');
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $definition->getArgument(3)->getInvalidBehavior());
         $this->assertSame([['channel' => 'key_management']], $definition->getTag('monolog.logger'));
         $this->assertSame([['key' => 'main']], $definition->getTag('key_management.client'), 'a composite client is a client like any other for the commands and the profiler.');
 
@@ -697,6 +698,52 @@ class KeyManagementBundleExtensionTest extends TestCase
                 'clients' => [
                     'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
                     'main' => ['members' => ['aws' => null, 'gcp' => 'backup']],
+                ],
+            ]);
+        });
+    }
+
+    public function testARetiredMemberIsPassedToTheCompositeClient()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'old' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'new' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['new' => null], 'retired' => ['old']],
+                ],
+            ]);
+        });
+
+        $this->assertSame(['old'], $container->getDefinition('key_management.main')->getArgument(2));
+    }
+
+    public function testARetiredMemberMustBeRegistered()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The member "old" of the composite KMS client "main" is not registered');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'new' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'main' => ['members' => ['new' => null], 'retired' => ['old']],
+                ],
+            ]);
+        });
+    }
+
+    public function testARetiredMemberCannotBeACompositeClientItself()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The member "inner" of the composite KMS client "outer" is a composite client itself');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'inner' => ['members' => ['aws' => null]],
+                    'outer' => ['members' => ['aws' => null], 'retired' => ['inner']],
                 ],
             ]);
         });

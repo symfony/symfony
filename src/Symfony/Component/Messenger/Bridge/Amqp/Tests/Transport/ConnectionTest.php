@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 #[RequiresPhpExtension('amqp')]
 #[Group('time-sensitive')]
@@ -905,6 +906,43 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    public function testALateAckIsNotTakenForTheConfirmOfTheNextMessage()
+    {
+        $connection = $this->createConfirmingConnection([[], [['ack', 1], ['nack', 2]]]);
+
+        try {
+            $connection->publish('m1');
+            $this->fail('The confirm of the first message should have timed out.');
+        } catch (\AMQPQueueException) {
+        }
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Message publication failed due to a negative acknowledgment (nack) from the broker.');
+
+        $connection->publish('m2');
+    }
+
+    public function testALateNackDoesNotFailTheNextMessage()
+    {
+        $connection = $this->createConfirmingConnection([[], [['nack', 1], ['ack', 2]]]);
+
+        try {
+            $connection->publish('m1');
+            $this->fail('The confirm of the first message should have timed out.');
+        } catch (\AMQPQueueException) {
+        }
+
+        $connection->publish('m2');
+    }
+
+    public function testConfirmsAreCountedFromOneOnANewChannel()
+    {
+        $connection = $this->createConfirmingConnection([[['ack', 1]], [['ack', 1]]], [true, false]);
+
+        $connection->publish('m1');
+        $connection->publish('m2');
+    }
+
     public function testItCanBeConstructedWithTLSOptionsAndNonTLSDsn()
     {
         $this->assertEquals(
@@ -1088,6 +1126,29 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
         $connection->publish('body');
+    }
+
+    private function createConfirmingConnection(array $confirms, array $connected = [true, true]): Connection
+    {
+        $callbacks = [];
+        $amqpChannel = $this->createMock(\AMQPChannel::class);
+        $amqpChannel->method('isConnected')->willReturnOnConsecutiveCalls(...$connected);
+        $amqpChannel->method('setConfirmCallback')->willReturnCallback(static function (callable $ack, callable $nack) use (&$callbacks) {
+            $callbacks = ['ack' => $ack, 'nack' => $nack];
+        });
+        $amqpChannel->expects($this->exactly(\count($confirms)))->method('waitForConfirm')->with(0.5)->willReturnCallback(static function () use (&$callbacks, &$confirms) {
+            foreach (array_shift($confirms) as [$method, $seqNo]) {
+                if (false === $callbacks[$method]($seqNo, false, false)) {
+                    return;
+                }
+            }
+
+            throw new \AMQPQueueException('Wait timeout exceed');
+        });
+
+        $factory = new TestAmqpFactory($this->createStub(\AMQPConnection::class), $amqpChannel, $this->createStub(\AMQPQueue::class), $this->createStub(\AMQPExchange::class));
+
+        return Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
     }
 
     private function createDelayOrRetryConnection(\AMQPExchange $delayExchange, string $deadLetterExchangeName, string $delayQueueName, bool|string $dailyDelayQueues = false): Connection

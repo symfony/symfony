@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T19:42:01Z
+
+Thanks @wachterjohannes. No changelog line for MongoDB and AMPHP SQL on purpose: both bridges are new in 8.2, so batching ships with their first release. `ordered: false` is in, see the thread above. Write concern errors and connections dropped mid-pipeline leave the same ambiguity as a single `send()` does, batches only widen the window: that's Messenger's at-least-once delivery.
+
+PR rebased after #66628 got merged. The red Psalm job is about the 2 new `Relay\Exception` catches in the Redis transport: Psalm has no Relay stubs on CI, and the 13 existing catches of that file are in its baseline.

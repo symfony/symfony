@@ -1032,6 +1032,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('web_link.add_link_header_listener'));
     }
 
+    public function testControllerExpressionLanguageIsLazy()
+    {
+        $container = $this->createContainerFromFile('default_config');
+
+        $this->assertTrue($container->getDefinition('controller.expression_language')->isLazy());
+    }
+
     public function testMessengerServicesRemovedWhenDisabled()
     {
         $container = $this->createContainerFromFile('messenger_disabled');

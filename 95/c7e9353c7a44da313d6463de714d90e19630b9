@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T15:13:25Z
+
+Thanks @HypeMC. I made `$if` accept a bool and default to `true`, like the `$if` argument of `#[Cache]`, so it now matches the description :)

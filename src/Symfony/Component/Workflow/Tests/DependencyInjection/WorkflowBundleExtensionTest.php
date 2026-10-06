@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -345,6 +346,10 @@ class WorkflowBundleExtensionTest extends TestCase
         $this->assertSame('!!true', $transitionGuardExpressions[0]->getArgument(1));
         $this->assertSame('.workflow.article.transition.4', (string) $transitionGuardExpressions[1]->getArgument(0));
         $this->assertSame('!!false', $transitionGuardExpressions[1]->getArgument(1));
+
+        $expressionLanguage = $container->getDefinition('workflow.security.expression_language');
+        $this->assertEquals(new Reference('cache.workflow_expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE), $expressionLanguage->getArgument(0));
+        $this->assertSame([['expressions' => ['!!true', '!!false']]], $expressionLanguage->getTag('expression_language.compiled'));
     }
 
     public function testWorkflowServicesCanBeEnabled()
@@ -353,6 +358,7 @@ class WorkflowBundleExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('workflow.registry'));
         $this->assertTrue($container->hasDefinition('console.command.workflow_dump'));
+        $this->assertFalse($container->getDefinition('workflow.security.expression_language')->hasTag('expression_language.compiled'));
     }
 
     public function testWorkflowServicesAreEnabledByDefault()

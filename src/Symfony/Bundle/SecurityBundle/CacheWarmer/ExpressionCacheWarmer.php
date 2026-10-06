@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\CacheWarmer;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 final class ExpressionCacheWarmer implements CacheWarmerInterface
 {

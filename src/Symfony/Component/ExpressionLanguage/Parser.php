@@ -37,6 +37,7 @@ class Parser
     private array $names;
     private int $flags = 0;
     private int $nestingLevel = 0;
+    private array $variables = [];
 
     public function __construct(
         private array $functions,
@@ -132,6 +133,7 @@ class Parser
         $this->stream = $stream;
         $this->names = $names;
         $this->nestingLevel = 0;
+        $this->variables = [];
 
         $node = $this->parseExpression();
         if (!$stream->isEOF()) {
@@ -255,6 +257,8 @@ class Parser
 
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
+                            $this->variables[$token->value] ??= $this->stream->current->test(Token::PUNCTUATION_TYPE, '??') ? null : $token->cursor;
+
                             if (!($this->flags & self::IGNORE_UNKNOWN_VARIABLES)) {
                                 if (!\in_array($token->value, $this->names, true)) {
                                     if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '??')) {
@@ -453,6 +457,20 @@ class Parser
         $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'A list of arguments must be closed by a parenthesis');
 
         return new Node\Node($args);
+    }
+
+    /**
+     * Returns the variables read by the last parsed expression.
+     *
+     * Each name maps to the position where the expression first reads it without "??", or to null when "??" guards every read.
+     *
+     * @return array<string, int|null>
+     *
+     * @internal
+     */
+    public function getVariables(): array
+    {
+        return $this->variables;
     }
 
     /**

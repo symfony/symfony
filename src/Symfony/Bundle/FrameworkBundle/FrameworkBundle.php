@@ -60,6 +60,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueReso
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerAttributesListenerPass;
 use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\DependencyInjection\RegisterCompiledExpressionLanguagesPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterLocaleAwareServicesPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
@@ -224,6 +225,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FindCommandBundlesPass());
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
+        $container->addCompilerPass(new RegisterCompiledExpressionLanguagesPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RoutingResolverPass());
         $this->addCompilerPassIfExists($container, RoutingControllerPass::class);

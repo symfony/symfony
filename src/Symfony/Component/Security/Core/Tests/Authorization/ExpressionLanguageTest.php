@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\CompiledExpressionLanguage;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
@@ -42,6 +43,24 @@ class ExpressionLanguageTest extends TestCase
         $context['token'] = $token;
 
         $this->assertEquals($result, $expressionLanguage->evaluate($expression, $context));
+    }
+
+    #[DataProvider('provider')]
+    public function testIsAuthenticatedWhenCompiled($token, $expression, $result)
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_compiled_expressions_');
+        file_put_contents($file, (new CompiledExpressionLanguage(new ExpressionLanguage()))->dumpCompiled([$expression]));
+
+        try {
+            $expressionLanguage = new CompiledExpressionLanguage(new ExpressionLanguage(), $file);
+            $tokenStorage = new TokenStorage();
+            $tokenStorage->setToken($token);
+            $authChecker = new AuthorizationChecker($tokenStorage, new AccessDecisionManager([new RoleVoter(), new AuthenticatedVoter(new AuthenticationTrustResolver())]));
+
+            $this->assertEquals($result, $expressionLanguage->evaluate($expression, ['auth_checker' => $authChecker, 'token' => $token]));
+        } finally {
+            unlink($file);
+        }
     }
 
     public static function provider()

@@ -33,7 +33,7 @@
         "symfony/css-selector": "^7.4|^8.0",
         "symfony/dependency-injection": "^8.2",
         "symfony/dom-crawler": "^7.4|^8.0",
-        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/expression-language": "^8.2",
         "symfony/finder": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/http-client-contracts": "^2.5|^3",

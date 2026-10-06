@@ -462,6 +462,7 @@ class WorkflowBundle extends AbstractBundle
         }
 
         $registryDefinition = $container->getDefinition('workflow.registry');
+        $guardExpressions = [];
 
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
@@ -631,7 +632,18 @@ class WorkflowBundle extends AbstractBundle
 
                 $container->setDefinition(\sprintf('.%s.listener.guard', $workflowId), $guard);
                 $container->setParameter('workflow.has_guard_listeners', true);
+
+                foreach ($guardsConfiguration as $guardExpressionDefinitions) {
+                    foreach ($guardExpressionDefinitions as $guardExpression) {
+                        $guardExpressions[] = $guardExpression->getArgument(1);
+                    }
+                }
             }
+        }
+
+        if ($guardExpressions) {
+            $container->getDefinition('workflow.security.expression_language')
+                ->addTag('expression_language.compiled', ['expressions' => array_values(array_unique($guardExpressions))]);
         }
     }
 }

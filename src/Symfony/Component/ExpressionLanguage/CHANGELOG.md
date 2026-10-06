@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `CompiledExpressionLanguage`, a decorator that evaluates and lints the expressions compiled by its `dumpCompiled()` method without parsing them
  * Add `count()` function to ExpressionLanguage
 
 8.1

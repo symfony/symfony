@@ -43,6 +43,13 @@ return static function (ContainerConfigurator $container) {
         ->set('workflow.registry', Registry::class)
         ->alias(Registry::class, 'workflow.registry')
         ->set('workflow.security.expression_language', ExpressionLanguage::class)
+            ->args([service('cache.workflow_expression_language')->nullOnInvalid()])
+
+        ->set('cache.workflow_expression_language')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
 
         ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
             ->args([

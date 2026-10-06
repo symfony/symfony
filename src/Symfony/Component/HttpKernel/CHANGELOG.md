@@ -26,6 +26,7 @@ CHANGELOG
  * Make `HttpClientKernel` forward the responses that carry the RFC 10036 `Incremental: ?1` header without buffering them
  * Consume the tokens of `#[RateLimit]` before resolving the controller arguments when its key does not read them
  * Add argument `$expressionLanguage` to `RateLimitAttributeListener`
+ * Add the `$if` argument to `#[RateLimit]`
 
 8.1
 ---

@@ -860,6 +860,130 @@ class RateLimitAttributeListenerTest extends TestCase
         $listener = new RateLimitAttributeListener($locator);
         $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api', methods: ['POST']), Request::create('/', 'GET')));
     }
+
+    public static function provideIfConditions(): iterable
+    {
+        yield 'false' => [false, null];
+        yield 'true' => [true, '1.2.3.4~GET~/'];
+        yield 'closure evaluating to false' => [static fn ($args, Request $request) => $request->isMethod('POST'), null];
+        yield 'closure evaluating to true' => [static fn ($args, Request $request) => $request->isMethod('GET'), '1.2.3.4~GET~/'];
+        yield 'expression evaluating to false' => [new Expression('request.isMethod("POST")'), null];
+        yield 'expression evaluating to true' => [new Expression('request.isMethod("GET")'), '1.2.3.4~GET~/'];
+    }
+
+    #[DataProvider('provideIfConditions')]
+    public function testIf(bool|Expression|\Closure $if, ?string $expectedKey)
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+
+        $listener->onKernelControllerAttribute($this->makeEvent(
+            new RateLimit('api', if: $if),
+            Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']),
+            new ExpressionLanguage(),
+        ));
+
+        $this->assertSame($expectedKey, $usedKey);
+    }
+
+    public function testFalseIfIsEvaluatedBeforeTheLimiterIsLookedUp()
+    {
+        $locator = $this->createStub(ServiceProviderInterface::class);
+        $locator->method('has')->willReturn(false);
+        $locator->method('getProvidedServices')->willReturn([]);
+
+        $listener = new RateLimitAttributeListener($locator);
+        $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('missing', if: static fn () => false), Request::create('/')));
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testFalseIfIsEvaluatedBeforeTheKey()
+    {
+        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(
+            new RateLimit('api', key: static fn () => throw new \LogicException('The key must not be evaluated.'), if: static fn () => false),
+            Request::create('/'),
+        ));
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testNonBooleanIfThrows()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('must evaluate to a boolean, "int" given');
+
+        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(
+            new RateLimit('api', if: static fn () => 42),
+            Request::create('/'),
+        ));
+    }
+
+    #[DataProvider('provideConditionsReadingArguments')]
+    public function testConditionReadingArgumentsIsConsumedOnceTheArgumentsAreResolved(Expression|\Closure $if)
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+        $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
+        $attribute = new RateLimit('api', if: $if);
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $controller = static fn ($id) => null;
+
+        $listener->onKernelControllerAttribute(new ControllerAttributeEvent($attribute, new ControllerEvent($kernel, $controller, $request, null), new ExpressionLanguage()));
+        $this->assertNull($usedKey, 'the condition reads the arguments, so it cannot be answered yet');
+
+        $listener->onKernelControllerAttribute(new ControllerAttributeEvent($attribute, new ControllerArgumentsEvent($kernel, $controller, ['42'], $request, null), new ExpressionLanguage()));
+        $this->assertSame('1.2.3.4~GET~/', $usedKey);
+    }
+
+    public static function provideConditionsReadingArguments(): iterable
+    {
+        yield 'expression reading args' => [new Expression('args["id"] != "0"')];
+        yield 'closure' => [static fn (array $args) => '0' !== $args['id']];
+    }
+
+    public function testConditionNotReadingArgumentsIsConsumedBeforeTheArgumentsAreResolved()
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+        $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
+        $attribute = new RateLimit('api', if: new Expression('request.isMethod("GET")'));
+
+        $listener->onKernelControllerAttribute($this->makeControllerEvent($attribute, $request, new ExpressionLanguage()));
+        $this->assertSame('1.2.3.4~GET~/', $usedKey);
+
+        $usedKey = null;
+        $listener->onKernelControllerAttribute($this->makeEvent($attribute, $request, new ExpressionLanguage()));
+        $this->assertNull($usedKey, 'the limit is not consumed a second time');
+    }
+
+    public function testStackedConditionalLimitersThroughARealKernelOnlyConsumeTheMatchingOne()
+    {
+        $kernel = $this->makeRealKernelWithLimiters([
+            'anonymous' => ['policy' => 'fixed_window', 'limit' => 2, 'interval' => '1 minute'],
+            'authenticated' => ['policy' => 'fixed_window', 'limit' => 100, 'interval' => '1 minute'],
+        ]);
+
+        $handle = static function (bool $authenticated) use ($kernel): Response {
+            $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
+            $request->attributes->set('_controller', new ConditionallyRateLimitedController());
+
+            if ($authenticated) {
+                $request->headers->set('Authorization', 'Bearer token');
+            }
+
+            return $kernel->handle($request);
+        };
+
+        $anonymous = $handle(false);
+        $this->assertSame('2', $anonymous->headers->get('X-RateLimit-Limit'));
+        $this->assertSame('1', $anonymous->headers->get('X-RateLimit-Remaining'));
+
+        $authenticated = $handle(true);
+        $this->assertSame('100', $authenticated->headers->get('X-RateLimit-Limit'), 'the other limiter speaks for this request');
+        $this->assertSame('99', $authenticated->headers->get('X-RateLimit-Remaining'));
+
+        $anonymousAgain = $handle(false);
+        $this->assertSame('2', $anonymousAgain->headers->get('X-RateLimit-Limit'));
+        $this->assertSame('0', $anonymousAgain->headers->get('X-RateLimit-Remaining'));
+    }
 }
 
 class RateLimitedController
@@ -949,6 +1073,16 @@ class StackedTokenCostController
 {
     #[RateLimit('cheap', key: 'k', exposeHeaders: true)]
     #[RateLimit('pricey', key: 'k', tokens: 10, exposeHeaders: true)]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+class ConditionallyRateLimitedController
+{
+    #[RateLimit('anonymous', key: 'k', exposeHeaders: true, if: new Expression('!request.headers.has("Authorization")'))]
+    #[RateLimit('authenticated', key: 'k', exposeHeaders: true, if: new Expression('request.headers.has("Authorization")'))]
     public function __invoke(): Response
     {
         return new Response('ok');

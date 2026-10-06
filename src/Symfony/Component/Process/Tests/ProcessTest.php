@@ -1451,10 +1451,7 @@ class ProcessTest extends TestCase
             $output[] = [$type, $data];
             break;
         }
-        $expectedOutput = [
-            [$process::OUT, '123'],
-        ];
-        $this->assertSame($expectedOutput, $output);
+        $this->assertCount(1, $output);
 
         $input->write(345);
 
@@ -1464,6 +1461,17 @@ class ProcessTest extends TestCase
 
         $this->assertSame('', $process->getOutput());
         $this->assertFalse($process->isRunning());
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            // Output files are polled on Windows, so the order of chunks across stdout and stderr is not preserved
+            $streams = [$process::OUT => '', $process::ERR => ''];
+            foreach ($output as [$type, $data]) {
+                $streams[$type] .= $data;
+            }
+            $this->assertSame([$process::OUT => '123345', $process::ERR => '234456'], $streams);
+
+            return;
+        }
 
         $expectedOutput = [
             [$process::OUT, '123'],

@@ -8,6 +8,7 @@ CHANGELOG
  * Round delays up to two significant digits and add the `delay[granularity]` option to control that rounding
  * Implement the `KeepaliveReceiverInterface` to enable asynchronously notifying AMQP that the job is still being processed, in order to avoid timeouts
  * Pass the routing key to the serializer as `extra[routing_key]` when decoding
+ * Add `bindings` option to `queues` to configure additional exchange-queue bindings
 
 8.1
 ---

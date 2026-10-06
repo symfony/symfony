@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add support for consuming stream entries written with a raw `XADD`, using `body` and `headers` fields
  * Report stream entries that cannot be decoded through the failure transport instead of dropping them silently
+ * Make `RedisSender` and `RedisTransport` implement `BatchSenderInterface`, pipelining up to 1000 messages per round trip
 
 8.1
 ---

@@ -61,4 +61,16 @@ final class PostgresBackend implements BackendInterface
 
         return $transaction->execute(\sprintf('INSERT INTO %s (body, headers, queue_name, created_at, available_at) VALUES (?, ?, ?, %s, %s + ?) RETURNING id', $table, $now, $now), [$body, $headers, $queueName, $delay])->fetchRow()['id'] ?? null;
     }
+
+    public function insertBatch(SqlTransaction $transaction, string $table, array $messages, string $queueName): array
+    {
+        $now = $this->getNowExpression();
+        $values = implode(', ', array_fill(0, \count($messages), \sprintf('(?, ?, ?, %s, %s + ?)', $now, $now)));
+        $params = [];
+        foreach ($messages as [$body, $headers, $delay]) {
+            array_push($params, $body, $headers, $queueName, $delay);
+        }
+
+        return array_column(iterator_to_array($transaction->execute(\sprintf('INSERT INTO %s (body, headers, queue_name, created_at, available_at) VALUES %s RETURNING id', $table, $values), $params), false), 'id');
+    }
 }

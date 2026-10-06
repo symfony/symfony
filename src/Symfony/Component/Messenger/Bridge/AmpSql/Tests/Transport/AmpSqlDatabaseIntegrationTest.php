@@ -29,28 +29,7 @@ final class AmpSqlDatabaseIntegrationTest extends TestCase
     #[DataProvider('provideServerDsn')]
     public function testConcurrentConsumersDoNotClaimTheSameMessages(string $dsnEnvironmentVariable, string $defaultDsn)
     {
-        $dsn = getenv($dsnEnvironmentVariable);
-        $required = false !== $dsn;
-        $dsn = $dsn ?: $defaultDsn;
-        $parts = parse_url($dsn);
-        if (false === $parts || !isset($parts['host'], $parts['scheme'])) {
-            self::fail('The database DSN is invalid.');
-        }
-
-        $port = $parts['port'] ?? match ($parts['scheme']) {
-            'amp-mysql' => 3306,
-            'amp-postgres' => 5432,
-        };
-        $socket = @fsockopen(trim($parts['host'], '[]'), $port, $errorCode, $errorMessage, 0.1);
-        if (false === $socket) {
-            $message = \sprintf('%s is not available: %s (%d).', $parts['scheme'], $errorMessage, $errorCode);
-            if ($required) {
-                self::fail($message);
-            }
-            self::markTestSkipped($message);
-        }
-        fclose($socket);
-
+        $dsn = self::getAvailableDsn($dsnEnvironmentVariable, $defaultDsn);
         $options = [
             'queue_name' => 'test_'.bin2hex(random_bytes(6)),
             'table_name' => 'messenger_amp_test',
@@ -87,10 +66,73 @@ final class AmpSqlDatabaseIntegrationTest extends TestCase
         }
     }
 
+    #[DataProvider('provideServerDsn')]
+    public function testSendBatch(string $dsnEnvironmentVariable, string $defaultDsn)
+    {
+        $dsn = self::getAvailableDsn($dsnEnvironmentVariable, $defaultDsn);
+        $transport = (new AmpSqlTransportFactory())->createTransport($dsn, ['queue_name' => 'test_'.bin2hex(random_bytes(6)), 'table_name' => 'messenger_amp_test'], new PhpSerializer());
+        self::assertInstanceOf(AmpSqlTransport::class, $transport);
+
+        try {
+            $envelopes = [];
+            foreach (range(1, 150) as $number) {
+                $envelopes['m'.$number] = new Envelope(new DummyMessage((string) $number));
+            }
+
+            $sent = $transport->sendBatch($envelopes);
+            $ids = array_map(static fn (Envelope $envelope): int|string|null => $envelope->last(TransportMessageIdStamp::class)?->getId(), $sent);
+
+            self::assertSame(array_keys($envelopes), array_keys($sent));
+            self::assertSame(150, $transport->getMessageCount());
+
+            $received = iterator_to_array($transport->get(150));
+            self::assertSame(array_map(strval(...), range(1, 150)), array_map(static fn (Envelope $envelope): string => $envelope->getMessage()->getValue(), $received));
+
+            if (str_starts_with($dsn, 'amp-postgres:')) {
+                self::assertSame(array_values($ids), array_map(static fn (Envelope $envelope): int|string|null => $envelope->last(TransportMessageIdStamp::class)?->getId(), $received));
+            } else {
+                self::assertSame(array_fill_keys(array_keys($envelopes), null), $ids);
+            }
+
+            foreach ($received as $message) {
+                $transport->ack($message);
+            }
+        } finally {
+            $transport->close();
+        }
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function provideServerDsn(): iterable
     {
         yield 'MySQL' => ['AMP_SQL_MYSQL_DSN', 'amp-mysql://root:password@127.0.0.1:3306/messenger'];
         yield 'PostgreSQL' => ['AMP_SQL_POSTGRES_DSN', 'amp-postgres://postgres:password@127.0.0.1:5432/postgres'];
+    }
+
+    private static function getAvailableDsn(string $dsnEnvironmentVariable, string $defaultDsn): string
+    {
+        $dsn = getenv($dsnEnvironmentVariable);
+        $required = false !== $dsn;
+        $dsn = $dsn ?: $defaultDsn;
+        $parts = parse_url($dsn);
+        if (false === $parts || !isset($parts['host'], $parts['scheme'])) {
+            self::fail('The database DSN is invalid.');
+        }
+
+        $port = $parts['port'] ?? match ($parts['scheme']) {
+            'amp-mysql' => 3306,
+            'amp-postgres' => 5432,
+        };
+        $socket = @fsockopen(trim($parts['host'], '[]'), $port, $errorCode, $errorMessage, 0.1);
+        if (false === $socket) {
+            $message = \sprintf('%s is not available: %s (%d).', $parts['scheme'], $errorMessage, $errorCode);
+            if ($required) {
+                self::fail($message);
+            }
+            self::markTestSkipped($message);
+        }
+        fclose($socket);
+
+        return $dsn;
     }
 }

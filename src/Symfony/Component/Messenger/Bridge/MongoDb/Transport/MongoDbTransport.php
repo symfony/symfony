@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -22,7 +23,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * @author Alessandro Lai <alessandro.lai85@gmail.com>
  */
-class MongoDbTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface, QueueReceiverInterface
+class MongoDbTransport implements TransportInterface, BatchSenderInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface, QueueReceiverInterface
 {
     private MongoDbReceiver $receiver;
     private MongoDbSender $sender;
@@ -56,6 +57,11 @@ class MongoDbTransport implements TransportInterface, SetupableTransportInterfac
     public function send(Envelope $envelope): Envelope
     {
         return $this->getSender()->send($envelope);
+    }
+
+    public function sendBatch(array $envelopes): array
+    {
+        return $this->getSender()->sendBatch($envelopes);
     }
 
     /**

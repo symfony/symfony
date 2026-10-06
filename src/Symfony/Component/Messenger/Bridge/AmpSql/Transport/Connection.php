@@ -35,6 +35,11 @@ final class Connection
         'table_name' => 'messenger_amp_messages',
     ];
 
+    // 400 parameters per statement, far below the limit of every backend
+    private const MAX_BATCH_ROWS = 100;
+    // keeps the statements of a batch below the packet size limit of the server
+    private const MAX_BATCH_SIZE = 1048576;
+
     private bool $autoSetup;
     private string $queueName;
     private int $redeliverTimeout;
@@ -72,6 +77,56 @@ final class Connection
         } catch (\Throwable $e) {
             $this->rollback($transaction);
             throw $this->createTransportException('Could not send the message to AMPHP SQL.', $e);
+        }
+    }
+
+    /**
+     * Inserts messages in one transaction, with as few statements as possible.
+     *
+     * @param non-empty-array<array{string, array<string, string>, int}> $messages The arguments of send() for each message
+     *
+     * @return array<int|string> The inserted IDs by the key of the messages, when the backend tells them
+     */
+    public function sendBatch(#[\SensitiveParameter] array $messages): array
+    {
+        $this->ensureSetup();
+        $transaction = null;
+
+        try {
+            $batches = [];
+            $batch = [];
+            $batchSize = 0;
+
+            foreach ($messages as $key => [$body, $headers, $delay]) {
+                $message = [base64_encode($body), json_encode($headers, \JSON_THROW_ON_ERROR), $delay];
+                $size = \strlen($message[0]) + \strlen($message[1]);
+
+                if ($batch && (self::MAX_BATCH_ROWS === \count($batch) || self::MAX_BATCH_SIZE < $batchSize + $size)) {
+                    $batches[] = $batch;
+                    $batch = [];
+                    $batchSize = 0;
+                }
+
+                $batch[$key] = $message;
+                $batchSize += $size;
+            }
+
+            $batches[] = $batch;
+            $ids = [];
+            $transaction = $this->connection->beginTransaction();
+
+            foreach ($batches as $batch) {
+                if ($batchIds = $this->backend->insertBatch($transaction, $this->tableName, array_values($batch), $this->queueName)) {
+                    $ids += array_combine(array_keys($batch), array_map(self::normalizeId(...), $batchIds));
+                }
+            }
+
+            $transaction->commit();
+
+            return $ids;
+        } catch (\Throwable $e) {
+            $this->rollback($transaction);
+            throw $this->createTransportException('Could not send the messages to AMPHP SQL.', $e);
         }
     }
 

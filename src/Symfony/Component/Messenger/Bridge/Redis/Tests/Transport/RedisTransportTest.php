@@ -17,6 +17,8 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -29,6 +31,7 @@ class RedisTransportTest extends TestCase
         $transport = $this->getTransport();
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
+        $this->assertInstanceOf(BatchSenderInterface::class, $transport);
     }
 
     public function testReceivesMessages()
@@ -96,6 +99,20 @@ class RedisTransportTest extends TestCase
         $connection->expects($this->once())->method('keepalive')->with('redisid-123');
 
         $transport->keepalive(new Envelope(new DummyMessage('foo'), [new RedisReceivedStamp('redisid-123')]));
+    }
+
+    public function testSendBatch()
+    {
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => '...']);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('addBatch')->with([['...', [], 0], ['...', [], 0]])->willReturn([['1-0', '1-1'], []]);
+
+        $envelopes = $this->getTransport($serializer, $connection)->sendBatch([new Envelope(new DummyMessage('a')), new Envelope(new DummyMessage('b'))]);
+
+        $this->assertSame('1-0', $envelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+        $this->assertSame('1-1', $envelopes[1]->last(TransportMessageIdStamp::class)?->getId());
     }
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): RedisTransport

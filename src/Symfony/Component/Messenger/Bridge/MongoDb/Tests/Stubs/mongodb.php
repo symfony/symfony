@@ -61,6 +61,10 @@ namespace MongoDB {
             {
             }
 
+            public function insertMany(array $documents, array $options = [])
+            {
+            }
+
             public function insertOne($document, array $options = [])
             {
             }
@@ -71,6 +75,15 @@ namespace MongoDB {
         class DeleteResult
         {
             public function getDeletedCount()
+            {
+            }
+        }
+    }
+
+    if (!class_exists(InsertManyResult::class, \extension_loaded('mongodb'))) {
+        class InsertManyResult
+        {
+            public function getInsertedIds()
             {
             }
         }
@@ -165,9 +178,71 @@ namespace MongoDB\Driver {
         {
         }
     }
+
+    if (!class_exists(WriteConcernError::class, \extension_loaded('mongodb'))) {
+        class WriteConcernError
+        {
+        }
+    }
+
+    if (!class_exists(WriteError::class, \extension_loaded('mongodb'))) {
+        class WriteError
+        {
+            public function __construct(
+                private int $index,
+                private string $message,
+            ) {
+            }
+
+            public function getIndex(): int
+            {
+                return $this->index;
+            }
+
+            public function getMessage(): string
+            {
+                return $this->message;
+            }
+        }
+    }
+
+    if (!class_exists(WriteResult::class, \extension_loaded('mongodb'))) {
+        class WriteResult
+        {
+            /**
+             * @param list<WriteError> $writeErrors
+             */
+            public function __construct(
+                private int $insertedCount,
+                private ?WriteConcernError $writeConcernError = null,
+                private array $writeErrors = [],
+            ) {
+            }
+
+            public function getInsertedCount(): ?int
+            {
+                return $this->insertedCount;
+            }
+
+            public function getWriteConcernError(): ?WriteConcernError
+            {
+                return $this->writeConcernError;
+            }
+
+            /**
+             * @return list<WriteError>
+             */
+            public function getWriteErrors(): array
+            {
+                return $this->writeErrors;
+            }
+        }
+    }
 }
 
 namespace MongoDB\Driver\Exception {
+    use MongoDB\Driver\WriteResult;
+
     if (!interface_exists(Exception::class, \extension_loaded('mongodb'))) {
         interface Exception extends \Throwable
         {
@@ -177,6 +252,23 @@ namespace MongoDB\Driver\Exception {
     if (!class_exists(RuntimeException::class, \extension_loaded('mongodb'))) {
         class RuntimeException extends \RuntimeException implements Exception
         {
+        }
+    }
+
+    if (!class_exists(BulkWriteException::class, \extension_loaded('mongodb'))) {
+        class BulkWriteException extends RuntimeException
+        {
+            public function __construct(
+                string $message,
+                private WriteResult $writeResult,
+            ) {
+                parent::__construct($message);
+            }
+
+            public function getWriteResult(): WriteResult
+            {
+                return $this->writeResult;
+            }
         }
     }
 }

@@ -1193,6 +1193,149 @@ class ConnectionTest extends TestCase
         $connection->publish('m2');
     }
 
+    public function testPublishBatchWaitsForTheConfirmsOnce()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createConfirmingChannel([[['ack', 3, true]]]),
+            $this->createStub(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->exactly(3))->method('publish');
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+
+        $this->assertSame([], $connection->publishBatch(['a' => ['a', [], 0, null], 'b' => ['b', [], 0, null], 'c' => ['c', [], 0, null]]));
+    }
+
+    public function testPublishBatchWaitsAgainWhenTheWaitEndsBeforeAllMessagesAreConfirmed()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createConfirmingChannel([[['ack', 1, false]], [['ack', 2, false]]]),
+            $this->createStub(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+
+        $this->assertSame([], $connection->publishBatch([['a', [], 0, null], ['b', [], 0, null]]));
+    }
+
+    public function testPublishBatchTellsWhichMessagesWereNacked()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createConfirmingChannel([[['nack', 3, false], ['ack', 2, true], ['nack', 4, false]]]),
+            $this->createStub(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+        $exceptions = $connection->publishBatch(['a' => ['a', [], 0, null], 'b' => ['b', [], 0, null], 'c' => ['c', [], 0, null], 'd' => ['d', [], 0, null]]);
+
+        $this->assertSame(['c', 'd'], array_keys($exceptions));
+        $this->assertInstanceOf(TransportException::class, $exceptions['c']);
+        $this->assertSame('Message publication failed due to a negative acknowledgment (nack) from the broker.', $exceptions['c']->getMessage());
+        $this->assertInstanceOf(TransportException::class, $exceptions['d']);
+    }
+
+    public function testPublishBatchReportsTheUnconfirmedMessagesWhenTheWaitTimesOut()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createConfirmingChannel([[['ack', 1, false], $timeout = new \AMQPQueueException('Wait timeout exceed')]]),
+            $this->createStub(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+        $exceptions = $connection->publishBatch([['a', [], 0, null], ['b', [], 0, null], ['c', [], 0, null]]);
+
+        $this->assertSame([1, 2], array_keys($exceptions));
+        $this->assertSame($exceptions[1], $exceptions[2]);
+        $this->assertInstanceOf(TransportException::class, $exceptions[1]);
+        $this->assertSame('Wait timeout exceed', $exceptions[1]->getMessage());
+        $this->assertSame($timeout, $exceptions[1]->getPrevious());
+    }
+
+    public function testPublishBatchCountsTheMessagesPublishedBeforeOnTheChannel()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createConfirmingChannel([[['ack', 1, false]], [['ack', 2, false], ['nack', 3, false]]]),
+            $this->createStub(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+        $connection->publish('first');
+
+        $this->assertSame(['b'], array_keys($connection->publishBatch(['a' => ['a', [], 0, null], 'b' => ['b', [], 0, null]])));
+    }
+
+    public function testPublishBatchPublishesTheUnconfirmedMessagesAgainAfterAConnectionException()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createConfirmingChannel([[['ack', 1, false], new \AMQPConnectionException('a socket error occurred')], [['ack', 2, true]]]),
+            $this->createStub(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $published = [];
+        $amqpExchange->expects($this->exactly(5))->method('publish')->willReturnCallback(static function (string $body) use (&$published) {
+            $published[] = $body;
+        });
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+
+        $this->assertSame([], $connection->publishBatch([['a', [], 0, null], ['b', [], 0, null], ['c', [], 0, null]]));
+        $this->assertSame(['a', 'b', 'c', 'b', 'c'], $published);
+    }
+
+    public function testPublishBatchWithoutConfirms()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $this->createStub(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpChannel->expects($this->never())->method('waitForConfirm');
+        $amqpExchange->expects($this->exactly(2))->method('publish');
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+
+        $this->assertSame([], $connection->publishBatch([['a', [], 0, null], ['b', [], 0, null]]));
+    }
+
+    public function testPublishBatchWithoutConfirmsStopsAtTheFirstFailure()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createStub(\AMQPChannel::class),
+            $this->createStub(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->exactly(2))->method('publish')->willReturnCallback(static function (string $body) {
+            if ('b' === $body) {
+                throw new \AMQPChannelException('Could not publish.');
+            }
+        });
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $exceptions = $connection->publishBatch(['a' => ['a', [], 0, null], 'b' => ['b', [], 0, null], 'c' => ['c', [], 0, null]]);
+
+        $this->assertSame(['b', 'c'], array_keys($exceptions));
+        $this->assertSame($exceptions['b'], $exceptions['c']);
+        $this->assertInstanceOf(TransportException::class, $exceptions['b']);
+        $this->assertSame('Could not publish.', $exceptions['b']->getMessage());
+    }
+
     public function testItCanBeConstructedWithTLSOptionsAndNonTLSDsn()
     {
         $this->assertEquals(
@@ -1399,6 +1542,31 @@ class ConnectionTest extends TestCase
         $factory = new TestAmqpFactory($this->createStub(\AMQPConnection::class), $amqpChannel, $this->createStub(\AMQPQueue::class), $this->createStub(\AMQPExchange::class));
 
         return Connection::fromDsn('amqp://localhost?confirm_timeout=0.5', [], $factory);
+    }
+
+    private function createConfirmingChannel(array $waits): \AMQPChannel
+    {
+        $callbacks = [];
+        $amqpChannel = $this->createMock(\AMQPChannel::class);
+        $amqpChannel->method('isConnected')->willReturn(true);
+        $amqpChannel->method('setConfirmCallback')->willReturnCallback(static function (?callable $ack, ?callable $nack) use (&$callbacks) {
+            $callbacks = ['ack' => $ack, 'nack' => $nack];
+        });
+        $amqpChannel->expects($this->exactly(\count($waits)))->method('waitForConfirm')->with(0.5)->willReturnCallback(static function () use (&$waits, &$callbacks) {
+            foreach (array_shift($waits) as $confirm) {
+                if ($confirm instanceof \Throwable) {
+                    throw $confirm;
+                }
+
+                [$method, $tag, $multiple] = $confirm;
+
+                if (false === ('ack' === $method ? $callbacks['ack']($tag, $multiple) : $callbacks['nack']($tag, $multiple, false))) {
+                    return;
+                }
+            }
+        });
+
+        return $amqpChannel;
     }
 
     private function createDelayOrRetryConnection(\AMQPExchange $delayExchange, string $deadLetterExchangeName, string $delayQueueName, bool|string $dailyDelayQueues = false, int $expectedDelay = 5000, array $delayOptions = []): Connection

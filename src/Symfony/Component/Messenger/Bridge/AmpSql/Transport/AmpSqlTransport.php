@@ -16,11 +16,12 @@ use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-final class AmpSqlTransport implements TransportInterface, KeepaliveReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
+final class AmpSqlTransport implements TransportInterface, BatchSenderInterface, KeepaliveReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
     private AmpSqlReceiver $receiver;
     private AmpSqlSender $sender;
@@ -54,6 +55,11 @@ final class AmpSqlTransport implements TransportInterface, KeepaliveReceiverInte
     public function send(Envelope $envelope): Envelope
     {
         return $this->getSender()->send($envelope);
+    }
+
+    public function sendBatch(array $envelopes): array
+    {
+        return $this->getSender()->sendBatch($envelopes);
     }
 
     public function setup(): void

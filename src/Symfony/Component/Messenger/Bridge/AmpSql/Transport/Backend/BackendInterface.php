@@ -30,4 +30,13 @@ interface BackendInterface
      * validates and normalizes it.
      */
     public function insert(SqlTransaction $transaction, string $table, string $body, string $headers, string $queueName, int $delay): mixed;
+
+    /**
+     * Inserts several messages with one statement and returns their IDs as provided by the driver, in the order of the messages, or an empty list when the driver cannot tell the ID of each row.
+     *
+     * @param non-empty-list<array{string, string, int}> $messages The body, headers and delay of each message
+     *
+     * @return list<mixed>
+     */
+    public function insertBatch(SqlTransaction $transaction, string $table, array $messages, string $queueName): array;
 }

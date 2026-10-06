@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
@@ -23,8 +24,9 @@ use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
  *
  * Consuming the outbox transport forwards the stored messages to the target transport.
  * Redelivered messages went through the outbox already and are sent to the target directly.
+ * When the outbox transport sends batches, the new messages of a batch are stored with as few requests as it allows.
  */
-final class OutboxSender implements SenderInterface
+final class OutboxSender implements BatchSenderInterface
 {
     public function __construct(
         private SenderInterface $target,
@@ -53,5 +55,38 @@ final class OutboxSender implements SenderInterface
         }
 
         return $this->outbox->send($envelope->with(new OutboxStamp($this->targetName)))->withoutAll(OutboxStamp::class);
+    }
+
+    public function sendBatch(array $envelopes): array
+    {
+        $sent = $exceptions = [];
+        $new = array_filter($envelopes, static fn (Envelope $envelope) => !$envelope->last(OutboxStamp::class) && !$envelope->last(RedeliveryStamp::class));
+
+        // storing first keeps an exception other than BatchSendFailedException meaning that no envelope was sent
+        if ($new && $this->outbox instanceof BatchSenderInterface) {
+            try {
+                $sent = $this->outbox->sendBatch(array_map(fn (Envelope $envelope) => $envelope->with(new OutboxStamp($this->targetName)), $new));
+            } catch (BatchSendFailedException $e) {
+                $sent = $e->getEnvelopes();
+                $exceptions = $e->getExceptions();
+            }
+
+            $sent = array_map(static fn (Envelope $envelope) => $envelope->withoutAll(OutboxStamp::class), $sent);
+        }
+
+        foreach (array_diff_key($envelopes, $sent, $exceptions) as $key => $envelope) {
+            try {
+                $sent[$key] = $this->send($envelope);
+            } catch (\Throwable $e) {
+                $exceptions += array_fill_keys(array_keys(array_diff_key($envelopes, $sent, $exceptions)), $e);
+                break;
+            }
+        }
+
+        if ($exceptions) {
+            throw new BatchSendFailedException($sent, $exceptions);
+        }
+
+        return $sent;
     }
 }

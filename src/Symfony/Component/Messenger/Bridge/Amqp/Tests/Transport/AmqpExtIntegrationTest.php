@@ -21,6 +21,8 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpSender;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -113,6 +115,78 @@ class AmqpExtIntegrationTest extends TestCase
         // next tests send
         $connection->channel()->getConnection()->disconnect();
         $connection->clear();
+    }
+
+    public function testItSendsABatchOfMessagesAndWaitsForTheirConfirmsOnce()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), ['confirm_timeout' => 2]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection, $serializer);
+        $receiver = new AmqpReceiver($connection, $serializer);
+
+        $sender->send(new Envelope(new DummyMessage('First')));
+
+        $envelopes = [
+            'a' => new Envelope(new DummyMessage('Second')),
+            'b' => new Envelope(new DummyMessage('Delayed'), [new DelayStamp(1000)]),
+            'c' => new Envelope(new DummyMessage('Third')),
+        ];
+
+        $this->assertSame(['a', 'b', 'c'], array_keys($sender->sendBatch($envelopes)));
+
+        foreach (['First', 'Second', 'Third', 'Delayed'] as $expected) {
+            $envelopes = $this->receiveEnvelopes($receiver, 5);
+            $this->assertCount(1, $envelopes);
+            $this->assertEquals(new DummyMessage($expected), $envelopes[0]->getMessage());
+            $receiver->ack($envelopes[0]);
+        }
+    }
+
+    public function testItTellsWhichMessagesOfABatchTheBrokerRejected()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
+            'confirm_timeout' => 2,
+            'exchange' => ['name' => 'messages_batch'],
+            'queues' => ['messages_batch' => ['arguments' => ['x-max-length' => 3, 'x-overflow' => 'reject-publish']]],
+        ]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection, $serializer);
+        $receiver = new AmqpReceiver($connection, $serializer);
+
+        $sender->send(new Envelope(new DummyMessage('First')));
+
+        $envelopes = [
+            'a' => new Envelope(new DummyMessage('Second')),
+            'b' => new Envelope(new DummyMessage('Third')),
+            'c' => new Envelope(new DummyMessage('Fourth')),
+            'd' => new Envelope(new DummyMessage('Fifth')),
+        ];
+
+        try {
+            $sender->sendBatch($envelopes);
+            $this->fail('An exception should have been thrown.');
+        } catch (BatchSendFailedException $e) {
+            $this->assertSame(['a', 'b'], array_keys($e->getEnvelopes()));
+            $this->assertSame(['c', 'd'], array_keys($e->getExceptions()));
+            $this->assertInstanceOf(TransportException::class, $e->getExceptions()['c']);
+        }
+
+        foreach (['First', 'Second', 'Third'] as $expected) {
+            $envelopes = iterator_to_array($receiver->get());
+            $this->assertCount(1, $envelopes);
+            $this->assertEquals(new DummyMessage($expected), $envelopes[0]->getMessage());
+            $receiver->ack($envelopes[0]);
+        }
+
+        $this->assertSame([], iterator_to_array($receiver->get()));
     }
 
     public function testItSendsAndReceivesMessagesThroughDefaultExchange()

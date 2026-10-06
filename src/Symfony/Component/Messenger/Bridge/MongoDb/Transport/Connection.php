@@ -16,6 +16,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
 use MongoDB\Collection;
+use MongoDB\Driver\Exception\BulkWriteException;
 use MongoDB\Driver\Exception\Exception as MongoDriverException;
 use MongoDB\Driver\Session;
 use MongoDB\Driver\WriteConcern;
@@ -190,15 +191,7 @@ class Connection
      */
     public function send(string $body, array $headers = [], int $delay = 0, ?Session $session = null, ?string $queueName = null): ObjectId
     {
-        $now = $this->now();
-        $availableAt = $now->modify(\sprintf('+%d milliseconds', $delay));
-
-        $document = new BSONDocument();
-        $document['body'] = $body;
-        $document['headers'] = new BSONDocument($headers);
-        $document['queueName'] = $queueName ?? $this->queueName;
-        $document['createdAt'] = new UTCDateTime($now);
-        $document['availableAt'] = new UTCDateTime($availableAt);
+        $document = $this->createDocument($this->now(), $body, $headers, $delay, $queueName);
 
         try {
             $insertResult = $this->collection->insertOne($document, $this->getWriteOptions($session));
@@ -207,6 +200,68 @@ class Connection
         }
 
         return $insertResult->getInsertedId();
+    }
+
+    /**
+     * Inserts messages with one request per run of consecutive messages that share the same session.
+     *
+     * The driver splits each request into as many commands as the size limits of the server require.
+     *
+     * @param non-empty-array<array{string, array<string, string>, int, ?Session, ?string}> $messages The arguments of send() for each message
+     *
+     * @return array{array<ObjectId>, array<TransportException>} The ids of the inserted messages and the exceptions that prevented inserting the others, by the key of the messages
+     */
+    public function sendBatch(array $messages): array
+    {
+        $now = $this->now();
+        $ids = $requests = $documents = [];
+        $session = null;
+
+        foreach ($messages as $key => [$body, $headers, $delay, $messageSession, $queueName]) {
+            if ($documents && $messageSession !== $session) {
+                $requests[] = [$session, $documents];
+                $documents = [];
+            }
+
+            $session = $messageSession;
+            $document = $this->createDocument($now, $body, $headers, $delay, $queueName);
+            // generated like the driver does, to know the ids of the documents inserted before a failure
+            $document['_id'] = $ids[$key] = new ObjectId();
+            $documents[$key] = $document;
+        }
+
+        $requests[] = [$session, $documents];
+        $exceptions = [];
+
+        foreach ($requests as $i => [$session, $documents]) {
+            try {
+                $this->collection->insertMany(array_values($documents), ['ordered' => false] + $this->getWriteOptions($session));
+            } catch (MongoDriverException $e) {
+                $keys = array_keys($documents);
+                // a write concern error fails all the documents, as it fails send()
+                $result = $e instanceof BulkWriteException && !$e->getWriteResult()->getWriteConcernError() ? $e->getWriteResult() : null;
+
+                foreach ($result?->getWriteErrors() ?? [] as $error) {
+                    $exceptions[$keys[$error->getIndex()]] = new TransportException($error->getMessage());
+                }
+
+                // unordered inserts go on after a rejected document; the driver sends the documents in order until an error stops it
+                $processed = $result ? $result->getInsertedCount() + \count($result->getWriteErrors()) : 0;
+
+                if ($processed < \count($keys)) {
+                    $exception = new TransportException($e->getMessage(), 0, $e);
+                    $exceptions += array_fill_keys(\array_slice($keys, $processed), $exception);
+
+                    foreach (\array_slice($requests, $i + 1) as [, $unsent]) {
+                        $exceptions += array_fill_keys(array_keys($unsent), $exception);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return [array_diff_key($ids, $exceptions), $exceptions];
     }
 
     /**
@@ -373,6 +428,23 @@ class Connection
     private function now(): \DateTimeImmutable
     {
         return $this->clock?->now() ?? new \DateTimeImmutable();
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
+    private function createDocument(\DateTimeImmutable $now, string $body, array $headers, int $delay, ?string $queueName): BSONDocument
+    {
+        $availableAt = $now->modify(\sprintf('+%d milliseconds', $delay));
+
+        $document = new BSONDocument();
+        $document['body'] = $body;
+        $document['headers'] = new BSONDocument($headers);
+        $document['queueName'] = $queueName ?? $this->queueName;
+        $document['createdAt'] = new UTCDateTime($now);
+        $document['availableAt'] = new UTCDateTime($availableAt);
+
+        return $document;
     }
 
     private static function removeUriOption(string $uri, string $option): string

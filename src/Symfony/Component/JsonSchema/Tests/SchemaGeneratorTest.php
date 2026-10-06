@@ -30,12 +30,17 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\BookWithAuthors;
 use Symfony\Component\JsonSchema\Tests\Fixtures\CamelCaseProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ContactWithFormatConstraints;
 use Symfony\Component\JsonSchema\Tests\Fixtures\DocumentedArticle;
+use Symfony\Component\JsonSchema\Tests\Fixtures\FixedPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\GroupedProduct;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IdentifierDefinitionProcessor;
+use Symfony\Component\JsonSchema\Tests\Fixtures\IriReferenceClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Library;
+use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NativeObjectProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NestedAttributesBook;
+use Symfony\Component\JsonSchema\Tests\Fixtures\NonSerializableProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ProductPair;
+use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionPolicy;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionProcessor;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingNameConverter;
@@ -46,6 +51,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\Shelf;
 use Symfony\Component\JsonSchema\Tests\Fixtures\StrictInput;
 use Symfony\Component\JsonSchema\Tests\Fixtures\UnionProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ValidatedRegistration;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -133,12 +139,27 @@ class SchemaGeneratorTest extends TestCase
         ], $schema->getRoot());
     }
 
-    public function testUnsupportedTypeThrows()
+    public function testUnsupportedRootTypeThrows()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"callable"');
 
         SchemaGenerator::create()->generate(Type::builtin(TypeIdentifier::CALLABLE));
+    }
+
+    public function testCallableAndResourcePropertiesAreSkippedAndUnsupportedUnionBranchesDropped()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::object(NonSerializableProperties::class));
+
+        $this->assertSameSchema([
+            'NonSerializableProperties' => [
+                'type' => 'object',
+                'properties' => [
+                    'name' => ['type' => 'string'],
+                    'retryPolicy' => ['type' => 'integer'],
+                ],
+            ],
+        ], $schema->getDefinitions());
     }
 
     public function testSelfReferencingClassReferencesItsOwnDefinition()
@@ -388,6 +409,82 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSame([], $processor->calls);
     }
 
+    public function testClassSchemaResolversReceiveTheDefinitionParent()
+    {
+        $resolver = new RecordingClassSchemaResolver();
+
+        (new SchemaGenerator(self::createPhpDocPropertyInfo(), classSchemaResolvers: [$resolver]))->generate(Type::object(BookWithAuthors::class));
+
+        $this->assertEquals([
+            [BookWithAuthors::class, null],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'author')],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'coAuthor')],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'reviewers')],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'authorsByRole')],
+        ], $resolver->calls);
+    }
+
+    public function testClassSchemaResolverCanReplaceNestedRelationsByAnIriReferenceWithoutDefinition()
+    {
+        $generator = new SchemaGenerator(self::createPhpDocPropertyInfo(), classSchemaResolvers: [new IriReferenceClassSchemaResolver(Author::class)]);
+
+        $schema = $generator->generate(Type::object(BookWithAuthors::class));
+
+        $this->assertSame(['BookWithAuthors'], array_keys($schema->getDefinitions()));
+        $this->assertSameSchema(['type' => ['string', 'null'], 'format' => 'iri-reference'], $schema->getDefinitions()['BookWithAuthors']['properties']['coAuthor']);
+        $this->assertSameSchema(['type' => 'array', 'items' => ['type' => 'string', 'format' => 'iri-reference']], $schema->getDefinitions()['BookWithAuthors']['properties']['reviewers']);
+    }
+
+    public function testPropertySchemaProviderReplacesTheGeneratedSchema()
+    {
+        $generator = new SchemaGenerator(self::createReflectionPropertyInfo(), propertySchemaProviders: [new FixedPropertySchemaProvider(BookWithAuthors::class, 'coAuthor', ['type' => 'string', 'format' => 'iri-reference'])]);
+
+        $definition = $generator->generate(Type::object(BookWithAuthors::class))->getDefinitions()['BookWithAuthors'];
+
+        $this->assertSameSchema(['type' => 'string', 'format' => 'iri-reference'], $definition['properties']['coAuthor']);
+    }
+
+    public function testRelatedClassReferencedOnlyByAProvidedPropertyHasNoDefinition()
+    {
+        $resolver = new RecordingClassSchemaResolver();
+        $generator = new SchemaGenerator(
+            self::createReflectionPropertyInfo(),
+            classSchemaResolvers: [$resolver],
+            propertySchemaProviders: [new FixedPropertySchemaProvider(Library::class, 'shelf', ['type' => 'string'])],
+        );
+
+        $schema = $generator->generate(Type::object(Library::class));
+
+        $this->assertSame(['Library'], array_keys($schema->getDefinitions()));
+        $this->assertEquals([[Library::class, null]], $resolver->calls);
+    }
+
+    public function testEnrichersRunOnTheProvidedPropertySchema()
+    {
+        $generator = new SchemaGenerator(
+            self::createReflectionPropertyInfo(),
+            propertySchemaProviders: [new FixedPropertySchemaProvider(Library::class, 'shelf', ['type' => 'string'])],
+            propertySchemaEnrichers: [new MarkingPropertySchemaEnricher()],
+        );
+
+        $definition = $generator->generate(Type::object(Library::class))->getDefinitions()['Library'];
+
+        $this->assertSameSchema(['type' => 'string', 'x-enriched' => true], $definition['properties']['shelf']);
+    }
+
+    public function testFirstPropertySchemaProviderReturningASchemaWins()
+    {
+        $generator = new SchemaGenerator(self::createReflectionPropertyInfo(), propertySchemaProviders: [
+            new FixedPropertySchemaProvider(Library::class, 'unknown', ['type' => 'boolean']),
+            new FixedPropertySchemaProvider(Library::class, 'shelf', ['type' => 'string']),
+            new FixedPropertySchemaProvider(Library::class, 'shelf', ['type' => 'integer']),
+        ]);
+
+        $definition = $generator->generate(Type::object(Library::class))->getDefinitions()['Library'];
+
+        $this->assertSameSchema(['type' => 'string'], $definition['properties']['shelf']);
+    }
+
     public function testClassesSharingAShortNameGetDistinctDefinitions()
     {
         $schema = SchemaGenerator::create()->generate(Type::object(ProductPair::class));
@@ -603,6 +700,13 @@ class SchemaGeneratorTest extends TestCase
         $reflectionExtractor = new ReflectionExtractor();
 
         return new PropertyInfoExtractor([$reflectionExtractor], [$reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
+    }
+
+    private static function createPhpDocPropertyInfo(): PropertyInfoExtractor
+    {
+        $reflectionExtractor = new ReflectionExtractor();
+
+        return new PropertyInfoExtractor([$reflectionExtractor], [new PhpStanExtractor(), $reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
     }
 
     private function assertSameSchema(array $expected, array|Schema $actual): void

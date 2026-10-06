@@ -24,6 +24,7 @@ use Symfony\Component\JsonSchema\Enricher\AttributePropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Enricher\DescriptionPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Enricher\PropertySchema;
 use Symfony\Component\JsonSchema\Enricher\PropertySchemaEnricherInterface;
+use Symfony\Component\JsonSchema\Enricher\PropertySchemaProviderInterface;
 use Symfony\Component\JsonSchema\Enricher\ValidatorPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Exception\CircularReferenceException;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
@@ -57,6 +58,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 {
     /**
      * @param iterable<ClassSchemaResolverInterface>    $classSchemaResolvers
+     * @param iterable<PropertySchemaProviderInterface> $propertySchemaProviders
      * @param iterable<PropertySchemaEnricherInterface> $propertySchemaEnrichers
      * @param iterable<DefinitionProcessorInterface>    $definitionProcessors
      */
@@ -64,6 +66,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         private readonly PropertyInfoExtractorInterface $propertyInfoExtractor,
         private readonly DefinitionPolicyInterface $definitionPolicy = new ShortNameDefinitionPolicy(),
         private readonly iterable $classSchemaResolvers = [],
+        private readonly iterable $propertySchemaProviders = [],
         private readonly iterable $propertySchemaEnrichers = [],
         private readonly iterable $definitionProcessors = [],
         private readonly ?NameConverterInterface $nameConverter = null,
@@ -100,7 +103,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         }
         $propertySchemaEnrichers[] = new AttributePropertySchemaEnricher();
 
-        return new self($propertyInfoExtractor, new ShortNameDefinitionPolicy(), $classSchemaResolvers, $propertySchemaEnrichers);
+        return new self($propertyInfoExtractor, new ShortNameDefinitionPolicy(), $classSchemaResolvers, propertySchemaEnrichers: $propertySchemaEnrichers);
     }
 
     public function generate(Type $type, Configuration $config = new Configuration()): Schema
@@ -165,11 +168,16 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     {
         $nullable = false;
         $schemas = [];
+        $dropUnrepresentable = self::isRepresentable($type);
 
         foreach ($type->getTypes() as $t) {
             if ($t instanceof BuiltinType && TypeIdentifier::NULL === $t->getTypeIdentifier()) {
                 $nullable = true;
 
+                continue;
+            }
+
+            if ($dropUnrepresentable && !self::isRepresentable($t)) {
                 continue;
             }
 
@@ -283,7 +291,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     private function buildObjectSchema(string $class, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
     {
         foreach ($this->classSchemaResolvers as $resolver) {
-            if (null !== $schema = $resolver->resolve($class, $config)) {
+            if (null !== $schema = $resolver->resolve($class, $config, $parent)) {
                 return $schema;
             }
         }
@@ -344,7 +352,16 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             }
 
             $type = $this->propertyInfoExtractor->getType($class, $property, $context);
-            $schema = null !== $type ? $this->buildTypeSchema($type, $this->createChildConfiguration($config, $property), new DefinitionParent($class, $property, $parent), $definitions, $classes) : [];
+            $schema = $this->provideSchema($class, $property, $config);
+
+            if (null === $schema) {
+                if (null !== $type && !self::isRepresentable($type)) {
+                    continue;
+                }
+
+                $schema = null !== $type ? $this->buildTypeSchema($type, $this->createChildConfiguration($config, $property), new DefinitionParent($class, $property, $parent), $definitions, $classes) : [];
+            }
+
             if (null !== $default = self::normalizeDefaultValue(self::getDefaultValue($class, $property))) {
                 $schema['default'] = $default;
             }
@@ -380,6 +397,31 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         }
 
         return $definition;
+    }
+
+    /**
+     * @param class-string $class
+     *
+     * @return array<string, mixed>|null
+     */
+    private function provideSchema(string $class, string $property, Configuration $config): ?array
+    {
+        foreach ($this->propertySchemaProviders as $provider) {
+            if (null !== $schema = $provider->provide($class, $property, $config)) {
+                return $schema;
+            }
+        }
+
+        return null;
+    }
+
+    private static function isRepresentable(Type $type): bool
+    {
+        return match (true) {
+            $type instanceof UnionType => array_any($type->getTypes(), static fn (Type $t): bool => !$t->isIdentifiedBy(TypeIdentifier::NULL) && self::isRepresentable($t)),
+            $type instanceof BuiltinType => !\in_array($type->getTypeIdentifier(), [TypeIdentifier::CALLABLE, TypeIdentifier::RESOURCE], true),
+            default => true,
+        };
     }
 
     private function createChildConfiguration(Configuration $config, string $property): Configuration

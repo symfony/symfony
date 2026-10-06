@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonSchema\ClassSchemaResolver;
 
 use Symfony\Component\JsonSchema\Configuration;
+use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
 
 /**
  * Describes a class with an inline schema instead of a definition.
@@ -21,9 +22,10 @@ use Symfony\Component\JsonSchema\Configuration;
 interface ClassSchemaResolverInterface
 {
     /**
-     * @param class-string $class
+     * @param class-string          $class
+     * @param DefinitionParent|null $parent the property through which the class is reached, null for the root type
      *
      * @return array<string, mixed>|null null when the class is not supported
      */
-    public function resolve(string $class, Configuration $config): ?array;
+    public function resolve(string $class, Configuration $config, ?DefinitionParent $parent = null): ?array;
 }

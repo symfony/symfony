@@ -9,24 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\JsonSchema\ClassSchemaResolver;
+namespace Symfony\Component\JsonSchema\Tests\Fixtures;
 
+use Symfony\Component\JsonSchema\ClassSchemaResolver\ClassSchemaResolverInterface;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
-use Symfony\Component\Uid\Ulid;
-use Symfony\Component\Uid\Uuid;
 
-/**
- * @experimental
- */
-final class UidClassSchemaResolver implements ClassSchemaResolverInterface
+class RecordingClassSchemaResolver implements ClassSchemaResolverInterface
 {
+    /**
+     * @var list<array{string, ?DefinitionParent}>
+     */
+    public array $calls = [];
+
     public function resolve(string $class, Configuration $config, ?DefinitionParent $parent = null): ?array
     {
-        return match (true) {
-            is_a($class, Uuid::class, true) => ['type' => 'string', 'format' => 'uuid'],
-            is_a($class, Ulid::class, true) => ['type' => 'string', 'format' => 'ulid'],
-            default => null,
-        };
+        $this->calls[] = [$class, $parent];
+
+        return null;
     }
 }

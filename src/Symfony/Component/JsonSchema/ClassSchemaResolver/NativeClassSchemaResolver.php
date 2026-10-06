@@ -13,13 +13,14 @@ namespace Symfony\Component\JsonSchema\ClassSchemaResolver;
 
 use BcMath\Number;
 use Symfony\Component\JsonSchema\Configuration;
+use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
 
 /**
  * @experimental
  */
 final class NativeClassSchemaResolver implements ClassSchemaResolverInterface
 {
-    public function resolve(string $class, Configuration $config): ?array
+    public function resolve(string $class, Configuration $config, ?DefinitionParent $parent = null): ?array
     {
         return match (true) {
             is_a($class, \DateTimeInterface::class, true) => ['type' => 'string', 'format' => 'date-time'],

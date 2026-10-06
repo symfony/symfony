@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
@@ -145,7 +146,18 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'request'])
 
         ->set('controller.cache_attribute_listener', CacheAttributeListener::class)
+            ->args([
+                service('controller.expression_language')->nullOnInvalid(),
+            ])
             ->tag('kernel.event_subscriber')
 
+        ->set('controller.expression_language', ExpressionLanguage::class)
+            ->lazy()
+            ->args([service('cache.controller_expression_language')->nullOnInvalid()])
+
+        ->set('cache.controller_expression_language')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
     ;
 };

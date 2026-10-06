@@ -131,7 +131,7 @@ class Filesystem
     public function touch(string|iterable $files, ?int $time = null, ?int $atime = null): void
     {
         foreach ($this->toIterable($files) as $file) {
-            if (!($time ? self::box('touch', $file, $time, $atime) : self::box('touch', $file))) {
+            if (!(null !== $time ? self::box('touch', $file, $time, $atime) : self::box('touch', $file))) {
                 throw new IOException(\sprintf('Failed to touch "%s": ', $file).self::$lastError, 0, null, $file);
             }
         }

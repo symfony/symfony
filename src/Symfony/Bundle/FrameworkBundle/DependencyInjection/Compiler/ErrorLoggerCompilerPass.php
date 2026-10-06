@@ -27,7 +27,7 @@ class ErrorLoggerCompilerPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('debug.error_handler_configurator');
-        if ($container->hasDefinition('monolog.logger.php')) {
+        if ($container->hasDefinition('monolog.logger.php') && null !== $definition->getArgument(0)) {
             $definition->replaceArgument(0, new Reference('monolog.logger.php'));
         }
         if ($container->hasDefinition('monolog.logger.deprecation')) {

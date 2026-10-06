@@ -255,6 +255,15 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileExists($file);
     }
 
+    public function testTouchWithZeroTimestamp()
+    {
+        $file = $this->workspace.\DIRECTORY_SEPARATOR.'1';
+
+        $this->filesystem->touch($file, 0);
+
+        $this->assertSame(0, filemtime($file));
+    }
+
     public function testTouchFails()
     {
         $this->expectException(IOException::class);

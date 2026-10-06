@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use Symfony\Component\ExpressionLanguage\Parser;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\FooBackedEnum;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\FooEnum;
@@ -544,6 +545,17 @@ class ExpressionLanguageTest extends TestCase
                 },
             ],
         ];
+    }
+
+    public function testParseDoesNotReuseAnExpressionParsedWithOtherFlags()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionLanguage->parse('a + 1', [], Parser::IGNORE_UNKNOWN_VARIABLES);
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Variable "a" is not valid around position 1 for expression `a + 1`.');
+
+        $expressionLanguage->parse('a + 1', []);
     }
 
     public function testParseAlreadyParsedExpressionReturnsSameObject()

@@ -92,6 +92,54 @@ class MappedAssetFactoryTest extends TestCase
         $factory->createMappedAsset('circular1.css', __DIR__.'/../Fixtures/circular_dir/circular1.css');
     }
 
+    public function testCreateMappedAssetReportsTheSameCircularReferencesWhenRetried()
+    {
+        $factory = $this->createFactory();
+
+        foreach (['circular1.css' => 'circular2.css', 'circular2.css' => 'circular1.css'] as $logicalPath => $importedPath) {
+            for ($attempt = 1; $attempt <= 2; ++$attempt) {
+                try {
+                    $factory->createMappedAsset($logicalPath, __DIR__.'/../Fixtures/circular_dir/'.$logicalPath);
+                    $this->fail('A circular reference should be detected.');
+                } catch (CircularAssetsException $e) {
+                    $this->assertSame(\sprintf('Circular reference detected while creating asset for "%1$s": "%1$s -> %2$s -> %1$s".', $logicalPath, $importedPath), $e->getMessage());
+                }
+            }
+        }
+    }
+
+    public function testCreateMappedAssetCanBeRetriedAfterACompilerFailed()
+    {
+        $compiler = new class implements AssetCompilerInterface {
+            private int $calls = 0;
+
+            public function supports(MappedAsset $asset): bool
+            {
+                return true;
+            }
+
+            public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
+            {
+                if (1 === ++$this->calls) {
+                    throw new \RuntimeException('Compilation failed.');
+                }
+
+                return $content;
+            }
+        };
+        $factory = $this->createFactory($compiler);
+
+        try {
+            $factory->createMappedAsset('file2.js', __DIR__.'/../Fixtures/dir1/file2.js');
+            $this->fail('The compiler failure should propagate.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Compilation failed.', $e->getMessage());
+        }
+
+        $asset = $factory->createMappedAsset('file2.js', __DIR__.'/../Fixtures/dir1/file2.js');
+        $this->assertMatchesRegularExpression('/^\/final-assets\/file2-[a-zA-Z0-9]{7,128}\.js$/', $asset->publicPath);
+    }
+
     public function testCreateMappedAssetWithDigest()
     {
         $file6Compiler = new class implements AssetCompilerInterface {

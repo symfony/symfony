@@ -46,6 +46,7 @@ use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
@@ -92,6 +93,34 @@ class SecurityExtensionTest extends TestCase
         $decorated = $container->getDefinition('security.authenticator.form_login_ldap.main')->getArgument(0);
         $this->assertSame('security.authenticator.form_login_ldap.main.inner', (string) $decorated);
         $this->assertSame('/login_check_ldap', $container->getDefinition((string) $decorated)->getArgument(4)['check_path']);
+    }
+
+    public function testExpressionLanguagesOfControllerAttributesAreTagged()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+        ]);
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('security.expression_language')->hasTag('expression_language.compiled'));
+        $this->assertTrue($container->getDefinition('security.is_granted_attribute_expression_language')->hasTag('expression_language.compiled'));
+        $this->assertTrue($container->getDefinition('security.is_csrf_token_valid_attribute_expression_language')->hasTag('expression_language.compiled'));
+    }
+
+    public function testAccessControlExpressionsAreCompiled()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'access_control' => [
+                ['path' => '^/admin', 'allow_if' => 'is_granted("ROLE_ADMIN")'],
+                ['path' => '^/api', 'allow_if' => 'request.isSecure()'],
+            ],
+        ]);
+        $container->compile();
+
+        $this->assertSame([['attributes' => [IsGranted::class => ['attribute']]], ['expressions' => ['is_granted("ROLE_ADMIN")', 'request.isSecure()']]], $container->getDefinition('security.expression_language')->getTag('expression_language.compiled'));
     }
 
     public function testLdapUsersOnlyReachesTheCredentialsListener()

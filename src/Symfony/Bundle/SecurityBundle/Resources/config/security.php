@@ -50,6 +50,8 @@ use Symfony\Component\Security\Core\User\MissingUserProvider;
 use Symfony\Component\Security\Core\User\OidcUserProvider;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Csrf\DelegatingCsrfTokenManager;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\SecurityTokenValueResolver;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
@@ -162,6 +164,7 @@ return static function (ContainerConfigurator $container) {
         ->set('security.expression_language', ExpressionLanguage::class)
             ->lazy()
             ->args([service('cache.security_expression_language')->nullOnInvalid()])
+            ->tag('expression_language.compiled', ['attributes' => [IsGranted::class => ['attribute']]])
 
         // For the expression languages that evaluate expressions outside of an authorization check,
         // such as the validator's and the entity value resolver's. Tagging it is pointless:
@@ -373,6 +376,7 @@ return static function (ContainerConfigurator $container) {
         ->set('security.is_granted_attribute_expression_language', BaseExpressionLanguage::class)
             ->lazy()
             ->args([service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid()])
+            ->tag('expression_language.compiled', ['attributes' => [IsGranted::class => ['subject']]])
 
         ->set('cache.security_is_granted_attribute_expression_language')
             ->parent('cache.system')
@@ -383,6 +387,7 @@ return static function (ContainerConfigurator $container) {
         ->set('security.is_csrf_token_valid_attribute_expression_language', BaseExpressionLanguage::class)
             ->lazy()
             ->args([service('cache.security_is_csrf_token_valid_attribute_expression_language')->nullOnInvalid()])
+            ->tag('expression_language.compiled', ['attributes' => [IsCsrfTokenValid::class => ['id']]])
 
         ->set('cache.security_is_csrf_token_valid_attribute_expression_language')
             ->parent('cache.system')

@@ -49,7 +49,7 @@
         "symfony/css-selector": "^7.4|^8.0",
         "symfony/dom-crawler": "^7.4|^8.0",
         "symfony/dotenv": "^7.4|^8.0",
-        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/expression-language": "^8.2",
         "symfony/form": "^7.4|^8.0",
         "symfony/html-sanitizer": "^8.2",
         "symfony/http-client": "^8.2",

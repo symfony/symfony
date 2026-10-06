@@ -16,6 +16,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\HttpKernel\Attribute\Cache;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
@@ -180,6 +184,16 @@ return static function (ContainerConfigurator $container) {
             ->lazy()
             ->args([service('cache.controller_expression_language')->nullOnInvalid()])
             ->call('registerProvider', [service('security.expression_language_provider')->ignoreOnInvalid()])
+            ->tag('expression_language.compiled', [
+                'attributes' => [
+                    MapQueryString::class => ['validationGroups'],
+                    MapRequestPayload::class => ['validationGroups'],
+                    RateLimit::class => ['key'],
+                ],
+                'string_expressions' => [
+                    Cache::class => ['if', 'lastModified', 'etag'],
+                ],
+            ])
 
         ->set('cache.controller_expression_language')
             ->parent('cache.system')

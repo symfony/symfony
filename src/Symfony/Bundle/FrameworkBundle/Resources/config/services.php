@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
+use Symfony\Component\HttpKernel\CacheWarmer\ExpressionLanguageCacheWarmer;
 use Symfony\Component\HttpKernel\Config\FileLocator as LegacyFileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface as LegacyServicesResetterInterface;
 use Symfony\Component\HttpKernel\EventListener\LocaleAwareListener;
@@ -91,6 +92,15 @@ return static function (ContainerConfigurator $container) {
                 \sprintf('%s/%sDeprecations.log', param('kernel.build_dir'), param('kernel.container_class')),
             ])
             ->tag('container.no_preload')
+
+        ->set('expression_language.cache_warmer', ExpressionLanguageCacheWarmer::class)
+            ->args([
+                abstract_arg('expression languages, set in RegisterCompiledExpressionLanguagesPass'),
+                abstract_arg('controller classes, set in RegisterCompiledExpressionLanguagesPass'),
+                abstract_arg('controller attributes holding expressions, set in RegisterCompiledExpressionLanguagesPass'),
+                abstract_arg('more expressions to compile, set in RegisterCompiledExpressionLanguagesPass'),
+            ])
+            ->tag('kernel.cache_warmer')
 
         ->set('cache_clearer', ChainCacheClearer::class)
             ->args([

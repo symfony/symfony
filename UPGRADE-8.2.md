@@ -481,6 +481,7 @@ SecurityBundle
    ```
 
  * Deprecate the `Symfony\Component\Security\Http\Firewall` autowiring alias, the firewall listens to kernel events and is not meant to be injected
+ * The `security.expression_language` service is decorated by a `CompiledExpressionLanguage`; inject it as a `Symfony\Component\ExpressionLanguage\ExpressionLanguage`, not as a `Symfony\Component\Security\Core\Authorization\ExpressionLanguage`
 
 Serializer
 ----------
@@ -561,6 +562,11 @@ Webhook
 
  * Deprecate the `Symfony\Component\Webhook\Client\RequestParser` alias.
    Reference the `webhook.request_parser` service in the `service` option of the webhook routing instead, and use `#[Target('webhook')]` with `RequestParserInterface` to autowire it
+
+Workflow
+--------
+
+ * The `workflow.security.expression_language` service is decorated by a `CompiledExpressionLanguage` when guards are configured; inject it as a `Symfony\Component\ExpressionLanguage\ExpressionLanguage`, not as a `Symfony\Component\Workflow\EventListener\ExpressionLanguage`
 
 Yaml
 ----

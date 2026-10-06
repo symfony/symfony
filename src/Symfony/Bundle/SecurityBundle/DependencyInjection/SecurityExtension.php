@@ -278,6 +278,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if ($this->expressions) {
             $container->getDefinition('security.cache_warmer.expression')
                 ->replaceArgument(0, new IteratorArgument(array_values($this->expressions)));
+            $container->getDefinition('security.expression_language')
+                ->addTag('expression_language.compiled', ['expressions' => array_map(static fn ($id) => $container->getDefinition($id)->getArgument(0), array_keys($this->expressions))]);
         } else {
             $container->removeDefinition('security.cache_warmer.expression');
         }

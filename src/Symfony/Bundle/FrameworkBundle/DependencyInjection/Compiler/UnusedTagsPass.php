@@ -54,6 +54,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'doctrine.event_listener',
         'doctrine.orm.entity',
         'event_dispatcher.dispatcher',
+        'expression_language.compiled',
         'flysystem.storage',
         'form.type',
         'form.type_extension',

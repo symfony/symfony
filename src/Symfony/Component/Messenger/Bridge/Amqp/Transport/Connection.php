@@ -70,6 +70,7 @@ class Connection
     private const AVAILABLE_QUEUE_OPTIONS = [
         'binding_keys',
         'binding_arguments',
+        'bindings',
         'flags',
         'arguments',
     ];
@@ -81,6 +82,11 @@ class Connection
         'flags',
         'arguments',
         'bindings',
+    ];
+
+    private const AVAILABLE_BINDING_OPTIONS = [
+        'binding_keys',
+        'binding_arguments',
     ];
 
     private AmqpFactory $amqpFactory;
@@ -160,6 +166,9 @@ class Connection
      *     * binding_arguments: Arguments to be used while binding the queue.
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
+     *     * bindings[name]: An array of the additional exchanges to bind this queue to, keyed by the name.
+     *       * binding_keys: The binding/routing keys to be used for the binding
+     *       * binding_arguments: Additional binding arguments
      *   * queues: Set to false (or "queues=false" in the DSN query) to skip binding the default "messages" queue when no queues are defined
      *   * exchange:
      *     * name: Name of the exchange. An empty string (name: '') can be used to use the default exchange
@@ -299,6 +308,12 @@ class Connection
 
                 if ($invalidQueueOptions = array_diff(array_keys($queue), self::AVAILABLE_QUEUE_OPTIONS)) {
                     throw new LogicException(\sprintf('Invalid queue option(s) "%s" passed to the AMQP Messenger transport.', implode('", "', $invalidQueueOptions)));
+                }
+
+                foreach (\is_array($queue['bindings'] ?? null) ? $queue['bindings'] : [] as $binding) {
+                    if (\is_array($binding) && $invalidBindingOptions = array_diff(array_keys($binding), self::AVAILABLE_BINDING_OPTIONS)) {
+                        throw new LogicException(\sprintf('Invalid binding option(s) "%s" passed to the AMQP Messenger transport.', implode('", "', $invalidBindingOptions)));
+                    }
                 }
             }
         }
@@ -687,6 +702,14 @@ class Connection
             if ('' !== $this->exchangeOptions['name']) {
                 foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
                     $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
+                }
+            }
+
+            if ($queueConfig['bindings'] ?? false) {
+                foreach ($queueConfig['bindings'] as $exchangeName => $queueBinding) {
+                    foreach ($queueBinding['binding_keys'] ?? [null] as $bindingKey) {
+                        $this->queue($queueName)->bind($exchangeName, $bindingKey, $queueBinding['binding_arguments'] ?? []);
+                    }
                 }
             }
         }

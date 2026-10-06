@@ -157,6 +157,12 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('amqp://host', ['queues' => ['queueName' => ['foo' => 'bar']]]);
     }
 
+    public function testExceptionIfInvalidQueueBindingOptionIsPassed()
+    {
+        $this->expectExceptionMessage('Invalid binding option(s) "binding_key" passed to the AMQP Messenger transport.');
+        Connection::fromDsn('amqp://host', ['queues' => ['queueName' => ['bindings' => ['exchange1' => ['binding_key' => ['key']]]]]]);
+    }
+
     public function testExceptionIfInvalidExchangeOptionIsPassed()
     {
         $this->expectExceptionMessage('Invalid exchange option(s) "foo" passed to the AMQP Messenger transport.');
@@ -537,6 +543,57 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn($dsn, [], $factory);
         $connection->publish('body');
+    }
+
+    public function testQueueAdditionalBindings()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createStub(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $amqpQueue->expects($this->once())->method('declareQueue');
+        $amqpQueue->expects($this->exactly(5))->method('bind')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    ['exchange0', null, []],
+                    ['exchange1', null, []],
+                    ['exchange2', 'binding_key0', []],
+                    ['exchange2', 'binding_key1', []],
+                    ['exchange3', null, ['x-match' => 'all']],
+                ];
+
+                $expectedArgs = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+            })
+        ;
+
+        $dsn = 'amqp://localhost?exchange[name]=exchange0'.
+            '&queues[queueName][bindings][exchange1]'.
+            '&queues[queueName][bindings][exchange2][binding_keys][0]=binding_key0'.
+            '&queues[queueName][bindings][exchange2][binding_keys][1]=binding_key1'.
+            '&queues[queueName][bindings][exchange3][binding_arguments][x-match]=all';
+
+        $connection = Connection::fromDsn($dsn, [], $factory);
+        $connection->setup();
+    }
+
+    public function testQueueAdditionalBindingsWithTheDefaultExchange()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $this->createStub(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $amqpQueue->expects($this->once())->method('declareQueue');
+        $amqpQueue->expects($this->once())->method('bind')->with('exchange1', null, []);
+
+        $connection = Connection::fromDsn('amqp://localhost?exchange[name]=&queues[queueName][bindings][exchange1]', [], $factory);
+        $connection->setup();
     }
 
     public function testExchangeBindingArguments()

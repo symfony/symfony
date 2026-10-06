@@ -70,6 +70,17 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('/login_check_ldap', $container->getDefinition((string) $decorated)->getArgument(4)['check_path']);
     }
 
+    public function testIsGrantedAttributeExpressionLanguageIsLazy()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+        ]);
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('security.is_granted_attribute_expression_language')->isLazy());
+    }
+
     public function testInvalidCheckPath()
     {
         $container = $this->getRawContainer();

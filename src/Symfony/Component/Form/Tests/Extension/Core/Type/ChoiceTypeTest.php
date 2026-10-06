@@ -1697,6 +1697,40 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertSame(['hidden' => true], $view->vars['placeholder_attr']);
     }
 
+    public function testPlaceholderAttrIsEmptyByDefaultIfParentIsNotRequired()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'required' => false,
+            ])
+            ->add('child', static::TESTED_TYPE, [
+                'placeholder' => 'Select an option',
+                'choices' => $this->choices,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertFalse($view['child']->vars['required']);
+        $this->assertSame([], $view['child']->vars['placeholder_attr']);
+    }
+
+    public function testCustomPlaceholderAttrIsKeptIfParentIsNotRequired()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'required' => false,
+            ])
+            ->add('child', static::TESTED_TYPE, [
+                'placeholder' => 'Select an option',
+                'placeholder_attr' => ['hidden' => true, 'class' => 'foo'],
+                'choices' => $this->choices,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertSame(['hidden' => true, 'class' => 'foo'], $view['child']->vars['placeholder_attr']);
+    }
+
     #[DataProvider('getOptionsWithPlaceholder')]
     public function testPassPlaceholderToView($multiple, $expanded, $required, $placeholder, $placeholderViewValue, $placeholderAttr, $placeholderAttrViewValue)
     {

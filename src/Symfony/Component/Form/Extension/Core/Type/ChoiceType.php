@@ -263,6 +263,11 @@ class ChoiceType extends AbstractType
         if (null !== $options['placeholder'] && !$view->vars['placeholder_in_choices']) {
             $view->vars['placeholder'] = $options['placeholder'];
             $view->vars['placeholder_attr'] = $options['placeholder_attr'];
+
+            // The default hides the placeholder of required fields, but an optional parent makes the field optional too
+            if ($options['required'] && !$form->isRequired() && ['hidden' => true] === $options['placeholder_attr']) {
+                $view->vars['placeholder_attr'] = [];
+            }
         }
 
         if ($options['multiple'] && !$options['expanded']) {

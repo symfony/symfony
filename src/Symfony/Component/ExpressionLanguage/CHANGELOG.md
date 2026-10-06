@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Keep the last 1024 parsed expressions in memory, so that `parse()` returns the same `ParsedExpression` instance for the same expression and names
  * Add `CompiledExpressionLanguage`, a decorator that evaluates and lints the expressions compiled by its `dumpCompiled()` method without parsing them
  * Add `count()` function to ExpressionLanguage
  * Add `ConstantFunctionProvider` to restrict the `constant()` and `enum()` functions to a list of allowed constants

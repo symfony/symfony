@@ -15,6 +15,7 @@ use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
@@ -182,7 +183,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('controller.expression_language', ExpressionLanguage::class)
             ->lazy()
-            ->args([service('cache.controller_expression_language')->nullOnInvalid()])
+            ->args([
+                service('cache.controller_expression_language')->nullOnInvalid(),
+                class_exists(ConstantFunctionProvider::class) ? [inline_service(ConstantFunctionProvider::class)->args([['*', '*::*']])] : [],
+            ])
             ->call('registerProvider', [service('security.expression_language_provider')->ignoreOnInvalid()])
             ->tag('expression_language.compiled', [
                 'attributes' => [

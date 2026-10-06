@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
@@ -38,7 +39,7 @@ class ControllerAttributesListener implements EventSubscriberInterface
         private readonly array $attributesWithListenersByEvent,
         private ?ExpressionLanguage $expressionLanguage = null,
     ) {
-        $this->expressionLanguage ??= class_exists(ExpressionLanguage::class, false) ? new ExpressionLanguage() : null;
+        $this->expressionLanguage ??= class_exists(ExpressionLanguage::class, false) ? new ExpressionLanguage(null, class_exists(ConstantFunctionProvider::class) ? [new ConstantFunctionProvider(['*', '*::*'])] : []) : null;
     }
 
     private static array $attributeHierarchyCache = [];

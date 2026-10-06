@@ -255,6 +255,10 @@ class Parser
                                 throw new SyntaxError(\sprintf('The function "%s" does not exist.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, array_keys($this->functions));
                             }
 
+                            if (isset($this->functions[$token->value]['deprecation'])) {
+                                trigger_deprecation(...$this->functions[$token->value]['deprecation']);
+                            }
+
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
                             $this->variables[$token->value] ??= $this->stream->current->test(Token::PUNCTUATION_TYPE, '??') ? null : $token->cursor;

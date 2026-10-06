@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
@@ -247,7 +248,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             if (!class_exists(ExpressionLanguage::class)) {
                 throw new \LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
             }
-            $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
+            $this->expressionLanguage = new ExpressionLanguage(null, class_exists(ConstantFunctionProvider::class) ? [new ConstantFunctionProvider(['*', '*::*']), ...$this->expressionLanguageProviders] : $this->expressionLanguageProviders);
         }
 
         return $this->expressionLanguage;

@@ -63,6 +63,11 @@ class ExpressionLanguageTest extends TestCase
         }
     }
 
+    public function testConstantFunctionAllowsAnyConstant()
+    {
+        $this->assertSame(\PHP_VERSION, (new ExpressionLanguage())->evaluate('constant("PHP_VERSION")'));
+    }
+
     public static function provider()
     {
         $roles = ['ROLE_USER', 'ROLE_ADMIN'];

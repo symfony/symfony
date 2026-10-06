@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -281,7 +282,7 @@ class CacheAttributeListener implements EventSubscriberInterface
     private function getExpressionLanguage(): ExpressionLanguage
     {
         return $this->expressionLanguage ??= class_exists(ExpressionLanguage::class)
-            ? new ExpressionLanguage()
+            ? new ExpressionLanguage(null, class_exists(ConstantFunctionProvider::class) ? [new ConstantFunctionProvider(['*', '*::*'])] : [])
             : throw new \LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed. Try running "composer require symfony/expression-language".');
     }
 

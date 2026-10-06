@@ -30,6 +30,13 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         return new ExpressionValidator();
     }
 
+    public function testConstantFunction()
+    {
+        $this->validate(null, new Expression(expression: 'constant("PHP_INT_SIZE") > 0'));
+
+        $this->assertNoViolation();
+    }
+
     public function testExpressionIsEvaluatedWithNullValue()
     {
         $constraint = new Expression(

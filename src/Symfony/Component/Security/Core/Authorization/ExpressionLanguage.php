@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 
 if (!class_exists(BaseExpressionLanguage::class)) {
@@ -35,8 +36,12 @@ if (!class_exists(BaseExpressionLanguage::class)) {
                 $providers = iterator_to_array($providers, false);
             }
 
-            // prepend the default provider to let users override it easily
+            // prepend the default providers to let users override them easily
             array_unshift($providers, new ExpressionLanguageProvider());
+
+            if (class_exists(ConstantFunctionProvider::class)) {
+                array_unshift($providers, new ConstantFunctionProvider(['*', '*::*']));
+            }
 
             parent::__construct($cache, $providers);
         }

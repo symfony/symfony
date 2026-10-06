@@ -531,6 +531,15 @@ class CacheAttributeListenerTest extends TestCase
             true,
         ];
 
+        yield 'expression using a constant' => [
+            'constant("PHP_INT_SIZE") <= 0',
+            'constant("PHP_INT_SIZE") > 0',
+            false,
+            false,
+            true,
+            true,
+        ];
+
         yield 'expression accessing controller' => [
             'this.cache',
             'not this.cache',

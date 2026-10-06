@@ -14,7 +14,6 @@ namespace Symfony\Component\JsonSchema\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\Dialect;
-use Symfony\Component\JsonSchema\Direction;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
 use Symfony\Component\JsonSchema\ReferenceStrategy;
 
@@ -25,13 +24,11 @@ class ConfigurationTest extends TestCase
         $config = new Configuration();
 
         $this->assertEquals(Dialect::jsonSchema202012(), $config->dialect);
-        $this->assertSame(Direction::Response, $config->direction);
         $this->assertSame(ReferenceStrategy::ByDefinition, $config->references);
         $this->assertSame([], $config->groups);
         $this->assertNull($config->attributes);
         $this->assertSame([], $config->ignoredAttributes);
         $this->assertTrue($config->allowExtraAttributes);
-        $this->assertFalse($config->partial);
         $this->assertNull($config->validationGroups);
         $this->assertNull($config->definitionName);
         $this->assertNull($config->definitionPrefix);
@@ -42,12 +39,12 @@ class ConfigurationTest extends TestCase
     {
         $config = new Configuration(dialect: Dialect::openApi30(), groups: ['read'], definitionPrefix: 'Book');
 
-        $changed = $config->with(partial: true, definitionPrefix: null);
+        $changed = $config->with(allowExtraAttributes: false, definitionPrefix: null);
 
         $this->assertNotSame($config, $changed);
         $this->assertEquals(Dialect::openApi30(), $changed->dialect);
         $this->assertSame(['read'], $changed->groups);
-        $this->assertTrue($changed->partial);
+        $this->assertFalse($changed->allowExtraAttributes);
         $this->assertNull($changed->definitionPrefix);
         $this->assertSame('Book', $config->definitionPrefix);
     }

@@ -29,10 +29,6 @@ final class AttributePropertySchemaEnricher implements PropertySchemaEnricherInt
         foreach ((new \ReflectionProperty($property->class, $property->property))->getAttributes(JsonSchemaConstraint::class) as $attribute) {
             $constraint = $attribute->newInstance();
 
-            if (null !== $constraint->applyTo && $constraint->applyTo !== $config->direction) {
-                continue;
-            }
-
             $property = $property->withSchema($this->apply($constraint, $property->schema, $config));
 
             if (null !== $constraint->required) {
@@ -51,7 +47,7 @@ final class AttributePropertySchemaEnricher implements PropertySchemaEnricherInt
     private function apply(JsonSchemaConstraint $constraint, array $schema, Configuration $config): array
     {
         foreach (get_object_vars($constraint) as $keyword => $value) {
-            if (null === $value || 'required' === $keyword || 'applyTo' === $keyword) {
+            if (null === $value || 'required' === $keyword) {
                 continue;
             }
 

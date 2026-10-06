@@ -20,7 +20,6 @@ composer require symfony/json-schema
 ```php
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\Dialect;
-use Symfony\Component\JsonSchema\Direction;
 use Symfony\Component\JsonSchema\ReferenceStrategy;
 use Symfony\Component\JsonSchema\SchemaGenerator;
 use Symfony\Component\TypeInfo\Type;
@@ -33,7 +32,6 @@ $schema = $generator->generate(Type::object(Book::class));
 // an OpenAPI 3.1 request body, restricted to the "book:write" serialization group
 $schema = $generator->generate(Type::object(Book::class), new Configuration(
     dialect: Dialect::openApi31(),
-    direction: Direction::Request,
     groups: ['book:write'],
 ));
 $schema->getRoot();        // ['$ref' => '#/components/schemas/Book-book.write']

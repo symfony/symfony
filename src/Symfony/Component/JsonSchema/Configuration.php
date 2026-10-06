@@ -30,13 +30,11 @@ final readonly class Configuration
      */
     public function __construct(
         ?Dialect $dialect = null,
-        public Direction $direction = Direction::Response,
         public ReferenceStrategy $references = ReferenceStrategy::ByDefinition,
         public array $groups = [],
         public ?array $attributes = null,
         public array $ignoredAttributes = [],
         public bool $allowExtraAttributes = true,
-        public bool $partial = false,
         public array|GroupSequence|\Closure|null $validationGroups = null,
         public ?string $definitionName = null,
         public ?string $definitionPrefix = null,

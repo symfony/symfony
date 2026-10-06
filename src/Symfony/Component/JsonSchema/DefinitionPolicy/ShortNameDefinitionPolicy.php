@@ -55,10 +55,6 @@ final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface
             $name = $parts ? $prefix.'-'.implode('_', $parts) : $prefix;
         }
 
-        if ($config->partial) {
-            $name .= self::GLUE.'partial';
-        }
-
         return preg_replace('/[^a-zA-Z0-9.\-_]/', self::GLUE, $name);
     }
 

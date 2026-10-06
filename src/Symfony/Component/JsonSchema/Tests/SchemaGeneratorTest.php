@@ -17,7 +17,6 @@ use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\Dialect;
-use Symfony\Component\JsonSchema\Direction;
 use Symfony\Component\JsonSchema\Enricher\AttributePropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Exception\CircularReferenceException;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
@@ -500,14 +499,6 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['$ref' => '#/$defs/GroupedProduct-Custom'], $schema->getRoot());
     }
 
-    public function testPartialRemovesRequired()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(direction: Direction::Request, partial: true));
-
-        $this->assertSameSchema(['$ref' => '#/$defs/ValidatedRegistration.partial'], $schema->getRoot());
-        $this->assertArrayNotHasKey('required', $schema->getDefinitions()['ValidatedRegistration.partial']);
-    }
-
     public function testDisallowingExtraAttributesClosesTheObject()
     {
         $schema = SchemaGenerator::create()->generate(Type::object(StrictInput::class), new Configuration(allowExtraAttributes: false));
@@ -515,35 +506,30 @@ class SchemaGeneratorTest extends TestCase
         $this->assertFalse($schema->getDefinitions()['StrictInput']['additionalProperties']);
     }
 
-    public function testResponseDirectionKeepsReadableProperties()
+    public function testAccessMetadataFlagsReadOnlyAndWriteOnlyProperties()
     {
-        $definition = SchemaGenerator::create()->generate(Type::object(AccountWithAccessors::class), new Configuration(direction: Direction::Response))->getDefinitions()['AccountWithAccessors'];
-
-        $this->assertSame(['email', 'id', 'createdAt'], array_keys($definition['properties']));
-    }
-
-    public function testRequestDirectionKeepsWritableAndInitializableProperties()
-    {
-        $definition = SchemaGenerator::create()->generate(Type::object(AccountWithAccessors::class), new Configuration(direction: Direction::Request))->getDefinitions()['AccountWithAccessors'];
-
-        $this->assertSame(['email', 'id', 'password'], array_keys($definition['properties']));
-    }
-
-    public function testBidirectionalFlagsReadOnlyAndWriteOnlyProperties()
-    {
-        $properties = SchemaGenerator::create()->generate(Type::object(AccountWithAccessors::class), new Configuration(direction: Direction::Bidirectional))->getDefinitions()['AccountWithAccessors']['properties'];
+        $properties = SchemaGenerator::create()->generate(Type::object(AccountWithAccessors::class))->getDefinitions()['AccountWithAccessors']['properties'];
 
         $this->assertSameSchema([
             'email' => ['type' => 'string'],
-            'id' => ['type' => 'string'],
+            'id' => ['type' => 'integer', 'readOnly' => true],
             'password' => ['type' => 'string', 'writeOnly' => true],
-            'createdAt' => ['type' => 'string', 'format' => 'date-time', 'readOnly' => true],
+        ], $properties);
+    }
+
+    public function testListedPropertyWithoutAnyAccessIsKeptWithoutFlags()
+    {
+        $properties = SchemaGenerator::create()->generate(Type::object(AccountWithAccessors::class), new Configuration(groups: ['account:internal']))->getDefinitions()['AccountWithAccessors-account.internal']['properties'];
+
+        $this->assertSameSchema([
+            'email' => ['type' => 'string'],
+            'auditTrail' => ['type' => 'string'],
         ], $properties);
     }
 
     public function testValidatorConstraintsEnrichProperties()
     {
-        $definition = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(direction: Direction::Request))->getDefinitions()['ValidatedRegistration'];
+        $definition = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class))->getDefinitions()['ValidatedRegistration'];
 
         $this->assertSameSchema([
             'type' => 'object',
@@ -564,7 +550,7 @@ class SchemaGeneratorTest extends TestCase
 
     public function testValidatorFormatConstraintsAndMultipleChoice()
     {
-        $properties = SchemaGenerator::create()->generate(Type::object(ContactWithFormatConstraints::class), new Configuration(direction: Direction::Request))->getDefinitions()['ContactWithFormatConstraints']['properties'];
+        $properties = SchemaGenerator::create()->generate(Type::object(ContactWithFormatConstraints::class))->getDefinitions()['ContactWithFormatConstraints']['properties'];
 
         $this->assertSameSchema([
             'ipv4' => ['type' => ['string', 'null'], 'format' => 'ipv4'],
@@ -582,7 +568,7 @@ class SchemaGeneratorTest extends TestCase
 
     public function testValidationGroupsSelectConstraintsAndSuffixTheDefinitionName()
     {
-        $schema = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(direction: Direction::Request, validationGroups: ['registration:create']));
+        $schema = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(validationGroups: ['registration:create']));
         $definition = $schema->getDefinitions()['ValidatedRegistration-validation.registration.create'];
 
         $this->assertSameSchema(['type' => ['string', 'null'], 'maxLength' => 10], $definition['properties']['invitationCode']);
@@ -636,13 +622,6 @@ class SchemaGeneratorTest extends TestCase
             ],
             'required' => ['kind'],
         ], $definition);
-    }
-
-    public function testJsonSchemaConstraintAttributeHonoursDirection()
-    {
-        $properties = SchemaGenerator::create()->generate(Type::object(DocumentedArticle::class), new Configuration(direction: Direction::Request))->getDefinitions()['DocumentedArticle']['properties'];
-
-        $this->assertSameSchema(['type' => 'string'], $properties['contact']);
     }
 
     public function testJsonSchemaConstraintAttributeFollowsTheDialect()

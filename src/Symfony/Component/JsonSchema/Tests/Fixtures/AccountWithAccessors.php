@@ -11,23 +11,24 @@
 
 namespace Symfony\Component\JsonSchema\Tests\Fixtures;
 
+use Symfony\Component\Serializer\Attribute\Groups;
+
 class AccountWithAccessors
 {
+    #[Groups(['account:internal'])]
     public string $email;
+    private int $id;
     private string $password;
+    #[Groups(['account:internal'])]
+    private string $auditTrail;
 
-    public function __construct(
-        public readonly string $id,
-    ) {
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function setPassword(string $password): void
     {
         $this->password = $password;
-    }
-
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return new \DateTimeImmutable();
     }
 }

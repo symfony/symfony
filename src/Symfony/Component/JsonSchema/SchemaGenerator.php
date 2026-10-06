@@ -253,7 +253,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         foreach ($shape as $key => ['type' => $type, 'optional' => $optional]) {
             $schema['properties'][(string) $key] = $this->buildTypeSchema($type, $config, $parent, $definitions, $classes);
 
-            if (!$optional && !$config->partial) {
+            if (!$optional) {
                 $schema['required'][] = (string) $key;
             }
         }
@@ -343,14 +343,6 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $writable = ($this->propertyInfoExtractor->isWritable($class, $property, $context) ?? false)
                 || ($this->propertyInfoExtractor instanceof PropertyInitializableExtractorInterface && ($this->propertyInfoExtractor->isInitializable($class, $property, $context) ?? false));
 
-            if (!match ($config->direction) {
-                Direction::Response => $readable,
-                Direction::Request => $writable,
-                Direction::Bidirectional => $readable || $writable,
-            }) {
-                continue;
-            }
-
             $type = $this->propertyInfoExtractor->getType($class, $property, $context);
             $schema = $this->provideSchema($class, $property, $config);
 
@@ -366,13 +358,12 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 $schema['default'] = $default;
             }
 
-            if (Direction::Bidirectional === $config->direction) {
-                if (!$writable) {
-                    $schema['readOnly'] = true;
-                }
-                if (!$readable) {
-                    $schema['writeOnly'] = true;
-                }
+            if ($readable && !$writable) {
+                $schema['readOnly'] = true;
+            }
+
+            if ($writable && !$readable) {
+                $schema['writeOnly'] = true;
             }
 
             $propertySchema = new PropertySchema($class, $property, $type, $schema, false);
@@ -383,7 +374,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $name = $this->nameConverter?->normalize($property, $class, $config->format, $nameConverterContext) ?? $property;
             $definition['properties'][$name] = $propertySchema->schema;
 
-            if ($propertySchema->required && !$config->partial) {
+            if ($propertySchema->required) {
                 $required[] = $name;
             }
         }

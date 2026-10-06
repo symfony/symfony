@@ -12,7 +12,6 @@
 namespace Symfony\Component\JsonSchema\Tests\Fixtures;
 
 use Symfony\Component\JsonSchema\Attribute\JsonSchemaConstraint;
-use Symfony\Component\JsonSchema\Direction;
 
 class DocumentedArticle
 {
@@ -27,7 +26,7 @@ class DocumentedArticle
     #[JsonSchemaConstraint(minimum: 0, exclusiveMaximum: 10, multipleOf: 0.5)]
     public float $rating;
 
-    #[JsonSchemaConstraint(format: 'email', readOnly: true, applyTo: Direction::Response)]
+    #[JsonSchemaConstraint(format: 'email', readOnly: true)]
     public string $contact;
 
     /** @var list<string> */

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\JsonSchema\Attribute;
 
-use Symfony\Component\JsonSchema\Direction;
-
 /**
  * Sets JSON Schema keywords on a property. A null argument leaves the keyword unset.
  *
@@ -23,7 +21,6 @@ final readonly class JsonSchemaConstraint
 {
     /**
      * @param list<mixed>|null $enum
-     * @param Direction|null   $applyTo restricts the keywords to schemas generated for this direction
      */
     public function __construct(
         public ?string $title = null,
@@ -50,7 +47,6 @@ final readonly class JsonSchemaConstraint
         public ?bool $readOnly = null,
         public ?bool $writeOnly = null,
         public ?bool $required = null,
-        public ?Direction $applyTo = null,
     ) {
     }
 }

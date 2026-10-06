@@ -41,7 +41,6 @@ class ShortNameDefinitionPolicyTest extends TestCase
         yield 'groups and validation groups' => [new Configuration(groups: ['write'], validationGroups: ['create']), 'Author-write_validation.create'];
         yield 'definition name' => [new Configuration(groups: ['write'], definitionName: 'Custom'), 'Author-Custom'];
         yield 'empty definition name' => [new Configuration(groups: ['write'], definitionName: ''), 'Author'];
-        yield 'partial' => [new Configuration(partial: true), 'Author.partial'];
         yield 'prefix' => [new Configuration(groups: ['read'], definitionPrefix: 'Writer'), 'Writer-read'];
     }
 

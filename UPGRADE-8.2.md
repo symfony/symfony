@@ -16,10 +16,10 @@ AssetMapper
 Config
 ------
 
- * [BC BREAK] The `enabled` node of the sections declared with `canBeEnabled()` or `canBeDisabled()` reads the
-   env vars it references while the container is compiled, where the extension used to get a placeholder that
-   was always truthy. A section configured with `enabled: '%env(bool:FOO)%'` is now really disabled when `FOO`
-   is false, and compiling fails when `FOO` has no value at that point
+ * [BC BREAK] The `enabled` node of the sections created with `canBeEnabled()` or `canBeDisabled()` is declared
+   with `resolvesAtCompileTime()`: its env vars are read while the container is compiled, where the extension
+   used to get a placeholder that was always truthy. A section configured with `enabled: '%env(bool:FOO)%'` is
+   now really disabled when `FOO` is false, and compiling fails when `FOO` has no value at that point
 
 Console
 -------

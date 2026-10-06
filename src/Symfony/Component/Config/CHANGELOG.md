@@ -4,8 +4,8 @@ CHANGELOG
 8.2
 ---
 
- * Add `NodeDefinition::inlineEnvVars()` to replace the env vars referenced by a node with their value while the configuration is processed
- * Inline the env vars referenced by the `enabled` node of the sections declared with `canBeEnabled()` or `canBeDisabled()`
+ * Add `NodeDefinition::resolvesAtCompileTime()` to declare that the value of a node is needed while the container is compiled, so that its env vars are resolved instead of passed as placeholders
+ * Declare the `enabled` node of the sections created with `canBeEnabled()` or `canBeDisabled()` with `resolvesAtCompileTime()`
  * Add `NodeDefinition::aliasOf()` to declare that the value of a node belongs to the configuration rooted at another name
  * Add argument `$resolveAlias` to `ArrayShapeGenerator::generate()` and to the constructor of `JsonSchemaDumper` to dump the nodes declared with `NodeDefinition::aliasOf()` as references
  * Add `JsonSchemaDumper` to dump JSON Schema from configuration node definitions

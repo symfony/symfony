@@ -92,8 +92,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Registers the resolver that gives the actual value of a dynamic placeholder.
      *
-     * Nodes that declare their dynamic values must be inlined use it to replace placeholders
-     * by their actual value, once configurations are merged, or before normalizing array nodes.
+     * Nodes that declare they resolve at compile time use it to replace placeholders by their actual value, once configurations are merged, or before normalizing array nodes.
      *
      * @internal
      */
@@ -394,7 +393,7 @@ abstract class BaseNode implements NodeInterface
     final public function normalize(mixed $value): mixed
     {
         // an array node cannot normalize a placeholder, the other nodes resolve it in finalize() so that a value overridden by a later configuration is not read
-        if (null !== self::$placeholderResolver && !$this->allowPlaceholders() && $this->getAttribute('inline_env_vars', false)) {
+        if (null !== self::$placeholderResolver && !$this->allowPlaceholders() && $this->getAttribute('resolves_at_compile_time', false)) {
             $value = (self::$placeholderResolver)($value, $this->getPath());
         }
 
@@ -407,8 +406,8 @@ abstract class BaseNode implements NodeInterface
 
         // resolve placeholder value
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
-            // the value is inlined before it is used, so there is no dynamic value to validate
-            if ($this->getAttribute('inline_env_vars', false)) {
+            // the node declared that it resolves at compile time, so there is no dynamic value to validate
+            if ($this->getAttribute('resolves_at_compile_time', false)) {
                 return $value;
             }
 
@@ -466,12 +465,12 @@ abstract class BaseNode implements NodeInterface
 
     final public function finalize(mixed $value): mixed
     {
-        if (null !== self::$placeholderResolver && $this->getAttribute('inline_env_vars', false)) {
+        if (null !== self::$placeholderResolver && $this->getAttribute('resolves_at_compile_time', false)) {
             $value = (self::$placeholderResolver)($value, $this->getPath());
         }
 
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
-            if ($this->getAttribute('inline_env_vars', false)) {
+            if ($this->getAttribute('resolves_at_compile_time', false)) {
                 return $value;
             }
 

@@ -134,17 +134,16 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Replaces the env vars referenced by this node with their value instead of passing along placeholders.
+     * Declares that the value of this node is needed while the container is compiled, so that its env vars are resolved instead of passed as placeholders.
      *
-     * Use it when the value is needed while the configuration is processed, for example to decide
-     * which services to register. The env vars are read once, so the container must be rebuilt when
-     * their value changes.
+     * Use it when the extension reads the value itself, for example to decide which services to register.
+     * The env vars are read once, so the container must be rebuilt when their value changes.
      *
      * @return $this
      */
-    public function inlineEnvVars(bool $inlineEnvVars = true): static
+    public function resolvesAtCompileTime(bool $resolvesAtCompileTime = true): static
     {
-        return $this->attribute('inline_env_vars', $inlineEnvVars);
+        return $this->attribute('resolves_at_compile_time', $resolvesAtCompileTime);
     }
 
     /**

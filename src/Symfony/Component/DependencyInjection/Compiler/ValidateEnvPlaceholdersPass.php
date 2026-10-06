@@ -74,8 +74,9 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
             $this->extensionConfig[$name] = $processor->processConfiguration($configuration, $config);
         }
 
-        // placeholders that no definition references are about to be dropped, while the configuration
-        // can still hold the ones that were inlined, so name their env var before they become unknown
+        // placeholders that no definition references are about to be dropped,
+        // while the configuration can still hold the ones of the nodes that resolve at compile time:
+        // name their env var before they become unknown
         $names = [];
         foreach ($resolvingBag->getUnusedEnvPlaceholders() as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {

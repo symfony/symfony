@@ -197,7 +197,7 @@ class DebugDumpConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('debug_dump');
         $treeBuilder->getRootNode()
             ->children()
-                ->scalarNode('node_inlined')->inlineEnvVars()->end()
+                ->scalarNode('node_inlined')->resolvesAtCompileTime()->end()
                 ->scalarNode('ext_inlined')->end()
                 ->scalarNode('dynamic')->end()
                 ->scalarNode('dropped')->end()

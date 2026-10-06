@@ -364,7 +364,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             ->children()
                 ->booleanNode('enabled')
                     ->defaultFalse()
-                    ->inlineEnvVars()
+                    ->resolvesAtCompileTime()
         ;
 
         if ($info) {
@@ -394,7 +394,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             ->children()
                 ->booleanNode('enabled')
                     ->defaultTrue()
-                    ->inlineEnvVars()
+                    ->resolvesAtCompileTime()
         ;
 
         if ($info) {

@@ -570,15 +570,15 @@ class ConfigurationWithInlinedEnvVars implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('env_extension');
         $treeBuilder->getRootNode()
             ->children()
-                ->scalarNode('level')->attribute('inline_env_vars', true)->end()
+                ->scalarNode('level')->attribute('resolves_at_compile_time', true)->end()
                 ->enumNode('mode')
-                    ->attribute('inline_env_vars', true)
+                    ->attribute('resolves_at_compile_time', true)
                     ->values(['fast', 'safe'])
                     ->validate()->ifTrue(static fn ($v) => 'fast' === $v)->thenInvalid('Not that fast.')->end()
                 ->end()
                 ->scalarNode('dynamic')->end()
                 ->arrayNode('locales')
-                    ->attribute('inline_env_vars', true)
+                    ->attribute('resolves_at_compile_time', true)
                     ->scalarPrototype()->end()
                 ->end()
             ->end();

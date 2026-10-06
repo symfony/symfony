@@ -21,7 +21,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  * does not expose its state, the response carries no `X-RateLimit-*` headers at all.
  *
  * Tokens are consumed as soon as the controller is known, before its arguments are resolved,
- * unless $key reads them: a Closure, or an Expression that uses `args`.
+ * unless $key or $if reads them: a Closure, or an Expression that uses `args`.
  *
  * @see https://symfony.com/doc/current/rate_limiter.html
  *
@@ -39,6 +39,7 @@ final class RateLimit
      * @param int                             $tokens        The number of tokens to consume
      * @param string[]|string                 $methods       HTTP methods to rate limit; empty means all methods
      * @param bool                            $exposeHeaders Whether this limiter's state may be exposed via the `X-RateLimit-*` response headers, opt-in
+     * @param bool|Expression|\Closure        $if            Whether the rate limit applies: a boolean, or an Expression or a Closure evaluating to one
      */
     public function __construct(
         public readonly string $limiter,
@@ -46,6 +47,7 @@ final class RateLimit
         public readonly int $tokens = 1,
         array|string $methods = [],
         public readonly bool $exposeHeaders = false,
+        public readonly bool|Expression|\Closure $if = true,
     ) {
         if ($this->tokens < 1) {
             throw new \InvalidArgumentException(\sprintf('The "$tokens" argument of "%s" must be greater than 0, "%d" given.', self::class, $this->tokens));

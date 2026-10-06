@@ -46,7 +46,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
 
     /**
      * @param ServiceProviderInterface<RateLimiterFactoryInterface> $limiters
-     * @param ExpressionLanguage|null                               $expressionLanguage The one that evaluates the keys, which knows the variables of the expressions it compiled
+     * @param ExpressionLanguage|null                               $expressionLanguage The one that evaluates the keys and the conditions, which knows the variables of the expressions it compiled
      */
     public function __construct(
         private readonly ServiceProviderInterface $limiters,
@@ -56,7 +56,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
     }
 
     /**
-     * Consumes tokens as soon as the controller is known, or once its arguments are resolved when the key reads them.
+     * Consumes tokens as soon as the controller is known, or once its arguments are resolved when the key or the condition reads them.
      *
      * @param ControllerAttributeEvent<RateLimit, ControllerEvent|ControllerArgumentsEvent> $event
      */
@@ -66,7 +66,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         $attribute = $event->attribute;
 
         if ($event->kernelEvent instanceof ControllerEvent) {
-            if ($this->readsArguments($attribute->key)) {
+            if ($this->readsArguments($attribute->key) || $this->readsArguments($attribute->if)) {
                 return;
             }
 
@@ -76,6 +76,14 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         }
 
         if ($attribute->methods && !\in_array($request->getMethod(), $attribute->methods, true)) {
+            return;
+        }
+
+        if (!\is_bool($if = $event->evaluate($attribute->if))) {
+            throw new \TypeError(\sprintf('The value of the "$if" option of the "%s" attribute must evaluate to a boolean, "%s" given.', RateLimit::class, get_debug_type($if)));
+        }
+
+        if (!$if) {
             return;
         }
 
@@ -153,14 +161,14 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         ];
     }
 
-    private function readsArguments(string|Expression|\Closure|null $key): bool
+    private function readsArguments(string|bool|Expression|\Closure|null $value): bool
     {
-        if (!$key instanceof Expression) {
-            return $key instanceof \Closure;
+        if (!$value instanceof Expression) {
+            return $value instanceof \Closure;
         }
 
         try {
-            ($this->expressionLanguage ??= new ExpressionLanguage())->lint($key, ['request', 'this'], Parser::IGNORE_UNKNOWN_FUNCTIONS);
+            ($this->expressionLanguage ??= new ExpressionLanguage())->lint($value, ['request', 'this'], Parser::IGNORE_UNKNOWN_FUNCTIONS);
         } catch (SyntaxError) {
             return true;
         }

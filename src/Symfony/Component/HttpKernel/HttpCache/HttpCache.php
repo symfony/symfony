@@ -603,7 +603,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
         // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
         $entry->setStatusCode(503);
-        $entry->setContent('503 Service Unavailable');
+        if (!$entry->headers->has('X-Body-File') && !$entry->headers->has('X-Body-Eval')) {
+            $entry->setContent('503 Service Unavailable');
+        }
         $entry->headers->set('Retry-After', 10);
 
         return true;
@@ -655,20 +657,27 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if ($response->headers->has('X-Body-Eval')) {
             \assert(self::BODY_EVAL_BOUNDARY_LENGTH === 24);
 
+            $level = ob_get_level();
             ob_start();
 
-            $content = $response->getContent();
-            $boundary = substr($content, 0, 24);
-            $j = strpos($content, $boundary, 24);
-            echo substr($content, 24, $j - 24);
-            $i = $j + 24;
-
-            while (false !== $j = strpos($content, $boundary, $i)) {
-                [$uri, $alt, $ignoreErrors, $part] = explode("\n", substr($content, $i, $j - $i), 4);
+            try {
+                $content = $response->getContent();
+                $boundary = substr($content, 0, 24);
+                $j = strpos($content, $boundary, 24);
+                echo substr($content, 24, $j - 24);
                 $i = $j + 24;
 
-                echo $this->surrogate->handle($this, $uri, $alt, $ignoreErrors);
-                echo $part;
+                while (false !== $j = strpos($content, $boundary, $i)) {
+                    [$uri, $alt, $ignoreErrors, $part] = explode("\n", substr($content, $i, $j - $i), 4);
+                    $i = $j + 24;
+
+                    echo $this->surrogate->handle($this, $uri, $alt, $ignoreErrors);
+                    echo $part;
+                }
+            } catch (\Throwable $e) {
+                Response::closeOutputBuffers($level, false);
+
+                throw $e;
             }
 
             $response->setContent(ob_get_clean());

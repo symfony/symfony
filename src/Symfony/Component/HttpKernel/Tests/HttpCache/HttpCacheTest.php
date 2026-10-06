@@ -757,6 +757,49 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Old response', $this->response->getContent());
     }
 
+    public function testDegradationWhenCacheLockedWithEsi()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        $this->cacheConfig['stale_while_revalidate'] = 0;
+
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'Old response <esi:include src="/foo" />',
+                'headers' => [
+                    'Cache-Control' => 'public, s-maxage=5',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'Last-Modified' => 'some while ago',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'with fragment',
+                'headers' => [
+                    'Cache-Control' => 'public, s-maxage=60',
+                ],
+            ],
+        ]);
+        $this->request('GET', '/', [], [], true); // warm the cache
+        $this->assertSame('Old response with fragment', $this->response->getContent());
+
+        // Now, lock the cache
+        $concurrentRequest = Request::create('/', 'GET');
+        $this->store->lock($concurrentRequest);
+
+        sleep(10);
+
+        $this->store = $this->createStore(); // create another store instance that does not hold the current lock
+        $this->request('GET', '/', [], [], true);
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame(503, $this->response->getStatusCode());
+        $this->assertSame('10', $this->response->headers->get('Retry-After'));
+        $this->assertSame('Old response with fragment', $this->response->getContent());
+    }
+
     public function testHitBackendOnlyOnceWhenCacheWasLocked()
     {
         // Disable stale-while-revalidate, it circumvents waiting for the lock
@@ -1700,6 +1743,66 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/', [], [], true);
         $this->assertEquals('Hello World!', $this->response->getContent());
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
+    }
+
+    public function testEsiFragmentErrorClosesTheOutputBuffer()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'Main <esi:include src="/foo" />',
+                'headers' => [
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ],
+            ],
+            [
+                'status' => 500,
+                'body' => 'Broken fragment',
+                'headers' => [],
+            ],
+        ]);
+
+        $level = ob_get_level();
+
+        try {
+            $this->request('GET', '/', [], [], true);
+            $this->fail('The fragment error should be thrown.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Error when rendering "http://localhost/foo" (Status code is 500).', $e->getMessage());
+        }
+
+        $this->assertSame($level, ob_get_level());
+    }
+
+    public function testEsiNestedFragmentErrorIsIgnored()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'Main <esi:include src="/foo" onerror="continue" /> end',
+                'headers' => [
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'Foo <esi:include src="/bar" /> foo end',
+                'headers' => [
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ],
+            ],
+            [
+                'status' => 500,
+                'body' => 'Broken fragment',
+                'headers' => [],
+            ],
+        ]);
+
+        $level = ob_get_level();
+        $this->request('GET', '/', [], [], true);
+
+        $this->assertSame('Main  end', $this->response->getContent());
+        $this->assertSame($level, ob_get_level());
     }
 
     public function testEsiRecalculateContentLengthHeaderForHeadRequest()

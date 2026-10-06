@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T12:05:51Z
+
+PR updated: the `allow_if` expressions of `access_control` rules are now compiled too, see the second commit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T12:47:35Z
+
+PR updated: the tag is now `expression_language.compiled`, each expression language declares the attribute properties it evaluates, and workflow guards are compiled too (their expression language had no cache pool at all).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T14:02:58Z
+
+PR updated: a function whose compiler throws is now compiled to a call to its evaluator, so that expressions using the security functions on `controller.expression_language` get compiled too. And the new `string_expressions` option of the tag replaces the special case for `#[Cache]`, so that DoctrineBundle can bind `#[MapEntity(expr: ...)]` the same way.

@@ -22,9 +22,15 @@ class RecordingClassSchemaResolver implements ClassSchemaResolverInterface
      */
     public array $calls = [];
 
+    /**
+     * @var list<Configuration>
+     */
+    public array $configs = [];
+
     public function resolve(string $class, Configuration $config, ?DefinitionParent $parent = null): ?array
     {
         $this->calls[] = [$class, $parent];
+        $this->configs[] = $config;
 
         return null;
     }

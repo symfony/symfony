@@ -328,8 +328,8 @@ class SchemaGeneratorTest extends TestCase
 
         $this->assertEquals([
             [BookWithAuthors::class, null],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'author')],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'coAuthor')],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'author', new Configuration())],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'coAuthor', new Configuration())],
         ], $policy->calls);
     }
 
@@ -369,8 +369,8 @@ class SchemaGeneratorTest extends TestCase
         (new SchemaGenerator(self::createReflectionPropertyInfo(), definitionProcessors: [$processor]))->generate(Type::object(Library::class));
 
         $this->assertEquals([
-            [Author::class, new DefinitionParent(Shelf::class, 'topAuthor', new DefinitionParent(Library::class, 'shelf'))],
-            [Shelf::class, new DefinitionParent(Library::class, 'shelf')],
+            [Author::class, new DefinitionParent(Shelf::class, 'topAuthor', new Configuration(), new DefinitionParent(Library::class, 'shelf', new Configuration()))],
+            [Shelf::class, new DefinitionParent(Library::class, 'shelf', new Configuration())],
             [Library::class, null],
         ], $processor->calls);
     }
@@ -416,11 +416,40 @@ class SchemaGeneratorTest extends TestCase
 
         $this->assertEquals([
             [BookWithAuthors::class, null],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'author')],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'coAuthor')],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'reviewers')],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'authorsByRole')],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'author', new Configuration())],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'coAuthor', new Configuration())],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'reviewers', new Configuration())],
+            [Author::class, new DefinitionParent(BookWithAuthors::class, 'authorsByRole', new Configuration())],
         ], $resolver->calls);
+    }
+
+    public function testClassSchemaResolversReceiveTheOwnerConfigurationOnTheDefinitionParent()
+    {
+        $resolver = new RecordingClassSchemaResolver();
+        $config = new Configuration(attributes: ['title', 'author' => ['name']]);
+
+        (new SchemaGenerator(self::createPhpDocPropertyInfo(), classSchemaResolvers: [$resolver]))->generate(Type::object(BookWithAuthors::class), $config);
+
+        [$authorClass, $authorParent] = $resolver->calls[1];
+
+        $this->assertSame(Author::class, $authorClass);
+        $this->assertSame(['name'], $resolver->configs[1]->attributes);
+        $this->assertSame($config, $authorParent->config);
+    }
+
+    public function testDefinitionParentChainCarriesTheRootConfiguration()
+    {
+        $resolver = new RecordingClassSchemaResolver();
+        $config = new Configuration(attributes: ['shelf' => ['topAuthor' => ['name']]]);
+
+        (new SchemaGenerator(self::createReflectionPropertyInfo(), classSchemaResolvers: [$resolver]))->generate(Type::object(Library::class), $config);
+
+        [$authorClass, $authorParent] = $resolver->calls[2];
+
+        $this->assertSame(Author::class, $authorClass);
+        $this->assertSame(['name'], $resolver->configs[2]->attributes);
+        $this->assertSame(['topAuthor' => ['name']], $authorParent->config->attributes);
+        $this->assertSame($config, $authorParent->parent->config);
     }
 
     public function testClassSchemaResolverCanReplaceNestedRelationsByAnIriReferenceWithoutDefinition()

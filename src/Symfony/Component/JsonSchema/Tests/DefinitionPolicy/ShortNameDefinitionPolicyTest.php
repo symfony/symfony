@@ -67,6 +67,6 @@ class ShortNameDefinitionPolicyTest extends TestCase
         $config = new Configuration(definitionPrefix: 'Writer');
 
         $this->assertSame('Writer', $policy->nameFor(Author::class, $config));
-        $this->assertSame('Author', $policy->nameFor(Author::class, $config, new DefinitionParent(CatalogProduct::class, 'author')));
+        $this->assertSame('Author', $policy->nameFor(Author::class, $config, new DefinitionParent(CatalogProduct::class, 'author', $config)));
     }
 }

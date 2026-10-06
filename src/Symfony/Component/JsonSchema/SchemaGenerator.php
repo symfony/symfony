@@ -351,7 +351,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                     continue;
                 }
 
-                $schema = null !== $type ? $this->buildTypeSchema($type, $this->createChildConfiguration($config, $property), new DefinitionParent($class, $property, $parent), $definitions, $classes) : [];
+                $schema = null !== $type ? $this->buildTypeSchema($type, $this->createChildConfiguration($config, $property), new DefinitionParent($class, $property, $config, $parent), $definitions, $classes) : [];
             }
 
             if (null !== $default = self::normalizeDefaultValue(self::getDefaultValue($class, $property))) {

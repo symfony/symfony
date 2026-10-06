@@ -808,7 +808,7 @@ class RateLimitAttributeListenerTest extends TestCase
         $expressionLanguage = new class extends ExpressionLanguage {
             public array $lintedNames = [];
 
-            public function lint(Expression|string $expression, array $names, int $flags = 0): void
+            public function lint(Expression|string $expression, ?array $names, int $flags = 0): void
             {
                 $this->lintedNames[] = $names;
 

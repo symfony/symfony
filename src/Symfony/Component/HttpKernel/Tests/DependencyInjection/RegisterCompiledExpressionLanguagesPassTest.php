@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\CompiledExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -91,15 +92,27 @@ class RegisterCompiledExpressionLanguagesPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('expression_language.cache_warmer'));
     }
 
-    public function testSkipsExpressionLanguagesThatCannotLoadCompiledExpressions()
+    public function testThrowsWhenTheTaggedServiceIsNotAnExpressionLanguage()
     {
         $container = new ContainerBuilder();
         $container->register('expression_language.cache_warmer', ExpressionLanguageCacheWarmer::class)->setArguments([[], [], [], []]);
         $container->register('app.expression_language', \stdClass::class)->addTag('expression_language.compiled');
 
-        (new RegisterCompiledExpressionLanguagesPass())->process($container);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Service "app.expression_language" tagged "expression_language.compiled" must be an instance of "Symfony\Component\ExpressionLanguage\ExpressionLanguage".');
 
-        $this->assertFalse($container->hasDefinition('.app.expression_language.compiled'));
-        $this->assertFalse($container->hasDefinition('expression_language.cache_warmer'));
+        (new RegisterCompiledExpressionLanguagesPass())->process($container);
+    }
+
+    public function testThrowsWhenTheClassOfTheTaggedServiceCannotBeFound()
+    {
+        $container = new ContainerBuilder();
+        $container->register('expression_language.cache_warmer', ExpressionLanguageCacheWarmer::class)->setArguments([[], [], [], []]);
+        $container->register('app.expression_language', 'App\MissingExpressionLanguage')->addTag('expression_language.compiled');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Class "App\MissingExpressionLanguage" used for service "app.expression_language" cannot be found.');
+
+        (new RegisterCompiledExpressionLanguagesPass())->process($container);
     }
 }

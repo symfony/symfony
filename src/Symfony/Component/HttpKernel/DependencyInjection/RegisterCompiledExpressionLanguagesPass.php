@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\CompiledExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -44,10 +45,12 @@ final class RegisterCompiledExpressionLanguagesPass implements CompilerPassInter
         $expressionLanguages = $attributes = $expressions = [];
 
         foreach ($container->findTaggedServiceIds('expression_language.compiled') as $id => $tags) {
-            $r = $container->getReflectionClass(self::getClass($container, $id), false);
+            if (!$r = $container->getReflectionClass($class = self::getClass($container, $id), false)) {
+                throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+            }
 
-            if (!$r || !is_a($r->name, ExpressionLanguage::class, true)) {
-                continue;
+            if (!is_a($r->name, ExpressionLanguage::class, true)) {
+                throw new InvalidArgumentException(\sprintf('Service "%s" tagged "expression_language.compiled" must be an instance of "%s".', $id, ExpressionLanguage::class));
             }
 
             // decorating in debug mode too keeps the class of the service the same in every environment

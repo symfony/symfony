@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-06T04:43:43Z
+
+When the expression language is used in the code, such as in routing configuration, being able to use any constant is not a security issue; it is a convenience. Requiring to explicitly allow every usable constant is a constraint that does not seem necessary for this use case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T05:38:19Z
+
+Which is why I allowed all consts by default there @GromNaN , see eg https://github.com/symfony/symfony/pull/66630/files#diff-71fe9bbab0c0d6aa210c7bd00c7b181cba7c851476f5fc100d23a4a9613e9143
+
+Unless I missed something?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-06T06:05:15Z
+
+Ok, perfect then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T15:58:54Z
+
+Rebased on #66652, with the tests of the provider now also run through `CompiledExpressionLanguage`. Doing so revealed that the compiled code overwrote an expression variable named `v`, since it used `$v` as a temporary variable: dynamic names now go through two internal static helpers instead.

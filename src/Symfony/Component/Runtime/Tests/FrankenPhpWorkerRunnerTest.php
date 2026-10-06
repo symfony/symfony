@@ -39,9 +39,15 @@ class FrankenPhpWorkerRunnerTest extends TestCase
             });
         $application->expects($this->once())->method('terminate');
 
-        $_SERVER['FOO'] = 'bar';
+        $server = $_SERVER;
 
-        $runner = new FrankenPhpWorkerRunner($application, 500);
-        $this->assertSame(0, $runner->run());
+        try {
+            $_SERVER['FOO'] = 'bar';
+
+            $runner = new FrankenPhpWorkerRunner($application, 500);
+            $this->assertSame(0, $runner->run());
+        } finally {
+            $_SERVER = $server;
+        }
     }
 }

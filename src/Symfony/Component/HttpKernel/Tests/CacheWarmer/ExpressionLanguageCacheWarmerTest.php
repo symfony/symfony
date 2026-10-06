@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\CacheWarmer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\CompiledExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\CacheWarmer\ExpressionLanguageCacheWarmer;
@@ -62,12 +63,45 @@ class ExpressionLanguageCacheWarmerTest extends TestCase
     {
         $file = $this->buildDir.'/expression_language/expressions.php';
         $otherFile = $this->buildDir.'/expression_language/other.php';
-        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage()), $otherFile => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['request.isSecure()', 'a +']]);
+        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage()), $otherFile => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['request.isSecure()' => ['request']]]);
 
         $warmer->warmUp($this->buildDir, $this->buildDir);
 
         $this->assertSame(['request.isSecure()'], array_keys(require $file));
         $this->assertSame([], require $otherFile);
+    }
+
+    public function testWarmUpFailsOnInvalidListedExpression()
+    {
+        $file = $this->buildDir.'/expression_language/expressions.php';
+        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['request.isSecure()' => null, 'a +' => null]]);
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Unexpected token "end of expression" of value "" around position 4 for expression `a +`.');
+
+        $warmer->warmUp($this->buildDir, $this->buildDir);
+    }
+
+    public function testWarmUpFailsOnUnknownVariableInListedExpression()
+    {
+        $file = $this->buildDir.'/expression_language/expressions.php';
+        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['request.isSecure()' => ['req']]]);
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Variable "request" is not valid around position 1 for expression `request.isSecure()`.');
+
+        $warmer->warmUp($this->buildDir, $this->buildDir);
+    }
+
+    public function testWarmUpFailsOnUnknownFunctionInListedExpression()
+    {
+        $file = $this->buildDir.'/expression_language/expressions.php';
+        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['is_granted("ROLE_ADMIN")' => null]]);
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('The function "is_granted" does not exist around position 1 for expression `is_granted("ROLE_ADMIN")`.');
+
+        $warmer->warmUp($this->buildDir, $this->buildDir);
     }
 
     public function testWarmUpWithoutBuildDir()

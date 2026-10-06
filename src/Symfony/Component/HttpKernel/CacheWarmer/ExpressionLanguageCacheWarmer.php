@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
 
 use Symfony\Component\ExpressionLanguage\CompiledExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\Parser;
 
 /**
  * Compiles the expressions of controller attributes, plus the ones listed for each expression language.
@@ -27,7 +28,7 @@ final class ExpressionLanguageCacheWarmer extends CacheWarmer
      * @param iterable<string, CompiledExpressionLanguage>            $expressionLanguages Indexed by the file to compile the expressions into
      * @param list<class-string>                                      $controllers
      * @param array<string, array<class-string, array<string, bool>>> $attributes          The properties of controller attributes that hold the expressions to compile, mapped to whether their strings are expressions too, indexed by the file to compile them into
-     * @param array<string, list<string>>                             $expressions         More expressions to compile, indexed by the file to compile them into
+     * @param array<string, array<string, list<string>|null>>         $expressions         More expressions to compile, mapped to the variables they can read or to null when any variable is allowed, indexed by the file to compile them into
      */
     public function __construct(
         private iterable $expressionLanguages,
@@ -71,7 +72,9 @@ final class ExpressionLanguageCacheWarmer extends CacheWarmer
                 }
             }
 
-            foreach ($this->expressions[$file] ?? [] as $expression) {
+            // listed expressions come from the configuration: an invalid one fails the warmup instead of being left out
+            foreach ($this->expressions[$file] ?? [] as $expression => $variables) {
+                $expressionLanguage->lint($expression = (string) $expression, $variables ?? [], null === $variables ? Parser::IGNORE_UNKNOWN_VARIABLES : 0);
                 $expressions[$expression] = $expression;
             }
 

@@ -78,10 +78,18 @@ final class RegisterCompiledExpressionLanguagesPass implements CompilerPassInter
                         $attributes[$file][$class][$property] = true;
                     }
                 }
-            }
 
-            if ($tagExpressions = array_merge(...array_column($tags, 'expressions'))) {
-                $expressions[$file] = array_values(array_unique($tagExpressions));
+                // an expression listed by several tags can read the variables of all of them, or any variable when one of them doesn't list its variables
+                $variables = $tag['variables'] ?? null;
+                foreach ($tag['expressions'] ?? [] as $expression) {
+                    if (!\array_key_exists($expression, $expressions[$file] ?? [])) {
+                        $expressions[$file][$expression] = $variables;
+                    } elseif (null === $variables || null === $expressions[$file][$expression]) {
+                        $expressions[$file][$expression] = null;
+                    } else {
+                        $expressions[$file][$expression] = array_values(array_unique([...$expressions[$file][$expression], ...$variables]));
+                    }
+                }
             }
         }
 

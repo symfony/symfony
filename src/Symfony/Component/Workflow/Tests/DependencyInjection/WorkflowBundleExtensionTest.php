@@ -21,18 +21,30 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Definition as WorkflowDefinition;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowAttributePass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
+use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\EventListener\GuardListener;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
+use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Tests\Fixtures\DefinitionValidator;
+use Symfony\Component\Workflow\Tests\Subject;
+use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 use Symfony\Component\Workflow\WorkflowBundle;
 use Symfony\Component\Workflow\WorkflowEvents;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 class WorkflowBundleExtensionTest extends TestCase
 {
@@ -351,7 +363,24 @@ class WorkflowBundleExtensionTest extends TestCase
 
         $expressionLanguage = $container->getDefinition('workflow.security.expression_language');
         $this->assertEquals(new Reference('cache.workflow_expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE), $expressionLanguage->getArgument(0));
-        $this->assertSame([['expressions' => ['!!true', '!!false']]], $expressionLanguage->getTag('expression_language.compiled'));
+        $tags = $expressionLanguage->getTag('expression_language.compiled');
+        $this->assertSame(['!!true', '!!false'], $tags[0]['expressions']);
+
+        $spy = new class extends ExpressionLanguage {
+            public array $variables = [];
+
+            public function evaluate(Expression|string $expression, array $values = []): mixed
+            {
+                $this->variables = array_keys($values);
+
+                return true;
+            }
+        };
+        $subject = new Subject();
+        $guardListener = new GuardListener(['guard' => ['true']], $spy, new TokenStorage(), $this->createStub(AuthorizationCheckerInterface::class), $this->createStub(AuthenticationTrustResolverInterface::class), new RoleHierarchy([]));
+        $guardListener->onTransition(new GuardEvent($subject, new Marking([]), new Transition('t', 'a', 'b'), $this->createStub(WorkflowInterface::class)), 'guard');
+
+        $this->assertEqualsCanonicalizing($spy->variables, $tags[0]['variables']);
     }
 
     public function testWorkflowServicesCanBeEnabled()

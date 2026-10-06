@@ -161,7 +161,7 @@ class WorkflowAttributePassTest extends TestCase
         }
         $container->compile();
 
-        $this->assertSame([['expressions' => ['subject.ready']]], $container->getDefinition('workflow.security.expression_language')->getTag('expression_language.compiled'));
+        $this->assertSame([['expressions' => ['subject.ready'], 'variables' => ['subject', 'auth_checker', 'trust_resolver', 'validator', 'token', 'user', 'role_names']]], $container->getDefinition('workflow.security.expression_language')->getTag('expression_language.compiled'));
     }
 
     public function testAttributeAndConfiguredWorkflowsCoexist()

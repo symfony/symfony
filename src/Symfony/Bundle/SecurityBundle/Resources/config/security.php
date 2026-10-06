@@ -313,6 +313,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
 
         ->set('security.is_granted_attribute_expression_language', BaseExpressionLanguage::class)
+            ->lazy()
             ->args([service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid()])
 
         ->set('cache.security_is_granted_attribute_expression_language')
@@ -321,6 +322,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('cache.pool')
 
         ->set('security.is_csrf_token_valid_attribute_expression_language', BaseExpressionLanguage::class)
+            ->lazy()
             ->args([service('cache.security_is_csrf_token_valid_attribute_expression_language')->nullOnInvalid()])
 
         ->set('cache.security_is_csrf_token_valid_attribute_expression_language')

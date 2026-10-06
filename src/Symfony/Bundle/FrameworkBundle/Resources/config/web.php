@@ -164,6 +164,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
 
         ->set('controller.cache_attribute_listener', CacheAttributeListener::class)
+            ->args([
+                service('controller.expression_language')->nullOnInvalid(),
+            ])
             ->tag('kernel.event_subscriber')
             ->tag('kernel.reset', ['method' => '?reset'])
 

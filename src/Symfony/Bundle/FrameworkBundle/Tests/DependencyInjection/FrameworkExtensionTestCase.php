@@ -1039,6 +1039,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->getDefinition('controller.expression_language')->isLazy());
     }
 
+    public function testCacheAttributeListenerUsesACachedExpressionLanguage()
+    {
+        $container = $this->createContainerFromFile('default_config');
+
+        $this->assertEquals(new Reference('controller.expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('controller.cache_attribute_listener')->getArgument(0));
+        $this->assertEquals(new Reference('cache.controller_expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('controller.expression_language')->getArgument(0));
+        $this->assertTrue($container->getDefinition('controller.expression_language')->isLazy());
+    }
+
     public function testMessengerServicesRemovedWhenDisabled()
     {
         $container = $this->createContainerFromFile('messenger_disabled');

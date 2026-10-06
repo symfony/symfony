@@ -20,6 +20,9 @@ use Symfony\Component\ExpressionLanguage\Expression;
  * rejecting, out of those with $exposeHeaders enabled. A rejecting limiter always wins; when it
  * does not expose its state, the response carries no `X-RateLimit-*` headers at all.
  *
+ * Tokens are consumed as soon as the controller is known, before its arguments are resolved,
+ * unless $key reads them: a Closure, or an Expression that uses `args`.
+ *
  * @see https://symfony.com/doc/current/rate_limiter.html
  *
  * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>

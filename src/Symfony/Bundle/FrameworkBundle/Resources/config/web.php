@@ -191,6 +191,7 @@ return static function (ContainerConfigurator $container) {
         ->set('rate_limiter.attribute_listener', RateLimitAttributeListener::class)
             ->args([
                 tagged_locator('rate_limiter', 'name'),
+                service('controller.expression_language')->nullOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('container.remove_if_missing', ['service' => 'limiter'])

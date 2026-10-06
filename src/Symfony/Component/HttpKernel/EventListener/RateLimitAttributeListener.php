@@ -12,9 +12,15 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Parser;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -34,20 +40,40 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
     private const RATE_LIMIT_ATTRIBUTE = '_rate_limit';
 
     /**
+     * @var \WeakMap<Request, list<RateLimit>>
+     */
+    private \WeakMap $consumedBeforeArguments;
+
+    /**
      * @param ServiceProviderInterface<RateLimiterFactoryInterface> $limiters
+     * @param ExpressionLanguage|null                               $expressionLanguage The one that evaluates the keys, which knows the variables of the expressions it compiled
      */
     public function __construct(
         private readonly ServiceProviderInterface $limiters,
+        private ?ExpressionLanguage $expressionLanguage = null,
     ) {
+        $this->consumedBeforeArguments = new \WeakMap();
     }
 
     /**
-     * @param ControllerAttributeEvent<RateLimit, ControllerArgumentsEvent> $event
+     * Consumes tokens as soon as the controller is known, or once its arguments are resolved when the key reads them.
+     *
+     * @param ControllerAttributeEvent<RateLimit, ControllerEvent|ControllerArgumentsEvent> $event
      */
     public function onKernelControllerAttribute(ControllerAttributeEvent $event, ?string $eventName = null, ?EventDispatcherInterface $dispatcher = null): void
     {
         $request = $event->kernelEvent->getRequest();
         $attribute = $event->attribute;
+
+        if ($event->kernelEvent instanceof ControllerEvent) {
+            if ($this->readsArguments($attribute->key)) {
+                return;
+            }
+
+            $this->consumedBeforeArguments[$request] = [...$this->consumedBeforeArguments[$request] ?? [], $attribute];
+        } elseif (\in_array($attribute, $this->consumedBeforeArguments[$request] ?? [], true)) {
+            return;
+        }
 
         if ($attribute->methods && !\in_array($request->getMethod(), $attribute->methods, true)) {
             return;
@@ -121,8 +147,24 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            KernelEvents::CONTROLLER.'.'.RateLimit::class => 'onKernelControllerAttribute',
             KernelEvents::CONTROLLER_ARGUMENTS.'.'.RateLimit::class => 'onKernelControllerAttribute',
             KernelEvents::RESPONSE => 'onKernelResponse',
         ];
+    }
+
+    private function readsArguments(string|Expression|\Closure|null $key): bool
+    {
+        if (!$key instanceof Expression) {
+            return $key instanceof \Closure;
+        }
+
+        try {
+            ($this->expressionLanguage ??= new ExpressionLanguage())->lint($key, ['request', 'this'], Parser::IGNORE_UNKNOWN_FUNCTIONS);
+        } catch (SyntaxError) {
+            return true;
+        }
+
+        return false;
     }
 }

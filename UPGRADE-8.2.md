@@ -259,6 +259,8 @@ HttpKernel
    class to keep the previous behavior
  * `Kernel::boot()` now iterates over the `$bundles` property instead of calling `getBundles()`, so that the
    bundles that have nothing to do at boot time are not instantiated
+ * `#[RateLimit]` now consumes its tokens on `kernel.controller`, before the controller arguments are resolved, unless its key is a Closure or an Expression that uses `args`.
+   Such a limit now runs before the attributes handled on `kernel.controller_arguments`, like `#[IsGranted]`, whatever their order, so the requests they deny consume tokens too
 
 JsonStreamer
 ------------

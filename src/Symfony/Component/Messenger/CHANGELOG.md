@@ -52,6 +52,9 @@ CHANGELOG
  * Add `dispatch_on_failure` to the default bus middleware, between `flow_context` and `dispatch_after_current_bus`
  * Accept a list of keys in `SigningSerializer::__construct()` to rotate them
  * Add the `messenger.serializer.signing_secret` option
+ * Add `BatchDispatcher` to dispatch several messages and send them to their transports in batches
+ * Add `BatchSenderInterface` for the senders that send several messages at once, and `BatchSendFailedException` to tell which messages of a batch were sent
+ * Make `OutboxSender` implement `BatchSenderInterface`, storing the new messages of a batch with as few requests as the outbox transport allows
 
 8.1
 ---

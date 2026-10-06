@@ -19,8 +19,14 @@ use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\DeleteResult;
 use MongoDB\Driver\CursorInterface;
+use MongoDB\Driver\Exception\BulkWriteException;
 use MongoDB\Driver\Exception\RuntimeException;
+use MongoDB\Driver\Session;
 use MongoDB\Driver\WriteConcern;
+use MongoDB\Driver\WriteConcernError;
+use MongoDB\Driver\WriteError;
+use MongoDB\Driver\WriteResult;
+use MongoDB\InsertManyResult;
 use MongoDB\InsertOneResult;
 use MongoDB\Model\BSONDocument;
 use MongoDB\Operation\FindOneAndUpdate;
@@ -395,6 +401,175 @@ class ConnectionTest extends TestCase
         $connection->send('body');
     }
 
+    public function testSendBatch()
+    {
+        $clock = new MockClock();
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())
+            ->method('insertMany')
+            ->with(
+                $this->callback(static function (array $documents) use (&$inserted, $clock): bool {
+                    self::assertTrue(array_is_list($documents));
+                    self::assertCount(2, $documents);
+                    self::assertInstanceOf(ObjectId::class, $documents[0]->_id);
+                    self::assertSame('first', $documents[0]->body);
+                    self::assertEquals(new BSONDocument(['type' => 'foo']), $documents[0]->headers);
+                    self::assertSame('foobar', $documents[0]->queueName);
+                    self::assertEquals(new UTCDateTime($clock->now()), $documents[0]->createdAt);
+                    self::assertEquals(new UTCDateTime($clock->now()), $documents[0]->availableAt);
+                    self::assertInstanceOf(ObjectId::class, $documents[1]->_id);
+                    self::assertSame('second', $documents[1]->body);
+                    self::assertSame('bar', $documents[1]->queueName);
+                    self::assertEquals(new UTCDateTime($clock->now()->modify('+100 seconds')), $documents[1]->availableAt);
+                    $inserted = $documents;
+
+                    return true;
+                }),
+                ['ordered' => false, 'writeConcern' => new WriteConcern(WriteConcern::MAJORITY)]
+            )
+            ->willReturn($this->createStub(InsertManyResult::class));
+
+        $connection = new Connection($collection, 'foobar', 3_600, $clock);
+
+        [$ids, $exceptions] = $connection->sendBatch([
+            'a' => ['first', ['type' => 'foo'], 0, null, null],
+            'b' => ['second', [], 100_000, null, 'bar'],
+        ]);
+
+        $this->assertSame(['a' => $inserted[0]->_id, 'b' => $inserted[1]->_id], $ids);
+        $this->assertSame([], $exceptions);
+    }
+
+    public function testSendBatchInsertsTheMessagesOfEachSessionWithTheirOwnRequest()
+    {
+        $session = $this->createSession();
+        $otherSession = $this->createSession();
+        $requests = [];
+
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->exactly(4))
+            ->method('insertMany')
+            ->willReturnCallback(function (array $documents, array $options) use (&$requests) {
+                $requests[] = [array_map(static fn (BSONDocument $document) => $document->body, $documents), $options['session'] ?? null];
+
+                return $this->createStub(InsertManyResult::class);
+            });
+
+        $connection = new Connection($collection, 'foobar', 3_600);
+
+        [$ids, $exceptions] = $connection->sendBatch([
+            ['a', [], 0, null, null],
+            ['b', [], 0, $session, null],
+            ['c', [], 0, $session, null],
+            ['d', [], 0, $otherSession, null],
+            ['e', [], 0, null, null],
+        ]);
+
+        $this->assertSame([[['a'], null], [['b', 'c'], $session], [['d'], $otherSession], [['e'], null]], $requests);
+        $this->assertSame([0, 1, 2, 3, 4], array_keys($ids));
+        $this->assertSame([], $exceptions);
+    }
+
+    public function testSendBatchReportsTheMessagesTheServerRejected()
+    {
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->exactly(2))
+            ->method('insertMany')
+            ->willReturnOnConsecutiveCalls($this->throwException($this->createBulkWriteException(2, false, [1 => 'E11000 duplicate key error'])), $this->createStub(InsertManyResult::class));
+
+        $connection = new Connection($collection, 'foobar', 3_600);
+
+        [$ids, $exceptions] = $connection->sendBatch([
+            'a' => ['a', [], 0, null, null],
+            'b' => ['b', [], 0, null, null],
+            'c' => ['c', [], 0, null, null],
+            'd' => ['d', [], 0, $this->createSession(), null],
+        ]);
+
+        $this->assertSame(['a', 'c', 'd'], array_keys($ids));
+        $this->assertSame(['b'], array_keys($exceptions));
+        $this->assertInstanceOf(TransportException::class, $exceptions['b']);
+        $this->assertSame('E11000 duplicate key error', $exceptions['b']->getMessage());
+    }
+
+    public function testSendBatchReportsTheMessagesNotSentAfterAnErrorStoppedTheInsert()
+    {
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())
+            ->method('insertMany')
+            ->willThrowException($bulkWriteException = $this->createBulkWriteException(1, false, [1 => 'E11000 duplicate key error']));
+
+        $connection = new Connection($collection, 'foobar', 3_600);
+
+        [$ids, $exceptions] = $connection->sendBatch([
+            'a' => ['a', [], 0, null, null],
+            'b' => ['b', [], 0, null, null],
+            'c' => ['c', [], 0, null, null],
+            'd' => ['d', [], 0, $this->createSession(), null],
+        ]);
+
+        $this->assertSame(['a'], array_keys($ids));
+        $this->assertSame(['b', 'c', 'd'], array_keys($exceptions));
+        $this->assertSame('E11000 duplicate key error', $exceptions['b']->getMessage());
+        $this->assertSame('Write failed.', $exceptions['c']->getMessage());
+        $this->assertSame($bulkWriteException, $exceptions['c']->getPrevious());
+        $this->assertSame($exceptions['c'], $exceptions['d']);
+    }
+
+    public function testSendBatchReportsAllMessagesOfARequestThatFailedItsWriteConcernAsNotInserted()
+    {
+        $collection = $this->createStub(Collection::class);
+        $collection->method('insertMany')
+            ->willThrowException($this->createBulkWriteException(2, true));
+
+        $connection = new Connection($collection, 'foobar', 3_600);
+
+        [$ids, $exceptions] = $connection->sendBatch([['a', [], 0, null, null], ['b', [], 0, null, null]]);
+
+        $this->assertSame([], $ids);
+        $this->assertSame([0, 1], array_keys($exceptions));
+    }
+
+    public function testSendBatchStopsAtTheFirstFailedRequest()
+    {
+        $session = $this->createSession();
+
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->exactly(2))
+            ->method('insertMany')
+            ->willReturnOnConsecutiveCalls($this->createStub(InsertManyResult::class), $this->throwException(new RuntimeException('Foo bar baz')));
+
+        $connection = new Connection($collection, 'foobar', 3_600);
+
+        [$ids, $exceptions] = $connection->sendBatch([
+            'a' => ['a', [], 0, null, null],
+            'b' => ['b', [], 0, $session, null],
+            'c' => ['c', [], 0, $session, null],
+            'd' => ['d', [], 0, null, null],
+        ]);
+
+        $this->assertSame(['a'], array_keys($ids));
+        $this->assertSame(['b', 'c', 'd'], array_keys($exceptions));
+        $this->assertSame('Foo bar baz', $exceptions['d']->getMessage());
+    }
+
+    public function testSendBatchWrapsMongoExceptions()
+    {
+        $collection = $this->createStub(Collection::class);
+        $collection->method('insertMany')
+            ->willThrowException(new RuntimeException('Foo bar baz'));
+
+        $connection = new Connection($collection, 'queueName', 100);
+
+        [$ids, $exceptions] = $connection->sendBatch(['a' => ['a', [], 0, null, null], 'b' => ['b', [], 0, null, null]]);
+
+        $this->assertSame([], $ids);
+        $this->assertSame(['a', 'b'], array_keys($exceptions));
+        $this->assertInstanceOf(TransportException::class, $exceptions['a']);
+        $this->assertSame('Foo bar baz', $exceptions['a']->getMessage());
+        $this->assertSame($exceptions['a'], $exceptions['b']);
+    }
+
     /**
      * @return array{int, bool}[]
      */
@@ -541,5 +716,23 @@ class ConnectionTest extends TestCase
         $document->deliveredTo = $deliveredTo;
 
         return $document;
+    }
+
+    private function createSession(): Session
+    {
+        if (\extension_loaded('mongodb')) {
+            $this->markTestSkipped('The driver creates sessions only when connected to a server.');
+        }
+
+        return new Session();
+    }
+
+    private function createBulkWriteException(int $insertedCount, bool $writeConcernError = false, array $writeErrors = []): BulkWriteException
+    {
+        if (\extension_loaded('mongodb')) {
+            $this->markTestSkipped('The driver creates write results only when connected to a server.');
+        }
+
+        return new BulkWriteException('Write failed.', new WriteResult($insertedCount, $writeConcernError ? new WriteConcernError() : null, array_map(static fn (int $index, string $message) => new WriteError($index, $message), array_keys($writeErrors), $writeErrors)));
     }
 }

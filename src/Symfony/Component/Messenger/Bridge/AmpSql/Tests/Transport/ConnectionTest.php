@@ -13,7 +13,9 @@ namespace Symfony\Component\Messenger\Bridge\AmpSql\Tests\Transport;
 
 use Amp\Sql\SqlConnection;
 use Amp\Sql\SqlConnectionException;
+use Amp\Sql\SqlQueryError;
 use Amp\Sql\SqlResult;
+use Amp\Sql\SqlTransaction;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\Backend\BackendInterface;
@@ -122,5 +124,88 @@ final class ConnectionTest extends TestCase
             ->willReturn($result);
 
         (new MysqlBackend())->setup($connection, 'messages');
+    }
+
+    public function testSendBatchInsertsTheMessagesInOneTransaction()
+    {
+        $transaction = $this->createMock(SqlTransaction::class);
+        $transaction->expects(self::once())->method('commit');
+        $transaction->expects(self::never())->method('rollback');
+        $connection = $this->createMock(SqlConnection::class);
+        $connection->expects(self::once())->method('beginTransaction')->willReturn($transaction);
+        $backend = $this->createMock(BackendInterface::class);
+        $backend->expects(self::once())
+            ->method('insertBatch')
+            ->with($transaction, 'messages', [[base64_encode('body a'), '{"type":"A"}', 0], [base64_encode('body b'), '[]', 500]], 'queue')
+            ->willReturn([15, '16']);
+
+        $ids = (new Connection($connection, $backend, ['auto_setup' => false, 'table_name' => 'messages', 'queue_name' => 'queue']))->sendBatch(['a' => ['body a', ['type' => 'A'], 0], 'b' => ['body b', [], 500]]);
+
+        self::assertSame(['a' => 15, 'b' => '16'], $ids);
+    }
+
+    public function testSendBatchSplitsLargeBatches()
+    {
+        $transaction = $this->createMock(SqlTransaction::class);
+        $transaction->expects(self::once())->method('commit');
+        $connection = $this->createStub(SqlConnection::class);
+        $connection->method('beginTransaction')->willReturn($transaction);
+        $rows = [];
+        $backend = $this->createStub(BackendInterface::class);
+        $backend->method('insertBatch')->willReturnCallback(static function (SqlTransaction $transaction, string $table, array $messages) use (&$rows): array {
+            $rows[] = \count($messages);
+
+            return [];
+        });
+
+        $messages = array_fill(0, 250, ['body', [], 0]);
+        $messages[] = [str_repeat('a', 600000), [], 0];
+        $messages[] = [str_repeat('b', 600000), [], 0];
+
+        self::assertSame([], (new Connection($connection, $backend, ['auto_setup' => false]))->sendBatch($messages));
+        self::assertSame([100, 100, 51, 1], $rows);
+    }
+
+    public function testSendBatchRollsBackWhenAStatementFails()
+    {
+        $error = new SqlQueryError('Deadlock found.', 'INSERT INTO messages');
+        $transaction = $this->createMock(SqlTransaction::class);
+        $transaction->method('isActive')->willReturn(true);
+        $transaction->expects(self::never())->method('commit');
+        $transaction->expects(self::once())->method('rollback');
+        $connection = $this->createStub(SqlConnection::class);
+        $connection->method('beginTransaction')->willReturn($transaction);
+        $calls = 0;
+        $backend = $this->createStub(BackendInterface::class);
+        $backend->method('insertBatch')->willReturnCallback(static function () use (&$calls, $error): array {
+            if (2 === ++$calls) {
+                throw $error;
+            }
+
+            return [];
+        });
+
+        try {
+            (new Connection($connection, $backend, ['auto_setup' => false]))->sendBatch(array_fill(0, 150, ['body', [], 0]));
+            self::fail('Expected sending to fail.');
+        } catch (TransportException $e) {
+            self::assertSame('Could not send the messages to AMPHP SQL.', $e->getMessage());
+            self::assertInstanceOf(SqlQueryError::class, $e->getPrevious());
+            self::assertSame($error->getMessage(), $e->getPrevious()->getMessage());
+            self::assertNotSame($error, $e->getPrevious());
+        }
+    }
+
+    public function testMysqlInsertBatchUsesOneStatementWithoutIds()
+    {
+        $backend = new MysqlBackend();
+        $now = $backend->getNowExpression();
+        $transaction = $this->createMock(SqlTransaction::class);
+        $transaction->expects(self::once())
+            ->method('execute')
+            ->with(\sprintf('INSERT INTO messages (body, headers, queue_name, created_at, available_at) VALUES (?, ?, ?, %1$s, %1$s + ?), (?, ?, ?, %1$s, %1$s + ?)', $now), ['body a', '{"type":"A"}', 'queue', 0, 'body b', '[]', 'queue', 500])
+            ->willReturn($this->createStub(SqlResult::class));
+
+        self::assertSame([], $backend->insertBatch($transaction, 'messages', [['body a', '{"type":"A"}', 0], ['body b', '[]', 500]], 'queue'));
     }
 }

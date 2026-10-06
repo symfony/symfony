@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Core\Exception\Exception as AsyncAwsException;
 use AsyncAws\Core\Result;
 use AsyncAws\Core\Sts\StsClient;
 use AsyncAws\Core\Waiter;
@@ -36,6 +37,10 @@ class Connection
 {
     private const AWS_SQS_FIFO_SUFFIX = '.fifo';
     private const MESSAGE_ATTRIBUTE_NAME = 'X-Symfony-Messenger';
+    private const DEFAULT_MESSAGE_GROUP_ID = self::class.'::send';
+    private const MAX_BATCH_ENTRIES = 10;
+    // the batch payload limit of SQS before it was raised to 1 MiB
+    private const MAX_BATCH_SIZE = 262144;
 
     private const DEFAULT_OPTIONS = [
         'buffer_size' => 9,
@@ -392,8 +397,108 @@ class Connection
             $this->setup();
         }
 
+        $parameters = ['QueueUrl' => $this->getQueueUrl()] + $this->getMessageParameters($body, $headers, $delay, $messageGroupId, $messageDeduplicationId, $xrayTraceId);
+
+        $this->holdSignals(fn () => $this->client->sendMessage($parameters));
+    }
+
+    /**
+     * Sends messages with as few requests as SQS allows.
+     *
+     * @param non-empty-array<array{string, array, ?int, ?string, ?string, ?string}> $messages The arguments of send() for each message
+     *
+     * @return array<TransportException> The exceptions that prevented sending some messages, by the key of the messages
+     */
+    public function sendBatch(array $messages): array
+    {
+        if ($this->configuration['auto_setup']) {
+            $this->setup();
+        }
+
+        $queueUrl = $this->getQueueUrl();
+        $batches = [];
+        $batch = [];
+        $batchSize = 0;
+
+        foreach ($messages as $key => $message) {
+            $entry = $this->getMessageParameters(...$message);
+            $size = \strlen($entry['MessageBody']);
+
+            foreach ($entry['MessageAttributes'] as $name => $attribute) {
+                $size += \strlen($name) + \strlen($attribute->getDataType()) + \strlen($attribute->getStringValue() ?? '');
+            }
+
+            if ($batch && (self::MAX_BATCH_ENTRIES === \count($batch) || self::MAX_BATCH_SIZE < $batchSize + $size)) {
+                $batches[] = $batch;
+                $batch = [];
+                $batchSize = 0;
+            }
+
+            $batch[$key] = $entry;
+            $batchSize += $size;
+        }
+
+        $batches[] = $batch;
+        $exceptions = [];
+
+        foreach ($batches as $i => $batch) {
+            $keys = array_keys($batch);
+
+            try {
+                $result = $this->holdSignals(fn () => $this->client->sendMessageBatch([
+                    'QueueUrl' => $queueUrl,
+                    'Entries' => array_map(static fn (int $id, array $entry) => ['Id' => (string) $id] + $entry, array_keys($keys), array_values($batch)),
+                ]));
+            } catch (AsyncAwsException $e) {
+                // the next requests are likely to fail the same way, like when SQS cannot be reached
+                $e = new TransportException($e->getMessage(), 0, $e);
+
+                foreach (\array_slice($batches, $i) as $unsent) {
+                    $exceptions += array_fill_keys(array_keys($unsent), $e);
+                }
+
+                break;
+            }
+
+            foreach ($result->getFailed() as $failure) {
+                $exceptions[$keys[$failure->getId()]] = new TransportException($failure->getCode().(null !== $failure->getMessage() ? ': '.$failure->getMessage() : ''));
+            }
+        }
+
+        return $exceptions;
+    }
+
+    public function reset(): void
+    {
+        $this->holdSignals(function () {
+            if (null !== $this->currentResponse) {
+                try {
+                    // fetch current response in order to requeue in transit messages
+                    if (!$this->fetchPendingMessages()) {
+                        $this->currentResponse->cancel();
+                        $this->currentResponse = null;
+                    }
+                } catch (\Throwable) {
+                    // discard the in-flight response that cannot be reused so the connection stays usable
+                    $response = $this->currentResponse;
+                    $this->currentResponse = null;
+                    $response->cancel();
+                }
+            }
+
+            foreach ($this->getPendingMessages(\count($this->buffer)) as $message) {
+                $this->client->changeMessageVisibility([
+                    'QueueUrl' => $this->getQueueUrl(),
+                    'ReceiptHandle' => $message['id'],
+                    'VisibilityTimeout' => 0,
+                ]);
+            }
+        });
+    }
+
+    private function getMessageParameters(string $body, array $headers, ?int $delay = null, ?string $messageGroupId = null, ?string $messageDeduplicationId = null, ?string $xrayTraceId = null): array
+    {
         $parameters = [
-            'QueueUrl' => $this->getQueueUrl(),
             'MessageBody' => $body,
             'MessageAttributes' => [],
             'MessageSystemAttributes' => [],
@@ -433,7 +538,7 @@ class Connection
         }
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {
-            $parameters['MessageGroupId'] = $messageGroupId ?? __METHOD__;
+            $parameters['MessageGroupId'] = $messageGroupId ?? self::DEFAULT_MESSAGE_GROUP_ID;
             // a unique id by default: deduplicating on the content is up to the queue (ContentBasedDeduplication) or to an explicit id
             $parameters['MessageDeduplicationId'] = $messageDeduplicationId ?? bin2hex(random_bytes(16));
             unset($parameters['DelaySeconds']);
@@ -441,35 +546,7 @@ class Connection
             $parameters['MessageGroupId'] = $messageGroupId;
         }
 
-        $this->holdSignals(fn () => $this->client->sendMessage($parameters));
-    }
-
-    public function reset(): void
-    {
-        $this->holdSignals(function () {
-            if (null !== $this->currentResponse) {
-                try {
-                    // fetch current response in order to requeue in transit messages
-                    if (!$this->fetchPendingMessages()) {
-                        $this->currentResponse->cancel();
-                        $this->currentResponse = null;
-                    }
-                } catch (\Throwable) {
-                    // discard the in-flight response that cannot be reused so the connection stays usable
-                    $response = $this->currentResponse;
-                    $this->currentResponse = null;
-                    $response->cancel();
-                }
-            }
-
-            foreach ($this->getPendingMessages(\count($this->buffer)) as $message) {
-                $this->client->changeMessageVisibility([
-                    'QueueUrl' => $this->getQueueUrl(),
-                    'ReceiptHandle' => $message['id'],
-                    'VisibilityTimeout' => 0,
-                ]);
-            }
-        });
+        return $parameters;
     }
 
     private static function isSslEnabled(array $options, string $scheme): bool

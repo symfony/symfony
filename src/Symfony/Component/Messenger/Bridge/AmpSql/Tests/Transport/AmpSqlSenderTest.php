@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\AmpSql\Tests\Transport;
 
 use Amp\Parallel\Context\ProcessContextFactory;
+use Amp\Sql\SqlConnection;
 use Amp\Sql\SqlQueryError;
 use Fabpot\Amp\Sqlite\SqliteConfig;
 use Fabpot\Amp\Sqlite\SqliteConnector;
@@ -67,6 +68,49 @@ final class AmpSqlSenderTest extends TestCase
             self::assertNull($e->getPrevious());
         } finally {
             $connection->close();
+        }
+    }
+
+    public function testSendBatchDatabaseErrorKeepsSafeDiagnostics()
+    {
+        $serializedBody = 'serialized-secret-body';
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => $serializedBody]);
+        $connection = (new SqliteConnector(new ProcessContextFactory(childConnectTimeout: 30)))->connect(new SqliteConfig(':memory:'));
+        $sender = new AmpSqlSender(new Connection($connection, new SqliteBackend(), ['auto_setup' => false]), $serializer);
+
+        try {
+            $sender->sendBatch([new Envelope(new \stdClass()), new Envelope(new \stdClass())]);
+            self::fail('Expected sending to fail.');
+        } catch (TransportException $e) {
+            self::assertSame('Could not send the messages to AMPHP SQL.', $e->getMessage());
+            self::assertInstanceOf(SqlQueryError::class, $e->getPrevious());
+            self::assertStringNotContainsString($serializedBody, $e->getPrevious()->getMessage());
+
+            $traces = [];
+            do {
+                $traces[] = $e->getTrace();
+            } while ($e = $e->getPrevious());
+            self::assertFalse(self::containsString($traces, $serializedBody));
+            self::assertFalse(self::containsString($traces, base64_encode($serializedBody)));
+        } finally {
+            $connection->close();
+        }
+    }
+
+    public function testSendBatchSerializationErrorDoesNotExposeMessageBody()
+    {
+        $serializedBody = 'serialized-secret-body';
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willThrowException(new \RuntimeException($serializedBody));
+        $sender = new AmpSqlSender(new Connection($this->createStub(SqlConnection::class), new SqliteBackend()), $serializer);
+
+        try {
+            $sender->sendBatch([new Envelope(new \stdClass())]);
+            self::fail('Expected sending to fail.');
+        } catch (TransportException $e) {
+            self::assertStringNotContainsString($serializedBody, $e->getMessage());
+            self::assertNull($e->getPrevious());
         }
     }
 

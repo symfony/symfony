@@ -21,7 +21,7 @@
         "doctrine/persistence": "^1.3|^2|^3|^4",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/event-dispatcher": "^7.4|^8.0",
-        "symfony/messenger": "^8.1",
+        "symfony/messenger": "^8.2",
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {

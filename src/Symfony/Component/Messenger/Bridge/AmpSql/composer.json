@@ -25,7 +25,7 @@
     "require": {
         "php": ">=8.4.1",
         "amphp/sql": "^2.1",
-        "symfony/messenger": "^8.1"
+        "symfony/messenger": "^8.2"
     },
     "require-dev": {
         "amphp/byte-stream": "^2.0",

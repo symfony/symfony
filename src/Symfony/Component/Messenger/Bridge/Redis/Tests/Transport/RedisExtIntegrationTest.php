@@ -18,9 +18,14 @@ use PHPUnit\Framework\TestCase;
 use Relay\Relay;
 use Symfony\Component\Messenger\Bridge\Redis\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
+use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
 #[RequiresPhpExtension('redis')]
@@ -486,6 +491,65 @@ class RedisExtIntegrationTest extends TestCase
         $this->connection->ack($msg3[0]['id']);
 
         $this->assertNull($this->connection->get());
+    }
+
+    public function testSendBatch()
+    {
+        $redis = $this->createRedisClient();
+        $connection = Connection::fromDsn('redis://localhost/messenger-batch', [], $redis);
+        $connection->cleanup();
+        $transport = new RedisTransport($connection, new Serializer());
+
+        try {
+            $sent = $transport->sendBatch([
+                'a' => new Envelope(new DummyMessage('Hi1')),
+                'b' => new Envelope(new DummyMessage('Hi2'), [new DelayStamp(60000)]),
+                'c' => new Envelope(new DummyMessage('Hi3')),
+            ]);
+
+            $this->assertSame(['a', 'b', 'c'], array_keys($sent));
+
+            $received = [...$transport->get(3)];
+
+            $this->assertCount(2, $received);
+            $this->assertEquals(new DummyMessage('Hi1'), $received[0]->getMessage());
+            $this->assertSame($sent['a']->last(TransportMessageIdStamp::class)->getId(), $received[0]->last(RedisReceivedStamp::class)->getId());
+            $this->assertEquals(new DummyMessage('Hi3'), $received[1]->getMessage());
+            $this->assertSame($sent['c']->last(TransportMessageIdStamp::class)->getId(), $received[1]->last(RedisReceivedStamp::class)->getId());
+
+            $delayed = $redis->rawCommand('ZRANGE', 'messenger-batch__queue', '0', '-1');
+
+            $this->assertCount(1, $delayed);
+            $this->assertSame($sent['b']->last(TransportMessageIdStamp::class)->getId(), json_decode($delayed[0], true)['uniqid']);
+        } finally {
+            $redis->unlink('messenger-batch', 'messenger-batch__queue');
+        }
+    }
+
+    public function testSendBatchTellsWhichMessagesWereSent()
+    {
+        $redis = $this->createRedisClient();
+        $connection = Connection::fromDsn('redis://localhost/messenger-batch', [], $redis);
+        $connection->cleanup();
+        $transport = new RedisTransport($connection, new Serializer());
+        $redis->set('messenger-batch__queue', 'not a sorted set');
+
+        try {
+            $transport->sendBatch([
+                'a' => new Envelope(new DummyMessage('Hi1')),
+                'b' => new Envelope(new DummyMessage('Hi2'), [new DelayStamp(60000)]),
+                'c' => new Envelope(new DummyMessage('Hi3')),
+            ]);
+
+            $this->fail('An exception should have been thrown.');
+        } catch (BatchSendFailedException $e) {
+            $this->assertSame(['a', 'c'], array_keys($e->getEnvelopes()));
+            $this->assertSame(['b'], array_keys($e->getExceptions()));
+            $this->assertInstanceOf(TransportException::class, $e->getExceptions()['b']);
+            $this->assertSame(array_map(static fn (Envelope $envelope) => $envelope->last(TransportMessageIdStamp::class)->getId(), array_values($e->getEnvelopes())), array_column($connection->findAll(), 'id'));
+        } finally {
+            $redis->unlink('messenger-batch', 'messenger-batch__queue');
+        }
     }
 
     private function getConnectionGroup(Connection $connection): string

@@ -13,10 +13,12 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 
@@ -219,6 +221,73 @@ class DoctrineIntegrationTest extends TestCase
         $this->connection->send('the body', ['my' => 'header']);
         $envelope = $this->connection->get();
         $this->assertEquals('the body', $envelope[0]['body']);
+    }
+
+    public function testSendBatch()
+    {
+        $statements = [];
+        $connection = $this->createLoggedConnection($statements);
+        $connection->setup();
+
+        $connection->sendBatch([
+            'a' => ['{"message": "a"}', ['type' => DummyMessage::class]],
+            'b' => ['{"message": "b"}', ['type' => DummyMessage::class], 600000],
+            'c' => ['{"message": "c"}', ['type' => DummyMessage::class], 0],
+        ]);
+
+        $this->assertCount(1, array_filter($statements, static fn (string $sql) => str_starts_with($sql, 'INSERT')));
+        $this->assertSame(2, $connection->getMessageCount());
+        $this->assertSame('{"message": "a"}', $connection->get()[0]['body']);
+        $this->assertSame('{"message": "c"}', $connection->get()[0]['body']);
+        $this->assertNull($connection->get());
+    }
+
+    public function testSendBatchSplitsLargeBatches()
+    {
+        $statements = [];
+        $connection = $this->createLoggedConnection($statements);
+        $connection->setup();
+
+        $messages = [];
+        for ($i = 0; $i < 250; ++$i) {
+            $messages[] = ['{"message": "'.$i.'"}', []];
+        }
+        $messages[] = [str_repeat('a', 600000), []];
+        $messages[] = [str_repeat('b', 600000), []];
+        $connection->sendBatch($messages);
+
+        $this->assertCount(4, array_filter($statements, static fn (string $sql) => str_starts_with($sql, 'INSERT')));
+        $this->assertSame(252, $connection->getMessageCount());
+    }
+
+    public function testSendBatchSetsUpTheTable()
+    {
+        $this->connection->sendBatch([['{"message": "a"}', []], ['{"message": "b"}', []]]);
+
+        $this->assertSame(2, $this->connection->getMessageCount());
+    }
+
+    private function createLoggedConnection(array &$statements): Connection
+    {
+        $config = new Configuration();
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        $config->setMiddlewares([new Middleware(new class($statements) extends AbstractLogger {
+            public function __construct(
+                private array &$statements,
+            ) {
+            }
+
+            public function log($level, $message, array $context = []): void
+            {
+                if (isset($context['sql'])) {
+                    $this->statements[] = $context['sql'];
+                }
+            }
+        })]);
+
+        $this->driverConnection = DriverManager::getConnection($this->driverConnection->getParams(), $config);
+
+        return new Connection([], $this->driverConnection);
     }
 
     private function formatDateTime(\DateTimeImmutable $dateTime): string

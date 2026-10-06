@@ -275,6 +275,46 @@ final class AmpSqlTransportTest extends TestCase
         }
     }
 
+    public function testSendBatch()
+    {
+        $transport = $this->createTransport();
+
+        try {
+            $sent = $transport->sendBatch([
+                'a' => new Envelope(new DummyMessage('a')),
+                'b' => new Envelope(new DummyMessage('b'), [new DelayStamp(60_000)]),
+                'c' => new Envelope(new DummyMessage('c')),
+            ]);
+
+            self::assertSame(['a', 'b', 'c'], array_keys($sent));
+            self::assertSame('b', self::messageValue($sent['b']));
+            self::assertNull($sent['a']->last(TransportMessageIdStamp::class));
+            self::assertSame(2, $transport->getMessageCount());
+
+            /** @var list<Envelope> $received */
+            $received = iterator_to_array($transport->get(3));
+            self::assertSame(['a', 'c'], array_map(static fn (Envelope $envelope) => self::messageValue($envelope), $received));
+        } finally {
+            $transport->close();
+        }
+    }
+
+    public function testSendBatchSplitInSeveralStatements()
+    {
+        $transport = $this->createTransport();
+
+        try {
+            $values = array_map(strval(...), range(1, 150));
+            $transport->sendBatch(array_map(static fn (string $value) => new Envelope(new DummyMessage($value)), $values));
+
+            /** @var list<Envelope> $messages */
+            $messages = iterator_to_array($transport->all());
+            self::assertSame($values, array_map(static fn (Envelope $envelope) => self::messageValue($envelope), $messages));
+        } finally {
+            $transport->close();
+        }
+    }
+
     private static function messageValue(Envelope $envelope): string
     {
         $message = $envelope->getMessage();

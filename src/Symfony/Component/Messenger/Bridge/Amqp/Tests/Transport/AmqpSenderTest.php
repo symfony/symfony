@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpSender;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -280,5 +281,62 @@ class AmqpSenderTest extends TestCase
 
         $sender = new AmqpSender($connection, $serializer);
         $sender->send($envelope);
+    }
+
+    public function testSendBatch()
+    {
+        $envelopes = [
+            'a' => new Envelope(new DummyMessage('a'), [new DelayStamp(500)]),
+            'b' => new Envelope(new DummyMessage('b'), [$stamp = new AmqpStamp('rk', \AMQP_NOPARAM, ['message_id' => 'id-b'])]),
+        ];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->never())->method('publish');
+        $connection->expects($this->once())->method('publishBatch')->with([
+            'a' => ['body a', ['type' => DummyMessage::class], 500, null],
+            'b' => ['body b', ['type' => DummyMessage::class], 0, $stamp],
+        ])->willReturn([]);
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturnCallback(static fn (Envelope $envelope) => ['body' => 'body '.$envelope->getMessage()->getMessage(), 'headers' => ['type' => DummyMessage::class]]);
+
+        $sent = (new AmqpSender($connection, $serializer))->sendBatch($envelopes);
+
+        $this->assertSame(['a', 'b'], array_keys($sent));
+        $this->assertSame($envelopes['a'], $sent['a']);
+        $this->assertSame('id-b', $sent['b']->last(TransportMessageIdStamp::class)?->getId());
+    }
+
+    public function testSendBatchTellsWhichMessagesWereSent()
+    {
+        $envelopes = ['a' => new Envelope(new DummyMessage('a')), 'b' => new Envelope(new DummyMessage('b'))];
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('publishBatch')->willReturn(['b' => $exception = new TransportException('Nacked.')]);
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => '...']);
+
+        try {
+            (new AmqpSender($connection, $serializer))->sendBatch($envelopes);
+            $this->fail('An exception should have been thrown.');
+        } catch (BatchSendFailedException $e) {
+            $this->assertSame(['a' => $envelopes['a']], $e->getEnvelopes());
+            $this->assertSame(['b' => $exception], $e->getExceptions());
+        }
+    }
+
+    public function testItConvertsAmqpExceptionDuringSendBatchIntoTransportException()
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('publishBatch')->willThrowException(new \AMQPException('Could not connect to the AMQP server.'));
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => '...']);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not connect to the AMQP server.');
+
+        (new AmqpSender($connection, $serializer))->sendBatch([new Envelope(new DummyMessage('a'))]);
     }
 }

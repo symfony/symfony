@@ -12,6 +12,10 @@
 namespace Symfony\Component\Messenger\Bridge\MongoDb\Tests\Transport;
 
 use MongoDB\Client;
+use MongoDB\Driver\Monitoring\CommandFailedEvent;
+use MongoDB\Driver\Monitoring\CommandStartedEvent;
+use MongoDB\Driver\Monitoring\CommandSubscriber;
+use MongoDB\Driver\Monitoring\CommandSucceededEvent;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +24,8 @@ use Symfony\Component\Messenger\Bridge\MongoDb\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\BatchSendFailedException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -143,6 +149,66 @@ class MongoDbTransportIntegrationTest extends TestCase
         $this->assertSame(1, $this->transport->getMessageCount());
     }
 
+    public function testSendBatch()
+    {
+        $inserts = $this->countInserts(function () use (&$envelopes) {
+            $envelopes = $this->transport->sendBatch([
+                'a' => new Envelope(new DummyMessage('First')),
+                'b' => new Envelope(new DummyMessage('Later'), [new DelayStamp(60000)]),
+                'c' => new Envelope(new DummyMessage('Second')),
+            ]);
+        });
+
+        $this->assertSame(1, $inserts);
+        $this->assertSame(['a', 'b', 'c'], array_keys($envelopes));
+        $this->assertSame('Later', $this->transport->find($envelopes['b']->last(TransportMessageIdStamp::class)->getId())?->getMessage()->getMessage());
+        $this->assertSame(2, $this->transport->getMessageCount());
+        $this->assertSame(['First', 'Second'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), iterator_to_array($this->transport->all(), false)));
+    }
+
+    public function testSendBatchInsertsTheMessagesOfEachSessionTogether()
+    {
+        $session = $this->client->startSession();
+
+        $inserts = $this->countInserts(fn () => $this->transport->sendBatch([
+            new Envelope(new DummyMessage('a')),
+            new Envelope(new DummyMessage('b'), [new MongoDbSessionStamp($session)]),
+            new Envelope(new DummyMessage('c'), [new MongoDbSessionStamp($session)]),
+            new Envelope(new DummyMessage('d')),
+        ]));
+
+        $this->assertSame(3, $inserts);
+        $this->assertSame(['a', 'b', 'c', 'd'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), iterator_to_array($this->transport->all(), false)));
+    }
+
+    public function testSendBatchReportsTheMessagesTheServerRejected()
+    {
+        $connection = Connection::fromDsn('mongodb://localhost/'.self::DATABASE, ['collection_name' => 'messenger_unique_bodies'], $this->client);
+        $collection = $this->client->getCollection(self::DATABASE, 'messenger_unique_bodies');
+        $collection->drop();
+        $collection->createIndex(['body' => 1], ['unique' => true]);
+
+        try {
+            $transport = new MongoDbTransport($connection, new PhpSerializer());
+            $transport->send($duplicate = new Envelope(new DummyMessage('b')));
+
+            try {
+                $transport->sendBatch(['a' => new Envelope(new DummyMessage('a')), 'b' => $duplicate, 'c' => new Envelope(new DummyMessage('c'))]);
+                $this->fail('An exception should have been thrown.');
+            } catch (BatchSendFailedException $e) {
+                $this->assertSame(['a', 'c'], array_keys($e->getEnvelopes()));
+                $this->assertSame(['b'], array_keys($e->getExceptions()));
+                $this->assertInstanceOf(TransportException::class, $e->getExceptions()['b']);
+                $this->assertStringContainsString('E11000', $e->getExceptions()['b']->getMessage());
+                $this->assertSame('c', $transport->find($e->getEnvelopes()['c']->last(TransportMessageIdStamp::class)->getId())?->getMessage()->getMessage());
+            }
+
+            $this->assertSame(3, $connection->getMessageCount());
+        } finally {
+            $collection->drop();
+        }
+    }
+
     public function testGetFromQueuesClaimsAcrossSeveralQueuesWithASingleRequest()
     {
         $foo = Connection::fromDsn('mongodb://localhost/'.self::DATABASE, ['queue_name' => 'foo'], $this->client);
@@ -241,5 +307,37 @@ class MongoDbTransportIntegrationTest extends TestCase
         }
 
         $this->assertContainsEquals(['availableAt' => 1, 'queueName' => 1, 'deliveredAt' => 1], $indexKeys);
+    }
+
+    private function countInserts(callable $callback): int
+    {
+        $subscriber = new class implements CommandSubscriber {
+            public int $inserts = 0;
+
+            public function commandStarted(CommandStartedEvent $event): void
+            {
+                if ('insert' === $event->getCommandName()) {
+                    ++$this->inserts;
+                }
+            }
+
+            public function commandSucceeded(CommandSucceededEvent $event): void
+            {
+            }
+
+            public function commandFailed(CommandFailedEvent $event): void
+            {
+            }
+        };
+
+        $this->client->getManager()->addSubscriber($subscriber);
+
+        try {
+            $callback();
+        } finally {
+            $this->client->getManager()->removeSubscriber($subscriber);
+        }
+
+        return $subscriber->inserts;
     }
 }

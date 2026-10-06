@@ -9,6 +9,7 @@ CHANGELOG
  * Implement the `KeepaliveReceiverInterface` to enable asynchronously notifying AMQP that the job is still being processed, in order to avoid timeouts
  * Pass the routing key to the serializer as `extra[routing_key]` when decoding
  * Add `bindings` option to `queues` to configure additional exchange-queue bindings
+ * Make `AmqpSender` and `AmqpTransport` implement `BatchSenderInterface`, waiting once for the publisher confirms of a batch when `confirm_timeout` is set
 
 8.1
 ---

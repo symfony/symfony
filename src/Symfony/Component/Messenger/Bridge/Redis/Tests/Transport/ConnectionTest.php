@@ -1130,4 +1130,179 @@ class ConnectionTest extends TestCase
 
         $this->assertNull($message);
     }
+
+    public function testAddBatch()
+    {
+        $redis = $this->createRedisMock();
+        $commands = [];
+
+        $redis->expects($this->once())->method('pipeline')->willReturnSelf();
+        $redis->method('xadd')->willReturnCallback(static function (...$arguments) use (&$commands, $redis) {
+            $commands[] = ['xadd', ...$arguments];
+
+            return $redis;
+        });
+        $redis->method('rawCommand')->willReturnCallback(static function (...$arguments) use (&$commands, $redis) {
+            $commands[] = ['rawCommand', ...$arguments];
+
+            return $redis;
+        });
+        $redis->expects($this->once())->method('exec')->willReturn(['1-0', 1, '1-1']);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', ['auto_setup' => false], $redis);
+
+        [$ids, $exceptions] = $connection->addBatch([
+            'a' => ['1', [], 0],
+            'b' => ['2', ['foo' => 'bar'], 100],
+            'c' => ['3', [], 0],
+        ]);
+
+        $this->assertSame([], $exceptions);
+        $this->assertSame(['a', 'b', 'c'], array_keys($ids));
+        $this->assertSame('1-0', $ids['a']);
+        $this->assertSame('1-1', $ids['c']);
+
+        $this->assertCount(3, $commands);
+        $this->assertSame(['xadd', 'queue', '*', ['message' => '{"body":"1","headers":[]}'], 20000, true], \array_slice($commands[0], 0, 6));
+        $this->assertSame(['xadd', 'queue', '*', ['message' => '{"body":"3","headers":[]}'], 20000, true], \array_slice($commands[2], 0, 6));
+        $this->assertSame(['rawCommand', 'ZADD', 'queue__queue', 'NX'], \array_slice($commands[1], 0, 4));
+        $this->assertSame(['body' => '2', 'headers' => ['foo' => 'bar'], 'uniqid' => $ids['b']], json_decode($commands[1][5], true));
+    }
+
+    public function testAddBatchReportsFailedCommands()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->once())->method('exec')->willReturn(['1-0', false, '1-2', false, $e = new \RedisException('ERR from the pipeline')]);
+        $redis->method('getLastError')->willReturn('WRONGTYPE Operation against a key holding the wrong kind of value');
+        $redis->expects($this->once())->method('clearLastError');
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+
+        [$ids, $exceptions] = $connection->addBatch([
+            'a' => ['1', [], 0],
+            'b' => ['2', [], 0],
+            'c' => ['3', [], 0],
+            'd' => ['4', [], 100],
+            'e' => ['5', [], 0],
+        ]);
+
+        $this->assertSame(['a' => '1-0', 'c' => '1-2'], $ids);
+        $this->assertSame(['b', 'd', 'e'], array_keys($exceptions));
+        $this->assertContainsOnlyInstancesOf(TransportException::class, $exceptions);
+        $this->assertSame('WRONGTYPE Operation against a key holding the wrong kind of value', $exceptions['b']->getMessage());
+        $this->assertSame('WRONGTYPE Operation against a key holding the wrong kind of value', $exceptions['d']->getMessage());
+        $this->assertSame('ERR from the pipeline', $exceptions['e']->getMessage());
+        $this->assertSame($e, $exceptions['e']->getPrevious());
+    }
+
+    public function testAddBatchReportsMessagesThatCannotBeEncoded()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->once())->method('xadd')->with('queue', '*', ['message' => '{"body":"1","headers":[]}'])->willReturnSelf();
+        $redis->expects($this->once())->method('exec')->willReturn(['1-0']);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+
+        [$ids, $exceptions] = $connection->addBatch([
+            'a' => ["\xB1\x31", [], 0],
+            'b' => ['1', [], 0],
+        ]);
+
+        $this->assertSame(['b' => '1-0'], $ids);
+        $this->assertSame(['a'], array_keys($exceptions));
+        $this->assertInstanceOf(TransportException::class, $exceptions['a']);
+        $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $exceptions['a']->getMessage());
+    }
+
+    #[DataProvider('provideBatchesSplitInPipelines')]
+    public function testAddBatchSplitsPipelines(array $messages, array $pipelines)
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(\count($pipelines)))->method('pipeline')->willReturnSelf();
+        $redis->expects($this->exactly(\count($pipelines)))->method('exec')->willReturnOnConsecutiveCalls(...array_map(static fn (int $commands) => array_fill(0, $commands, '1-0'), $pipelines));
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+
+        [$ids, $exceptions] = $connection->addBatch($messages);
+
+        $this->assertCount(\count($messages), $ids);
+        $this->assertSame([], $exceptions);
+    }
+
+    public static function provideBatchesSplitInPipelines(): iterable
+    {
+        yield 'by commands' => [array_fill(0, 1001, ['1', [], 0]), [1000, 1]];
+        yield 'by size' => [array_fill(0, 3, [str_repeat('a', 400000), [], 0]), [2, 1]];
+    }
+
+    public function testAddBatchStopsAtTheFirstFailingPipeline()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(2))->method('pipeline')->willReturnSelf();
+        $redis->expects($this->exactly(2))->method('exec')->willReturnOnConsecutiveCalls(
+            array_fill(0, 1000, '1-0'),
+            $this->throwException($e = new \RedisException('Connection closed')),
+        );
+        $redis->method('getMode')->willReturn(\Redis::PIPELINE);
+        $redis->expects($this->once())->method('discard');
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+
+        [$ids, $exceptions] = $connection->addBatch(array_fill(0, 2001, ['1', [], 0]));
+
+        $this->assertSame(range(0, 999), array_keys($ids));
+        $this->assertSame(range(1000, 2000), array_keys($exceptions));
+        $this->assertContainsOnlyInstancesOf(TransportException::class, $exceptions);
+        $this->assertSame('Connection closed', $exceptions[1000]->getMessage());
+        $this->assertSame($e, $exceptions[1000]->getPrevious());
+        $this->assertSame($exceptions[1000], $exceptions[2000]);
+    }
+
+    public function testAddBatchReportsPipelinesWithoutResults()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->once())->method('exec')->willReturn(false);
+        $redis->method('getLastError')->willReturn('Connection lost');
+        $redis->expects($this->once())->method('clearLastError');
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+
+        [$ids, $exceptions] = $connection->addBatch(['a' => ['1', [], 0], 'b' => ['2', [], 0]]);
+
+        $this->assertSame([], $ids);
+        $this->assertSame(['a', 'b'], array_keys($exceptions));
+        $this->assertInstanceOf(TransportException::class, $exceptions['a']);
+        $this->assertSame('Connection lost', $exceptions['a']->getMessage());
+        $this->assertSame($exceptions['a'], $exceptions['b']);
+    }
+
+    public function testAddBatchOnRedisClusterSendsMessagesOneByOne()
+    {
+        $redis = $this->createMock(\RedisCluster::class);
+
+        $redis->expects($this->exactly(2))->method('xadd')->willReturnOnConsecutiveCalls('1-0', $this->throwException($e = new \RedisClusterException('Connection lost')));
+        $redis->expects($this->once())->method('rawCommand')->with('queue__queue', 'ZADD', 'queue__queue', 'NX')->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+
+        [$ids, $exceptions] = $connection->addBatch([
+            'a' => ['1', [], 0],
+            'b' => ['2', [], 100],
+            'c' => ['3', [], 0],
+            'd' => ['4', [], 0],
+        ]);
+
+        $this->assertSame(['a', 'b'], array_keys($ids));
+        $this->assertSame('1-0', $ids['a']);
+        $this->assertSame(['c', 'd'], array_keys($exceptions));
+        $this->assertInstanceOf(TransportException::class, $exceptions['c']);
+        $this->assertSame('Connection lost', $exceptions['c']->getMessage());
+        $this->assertSame($e, $exceptions['c']->getPrevious());
+        $this->assertSame($exceptions['c'], $exceptions['d']);
+    }
 }

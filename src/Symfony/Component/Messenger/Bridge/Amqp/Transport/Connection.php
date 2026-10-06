@@ -34,6 +34,8 @@ class Connection
         'x-delivery-limit',
     ];
 
+    private const NACK_MESSAGE = 'Message publication failed due to a negative acknowledgment (nack) from the broker.';
+
     /**
      * @see https://github.com/php-amqp/php-amqp/blob/master/amqp_connection_resource.h
      */
@@ -358,20 +360,68 @@ class Connection
         }
 
         $this->withConnectionExceptionRetry(function () use ($body, $headers, $delayInMs, $amqpStamp) {
-            if (0 < $delayInMs) {
-                $this->publishWithDelay($body, $headers, $delayInMs, $amqpStamp);
+            $this->publishMessage($body, $headers, $delayInMs, $amqpStamp);
 
-                return;
+            if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
+                $seqNo = $this->publishSeqNo;
+                $channel = $this->channel();
+                // the confirm of a message published before this one, which timed out, keeps the wait going
+                $channel->setConfirmCallback(
+                    static fn (int $confirmedSeqNo): bool => $confirmedSeqNo < $seqNo,
+                    static fn (int $confirmedSeqNo): bool => $confirmedSeqNo < $seqNo ?: throw new TransportException(self::NACK_MESSAGE),
+                );
+                $channel->waitForConfirm((float) $this->connectionOptions['confirm_timeout']);
             }
-
-            $this->publishOnExchange(
-                $this->exchange(),
-                $body,
-                $this->getRoutingKeyForMessage($amqpStamp),
-                $headers,
-                $amqpStamp
-            );
         });
+    }
+
+    /**
+     * Publishes messages, waiting for the confirms of all of them at once when the "confirm_timeout" option is set.
+     *
+     * @param non-empty-array<array{string, array, int, ?AmqpStamp}> $messages The arguments of publish() for each message
+     *
+     * @return array<TransportException> The exceptions that prevented publishing some messages, by the key of the messages
+     *
+     * @throws \AMQPException When none of the messages could be published
+     *
+     * @internal
+     */
+    public function publishBatch(array $messages): array
+    {
+        $this->clearWhenDisconnected();
+
+        if ($this->autoSetupExchange) {
+            $this->setupExchangeAndQueues();
+        }
+
+        $confirmTimeout = $this->connectionOptions['confirm_timeout'] ?? '';
+        $exceptions = [];
+
+        try {
+            // a message leaves $messages once published, or once confirmed when confirms are enabled, so that a retry publishes only the others
+            $this->withConnectionExceptionRetry(function () use (&$messages, &$exceptions, $confirmTimeout) {
+                $pending = [];
+
+                foreach ($messages as $key => [$body, $headers, $delayInMs, $amqpStamp]) {
+                    $this->publishMessage($body, $headers, $delayInMs, $amqpStamp);
+
+                    if ('' === $confirmTimeout) {
+                        unset($messages[$key]);
+                    } else {
+                        $pending[$this->publishSeqNo] = $key;
+                    }
+                }
+
+                if ($pending) {
+                    $this->waitForConfirms($pending, $messages, $exceptions, (float) $confirmTimeout);
+                }
+            });
+        } catch (\AMQPException $e) {
+            $e = new TransportException($e->getMessage(), 0, $e);
+            $exceptions += array_fill_keys(array_keys($messages), $e);
+        }
+
+        return $exceptions;
     }
 
     /**
@@ -426,16 +476,7 @@ class Connection
             $attributes
         );
 
-        if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
-            $seqNo = ++$this->publishSeqNo;
-            $channel = $this->channel();
-            // the confirm of a message published before this one, which timed out, keeps the wait going
-            $channel->setConfirmCallback(
-                static fn (int $confirmedSeqNo): bool => $confirmedSeqNo < $seqNo,
-                static fn (int $confirmedSeqNo): bool => $confirmedSeqNo < $seqNo ?: throw new TransportException('Message publication failed due to a negative acknowledgment (nack) from the broker.'),
-            );
-            $channel->waitForConfirm((float) $this->connectionOptions['confirm_timeout']);
-        }
+        ++$this->publishSeqNo;
     }
 
     private function setupDelay(int $delay, ?string $routingKey, bool $isRetryAttempt): void
@@ -748,7 +789,7 @@ class Connection
                 $this->publishSeqNo = 0;
                 $this->amqpChannel->setConfirmCallback(
                     static fn (): bool => false,
-                    static fn () => throw new TransportException('Message publication failed due to a negative acknowledgment (nack) from the broker.'),
+                    static fn () => throw new TransportException(self::NACK_MESSAGE),
                 );
             }
 
@@ -851,6 +892,59 @@ class Connection
             }
 
             throw $e;
+        }
+    }
+
+    private function publishMessage(string $body, array $headers, int $delayInMs, ?AmqpStamp $amqpStamp): void
+    {
+        if (0 < $delayInMs) {
+            $this->publishWithDelay($body, $headers, $delayInMs, $amqpStamp);
+
+            return;
+        }
+
+        $this->publishOnExchange(
+            $this->exchange(),
+            $body,
+            $this->getRoutingKeyForMessage($amqpStamp),
+            $headers,
+            $amqpStamp
+        );
+    }
+
+    /**
+     * @param non-empty-array<int, array-key> $pending The keys of the messages waiting for a confirm, by their sequence number on the channel
+     */
+    private function waitForConfirms(array $pending, array &$messages, array &$exceptions, float $timeout): void
+    {
+        // the broker confirms messages by their sequence number on the channel, possibly out of order, and a confirm with the "multiple" flag settles all the messages up to that number
+        $confirm = static function (int $seqNo, bool $multiple, ?TransportException $exception = null) use (&$pending, &$messages, &$exceptions): bool {
+            foreach ($pending as $n => $key) {
+                if ($n > $seqNo) {
+                    break;
+                }
+
+                if ($n === $seqNo || $multiple) {
+                    unset($pending[$n], $messages[$key]);
+
+                    if ($exception) {
+                        $exceptions[$key] = $exception;
+                    }
+                }
+            }
+
+            return (bool) $pending;
+        };
+
+        $channel = $this->channel();
+        $channel->setConfirmCallback(
+            static fn (int $seqNo, bool $multiple): bool => $confirm($seqNo, $multiple),
+            static fn (int $seqNo, bool $multiple): bool => $confirm($seqNo, $multiple, new TransportException(self::NACK_MESSAGE)),
+        );
+
+        // a basic.return from the broker also ends the wait
+        while ($pending) {
+            $channel->waitForConfirm($timeout);
         }
     }
 }

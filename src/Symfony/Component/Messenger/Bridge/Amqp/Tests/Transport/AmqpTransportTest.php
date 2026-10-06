@@ -65,6 +65,19 @@ class AmqpTransportTest extends TestCase
         $transport->keepalive(new Envelope(new DummyMessage('foo'), [new AmqpReceivedStamp($this->createStub(\AMQPEnvelope::class), 'queueName')]));
     }
 
+    public function testSendBatch()
+    {
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => '...']);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publishBatch')->with([['...', [], 0, null], ['...', [], 0, null]])->willReturn([]);
+
+        $envelopes = [new Envelope(new DummyMessage('a')), new Envelope(new DummyMessage('b'))];
+
+        $this->assertSame($envelopes, $this->getTransport($serializer, $connection)->sendBatch($envelopes));
+    }
+
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): AmqpTransport
     {
         $serializer ??= $this->createStub(SerializerInterface::class);

@@ -20,7 +20,9 @@ use Symfony\Component\Messenger\Bridge\MongoDb\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class MongoDbTransportTest extends TestCase
@@ -40,6 +42,27 @@ class MongoDbTransportTest extends TestCase
 
         $this->assertInstanceOf(QueueReceiverInterface::class, $transport);
         $this->assertSame(2, iterator_count($transport->getFromQueues(['foo', 'bar'], 2)));
+    }
+
+    public function testSendBatch()
+    {
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => '...']);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())
+            ->method('sendBatch')
+            ->with([['...', [], 0, null, null], ['...', [], 0, null, null]])
+            ->willReturn([[new ObjectId('5f0c7a2b9d1e4c3a2b1f0e9d'), new ObjectId('5f0c7a2b9d1e4c3a2b1f0e9e')], []]);
+
+        $transport = new MongoDbTransport($connection, $serializer);
+
+        $this->assertInstanceOf(BatchSenderInterface::class, $transport);
+
+        $envelopes = $transport->sendBatch([new Envelope(new DummyMessage('a')), new Envelope(new DummyMessage('b'))]);
+
+        $this->assertSame('5f0c7a2b9d1e4c3a2b1f0e9d', $envelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+        $this->assertSame('5f0c7a2b9d1e4c3a2b1f0e9e', $envelopes[1]->last(TransportMessageIdStamp::class)?->getId());
     }
 
     private function createDocument(): BSONDocument

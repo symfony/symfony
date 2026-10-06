@@ -13,14 +13,18 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Log\AbstractLogger;
+use Symfony\Component\Messenger\BatchDispatcher;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
@@ -36,6 +40,7 @@ class DoctrineOutboxIntegrationTest extends TestCase
     private DoctrineTransport $outbox;
     private InMemoryTransport $target;
     private MessageBus $bus;
+    private array $statements = [];
 
     protected function setUp(): void
     {
@@ -47,6 +52,19 @@ class DoctrineOutboxIntegrationTest extends TestCase
         $params = (new DsnParser())->parse($dsn);
         $config = new Configuration();
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        $config->setMiddlewares([new Middleware(new class($this->statements) extends AbstractLogger {
+            public function __construct(
+                private array &$statements,
+            ) {
+            }
+
+            public function log($level, $message, array $context = []): void
+            {
+                if (isset($context['sql'])) {
+                    $this->statements[] = $context['sql'];
+                }
+            }
+        })]);
 
         $this->driverConnection = DriverManager::getConnection($params, $config);
         $this->outbox = new DoctrineTransport(new Connection([], $this->driverConnection), new PhpSerializer());
@@ -101,6 +119,16 @@ class DoctrineOutboxIntegrationTest extends TestCase
 
         $this->assertCount(1, $stored);
         $this->assertSame('orders', $stored[0]->last(OutboxStamp::class)?->getTransportName());
+    }
+
+    public function testABatchIsStoredWithOneInsert()
+    {
+        (new BatchDispatcher($this->bus))->dispatch([new DummyMessage('a'), new DummyMessage('b'), new DummyMessage('c')]);
+
+        $this->assertCount(1, array_filter($this->statements, static fn (string $sql) => str_starts_with($sql, 'INSERT')));
+        $this->assertSame(3, $this->countStoredMessages());
+        $this->assertSame(['orders', 'orders', 'orders'], array_map(static fn (Envelope $envelope) => $envelope->last(OutboxStamp::class)?->getTransportName(), iterator_to_array($this->outbox->all(), false)));
+        $this->assertSame([], $this->target->getSent());
     }
 
     private function countStoredMessages(): int

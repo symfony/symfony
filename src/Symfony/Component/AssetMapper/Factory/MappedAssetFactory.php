@@ -43,32 +43,39 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         }
         $this->assetsBeingCreated[$logicalPath] = $logicalPath;
 
-        if (!isset($this->assetsCache[$logicalPath])) {
-            $isVendor = $this->isVendor($sourcePath);
-            $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath), isVendor: $isVendor);
-            $this->assetsCache[$logicalPath] = $asset;
+        try {
+            if (!isset($this->assetsCache[$logicalPath])) {
+                $isVendor = $this->isVendor($sourcePath);
+                $asset = new MappedAsset($logicalPath, $sourcePath, $this->assetsPathResolver->resolvePublicPath($logicalPath), isVendor: $isVendor);
+                $this->assetsCache[$logicalPath] = $asset;
 
-            $content = $this->compileContent($asset);
-            [$digest, $isPredigested] = $this->getDigest($asset, $content);
+                $content = $this->compileContent($asset);
+                [$digest, $isPredigested] = $this->getDigest($asset, $content);
 
-            $asset = new MappedAsset(
-                $asset->logicalPath,
-                $asset->sourcePath,
-                $asset->publicPathWithoutDigest,
-                $this->getPublicPath($asset, $content),
-                $content,
-                $digest,
-                $isPredigested,
-                $isVendor,
-                $asset->getDependencies(),
-                $asset->getFileDependencies(),
-                $asset->getJavaScriptImports(),
-            );
+                $asset = new MappedAsset(
+                    $asset->logicalPath,
+                    $asset->sourcePath,
+                    $asset->publicPathWithoutDigest,
+                    $this->getPublicPath($asset, $content),
+                    $content,
+                    $digest,
+                    $isPredigested,
+                    $isVendor,
+                    $asset->getDependencies(),
+                    $asset->getFileDependencies(),
+                    $asset->getJavaScriptImports(),
+                );
 
-            $this->assetsCache[$logicalPath] = $asset;
+                $this->assetsCache[$logicalPath] = $asset;
+            }
+        } catch (\Throwable $e) {
+            // drop the half-built asset, or the next call would return it as if it were complete
+            unset($this->assetsCache[$logicalPath]);
+
+            throw $e;
+        } finally {
+            unset($this->assetsBeingCreated[$logicalPath]);
         }
-
-        unset($this->assetsBeingCreated[$logicalPath]);
 
         return $this->assetsCache[$logicalPath];
     }

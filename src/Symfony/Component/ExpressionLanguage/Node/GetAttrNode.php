@@ -87,6 +87,8 @@ class GetAttrNode extends Node
     public function evaluate(array $functions, array $values): mixed
     {
         $nullSafe = $this->attributes['is_null_safe'];
+        $this->attributes['is_short_circuited'] = false;
+
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);

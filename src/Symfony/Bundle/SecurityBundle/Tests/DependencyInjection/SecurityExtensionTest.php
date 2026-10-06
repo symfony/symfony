@@ -253,6 +253,18 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->getDefinition('security.listener.form_login_ldap.main')->getArgument(1));
     }
 
+    public function testAttributeExpressionLanguagesAreLazy()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+        ]);
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('security.is_granted_attribute_expression_language')->isLazy());
+        $this->assertTrue($container->getDefinition('security.is_csrf_token_valid_attribute_expression_language')->isLazy());
+    }
+
     public function testInvalidCheckPath()
     {
         $container = $this->getRawContainer();

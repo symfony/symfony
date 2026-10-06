@@ -159,6 +159,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
 
         ->set('controller.cache_attribute_listener', CacheAttributeListener::class)
+            ->args([
+                service('controller.expression_language')->nullOnInvalid(),
+            ])
             ->tag('kernel.event_subscriber')
             ->tag('kernel.reset', ['method' => '?reset'])
 
@@ -174,6 +177,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(ControllerHelper::class, 'controller.helper')
 
         ->set('controller.expression_language', ExpressionLanguage::class)
+            ->lazy()
             ->args([service('cache.controller_expression_language')->nullOnInvalid()])
             ->call('registerProvider', [service('security.expression_language_provider')->ignoreOnInvalid()])
 

@@ -179,6 +179,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(ControllerHelper::class, 'controller.helper')
 
         ->set('controller.expression_language', ExpressionLanguage::class)
+            ->lazy()
             ->args([service('cache.controller_expression_language')->nullOnInvalid()])
 
         ->set('cache.controller_expression_language')

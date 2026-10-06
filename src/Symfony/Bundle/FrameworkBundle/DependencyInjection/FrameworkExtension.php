@@ -294,6 +294,10 @@ class FrameworkExtension extends Extension
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
 
+        if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/framework-bundle'])) {
+            $container->removeDefinition('controller.expression_language');
+        }
+
         $loader->load('process.php');
 
         if (!class_exists(RunProcessMessageHandler::class)) {

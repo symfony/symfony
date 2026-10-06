@@ -13,9 +13,15 @@ namespace Symfony\Bundle\SecurityBundle\Tests\CacheWarmer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 
 class ExpressionCacheWarmerTest extends TestCase
 {
@@ -24,8 +30,8 @@ class ExpressionCacheWarmerTest extends TestCase
         $expressions = [new Expression('A'), new Expression('B')];
 
         $series = [
-            [$expressions[0], ['token', 'user', 'object', 'subject', 'role_names', 'request', 'trust_resolver']],
-            [$expressions[1], ['token', 'user', 'object', 'subject', 'role_names', 'request', 'trust_resolver']],
+            [$expressions[0], ['token', 'user', 'object', 'subject', 'role_names', 'auth_checker', 'request', 'trust_resolver']],
+            [$expressions[1], ['token', 'user', 'object', 'subject', 'role_names', 'auth_checker', 'request', 'trust_resolver']],
         ];
 
         $expressionLang = $this->createMock(ExpressionLanguage::class);
@@ -42,5 +48,20 @@ class ExpressionCacheWarmerTest extends TestCase
         ;
 
         (new ExpressionCacheWarmer($expressions, $expressionLang))->warmUp('');
+    }
+
+    public function testWarmUpPrimesTheCacheEntriesReadByTheExpressionVoter()
+    {
+        $cache = new ArrayAdapter();
+        $expressionLanguage = new ExpressionLanguage($cache);
+        $expression = new Expression('is_granted("ROLE_USER")');
+
+        (new ExpressionCacheWarmer([$expression], $expressionLanguage))->warmUp('');
+        $warmedKeys = array_keys($cache->getValues());
+
+        $voter = new ExpressionVoter($expressionLanguage, new AuthenticationTrustResolver(), $this->createStub(AuthorizationCheckerInterface::class));
+        $voter->vote(new NullToken(), new Request(), [$expression]);
+
+        $this->assertSame($warmedKeys, array_keys($cache->getValues()));
     }
 }

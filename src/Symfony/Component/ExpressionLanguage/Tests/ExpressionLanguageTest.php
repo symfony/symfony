@@ -391,6 +391,25 @@ class ExpressionLanguageTest extends TestCase
         }
     }
 
+    public function testNullSafeEvaluateFailsWithReusedParsedExpression()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        foreach (self::provideInvalidNullSafe() as [$expression, $foo, $message]) {
+            $parsedExpression = $expressionLanguage->parse($expression, ['foo']);
+            $this->assertNull($expressionLanguage->evaluate($parsedExpression, ['foo' => null]));
+
+            try {
+                $expressionLanguage->evaluate($parsedExpression, ['foo' => $foo]);
+            } catch (\RuntimeException $e) {
+                $this->assertSame($message, $e->getMessage());
+                continue;
+            }
+
+            $this->fail(\sprintf('Evaluating "%s" again should throw.', $expression));
+        }
+    }
+
     public static function provideInvalidNullSafe()
     {
         yield ['foo?.bar.baz', (object) ['bar' => null], 'Unable to get property "baz" of non-object "foo?.bar".'];

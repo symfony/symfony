@@ -22,8 +22,11 @@ use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
@@ -93,6 +96,16 @@ class RateLimitAttributeListenerTest extends TestCase
             $this->createStub(HttpKernelInterface::class),
             static fn () => null,
             [],
+            $request,
+            null,
+        ), $el);
+    }
+
+    private function makeControllerEvent(RateLimit $attribute, Request $request, ?ExpressionLanguage $el = null): ControllerAttributeEvent
+    {
+        return new ControllerAttributeEvent($attribute, new ControllerEvent(
+            $this->createStub(HttpKernelInterface::class),
+            static fn () => null,
             $request,
             null,
         ), $el);
@@ -746,6 +759,94 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertSame([], $dispatched);
     }
 
+    #[DataProvider('provideKeysNotReadingArguments')]
+    public function testKeyNotReadingArgumentsIsConsumedBeforeTheArgumentsAreResolved(string|Expression|null $key, string $expectedKey)
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+        $request = Request::create('/', 'GET', [], [], [], ['REMOTE_ADDR' => '1.2.3.4']);
+        $attribute = new RateLimit('api', key: $key);
+
+        $listener->onKernelControllerAttribute($this->makeControllerEvent($attribute, $request, new ExpressionLanguage()));
+        $this->assertSame($expectedKey, $usedKey);
+
+        $usedKey = null;
+        $listener->onKernelControllerAttribute($this->makeEvent($attribute, $request, new ExpressionLanguage()));
+        $this->assertNull($usedKey);
+    }
+
+    public static function provideKeysNotReadingArguments(): iterable
+    {
+        yield 'default key' => [null, '1.2.3.4~GET~/'];
+        yield 'literal key' => ['shared', 'shared'];
+        yield 'expression not reading args' => [new Expression('request.getClientIp()'), '1.2.3.4'];
+    }
+
+    #[DataProvider('provideKeysReadingArguments')]
+    public function testKeyReadingArgumentsIsConsumedOnceTheArgumentsAreResolved(Expression|\Closure $key)
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+        $request = Request::create('/');
+        $attribute = new RateLimit('api', key: $key);
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $controller = static fn ($id) => null;
+
+        $listener->onKernelControllerAttribute(new ControllerAttributeEvent($attribute, new ControllerEvent($kernel, $controller, $request, null), new ExpressionLanguage()));
+        $this->assertNull($usedKey);
+
+        $listener->onKernelControllerAttribute(new ControllerAttributeEvent($attribute, new ControllerArgumentsEvent($kernel, $controller, ['42'], $request, null), new ExpressionLanguage()));
+        $this->assertSame('user-42', $usedKey);
+    }
+
+    public static function provideKeysReadingArguments(): iterable
+    {
+        yield 'expression reading args' => [new Expression('"user-" ~ args["id"]')];
+        yield 'closure' => [static fn (array $args) => 'user-'.$args['id']];
+    }
+
+    public function testExpressionKeyIsLintedByTheExpressionLanguageThatEvaluatesIt()
+    {
+        $expressionLanguage = new class extends ExpressionLanguage {
+            public array $lintedNames = [];
+
+            public function lint(Expression|string $expression, array $names, int $flags = 0): void
+            {
+                $this->lintedNames[] = $names;
+
+                parent::lint($expression, $names, $flags);
+            }
+        };
+
+        $listener = new RateLimitAttributeListener($this->createStub(ServiceProviderInterface::class), $expressionLanguage);
+        $listener->onKernelControllerAttribute($this->makeControllerEvent(new RateLimit('api', key: new Expression('"user-" ~ args["id"]')), Request::create('/'), $expressionLanguage));
+
+        $this->assertSame([['request', 'this']], $expressionLanguage->lintedNames);
+    }
+
+    public function testRejectionThroughARealKernelHappensBeforeTheArgumentsAreResolved()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ControllerAttributesListener([
+            KernelEvents::CONTROLLER => [RateLimit::class => true],
+            KernelEvents::CONTROLLER_ARGUMENTS => [RateLimit::class => true],
+        ]));
+        $dispatcher->addSubscriber($this->makeListener(false));
+
+        $valueResolver = new class implements ValueResolverInterface {
+            public function resolve(Request $request, ArgumentMetadata $argument): iterable
+            {
+                throw new \LogicException('The arguments of a rejected request must not be resolved.');
+            }
+        };
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), null, new ArgumentResolver(null, [$valueResolver]));
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', new RateLimitedControllerWithArgument());
+
+        $this->expectException(TooManyRequestsHttpException::class);
+
+        $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
+    }
+
     public function testMethodFilterSkipsNonMatchingMethod()
     {
         $factory = $this->createMock(RateLimiterFactoryInterface::class);
@@ -767,6 +868,15 @@ class RateLimitedController
     public function __invoke(): Response
     {
         return new Response('ok');
+    }
+}
+
+class RateLimitedControllerWithArgument
+{
+    #[RateLimit('api')]
+    public function __invoke(string $id): Response
+    {
+        return new Response($id);
     }
 }
 

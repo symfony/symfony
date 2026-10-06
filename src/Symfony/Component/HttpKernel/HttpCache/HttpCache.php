@@ -603,7 +603,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
         // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
         $entry->setStatusCode(503);
-        $entry->setContent('503 Service Unavailable');
+        if (!$entry->headers->has('X-Body-File') && !$entry->headers->has('X-Body-Eval')) {
+            $entry->setContent('503 Service Unavailable');
+        }
         $entry->headers->set('Retry-After', 10);
 
         return true;

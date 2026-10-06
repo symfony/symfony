@@ -1,0 +1,38 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/PublishedArticle",
+    "$defs": {
+        "PublishedArticle": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string",
+                    "default": ""
+                },
+                "meta": {
+                    "type": "object",
+                    "properties": {
+                        "author": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "default": ""
+                                }
+                            }
+                        },
+                        "title": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ]
+                }
+            },
+            "required": [
+                "meta"
+            ]
+        }
+    }
+}

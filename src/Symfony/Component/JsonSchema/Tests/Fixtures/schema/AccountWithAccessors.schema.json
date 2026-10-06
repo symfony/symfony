@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/AccountWithAccessors",
+    "$defs": {
+        "AccountWithAccessors": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "password": {
+                    "type": "string",
+                    "writeOnly": true
+                }
+            }
+        }
+    }
+}

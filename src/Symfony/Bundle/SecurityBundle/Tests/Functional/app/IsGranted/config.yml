@@ -1,0 +1,14 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+framework:
+    serializer: ~
+
+security:
+    firewalls:
+        main:
+            security: false
+
+services:
+    Symfony\Bundle\SecurityBundle\Tests\Functional\IsGrantedPostVoter:
+        tags: [security.voter]

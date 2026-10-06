@@ -14,6 +14,11 @@ namespace Symfony\Component\Security\Http\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Parser;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
@@ -32,9 +37,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  */
 class IsGrantedAttributeListener implements EventSubscriberInterface
 {
+    /**
+     * @param (\Closure(ControllerArgumentsEvent): void)|null $mapRequestPayload Maps the arguments of the event that #[MapRequestPayload], #[MapQueryString] or #[MapUploadedFile] did not map yet
+     */
     public function __construct(
         private readonly AuthorizationCheckerInterface $authChecker,
         private ?ExpressionLanguage $expressionLanguage = null,
+        private ?\Closure $mapRequestPayload = null,
     ) {
     }
 
@@ -81,6 +90,10 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
         $subject = null;
 
         if ($subjectRef = $attribute->subject) {
+            if ($this->mapRequestPayload && array_any(\is_array($subjectRef) ? $subjectRef : [$subjectRef], fn ($ref) => $this->readsUnmappedArguments($ref, $event))) {
+                ($this->mapRequestPayload)($event);
+            }
+
             if (\is_array($subjectRef)) {
                 foreach ($subjectRef as $refKey => $ref) {
                     $subject[\is_string($refKey) ? $refKey : (string) $ref] = $this->getIsGrantedSubject($ref, $event);
@@ -131,5 +144,38 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
         }
 
         return $arguments[$subjectRef];
+    }
+
+    /**
+     * Tells whether the subject reads an argument that #[MapRequestPayload], #[MapQueryString] or #[MapUploadedFile] did not map yet.
+     */
+    private function readsUnmappedArguments(string|Expression|\Closure $subjectRef, ControllerArgumentsEvent $event): bool
+    {
+        if (\is_string($subjectRef)) {
+            $argument = $event->getNamedArguments()[$subjectRef] ?? null;
+
+            return self::isUnmapped($argument) || \is_array($argument) && array_any($argument, self::isUnmapped(...));
+        }
+
+        if (!array_any($event->getArguments(), self::isUnmapped(...))) {
+            return false;
+        }
+
+        if ($subjectRef instanceof \Closure) {
+            return true;
+        }
+
+        try {
+            $this->expressionLanguage?->lint($subjectRef, ['request', 'this'], Parser::IGNORE_UNKNOWN_FUNCTIONS);
+        } catch (SyntaxError) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static function isUnmapped(mixed $argument): bool
+    {
+        return $argument instanceof MapRequestPayload || $argument instanceof MapQueryString || $argument instanceof MapUploadedFile;
     }
 }

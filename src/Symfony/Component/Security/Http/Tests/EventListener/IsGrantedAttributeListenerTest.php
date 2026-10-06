@@ -17,6 +17,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -461,6 +464,113 @@ class IsGrantedAttributeListenerTest extends TestCase
 
         $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage());
         $listener->onKernelControllerArguments($event);
+    }
+
+    #[DataProvider('provideSubjectsReadingUnmappedArguments')]
+    public function testArgumentsAreMappedBeforeCheckingSubjectsThatReadThem(string $method, array $unmappedArguments, array $mappedArguments, mixed $expectedSubject)
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($this->anything(), $expectedSubject)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), $method],
+            $unmappedArguments,
+            new Request(),
+            null
+        );
+
+        $mappings = 0;
+        $mapRequestPayload = static function (ControllerArgumentsEvent $event) use ($mappedArguments, &$mappings) {
+            $event->setArguments($mappedArguments);
+            ++$mappings;
+        };
+
+        $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage(), $mapRequestPayload);
+        $listener->onKernelControllerArguments($event);
+
+        $this->assertSame(1, $mappings);
+    }
+
+    public static function provideSubjectsReadingUnmappedArguments(): iterable
+    {
+        $post = new \stdClass();
+        $postWithAuthor = new class {
+            public function getAuthor(): string
+            {
+                return 'author';
+            }
+        };
+        $files = [new \SplFileInfo('a'), new \SplFileInfo('b')];
+
+        yield 'argument name' => ['withMappedSubject', [new MapRequestPayload()], [$post], $post];
+        yield 'expression returning the argument' => ['withMappedSubjectExpression', [new MapQueryString()], [$post], $post];
+        yield 'expression reading the argument' => ['withExpressionInSubject', [new MapRequestPayload()], [$postWithAuthor], 'author'];
+        yield 'array' => ['withMappedSubjectArray', [new MapRequestPayload(), 'arg2Value'], [$post, 'arg2Value'], ['post' => $post, 'arg2Name' => 'arg2Value']];
+        yield 'variadic' => ['withMappedVariadicSubject', [new MapUploadedFile()], $files, $files];
+    }
+
+    public function testExpressionSubjectIsLintedByTheExpressionLanguageThatEvaluatesIt()
+    {
+        $expressionLanguage = new class extends ExpressionLanguage {
+            public array $lintedNames = [];
+
+            public function lint(Expression|string $expression, array $names, int $flags = 0): void
+            {
+                $this->lintedNames[] = $names;
+
+                parent::lint($expression, $names, $flags);
+            }
+        };
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'withMappedSubjectExpression'],
+            [new MapRequestPayload()],
+            new Request(),
+            null
+        );
+
+        $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
+        $authChecker->method('isGranted')->willReturn(true);
+
+        $listener = new IsGrantedAttributeListener($authChecker, $expressionLanguage, static fn (ControllerArgumentsEvent $event) => $event->setArguments([new \stdClass()]));
+        $listener->onKernelControllerArguments($event);
+
+        $this->assertSame([['request', 'this']], $expressionLanguage->lintedNames);
+    }
+
+    #[DataProvider('provideSubjectsNotReadingUnmappedArguments')]
+    public function testArgumentsAreNotMappedForSubjectsThatDoNotReadThem(string $method, array $unmappedArguments, mixed $expectedSubject)
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($this->anything(), $expectedSubject)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), $method],
+            $unmappedArguments,
+            new Request(),
+            null
+        );
+
+        $mapRequestPayload = static fn () => self::fail('The request payload must not be mapped.');
+
+        $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage(), $mapRequestPayload);
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public static function provideSubjectsNotReadingUnmappedArguments(): iterable
+    {
+        yield 'no subject' => ['admin', [new MapRequestPayload()], null];
+        yield 'another argument' => ['withSubject', [new MapRequestPayload(), 'arg2Value'], 'arg2Value'];
+        yield 'expression not reading the arguments' => ['withControllerPropertyAsSubject', [new MapRequestPayload()], 42];
     }
 
     public function testHttpExceptionWithExceptionCode()

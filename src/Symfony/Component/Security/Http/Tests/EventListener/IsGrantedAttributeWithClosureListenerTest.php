@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -275,6 +276,30 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $this->expectException(HttpException::class);
         $this->expectExceptionMessage('Not found');
 
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testArgumentsAreMappedBeforeEvaluatingAClosureSubject()
+    {
+        $post = new \stdClass();
+
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($this->anything(), $post)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsWithClosureController(), 'withClosureAsSubject'],
+            [new MapRequestPayload()],
+            new Request(),
+            null
+        );
+
+        $mapRequestPayload = static fn (ControllerArgumentsEvent $event) => $event->setArguments([$post]);
+
+        $listener = new IsGrantedAttributeListener($authChecker, null, $mapRequestPayload);
         $listener->onKernelControllerArguments($event);
     }
 

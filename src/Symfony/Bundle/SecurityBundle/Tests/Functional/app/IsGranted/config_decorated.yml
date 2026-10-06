@@ -1,0 +1,7 @@
+imports:
+    - { resource: ./config.yml }
+
+services:
+    Symfony\Bundle\SecurityBundle\Tests\Functional\IsGrantedDecoratingValueResolver:
+        decorates: argument_resolver.request_payload
+        arguments: ['@.inner']

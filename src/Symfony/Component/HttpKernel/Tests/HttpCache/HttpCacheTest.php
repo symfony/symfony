@@ -1775,6 +1775,66 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
     }
 
+    public function testEsiFragmentErrorClosesTheOutputBuffer()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'Main <esi:include src="/foo" />',
+                'headers' => [
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ],
+            ],
+            [
+                'status' => 500,
+                'body' => 'Broken fragment',
+                'headers' => [],
+            ],
+        ]);
+
+        $level = ob_get_level();
+
+        try {
+            $this->request('GET', '/', [], [], true);
+            $this->fail('The fragment error should be thrown.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Error when rendering "http://localhost/foo" (Status code is 500).', $e->getMessage());
+        }
+
+        $this->assertSame($level, ob_get_level());
+    }
+
+    public function testEsiNestedFragmentErrorIsIgnored()
+    {
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => 'Main <esi:include src="/foo" onerror="continue" /> end',
+                'headers' => [
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ],
+            ],
+            [
+                'status' => 200,
+                'body' => 'Foo <esi:include src="/bar" /> foo end',
+                'headers' => [
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ],
+            ],
+            [
+                'status' => 500,
+                'body' => 'Broken fragment',
+                'headers' => [],
+            ],
+        ]);
+
+        $level = ob_get_level();
+        $this->request('GET', '/', [], [], true);
+
+        $this->assertSame('Main  end', $this->response->getContent());
+        $this->assertSame($level, ob_get_level());
+    }
+
     public function testEsiRecalculateContentLengthHeaderForHeadRequest()
     {
         $responses = [

@@ -478,6 +478,7 @@ class MessengerBundle extends AbstractBundle
 
         if (empty($config['transports'])) {
             $container->removeDefinition('messenger.transport.symfony_serializer');
+            $container->removeDefinition('messenger.transport.interop_serializer');
             $container->removeDefinition('messenger.transport.amqp.factory');
             $container->removeDefinition('messenger.transport.redis.factory');
             $container->removeDefinition('messenger.transport.sqs.factory');

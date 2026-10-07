@@ -18,6 +18,7 @@ use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
 use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 
@@ -294,6 +295,45 @@ class AddScheduleMessengerPassTest extends TestCase
         (new AddScheduleMessengerPass())->process($container);
 
         $this->assertTrue($container->hasDefinition('cache.scheduler'));
+    }
+
+    public function testStatefulScheduleIsNotLockedWithoutALockFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('scheduler.messenger_transport_factory');
+        $container->register('messenger.transport_factory');
+        $container->register('cache.app');
+        $container->register('cache.scheduler');
+        $container->register('app.task', \stdClass::class)
+            ->addTag('scheduler.task', ['trigger' => 'every', 'frequency' => '1 hour']);
+        $container->setParameter('.scheduler.schedules', [
+            'default' => ['stateful' => true, 'cache_pool' => null, 'lock_factory' => null, 'process_only_last_missed_run' => false],
+        ]);
+
+        (new AddScheduleMessengerPass())->process($container);
+
+        $calls = $container->getDefinition('scheduler.provider.default')->getMethodCalls();
+
+        $this->assertSame(['add', 'stateful'], array_column($calls, 0));
+        $this->assertEquals([new Reference('cache.scheduler')], $calls[1][1]);
+    }
+
+    public function testConfiguringAnUnknownScheduleIsReported()
+    {
+        $container = new ContainerBuilder();
+        $container->register('scheduler.messenger_transport_factory');
+        $container->register('messenger.transport_factory');
+        $container->register('app.task', \stdClass::class)
+            ->addTag('scheduler.task', ['trigger' => 'every', 'frequency' => '1 hour']);
+        $container->setParameter('.scheduler.schedules', [
+            'unknown' => ['stateful' => true, 'cache_pool' => null, 'lock_factory' => null, 'process_only_last_missed_run' => false],
+        ]);
+
+        (new AddScheduleMessengerPass())->process($container);
+
+        $this->assertStringContainsString('Schedule "unknown" is configured but no task or schedule provider uses it; check for a typo (known schedules: "default").', implode("\n", $container->getCompiler()->getLog()));
+        $this->assertFalse($container->hasDefinition('scheduler.provider.unknown'));
+        $this->assertFalse($container->hasDefinition('messenger.transport.scheduler_unknown'));
     }
 
     public function testMissingMessengerIsReportedWhenATaskIsDeclared()

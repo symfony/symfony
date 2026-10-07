@@ -54,6 +54,30 @@ class SchedulerBundle extends AbstractBundle
                     ->defaultNull()
                     ->info('Whether scheduled messages are routed to the Messenger senders configured for their class, as any other dispatched message is. A class with no sender configured still runs in the scheduler worker, and a "transports" option set on a task still wins.')
                 ->end()
+                ->arrayNode('schedules')
+                    ->info('Options of the schedules, keyed by schedule name, whether their tasks are declared with attributes or returned by a schedule provider.')
+                    ->useAttributeAsKey('name')
+                    ->arrayPrototype()
+                        ->children()
+                            ->booleanNode('stateful')
+                                ->info('Whether the schedule keeps its state in the "cache.scheduler" pool and, when locks are enabled, runs in only one worker at a time.')
+                                ->defaultFalse()
+                            ->end()
+                            ->scalarNode('cache_pool')
+                                ->info('The cache pool that stores the state of the schedule, so that a restarted worker resumes where the previous one stopped.')
+                                ->defaultNull()
+                            ->end()
+                            ->scalarNode('lock_factory')
+                                ->info('The service ID of the lock factory used to run the schedule in only one worker at a time.')
+                                ->defaultNull()
+                            ->end()
+                            ->booleanNode('process_only_last_missed_run')
+                                ->info('Whether a task that missed several runs runs only once instead of once per missed run.')
+                                ->defaultFalse()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
     }
@@ -81,6 +105,7 @@ class SchedulerBundle extends AbstractBundle
         // when a scheduled message is actually redispatched, instead of on every
         // container build regardless of whether the scheduler is actually used
         $container->setParameter('.scheduler.use_messenger_routing', $useMessengerRouting);
+        $container->setParameter('.scheduler.schedules', $config['schedules']);
 
         $configurator->import('Resources/config/scheduler.php');
 

@@ -13,6 +13,7 @@ CHANGELOG
  * Add `$useMessengerRouting` constructor argument to `SchedulerTransport` and `SchedulerTransportFactory`
  * Add `SerializedTrigger`, the trigger a `MessageContext` carries once its message has crossed a transport
  * Dispatch the scheduled message instead of its `RedispatchMessage` wrapper in `PreRunEvent`, `PostRunEvent` and `FailureEvent`
+ * Add the `schedules` configuration option to make a schedule stateful or locked, and to process only its last missed run
 
 8.1
 ---

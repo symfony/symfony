@@ -57,13 +57,13 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
 
         if (
             $node instanceof FilterExpression
-            && 'trans' === ($node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'))
+            && \in_array($filter = $node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'), ['trans', 'trans_html'], true)
             && $node->getNode('node') instanceof ConstantExpression
         ) {
             // extract constant nodes with a trans filter
             $this->messages[] = [
                 $node->getNode('node')->getAttribute('value'),
-                $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
+                $this->getReadDomainFromArguments($node->getNode('arguments'), 'trans_html' === $filter ? 2 : 1),
             ];
         } elseif (
             $node instanceof FunctionExpression
@@ -85,13 +85,13 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
             ];
         } elseif (
             $node instanceof FilterExpression
-            && 'trans' === ($node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'))
+            && \in_array($filter = $node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'), ['trans', 'trans_html'], true)
             && $node->getNode('node') instanceof ConcatBinary
             && $message = $this->getConcatValueFromNode($node->getNode('node'), null)
         ) {
             $this->messages[] = [
                 $message,
-                $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
+                $this->getReadDomainFromArguments($node->getNode('arguments'), 'trans_html' === $filter ? 2 : 1),
             ];
         }
 

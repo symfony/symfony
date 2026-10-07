@@ -100,8 +100,10 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
             return $node;
         }
 
-        if ($node instanceof FilterExpression && 'trans' === ($node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'))) {
+        if ($node instanceof FilterExpression && \in_array($filter = $node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'), ['trans', 'trans_html'], true)) {
             $arguments = $node->getNode('arguments');
+            // the tags argument of trans_html comes before the arguments of trans
+            $domainIndex = 'trans_html' === $filter ? 2 : 1;
 
             if ($arguments instanceof EmptyNode) {
                 $arguments = new Nodes();
@@ -109,15 +111,15 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
             }
 
             if ($this->isNamedArguments($arguments)) {
-                if (!$arguments->hasNode('domain') && !$arguments->hasNode(1)) {
+                if (!$arguments->hasNode('domain') && !$arguments->hasNode($domainIndex)) {
                     $arguments->setNode('domain', $this->scope->get('domain'));
                 }
-            } elseif (!$arguments->hasNode(1)) {
-                if (!$arguments->hasNode(0)) {
-                    $arguments->setNode(0, new ArrayExpression([], $node->getTemplateLine()));
+            } elseif (!$arguments->hasNode($domainIndex) && ('trans_html' !== $filter || $arguments->hasNode(0))) {
+                if (!$arguments->hasNode($domainIndex - 1)) {
+                    $arguments->setNode($domainIndex - 1, new ArrayExpression([], $node->getTemplateLine()));
                 }
 
-                $arguments->setNode(1, $this->scope->get('domain'));
+                $arguments->setNode($domainIndex, $this->scope->get('domain'));
             }
         } elseif ($node instanceof TransNode) {
             if (!$node->hasNode('domain')) {

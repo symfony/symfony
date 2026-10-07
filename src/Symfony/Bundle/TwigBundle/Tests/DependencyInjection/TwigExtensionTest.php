@@ -360,6 +360,16 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(new Reference('uri_signer', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('twig.extension.httpfoundation')->getArgument(1));
     }
 
+    public function testTranslationExtensionReceivesTheHtmlTranslator()
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig');
+        $this->compileContainer($container);
+
+        $this->assertEquals(new Reference('translator.html', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('twig.extension.trans')->getArgument(2));
+    }
+
     public function testDefaultPathContainingAPercentSign()
     {
         // two percent signs are required: "%2Fother%" is what the parameter bag reads as a reference

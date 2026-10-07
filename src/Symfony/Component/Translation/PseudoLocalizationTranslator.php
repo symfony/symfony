@@ -134,6 +134,15 @@ final class PseudoLocalizationTranslator implements TranslatorInterface, Transla
         return $this->translator->getCatalogues();
     }
 
+    public function getGlobalParameters(): array
+    {
+        if ($this->translator instanceof Translator || method_exists($this->translator, 'getGlobalParameters')) {
+            return $this->translator->getGlobalParameters();
+        }
+
+        return [];
+    }
+
     private function getParts(string $originalTrans): array
     {
         if (!$this->parseHTML) {

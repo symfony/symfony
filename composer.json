@@ -49,7 +49,7 @@
         "psr/log": "^1|^2|^3",
         "symfony/contracts": "^3.7",
         "symfony/polyfill-ctype": "^1.8",
-        "symfony/polyfill-deepclone": "^1.40",
+        "symfony/polyfill-deepclone": "^1.43.1",
         "symfony/polyfill-intl-grapheme": "^1.33",
         "symfony/polyfill-intl-icu": "^1.0",
         "symfony/polyfill-intl-idn": "^1.10",

@@ -533,6 +533,22 @@ class DeepCloneTest extends TestCase
         $this->assertSame('inner', $clone2->child->bar);
     }
 
+    public function testOriginalArrayObjectMutationDoesNotAffectClone()
+    {
+        $obj = new \stdClass();
+        $obj->list = new \ArrayObject([1]);
+        $obj->iterator = new \ArrayIterator([1]);
+
+        $cloner = new DeepCloner($obj);
+
+        $obj->list[] = 2;
+        $obj->iterator[] = 2;
+
+        $clone = $cloner->clone();
+        $this->assertSame([1], $clone->list->getArrayCopy());
+        $this->assertSame([1], $clone->iterator->getArrayCopy());
+    }
+
     public function testSerializeClonerStaticValue()
     {
         $cloner = new DeepCloner(42);

@@ -52,6 +52,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\ErrorHandler;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface as ComponentEventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -1046,6 +1047,13 @@ class Application implements ResetInterface
             $this->getSignalRegistry()->pushCurrentHandlers();
 
             if ($this->dispatcher) {
+                // Build the lazy listeners before a signal handler needs them: a signal can interrupt the autoloading of a class they use, which cannot be loaded again from the handler
+                if ($this->signalsToDispatchEvent && $this->dispatcher instanceof ComponentEventDispatcherInterface) {
+                    foreach ([ConsoleEvents::SIGNAL, ConsoleEvents::TERMINATE] as $eventName) {
+                        $this->dispatcher->getListeners($eventName);
+                    }
+                }
+
                 // We register application signals, so that we can dispatch the event
                 foreach ($this->signalsToDispatchEvent as $signal) {
                     $event = new ConsoleSignalEvent($command, $input, $output, $signal);

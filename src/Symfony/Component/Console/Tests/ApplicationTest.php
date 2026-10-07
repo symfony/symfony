@@ -2050,6 +2050,61 @@ class ApplicationTest extends TestCase
     /**
      * @requires extension pcntl
      */
+    public function testSignalInterruptingTheAutoloadOfAClassNeededByALazyListener()
+    {
+        $class = 'Symfony\\Component\\Console\\Tests\\AutoloadedDuringSignal'.bin2hex(random_bytes(4));
+        $commandRunning = false;
+        $autoloader = static function (string $name) use ($class, &$commandRunning) {
+            if ($class !== $name) {
+                return;
+            }
+            if ($commandRunning) {
+                // the async handler runs before this autoload completes
+                posix_kill(posix_getpid(), \SIGUSR1);
+            }
+            eval('namespace Symfony\\Component\\Console\\Tests; final class '.substr($class, strrpos($class, '\\') + 1).' {}');
+        };
+
+        $listener = new class {
+            public bool $called = false;
+
+            public function onSignal(ConsoleSignalEvent $event): void
+            {
+                $event->abortExit();
+                $this->called = true;
+            }
+        };
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(ConsoleEvents::SIGNAL, [static function () use ($class, $listener) {
+            new $class();
+
+            return $listener;
+        }, 'onSignal']);
+
+        $command = new Command('signal');
+        $command->setCode(static function () use ($class, &$commandRunning) {
+            $commandRunning = true;
+            new $class();
+            posix_kill(posix_getpid(), \SIGUSR1);
+
+            return 0;
+        });
+
+        $application = $this->createSignalableApplication($command, $dispatcher);
+        $application->setCatchExceptions(false);
+
+        spl_autoload_register($autoloader, true, true);
+        try {
+            $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+        $this->assertTrue($listener->called);
+    }
+
+    /**
+     * @requires extension pcntl
+     */
     public function testSignalDispatchWithoutEventToDispatch()
     {
         $command = new SignableCommand();

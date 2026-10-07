@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeMismatch;
 
 /**
  * Represents the exact shape of an array.
@@ -118,6 +119,43 @@ final class ArrayShapeType extends CollectionType
         }
 
         return true;
+    }
+
+    public function getMismatches(mixed $value): array
+    {
+        if (!\is_array($value)) {
+            return [new TypeMismatch('', $this, get_debug_type($value))];
+        }
+
+        $mismatches = [];
+
+        foreach ($this->shape as $key => $shapeValue) {
+            if (\array_key_exists($key, $value)) {
+                foreach ($shapeValue['type']->getMismatches($value[$key]) as $mismatch) {
+                    $mismatches[] = $mismatch->withParentPath("[$key]");
+                }
+            } elseif (!($shapeValue['optional'] ?? false)) {
+                $mismatches[] = new TypeMismatch("[$key]", $shapeValue['type'], null);
+            }
+        }
+
+        foreach ($value as $key => $itemValue) {
+            if (isset($this->shape[$key])) {
+                continue;
+            }
+
+            if ($this->isSealed() || !$this->extraKeyType->accepts($key)) {
+                $mismatches[] = new TypeMismatch("[$key]", Type::never(), get_debug_type($itemValue));
+
+                continue;
+            }
+
+            foreach ($this->extraValueType->getMismatches($itemValue) as $mismatch) {
+                $mismatches[] = $mismatch->withParentPath("[$key]");
+            }
+        }
+
+        return $mismatches;
     }
 
     /**

@@ -90,6 +90,16 @@ abstract class Type implements \Stringable
     }
 
     /**
+     * Tells where and why the $value is not accepted by the type.
+     *
+     * @return list<TypeMismatch>
+     */
+    public function getMismatches(mixed $value): array
+    {
+        return $this->accepts($value) ? [] : [new TypeMismatch('', $this, get_debug_type($value))];
+    }
+
+    /**
      * Maps the type (and its wrapped/composed parts) bottom-up with a $mapper.
      *
      * @param-immediately-invoked-callable $mapper

@@ -13,6 +13,7 @@ namespace Symfony\Component\TypeInfo\Type;
 
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeMismatch;
 
 /**
  * Represents the exact shape of an anonymous object.
@@ -101,6 +102,34 @@ final class ObjectShapeType extends Type
         }
 
         return true;
+    }
+
+    public function getMismatches(mixed $value): array
+    {
+        if (!\is_object($value)) {
+            return [new TypeMismatch('', $this, get_debug_type($value))];
+        }
+
+        $vars = get_object_vars($value);
+        $mismatches = [];
+
+        foreach ($this->shape as $key => $shapeValue) {
+            if (\array_key_exists($key, $vars)) {
+                foreach ($shapeValue['type']->getMismatches($vars[$key]) as $mismatch) {
+                    $mismatches[] = $mismatch->withParentPath($key);
+                }
+            } elseif (!($shapeValue['optional'] ?? false)) {
+                $mismatches[] = new TypeMismatch($key, $shapeValue['type'], null);
+            }
+        }
+
+        foreach ($vars as $key => $itemValue) {
+            if (!isset($this->shape[$key])) {
+                $mismatches[] = new TypeMismatch($key, Type::never(), get_debug_type($itemValue));
+            }
+        }
+
+        return $mismatches;
     }
 
     /**

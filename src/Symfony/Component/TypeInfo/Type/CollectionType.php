@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeMismatch;
 
 /**
  * Represents a key/value collection type.
@@ -214,6 +215,29 @@ class CollectionType extends Type implements WrappingTypeInterface
         }
 
         return true;
+    }
+
+    public function getMismatches(mixed $value): array
+    {
+        if (!\is_array($value) || ($this->isList() && !array_is_list($value)) || !parent::accepts($value)) {
+            return parent::getMismatches($value);
+        }
+
+        $keyType = $this->getCollectionKeyType();
+        $valueType = $this->getCollectionValueType();
+        $mismatches = [];
+
+        foreach ($value as $k => $v) {
+            if (!$keyType->accepts($k)) {
+                return [new TypeMismatch('', $this, 'array')];
+            }
+
+            foreach ($valueType->getMismatches($v) as $mismatch) {
+                $mismatches[] = $mismatch->withParentPath("[$k]");
+            }
+        }
+
+        return $mismatches;
     }
 
     /**

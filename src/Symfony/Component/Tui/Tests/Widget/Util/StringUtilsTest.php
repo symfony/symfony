@@ -59,11 +59,27 @@ class StringUtilsTest extends TestCase
         yield 'empty' => [''];
     }
 
-    public function testSanitizeUtf8InvalidBytes()
+    #[DataProvider('sanitizeUtf8InvalidBytesProvider')]
+    public function testSanitizeUtf8InvalidBytes(string $input, string $expected)
     {
-        $result = StringUtils::sanitizeUtf8("hello\xFF\xFEworld");
-        $this->assertSame('helloworld', $result);
+        $result = StringUtils::sanitizeUtf8($input);
+        $this->assertSame($expected, $result);
         $this->assertTrue(mb_check_encoding($result, 'UTF-8'));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function sanitizeUtf8InvalidBytesProvider(): iterable
+    {
+        yield 'invalid bytes' => ["hello\xFF\xFEworld", 'helloworld'];
+        // "crème café" in ISO-8859-1
+        yield 'ending with an invalid byte' => ["cr\xE8me caf\xE9", 'crme caf'];
+        yield 'ending with a truncated sequence' => ["caf\xC3", 'caf'];
+        yield 'truncated sequence before a valid one' => ["\xF0\x9F\x98caf\xC3\xA9", 'café'];
+        yield 'surrogate' => ["a\xED\xA0\x80b", 'ab'];
+        yield 'overlong encoding' => ["a\xC0\xAFb", 'ab'];
+        yield 'beyond U+10FFFF' => ["a\xF4\x90\x80\x80b", 'ab'];
     }
 
     #[DataProvider('ctrlLetterKeysProvider')]

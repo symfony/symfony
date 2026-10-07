@@ -76,6 +76,17 @@ class TextTest extends TestCase
         $this->assertSame(20, AnsiUtils::visibleWidth($lines[0]));
     }
 
+    public function testRenderStyledTextEndingWithInvalidUtf8()
+    {
+        // "crème café" in ISO-8859-1
+        $text = new TextWidget("cr\xE8me caf\xE9");
+        $text->setStyle(new Style(color: 'gray'));
+        $lines = $this->renderWidget($text, 20, 24);
+
+        $this->assertCount(1, $lines);
+        $this->assertSame(20, AnsiUtils::visibleWidth($lines[0]));
+    }
+
     public function testRenderLineWidthWithBackground()
     {
         $text = new TextWidget('Hello');

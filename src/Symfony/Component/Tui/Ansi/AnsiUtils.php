@@ -186,12 +186,9 @@ final class AnsiUtils
             return 0;
         }
 
+        // Replace each invalid sequence by a character, so that it counts a column as with mb_strwidth(), which slicing measures with
         if (false === preg_match('//u', $clean)) {
-            $clean = @iconv('UTF-8', 'UTF-8//IGNORE', $clean) ?: '';
-        }
-
-        if ('' === $clean) {
-            return 0;
+            $clean = mb_scrub($clean, 'UTF-8');
         }
 
         // Only text that mb_strwidth() mismeasures needs the slower per grapheme walk, which is also the measure the wrapper breaks lines by:
@@ -532,7 +529,7 @@ final class AnsiUtils
     /**
      * Calculate the display width of a single grapheme in terminal columns.
      *
-     * A single code point is measured with mb_strwidth(), a fast C-level call, except the ones it gives a column that terminals do not draw, like a lone combining mark or a bidi isolate: those, and graphemes of several code points, are measured with CodePointString::width(). Malformed UTF-8 is measured on what is left once the invalid bytes are dropped, so it never throws. Widths are cached per grapheme.
+     * A single code point is measured with mb_strwidth(), a fast C-level call, except the ones it gives a column that terminals do not draw, like a lone combining mark or a bidi isolate: those, and graphemes of several code points, are measured with CodePointString::width(). Malformed UTF-8 is measured with each invalid sequence replaced by a character, the way visibleWidth() does, so it never throws. Widths are cached per grapheme.
      */
     public static function graphemeWidth(string $grapheme): int
     {
@@ -545,9 +542,8 @@ final class AnsiUtils
         } elseif (preg_match('//u', $grapheme)) {
             $width = new CodePointString($grapheme)->width(false);
         } else {
-            // CodePointString rejects malformed UTF-8. Drop the invalid bytes the way visibleWidth() does, so text that reaches a measure unscrubbed comes out as a wrong glyph instead of aborting the render.
-            $valid = @iconv('UTF-8', 'UTF-8//IGNORE', $grapheme) ?: '';
-            $width = 1 >= mb_strlen($valid, 'UTF-8') ? mb_strwidth($valid, 'UTF-8') : new CodePointString($valid)->width(false);
+            // CodePointString rejects malformed UTF-8. Replace the invalid sequences the way visibleWidth() does, so text that reaches a measure unscrubbed comes out as a wrong glyph instead of aborting the render.
+            $width = new CodePointString(mb_scrub($grapheme, 'UTF-8'))->width(false);
         }
 
         if (self::GRAPHEME_WIDTHS_CLEANUP_THRESHOLD <= \count(self::$graphemeWidths)) {

@@ -51,9 +51,8 @@ final class StringUtils
             return $value;
         }
 
-        $sanitized = @iconv('UTF-8', 'UTF-8//IGNORE', $value);
-
-        return false === $sanitized ? '' : $sanitized;
+        // Keep the well-formed multibyte sequences and drop every other non-ASCII byte. iconv() with //IGNORE would return false on a sequence cut at the end of the string, or on any invalid byte with musl.
+        return preg_replace('/([\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})|[\x80-\xFF]/', '$1', $value);
     }
 
     /**

@@ -37,10 +37,13 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
 
         try {
             $envelope = $this->bus->dispatch($envelope->with(new AckStamp($ack)));
-            $onHandled($envelope, $transportName, $acked, $error);
         } catch (\Throwable $e) {
             $onHandled($envelope, $transportName, $acked, $e);
+
+            return;
         }
+
+        $onHandled($envelope, $transportName, $acked, $error);
     }
 
     public function shouldPauseConsumption(): bool

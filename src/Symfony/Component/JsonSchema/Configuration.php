@@ -30,7 +30,6 @@ final readonly class Configuration
      */
     public function __construct(
         ?Dialect $dialect = null,
-        public ReferenceStrategy $references = ReferenceStrategy::ByDefinition,
         public array $groups = [],
         public ?array $attributes = null,
         public array $ignoredAttributes = [],

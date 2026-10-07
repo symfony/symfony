@@ -18,9 +18,7 @@ use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\Dialect;
 use Symfony\Component\JsonSchema\Enricher\AttributePropertySchemaEnricher;
-use Symfony\Component\JsonSchema\Exception\CircularReferenceException;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
-use Symfony\Component\JsonSchema\ReferenceStrategy;
 use Symfony\Component\JsonSchema\Schema;
 use Symfony\Component\JsonSchema\SchemaGenerator;
 use Symfony\Component\JsonSchema\Tests\Fixtures\AccountWithAccessors;
@@ -176,9 +174,9 @@ class SchemaGeneratorTest extends TestCase
         ], $schema->getDefinitions());
     }
 
-    public function testInlineAlwaysProducesNoReferences()
+    public function testFlattenProducesNoReferencesWhenAcyclic()
     {
-        $schema = SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class), new Configuration(references: ReferenceStrategy::InlineAlways));
+        $schema = SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class))->flatten();
 
         $author = ['type' => 'object', 'properties' => ['name' => ['type' => 'string']]];
 
@@ -197,17 +195,9 @@ class SchemaGeneratorTest extends TestCase
         ], $schema->getRoot());
     }
 
-    public function testInlineAlwaysThrowsOnCycle()
+    public function testFlattenKeepsTheCyclicDefinitions()
     {
-        $this->expectException(CircularReferenceException::class);
-        $this->expectExceptionMessage('SelfReferencingCategory');
-
-        SchemaGenerator::create()->generate(Type::object(SelfReferencingCategory::class), new Configuration(references: ReferenceStrategy::InlineAlways));
-    }
-
-    public function testInlineOnCycleKeepsOnlyCyclicReferences()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(SelfReferencingCategory::class), new Configuration(references: ReferenceStrategy::InlineOnCycle));
+        $schema = SchemaGenerator::create()->generate(Type::object(SelfReferencingCategory::class))->flatten();
 
         $this->assertSameSchema([
             'type' => 'object',
@@ -383,11 +373,11 @@ class SchemaGeneratorTest extends TestCase
         ], $processor->calls);
     }
 
-    public function testDefinitionProcessorsRunWhenInliningEverything()
+    public function testDefinitionProcessorsRunBeforeFlatteningInlinesTheDefinitions()
     {
         $generator = new SchemaGenerator(self::createReflectionPropertyInfo(), definitionProcessors: [new IdentifierDefinitionProcessor()]);
 
-        $schema = $generator->generate(Type::object(Shelf::class), new Configuration(references: ReferenceStrategy::InlineAlways));
+        $schema = $generator->generate(Type::object(Shelf::class))->flatten();
 
         $this->assertSameSchema([
             'type' => 'object',

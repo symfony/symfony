@@ -18,8 +18,8 @@ use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
  * Post-processes every object definition once its properties are assembled.
  *
  * Processors run in order on each definition, once per definition name, after the definitions
- * of its properties have been built (children first). They also run on definitions that end up
- * inlined by the reference strategy, but not on the inline schemas returned by a
+ * of its properties have been built (children first). They run on every definition, before
+ * {@see Schema::flatten()} inlines any of them, but not on the inline schemas returned by a
  * ClassSchemaResolverInterface.
  *
  * A processor can only change the definition it receives: wrapping it, adding properties

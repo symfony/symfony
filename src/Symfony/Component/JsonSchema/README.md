@@ -20,7 +20,6 @@ composer require symfony/json-schema
 ```php
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\Dialect;
-use Symfony\Component\JsonSchema\ReferenceStrategy;
 use Symfony\Component\JsonSchema\SchemaGenerator;
 use Symfony\Component\TypeInfo\Type;
 
@@ -38,9 +37,9 @@ $schema->getRoot();        // ['$ref' => '#/components/schemas/Book-book.write']
 $schema->getDefinitions(); // ['Book-book.write' => [...]]
 
 // a self-contained schema without any reference, e.g. for an MCP tool
-$schema = $generator->generate(Type::object(Book::class), new Configuration(references: ReferenceStrategy::InlineAlways));
+$schema = $generator->generate(Type::object(Book::class))->flatten();
 
-echo json_encode($schema->withDescription('A book.'));
+echo json_encode($schema);
 ```
 
 Resources

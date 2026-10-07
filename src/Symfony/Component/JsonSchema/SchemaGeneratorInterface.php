@@ -16,8 +16,8 @@ use Symfony\Component\TypeInfo\Type;
 /**
  * Generates the JSON Schema of a type.
  *
- * Objects are described by definitions referenced from the root (see {@see Configuration::$references}),
- * the returned {@see Schema} holds both and renders them for the configured dialect.
+ * Objects are described by definitions referenced from the root, the returned {@see Schema} holds both
+ * and renders them for the configured dialect. {@see Schema::flatten()} inlines the definitions afterwards.
  *
  * @experimental
  */

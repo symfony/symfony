@@ -26,7 +26,6 @@ use Symfony\Component\JsonSchema\Enricher\PropertySchema;
 use Symfony\Component\JsonSchema\Enricher\PropertySchemaEnricherInterface;
 use Symfony\Component\JsonSchema\Enricher\PropertySchemaProviderInterface;
 use Symfony\Component\JsonSchema\Enricher\ValidatorPropertySchemaEnricher;
-use Symfony\Component\JsonSchema\Exception\CircularReferenceException;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -109,50 +108,30 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     public function generate(Type $type, Configuration $config = new Configuration()): Schema
     {
         $definitions = [];
-        $classes = [];
-        $schema = new Schema($this->buildTypeSchema($type, $config, null, $definitions, $classes), $definitions, $config->dialect);
+        $schema = $this->buildTypeSchema($type, $config, null, $definitions);
 
-        return match ($config->references) {
-            ReferenceStrategy::ByDefinition => $schema,
-            ReferenceStrategy::InlineOnCycle => $schema->flatten(),
-            ReferenceStrategy::InlineAlways => $this->inlineAlways($schema, $classes),
-        };
-    }
-
-    /**
-     * @param array<string, class-string> $classes
-     */
-    private function inlineAlways(Schema $schema, array $classes): Schema
-    {
-        $flattened = $schema->flatten();
-
-        if ($cyclic = array_keys($flattened->getDefinitions())) {
-            throw new CircularReferenceException(\sprintf('Cannot inline the schema of "%s" as it references itself, use "%s::InlineOnCycle" or "%s::ByDefinition" instead.', implode('", "', array_map(static fn (string $name): string => $classes[$name], $cyclic)), ReferenceStrategy::class, ReferenceStrategy::class));
-        }
-
-        return $flattened;
+        return new Schema($schema, $definitions, $config->dialect);
     }
 
     /**
      * @param array<string, array<string, mixed>> $definitions
-     * @param array<string, class-string>         $classes
      *
      * @return array<string, mixed>
      */
-    private function buildTypeSchema(Type $type, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
+    private function buildTypeSchema(Type $type, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
         return match (true) {
-            $type instanceof UnionType => $this->buildUnionSchema($type, $config, $parent, $definitions, $classes),
-            $type instanceof IntersectionType => $this->buildIntersectionSchema($type, $config, $parent, $definitions, $classes),
-            $type instanceof ArrayShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $definitions, $classes) + match (true) {
+            $type instanceof UnionType => $this->buildUnionSchema($type, $config, $parent, $definitions),
+            $type instanceof IntersectionType => $this->buildIntersectionSchema($type, $config, $parent, $definitions),
+            $type instanceof ArrayShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $definitions) + match (true) {
                 $type->isSealed() => ['additionalProperties' => false],
-                null !== $type->getExtraValueType() => ['additionalProperties' => $this->buildTypeSchema($type->getExtraValueType(), $config, $parent, $definitions, $classes)],
+                null !== $type->getExtraValueType() => ['additionalProperties' => $this->buildTypeSchema($type->getExtraValueType(), $config, $parent, $definitions)],
                 default => [],
             },
-            $type instanceof CollectionType => $this->buildCollectionSchema($type, $config, $parent, $definitions, $classes),
-            $type instanceof ObjectShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $definitions, $classes),
-            $type instanceof GenericType, $type instanceof TemplateType => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $definitions, $classes),
-            $type instanceof ObjectType => $this->buildObjectSchema($type->getClassName(), $config, $parent, $definitions, $classes),
+            $type instanceof CollectionType => $this->buildCollectionSchema($type, $config, $parent, $definitions),
+            $type instanceof ObjectShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $definitions),
+            $type instanceof GenericType, $type instanceof TemplateType => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $definitions),
+            $type instanceof ObjectType => $this->buildObjectSchema($type->getClassName(), $config, $parent, $definitions),
             $type instanceof BuiltinType => $this->buildBuiltinSchema($type, $config->dialect),
             default => throw new InvalidArgumentException(\sprintf('Cannot generate a JSON Schema for type "%s".', $type)),
         };
@@ -160,16 +139,15 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
     /**
      * @param array<string, array<string, mixed>> $definitions
-     * @param array<string, class-string>         $classes
      *
      * @return array<string, mixed>
      */
-    private function buildIntersectionSchema(IntersectionType $type, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
+    private function buildIntersectionSchema(IntersectionType $type, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
         $schemas = [];
 
         foreach ($type->getTypes() as $t) {
-            $schemas[] = $this->buildTypeSchema($t, $config, $parent, $definitions, $classes);
+            $schemas[] = $this->buildTypeSchema($t, $config, $parent, $definitions);
         }
 
         return ['allOf' => $schemas];
@@ -177,11 +155,10 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
     /**
      * @param array<string, array<string, mixed>> $definitions
-     * @param array<string, class-string>         $classes
      *
      * @return array<string, mixed>
      */
-    private function buildUnionSchema(UnionType $type, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
+    private function buildUnionSchema(UnionType $type, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
         $nullable = false;
         $schemas = [];
@@ -198,7 +175,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 continue;
             }
 
-            $schemas[] = $this->buildTypeSchema($t, $config, $parent, $definitions, $classes);
+            $schemas[] = $this->buildTypeSchema($t, $config, $parent, $definitions);
         }
 
         $schema = 1 === \count($schemas) ? $schemas[0] : ['anyOf' => $schemas];
@@ -240,13 +217,12 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
     /**
      * @param array<string, array<string, mixed>> $definitions
-     * @param array<string, class-string>         $classes
      *
      * @return array<string, mixed>
      */
-    private function buildCollectionSchema(CollectionType $type, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
+    private function buildCollectionSchema(CollectionType $type, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
-        $valueSchema = $this->buildTypeSchema($type->getCollectionValueType(), $config, $parent, $definitions, $classes);
+        $valueSchema = $this->buildTypeSchema($type->getCollectionValueType(), $config, $parent, $definitions);
         $keyType = $type->getCollectionKeyType();
 
         if (!$type->isList() && $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier()) {
@@ -259,16 +235,15 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     /**
      * @param array<array{type: Type, optional?: bool}> $shape
      * @param array<string, array<string, mixed>>       $definitions
-     * @param array<string, class-string>               $classes
      *
      * @return array<string, mixed>
      */
-    private function buildShapeSchema(array $shape, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
+    private function buildShapeSchema(array $shape, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
         $schema = ['type' => 'object'];
 
         foreach ($shape as $key => ['type' => $type, 'optional' => $optional]) {
-            $schema['properties'][(string) $key] = $this->buildTypeSchema($type, $config, $parent, $definitions, $classes);
+            $schema['properties'][(string) $key] = $this->buildTypeSchema($type, $config, $parent, $definitions);
 
             if (!$optional) {
                 $schema['required'][] = (string) $key;
@@ -301,11 +276,10 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     /**
      * @param class-string                        $class
      * @param array<string, array<string, mixed>> $definitions
-     * @param array<string, class-string>         $classes
      *
      * @return array<string, mixed>
      */
-    private function buildObjectSchema(string $class, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
+    private function buildObjectSchema(string $class, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
         foreach ($this->classSchemaResolvers as $resolver) {
             if (null !== $schema = $resolver->resolve($class, $config, $parent)) {
@@ -317,8 +291,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
         if (!isset($definitions[$name])) {
             $definitions[$name] = [];
-            $classes[$name] = $class;
-            $definition = $this->buildDefinition($class, $config, $parent, $definitions, $classes);
+            $definition = $this->buildDefinition($class, $config, $parent, $definitions);
 
             foreach ($this->definitionProcessors as $processor) {
                 $definition = $processor->process($definition, $class, $config, $parent);
@@ -333,11 +306,10 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     /**
      * @param class-string                        $class
      * @param array<string, array<string, mixed>> $definitions
-     * @param array<string, class-string>         $classes
      *
      * @return array<string, mixed>
      */
-    private function buildDefinition(string $class, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
+    private function buildDefinition(string $class, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
         $context = [];
         if ($config->groups) {
@@ -368,7 +340,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                     continue;
                 }
 
-                $schema = null !== $type ? $this->buildTypeSchema($type, $this->createChildConfiguration($config, $property), new DefinitionParent($class, $property, $config, $parent), $definitions, $classes) : [];
+                $schema = null !== $type ? $this->buildTypeSchema($type, $this->createChildConfiguration($config, $property), new DefinitionParent($class, $property, $config, $parent), $definitions) : [];
             }
 
             if (null !== $default = self::normalizeDefaultValue(self::getDefaultValue($class, $property))) {

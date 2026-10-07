@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\Dialect;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
-use Symfony\Component\JsonSchema\ReferenceStrategy;
 
 class ConfigurationTest extends TestCase
 {
@@ -24,7 +23,6 @@ class ConfigurationTest extends TestCase
         $config = new Configuration();
 
         $this->assertEquals(Dialect::jsonSchema202012(), $config->dialect);
-        $this->assertSame(ReferenceStrategy::ByDefinition, $config->references);
         $this->assertSame([], $config->groups);
         $this->assertNull($config->attributes);
         $this->assertSame([], $config->ignoredAttributes);

@@ -11,19 +11,24 @@
 
 namespace Symfony\Component\Messenger\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageMiddleware;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
@@ -34,6 +39,7 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\CausationStamp;
 use Symfony\Component\Messenger\Stamp\CorrelationStamp;
+use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -53,6 +59,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Uid\Uuid;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\inline_service;
 
 class MessengerBundleTest extends TestCase
 {
@@ -165,6 +173,48 @@ class MessengerBundleTest extends TestCase
         $this->assertSame('sync_with_retry', $failed->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName());
         $this->assertSame('Handling "Hey" failed 3 time(s).', $failed->last(ErrorDetailsStamp::class)?->getExceptionMessage());
         $this->assertCount(3, $failed->all(RedeliveryStamp::class));
+    }
+
+    #[DataProvider('provideDefaultLockFactories')]
+    public function testDeduplicationUsesTheConfiguredLockFactory(bool $withDefaultLockFactory)
+    {
+        $kernel = new TestDeduplicationKernel('test', true, $this->varDir, 'lock.dedup.factory', $withDefaultLockFactory);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $bus = $container->get('test.messenger.default_bus');
+        $transport = $container->get('test.messenger.transport.async');
+
+        $envelope = $bus->dispatch(new DummyMessage('hello'), [new DeduplicateStamp('message')]);
+        $bus->dispatch(new DummyMessage('hello again'), [new DeduplicateStamp('message')]);
+
+        $this->assertCount(1, $transport->getSent());
+        $lock = $container->get('test.lock.dedup.factory')->createLock('message');
+        $this->assertFalse($lock->acquire());
+
+        $container->get('test.event_dispatcher')->dispatch(new WorkerMessageFailedEvent($envelope, 'async', new \RuntimeException('Handling failed.')));
+
+        $this->assertTrue($lock->acquire());
+        $lock->release();
+
+        $bus->dispatch(new DummyMessage('hello after failure'), [new DeduplicateStamp('message')]);
+
+        $this->assertCount(2, $transport->getSent());
+    }
+
+    public static function provideDefaultLockFactories(): iterable
+    {
+        yield 'without a default factory' => [false];
+        yield 'with a default factory' => [true];
+    }
+
+    public function testAMissingDeduplicationLockFactoryIsReported()
+    {
+        $kernel = new TestDeduplicationKernel('test', true, $this->varDir, 'lock.missing.factory');
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The service "messenger.middleware.deduplicate_middleware" has a dependency on a non-existent service "lock.missing.factory".');
+
+        $kernel->boot();
     }
 
     public function testAReplayedDecodingFailureKeepsTheIdentityAndThePropagatedStampsOfItsMessage()
@@ -389,6 +439,48 @@ class TestMessengerKernel extends AbstractKernel
             ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
             ->alias('test.messenger.transport.async', 'messenger.transport.async')->public()
         ;
+    }
+}
+
+class TestDeduplicationKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir, private string $lockFactory = 'lock.dedup.factory', private bool $withDefaultLockFactory = false)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'deduplication' => ['lock_factory' => $this->lockFactory],
+            'transports' => ['async' => ['dsn' => 'in-memory://', 'retry_strategy' => ['max_retries' => 0]]],
+            'routing' => [DummyMessage::class => 'async'],
+        ]);
+        $services = $container->services()
+            ->set('lock.dedup.factory', LockFactory::class)
+                ->args([inline_service(InMemoryStore::class)])
+            ->alias('test.lock.dedup.factory', 'lock.dedup.factory')->public()
+            ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
+            ->alias('test.messenger.transport.async', 'messenger.transport.async')->public()
+            ->alias('test.event_dispatcher', 'event_dispatcher')->public()
+        ;
+
+        if ($this->withDefaultLockFactory) {
+            $services->set('lock.factory', LockFactory::class)
+                ->args([inline_service(InMemoryStore::class)]);
+        }
     }
 }
 

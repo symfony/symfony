@@ -229,6 +229,15 @@ class MessengerBundle extends AbstractBundle
                     ->defaultTrue()
                     ->info('Whether redeliveries should be rejected and retried through a new message instead of being handled directly. This mostly makes sense for AMQP, which redelivers messages that were neither acknowledged nor rejected. Disabling it avoids losing a message when the retry or the failure transport is unreachable, at the risk of a redelivery loop that blocks the queue.')
                 ->end()
+                ->arrayNode('deduplication')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('lock_factory')
+                            ->info('The service ID of the lock factory used to deduplicate messages, "lock.factory" when not set.')
+                            ->defaultNull()
+                        ->end()
+                    ->end()
+                ->end()
                 ->booleanNode('identity_stamps')
                     ->defaultFalse()
                     ->info('Adds a message id and a causation id to dispatched messages, and a correlation id at the start of each flow.')
@@ -413,6 +422,14 @@ class MessengerBundle extends AbstractBundle
         // RemoveMissingDependenciesPass drops the middleware again when no default lock factory is registered
         if (class_exists(LockFactory::class)) {
             $defaultMiddleware['before'][] = ['id' => 'deduplicate_middleware'];
+        }
+
+        if ($lockFactory = $config['deduplication']['lock_factory']) {
+            foreach (['messenger.middleware.deduplicate_middleware', 'messenger.failure.release_deduplication_lock_on_failure_listener'] as $id) {
+                $container->getDefinition($id)
+                    ->replaceArgument(0, new Reference($lockFactory))
+                    ->clearTag('container.remove_if_missing');
+            }
         }
 
         $container->getDefinition('messenger.middleware.flow_context')->replaceArgument(0, $config['identity_stamps']);

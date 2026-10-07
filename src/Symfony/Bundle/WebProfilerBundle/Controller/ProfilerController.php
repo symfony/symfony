@@ -323,7 +323,7 @@ class ProfilerController
         phpinfo();
         $phpinfo = ob_get_clean();
 
-        return new Response($phpinfo, 200, ['Content-Type' => 'text/html']);
+        return new Response($phpinfo, 200, ['Content-Type' => \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? 'text/plain' : 'text/html']);
     }
 
     /**

@@ -22,7 +22,6 @@ final readonly class Dialect
         public bool $supportsConst = true,
         public bool $supportsExclusiveMinAsNumber = true,
         public bool $supportsExamples = true,
-        public bool $supportsDiscriminator = true,
         public ?string $schemaUri = null,
     ) {
     }

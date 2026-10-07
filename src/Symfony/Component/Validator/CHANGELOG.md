@@ -6,19 +6,20 @@ CHANGELOG
 
  * Add the `Audio` constraint for validating audio files
  * Allow nesting a group-less `Valid` constraint in `Sequentially` to cascade only after preceding constraints pass
- * Add `#[WithHttpStatus(422)]` to `ValidationFailedException`, so that an uncaught one renders as an "Unprocessable Content" response instead of a 500 one
+ * Render an uncaught `ValidationFailedException` as a 422 response by adding `#[WithHttpStatus(422)]` to it
  * Add `ValidationBundle`, which provides the `validation` configuration and the services previously provided by `FrameworkBundle` under `framework.validation`
- * Add `CacheWarmer\ValidatorCacheWarmer` and `DependencyInjection\AddValidatorSecurityExpressionLanguageProviderPass`, which `FrameworkBundle` used to provide
+ * Add `CacheWarmer\ValidatorCacheWarmer`, which `FrameworkBundle` used to provide
+ * Add `DependencyInjection\AddValidatorSecurityExpressionLanguageProviderPass` to register the security expression functions in the validator expression language
  * Accept the `::class` constant of the annotated class in `GroupSequence` definitions
  * Add the `cascadeCurrentGroup` option to `GroupSequence` and `GroupSequenceProvider`
- * Remove the unused `GroupSequence::$cascadedGroup` property
+ * [BC BREAK] Remove the unused `GroupSequence::$cascadedGroup` property
  * Add the `restrictGroups` option to the `Valid` constraint
  * Add support for `BcMath\Number` values in the `Range` and comparison constraints
  * Add the `Cron` constraint to validate cron expressions
  * Add the `message` option to the `Callback` constraint; the callback must then return a boolean, and a violation is raised when it returns `false`
  * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`
  * Stop narrowing the `File` constraint's `mimeTypes` option with mime types auto-derived from the matched extension when `extensions` is configured
- * Add support for reading objects properties with `Unique` constraint `fields` option
+ * Allow the `fields` option of the `Unique` constraint to read object properties
  * Add an optional `$mappedClasses` argument to `Mapping\Loader\LoaderChain::__construct()`, to declare which classes each loader maps
  * Add `ValidatorBuilder::addMappedClasses()`, to declare which classes each mapping file maps
 

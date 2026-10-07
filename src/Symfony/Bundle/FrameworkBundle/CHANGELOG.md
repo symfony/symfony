@@ -4,77 +4,43 @@ CHANGELOG
 8.2
 ---
 
- * Add the `expression_language.compiled` tag, to decorate an expression language with `CompiledExpressionLanguage`; its `attributes`, `string_expressions` and `expressions` attributes list the expressions to compile when warming up the cache, `variables` the variables these expressions can read and `source` where the listed ones come from
+ * Add the `expression_language.compiled` tag to decorate an expression language with `CompiledExpressionLanguage`
  * Register the `lint:expressions` command
  * Add the `framework.session.isolate_attributes` option to deep-clone the values read from and passed to session attributes
  * List deprecated aliases in `debug:autowiring` only when the `--all` option is passed
  * Register the security expression functions on `controller.expression_language`
  * Add the `configure_container` option to `WebTestCase::createClient()` to configure the container after every kernel reboot
  * Add an "Inlined" column to `debug:container --env-vars`, telling which env vars are read while the container is compiled
- * Deprecate `Command\RouterMatchCommand`, use the one from the Routing component instead
- * Deprecate `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass`, `DependencyInjection\Compiler\AssetsContextPass` and `DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass`, use the ones from the Translation, Asset and Validator components instead
+ * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer`, `CacheWarmer\CachePoolClearerCacheWarmer` and the five `Command\CachePool*Command` classes, use the ones from the Cache component instead
+ * Deprecate `CacheWarmer\RouterCacheWarmer`, `Command\RouterMatchCommand`, `Controller\RedirectController`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader`, `Routing\RedirectableCompiledUrlMatcher`, `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use the ones from the Routing component instead
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead
- * Deprecate `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use the ones from the Routing component instead
- * Deprecate `Translation\Translator`, use `Symfony\Component\Translation\DependencyInjection\Translator` instead
- * Deprecate `Controller\TemplateController`, use `Symfony\Bundle\TwigBundle\Controller\TemplateController` instead
- * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, use the ones from the Cache component instead
- * Deprecate `CacheWarmer\SerializerCacheWarmer` and `CacheWarmer\ValidatorCacheWarmer`, use the ones from the Serializer and Validator components instead
- * Deprecate the five `Command\CachePool*Command` classes, use the ones from the Cache component instead
- * Deprecate `Command\TranslationDebugCommand` and `Command\TranslationExtractCommand`, use the ones from the Translation component instead
- * Deprecate `CacheWarmer\TranslationsCacheWarmer`, use `Symfony\Component\Translation\CacheWarmer\TranslationsCacheWarmer` instead
- * Deprecate `CacheWarmer\RouterCacheWarmer`, `Controller\RedirectController`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader` and `Routing\RedirectableCompiledUrlMatcher`, use their counterparts from the Routing component instead
- * Let `TranslationBundle` declare all the `translation:*` and `lint:translations` commands
- * Register the bundle each installed component now ships: `AssetBundle`, `AssetMapperBundle`, `CacheBundle`, `HtmlSanitizerBundle`, `HttpClientBundle`, `JsonPathBundle`, `JsonStreamerBundle`, `LockBundle`, `MailerBundle`, `MessengerBundle`, `MimeBundle`, `NotifierBundle`, `ObjectMapperBundle`, `ProcessBundle`, `PropertyAccessBundle`, `PropertyInfoBundle`, `RateLimiterBundle`, `RemoteEventBundle`, `RouterBundle`, `SchedulerBundle`, `SemaphoreBundle`, `SerializerBundle`, `TranslationBundle`, `TypeInfoBundle`, `UidBundle`, `ValidationBundle`, `WebLinkBundle`, `WebhookBundle` and `WorkflowBundle`
+ * Deprecate `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass` and `Translation\Translator`, use the ones from the Translation component instead
+ * Deprecate `CacheWarmer\SerializerCacheWarmer`, use the one from the Serializer component instead
+ * Deprecate `CacheWarmer\ValidatorCacheWarmer`, use the one from the Validator component instead
+ * Deprecate `DependencyInjection\Compiler\AssetsContextPass`, use the one from the Asset component instead
+ * Deprecate `DependencyInjection\Compiler\JsonPathPass`, use the one from the JsonPath component instead
+ * Deprecate `Controller\TemplateController`, use the one from TwigBundle instead
+ * Register the bundle each installed component now ships: `AssetBundle`, `AssetMapperBundle`, `CacheBundle`, `HtmlSanitizerBundle`, `HttpClientBundle`, `JsonPathBundle`, `JsonStreamerBundle`, `KeyManagementBundle`, `LockBundle`, `MailerBundle`, `MessengerBundle`, `MimeBundle`, `NotifierBundle`, `ObjectMapperBundle`, `ProcessBundle`, `PropertyAccessBundle`, `PropertyInfoBundle`, `RateLimiterBundle`, `RemoteEventBundle`, `RouterBundle`, `SchedulerBundle`, `SemaphoreBundle`, `SerializerBundle`, `TranslationBundle`, `TypeInfoBundle`, `UidBundle`, `ValidationBundle`, `WebLinkBundle`, `WebhookBundle` and `WorkflowBundle`
  * Make every `framework.*` key an alias of the configuration of the bundle that provides it; three are spelled differently at the root: `framework.assets` for `asset`, `framework.translator` for `translation` and `framework.workflows` for `workflow`
- * Deprecate `JsonPathPass`, use the one from the JsonPath component instead
  * Auto-configure the `form.data_class` resource tag for classes with the `#[AsFormType]` attribute
- * Add the `cache.adapter.mongodb` and `cache.adapter.mongodb_tag_aware` cache adapters, and the `framework.cache.default_mongodb_provider` option
- * Add Messenger routing and failure transport information to the `debug:messenger` command
- * Add the `framework.webhook.no_private_network` and `framework.webhook.http_client` options
- * Add the `claim_check` option to Messenger transports
- * Add the `framework.asset_mapper.importmap_entries` option to limit the rendered import map to the entries reachable from the rendered entrypoints
  * Add the `http_cache.cache_status` option to emit the RFC 9211 `Cache-Status` header
- * Add the `framework.mailer.tracking` option to set default open/click tracking for every outgoing message
  * Add the `doctrine.orm.entity` tag to auto-excluded `#[Entity]` and `#[MappedSuperclass]` classes to allow discovering them
- * Add `framework.rate_limiter.builder` option
- * Add JSON Schema validation to the `lint:yaml` command, resolved from the `--check-schema` option, an in-file schema header, the component schema for well-known config files (`config/routes`, `config/services`, `config/serializer`, `config/validator`), or `config/schema.json` for `config/packages` by default
- * Add the `cache.adapter.pdo_tag_aware` cache pool adapter
- * Register the `web_link.json_linkset_serializer`, `web_link.json_linkset_parser`, `web_link.link_template_header_serializer` and `web_link.link_template_header_parser` services
- * Add `framework.asset_mapper.importmap_integrity_algorithms` option to add integrity metadata to importmaps
- * Add `framework.asset_mapper.minimum_release_age` option to delay JavaScript package updates until a version reaches a minimum age
- * Add `framework.mailer.smime_encrypter.certificates`, `on_missing_certificate` and `encrypt_for_sender` options
- * Add `framework.mailer.pgp_signer` and `framework.mailer.pgp_encrypter` options to sign and encrypt messages with PGP/MIME
- * Allow `framework.rate_limiter.*.limiters` as a map to fix the `key` of individual sub-limiters of a compound rate limiter
- * Register `KeyManagementBundle` when `symfony/key-management` is installed
- * Add `framework.cache.default_provider` to configure `cache.app` with a DSN
- * Add `framework.messenger.reject_redelivered_messages` to allow disabling the `RejectRedeliveredMessageMiddleware`
- * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration
+ * Make `lint:yaml` validate the routing, service, serializer and validator mapping files against the schemas of their components, and the files of `config/packages` against the generated `config/schema.json`
+ * Add the `framework.uri_signer.expiration` and `framework.uri_signer.secret` options
  * Add `--dispatchers` option to `debug:event-dispatcher` command
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
  * Make the config tree independent from `kernel.debug` and deprecate passing the `$debug` argument to `DependencyInjection\Configuration::__construct()`
- * Allow prefixing entries with `!` in `framework.workflows.<name>.events_to_dispatch` to permanently disable an event; e.g. `events_to_dispatch: ['!workflow.announce']` fires every event except `workflow.announce`. The GuardEvent can never be disabled; `!workflow.guard` is rejected at config compile time. Mixing allow-list and block-list entries in the same list is rejected at config compile time too.
- * Add support for the HttpClient `max_connect_duration` option to the `http_client` configuration
- * Add `framework.scheduler.use_messenger_routing` to send scheduled messages through the Messenger senders configured for their class
- * Deprecate not setting the `framework.scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
  * Report `.env` variables that the container never uses in `debug:container --env-vars`
- * Add `service_id` and `advisory` options to lock stores to use advisory locks on an existing `\PDO` or Doctrine DBAL connection service
- * Add `framework.webhook.signature_format`, `framework.webhook.timestamp_header_name` and `framework.webhook.timestamp_tolerance` options
  * Make BrowserKit assertions non-verbose by default
- * Add the `http_client.*.retry_failed.base_uris` option, to retry a failed request against the next URI in the list
  * Resolve `debug:config` paths whose keys contain dots, e.g. `debug:config framework options.option.main`
- * Add a `priority` option to `framework.messenger.transports` to order the receivers `messenger:consume --all` consumes
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use ESI or inline rendering, or Symfony UX Turbo, instead
  * Add the `session:clear` command to remove all sessions from the configured handler
  * Generate JSON schema for YAML configuration of bundles
- * Add support for rate limited transports
- * Register the security functions `is_granted()`, `is_authenticated()`, `is_fully_authenticated()`, `is_remember_me()` and `current_user()` in the validator expression language
  * Add `framework.profiler.excluded_paths` and `framework.profiler.excluded_http_codes` to skip profiling requests matching a path or answered with a given HTTP status code
- * Add `framework.property_access.wildcard_reads` option to read every element of a collection through a `[*]` path
  * Instantiate on the console only the bundles that override the deprecated `Bundle::registerCommands()` method
- * Add `MessengerAssertionsTrait` to `KernelTestCase`, with `assertQueuedMessageCount()`, `getQueuedMessages()`, `getMessengerTransport()` and `consumeQueuedMessages()` for in-memory Messenger transports
+ * Add `MessengerAssertionsTrait` to `KernelTestCase` to assert on and consume the messages of in-memory Messenger transports
  * Don't use the secrets vault as an env var loader when its directory is in the project but does not exist at build time
  * Add the `framework.request.serializer` and `framework.response.serializer` options
- * Add the `framework.uri_signer.secret` option
  * Add support for the `#[Lock]` attribute on controllers when the Lock component is enabled
 
 8.1

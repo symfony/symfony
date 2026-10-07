@@ -5,41 +5,26 @@ CHANGELOG
 ---
 
  * Log the access tokens rejected by `OidcTokenHandler` at the `debug` level instead of `error`
- * Add `OidcClientInterface::request()`, to make a client-authenticated request to an endpoint of the OIDC provider
- * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in and the denied attribute kept in the session
- * Add `AuthenticationUtils::getReAuthenticationAttribute()`, the security attribute the current request is asking a re-authentication for
- * Add `SenderConstraintInterface` and `DpopSenderConstraint`, to accept only the access tokens bound to a key the request proves it holds (RFC 9449)
- * Add the `$senderConstraint` argument to `AccessTokenAuthenticator` and `InsufficientScopeAccessDeniedHandler`
+ * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in
+ * Add `AuthenticationUtils::getReAuthenticationAttribute()` and `SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE`, the security attribute the current request is asking a re-authentication for
+ * Add `SenderConstraintInterface`, `DpopSenderConstraint` and the `$senderConstraint` argument of `AccessTokenAuthenticator`, to accept only the access tokens bound to a key the request proves it holds (RFC 9449)
  * Add `DpopProofFactory`, to bind the tokens of an OIDC provider to a key the client holds (RFC 9449)
- * Add the `$dpopProofFactory` argument to `OidcClient` and `OidcLoginAuthenticator`
- * Add the `$discovery` argument to `ClientSecretJwt` and `PrivateKeyJwt`, and `OidcDiscovery::getIssuer()`
- * Support the OAuth 2.0 Form Post Response Mode in `OidcLoginAuthenticator`, reading the authorization response from the request body
- * Add `OidcBackChannelLogout`, `OidcLogoutToken`, `OidcEndedSessions` and `OidcBackChannelLogoutListener` to support OpenID Connect Back-Channel Logout
- * Add `OidcSessionEndedException`
- * Add the `oidc_sid` attribute to the tokens created by `OidcLoginAuthenticator`
- * Add `RefreshedUserCheckerListener`, running a user checker on `CheckRefreshedUserEvent` so an account disabled during a session is rejected on the next request
- * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, to add application-specific reasons to deauthenticate the token
+ * Add `OidcBackChannelLogout`, `OidcLogoutToken`, `OidcEndedSessions`, `OidcBackChannelLogoutListener` and `OidcSessionEndedException` to support OpenID Connect Back-Channel Logout
+ * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, and `RefreshedUserCheckerListener`, which runs a user checker on it so an account disabled during a session is rejected on the next request
  * Add argument `$mapRequestPayload` to `IsGrantedAttributeListener`, to map the `#[MapRequestPayload]`, `#[MapQueryString]` and `#[MapUploadedFile]` arguments that an `#[IsGranted]` subject reads before voting
  * Add argument `$exception` to `TokenDeauthenticatedEvent::__construct()` and `TokenDeauthenticatedEvent::getException()`
  * Handle security exceptions from a `kernel.exception` listener of the firewall, and deprecate `ExceptionListener::register()`, `ExceptionListener::unregister()` and the `$dispatcher` argument of `Firewall::__construct()`
- * Stop registering `ContextListener::onKernelResponse()` on the event dispatcher at runtime, register it on the `kernel.response` event instead
- * Make `OidcLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, starting an authorization request with `prompt=login` and the previous ID token as `id_token_hint`
- * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when the vote denying an attribute requests a re-authentication for it, as `AuthenticatedVoter` does for `IS_AUTHENTICATED_RECENTLY` and `IS_AUTHENTICATED_VERY_RECENTLY`
- * Add `IsGrantedContext::isAuthenticatedVeryRecently()`
- * Record the OIDC `acr` claim as the `oidc_acr` token attribute, the authentication context class the provider asserts
- * Add `SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE`, holding the denied attribute while a `ReAuthenticationEntryPointInterface` starts a re-authentication
- * Record the OIDC `amr` and `auth_time` claims as the authentication proofs of the token, so `max_age` and `IS_AUTHENTICATED_RECENTLY` agree
- * Add `AuthenticationProofsListener`, which records an interactive authentication as an authentication proof of the token, under the methods its `AuthenticationMethodBadge` states, and carries the proofs over when a re-authentication of the same user replaces the token
+ * Register `ContextListener::onKernelResponse()` on the `kernel.response` event instead of on the event dispatcher at runtime
+ * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when the vote denying an attribute requests a re-authentication for it
+ * Add `IsGrantedContext::isAuthenticatedRecently()` and `IsGrantedContext::isAuthenticatedVeryRecently()`
+ * Add `AuthenticationProofsListener`, which records an interactive authentication as an authentication proof of the token, under the methods its `AuthenticationMethodBadge` states
  * Add `AuthenticationMethodBadge`, for an authenticator to state which authentication methods it verified; `form_login`, `json_login` and `http_basic` state `AuthenticationMethod::PASSWORD`
  * Add `allowed_time_drift` option to `OidcTokenHandler` to configure time tolerance for token validation (`iat`, `nbf`, `exp` claims)
- * Expose the OAuth2 scopes an access token was granted as the `oauth2_scope` token attribute, read from the `scope` or `scp` claim
- * Add `OAuth2ScopeVoter` to require scopes of the access token, all the ones an `OAUTH2_SCOPE(...)` attribute lists
+ * Expose the OAuth2 scopes an access token was granted as the `oauth2_scope` token attribute, and add `OAuth2ScopeVoter` to require them with an `OAUTH2_SCOPE(...)` attribute
  * Add `InsufficientScopeAccessDeniedHandler` to answer a denial caused by a missing scope with the RFC 6750 §3.1 challenge
  * Add the `$audiences`, `$issuer`, `$claim`, `$clock` and `$allowedTimeDrift` arguments to `Oauth2TokenHandler`, which validates the `exp`, `nbf`, `iat`, `iss` and `aud` members of the introspection response against them
- * Add `Oauth2TokenHandler::enableCache()` to cache the introspection responses of active tokens, never beyond their `exp`
- * Add `Oauth2TokenHandler::enableSignedResponse()` to request and verify a JWT introspection response (RFC 9701)
- * Add `Oauth2TokenHandler::enableSignedResponseDiscovery()` to read the keys that response is verified against from the RFC 8414 metadata of the authorization server
- * Throw a 403 `Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException` instead of the `Security\Core` one when the `#[IsCsrfTokenValid]` attribute fails, so the failure is no longer handled as an authentication failure
+ * Add `Oauth2TokenHandler::enableCache()`, `enableSignedResponse()` and `enableSignedResponseDiscovery()` to cache the introspection responses and to request and verify them as JWTs (RFC 9701)
+ * Throw a 403 `Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException` instead of the `Security\Core` one when the `#[IsCsrfTokenValid]` attribute fails
  * Add the deauthentication reason and the responsible user providers to `TokenDeauthenticatedEvent`
  * Add `LogoutUrlGenerator::getLogoutForm()` to build a form that logs the user out with a POST
  * Throw the status-code-specific `HttpException` (e.g. `NotFoundHttpException`, `AccessDeniedHttpException`) instead of a generic one when `#[IsGranted]`'s `statusCode` option is set
@@ -48,29 +33,21 @@ CHANGELOG
  * Add `ImpersonateUrlGenerator::generateImpersonationForm()` and `generateExitForm()` to build a form that switches the user with a POST
  * Add `$targetUri` argument to `ImpersonateUrlGenerator::generateImpersonationPath()` and `generateImpersonationUrl()`
  * Configure the decorated handler of `CustomAuthenticationSuccessHandler` and `CustomAuthenticationFailureHandler` when they are called instead of when they are built, so that a single handler can be shared by several authenticators
- * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()` to add extra query parameters covered by the link signature
- * Expose the verified extra parameters via the `_login_link_parameters` request attribute when consuming a login link
- * Add `OidcLoginAuthenticator` for the OpenID Connect Authorization Code Flow (interactive login via OIDC provider)
- * Add `OidcClientInterface`, its `OidcClient` implementation and `OidcDiscovery` protocol classes
+ * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()` to add extra query parameters covered by the link signature, exposed as the `_login_link_parameters` request attribute when the link is consumed
+ * Add `OidcLoginAuthenticator`, `OidcClientInterface`, `OidcClient`, `OidcDiscovery` and `OidcSignatureVerifier` for the OpenID Connect Authorization Code Flow
  * Cache the discovery document of the `oidc` access token handler for one hour, where it was fetched again on every refresh of the JWKS
- * Add `OidcSignatureVerifier` to verify the ID token signature of the OIDC login authenticator against the provider JWKS, which it now does by default
- * Add `ClientAuthenticationInterface` and its `ClientSecretPost`, `ClientSecretBasic` and `NoClientAuthentication` implementations, which say how an OAuth2 client authenticates at the token endpoint; `OidcClient` takes one as a dependency, so that a public client relying on PKCE and a confidential one holding a secret are the same class
- * Add the `pkce_enabled`, `pkce_method` and `max_age` options and the `$authorizationParams` argument to `OidcLoginAuthenticator`, which checks the ID token `auth_time` claim when `max_age` is used
- * Add the `user_data_source` and `user_identifier_claim` options to `OidcLoginAuthenticator` to pick where the user claims are read from and the claim the user identifier is read from
+ * Add `ClientAuthenticationInterface` and its `ClientSecretBasic`, `ClientSecretPost`, `ClientSecretJwt`, `PrivateKeyJwt`, `TlsClientAuth`, `SelfSignedTlsClientAuth` and `NoClientAuthentication` implementations, which say how an OAuth2 client authenticates at the token endpoint
  * Add `OidcEndSessionListener` for RP-Initiated Logout via the OIDC `end_session_endpoint`
  * Add `UnsupportedReasons`, held by the `SecurityRequestAttributes::UNSUPPORTED_REASONS` request attribute while the profiler is enabled, so that `supports()` can tell why an authenticator did not support a request
- * Add the `oidc_refresh_token` and `oidc_access_token_expires_at` attributes to the token `OidcLoginAuthenticator` creates, and a `$clock` argument to its constructor
- * Add `OidcClient::refreshToken()`, `OidcTokenRefresher` and `OidcTokenRefreshListener` to renew the OIDC access token with the refresh token grant
- * Add the `$enforceAtJwtType` argument to `OidcTokenHandler` to reject the tokens whose `typ` header is not the `at+jwt` RFC 9068 requires from an access token
- * Deprecate not passing the `$enforceAtJwtType` argument to `OidcTokenHandler`; it defaults to `false` in 8.2 and will default to `true` in 9.0
+ * Add `OidcTokenRefresher` and `OidcTokenRefreshListener` to renew the OIDC access token with the refresh token grant
+ * Add the `$enforceAtJwtType` argument to `OidcTokenHandler` to reject the tokens whose `typ` header is not `at+jwt` (RFC 9068)
+ * Deprecate not passing the `$enforceAtJwtType` argument to `OidcTokenHandler`, it will default to `true` in 9.0
  * Make `OidcTokenGenerator` emit the `at+jwt` type header RFC 9068 requires from an access token
  * Add the `$resourceMetadataUri` argument to `AccessTokenAuthenticator`, advertised in the `resource_metadata` parameter of the `WWW-Authenticate` header (RFC 9728)
- * Widen the `$audience` argument of `OidcTokenHandler` and `OidcTokenGenerator` and the `$audiences` argument of `Oauth2TokenHandler` to take one identifier as a string or several as a list, one of which the `aud` claim must name
- * Add `FallbackAuthenticationEntryPointInterface` for an entry point that only stands in for a firewall declaring no other one, and make `AccessTokenAuthenticator` one, so that a request carrying no access token gets the RFC 6750 challenge instead of a bare 401
- * Add `PrivateKeyJwt` and `ClientSecretJwt`, which authenticate the OAuth2 client at the token endpoint with a JWT assertion it signs itself, respectively with its private key and with its secret (RFC 7523, OIDC Core 1.0 §9)
- * Add `OidcAuthorizationRequestEvent` and the `$eventDispatcher` argument to `OidcLoginAuthenticator`, so that the extra parameters of the OIDC authorization request can be computed per request
+ * Allow a list of identifiers in the `$audience` argument of `OidcTokenHandler` and `OidcTokenGenerator`
+ * Add `FallbackAuthenticationEntryPointInterface` for an entry point that only stands in for a firewall declaring no other one, and make `AccessTokenAuthenticator` one
+ * Add `OidcAuthorizationRequestEvent` to compute the extra parameters of each OIDC authorization request
  * Allow keying the clients passed to `OidcTokenHandler::enableDiscovery()` by the issuer their discovery document must announce
- * Add `TlsClientAuth`, `SelfSignedTlsClientAuth`, the `$certificateOptions` argument of `OidcClient` and the `$checkedMtlsAliases` argument of `OidcDiscovery` (RFC 8705)
  * Add the `$limiterName` argument to `LoginThrottlingListener`, which dispatches `RateLimitExceededEvent` when login throttling rejects an attempt
  * Add `#[FirewallListenerOrder]` to declare the firewall listeners a listener runs before or after
 

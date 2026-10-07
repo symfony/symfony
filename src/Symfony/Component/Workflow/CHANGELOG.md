@@ -13,7 +13,7 @@ CHANGELOG
  * Accept any `ExpressionLanguage` in `GuardListener`
  * Add `before` and `after` to the `#[As*Listener]` attributes, whose `$priority` is now nullable
  * Add `WorkflowBundle`, which provides the `workflow` configuration and the services previously provided by `FrameworkBundle` under `framework.workflows`
- * Allow prefixing entries with `!` in the `$eventsToDispatch` constructor argument of `Workflow` and `StateMachine` to permanently disable an event; e.g. `new Workflow(..., eventsToDispatch: ['!workflow.announce'])` fires every event except `workflow.announce`. The GuardEvent can never be suppressed; `!workflow.guard` throws an `InvalidArgumentException`. Mixing allow-list and block-list entries also throws an `InvalidArgumentException`.
+ * Allow prefixing an event with `!` in the `events_to_dispatch` option and in the `$eventsToDispatch` argument of `Workflow` and `StateMachine` to disable it
 
 8.1
 ---

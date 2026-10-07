@@ -204,10 +204,9 @@ FrameworkBundle
    parameter exists only to support the deprecated method and goes away with it in 9.0
  * Deprecate `JsonPathPass`, use the one from the JsonPath component instead
  * Deprecate `Command\RouterMatchCommand`, use `Symfony\Component\Routing\Command\RouterMatchCommand` instead
- * Deprecate the `TranslationLintCommandPass`, `TranslationUpdateCommandPass`, `AssetsContextPass` and
-   `AddValidatorSecurityExpressionLanguageProviderPass` compiler passes, use their counterparts from the
-   Translation, Asset and Validator components instead; each is now registered by the bundle of the
-   component that declares the services it acts on
+ * Deprecate the `TranslationLintCommandPass`, `TranslationUpdateCommandPass` and `AssetsContextPass` compiler
+   passes, use their counterparts from the Translation and Asset components instead; each is now registered by
+   the bundle of the component that declares the services it acts on
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component
    instead. Unlike the interface, the attribute is not inherited: a class extending an annotated one has to
    carry it too
@@ -236,7 +235,6 @@ FrameworkBundle
  * Deprecate `CacheWarmer\RouterCacheWarmer`, `Controller\RedirectController`,
    `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader` and
    `Routing\RedirectableCompiledUrlMatcher`, use their counterparts from the Routing component instead
- * Deprecate not setting the `framework.scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
  * The secrets vault no longer loads env vars when its directory is in the project but does not exist when the container is built (`config/secrets/` by default). The env var of `framework.secret` is then not derived from `SYMFONY_DECRYPTION_SECRET` anymore when it is empty or not defined: define it, or create the vault. In non-debug environments, clear the cache after creating the first vault
 
 HttpClient
@@ -413,6 +411,7 @@ RateLimiter
 Scheduler
 ---------
 
+ * Deprecate not setting the `scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
  * Deprecate `Schedule::with()`. It returns an empty schedule, so a lock or a state set on the original
    schedule is silently dropped, and the resulting schedule then runs unlocked.
 

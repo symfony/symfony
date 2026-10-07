@@ -4,18 +4,19 @@ CHANGELOG
 8.2
 ---
 
- * Add `HttpClientBundle` to provide the HTTP client services and the `http_client` configuration
+ * Add `HttpClientBundle`, which provides the `http_client` configuration and the services previously provided by `FrameworkBundle` under `framework.http_client`
+ * Add the `max_connect_duration` option to the `http_client` configuration
+ * Add the `retry_failed.base_uris` option of scoped clients to retry a failed request against the next URI in the list
  * Add `RecorderHttpClient` to record HTTP exchanges into HAR files and replay them
  * Make `HarFileResponseFactory` replay repeated entries in the order they were recorded
  * Add the `extra.cache_policy` option to `CachingHttpClient` to tag cached responses and force their lifetime
  * Allow passing a stream or a closure to `HttpOptions::buffer()`
  * Add `QUERY` to the list of cacheable HTTP methods in `CachingHttpClient`
  * Add `ScopingHttpClient::forBaseUris()` to scope a client to several base URIs at once
- * Collect the duration and the transferred sizes of each request in `HttpClientDataCollector`
- * Add `HttpClientDataCollector::getTotalTime()`, the sum of the durations of all requests, in seconds
+ * Collect the duration and the transferred sizes of each request in `HttpClientDataCollector`, and add `HttpClientDataCollector::getTotalTime()`
  * Add the `trailers` response info
  * Add support for the `on_trailers` request option to `GuzzleHttpHandler`
- * Allow passing the `query` and `body` options as lists of single-entry arrays to repeat a field, e.g. `[['tag' => 'a'], ['tag' => 'b']]` for `tag=a&tag=b`
+ * Allow passing the `query` and `body` options as lists of single-entry arrays to repeat a field
  * Make `http_version: 2.0` use HTTP/2 with prior knowledge on `http://` URLs in `CurlHttpClient` and `AmpHttpClient`
 
 8.1

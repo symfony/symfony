@@ -4,17 +4,12 @@ CHANGELOG
 8.2
 ---
 
- * Add `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand` and `CacheWarmer\TranslationsCacheWarmer`, which `FrameworkBundle` used to provide
- * Register all the `translation:*` and `lint:translations` commands, which `FrameworkBundle` used to declare
+ * Add `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\TranslationLintCommandPass`, `DependencyInjection\TranslationUpdateCommandPass` and `DependencyInjection\Translator`, which `FrameworkBundle` used to provide
  * Add `TranslationBundle`, which provides the `translation` configuration and the services previously provided by `FrameworkBundle` under `framework.translator`
- * Add `DependencyInjection\Translator`, which `FrameworkBundle` used to provide
- * Add `DependencyInjection\TranslationLintCommandPass` and `DependencyInjection\TranslationUpdateCommandPass`, which `FrameworkBundle` used to provide
  * Preserve the XLIFF `<source>` element when loading and dumping a file, instead of overwriting it with the message key
  * Add a locale-aware `Plural-Forms` header to the output of `PoFileDumper`
- * Re-add `PoEditorProvider`
  * Add `translation:update-xliff-sources` command to fill the `<source>` tags of XLIFF files with the default locale's translations
- * Add support for ternary and null-coalescing expressions when extracting translation messages from PHP files
- * Add support for `match` expressions, interpolated strings, variables and values returned by methods when extracting translation messages from PHP files
+ * Add support for ternary, null-coalescing and `match` expressions, interpolated strings, variables and values returned by methods when extracting translation messages from PHP files
  * Add argument `$skipValidationDirs` to `XliffFileLoader` to load the XLIFF files of these directories without validating them against the schema
 
 8.1

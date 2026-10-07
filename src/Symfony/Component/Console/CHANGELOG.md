@@ -8,12 +8,8 @@ CHANGELOG
  * Add `LockableTrait::setLockFactory()`, autowired with the lock factory of the resource named `console` when the app declares one
  * Allow `#[AsCommand]` to list `InputOption`s to add after the ones the parameters of the command declare
  * Register a class-level `#[AsCommand]` without `__invoke()` as the command grouping its method-level ones
- * Resolve spaced sub-command invocations through the tree derived from registered command names, with per-level options and `--` binding the remaining tokens to the current command
- * List the sub-commands of a command invoked bare when it has no code of its own, on the error output and with exit code 1 like a bare namespace
- * Walk namespaces without a registered root command the same way: `cache clear` runs `cache:clear`
- * Show the help of the deepest resolved command when `--help` is used on a spaced sub-command invocation
- * Add `CommandChain` to read the resolved commands and each level's bound input, injectable into invokable commands and exposed by `Application::getCommandChain()`
- * Complete sub-command segments, per-level options and the node's own argument values when the completion cursor sits inside a command tree
+ * Add docker-style sub-commands, resolved as command trees from the registered names: `cache clear` runs `cache:clear`, with per-level options, help and completion
+ * Add `CommandChain` and `Application::getCommandChain()` to read the resolved commands and the input bound at each level
  * Collapse the commands below a registered command to that command's line in the application listing, and list a command's sub-commands in its help
  * Add `InputDefinition::setIgnoreExtraArguments()`, `ArgvInput::getUnparsedTokens()` and `ArrayInput::getUnparsedTokens()` to stop parsing on the first extra argument and retrieve the remaining tokens
  * Add `UnexpectedArgumentException`, thrown when an input has more arguments than its definition expects

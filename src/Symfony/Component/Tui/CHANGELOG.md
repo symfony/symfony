@@ -12,11 +12,10 @@ CHANGELOG
  * Add `AbstractWidget::postRender()` to post-process a widget's finished lines, chrome included
  * Make `LoopClock` part of the public API
  * Dispatch paste lifecycle events through the terminal event dispatcher
- * Reuse unchanged rendered line segments during differential updates
  * Add `AbstractWidget::attachChild()` and `AbstractWidget::detachChild()` to wire child widgets
  * Add multi-select support to `SelectListWidget`
  * Make `SelectListWidget` wrap option labels and descriptions in aligned columns, and vertically expandable
- * Add the tab widget
+ * Add `TabsWidget`
  * [BC BREAK] Add `$multiselect` as the third argument of `SelectListWidget::__construct()`, moving `$keybindings` to fourth position
  * Add `KeyBindingWidget` to display the keybindings of the focused widget
  * Add the `super`, `hyper` and `meta` modifiers to key ids, and `Key::super()`

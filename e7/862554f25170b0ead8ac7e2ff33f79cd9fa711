@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T19:35:12Z
+
+Thank you @wachterjohannes. The ArrayObject case is php-src GH-17935: `__serialize()` returns its storage without separating it, so later writes leak into the payload. PR updated, snapshots are now serialized right away. Custom bags and saves that skip `Session::save()` aren't covered on purpose: the session listener and the test client both go through `Session::save()`, which is where dev and test traffic is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T19:58:09Z
+
+Moving to draft until symfony/polyfill#715 is released in v1.44. This PR now requires it instead of serializing every snapshot: `ArrayObject` and `ArrayIterator` leak later writes into deepclone payloads, which affects `DeepCloner` too. The extension gets the same fix in symfony/php-ext-deepclone#62.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-07T07:59:19Z
+
+Back to ready for review, polyfill bumped.

@@ -60,6 +60,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
 use Symfony\Component\Messenger\Transport\TransportFactory;
+use Symfony\Component\Messenger\WorkerRestarter;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\Uid\Uuid;
 
@@ -324,6 +325,13 @@ return static function (ContainerConfigurator $container) {
             ->private()
             ->tag('cache.pool')
             ->tag('container.remove_if_missing', ['service' => 'cache.app'])
+
+        ->set('messenger.worker_restarter', WorkerRestarter::class)
+            ->args([
+                service('cache.messenger.restart_workers_signal'),
+            ])
+            ->tag('container.remove_if_missing', ['service' => 'cache.messenger.restart_workers_signal'])
+        ->alias(WorkerRestarter::class, 'messenger.worker_restarter')
 
         ->set('messenger.listener.stop_worker_on_restart_signal_listener', StopWorkerOnRestartSignalListener::class)
             ->args([

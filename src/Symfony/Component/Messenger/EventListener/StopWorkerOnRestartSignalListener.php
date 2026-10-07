@@ -39,7 +39,7 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
 
     public function onWorkerRunning(WorkerRunningEvent $event): void
     {
-        if ($this->shouldRestart()) {
+        if ($this->shouldRestart($event->getWorker()->getMetadata()->getTransportNames())) {
             $event->getWorker()->stop();
             $this->logger?->info('Worker stopped because a restart was requested.');
         }
@@ -53,15 +53,23 @@ class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
         ];
     }
 
-    private function shouldRestart(): bool
+    /**
+     * @param string[] $transportNames
+     */
+    private function shouldRestart(array $transportNames): bool
     {
-        $cacheItem = $this->cachePool->getItem(self::RESTART_REQUESTED_TIMESTAMP_KEY);
+        $keys = [self::RESTART_REQUESTED_TIMESTAMP_KEY];
 
-        if (!$cacheItem->isHit()) {
-            // no restart has ever been scheduled
-            return false;
+        foreach ($transportNames as $transportName) {
+            $keys[] = self::RESTART_REQUESTED_TIMESTAMP_KEY.'.'.rawurlencode($transportName);
         }
 
-        return $this->workerStartedAt < $cacheItem->get();
+        foreach ($this->cachePool->getItems($keys) as $cacheItem) {
+            if ($cacheItem->isHit() && $this->workerStartedAt < $cacheItem->get()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

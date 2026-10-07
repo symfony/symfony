@@ -14,10 +14,11 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
+use Symfony\Component\Messenger\WorkerRestarter;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -34,11 +35,17 @@ class StopWorkersCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDefinition([])
+            ->setDefinition([
+                new InputArgument('receivers', InputArgument::IS_ARRAY, 'Names of the receivers/transports whose workers to stop, all workers when omitted'),
+            ])
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
 
                     <info>php %command.full_name%</info>
+
+                Pass the names of some receivers/transports to only stop the workers that consume them:
+
+                    <info>php %command.full_name% scheduler_default</info>
 
                 Each worker command will finish the message they are currently processing
                 and then exit. Worker commands are *not* automatically restarted: that
@@ -52,11 +59,10 @@ class StopWorkersCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $cacheItem = $this->restartSignalCachePool->getItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY);
-        $cacheItem->set(microtime(true));
-        $this->restartSignalCachePool->save($cacheItem);
+        $receivers = $input->getArgument('receivers');
+        new WorkerRestarter($this->restartSignalCachePool)(...$receivers);
 
-        $io->success('Signal successfully sent to stop any running workers.');
+        $io->success($receivers ? \sprintf('Signal successfully sent to stop the workers that consume "%s".', implode('", "', $receivers)) : 'Signal successfully sent to stop any running workers.');
 
         return 0;
     }

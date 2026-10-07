@@ -33,6 +33,29 @@ class StopWorkersCommandTest extends TestCase
         $tester->execute([]);
     }
 
+    public function testItStopsTheWorkersOfTheGivenTransports()
+    {
+        $savedKeys = [];
+        $cachePool = $this->createStub(CacheItemPoolInterface::class);
+        $cachePool->method('getItem')->willReturnCallback(function (string $key) {
+            $item = $this->createStub(CacheItemInterface::class);
+            $item->method('getKey')->willReturn($key);
+
+            return $item;
+        });
+        $cachePool->method('save')->willReturnCallback(static function (CacheItemInterface $item) use (&$savedKeys) {
+            $savedKeys[] = $item->getKey();
+
+            return true;
+        });
+
+        $tester = new CommandTester(new StopWorkersCommand($cachePool));
+        $tester->execute(['receivers' => ['scheduler_default', 'async']]);
+
+        $this->assertSame(['workers.restart_requested_timestamp.scheduler_default', 'workers.restart_requested_timestamp.async'], $savedKeys);
+        $this->assertStringContainsString('Signal successfully sent to stop the workers that consume "scheduler_default", "async".', preg_replace('/\s+/', ' ', $tester->getDisplay()));
+    }
+
     public function testSuccessMessageGoesToStdout()
     {
         $cachePool = $this->createStub(CacheItemPoolInterface::class);

@@ -140,6 +140,23 @@ class AttributeReaderTest extends TestCase
         yield 'initial enum case not used by the workflow' => [UnusedInitialCaseStateMachine::class, []];
     }
 
+    public function testExtendedAttributes()
+    {
+        $workflow = $this->read(ExtendedAttributesWorkflow::class)['extended_attributes'];
+
+        $this->assertSame(['reviewed'], $workflow['initial_marking']);
+
+        $this->assertSame([
+            ['name' => 'draft', 'metadata' => ['label' => 'Draft', 'bg_color' => '#eee']],
+            ['name' => 'published', 'metadata' => []],
+            ['name' => 'reviewed', 'metadata' => ['label' => 'Reviewed']],
+        ], $workflow['places']);
+        $this->assertSame([
+            ['name' => 'publish', 'from' => [['place' => 'draft']], 'to' => [['place' => 'published']], 'metadata' => ['label' => 'Publish', 'async' => true]],
+            ['name' => 'publish', 'from' => [['place' => 'reviewed']], 'to' => [['place' => 'published']], 'metadata' => ['async' => false]],
+        ], $workflow['transitions']);
+    }
+
     #[DataProvider('provideInvalidDefinitions')]
     public function testInvalidDefinition(string $class, string $expectedMessage)
     {
@@ -163,6 +180,8 @@ class AttributeReaderTest extends TestCase
         yield 'duplicate place' => [DuplicatePlaceWorkflow::class, 'The place "a" of the workflow defined by "'.$ns.'DuplicatePlaceWorkflow" is defined by both "'.$ns.'DuplicatePlaceWorkflow::A" and "'.$ns.'DuplicatePlaceWorkflow::B".'];
         yield 'places from a class' => [PlacesFromClassWorkflow::class, 'The "places" argument of "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" on "'.$ns.'PlacesFromClassWorkflow" must be the name of a string-backed enum, "stdClass" given.'];
         yield 'place not in the enum' => [PlaceNotInEnumWorkflow::class, 'The place "foreign" of the workflow defined by "'.$ns.'PlaceNotInEnumWorkflow" is not a case of "'.$ns.'TaskStep".'];
+        yield 'several place attributes on a constant' => [SeveralPlaceAttributesWorkflow::class, '"'.$ns.'SeveralPlaceAttributesWorkflow::START" cannot have several "#[Symfony\Component\Workflow\Attribute\Place]" attributes, including the ones extending it.'];
+        yield 'several place attributes on an enum case' => [SeveralPlaceAttributesOnCaseWorkflow::class, '"'.$ns.'SeveralPlaceAttributesStep::Start" cannot have several "#[Symfony\Component\Workflow\Attribute\Place]" attributes, including the ones extending it.'];
     }
 
     private function read(string $class): array
@@ -424,4 +443,72 @@ class UnusedInitialCaseStateMachine
 {
     #[Transition(from: ArticleStatus::Published, to: ArticleStatus::Archived)]
     public const ARCHIVE = 'archive';
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS_CONSTANT)]
+class ColoredPlace extends Place
+{
+    public function __construct(
+        public readonly ?string $label = null,
+        public readonly ?string $bgColor = null,
+        array $metadata = [],
+        bool $initial = false,
+    ) {
+        parent::__construct(array_filter(['label' => $label, 'bg_color' => $bgColor]) + $metadata, $initial);
+    }
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS_CONSTANT | \Attribute::IS_REPEATABLE)]
+class AsyncTransition extends Transition
+{
+    public function __construct(
+        \BackedEnum|string|array $from,
+        \BackedEnum|string|array $to,
+        public readonly ?string $label = null,
+        public readonly bool $async = true,
+    ) {
+        parent::__construct($from, $to, metadata: array_filter(['label' => $label]) + ['async' => $async]);
+    }
+}
+
+enum ExtendedStep: string
+{
+    #[ColoredPlace(label: 'Reviewed', initial: true)]
+    case Reviewed = 'reviewed';
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class ExtendedAttributesWorkflow
+{
+    #[ColoredPlace(label: 'Draft', bgColor: '#eee')]
+    public const DRAFT = 'draft';
+
+    #[AsyncTransition(from: self::DRAFT, to: 'published', label: 'Publish')]
+    #[AsyncTransition(from: ExtendedStep::Reviewed, to: 'published', async: false)]
+    public const PUBLISH = 'publish';
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class SeveralPlaceAttributesWorkflow
+{
+    #[Place(initial: true)]
+    #[ColoredPlace(label: 'Start')]
+    public const START = 'start';
+
+    #[Transition(from: self::START, to: 'end')]
+    public const GO = 'go';
+}
+
+enum SeveralPlaceAttributesStep: string
+{
+    #[Place(initial: true)]
+    #[ColoredPlace(label: 'Start')]
+    case Start = 'start';
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class SeveralPlaceAttributesOnCaseWorkflow
+{
+    #[Transition(from: SeveralPlaceAttributesStep::Start, to: 'end')]
+    public const GO = 'go';
 }

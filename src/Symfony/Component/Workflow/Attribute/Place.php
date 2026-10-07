@@ -21,7 +21,7 @@ namespace Symfony\Component\Workflow\Attribute;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 #[\Attribute(\Attribute::TARGET_CLASS_CONSTANT)]
-final class Place
+class Place
 {
     /**
      * @param array<string, mixed> $metadata The metadata of the place

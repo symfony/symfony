@@ -33,6 +33,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
@@ -82,8 +83,11 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $descriptionExtractors[] = $phpStanExtractor;
         }
 
+        $nameConverter = null;
         if (class_exists(AttributeLoader::class)) {
-            array_unshift($listExtractors, new SerializerExtractor(new ClassMetadataFactory(new AttributeLoader())));
+            $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+            array_unshift($listExtractors, new SerializerExtractor($classMetadataFactory));
+            $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
         }
 
         $propertyInfoExtractor = new PropertyInfoExtractor($listExtractors, $typeExtractors, $descriptionExtractors, [$reflectionExtractor], [$reflectionExtractor]);
@@ -94,7 +98,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         }
         $propertySchemaEnrichers[] = new AttributePropertySchemaEnricher();
 
-        return new self($propertyInfoExtractor, new ShortNameDefinitionPolicy(), [new NativeClassSchemaResolver()], propertySchemaEnrichers: $propertySchemaEnrichers);
+        return new self($propertyInfoExtractor, new ShortNameDefinitionPolicy(), [new NativeClassSchemaResolver()], propertySchemaEnrichers: $propertySchemaEnrichers, nameConverter: $nameConverter);
     }
 
     public function generate(Type $type, Configuration $config = new Configuration()): Schema
@@ -115,11 +119,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         return match (true) {
             $type instanceof UnionType => $this->buildUnionSchema($type, $config, $parent, $definitions),
             $type instanceof IntersectionType => $this->buildIntersectionSchema($type, $config, $parent, $definitions),
-            $type instanceof ArrayShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $definitions) + match (true) {
-                $type->isSealed() => ['additionalProperties' => false],
-                null !== $type->getExtraValueType() => ['additionalProperties' => $this->buildTypeSchema($type->getExtraValueType(), $config, $parent, $definitions)],
-                default => [],
-            },
+            $type instanceof ArrayShapeType => $this->buildArrayShapeSchema($type, $config, $parent, $definitions),
             $type instanceof CollectionType => $this->buildCollectionSchema($type, $config, $parent, $definitions),
             $type instanceof ObjectShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $definitions),
             $type instanceof GenericType, $type instanceof TemplateType => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $definitions),
@@ -225,6 +225,36 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
+     * List-shaped arrays are encoded as JSON arrays, other shapes as JSON objects.
+     *
+     * @param array<string, array<string, mixed>> $definitions
+     *
+     * @return array<string, mixed>
+     */
+    private function buildArrayShapeSchema(ArrayShapeType $type, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
+    {
+        $shape = $type->getShape();
+        $extraValueType = $type->getExtraValueType();
+
+        if (!array_is_list($shape) || !($type->getExtraKeyType()?->isIdentifiedBy(TypeIdentifier::INT) ?? true)) {
+            return $this->buildShapeSchema($shape, $config, $parent, $definitions) + ['additionalProperties' => null === $extraValueType ? false : $this->buildTypeSchema($extraValueType, $config, $parent, $definitions)];
+        }
+
+        $valueType = null === $extraValueType ? $type->getCollectionValueType() : CollectionType::mergeCollectionValueTypes([$type->getCollectionValueType(), $extraValueType]);
+        $schema = ['type' => 'array', 'items' => $this->buildTypeSchema($valueType, $config, $parent, $definitions)];
+
+        if ($minItems = \count(array_filter($shape, static fn (array $element): bool => !$element['optional']))) {
+            $schema['minItems'] = $minItems;
+        }
+
+        if (null === $extraValueType) {
+            $schema['maxItems'] = \count($shape);
+        }
+
+        return $schema;
+    }
+
+    /**
      * @param array<array{type: Type, optional?: bool}> $shape
      * @param array<string, array<string, mixed>>       $definitions
      *
@@ -303,10 +333,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
      */
     private function buildDefinition(string $class, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
-        $context = [];
-        if ($config->groups) {
-            $context['serializer_groups'] = $config->groups;
-        }
+        $context = ['serializer_groups' => $config->groups ?: null];
         if (null !== $config->attributes) {
             $context['serializer_attributes'] = $config->attributes;
         }
@@ -323,6 +350,10 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $readable = $this->propertyInfoExtractor->isReadable($class, $property, $context) ?? false;
             $writable = ($this->propertyInfoExtractor->isWritable($class, $property, $context) ?? false)
                 || ($this->propertyInfoExtractor instanceof PropertyInitializableExtractorInterface && ($this->propertyInfoExtractor->isInitializable($class, $property, $context) ?? false));
+
+            if (!$readable && !$writable && !$config->groups) {
+                continue;
+            }
 
             $type = $this->propertyInfoExtractor->getType($class, $property, $context);
             $schema = $this->provideSchema($class, $property, $config);

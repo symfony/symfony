@@ -44,6 +44,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingNameConverter;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ScalarProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SelfReferencingCategory;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SequencedSignup;
+use Symfony\Component\JsonSchema\Tests\Fixtures\SerializerMappedAccount;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Shelf;
 use Symfony\Component\JsonSchema\Tests\Fixtures\StrictInput;
 use Symfony\Component\JsonSchema\Tests\Fixtures\UnionProperties;
@@ -135,6 +136,36 @@ class SchemaGeneratorTest extends TestCase
             'required' => ['name'],
             'additionalProperties' => false,
         ], $schema->getRoot());
+    }
+
+    public function testListShapedArrayShapeBecomesAnArray()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::arrayShape([Type::int(), ['type' => Type::string(), 'optional' => true]]));
+
+        $this->assertSameSchema([
+            'type' => 'array',
+            'items' => ['anyOf' => [['type' => 'integer'], ['type' => 'string']]],
+            'minItems' => 1,
+            'maxItems' => 2,
+        ], $schema->getRoot());
+    }
+
+    public function testUnsealedListShapedArrayShapeAcceptsExtraItems()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::arrayShape([Type::int()], false, Type::int(), Type::bool()));
+
+        $this->assertSameSchema([
+            'type' => 'array',
+            'items' => ['anyOf' => [['type' => 'boolean'], ['type' => 'integer']]],
+            'minItems' => 1,
+        ], $schema->getRoot());
+    }
+
+    public function testEmptyArrayShapeBecomesAnEmptyArray()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::arrayShape([]));
+
+        $this->assertSameSchema(['type' => 'array', 'items' => [], 'maxItems' => 0], $schema->getRoot());
     }
 
     public function testUnsupportedRootTypeThrows()
@@ -272,6 +303,16 @@ class SchemaGeneratorTest extends TestCase
         $json = json_encode(SchemaGenerator::create()->generate(Type::object(UnionProperties::class)));
 
         $this->assertStringContainsString('"anything":{}', $json);
+    }
+
+    public function testSerializerMetadataAppliesWithoutGroups()
+    {
+        $properties = SchemaGenerator::create()->generate(Type::object(SerializerMappedAccount::class))->getDefinitions()['SerializerMappedAccount']['properties'];
+
+        $this->assertSameSchema([
+            'email' => ['type' => 'string'],
+            'display_name' => ['type' => 'string'],
+        ], $properties);
     }
 
     public function testGroupsFilterPropertiesAndSuffixTheDefinitionName()

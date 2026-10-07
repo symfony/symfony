@@ -112,8 +112,20 @@ final class Schema implements \JsonSerializable
         }
 
         foreach ($schema as $keyword => $value) {
-            if (\is_array($value) && !\in_array($keyword, self::LITERAL_KEYWORDS, true)) {
+            if (!\is_array($value) || \in_array($keyword, self::LITERAL_KEYWORDS, true)) {
+                continue;
+            }
+
+            if (!\in_array($keyword, self::SCHEMA_LIST_KEYWORDS, true) && !\in_array($keyword, self::SCHEMA_MAP_KEYWORDS, true)) {
                 $schema[$keyword] = $this->inline($value, $stack, $cyclic);
+
+                continue;
+            }
+
+            foreach ($value as $key => $subSchema) {
+                if (\is_array($subSchema)) {
+                    $schema[$keyword][$key] = $this->inline($subSchema, $stack, $cyclic);
+                }
             }
         }
 

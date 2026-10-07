@@ -75,6 +75,18 @@ class SchemaTest extends TestCase
         ], $flattened->getRoot());
     }
 
+    public function testFlattenInlinesPropertiesNamedAfterKeywords()
+    {
+        $kind = ['type' => 'object', 'properties' => ['label' => ['type' => 'string']]];
+        $properties = array_fill_keys(['type', 'enum', 'const', 'default', 'example', 'examples', 'required', 'properties', 'items'], ['$ref' => '#/$defs/Kind']);
+        $schema = new Schema(['type' => 'object', 'properties' => $properties], ['Kind' => $kind], Dialect::jsonSchema202012());
+
+        $flattened = $schema->flatten();
+
+        $this->assertSame([], $flattened->getDefinitions());
+        $this->assertSame(['type' => 'object', 'properties' => array_fill_keys(array_keys($properties), $kind)], $flattened->getRoot());
+    }
+
     public function testFlattenKeepsReferencesThatCloseACycle()
     {
         $schema = new Schema(

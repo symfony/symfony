@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\JsonSchema;
 
-use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
@@ -40,17 +39,6 @@ final readonly class Configuration
         public ?string $format = null,
     ) {
         $this->dialect = $dialect ?? Dialect::jsonSchema202012();
-    }
-
-    public function with(mixed ...$changes): self
-    {
-        $values = get_object_vars($this);
-
-        if ($unknown = array_diff_key($changes, $values)) {
-            throw new InvalidArgumentException(\sprintf('Unknown configuration "%s", expected one of "%s".', implode('", "', array_keys($unknown)), implode('", "', array_keys($values))));
-        }
-
-        return new self(...array_replace($values, $changes));
     }
 
     /**

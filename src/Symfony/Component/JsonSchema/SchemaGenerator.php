@@ -404,11 +404,21 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     {
         $attributes = \is_array($config->attributes[$property] ?? null) ? $config->attributes[$property] : null;
 
-        if (null === $config->definitionPrefix && $attributes === $config->attributes) {
+        if ($attributes === $config->attributes) {
             return $config;
         }
 
-        return $config->with(definitionPrefix: null, attributes: $attributes);
+        return new Configuration(
+            dialect: $config->dialect,
+            groups: $config->groups,
+            attributes: $attributes,
+            ignoredAttributes: $config->ignoredAttributes,
+            allowExtraAttributes: $config->allowExtraAttributes,
+            validationGroups: $config->validationGroups,
+            definitionName: $config->definitionName,
+            definitionPrefix: $config->definitionPrefix,
+            format: $config->format,
+        );
     }
 
     /**

@@ -14,7 +14,6 @@ namespace Symfony\Component\JsonSchema\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\Dialect;
-use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
 
 class ConfigurationTest extends TestCase
 {
@@ -31,27 +30,5 @@ class ConfigurationTest extends TestCase
         $this->assertNull($config->definitionName);
         $this->assertNull($config->definitionPrefix);
         $this->assertNull($config->format);
-    }
-
-    public function testWithChangesOnlyTheGivenValues()
-    {
-        $config = new Configuration(dialect: Dialect::openApi30(), groups: ['read'], definitionPrefix: 'Book');
-
-        $changed = $config->with(allowExtraAttributes: false, definitionPrefix: null);
-
-        $this->assertNotSame($config, $changed);
-        $this->assertEquals(Dialect::openApi30(), $changed->dialect);
-        $this->assertSame(['read'], $changed->groups);
-        $this->assertFalse($changed->allowExtraAttributes);
-        $this->assertNull($changed->definitionPrefix);
-        $this->assertSame('Book', $config->definitionPrefix);
-    }
-
-    public function testWithRejectsUnknownValues()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('"description"');
-
-        (new Configuration())->with(description: 'nope');
     }
 }

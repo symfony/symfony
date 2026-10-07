@@ -7,6 +7,7 @@ CHANGELOG
  * Add `TypeInfoBundle`, which provides the `type_info` configuration and the services previously provided by `FrameworkBundle` under `framework.type_info`
  * Add support for `@template-covariant` and its vendor prefixed synonyms
  * Add `Type::map()` to map a type and its parts bottom-up
+ * Add `Type::getMismatches()` and `TypeMismatch` to tell where and why a value is not accepted by a type
 
 8.1
 ---

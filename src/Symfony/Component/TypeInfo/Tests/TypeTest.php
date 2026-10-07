@@ -21,6 +21,8 @@ use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeMismatch;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class TypeTest extends TestCase
 {
@@ -183,6 +185,57 @@ class TypeTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         Type::union(Type::template('T'), Type::int())->map(self::replaceTemplate(Type::void()));
+    }
+
+    #[DataProvider('provideGetMismatches')]
+    public function testGetMismatches(Type $type, mixed $value, array $expectedMismatches)
+    {
+        $this->assertEquals($expectedMismatches, $type->getMismatches($value));
+        $this->assertSame([] === $expectedMismatches, $type->accepts($value));
+    }
+
+    public static function provideGetMismatches(): iterable
+    {
+        yield 'accepted' => [Type::int(), 1, []];
+        yield 'builtin' => [Type::int(), '1', [new TypeMismatch('', Type::int(), 'string')]];
+        yield 'object' => [Type::object(\Countable::class), new \stdClass(), [new TypeMismatch('', Type::object(\Countable::class), 'stdClass')]];
+        yield 'nullable' => [Type::nullable(Type::int()), '1', [new TypeMismatch('', Type::nullable(Type::int()), 'string')]];
+        yield 'union' => [Type::union(Type::int(), Type::string()), 1.5, [new TypeMismatch('', Type::union(Type::int(), Type::string()), 'float')]];
+
+        yield 'list items' => [Type::list(Type::int()), [1, '2', 3, '4'], [new TypeMismatch('[1]', Type::int(), 'string'), new TypeMismatch('[3]', Type::int(), 'string')]];
+        yield 'not a list' => [Type::list(Type::int()), [1 => 1], [new TypeMismatch('', Type::list(Type::int()), 'array')]];
+        yield 'collection key' => [Type::dict(Type::int()), [1], [new TypeMismatch('', Type::dict(Type::int()), 'array')]];
+        yield 'nested collections' => [Type::list(Type::list(Type::int())), [[1], [2, '3']], [new TypeMismatch('[1][1]', Type::int(), 'string')]];
+        yield 'not an array' => [Type::iterable(Type::int()), new \ArrayIterator(['1']), [new TypeMismatch('', Type::iterable(Type::int()), 'ArrayIterator')]];
+
+        $shape = Type::arrayShape(['foo' => Type::bool(), 'bar' => ['type' => Type::string(), 'optional' => true]]);
+        yield 'array shape' => [$shape, 'foo', [new TypeMismatch('', $shape, 'string')]];
+        yield 'array shape missing key' => [$shape, [], [new TypeMismatch('[foo]', Type::bool(), null)]];
+        yield 'array shape value' => [$shape, ['foo' => true, 'bar' => 1], [new TypeMismatch('[bar]', Type::string(), 'int')]];
+        yield 'array shape extra key' => [$shape, ['foo' => true, 'baz' => 1], [new TypeMismatch('[baz]', Type::never(), 'int')]];
+        yield 'array shape in a list' => [Type::list($shape), [['foo' => true], ['foo' => 'x']], [new TypeMismatch('[1][foo]', Type::bool(), 'string')]];
+
+        $unsealedShape = Type::arrayShape(['foo' => Type::bool()], false, Type::string(), Type::int());
+        yield 'unsealed array shape extra value' => [$unsealedShape, ['foo' => true, 'baz' => '1'], [new TypeMismatch('[baz]', Type::int(), 'string')]];
+        yield 'unsealed array shape extra key' => [$unsealedShape, ['foo' => true, 1 => 1], [new TypeMismatch('[1]', Type::never(), 'int')]];
+
+        $objectShape = Type::objectShape(['foo' => Type::bool(), 'bar' => ['type' => Type::objectShape(['baz' => Type::int()]), 'optional' => true]]);
+        yield 'object shape' => [$objectShape, [], [new TypeMismatch('', $objectShape, 'array')]];
+        yield 'object shape missing property' => [$objectShape, new \stdClass(), [new TypeMismatch('foo', Type::bool(), null)]];
+        yield 'object shape nested property' => [$objectShape, (object) ['foo' => true, 'bar' => (object) ['baz' => '1']], [new TypeMismatch('bar.baz', Type::int(), 'string')]];
+        yield 'object shape extra property' => [$objectShape, (object) ['foo' => true, 'qux' => 1], [new TypeMismatch('qux', Type::never(), 'int')]];
+        yield 'object shape in a list' => [Type::list($objectShape), [(object) ['foo' => 1]], [new TypeMismatch('[0].foo', Type::bool(), 'int')]];
+        yield 'list in an object shape' => [Type::objectShape(['foo' => Type::list(Type::int())]), (object) ['foo' => ['1']], [new TypeMismatch('foo[0]', Type::int(), 'string')]];
+
+        yield 'union member of the same kind' => [Type::nullable($shape), ['foo' => 1], [new TypeMismatch('[foo]', Type::bool(), 'int')]];
+        $union = Type::union(Type::list(Type::int()), $shape);
+        yield 'union members of the same kind' => [$union, [1, '2'], [new TypeMismatch('', $union, 'array')]];
+
+        yield 'resolved type' => [
+            TypeResolver::create()->resolve('array{data: list<array{id: string, shipment?: array{departure?: string|null, ...}|null, ...}>, ...}'),
+            ['data' => [['id' => 'A-1', 'shipment' => ['departure' => 20260918]]]],
+            [new TypeMismatch('[data][0][shipment][departure]', Type::nullable(Type::string()), 'int')],
+        ];
     }
 
     private static function replaceTemplate(Type $replacement): \Closure

@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeMismatch;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -109,6 +110,24 @@ class UnionType extends Type implements CompositeTypeInterface
         }
 
         return false;
+    }
+
+    public function getMismatches(mixed $value): array
+    {
+        $memberMismatches = null;
+
+        foreach ($this->types as $type) {
+            if (!$mismatches = $type->getMismatches($value)) {
+                return [];
+            }
+
+            // the value is of the same kind as this member, e.g. an array for an array shape, but its contents mismatch
+            if (!array_any($mismatches, static fn (TypeMismatch $mismatch): bool => '' === $mismatch->path)) {
+                $memberMismatches = null === $memberMismatches ? $mismatches : false;
+            }
+        }
+
+        return $memberMismatches ?: [new TypeMismatch('', $this, get_debug_type($value))];
     }
 
     /**

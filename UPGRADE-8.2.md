@@ -580,6 +580,7 @@ Webhook
 Workflow
 --------
 
+ * Add argument `$context` to `WorkflowInterface::getMarking()`
  * The `workflow.security.expression_language` service is decorated by a `CompiledExpressionLanguage` when guards are configured; inject it as a `Symfony\Component\ExpressionLanguage\ExpressionLanguage`, not as a `Symfony\Component\Workflow\EventListener\ExpressionLanguage`
 
 Yaml

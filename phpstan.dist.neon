@@ -56,6 +56,10 @@ parameters:
         -
             message: '#^Method Symfony\\Component\\Messenger\\Execution\\MessageExecutionStrategyInterface\:\:wait\(\) invoked with 2 parameters, 1 required\.$#'
             path: src/Symfony/Component/Messenger/Worker.php
+        # the $context argument is a commented-out argument of WorkflowInterface::getMarking()
+        -
+            message: '#^PHPDoc tag @param references unknown parameter\: \$context$#'
+            path: src/Symfony/Component/Workflow/WorkflowInterface.php
         # the $regexp argument is a commented-out argument of the case conversion methods, documented
         # with @param so that DebugClassLoader reports the implementations that do not declare it
         -

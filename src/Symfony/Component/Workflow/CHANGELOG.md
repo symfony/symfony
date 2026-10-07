@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add argument `$context` to `WorkflowInterface::getMarking()`
  * Cache the parsed guard expressions in a `cache.system` pool, and compile them when warming up the cache
  * Accept any `ExpressionLanguage` in `GuardListener`
  * Add `before` and `after` to the `#[As*Listener]` attributes, whose `$priority` is now nullable

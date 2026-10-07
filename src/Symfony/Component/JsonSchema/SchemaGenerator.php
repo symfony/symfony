@@ -20,7 +20,6 @@ use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionPolicyInterface;
 use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
 use Symfony\Component\JsonSchema\Enricher\AttributePropertySchemaEnricher;
-use Symfony\Component\JsonSchema\Enricher\DescriptionPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Enricher\PropertySchema;
 use Symfony\Component\JsonSchema\Enricher\PropertySchemaEnricherInterface;
 use Symfony\Component\JsonSchema\Enricher\PropertySchemaProviderInterface;
@@ -89,7 +88,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
         $propertyInfoExtractor = new PropertyInfoExtractor($listExtractors, $typeExtractors, $descriptionExtractors, [$reflectionExtractor], [$reflectionExtractor]);
 
-        $propertySchemaEnrichers = [new DescriptionPropertySchemaEnricher($propertyInfoExtractor)];
+        $propertySchemaEnrichers = [];
         if (class_exists(Validation::class)) {
             $propertySchemaEnrichers[] = new ValidatorPropertySchemaEnricher(Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator());
         }
@@ -346,6 +345,10 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
             if ($writable && !$readable) {
                 $schema['writeOnly'] = true;
+            }
+
+            if (!isset($schema['description']) && '' !== ($description = $this->propertyInfoExtractor->getShortDescription($class, $property, $context) ?? '')) {
+                $schema['description'] = $description;
             }
 
             $propertySchema = new PropertySchema($class, $property, $type, $schema, false);

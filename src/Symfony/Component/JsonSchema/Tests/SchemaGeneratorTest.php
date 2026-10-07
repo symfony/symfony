@@ -48,6 +48,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\Shelf;
 use Symfony\Component\JsonSchema\Tests\Fixtures\StrictInput;
 use Symfony\Component\JsonSchema\Tests\Fixtures\UnionProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ValidatedRegistration;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -659,6 +660,17 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'string', 'enum' => ['article']], $properties['kind']);
         $this->assertSame('hello-world', $properties['slug']['example']);
         $this->assertArrayNotHasKey('examples', $properties['slug']);
+    }
+
+    public function testShortDescriptionIsEmittedWithoutAnyEnricher()
+    {
+        $reflectionExtractor = new ReflectionExtractor();
+        $propertyInfo = new PropertyInfoExtractor([$reflectionExtractor], [$reflectionExtractor], [new PhpDocExtractor()], [$reflectionExtractor], [$reflectionExtractor]);
+
+        $properties = (new SchemaGenerator($propertyInfo))->generate(Type::object(DocumentedArticle::class))->getDefinitions()['DocumentedArticle']['properties'];
+
+        $this->assertSame('The article headline.', $properties['headline']['description']);
+        $this->assertArrayNotHasKey('description', $properties['slug']);
     }
 
     public function testNameConverterRenamesProperties()

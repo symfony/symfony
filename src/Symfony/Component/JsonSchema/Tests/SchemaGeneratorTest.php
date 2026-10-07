@@ -268,6 +268,14 @@ class SchemaGeneratorTest extends TestCase
         ], $properties);
     }
 
+    public function testIntersectionTypesBecomeAllOfAndKeepMemberDefinitions()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::intersection(Type::object(Author::class), Type::object(SelfReferencingCategory::class)));
+
+        $this->assertSameSchema(['allOf' => [['$ref' => '#/$defs/Author'], ['$ref' => '#/$defs/SelfReferencingCategory']]], $schema->getRoot());
+        $this->assertSame(['Author', 'SelfReferencingCategory'], array_keys($schema->getDefinitions()));
+    }
+
     public function testEmptySchemasAreSerializedAsObjects()
     {
         $json = json_encode(SchemaGenerator::create()->generate(Type::object(UnionProperties::class)));

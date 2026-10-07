@@ -143,7 +143,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     {
         return match (true) {
             $type instanceof UnionType => $this->buildUnionSchema($type, $config, $parent, $definitions, $classes),
-            $type instanceof IntersectionType => ['allOf' => array_map(fn (Type $t): array => $this->buildTypeSchema($t, $config, $parent, $definitions, $classes), $type->getTypes())],
+            $type instanceof IntersectionType => $this->buildIntersectionSchema($type, $config, $parent, $definitions, $classes),
             $type instanceof ArrayShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $definitions, $classes) + match (true) {
                 $type->isSealed() => ['additionalProperties' => false],
                 null !== $type->getExtraValueType() => ['additionalProperties' => $this->buildTypeSchema($type->getExtraValueType(), $config, $parent, $definitions, $classes)],
@@ -156,6 +156,23 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $type instanceof BuiltinType => $this->buildBuiltinSchema($type, $config->dialect),
             default => throw new InvalidArgumentException(\sprintf('Cannot generate a JSON Schema for type "%s".', $type)),
         };
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $definitions
+     * @param array<string, class-string>         $classes
+     *
+     * @return array<string, mixed>
+     */
+    private function buildIntersectionSchema(IntersectionType $type, Configuration $config, ?DefinitionParent $parent, array &$definitions, array &$classes): array
+    {
+        $schemas = [];
+
+        foreach ($type->getTypes() as $t) {
+            $schemas[] = $this->buildTypeSchema($t, $config, $parent, $definitions, $classes);
+        }
+
+        return ['allOf' => $schemas];
     }
 
     /**

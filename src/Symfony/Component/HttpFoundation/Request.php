@@ -1677,7 +1677,7 @@ class Request
     }
 
     /**
-     * Gets the Etags.
+     * @return list<string>
      */
     public function getETags(): array
     {

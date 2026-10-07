@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-01T08:06:32Z
+
+It might be nice to also have a lock per user / session, is that supported?
+
+---------------------------------------------------------------------------
+
+by Brajk19 at 2026-10-01T08:18:32Z
+
+@nicolas-grekas yes it should be doable with current setup:
+
+```php
+#[Lock(key: new Expression('"key-" ~ request.getSession().getId()'))]
+
+#[Lock(key: new Expression('"key-" ~ args["user"].getUserIdentifier()'))]
+public function export(#[CurrentUser] User $user): Response
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2026-10-01T09:08:44Z
+
+Should the attribute support acquiring a read lock only instead of a full lock ? This might make sense for safe methods
+
+---------------------------------------------------------------------------
+
+by Brajk19 at 2026-10-01T22:24:13Z
+
+> Could we also have a value resolver for `LockInterface` arguments? That'd let a controller `refresh()` the lock when it runs longer than the TTL, or `release()` it early. Arguments are resolved before this listener runs, so the resolver would return a placeholder that the listener replaces once the lock is acquired (and throw when several locks apply).
+
+@nicolas-grekas  i like the idea, but i'm not sure how to do it cleanly.
+sub-request (e.g. a fragment) can reuse a lock acquired by its main request, so injecting it into the sub-request's controller would let it call release() on the main request's lock in the middle of the request. throwing in that case would work, but then the argument only works sometimes, depending on whether a parent request already holds the key, which feels fragile.
+any ideas? maybe we could throw exception when a sub request asks for lock?
+
+---------------------------------------------------------------------------
+
+by Brajk19 at 2026-10-01T22:25:09Z
+
+> Should the attribute support acquiring a read lock only instead of a full lock ? This might make sense for safe methods
+
+@stof i like the idea
+https://github.com/symfony/symfony/pull/66515/commits/1be403ac1e695ada92cc79578b91c431513a12b5
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-07T15:18:23Z
+
+I pushed a few changes. Like `#[RateLimit]` since #66644, the lock is now acquired before the controller arguments are resolved, unless the key reads them: a request that waited for the lock doesn't run with arguments loaded before the wait anymore, and a rejected one doesn't resolve them at all. Promoting a read lock to a write lock doesn't wait anymore either, as two requests doing so would wait for each other.
+
+---------------------------------------------------------------------------
+
+by Brajk19 at 2026-10-07T20:19:52Z
+
+@nicolas-grekas changes look good 👍
+
+btw, after @HypeMC [suggested](https://github.com/symfony/symfony/pull/66515#discussion_r4189524488) we keep info about owner of each lock, i revisited your suggestion for lock value resolver. the problems i encountered before are easily handled now that we know exactly which request aquired the lock. if certain request did not aquire lock, it will not be injected and argument should be nullable
+
+i opened new PR so it doesnt block this one - https://github.com/symfony/symfony/pull/66697

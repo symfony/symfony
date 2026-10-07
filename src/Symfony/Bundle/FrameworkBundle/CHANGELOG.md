@@ -15,7 +15,7 @@ CHANGELOG
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead
  * Deprecate `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass` and `Translation\Translator`, use the ones from the Translation component instead
  * Deprecate `CacheWarmer\SerializerCacheWarmer`, use the one from the Serializer component instead
- * Deprecate `CacheWarmer\ValidatorCacheWarmer` and `DependencyInjection\Compiler\AddValidatorSecurityExpressionLanguageProviderPass`, use the ones from the Validator component instead
+ * Deprecate `CacheWarmer\ValidatorCacheWarmer`, use the one from the Validator component instead
  * Deprecate `DependencyInjection\Compiler\AssetsContextPass`, use the one from the Asset component instead
  * Deprecate `DependencyInjection\Compiler\JsonPathPass`, use the one from the JsonPath component instead
  * Deprecate `Controller\TemplateController`, use the one from TwigBundle instead

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\CacheWarmer;
 
 use Symfony\Component\ExpressionLanguage\CompiledExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\Parser;
 
 /**
@@ -25,16 +24,13 @@ use Symfony\Component\ExpressionLanguage\Parser;
 final class ExpressionLanguageCacheWarmer extends CacheWarmer
 {
     /**
-     * @param iterable<string, CompiledExpressionLanguage>            $expressionLanguages Indexed by the file to compile the expressions into
-     * @param list<class-string>                                      $controllers
-     * @param array<string, array<class-string, array<string, bool>>> $attributes          The properties of controller attributes that hold the expressions to compile, mapped to whether their strings are expressions too, indexed by the file to compile them into
-     * @param array<string, array<string, list<string>|null>>         $expressions         More expressions to compile, mapped to the variables they can read or to null when any variable is allowed, indexed by the file to compile them into
+     * @param iterable<string, CompiledExpressionLanguage> $expressionLanguages Indexed by their service id
+     * @param array<string, string>                        $files               The files to compile the expressions into, indexed by the service id of their expression language
      */
     public function __construct(
         private iterable $expressionLanguages,
-        private array $controllers,
-        private array $attributes = [],
-        private array $expressions = [],
+        private array $files,
+        private ExpressionCollector $collector,
     ) {
     }
 
@@ -49,33 +45,23 @@ final class ExpressionLanguageCacheWarmer extends CacheWarmer
             return [];
         }
 
-        $instances = $this->attributes ? $this->instantiateControllerAttributes() : [];
         $files = [];
 
-        foreach ($this->expressionLanguages as $file => $expressionLanguage) {
+        foreach ($this->expressionLanguages as $id => $expressionLanguage) {
+            if (!$file = $this->files[$id] ?? null) {
+                continue;
+            }
+
             $expressions = [];
 
-            foreach ($this->attributes[$file] ?? [] as $class => $properties) {
-                foreach ($instances as $instance) {
-                    if (!$instance instanceof $class) {
-                        continue;
-                    }
-
-                    $values = get_object_vars($instance);
-                    foreach ($properties as $property => $stringsAreExpressions) {
-                        if ($stringsAreExpressions && \is_string($value = $values[$property] ?? null)) {
-                            $expressions[$value] = $value;
-                        } else {
-                            self::collectExpressions([$values[$property] ?? null], $expressions);
-                        }
-                    }
-                }
+            foreach ($this->collector->getAttributeExpressions($id) as $collected) {
+                $expressions[(string) $collected->expression] = $collected->expression;
             }
 
             // listed expressions come from the configuration: an invalid one fails the warmup instead of being left out
-            foreach ($this->expressions[$file] ?? [] as $expression => $variables) {
-                $expressionLanguage->lint($expression = (string) $expression, $variables ?? [], null === $variables ? Parser::IGNORE_UNKNOWN_VARIABLES : 0);
-                $expressions[$expression] = $expression;
+            foreach ($this->collector->getListedExpressions($id) as $collected) {
+                $expressionLanguage->lint($collected->expression, $collected->variables ?? [], null === $collected->variables ? Parser::IGNORE_UNKNOWN_VARIABLES : 0);
+                $expressions[(string) $collected->expression] = $collected->expression;
             }
 
             if (!is_dir($dir = \dirname($file)) && !@mkdir($dir, 0o777, true) && !is_dir($dir)) {
@@ -87,46 +73,5 @@ final class ExpressionLanguageCacheWarmer extends CacheWarmer
         }
 
         return $files;
-    }
-
-    /**
-     * @return list<object>
-     */
-    private function instantiateControllerAttributes(): array
-    {
-        $instances = [];
-        foreach ($this->controllers as $class) {
-            $r = new \ReflectionClass($class);
-            $attributes = $r->getAttributes();
-
-            foreach ($r->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-                array_push($attributes, ...$method->getAttributes());
-
-                foreach ($method->getParameters() as $parameter) {
-                    array_push($attributes, ...$parameter->getAttributes());
-                }
-            }
-
-            foreach ($attributes as $attribute) {
-                try {
-                    $instances[] = $attribute->newInstance();
-                } catch (\Throwable) {
-                    // the expressions of an attribute that cannot be instantiated here are left to be parsed at runtime
-                }
-            }
-        }
-
-        return $instances;
-    }
-
-    private static function collectExpressions(array $values, array &$expressions): void
-    {
-        foreach ($values as $value) {
-            if ($value instanceof Expression) {
-                $expressions[(string) $value] = $value;
-            } elseif (\is_array($value)) {
-                self::collectExpressions($value, $expressions);
-            }
-        }
     }
 }

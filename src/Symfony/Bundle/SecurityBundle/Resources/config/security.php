@@ -166,7 +166,6 @@ return static function (ContainerConfigurator $container) {
         ->set('security.expression_language', ExpressionLanguage::class)
             ->lazy()
             ->args([service('cache.security_expression_language')->nullOnInvalid()])
-            ->tag('expression_language.compiled', ['attributes' => [IsGranted::class => ['attribute']]])
 
         // For the expression languages that evaluate expressions outside of an authorization check,
         // such as the validator's and the entity value resolver's. Tagging it is pointless:
@@ -373,7 +372,7 @@ return static function (ContainerConfigurator $container) {
                 service('cache.security_is_granted_attribute_expression_language')->nullOnInvalid(),
                 class_exists(ConstantFunctionProvider::class) ? [inline_service(ConstantFunctionProvider::class)->args([['*', '*::*']])] : [],
             ])
-            ->tag('expression_language.compiled', ['attributes' => [IsGranted::class => ['subject']]])
+            ->tag('expression_language.compiled', ['attributes' => [IsGranted::class => ['subject']], 'variables' => ['request', 'args', 'this']])
 
         ->set('cache.security_is_granted_attribute_expression_language')
             ->parent('cache.system')
@@ -387,7 +386,7 @@ return static function (ContainerConfigurator $container) {
                 service('cache.security_is_csrf_token_valid_attribute_expression_language')->nullOnInvalid(),
                 class_exists(ConstantFunctionProvider::class) ? [inline_service(ConstantFunctionProvider::class)->args([['*', '*::*']])] : [],
             ])
-            ->tag('expression_language.compiled', ['attributes' => [IsCsrfTokenValid::class => ['id']]])
+            ->tag('expression_language.compiled', ['attributes' => [IsCsrfTokenValid::class => ['id']], 'variables' => ['request', 'args', 'this']])
 
         ->set('cache.security_is_csrf_token_valid_attribute_expression_language')
             ->parent('cache.system')

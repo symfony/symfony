@@ -60,6 +60,8 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\Attribute\AsFormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
@@ -70,8 +72,10 @@ use Symfony\Component\HttpClient\HttpClientBundle;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
@@ -80,6 +84,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\JsonStreamer\JsonStreamerBundle;
 use Symfony\Component\Lock\LockBundle;
 use Symfony\Component\Mailer\DependencyInjection\RemoveMissingDependenciesPass as MailerRemoveMissingDependenciesPass;
@@ -191,6 +196,27 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new Reference('controller.expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('controller.cache_attribute_listener')->getArgument(0));
         $this->assertEquals(new Reference('cache.controller_expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('controller.expression_language')->getArgument(0));
         $this->assertTrue($container->getDefinition('controller.expression_language')->isLazy());
+    }
+
+    public function testControllerExpressionLanguageListsTheVariablesOfControllerEvents()
+    {
+        $container = $this->createContainerFromFile('default_config');
+        $tags = $container->getDefinition('controller.expression_language')->getTag('expression_language.compiled');
+
+        $expressionLanguage = new class extends ExpressionLanguage {
+            public array $variables = [];
+
+            public function evaluate(Expression|string $expression, array $values = []): mixed
+            {
+                $this->variables = array_keys($values);
+
+                return null;
+            }
+        };
+        (new ControllerArgumentsEvent($this->createStub(HttpKernelInterface::class), static fn () => null, [], new Request(), HttpKernelInterface::MAIN_REQUEST))->evaluate(new Expression('true'), $expressionLanguage);
+
+        $this->assertSame($expressionLanguage->variables, $tags[0]['variables']);
+        $this->assertArrayNotHasKey('variables', $tags[1]);
     }
 
     public function testCsrfProtectionNeedsSessionToBeEnabled()

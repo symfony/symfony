@@ -61,6 +61,7 @@ use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -274,12 +275,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                       ->addMethodCall('add', [$matcher, $roles, $access['requires_channel']]);
         }
 
-        // compile the expressions when warming up the cache
-        if ($this->expressions) {
+        // compile the expressions of #[IsGranted] and of access_control rules when warming up the cache
+        if ($container->hasDefinition('security.expression_language')) {
             $container->getDefinition('security.expression_language')
                 ->addTag('expression_language.compiled', [
+                    'attributes' => [IsGranted::class => ['attribute']],
                     'expressions' => array_map(static fn ($id) => $container->getDefinition($id)->getArgument(0), array_keys($this->expressions)),
                     'variables' => ['token', 'user', 'object', 'subject', 'role_names', 'auth_checker', 'trust_resolver', 'request'],
+                    'source' => 'security.access_control',
                 ]);
         }
     }

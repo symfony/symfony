@@ -208,6 +208,10 @@ return static function (ContainerConfigurator $container) {
                     RateLimit::class => ['key'],
                     Lock::class => ['key'],
                 ],
+                'variables' => ['request', 'args', 'this'],
+            ])
+            // the expressions of #[Cache] can also read the attributes of the request and the arguments of the controller
+            ->tag('expression_language.compiled', [
                 'string_expressions' => [
                     Cache::class => ['if', 'lastModified', 'etag'],
                 ],

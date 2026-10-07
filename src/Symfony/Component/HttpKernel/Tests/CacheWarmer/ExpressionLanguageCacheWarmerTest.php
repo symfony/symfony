@@ -17,6 +17,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\CacheWarmer\ExpressionCollector;
 use Symfony\Component\HttpKernel\CacheWarmer\ExpressionLanguageCacheWarmer;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExpressionsController;
 
@@ -43,9 +44,13 @@ class ExpressionLanguageCacheWarmerTest extends TestCase
         $queryFile = $this->buildDir.'/expression_language/query.php';
         $otherFile = $this->buildDir.'/expression_language/other.php';
         $warmer = new ExpressionLanguageCacheWarmer(
-            [$cacheFile => new CompiledExpressionLanguage(new ExpressionLanguage()), $queryFile => new CompiledExpressionLanguage(new ExpressionLanguage()), $otherFile => new CompiledExpressionLanguage(new ExpressionLanguage())],
-            [ExpressionsController::class],
-            [$cacheFile => [Cache::class => ['if' => true, 'lastModified' => true, 'etag' => true]], $queryFile => [MapQueryString::class => ['validationGroups' => false]], $otherFile => [Cache::class => ['if' => false]]],
+            ['cache' => new CompiledExpressionLanguage(new ExpressionLanguage()), 'query' => new CompiledExpressionLanguage(new ExpressionLanguage()), 'other' => new CompiledExpressionLanguage(new ExpressionLanguage())],
+            ['cache' => $cacheFile, 'query' => $queryFile, 'other' => $otherFile],
+            new ExpressionCollector([ExpressionsController::class], [
+                'cache' => [Cache::class => ['if' => [true, null], 'lastModified' => [true, null], 'etag' => [true, null]]],
+                'query' => [MapQueryString::class => ['validationGroups' => [false, null]]],
+                'other' => [Cache::class => ['if' => [false, null]]],
+            ]),
         );
 
         $this->assertTrue($warmer->isOptional());
@@ -63,7 +68,7 @@ class ExpressionLanguageCacheWarmerTest extends TestCase
     {
         $file = $this->buildDir.'/expression_language/expressions.php';
         $otherFile = $this->buildDir.'/expression_language/other.php';
-        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage()), $otherFile => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['request.isSecure()' => ['request']]]);
+        $warmer = new ExpressionLanguageCacheWarmer(['app' => new CompiledExpressionLanguage(new ExpressionLanguage()), 'other' => new CompiledExpressionLanguage(new ExpressionLanguage())], ['app' => $file, 'other' => $otherFile], new ExpressionCollector([], [], ['app' => ['request.isSecure()' => [['request'], []]]]));
 
         $warmer->warmUp($this->buildDir, $this->buildDir);
 
@@ -74,7 +79,7 @@ class ExpressionLanguageCacheWarmerTest extends TestCase
     public function testWarmUpFailsOnInvalidListedExpression()
     {
         $file = $this->buildDir.'/expression_language/expressions.php';
-        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['request.isSecure()' => null, 'a +' => null]]);
+        $warmer = new ExpressionLanguageCacheWarmer(['app' => new CompiledExpressionLanguage(new ExpressionLanguage())], ['app' => $file], new ExpressionCollector([], [], ['app' => ['request.isSecure()' => [null, []], 'a +' => [null, []]]]));
 
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Unexpected token "end of expression" of value "" around position 4 for expression `a +`.');
@@ -85,7 +90,7 @@ class ExpressionLanguageCacheWarmerTest extends TestCase
     public function testWarmUpFailsOnUnknownVariableInListedExpression()
     {
         $file = $this->buildDir.'/expression_language/expressions.php';
-        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['request.isSecure()' => ['req']]]);
+        $warmer = new ExpressionLanguageCacheWarmer(['app' => new CompiledExpressionLanguage(new ExpressionLanguage())], ['app' => $file], new ExpressionCollector([], [], ['app' => ['request.isSecure()' => [['req'], []]]]));
 
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Variable "request" is not valid around position 1 for expression `request.isSecure()`.');
@@ -96,7 +101,7 @@ class ExpressionLanguageCacheWarmerTest extends TestCase
     public function testWarmUpFailsOnUnknownFunctionInListedExpression()
     {
         $file = $this->buildDir.'/expression_language/expressions.php';
-        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage())], [], [], [$file => ['is_granted("ROLE_ADMIN")' => null]]);
+        $warmer = new ExpressionLanguageCacheWarmer(['app' => new CompiledExpressionLanguage(new ExpressionLanguage())], ['app' => $file], new ExpressionCollector([], [], ['app' => ['is_granted("ROLE_ADMIN")' => [null, []]]]));
 
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('The function "is_granted" does not exist around position 1 for expression `is_granted("ROLE_ADMIN")`.');
@@ -107,7 +112,7 @@ class ExpressionLanguageCacheWarmerTest extends TestCase
     public function testWarmUpWithoutBuildDir()
     {
         $file = $this->buildDir.'/expression_language/expressions.php';
-        $warmer = new ExpressionLanguageCacheWarmer([$file => new CompiledExpressionLanguage(new ExpressionLanguage())], [ExpressionsController::class], [$file => [Cache::class => ['etag' => true]]]);
+        $warmer = new ExpressionLanguageCacheWarmer(['app' => new CompiledExpressionLanguage(new ExpressionLanguage())], ['app' => $file], new ExpressionCollector([ExpressionsController::class], ['app' => [Cache::class => ['etag' => [true, null]]]]));
 
         $this->assertSame([], $warmer->warmUp($this->buildDir));
         $this->assertFileDoesNotExist($file);

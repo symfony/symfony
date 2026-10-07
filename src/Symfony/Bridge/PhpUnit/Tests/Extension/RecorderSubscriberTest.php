@@ -45,6 +45,9 @@ class RecorderSubscriberTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider provideResolveRecordPathCases
+     */
     #[DataProvider('provideResolveRecordPathCases')]
     public function testResolveRecordPath(?string $record, int|string|null $dataSetName, ?string $directory, string $expected)
     {
@@ -64,6 +67,9 @@ class RecorderSubscriberTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider provideIsAbsolutePathCases
+     */
     #[DataProvider('provideIsAbsolutePathCases')]
     public function testIsAbsolutePath(string $path, bool $expected)
     {

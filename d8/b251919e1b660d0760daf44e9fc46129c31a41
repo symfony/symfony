@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-05T11:25:06Z
+
+Thanks for the review. I reworked the pull request along those lines.
+
+The Serializer now keeps the outer class of `Collection<int, User>`. `AbstractObjectNormalizer` instantiates a concrete collection class that can be built from the elements, and delegates a collection interface to a normalizer that knows how to build it, with `value_type` and `key_type` in the context. When the constructor parameter or the setter accepts a plain array, the elements are passed as an array and the target builds the collection itself.
+
+This is also what fixes the `MapRequestPayload` case: the constructor now receives what it expects, so it runs, and the `newInstanceWithoutConstructor()` fallback that produced the 500 is not needed anymore.
+
+The PropertyAccess and PropertyInfo changes are dropped. `PropertyWriteInfo::TYPE_COLLECTION_ADDER_AND_REMOVER`, the `#[WithCollectionAccessors]` attribute and the accessor changes are gone, so consumers that switch on `getType()` (like jolicode/automapper) are not affected. Once the collection class is restored during denormalization, the existing write path is enough.
+
+The Doctrine bridge gains `CollectionDenormalizer`, which builds the `Collection` interface as an `ArrayCollection` by default. Like the other Doctrine bridge services, it is registered by DoctrineBundle, and a companion pull request will do that.
+
+Tests cover the array constructor, the array setter, an abstract container, scalar and nullable elements, and the interface path with and without a normalizer.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-05T13:22:38Z
+
+Thanks for the rework, the issue's example and the 500 are fixed and PropertyAccess is untouched now.
+
+I pushed a few commits on top, including one in your name that keeps the elements in the core and delegates only the container: with `deep_object_to_populate`, `CollectionDenormalizer` wrote into the existing collection by position (on a real entity, PATCHing `tags: [{"name": "x"}]` ran `UPDATE Tag SET name = 'x' WHERE id = 1` on a tag shared with other posts, and never called `addTag()`/`removeTag()`), and handing raw data to the delegate skipped the element rules (`Collection<int, int>` accepted `"x"`, nested collections lost data). The collection class is now built only when the write target rejects arrays, so `GetSetMethodNormalizer` with `setUsers(array)` keeps working.
+
+One thing left: a `Collection<int, User>|User[]` property now gets an `ArrayCollection` where it got an array. Is the DoctrineBundle PR coming? WDYT?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-05T14:08:54Z
+
+Thanks; I'm testing with API Platform. It seems we need some more changes.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-06T04:23:22Z
+
+Downstream, three pull requests wire this up:
+
+- api-platform/core#8640: `AbstractItemNormalizer` asks the Serializer for the collection class declared on the property, with `value_type` and `key_type` in the context, instead of `Foo[]`.
+- doctrine/DoctrineBundle#2297: registers the `CollectionDenormalizer` as `doctrine.orm.collection_denormalizer`.
+- doctrine/DoctrineMongoDBBundle#994: registers the same service as `doctrine_mongodb.odm.collection_denormalizer`.
+
+All three guard on `class_exists(CollectionDenormalizer::class)`, so they stay inert until 8.2 is released.
+
+One point about the shape of the result. The retained implementation injects a whole collection object: the elements are denormalized, the collection is built from them, and the property is written with that collection. With adders and removers, the elements are added one by one instead, which is how collections are handled today. The core keeps that element by element path as long as the write target accepts an array, and only builds the collection class when the target rejects one. On the API Platform side the collection class is requested whenever the property declares one and the class is available, so that distinction is not applied yet.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-06T18:45:56Z
+
+nicolas-grekas flagged that a `Collection<int, User>|User[]` property got an `ArrayCollection` where it got an array before. That is fixed: `createArrayOfElements()` now handles `UnionType`, building the array type for every member that declares a collection class and keeping the members that are already arrays, and `adaptTypeToWriteTarget()` goes through it. Two tests cover the array constructor parameter and the array property; both fail on the previous tip.
+
+The branch is rebased on the current 8.2 tip.
+
+The registration pull requests are now open: doctrine/DoctrineBundle#2297 and doctrine/DoctrineMongoDBBundle#994. API Platform passes the declared container class and the element type to the Serializer in api-platform/core#8640.

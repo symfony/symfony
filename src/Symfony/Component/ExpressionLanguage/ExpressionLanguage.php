@@ -24,10 +24,13 @@ class_exists(ParsedExpression::class);
  */
 class ExpressionLanguage
 {
+    private const MAX_PARSED_EXPRESSIONS = 1024;
+
     private CacheItemPoolInterface $cache;
     private Lexer $lexer;
     private Parser $parser;
     private Compiler $compiler;
+    private array $parsedExpressions = [];
 
     protected array $functions = [];
 
@@ -77,7 +80,17 @@ class ExpressionLanguage
             $cacheKeyItems[] = \is_int($nameKey) ? $name : $nameKey.':'.$name;
         }
 
-        $cacheItem = $this->cache->getItem(rawurlencode($expression.'//'.implode('|', $cacheKeyItems).($flags ? '//'.$flags : '')));
+        $key = $expression.'//'.implode('|', $cacheKeyItems).($flags ? '//'.$flags : '');
+
+        if (isset($this->parsedExpressions[$key])) {
+            // move the expression last, so that the least recently used one is evicted first
+            $parsedExpression = $this->parsedExpressions[$key];
+            unset($this->parsedExpressions[$key]);
+
+            return $this->parsedExpressions[$key] = $parsedExpression;
+        }
+
+        $cacheItem = $this->cache->getItem(rawurlencode($key));
 
         if (null === $parsedExpression = $cacheItem->get()) {
             $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names, $flags);
@@ -87,7 +100,11 @@ class ExpressionLanguage
             $this->cache->save($cacheItem);
         }
 
-        return $parsedExpression;
+        if (\count($this->parsedExpressions) >= self::MAX_PARSED_EXPRESSIONS) {
+            unset($this->parsedExpressions[array_key_first($this->parsedExpressions)]);
+        }
+
+        return $this->parsedExpressions[$key] = $parsedExpression;
     }
 
     /**

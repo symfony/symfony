@@ -17,6 +17,8 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
@@ -36,14 +38,14 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage = new ExpressionLanguage($cacheMock);
 
         $cacheMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getItem')
             ->with('1%20%2B%201%2F%2F')
             ->willReturn($cacheItemMock)
         ;
 
         $cacheItemMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('get')
             ->willReturnCallback(static function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
@@ -73,6 +75,27 @@ class ExpressionLanguageTest extends TestCase
 
         $parsedExpression = $expressionLanguage->parse('1 + 1', []);
         $this->assertSame($savedParsedExpression, $parsedExpression);
+    }
+
+    public function testKeepsTheLastUsedParsedExpressionsInMemory()
+    {
+        $cache = new TraceableAdapter(new ArrayAdapter());
+        $expressionLanguage = new ExpressionLanguage($cache);
+
+        for ($i = 0; $i < 1024; ++$i) {
+            $expressionLanguage->parse((string) $i, []);
+        }
+
+        $expressionLanguage->parse('0', []);
+        $expressionLanguage->parse('1024', []);
+        $cache->clearCalls();
+
+        $expressionLanguage->parse('0', []);
+        $expressionLanguage->parse('1024', []);
+        $this->assertSame([], $cache->getCalls());
+
+        $expressionLanguage->parse('1', []);
+        $this->assertSame(['getItem'], array_column($cache->getCalls(), 'name'));
     }
 
     #[DataProvider('basicPhpFunctionProvider')]
@@ -295,14 +318,14 @@ class ExpressionLanguageTest extends TestCase
         $savedParsedExpression = null;
 
         $cacheMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getItem')
             ->with('a%20%2B%20b%2F%2Fa%7CB%3Ab')
             ->willReturn($cacheItemMock)
         ;
 
         $cacheItemMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('get')
             ->willReturnCallback(static function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
@@ -456,6 +479,30 @@ class ExpressionLanguageTest extends TestCase
 
             $this->fail(\sprintf('Evaluating "%s" again should throw.', $expression));
         }
+    }
+
+    public function testNullSafeEvaluateFailsWhileAnotherFiberEvaluatesTheSameParsedExpression()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $parsedExpression = $expressionLanguage->parse('foo?.bar().baz', ['foo']);
+        $foo = new class {
+            public function bar()
+            {
+                \Fiber::suspend();
+
+                return null;
+            }
+        };
+
+        $fiber = new \Fiber(static fn () => $expressionLanguage->evaluate($parsedExpression, ['foo' => $foo]));
+        $fiber->start();
+
+        $this->assertNull($expressionLanguage->evaluate($parsedExpression, ['foo' => null]));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to get property "baz" of non-object "foo?.bar()".');
+
+        $fiber->resume();
     }
 
     public static function provideInvalidNullSafe()

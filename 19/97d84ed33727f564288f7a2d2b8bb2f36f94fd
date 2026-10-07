@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T19:35:03Z
+
+Thanks for the thorough check @wachterjohannes! About `clear()`: a parsed expression only depends on the expression and the names (functions are looked up by name when evaluating), so the copies kept in memory can't go stale, clearing the pool only frees space. About `$flags`: right, that gap predates this PR in the pool key, it's fixed on 7.4 in #66666 and this PR will inherit it.

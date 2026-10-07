@@ -27,6 +27,9 @@ final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface
     private const GLUE = '.';
 
     /**
+     * Definition name prefix => class that claimed it first, so two classes sharing a short name
+     * (App\Input\Book, App\Output\Book) never end up under the same definition.
+     *
      * @var array<string, class-string>
      */
     private array $owners = [];

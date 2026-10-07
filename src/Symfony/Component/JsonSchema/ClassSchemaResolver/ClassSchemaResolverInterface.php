@@ -17,6 +17,14 @@ use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
 /**
  * Describes a class with an inline schema instead of a definition.
  *
+ * Resolvers are asked in order every time a class is reached (root type, property, collection
+ * value, union member) before a definition is named, and the first non-null schema is inlined
+ * as is. Value objects serialized as scalars (dates, UUIDs, enums) or relations rendered as
+ * links are typical use cases: the parent tells through which property the class is reached.
+ *
+ * The schema is still subject to the null syntax of the dialect when the type is nullable,
+ * definition processors do not run on it.
+ *
  * @experimental
  */
 interface ClassSchemaResolverInterface

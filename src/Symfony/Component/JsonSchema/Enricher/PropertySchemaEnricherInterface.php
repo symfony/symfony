@@ -14,6 +14,20 @@ namespace Symfony\Component\JsonSchema\Enricher;
 use Symfony\Component\JsonSchema\Configuration;
 
 /**
+ * Refines the schema of a property once it is generated (descriptions, validation constraints, examples...).
+ *
+ * Enrichers run in order on every property of a definition, each one receiving the result
+ * of the previous one. The schema already holds the type schema (or the provided one), the default
+ * value and readOnly/writeOnly. It may be a reference or wrapped for null ({"anyOf": [..., {"type": "null"}]},
+ * "nullable", or "allOf" around a reference depending on the dialect), keywords that only make sense on
+ * the value type must account for it.
+ *
+ * {@see PropertySchema::$required} starts as false: a property is only required when an enricher says so,
+ * a nullable property can still be required.
+ *
+ * The configuration is the one of the class owning the property. Since a definition is built once
+ * per name, an enricher depending on something not encoded in the name sees the first occurrence only.
+ *
  * @experimental
  */
 interface PropertySchemaEnricherInterface

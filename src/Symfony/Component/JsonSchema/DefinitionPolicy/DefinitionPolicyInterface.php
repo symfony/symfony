@@ -16,6 +16,14 @@ use Symfony\Component\JsonSchema\Configuration;
 /**
  * Names the definition describing a class under a given configuration.
  *
+ * The name is the identity of a definition: it is called every time a class is reached
+ * and a definition is only built for the first occurrence of a name, with that occurrence's
+ * parent. Anything that changes the shape of the definition (groups, attributes, a format,
+ * the owning property...) must therefore be part of the name, otherwise the first shape wins.
+ *
+ * The name is reserved before the class properties are visited, which is what stops
+ * self-referencing classes from recursing forever.
+ *
  * @experimental
  */
 interface DefinitionPolicyInterface

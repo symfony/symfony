@@ -99,23 +99,6 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testRootDescriptionIsSetOnTheRootNode()
-    {
-        $schema = (new Schema(['type' => 'array', 'items' => ['$ref' => '#/$defs/Foo']], ['Foo' => ['type' => 'object']], Dialect::jsonSchema202012()))
-            ->withDescription('Foos.')
-            ->withDeprecated();
-
-        $this->assertSame(['type' => 'array', 'items' => ['$ref' => '#/$defs/Foo'], 'description' => 'Foos.', 'deprecated' => true], $schema->getRoot());
-        $this->assertSame(['Foo' => ['type' => 'object']], $schema->getDefinitions());
-    }
-
-    public function testDeprecatedIsDroppedWhenTheDialectHasNoSuchKeyword()
-    {
-        $schema = (new Schema(['$ref' => '#/definitions/Foo'], ['Foo' => ['type' => 'object']], Dialect::swagger20()))->withDeprecated();
-
-        $this->assertSame(['$ref' => '#/definitions/Foo'], $schema->getRoot());
-    }
-
     public function testJsonSerializeMatchesToArray()
     {
         $schema = new Schema(['$ref' => '#/$defs/Foo'], ['Foo' => ['type' => 'object', 'properties' => ['any' => []]]], Dialect::jsonSchema202012());

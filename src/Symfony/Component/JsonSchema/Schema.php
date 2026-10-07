@@ -49,25 +49,6 @@ final class Schema implements \JsonSerializable
         return $this->definitions;
     }
 
-    public function getDialect(): Dialect
-    {
-        return $this->dialect;
-    }
-
-    public function withDescription(string $description): self
-    {
-        return $this->withRootKeywords(['description' => $description]);
-    }
-
-    public function withDeprecated(bool $deprecated = true): self
-    {
-        if (!$this->dialect->supportsDeprecated) {
-            return $this;
-        }
-
-        return $this->withRootKeywords(['deprecated' => $deprecated]);
-    }
-
     /**
      * Inlines every reference, except the ones closing a cycle: those keep their $ref and definition.
      */
@@ -107,20 +88,6 @@ final class Schema implements \JsonSerializable
     public function jsonSerialize(): array|\ArrayObject
     {
         return self::encodeSchema($this->toArray());
-    }
-
-    /**
-     * @param array<string, mixed> $keywords
-     */
-    private function withRootKeywords(array $keywords): self
-    {
-        $root = $this->root;
-
-        if (isset($root['$ref']) && !$this->dialect->supportsRefSiblings) {
-            $root = ['allOf' => [$root]];
-        }
-
-        return new self([...$root, ...$keywords], $this->definitions, $this->dialect);
     }
 
     /**

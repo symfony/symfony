@@ -661,28 +661,6 @@ class SchemaGeneratorTest extends TestCase
         $this->assertArrayNotHasKey('examples', $properties['slug']);
     }
 
-    public function testRootDescriptionDoesNotLeakIntoDefinitions()
-    {
-        $schema = SchemaGenerator::create()
-            ->generate(Type::object(SelfReferencingCategory::class))
-            ->withDescription('A category tree.')
-            ->withDeprecated();
-
-        $this->assertSameSchema(['$ref' => '#/$defs/SelfReferencingCategory', 'description' => 'A category tree.', 'deprecated' => true], $schema->getRoot());
-        $this->assertArrayNotHasKey('description', $schema->getDefinitions()['SelfReferencingCategory']);
-        $this->assertArrayNotHasKey('deprecated', $schema->getDefinitions()['SelfReferencingCategory']);
-    }
-
-    public function testRootDescriptionWrapsTheReferenceWhenSiblingsAreIgnored()
-    {
-        $schema = SchemaGenerator::create()
-            ->generate(Type::object(BookWithAuthors::class), new Configuration(dialect: Dialect::openApi30()))
-            ->withDescription('A book.');
-
-        $this->assertSameSchema(['allOf' => [['$ref' => '#/components/schemas/BookWithAuthors']], 'description' => 'A book.'], $schema->getRoot());
-        $this->assertArrayNotHasKey('description', $schema->getDefinitions()['Author']);
-    }
-
     public function testNameConverterRenamesProperties()
     {
         $generator = new SchemaGenerator(self::createReflectionPropertyInfo(), new ShortNameDefinitionPolicy(), propertySchemaEnrichers: [new AttributePropertySchemaEnricher()], nameConverter: new CamelCaseToSnakeCaseNameConverter());

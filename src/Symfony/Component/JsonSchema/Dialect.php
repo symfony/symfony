@@ -23,8 +23,6 @@ final readonly class Dialect
         public bool $supportsExclusiveMinAsNumber = true,
         public bool $supportsExamples = true,
         public bool $supportsDiscriminator = true,
-        public bool $supportsRefSiblings = true,
-        public bool $supportsDeprecated = true,
         public ?string $schemaUri = null,
     ) {
     }
@@ -47,7 +45,6 @@ final readonly class Dialect
             supportsConst: false,
             supportsExclusiveMinAsNumber: false,
             supportsExamples: false,
-            supportsRefSiblings: false,
         );
     }
 
@@ -59,8 +56,6 @@ final readonly class Dialect
             supportsConst: false,
             supportsExclusiveMinAsNumber: false,
             supportsExamples: false,
-            supportsRefSiblings: false,
-            supportsDeprecated: false,
         );
     }
 }

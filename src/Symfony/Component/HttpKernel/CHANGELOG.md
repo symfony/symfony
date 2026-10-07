@@ -27,6 +27,7 @@ CHANGELOG
  * Consume the tokens of `#[RateLimit]` before resolving the controller arguments when its key does not read them
  * Add argument `$expressionLanguage` to `RateLimitAttributeListener`
  * Add the `$if` argument to `#[RateLimit]`
+ * Add the `#[Lock]` attribute and `ConcurrentRequestHttpException` to reject or delay concurrent requests to a controller
 
 8.1
 ---

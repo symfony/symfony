@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Attribute\Cache;
+use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
@@ -41,6 +42,7 @@ use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\IsSignatureValidAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
+use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
 use Symfony\Component\HttpKernel\EventListener\SerializeControllerResultAttributeListener;
@@ -176,6 +178,16 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
 
+        ->set('lock.attribute_listener', LockAttributeListener::class)
+            ->args([
+                tagged_locator('lock.factory', 'name'),
+                service('request_stack'),
+                service('controller.expression_language')->nullOnInvalid(),
+            ])
+            ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
+            ->tag('container.remove_if_missing', ['service' => 'lock.factory.abstract'])
+
         ->set('controller.helper', ControllerHelper::class)
             ->tag('container.service_subscriber')
 
@@ -193,6 +205,7 @@ return static function (ContainerConfigurator $container) {
                     MapQueryString::class => ['validationGroups'],
                     MapRequestPayload::class => ['validationGroups'],
                     RateLimit::class => ['key'],
+                    Lock::class => ['key'],
                 ],
                 'string_expressions' => [
                     Cache::class => ['if', 'lastModified', 'etag'],

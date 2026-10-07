@@ -70,7 +70,9 @@ use Symfony\Component\HttpClient\HttpClientBundle;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -647,6 +649,33 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('lock.default.factory'));
         $this->assertSame('.lock.flock.store', (string) $container->getDefinition('lock.default.factory')->getArgument(0));
         $this->assertSame('lock.default.factory', (string) $container->getAlias('lock.factory'));
+    }
+
+    public function testLockAttributeListener()
+    {
+        $container = $this->createContainerFromFile('legacy_lock');
+
+        $this->assertTrue($container->hasDefinition('lock.attribute_listener'));
+        $definition = $container->getDefinition('lock.attribute_listener');
+        $this->assertSame(LockAttributeListener::class, $definition->getClass());
+        $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
+        $this->assertSame([['method' => 'reset']], $definition->getTag('kernel.reset'));
+
+        $locator = $definition->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+        $this->assertSame('lock.factory', $locator->getTaggedIteratorArgument()->getTag());
+        $this->assertSame('name', $locator->getTaggedIteratorArgument()->getIndexAttribute());
+        $this->assertEquals(new Reference('request_stack'), $definition->getArgument(1));
+        $this->assertEquals(new Reference('controller.expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(2));
+        $this->assertSame(['key'], $container->getDefinition('controller.expression_language')->getTag('expression_language.compiled')[0]['attributes'][Lock::class]);
+        $this->assertSame([['name' => 'default']], $container->getDefinition('lock.default.factory')->getTag('lock.factory'));
+    }
+
+    public function testLockAttributeListenerIsRemovedWhenLockIsDisabled()
+    {
+        $container = $this->createContainerFromFile('legacy_lock_disabled');
+
+        $this->assertFalse($container->hasDefinition('lock.attribute_listener'));
     }
 
     public function testEnabledPhpErrorsConfig()

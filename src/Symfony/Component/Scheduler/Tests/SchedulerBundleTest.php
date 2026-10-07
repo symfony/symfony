@@ -191,7 +191,7 @@ class SchedulerBundleTest extends TestCase
         ]);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "framework.scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%"). Set a static boolean instead.');
+        $this->expectExceptionMessage('The "scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%"). Set a static boolean instead.');
 
         $container->compile();
     }

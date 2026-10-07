@@ -95,7 +95,7 @@ class SchedulerBundle extends AbstractBundle
             $container->resolveEnvPlaceholders($useMessengerRouting, null, $usedEnvs);
 
             if ($usedEnvs) {
-                throw new InvalidArgumentException(\sprintf('The "framework.scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%%env(%s)%%"). Set a static boolean instead.', implode('", "', array_keys($usedEnvs))));
+                throw new InvalidArgumentException(\sprintf('The "scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%%env(%s)%%"). Set a static boolean instead.', implode('", "', array_keys($usedEnvs))));
             }
         }
 

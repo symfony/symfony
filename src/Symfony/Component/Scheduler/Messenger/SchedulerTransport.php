@@ -46,7 +46,7 @@ class SchedulerTransport implements TransportInterface
 
                 $message = $message->envelope;
             } elseif (null === $this->useMessengerRouting) {
-                trigger_deprecation('symfony/framework-bundle', '8.2', 'Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
+                trigger_deprecation('symfony/scheduler', '8.2', 'Not setting the "scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
             } elseif ($this->useMessengerRouting) {
                 $stamps[] = new RedispatchStamp();
             }

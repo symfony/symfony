@@ -223,7 +223,7 @@ class SchedulerTransportTest extends TestCase
             yield new MessageContext('default', 'id', $this->createStub(TriggerInterface::class), new \DateTimeImmutable()) => new \stdClass();
         });
 
-        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
+        $this->expectUserDeprecationMessage('Since symfony/scheduler 8.2: Not setting the "scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
 
         $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: null))->get());
 

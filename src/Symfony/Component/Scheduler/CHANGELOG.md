@@ -11,6 +11,7 @@ CHANGELOG
  * Add `env` option to `#[AsCronTask]` and `#[AsPeriodicTask]` to restrict a task to one or more environments
  * Deprecate `Schedule::with()`, use `add()` on a new `Schedule` instead
  * Add the `scheduler.use_messenger_routing` option and the `$useMessengerRouting` argument of `SchedulerTransport` and `SchedulerTransportFactory`, to send scheduled messages through the Messenger senders configured for their class
+ * Deprecate not setting the `scheduler.use_messenger_routing` option, it will default to `true` in 9.0
  * Add `SerializedTrigger`, the trigger a `MessageContext` carries once its message has crossed a transport
  * Dispatch the scheduled message instead of its `RedispatchMessage` wrapper in `PreRunEvent`, `PostRunEvent` and `FailureEvent`
  * Add the `schedules` configuration option to make a schedule stateful or locked, and to process only its last missed run

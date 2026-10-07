@@ -29,7 +29,6 @@ CHANGELOG
  * Add `--dispatchers` option to `debug:event-dispatcher` command
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
  * Make the config tree independent from `kernel.debug` and deprecate passing the `$debug` argument to `DependencyInjection\Configuration::__construct()`
- * Deprecate not setting the `framework.scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
  * Report `.env` variables that the container never uses in `debug:container --env-vars`
  * Make BrowserKit assertions non-verbose by default
  * Resolve `debug:config` paths whose keys contain dots, e.g. `debug:config framework options.option.main`

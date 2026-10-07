@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheFactory;
@@ -28,6 +29,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\HtmlTranslator;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\TranslationBundle;
@@ -50,6 +52,17 @@ class TranslationBundleTest extends TestCase
         $this->assertFalse($container->hasDefinition('translator.default'));
         $this->assertTrue($container->hasDefinition('translator'));
         $this->assertSame(IdentityTranslator::class, $container->getDefinition('translator')->getClass());
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testTheHtmlTranslatorWrapsTheTranslator(bool $enabled)
+    {
+        $container = $this->load(['enabled' => $enabled]);
+
+        $this->assertSame(HtmlTranslator::class, $container->getDefinition('translator.html')->getClass());
+        $this->assertEquals([new Reference('translator')], $container->getDefinition('translator.html')->getArguments());
+        $this->assertSame('translator.html', (string) $container->getAlias(HtmlTranslator::class));
     }
 
     public function testTheLocalesAreReferencedInsteadOfResolved()

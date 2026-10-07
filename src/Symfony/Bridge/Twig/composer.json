@@ -46,7 +46,7 @@
         "symfony/security-http": "^8.2",
         "symfony/serializer": "^7.4.17|^8.1.5",
         "symfony/stopwatch": "^7.4|^8.0",
-        "symfony/translation": "^7.4|^8.0",
+        "symfony/translation": "^8.2",
         "symfony/validator": "^7.4|^8.0",
         "symfony/web-link": "^7.4|^8.0",
         "symfony/workflow": "^7.4|^8.0",

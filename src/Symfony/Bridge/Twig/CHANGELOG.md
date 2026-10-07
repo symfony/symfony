@@ -13,6 +13,7 @@ CHANGELOG
  * Allow passing a null user to the `is_granted_for_user()` and `access_decision_for_user()` functions to check guest permissions
  * Deprecate the `render_hinclude()` Twig function; use `render_esi()` or `render()`, or Symfony UX Turbo, instead
  * Add a `for _self` modifier to the `trans_default_domain` tag to apply the domain to the whole template
+ * Add the `trans_html` filter to translate messages whose tags are replaced by HTML elements while everything else is escaped
 
 8.1
 ---

@@ -100,7 +100,7 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
             return $node;
         }
 
-        if ($node instanceof FilterExpression && 'trans' === ($node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'))) {
+        if ($node instanceof FilterExpression && \in_array($node->hasAttribute('twig_callable') ? $node->getAttribute('twig_callable')->getName() : $node->getNode('filter')->getAttribute('value'), ['trans', 'trans_html'], true)) {
             $arguments = $node->getNode('arguments');
 
             if ($arguments instanceof EmptyNode) {

@@ -29,6 +29,7 @@ class UndefinedCallableHandler
         'normalize' => 'serializer',
         'serialize' => 'serializer',
         'trans' => 'translation',
+        'trans_html' => 'translation',
         'sanitize_html' => 'html-sanitizer',
         'yaml_encode' => 'yaml',
         'yaml_dump' => 'yaml',

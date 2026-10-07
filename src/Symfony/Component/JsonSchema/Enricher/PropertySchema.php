@@ -18,18 +18,18 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @experimental
  */
-final readonly class PropertySchema
+final class PropertySchema
 {
     /**
      * @param class-string         $class
      * @param array<string, mixed> $schema
      */
     public function __construct(
-        public string $class,
-        public string $property,
-        public ?Type $type,
-        public array $schema,
-        public bool $required,
+        public readonly string $class,
+        public readonly string $property,
+        public readonly ?Type $type,
+        public readonly array $schema,
+        public readonly bool $required,
     ) {
     }
 

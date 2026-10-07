@@ -20,16 +20,16 @@ use Symfony\Component\JsonSchema\Configuration;
  *
  * @experimental
  */
-final readonly class DefinitionParent
+final class DefinitionParent
 {
     /**
      * @param class-string $class
      */
     public function __construct(
-        public string $class,
-        public string $property,
-        public Configuration $config,
-        public ?self $parent = null,
+        public readonly string $class,
+        public readonly string $property,
+        public readonly Configuration $config,
+        public readonly ?self $parent = null,
     ) {
     }
 }

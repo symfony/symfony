@@ -58,7 +58,7 @@ final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface
             $name = $parts ? $prefix.'-'.implode('_', $parts) : $prefix;
         }
 
-        return preg_replace('/[^a-zA-Z0-9.\-_]/', self::GLUE, $name);
+        return (string) preg_replace('/[^a-zA-Z0-9.\-_]/', self::GLUE, $name);
     }
 
     private function claim(string $name, string $class): ?string

@@ -16,9 +16,9 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 /**
  * @experimental
  */
-final readonly class Configuration
+final class Configuration
 {
-    public Dialect $dialect;
+    public readonly Dialect $dialect;
 
     /**
      * @param list<string>                                                         $groups
@@ -29,14 +29,14 @@ final readonly class Configuration
      */
     public function __construct(
         ?Dialect $dialect = null,
-        public array $groups = [],
-        public ?array $attributes = null,
-        public array $ignoredAttributes = [],
-        public bool $allowExtraAttributes = true,
-        public array|GroupSequence|\Closure|null $validationGroups = null,
-        public ?string $definitionName = null,
-        public ?string $definitionPrefix = null,
-        public ?string $format = null,
+        public readonly array $groups = [],
+        public readonly ?array $attributes = null,
+        public readonly array $ignoredAttributes = [],
+        public readonly bool $allowExtraAttributes = true,
+        public readonly array|GroupSequence|\Closure|null $validationGroups = null,
+        public readonly ?string $definitionName = null,
+        public readonly ?string $definitionPrefix = null,
+        public readonly ?string $format = null,
     ) {
         $this->dialect = $dialect ?? Dialect::jsonSchema202012();
     }

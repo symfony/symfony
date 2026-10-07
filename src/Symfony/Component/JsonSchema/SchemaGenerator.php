@@ -200,7 +200,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             NullSyntax::Unsupported => $schema,
             NullSyntax::NullableFlag => isset($schema['$ref']) ? ['allOf' => [$schema], 'nullable' => true] : [...$schema, 'nullable' => true],
             NullSyntax::Union => match (true) {
-                isset($schema['type']) => [...$schema, 'type' => [...(array) $schema['type'], 'null']],
+                isset($schema['type']) => array_replace($schema, ['type' => [...(array) $schema['type'], 'null']]),
                 isset($schema['anyOf']) && 1 === \count($schema) => ['anyOf' => [...$schema['anyOf'], ['type' => 'null']]],
                 default => ['anyOf' => [$schema, ['type' => 'null']]],
             },

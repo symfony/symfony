@@ -14,15 +14,15 @@ namespace Symfony\Component\JsonSchema;
 /**
  * @experimental
  */
-final readonly class Dialect
+final class Dialect
 {
     public function __construct(
-        public string $refPath,
-        public NullSyntax $nullSyntax,
-        public bool $supportsConst = true,
-        public bool $supportsExclusiveMinAsNumber = true,
-        public bool $supportsExamples = true,
-        public ?string $schemaUri = null,
+        public readonly string $refPath,
+        public readonly NullSyntax $nullSyntax,
+        public readonly bool $supportsConst = true,
+        public readonly bool $supportsExclusiveMinAsNumber = true,
+        public readonly bool $supportsExamples = true,
+        public readonly ?string $schemaUri = null,
     ) {
     }
 

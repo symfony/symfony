@@ -17,36 +17,36 @@ namespace Symfony\Component\JsonSchema\Attribute;
  * @experimental
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final readonly class JsonSchemaConstraint
+final class JsonSchemaConstraint
 {
     /**
      * @param list<mixed>|null $enum
      */
     public function __construct(
-        public ?string $title = null,
-        public ?string $description = null,
-        public ?string $format = null,
-        public ?array $enum = null,
-        public mixed $const = null,
-        public ?string $pattern = null,
-        public ?int $minLength = null,
-        public ?int $maxLength = null,
-        public int|float|null $minimum = null,
-        public int|float|null $maximum = null,
-        public int|float|null $exclusiveMinimum = null,
-        public int|float|null $exclusiveMaximum = null,
-        public int|float|null $multipleOf = null,
-        public ?int $minItems = null,
-        public ?int $maxItems = null,
-        public ?bool $uniqueItems = null,
-        public ?int $minProperties = null,
-        public ?int $maxProperties = null,
-        public mixed $default = null,
-        public mixed $example = null,
-        public ?bool $deprecated = null,
-        public ?bool $readOnly = null,
-        public ?bool $writeOnly = null,
-        public ?bool $required = null,
+        public readonly ?string $title = null,
+        public readonly ?string $description = null,
+        public readonly ?string $format = null,
+        public readonly ?array $enum = null,
+        public readonly mixed $const = null,
+        public readonly ?string $pattern = null,
+        public readonly ?int $minLength = null,
+        public readonly ?int $maxLength = null,
+        public readonly int|float|null $minimum = null,
+        public readonly int|float|null $maximum = null,
+        public readonly int|float|null $exclusiveMinimum = null,
+        public readonly int|float|null $exclusiveMaximum = null,
+        public readonly int|float|null $multipleOf = null,
+        public readonly ?int $minItems = null,
+        public readonly ?int $maxItems = null,
+        public readonly ?bool $uniqueItems = null,
+        public readonly ?int $minProperties = null,
+        public readonly ?int $maxProperties = null,
+        public readonly mixed $default = null,
+        public readonly mixed $example = null,
+        public readonly ?bool $deprecated = null,
+        public readonly ?bool $readOnly = null,
+        public readonly ?bool $writeOnly = null,
+        public readonly ?bool $required = null,
     ) {
     }
 }

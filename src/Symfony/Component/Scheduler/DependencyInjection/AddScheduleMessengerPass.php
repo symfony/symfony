@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -161,12 +162,46 @@ class AddScheduleMessengerPass implements CompilerPassInterface
             }
         }
 
+        $schedulesConfig = [];
+
+        foreach ($container->hasParameter('.scheduler.schedules') ? $container->getParameter('.scheduler.schedules') : [] as $scheduleName => $scheduleConfig) {
+            if (!isset($tasksPerSchedule[$scheduleName]) && !isset($scheduleProviderIds[$scheduleName])) {
+                $knownSchedules = array_keys($tasksPerSchedule + $scheduleProviderIds);
+                sort($knownSchedules);
+
+                $container->log($this, \sprintf('Schedule "%s" is configured but no task or schedule provider uses it; check for a typo (known schedules: "%s").', $scheduleName, implode('", "', $knownSchedules)));
+
+                continue;
+            }
+
+            $tasksPerSchedule[$scheduleName] ??= [];
+
+            if ($scheduleConfig['stateful'] ?? false) {
+                $scheduleConfig['cache_pool'] ??= 'cache.scheduler';
+                $scheduleConfig['lock_factory'] ??= $container->has('lock.factory') ? 'lock.factory' : null;
+            }
+
+            $schedulesConfig[$scheduleName] = $scheduleConfig;
+        }
+
         foreach ($tasksPerSchedule as $scheduleName => $tasks) {
             $id = "scheduler.provider.$scheduleName";
             $schedule = new Definition(Schedule::class);
 
             if ($tasks) {
                 $schedule->addMethodCall('add', $tasks);
+            }
+
+            if (null !== $cachePool = $schedulesConfig[$scheduleName]['cache_pool'] ?? null) {
+                $schedule->addMethodCall('stateful', [new Reference($cachePool)]);
+            }
+
+            if (null !== $lockFactory = $schedulesConfig[$scheduleName]['lock_factory'] ?? null) {
+                $schedule->addMethodCall('lock', [(new Definition(LockInterface::class, ['scheduler_'.$scheduleName]))->setFactory([new Reference($lockFactory), 'createLock'])]);
+            }
+
+            if ($schedulesConfig[$scheduleName]['process_only_last_missed_run'] ?? false) {
+                $schedule->addMethodCall('processOnlyLastMissedRun', [true]);
             }
 
             if (isset($scheduleProviderIds[$scheduleName])) {

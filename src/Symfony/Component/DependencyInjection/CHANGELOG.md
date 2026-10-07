@@ -25,6 +25,7 @@ CHANGELOG
  * Add `#[AutowireClassMap]` attribute, `TaggedClassMapArgument`, the `!tagged_class_map` YAML tag and the `tagged_class_map()` PHP-DSL function to inject a map of classes found by resource tag name
  * Instantiate on demand the bundles that have nothing to do when the kernel boots, and add `AbstractKernel::instantiateBundle()` to control how they are created
  * Dump the container's compiler log in all environments, not only when debug mode is enabled
+ * Add `#[AsCallable]` to expose a public method of a service as a service of its own
 
 8.1
 ---

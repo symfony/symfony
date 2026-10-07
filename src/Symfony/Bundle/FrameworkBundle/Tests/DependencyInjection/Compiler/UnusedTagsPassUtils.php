@@ -18,6 +18,7 @@ class UnusedTagsPassUtils
     public static function getDefinedTags(): array
     {
         $tags = [
+            'container.callable_service' => true,
             'container.tracked_for_reset' => true,
             'doctrine.orm.entity' => true,
             'proxy' => true,

@@ -44,9 +44,11 @@ class PassConfig
             100 => [
                 new ResolveClassPass(),
                 new RegisterAutoconfigureAttributesPass(),
+                new RegisterAsCallableAttributesPass(),
                 new AutowireAsDecoratorPass(),
                 new AttributeAutoconfigurationPass(),
                 new ResolveInstanceofConditionalsPass(),
+                new RegisterCallableServicesPass(),
                 new RegisterEnvVarProcessorsPass(),
                 new RemoveMissingDependenciesPass(),
             ],

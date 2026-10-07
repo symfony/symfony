@@ -73,6 +73,7 @@ CHANGELOG
  * Don't use the secrets vault as an env var loader when its directory is in the project but does not exist at build time
  * Add the `framework.request.serializer` and `framework.response.serializer` options
  * Add the `framework.uri_signer.secret` option
+ * Add support for the `#[Lock]` attribute on controllers when the Lock component is enabled
 
 8.1
 ---

@@ -167,6 +167,7 @@ class LockBundle extends AbstractBundle
             // Generate factories for each resource
             $factoryDefinition = new ChildDefinition('lock.factory.abstract');
             $factoryDefinition->replaceArgument(0, new Reference($storeDefinitionId));
+            $factoryDefinition->addTag('lock.factory', ['name' => $resourceName]);
             $container->setDefinition('lock.'.$resourceName.'.factory', $factoryDefinition);
 
             // provide alias for default resource

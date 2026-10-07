@@ -19,6 +19,7 @@ use Symfony\Bridge\PsrHttpMessage\ArgumentValueResolver\PsrServerRequestResolver
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * @author Alexander M. Turek <me@derrabus.de>
@@ -53,6 +54,13 @@ final class PsrServerRequestResolverTest extends TestCase
         $resolver = $this->bootstrapResolver($symfonyRequest, $psrRequest);
 
         self::assertSame([$psrRequest], $resolver->getArguments($symfonyRequest, static function (MessageInterface $request): void {}));
+    }
+
+    public function testUntypedArgumentIsNotResolved()
+    {
+        $resolver = new PsrServerRequestResolver($this->createStub(HttpMessageFactoryInterface::class));
+
+        self::assertSame([], iterator_to_array($resolver->resolve(new Request(), new ArgumentMetadata('foo', null, false, false, null))));
     }
 
     private function bootstrapResolver(Request $symfonyRequest, ServerRequestInterface $psrRequest): ArgumentResolver

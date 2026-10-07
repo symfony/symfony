@@ -317,7 +317,7 @@ class Request
         if (str_starts_with($request->headers->get('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded')
             && \in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH'])
         ) {
-            parse_str($request->getContent(), $data);
+            @parse_str($request->getContent(), $data);
             $request->request = new InputBag($data);
         }
 
@@ -446,7 +446,7 @@ class Request
 
         $queryString = '';
         if (isset($components['query'])) {
-            parse_str(html_entity_decode($components['query']), $qs);
+            @parse_str(html_entity_decode($components['query']), $qs);
 
             if ($query) {
                 $query = array_replace($qs, $query);

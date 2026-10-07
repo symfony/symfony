@@ -14,6 +14,8 @@ namespace Symfony\Component\JsonSchema\ClassSchemaResolver;
 use BcMath\Number;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @experimental
@@ -27,6 +29,8 @@ final class NativeClassSchemaResolver implements ClassSchemaResolverInterface
             is_a($class, \DateInterval::class, true) => ['type' => 'string', 'format' => 'duration'],
             is_a($class, \SplFileInfo::class, true) => ['type' => 'string', 'format' => 'binary'],
             is_a($class, Number::class, true) => ['type' => 'string'],
+            is_a($class, Uuid::class, true) => ['type' => 'string', 'format' => 'uuid'],
+            is_a($class, Ulid::class, true) => ['type' => 'string', 'format' => 'ulid'],
             is_a($class, \BackedEnum::class, true) => [
                 'type' => 'int' === (string) (new \ReflectionEnum($class))->getBackingType() ? 'integer' : 'string',
                 'enum' => array_map(static fn (\BackedEnum $case): int|string => $case->value, $class::cases()),

@@ -15,7 +15,6 @@ use phpDocumentor\Reflection\Types\ContextFactory;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\ClassSchemaResolverInterface;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
-use Symfony\Component\JsonSchema\ClassSchemaResolver\UidClassSchemaResolver;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionPolicyInterface;
 use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
@@ -47,7 +46,6 @@ use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
-use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -91,18 +89,13 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
         $propertyInfoExtractor = new PropertyInfoExtractor($listExtractors, $typeExtractors, $descriptionExtractors, [$reflectionExtractor], [$reflectionExtractor]);
 
-        $classSchemaResolvers = [new NativeClassSchemaResolver()];
-        if (class_exists(AbstractUid::class)) {
-            $classSchemaResolvers[] = new UidClassSchemaResolver();
-        }
-
         $propertySchemaEnrichers = [new DescriptionPropertySchemaEnricher($propertyInfoExtractor)];
         if (class_exists(Validation::class)) {
             $propertySchemaEnrichers[] = new ValidatorPropertySchemaEnricher(Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator());
         }
         $propertySchemaEnrichers[] = new AttributePropertySchemaEnricher();
 
-        return new self($propertyInfoExtractor, new ShortNameDefinitionPolicy(), $classSchemaResolvers, propertySchemaEnrichers: $propertySchemaEnrichers);
+        return new self($propertyInfoExtractor, new ShortNameDefinitionPolicy(), [new NativeClassSchemaResolver()], propertySchemaEnrichers: $propertySchemaEnrichers);
     }
 
     public function generate(Type $type, Configuration $config = new Configuration()): Schema

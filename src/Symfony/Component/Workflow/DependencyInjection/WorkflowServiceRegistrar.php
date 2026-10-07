@@ -225,7 +225,10 @@ final class WorkflowServiceRegistrar
             }
 
             $container->getDefinition('workflow.security.expression_language')
-                ->addTag('expression_language.compiled', ['expressions' => array_values(array_unique($guardExpressions))]);
+                ->addTag('expression_language.compiled', [
+                    'expressions' => array_values(array_unique($guardExpressions)),
+                    'variables' => ['subject', 'auth_checker', 'trust_resolver', 'validator', 'token', 'user', 'role_names'],
+                ]);
         }
 
         return $workflowId;

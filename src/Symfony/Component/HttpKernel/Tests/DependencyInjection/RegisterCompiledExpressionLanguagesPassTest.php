@@ -38,7 +38,8 @@ class RegisterCompiledExpressionLanguagesPassTest extends TestCase
             ->setLazy(true)
             ->addTag('expression_language.compiled')
             ->addTag('expression_language.compiled', ['expressions' => ['a', 'b'], 'attributes' => [Cache::class => ['etag']]])
-            ->addTag('expression_language.compiled', ['expressions' => ['b', 'c'], 'attributes' => [RateLimit::class => ['key']], 'string_expressions' => [Cache::class => ['if']]]);
+            ->addTag('expression_language.compiled', ['expressions' => ['b', 'c'], 'variables' => ['x'], 'attributes' => [RateLimit::class => ['key']], 'string_expressions' => [Cache::class => ['if']]])
+            ->addTag('expression_language.compiled', ['expressions' => ['c'], 'variables' => ['x', 'y']]);
         $container->register('app.untagged_expression_language', ExpressionLanguage::class);
         $container->register('app.controller', ExpressionsController::class)->addTag('controller.service_arguments');
         $container->register('app.parent_controller', CacheAttributeController::class);
@@ -64,7 +65,7 @@ class RegisterCompiledExpressionLanguagesPassTest extends TestCase
         ]), $warmer->getArgument(0));
         $this->assertSame([ExpressionsController::class, CacheAttributeController::class], $warmer->getArgument(1));
         $this->assertSame([$hashedFile => [Cache::class => ['etag' => false, 'if' => true], RateLimit::class => ['key' => false]]], $warmer->getArgument(2));
-        $this->assertSame([$hashedFile => ['a', 'b', 'c']], $warmer->getArgument(3));
+        $this->assertSame([$hashedFile => ['a' => null, 'b' => null, 'c' => ['x', 'y']]], $warmer->getArgument(3));
     }
 
     public function testRemovesTheWarmerWhenNoExpressionLanguageIsTagged()

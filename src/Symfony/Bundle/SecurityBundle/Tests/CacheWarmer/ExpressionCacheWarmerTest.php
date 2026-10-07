@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\CacheWarmer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -25,6 +27,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 
 class ExpressionCacheWarmerTest extends TestCase
 {
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testWarmUp()
     {
         $expressions = [new Expression('A'), new Expression('B')];
@@ -47,9 +51,13 @@ class ExpressionCacheWarmerTest extends TestCase
             })
         ;
 
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.2: The "Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer" class is deprecated, as the expressions of "access_control" rules are compiled when warming up the cache.');
+
         (new ExpressionCacheWarmer($expressions, $expressionLang))->warmUp('');
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testWarmUpPrimesTheCacheEntriesReadByTheExpressionVoter()
     {
         $cache = new ArrayAdapter();

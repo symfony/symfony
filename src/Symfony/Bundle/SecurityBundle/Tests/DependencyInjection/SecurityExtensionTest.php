@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
@@ -40,7 +41,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -120,7 +125,23 @@ class SecurityExtensionTest extends TestCase
         ]);
         $container->compile();
 
-        $this->assertSame([['attributes' => [IsGranted::class => ['attribute']]], ['expressions' => ['is_granted("ROLE_ADMIN")', 'request.isSecure()']]], $container->getDefinition('security.expression_language')->getTag('expression_language.compiled'));
+        $tags = $container->getDefinition('security.expression_language')->getTag('expression_language.compiled');
+        $this->assertSame(['attributes' => [IsGranted::class => ['attribute']]], $tags[0]);
+        $this->assertSame(['is_granted("ROLE_ADMIN")', 'request.isSecure()'], $tags[1]['expressions']);
+
+        $expressionLanguage = new class extends ExpressionLanguage {
+            public array $variables = [];
+
+            public function evaluate(Expression|string $expression, array $values = []): mixed
+            {
+                $this->variables = array_keys($values);
+
+                return true;
+            }
+        };
+        (new ExpressionVoter($expressionLanguage, new AuthenticationTrustResolver(), $this->createStub(AuthorizationCheckerInterface::class)))->vote(new NullToken(), new Request(), [new Expression('true')]);
+
+        $this->assertEqualsCanonicalizing($expressionLanguage->variables, $tags[1]['variables']);
     }
 
     public function testLdapUsersOnlyReachesTheCredentialsListener()
@@ -745,11 +766,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame(Expression::class, $expressionDef->getClass());
         $this->assertSame($rawExpression, $expressionDef->getArgument(0));
 
-        $this->assertTrue($container->hasDefinition('security.cache_warmer.expression'));
-        $this->assertEquals(
-            new IteratorArgument([new Reference($expressionId)]),
-            $container->getDefinition('security.cache_warmer.expression')->getArgument(0)
-        );
+        $this->assertFalse($container->hasDefinition('security.cache_warmer.expression'));
     }
 
     public function testRegisterAccessControlWithSpecifiedRequestMatcherService()
@@ -918,25 +935,6 @@ class SecurityExtensionTest extends TestCase
         $this->expectExceptionMessage('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
 
         $container->compile();
-    }
-
-    public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()
-    {
-        $container = $this->getRawContainer();
-        $container->loadFromExtension('security', [
-            'providers' => [
-                'default' => ['id' => 'foo'],
-            ],
-            'firewalls' => [
-                'some_firewall' => [
-                    'pattern' => '/.*',
-                    'http_basic' => [],
-                ],
-            ],
-        ]);
-        $container->compile();
-
-        $this->assertFalse($container->hasDefinition('security.cache_warmer.expression'));
     }
 
     public function testRegisterTheUserProviderAlias()

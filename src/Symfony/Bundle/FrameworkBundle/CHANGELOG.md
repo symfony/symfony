@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Add the `expression_language.compiled` tag, to decorate an expression language with `CompiledExpressionLanguage`; its `attributes`, `string_expressions` and `expressions` attributes list the expressions to compile when warming up the cache
+ * Add the `expression_language.compiled` tag, to decorate an expression language with `CompiledExpressionLanguage`; its `attributes`, `string_expressions` and `expressions` attributes list the expressions to compile when warming up the cache, and `variables` the ones the listed expressions can read
  * List deprecated aliases in `debug:autowiring` only when the `--all` option is passed
  * Register the security expression functions on `controller.expression_language`
  * Add the `configure_container` option to `WebTestCase::createClient()` to configure the container after every kernel reboot

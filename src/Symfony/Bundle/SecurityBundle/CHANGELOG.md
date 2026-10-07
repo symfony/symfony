@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Compile the expressions of `access_control` rules and of `#[IsGranted]` and `#[IsCsrfTokenValid]` attributes when warming up the cache
+ * Deprecate the `ExpressionCacheWarmer` class
  * Make the `OidcClientInterface` of each `oidc_login` firewall autowirable, as `$<firewall>OidcClient` or with `#[Target('<firewall>')]`
  * Add the `backchannel_logout` option to `oidc_login`
  * Add the `dpop` option to the `access_token` authenticator, to accept only the access tokens bound to a key the request proves it holds (RFC 9449)

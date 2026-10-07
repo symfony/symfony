@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
 use Symfony\Bundle\SecurityBundle\Routing\LogoutRouteLoader;
 use Symfony\Bundle\SecurityBundle\Routing\OidcLoginRouteLoader;
@@ -357,14 +356,6 @@ return static function (ContainerConfigurator $container) {
             ->private()
             ->tag('cache.pool')
             ->tag('container.remove_if_missing', ['service' => 'cache.system'])
-
-        // Cache Warmers
-        ->set('security.cache_warmer.expression', ExpressionCacheWarmer::class)
-            ->args([
-                [],
-                service('security.expression_language'),
-            ])
-            ->tag('kernel.cache_warmer')
 
         ->set('controller.is_granted_attribute_listener', IsGrantedAttributeListener::class)
             ->args([

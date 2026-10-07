@@ -1,0 +1,211 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-03-26T14:59:24Z
+
+Hi @imenezzine 👋
+
+This PR looks great. Many thanks for this new feature.
+Except the presence of Form Flow related changes, I have no major remarks.
+Please rebase and if you have no additional changes we are good to go 👍.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2026-03-26T19:16:21Z
+
+![image](https://github.com/user-attachments/assets/01de7a24-352d-48e8-8da2-0d4f9ef23275)
+
+Looks like your commiter email is not associated with your GitHub account
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2026-03-26T19:19:50Z
+
+Could you please add the content of a har file to the PR header? Thanks
+
+---------------------------------------------------------------------------
+
+by imenezzine at 2026-04-28T13:45:00Z
+
+The PR description has been updated to provide clearer usage examples and more details regarding the available recording modes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T15:26:12Z
+
+We do want record and replay in HttpClient, so thanks for keeping at this. Let me be clearer about the direction than we have been so far, because the current shape needs a fair amount of rework and it is better you hear that now than after another round.
+
+The main change: build on what is already there instead of alongside it. `MockHttpClient` plus `HarFileResponseFactory` already does the replay half, and it does it well: it matches on method, URL and body, it understands base64 bodies, `stream()` and `toStream()` work, and a miss throws. The genuinely new and useful part of your PR is the recording half. If the recorder writes files that `HarFileResponseFactory` can read, you get replay for free and there is only one HAR implementation in the component.
+
+That also fixes a problem you may not have noticed. The current writer emits headers as `{"set-cookie": ["..."]}`, while HAR wants `[{"name": ..., "value": ...}]`, and it omits `time`, `timings`, `httpVersion`, `cookies`, `headersSize`, `bodySize` and `statusText`. Feeding one of your recordings to `HarFileResponseFactory` gives `Undefined array key "name"` and empty headers, and browser devtools cannot open the file either. Any fix to that format invalidates recordings people have already made, so it is worth settling before this ships rather than after.
+
+Four other things that need to change before we can take it:
+
+- Redaction on by default. Right now a recording contains the `Authorization` header, `Set-Cookie`, query string tokens and the request body verbatim, in a file that the workflow tells people to commit. It needs an allowlist or a filter list, enabled by default, with the option to widen it.
+- A miss in replay mode must never reach the network. `REPLAY_AND_RECORD_IF_MISSING` is the default for `#[UseRecord]`, so renaming a URL in a test currently makes the suite call the real service. I would make throwing the default and require an explicit opt-in to record.
+- `stream()` has to work. It currently fails with `AsyncResponse::stream(): Argument #1 ($responses) must be of type Traversable|array, NativeResponse given`, because `request()` does not wrap in `AsyncResponse`. This is what @stof raised in April and it is still the blocking one. Recording eagerly through `getContent()` also serialises concurrent requests, which changes what the tests under recording are measuring.
+- Answering @welcoMattic on the process-wide state, since that question was for us: no, we should not keep `RecorderHttpClient::$mode` and `$record` as statics. With `framework.http_client.recorder` decorating every client, one stray `setMode()` changes behaviour everywhere, including in production. Please make it instance state.
+
+Smaller ones for later: a class-level `#[UseRecord]` is silently ignored today because the subscriber calls `AttributeReader::forMethod()` rather than `forClassAndMethod()`, so the test quietly runs in passthrough; `Har/HarFile` uses `HttpKernel\Kernel::VERSION` and `FilesystemStore` uses `symfony/filesystem`, neither of which is declared; and the PhpUnit bridge references classes from HttpClient and HttpFoundation while requiring only `php`. Tests and CHANGELOG entries are missing throughout.
+
+None of this is a rejection of the idea. It is a request to make the recorder produce real HAR that our existing reader consumes, to fail closed, and to keep secrets out of files people commit.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-09-03T14:04:19Z
+
+@nicolas-grekas thanks for the detailed direction. I pushed a series of commits on @imenezzine's branch (rebased on 8.2, Imen is co-author, we worked in pair-programming) that goes through every point of your comment. Here is what changed, point by point.
+
+**Build on what is already there.** There is now a single HAR reader, `HarFile`, used by both `HarFileResponseFactory` (public API unchanged, it only gained an optional `MatcherInterface` argument) and `RecorderHttpClient`. The replay half is `MockHttpClient` fed by that reader. The recorder writes spec-compliant HAR: headers as `[{"name", "value"}]`, `creator.version` (from `InstalledVersions`), `time`, `timings`, `httpVersion`, `statusText`, `headersSize`, `bodySize`, `cookies`, and non UTF-8 bodies are stored with `"encoding": "base64"`. A record then replay round trip through the existing factory is covered by tests.
+
+**Redaction on by default.** `DefaultRedactor` masks, before anything is written: headers (`Authorization`, `Proxy-Authorization`, `Cookie`, `Set-Cookie`, `DPoP`, `X-Api-Key`, `X-Auth-Token`), query string and form fields, and JSON fields of both request and response bodies. The lists follow the IANA OAuth parameters registry plus OIDC and SAML bindings: `access_token`, `refresh_token`, `id_token`, `code`, `client_secret`, `client_assertion`, `assertion`, `code_verifier`, `device_code`, `user_code`, `subject_token`, `actor_token`, `registration_access_token`, `auth_req_id`, `logout_token`, `SAMLRequest`, `SAMLResponse`, `SAMLart`, and common names like `password`, `secret`, `api_key`. URL fragments (implicit flow) and the `Location` header are redacted as URLs. The lists can be widened with `framework.http_client.recorder.redact.{headers,query,body}`, or the whole thing replaced by a `RedactorInterface` service (`framework.http_client.recorder.redactor`). Redaction is deterministic and applied on both sides, so replay keeps matching the live request.
+
+**A miss in replay never reaches the network.** `#[UseRecord]` defaults to `RecorderMode::Replay` and a miss throws the dedicated `HarEntryNotFoundException` (a `TransportException`). Falling back to a real, recorded request is an explicit opt-in: `#[UseRecord(recordIfMissing: true)]`. The `REPLAY_AND_RECORD_IF_MISSING` mode is gone, and `RecorderMode` is now a real enum with cases (`Record`, `Replay`, `Passthrough`).
+
+**`stream()` works.** Every mode returns an `AsyncResponse`. Recording happens in the chunk passthru and is flushed on the last chunk, so nothing is consumed eagerly and concurrent requests stay concurrent. Replayed responses share one `MockHttpClient` per recorder, so `stream([$r1, $r2])` works in replay mode too. Both are covered by tests.
+
+**No process-wide state on the component.** `RecorderHttpClient` pulls its mode, HAR path and `recordIfMissing` flag from an injected `RecorderConfigurationInterface` on every request; the default `RecorderConfiguration` is immutable and `Passthrough`. The per-test state lives in the bridge only (`Symfony\Bridge\PhpUnit\HttpRecorder`, same model as `ClockMock`), driven by the subscriber before each test. FrameworkBundle injects it when the bridge is installed, and the recorder now decorates `http_client.transport` as the innermost decorator (like the mock transport) instead of every tagged client, so it sees absolute URLs after `ScopingHttpClient` and there is one recording per test for all clients. Requests are normalized through `HttpClientTrait::prepareRequest()` before being recorded, so `json`, array bodies, `query`, `auth_*` and `base_uri` are reflected in the file.
+
+**Smaller ones.** The class-level `#[UseRecord]` is read (`forClassAndMethod()`, method level wins). `Kernel::VERSION` and `symfony/filesystem` are gone (native functions in `FilesystemStore`), and the bridge declares `symfony/http-client` in `require-dev` while staying PHP 8.1 compatible. `RecorderExtension` is replaced by a subscriber registered from `SymfonyExtension`, configured with the `http-recorder-directory` parameter. Tests were added for the component (recorder, redactor, matcher, factory), the bridge and the bundle wiring, and CHANGELOG entries moved to 8.2.
+
+The PR description still needs a refresh (attribute namespace, defaults, a sample `.har`); we will take care of it.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-09-04T09:07:34Z
+
+@Jean-Beru @marilenaRM thanks for your reviews, your comments have been addressed.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-09-04T10:00:03Z
+
+@nicolas-grekas all six are addressed in 96cc122, thanks for reprobing.
+
+1. **Unconsumed responses.** The passthru skips `persist()` when `$context->getInfo('canceled')` is true, so nothing is written for a response destroyed unread, one where only `getStatusCode()` was called, or one that was explicitly canceled. I probed the neighbouring cases to make sure the guard is not too wide: a 404 or 500 consumed with `getContent(false)`, and a JSON error consumed with `toArray(false)`, are still recorded with their real status and body. The one case that now records nothing is an error status consumed through the thrown exception, since the body never reaches the passthru; that is the loud miss you asked for rather than an empty entry. It is documented on the class and in the PR description: to record an error path, consume it without throwing.
+
+2. **`withOptions()`.** Implemented on the class like `NoPrivateNetworkHttpClient` does, merging into `$this->defaultOptions` with `mergeDefaultOptions()`. The clone also resets the replay client and its playback cursor. `->withOptions(['base_uri' => 'https://example.com'])->request('GET', '/rel')` now records `https://example.com/rel`, headers set that way are recorded, replay still matches, and the source client keeps its own defaults.
+
+3. **`Record` truncation.** Moved to the bridge: the subscriber deletes the fixture at test start when the resolved mode is `Record`. The component only appends now, `$truncated` and `HarFile::clearEntries()` are gone, and two recorders created in the same test both write into the file (verified: two instances, two entries).
+
+4. **Lock file.** It lives in the system temporary directory, named after a hash of the absolute fixture path, so nothing lands next to the records. I did not delete it after unlocking, since that races with a concurrent holder. Verified with four processes appending twenty entries each into one file: eighty entries, none lost, no stray lock.
+
+5. **CHANGELOG.** Updated for sequential playback and for the matcher `HarFileResponseFactory` needs to read a recorder file. The PR description carries the same two notes plus the recording rule from point 1.
+
+6. **Fabbot.** Fixed. For codespell I added `caf` to `ignore-words-list` in `.codespellrc` rather than applying the patch, so the test fixtures keep the real accented word.
+
+You were right about the analysis jobs: the base branch had moved and the PR job reinstalls PHPUnit 9.5 whenever the root `composer.json` differs, which is where the `PHPUnit\Framework\Attributes\*` errors came from. A rebase cleared them. Psalm also wanted the mode `match` to stay exhaustive, so the request normalization moved into a dedicated method called from the two recorded arms, and `Passthrough` is still a no-op.
+
+Also applied @squrious's suggestion: the recorder section is read through `readConfigEnabled()`.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-04T15:03:26Z
+
+I wonder if `Replay + recordIfMissing: true` truly should exists...
+
+the recording part shpould not be part of the CI. it should be before commit. So what about always Replay and throws but through an env variable or another way (but opt in of the dev) it could allow to record and save to file locally.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T13:58:59Z
+
+Thanks @imenezzine, and thanks for your patience on this one: `framework.http_client` moved out of FrameworkBundle into `HttpClientBundle` on 8.2 while this was open, so the branch had become unmergeable.
+
+I rebased and moved the wiring across, since it was mechanical:
+
+- the `recorder` node is now in `HttpClientBundle::getConfigTreeBuilder()`, next to `max_host_connections`
+- the wiring is in `loadExtension()`, with `$config['recorder']['enabled']` instead of `readConfigEnabled()` and `$configurator->import()` instead of `$loader->load()`
+- `http_client_recorder.php` moved to the component's `Resources/config/`
+- the three DI tests are ported into `HttpClientBundleTest` using its own `getContainerExtension()->load()` helper, so the four Fixtures files are gone
+- the changelog entry moved from FrameworkBundle's to HttpClient's
+
+FrameworkBundle is untouched now. I also dropped the `(string)` cast in `HttpClientTrait`, per the thread above.
+
+Two things I did not touch, both worth a follow-up here since neither has a test:
+
+`Record` and `Replay` drop the inner client's default options. `prepareRequest()` always materialises `timeout`, so `$options += $defaultOptions` in the decorated client never applies:
+
+```
+inner alone     timeout=5.0   max_redirects=7
+via Passthrough timeout=5.0   max_redirects=7
+via Scoping     timeout=5.0   max_redirects=7
+via Record      timeout=60.0  max_redirects=20
+```
+
+So `new RecorderHttpClient(HttpClient::create(['timeout' => 5]), ...)` silently gets 60s once recording is on. A transparent decorator has to either forward the caller's original options and normalise only for matching, or strip the keys `prepareRequest()` invented.
+
+And a class-level `#[UseRecord]` pointing at a shared file keeps only the last test's entries, because the subscriber unlinks the fixture at every test preparation in `Record` mode. That shared-path form is in the attribute's own `@example`. Truncating once per resolved path per process would fix it.
+
+@Neirda24 your comments from the 14th are still open. The enum one stof answered; the rest are cosmetic and I left them as they are, but say if you feel strongly about any.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-18T16:55:10Z
+
+Thank you. I have some trouble to put words into what I sense about the approach, sorry for all the back and worth on these topics and I'll be happy getting this merged either way. (Thank you @imenezzine )
+
+I feel like this is too much focused on tests only. Yes this is the obvious need right now. But what would be the other contexts in which the recorder could be used ? What about using it standalone ? This is why I think my mind is not at ease with the closed approach and lack of extensibility.
+
+Should the need arise after this merge it may require some breaking changes. Maybe it would be possible to mark the recorder as experimental in order to gather feedback and allow a changé on architecture in early adoptions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-18T17:10:46Z
+
+I think CachingHttpClieint might be the solution to those other use cases @Neirda24, please have a look, esp since https://github.com/symfony/symfony/pull/65123
+
+---------------------------------------------------------------------------
+
+by imenezzine at 2026-09-22T15:23:43Z
+
+@nicolas-grekas both follow-ups from your last comment are fixed in 0e4a295ec80:
+
+1. **Default options no longer shadowed.** `record()` and `replay()` now compute a normalized copy of the request only to build the HAR key (matching, redaction), and forward the caller's original, untouched options to the real request — exactly like `Passthrough` already did. `new RecorderHttpClient(HttpClient::create(['timeout' => 5, 'max_redirects' => 7]), ...)` now reaches the inner client with neither key set, so its own defaults apply. Covered by `testRecordDoesNotInventTimeoutAndMaxRedirectsForTheInnerClient`.
+2. **Class-level `#[UseRecord]` on a shared file.** `RecorderSubscriber` now truncates a resolved path only the first time it's seen in the process (`shouldTruncate()`), so every test of the class appends to it instead of the file being wiped before each one. Covered by `testShouldTruncateOnlyOncePerPath`.
+
+@Neirda24 on the enum/extensibility point: given @nicolas-grekas's pointer to `CachingHttpClient` (#65123) for the standalone/non-test use case, I haven't touched `RecorderMode` — let me know if you still want something changed here before this can move forward.
+
+Also rebased on 8.2 to resolve the CHANGELOG conflict.
+
+---------------------------------------------------------------------------
+
+by imenezzine at 2026-10-07T08:27:31Z
+
+@nicolas-grekas thanks for the review, all your comments are addressed in cb24e6ea727 (rebased on 8.2), and the description is updated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-07T10:22:12Z
+
+Thanks @imenezzine. I pushed a rework as a separate commit on top of yours:
+
+- `MatcherInterface` is gone: requests match on method, URL and body once secrets are masked, so a field that changes on every request is ignored by adding it to `redact`. A matcher can come back later if needed, fed with the masked request.
+- `RecorderMode` is now a string enum whose values are the ones of `SYMFONY_HTTP_RECORDER`: `replay`, `record`, `missing` and `passthrough`.
+- `#[UseRecord]` paths are relative to the test file, or to the `http-recorder-directory` parameter when it is set (no more `@` prefix), and each data set gets its own file.
+- `redact` is a single list, plus `redact_except`.
+
+Also fixed: `record` deleted the file of a test that recorded nothing (a skipped one for example), and a miss printed the live URL with its secrets. Misses are now also reported as a PHPUnit warning, even when the tested code catches the exception. Recording an unchanged API again leaves the file as is, and multipart bodies match whatever their boundary.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-10-07T11:05:39Z
+
+> Thanks @imenezzine. I pushed a rework as a separate commit on top of yours:
+>
+> - `MatcherInterface` is gone: requests match on method, URL and body once secrets are masked, so a field that changes on every request is ignored by adding it to `redact`. A matcher can come back later if needed, fed with the masked request.
+> - `RecorderMode` is now a string enum whose values are the ones of `SYMFONY_HTTP_RECORDER`: `replay`, `record`, `missing` and `passthrough`.
+> - The recorder is on by default in the `test` env when the bridge is installed, `#[UseRecord]` paths are relative to the test file (no more `@` prefix nor `http-recorder-directory`), and each data set gets its own file.
+> - `redact` is a single list, plus `redact_except`.
+>
+> Also fixed: `record` deleted the file of a test that recorded nothing (a skipped one for example), and a miss printed the live URL with its secrets. Misses are now also reported as a PHPUnit warning, even when the tested code catches the exception. Recording an unchanged API again leaves the file as is, and multipart bodies match whatever their boundary.
+>
+
+The http-recorder-directory was helpful to centralize http files instead of having to set a relative value in all of Use record attributes. Otherwise har files will clutter in a lot of test directories.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-07T12:11:42Z
+
+`http-recorder-directory` is back @Neirda24, and goes further than before: when it's set, every path starts from it, including the default one, which mirrors the namespace of the test (`<dir>/App/Tests/FooTest/testBar.har`). Before, only `@`-prefixed paths used it.
+
+I also made the recorder opt-in again (`http_client.recorder: true` under `when@test`): enabling it from the env name was a first in the codebase.

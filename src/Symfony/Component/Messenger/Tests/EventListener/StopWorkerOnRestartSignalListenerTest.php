@@ -19,49 +19,52 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Component\Messenger\WorkerMetadata;
 
 #[Group('time-sensitive')]
 class StopWorkerOnRestartSignalListenerTest extends TestCase
 {
     #[DataProvider('restartTimeProvider')]
-    public function testWorkerStopsWhenMemoryLimitExceeded(?int $lastRestartTimeOffset, bool $shouldStop)
+    public function testWorkerStopsWhenARestartIsRequested(array $restartTimeOffsets, bool $shouldStop)
     {
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('isHit')->willReturn(true);
-        $cacheItem->expects($this->once())->method('get')->willReturn(null === $lastRestartTimeOffset ? null : time() + $lastRestartTimeOffset);
-        $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
-
         $worker = $this->createMock(Worker::class);
+        $worker->method('getMetadata')->willReturn(new WorkerMetadata(['transportNames' => ['async', 'scheduler_default']]));
         $worker->expects($shouldStop ? $this->once() : $this->never())->method('stop');
-        $event = new WorkerRunningEvent($worker, false);
 
-        $stopOnSignalListener = new StopWorkerOnRestartSignalListener($cachePool);
+        $stopOnSignalListener = new StopWorkerOnRestartSignalListener($this->createCachePool($restartTimeOffsets));
         $stopOnSignalListener->onWorkerStarted();
-        $stopOnSignalListener->onWorkerRunning($event);
+        $stopOnSignalListener->onWorkerRunning(new WorkerRunningEvent($worker, false));
     }
 
-    public static function restartTimeProvider()
+    public static function restartTimeProvider(): iterable
     {
-        yield [null, false]; // no cached restart time, do not restart
-        yield [+10, true]; // 10 seconds after starting, a restart was requested
-        yield [-10, false]; // a restart was requested, but 10 seconds before we started
+        yield 'no restart requested' => [[], false];
+        yield 'no cached restart time' => [['workers.restart_requested_timestamp' => null], false];
+        yield 'all workers, after the start' => [['workers.restart_requested_timestamp' => 10], true];
+        yield 'all workers, before the start' => [['workers.restart_requested_timestamp' => -10], false];
+        yield 'a consumed transport, after the start' => [['workers.restart_requested_timestamp.scheduler_default' => 10], true];
+        yield 'a consumed transport, before the start' => [['workers.restart_requested_timestamp.scheduler_default' => -10], false];
+        yield 'another transport' => [['workers.restart_requested_timestamp.failed' => 10], false];
     }
 
-    public function testWorkerDoesNotStopIfRestartNotInCache()
+    private function createCachePool(array $restartTimeOffsets): CacheItemPoolInterface
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())->method('isHit')->willReturn(false);
-        $cacheItem->expects($this->never())->method('get');
-        $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
+        $cachePool->expects($this->once())
+            ->method('getItems')
+            ->with(['workers.restart_requested_timestamp', 'workers.restart_requested_timestamp.async', 'workers.restart_requested_timestamp.scheduler_default'])
+            ->willReturnCallback(function (array $keys) use ($restartTimeOffsets) {
+                $items = [];
+                foreach ($keys as $key) {
+                    $item = $this->createStub(CacheItemInterface::class);
+                    $item->method('isHit')->willReturn(\array_key_exists($key, $restartTimeOffsets));
+                    $item->method('get')->willReturn(null === ($restartTimeOffsets[$key] ?? null) ? null : time() + $restartTimeOffsets[$key]);
+                    $items[$key] = $item;
+                }
 
-        $worker = $this->createMock(Worker::class);
-        $worker->expects($this->never())->method('stop');
-        $event = new WorkerRunningEvent($worker, false);
+                return $items;
+            });
 
-        $stopOnSignalListener = new StopWorkerOnRestartSignalListener($cachePool);
-        $stopOnSignalListener->onWorkerStarted();
-        $stopOnSignalListener->onWorkerRunning($event);
+        return $cachePool;
     }
 }

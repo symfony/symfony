@@ -56,6 +56,8 @@ CHANGELOG
  * Add `BatchDispatcher` to dispatch several messages and send them to their transports in batches
  * Add `BatchSenderInterface` for the senders that send several messages at once, and `BatchSendFailedException` to tell which messages of a batch were sent
  * Make `OutboxSender` implement `BatchSenderInterface`, storing the new messages of a batch with as few requests as the outbox transport allows
+ * Add an optional `receivers` argument to the `messenger:stop-workers` command to stop only the workers that consume these transports
+ * Add the invokable `WorkerRestarter` service to stop the workers of some or all transports from code
 
 8.1
 ---

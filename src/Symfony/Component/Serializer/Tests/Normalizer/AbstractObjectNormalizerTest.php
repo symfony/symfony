@@ -51,7 +51,10 @@ use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -1122,6 +1125,186 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(DummyWithArrayObjectOfDtos::class, $result);
         $this->assertContainsOnlyInstancesOf(DummyDtoItem::class, $result->items);
         $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, $result->items->getArrayCopy()));
+    }
+
+    public function testDenormalizeCollectionOfObjectsIntoTheDeclaredCollectionClass()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithDummyCollectionOfDtos::class);
+
+        $this->assertInstanceOf(DummyWithDummyCollectionOfDtos::class, $result);
+        $this->assertInstanceOf(DummyDtoCollection::class, $result->items);
+        $this->assertContainsOnlyInstancesOf(DummyDtoItem::class, $result->items);
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, iterator_to_array($result->items)));
+    }
+
+    public function testDenormalizeCollectionOfObjectsIntoAnInterfaceThroughADenormalizer()
+    {
+        $serializer = new Serializer([
+            new DummyCollectionDenormalizer(),
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithDummyCollectionInterfaceOfDtos::class);
+
+        $this->assertInstanceOf(DummyWithDummyCollectionInterfaceOfDtos::class, $result);
+        $this->assertInstanceOf(DummyDtoCollection::class, $result->items);
+        $this->assertContainsOnlyInstancesOf(DummyDtoItem::class, $result->items);
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, iterator_to_array($result->items)));
+    }
+
+    public function testDenormalizeCollectionOfObjectsLeavesTheArrayToAnArrayConstructorParameter()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithDummyCollectionOfDtosAndArrayConstructor::class);
+
+        $this->assertInstanceOf(DummyDtoCollection::class, $result->items);
+        $this->assertContainsOnlyInstancesOf(DummyDtoItem::class, $result->items);
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, iterator_to_array($result->items)));
+    }
+
+    public function testDenormalizeCollectionUnionLeavesTheArrayToAnArrayConstructorParameter()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithDummyCollectionUnionOfDtosAndArrayConstructor::class);
+
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, $result->items));
+    }
+
+    public function testDenormalizeCollectionUnionLeavesTheArrayToAnArrayProperty()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithDummyCollectionUnionOfDtosAndArrayProperty::class);
+
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, $result->items));
+    }
+
+    public function testDenormalizeCollectionOfObjectsLeavesTheArrayToANullableArrayConstructorParameter()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithNullableDummyCollectionOfDtosAndNullableArrayConstructor::class);
+
+        $this->assertInstanceOf(DummyDtoCollection::class, $result->items);
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, iterator_to_array($result->items)));
+
+        $result = $serializer->denormalize(['items' => null], DummyWithNullableDummyCollectionOfDtosAndNullableArrayConstructor::class);
+
+        $this->assertNull($result->items);
+    }
+
+    public function testDenormalizeCollectionClassWithObjectKeysIntoAnIterableProperty()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => ['foo' => 'bar']], DummyWithIterableOfObjectKeyedCollection::class);
+
+        $this->assertSame(['foo' => 'bar'], $result->items);
+    }
+
+    public function testDenormalizeCollectionOfObjectsLeavesTheArrayToAnArraySetter()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithDummyCollectionOfDtosAndArraySetter::class);
+
+        $this->assertInstanceOf(DummyDtoCollection::class, $result->getItems());
+        $this->assertContainsOnlyInstancesOf(DummyDtoItem::class, $result->getItems());
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, iterator_to_array($result->getItems())));
+    }
+
+    public function testDenormalizeCollectionOfObjectsLeavesTheArrayToAnArraySetterOfGetSetMethodNormalizer()
+    {
+        $propertyInfo = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer([new ArrayDenormalizer(), new GetSetMethodNormalizer(null, null, $propertyInfo), new ObjectNormalizer(null, null, null, $propertyInfo)]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithDummyCollectionOfDtosAndArraySetter::class);
+
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, iterator_to_array($result->getItems())));
+    }
+
+    public function testDenormalizeCollectionOfObjectsLeavesTheArrayToAnArrayPropertyOfPropertyNormalizer()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new PropertyNormalizer(null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithArrayPropertyOfDtosDocumentedAsArrayObject::class);
+
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, $result->items));
+    }
+
+    public function testDenormalizeCollectionOfObjectsLeavesTheArrayToAnUntypedProperty()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+
+        $result = $serializer->denormalize(['items' => [['value' => 'foo'], ['value' => 'bar']]], DummyWithUntypedDummyCollectionOfDtos::class);
+
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, $result->items));
+    }
+
+    public function testDenormalizeCollectionOfObjectsDoesNotDelegateAbstractCollectionClasses()
+    {
+        $serializer = new Serializer([
+            new DummyCollectionDenormalizer(),
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $serializer->denormalize(['items' => [['value' => 'foo']]], DummyWithAbstractDummyCollectionOfDtos::class);
+    }
+
+    public function testDenormalizeDoesNotPassTheElementTypeOfAParentCollectionToNestedAttributes()
+    {
+        $serializer = new Serializer([
+            new DummyCollectionDenormalizer(),
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['owners' => [['items' => ['foo', 'bar']]]], DummyWithListOfDummyCollectionOwners::class);
+
+        $this->assertSame(['foo', 'bar'], iterator_to_array($result->owners[0]->items));
+    }
+
+    public function testDenormalizeCollectionOfScalarsIntoAnInterfaceThroughADenormalizer()
+    {
+        $serializer = new Serializer([
+            new DummyCollectionDenormalizer(),
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(['items' => ['foo', 'bar']], DummyWithDummyCollectionInterfaceOfScalars::class);
+
+        $this->assertInstanceOf(DummyDtoCollection::class, $result->items);
+        $this->assertSame(['foo', 'bar'], iterator_to_array($result->items));
     }
 
     public function testDenormalizeWithNumberAsSerializedNameAndNoArrayReindex()
@@ -2847,6 +3030,188 @@ class DummyWithArrayObjectOfDtos
     public function __construct(iterable $items)
     {
         $this->items = new \ArrayObject(iterator_to_array($items));
+    }
+}
+
+interface DummyDtoCollectionInterface extends \Traversable, \Countable
+{
+}
+
+class DummyDtoCollection extends \ArrayObject implements DummyDtoCollectionInterface
+{
+}
+
+class DummyWithDummyCollectionOfDtos
+{
+    /** @var DummyDtoCollection<DummyDtoItem> */
+    public DummyDtoCollection $items;
+
+    public function __construct()
+    {
+        $this->items = new DummyDtoCollection();
+    }
+}
+
+class DummyWithDummyCollectionInterfaceOfDtos
+{
+    /** @var DummyDtoCollectionInterface<DummyDtoItem> */
+    public DummyDtoCollectionInterface $items;
+
+    public function __construct()
+    {
+        $this->items = new DummyDtoCollection();
+    }
+}
+
+class DummyWithDummyCollectionOfDtosAndArrayConstructor
+{
+    /** @var DummyDtoCollection<DummyDtoItem> */
+    public DummyDtoCollection $items;
+
+    public function __construct(array $items = [])
+    {
+        $this->items = new DummyDtoCollection($items);
+    }
+}
+
+class DummyWithDummyCollectionUnionOfDtosAndArrayConstructor
+{
+    /** @var DummyDtoCollection<DummyDtoItem>|DummyDtoItem[] */
+    public array $items;
+
+    /** @param DummyDtoCollection<DummyDtoItem>|DummyDtoItem[] $items */
+    public function __construct(array $items = [])
+    {
+        $this->items = $items;
+    }
+}
+
+class DummyWithDummyCollectionUnionOfDtosAndArrayProperty
+{
+    /** @var DummyDtoCollection<DummyDtoItem>|DummyDtoItem[] */
+    public array $items = [];
+}
+
+class DummyWithNullableDummyCollectionOfDtosAndNullableArrayConstructor
+{
+    /** @var DummyDtoCollection<DummyDtoItem>|null */
+    public ?DummyDtoCollection $items;
+
+    public function __construct(?array $items = null)
+    {
+        $this->items = null === $items ? null : new DummyDtoCollection($items);
+    }
+}
+
+class DummyWithIterableOfObjectKeyedCollection
+{
+    /** @var \WeakMap<DummyDtoItem, string> */
+    public iterable $items = [];
+}
+
+class DummyWithDummyCollectionOfDtosAndArraySetter
+{
+    /** @var DummyDtoCollection<DummyDtoItem> */
+    private DummyDtoCollection $items;
+
+    public function __construct()
+    {
+        $this->items = new DummyDtoCollection();
+    }
+
+    public function setItems(array $items): void
+    {
+        $this->items = new DummyDtoCollection($items);
+    }
+
+    public function getItems(): DummyDtoCollection
+    {
+        return $this->items;
+    }
+}
+
+abstract class AbstractDummyCollection extends \ArrayObject
+{
+}
+
+class ConcreteDummyCollection extends AbstractDummyCollection
+{
+}
+
+class DummyWithArrayPropertyOfDtosDocumentedAsArrayObject
+{
+    /** @var \ArrayObject<int, DummyDtoItem> */
+    public array $items = [];
+}
+
+class DummyWithUntypedDummyCollectionOfDtos
+{
+    /** @var DummyDtoCollection<DummyDtoItem> */
+    public $items;
+}
+
+class DummyWithAbstractDummyCollectionOfDtos
+{
+    /** @var AbstractDummyCollection<DummyDtoItem> */
+    public AbstractDummyCollection $items;
+
+    public function __construct()
+    {
+        $this->items = new ConcreteDummyCollection();
+    }
+}
+
+class DummyWithDummyCollectionInterfaceOfScalars
+{
+    /** @var DummyDtoCollectionInterface<string> */
+    public DummyDtoCollectionInterface $items;
+
+    public function __construct()
+    {
+        $this->items = new DummyDtoCollection();
+    }
+}
+
+class DummyWithListOfDummyCollectionOwners
+{
+    /** @var list<DummyCollectionOwner> */
+    public array $owners = [];
+}
+
+class DummyCollectionOwner
+{
+    public DummyDtoCollectionInterface $items;
+}
+
+class DummyCollectionDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
+{
+    use DenormalizerAwareTrait;
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [DummyDtoCollectionInterface::class => true];
+    }
+
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
+    {
+        return is_a($type, DummyDtoCollectionInterface::class, true);
+    }
+
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    {
+        $valueType = $context['value_type'] ?? null;
+        while ($valueType instanceof Type\WrappingTypeInterface) {
+            $valueType = $valueType->getWrappedType();
+        }
+        $elementClass = $valueType instanceof Type\ObjectType ? $valueType->getClassName() : null;
+
+        $collection = new DummyDtoCollection();
+
+        foreach ($data as $key => $value) {
+            $collection[$key] = null !== $elementClass ? $this->denormalizer->denormalize($value, $elementClass, $format, $context) : $value;
+        }
+
+        return $collection;
     }
 }
 

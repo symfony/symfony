@@ -14,6 +14,7 @@ CHANGELOG
  * Map the `DatePoint`, `DayPoint` and `TimePoint` property types to their Doctrine types, so schema tools detect them without an explicit `type`
  * Load a list of entities into `array`-typed controller and command arguments with `#[MapEntity]`, using `findBy()`
  * Add the `EntityExists` constraint for validating that a value references an existing entity
+ * Add `CollectionDenormalizer` to denormalize arrays into Doctrine collections, defaulting to `ArrayCollection` when the target type is the `Collection` interface
 
 8.1
 ---

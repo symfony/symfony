@@ -23,6 +23,7 @@ CHANGELOG
  * Resolve generic template types during denormalization, e.g. `T` in a `Box<Circle>`-typed property is denormalized as `Circle`
  * Add an optional `$mappedClasses` argument to `Mapping\Loader\LoaderChain::__construct()`, to declare which classes each loader maps
  * Trigger a deprecation when denormalizing a property from its PHP name while a name converter maps it to another key
+ * Build the collection class declared for a property, for example `ArrayCollection<int, User>`, from its denormalized elements when the property, its setter or its constructor parameter does not accept an array, and delegate collection interfaces to a denormalizer
 
 8.1
 ---

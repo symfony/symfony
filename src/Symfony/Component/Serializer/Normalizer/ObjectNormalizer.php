@@ -42,6 +42,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
     private static $isReadableCache = [];
     private static $isWritableCache = [];
     private static array $constructorParametersCache = [];
+    private static array $acceptsArrayCache = [];
 
     protected PropertyAccessorInterface $propertyAccessor;
     protected $propertyInfoExtractor;
@@ -131,6 +132,14 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         }
     }
 
+    protected function acceptsArrayForAttribute(string $class, string $attribute, array $context): bool
+    {
+        // attributes are written once the object exists, so the constructor is not a write target
+        $context = ['enable_constructor_extraction' => false] + array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true, 'enable_adder_remover_extraction' => true]);
+
+        return self::$acceptsArrayCache[$class.$attribute.hash('xxh128', serialize($context))] ??= $this->writeTargetAcceptsArray($class, $attribute, $context);
+    }
+
     protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
@@ -198,5 +207,29 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         return isset(self::$constructorParametersCache[$class][$attribute]);
+    }
+
+    private function writeTargetAcceptsArray(string $class, string $attribute, array $context): bool
+    {
+        $writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute, $context);
+
+        // adders take the elements one by one, and magic or unknown targets keep receiving an array
+        $type = match ($writeInfo?->getType()) {
+            PropertyWriteInfo::TYPE_PROPERTY => (new \ReflectionProperty($class, $writeInfo->getName()))->getType(),
+            PropertyWriteInfo::TYPE_METHOD => ((new \ReflectionMethod($class, $writeInfo->getName()))->getParameters()[0] ?? null)?->getType(),
+            default => null,
+        };
+
+        if (null === $type) {
+            return true;
+        }
+
+        foreach ($type instanceof \ReflectionUnionType ? $type->getTypes() : [$type] as $t) {
+            if ($t instanceof \ReflectionNamedType && $t->isBuiltin() && \in_array($t->getName(), ['array', 'iterable', 'mixed'], true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException as TypeInfoInvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\LogicException as TypeInfoLogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
@@ -339,6 +340,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return null;
         }
 
+        // the key and value types describe the collection holding this object, not its attributes
+        unset($context['key_type'], $context['value_type']);
+
         if (XmlEncoder::FORMAT === $format && !\is_array($data)) {
             $data = ['#' => $data];
         }
@@ -447,6 +451,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     $type = $this->replaceTemplateTypes($type, $templateTypes);
                 }
 
+                $type = $this->adaptTypeToWriteTarget($type, $resolvedClass, $attribute, $attributeContext);
+
                 try {
                     $value = $this->validateAndDenormalize($type, $resolvedClass, $attribute, $value, $format, $attributeContext);
                 } catch (NotNormalizableValueException $exception) {
@@ -534,6 +540,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             while ($t instanceof WrappingTypeInterface) {
                 $t = $t->getWrappedType();
             }
+
+            // the class of a collection of known elements, e.g. "Collection" for "Collection<int, User>", is built from the elements once they are denormalized
+            $collectionClass = null !== $collectionValueType && $t instanceof ObjectType && !$collectionValueType->isIdentifiedBy(TypeIdentifier::MIXED) ? $t->getClassName() : null;
 
             // Fix a collection that contains the only one element
             // This is special to xml format only
@@ -659,7 +668,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             );
                         }
 
-                        return $result;
+                        return $this->buildCollection($collectionClass, $result, $attribute, $format, $context, $collectionKeyType, $collectionValueType);
                     } elseif (\is_array($data) && self::hasScalarElements($collectionValueBaseType, $collectionValueType)) {
                         // elements of a scalar collection are converted and enforced with the very same rules as any other value
                         $result = [];
@@ -699,7 +708,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             }
                         }
 
-                        return $result;
+                        return $this->buildCollection($collectionClass, $result, $attribute, $format, $context, $collectionKeyType, $collectionValueType);
                     } elseif ($collectionValueBaseType instanceof BuiltinType && TypeIdentifier::ARRAY === $collectionValueBaseType->getTypeIdentifier()) {
                         // get inner type for any nested array
                         $innerType = $collectionValueType;
@@ -772,7 +781,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         $childContext['generic_type'] = $genericType;
                     }
                     if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
-                        return $this->serializer->denormalize($data, $class, $format, $childContext);
+                        $value = $this->serializer->denormalize($data, $class, $format, $childContext);
+
+                        return $this->buildCollection($collectionClass, $value, $attribute, $format, $context, $collectionKeyType, $collectionValueType);
                     }
                 }
 
@@ -907,10 +918,42 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
+        // The constructor builds the collection itself when its parameter accepts a plain array: denormalize the elements into an array instead of building the collection class.
+        if (self::acceptsArrayInType($parameter->getType())) {
+            $type = self::toArrayOfElements($type);
+        }
+
         $parameterData = $this->validateAndDenormalize($type, $class->getName(), $parameterName, $parameterData, $format, $context);
         $parameterData = $this->applyCallbacks($parameterData, $class->getName(), $parameterName, $format, $context);
 
         return $this->applyFilterBool($parameter, $parameterData, $context);
+    }
+
+    /**
+     * Turns a collection class into a plain array of its elements when the attribute is written into a target that accepts an array, so that only targets rejecting arrays get the collection object.
+     */
+    private function adaptTypeToWriteTarget(Type $type, string $class, string $attribute, array $context): Type
+    {
+        $arrayType = self::toArrayOfElements($type);
+
+        // the type has no collection class to build, or the target rejects arrays: keep the collection class
+        if ($arrayType === $type || !$this->acceptsArrayForAttribute($class, $attribute, $context)) {
+            return $type;
+        }
+
+        return $arrayType;
+    }
+
+    /**
+     * Tells whether the attribute is written into a target that accepts a plain array, in which case the declared collection class is not built.
+     *
+     * A target that cannot be inspected accepts arrays, so that it keeps receiving what it received before collection classes were built.
+     *
+     * @internal
+     */
+    protected function acceptsArrayForAttribute(string $class, string $attribute, array $context): bool
+    {
+        return true;
     }
 
     /**
@@ -927,6 +970,149 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         return $collectionValueBaseType instanceof BuiltinType && \in_array($collectionValueBaseType->getTypeIdentifier(), [TypeIdentifier::BOOL, TypeIdentifier::FLOAT, TypeIdentifier::INT, TypeIdentifier::STRING], true);
+    }
+
+    /**
+     * Tells whether a collection class can be built from an array of elements.
+     */
+    private static function acceptsArrayInConstructor(string $class): bool
+    {
+        $constructor = (new \ReflectionClass($class))->getConstructor();
+
+        // without a constructor taking the elements, the collection cannot be built from the array
+        if (null === $constructor || 0 === $constructor->getNumberOfParameters()) {
+            return false;
+        }
+
+        if (!self::acceptsArrayInType($constructor->getParameters()[0]->getType())) {
+            return false;
+        }
+
+        foreach (\array_slice($constructor->getParameters(), 1) as $parameter) {
+            if (!$parameter->isOptional() && !$parameter->isVariadic()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns the type of a plain array of the elements when the type is a collection class of known elements that has array keys, keeping it nullable and union members.
+     */
+    private static function toArrayOfElements(Type $type): Type
+    {
+        // building a type is costly and the types of attributes are cached, so are the array types built from them
+        static $arrayTypes = new \WeakMap();
+
+        return ($arrayTypes[$type] ??= self::createArrayOfElements($type) ?? false) ?: $type;
+    }
+
+    private static function createArrayOfElements(Type $type): ?Type
+    {
+        if ($type instanceof NullableType) {
+            $arrayType = self::createArrayOfElements($type->getWrappedType());
+
+            return null !== $arrayType ? Type::nullable($arrayType) : null;
+        }
+
+        if ($type instanceof UnionType) {
+            // a member without a collection class, e.g. "User[]", is already an array of elements and is kept as is
+            $changed = false;
+            $arrayTypes = [];
+
+            foreach ($type->getTypes() as $memberType) {
+                if (null !== $arrayType = self::createArrayOfElements($memberType)) {
+                    $changed = true;
+                } else {
+                    $arrayType = $memberType;
+                }
+
+                $arrayTypes[(string) $arrayType] = $arrayType;
+            }
+
+            if (!$changed) {
+                return null;
+            }
+
+            return 1 === \count($arrayTypes) ? array_values($arrayTypes)[0] : Type::union(...array_values($arrayTypes));
+        }
+
+        if (!$type instanceof CollectionType || null === self::getCollectionContainerClass($type) || $type->getCollectionValueType()->isIdentifiedBy(TypeIdentifier::MIXED)) {
+            return null;
+        }
+
+        try {
+            return Type::array($type->getCollectionValueType(), $type->getCollectionKeyType(), $type->isList());
+        } catch (TypeInfoInvalidArgumentException) {
+            // object keys, as in SplObjectStorage or WeakMap, cannot be the keys of an array
+            return null;
+        }
+    }
+
+    /**
+     * Returns the class of the container of a collection type, when it is an object (e.g. "ArrayCollection" for "ArrayCollection<int, User>").
+     */
+    private static function getCollectionContainerClass(CollectionType $type): ?string
+    {
+        $containerType = $type->getWrappedType();
+
+        while ($containerType instanceof WrappingTypeInterface) {
+            $containerType = $containerType->getWrappedType();
+        }
+
+        return $containerType instanceof ObjectType ? $containerType->getClassName() : null;
+    }
+
+    /**
+     * Tells whether a parameter type accepts a plain array or iterable of elements.
+     *
+     * An untyped parameter accepts anything, including an array.
+     */
+    private static function acceptsArrayInType(?\ReflectionType $type): bool
+    {
+        if (null === $type) {
+            return true;
+        }
+
+        foreach ($type instanceof \ReflectionUnionType ? $type->getTypes() : [$type] as $t) {
+            if ($t instanceof \ReflectionNamedType && $t->isBuiltin() && \in_array($t->getName(), ['array', 'iterable', 'mixed'], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Builds the declared collection class from its denormalized elements.
+     *
+     * A class whose constructor takes the elements is instantiated with them, an interface is delegated to the denormalizer that supports it, and the elements are returned as an array otherwise.
+     * Without a collection class, or when a delegate already built the collection, the value is returned as is.
+     */
+    private function buildCollection(?string $class, mixed $elements, string $attribute, ?string $format, array $context, ?Type $keyType, ?Type $valueType): mixed
+    {
+        if (null === $class || !\is_array($elements)) {
+            return $elements;
+        }
+
+        static $buildableFromArray = [];
+
+        if ($buildableFromArray[$class] ??= class_exists($class) && is_a($class, \Traversable::class, true) && (new \ReflectionClass($class))->isInstantiable() && self::acceptsArrayInConstructor($class)) {
+            return new $class($elements);
+        }
+
+        if (!interface_exists($class) || !$this->serializer instanceof DenormalizerInterface) {
+            return $elements;
+        }
+
+        $context = $this->createChildContext($context, $attribute, $format);
+        // the elements are new ones, as for an array: the collection being populated is left to the write target, which diffs it with adders and removers
+        unset($context[self::OBJECT_TO_POPULATE]);
+        $context['key_type'] = $keyType;
+        $context['value_type'] = $valueType;
+
+        return $this->serializer->supportsDenormalization($elements, $class, $format, $context) ? $this->serializer->denormalize($elements, $class, $format, $context) : $elements;
     }
 
     /**

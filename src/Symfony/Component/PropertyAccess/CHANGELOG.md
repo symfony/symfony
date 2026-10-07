@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Add `PropertyAccessBundle`, which provides the `property_access` configuration and the services previously provided by `FrameworkBundle` under `framework.property_access`
- * Add `PropertyAccessorBuilder::enableWildcardReads()` to read every element of a collection through a `[*]` path
+ * Add `PropertyAccessorBuilder::enableWildcardReads()` and the `property_access.wildcard_reads` option to read every element of a collection through a `[*]` path
 
 8.1
 ---

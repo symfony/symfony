@@ -8,7 +8,7 @@ CHANGELOG
  * Add `Response::cacheControl()` to set the targeted cache directives defined by RFC 9213, e.g. `CDN-Cache-Control`
  * Deprecate not passing an expiry to `UriSigner::sign()`
  * Add the `$defaultExpiration` argument to `UriSigner::__construct()`
- * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()` to bind a signed URI to a state token, folded into the signature
+ * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()` to bind a signed URI to a state token
  * Add `ParameterBag::filterCallback()` to filter a parameter value through a callback
  * Reject a `Cookie` whose name uses the `__Secure-`/`__Host-` prefix when its attributes break the prefix contract
  * Deprecate the `Request::$trustedHosts` property, it is never populated anymore
@@ -16,7 +16,7 @@ CHANGELOG
  * Add `ClearableSessionHandlerInterface` for clearing all session data
  * Add `Request::getStructuredSuffixFormat()` to resolve a mime type to the format of its structured syntax suffix, e.g. `application/vnd.api+json` to `json`
  * Accept a list of secrets in `UriSigner::__construct()` to rotate them
- * `StreamedResponse::__construct()` now accepts a `ResponseHeaderBag` as its third argument
+ * Allow passing a `ResponseHeaderBag` as the third argument of `StreamedResponse::__construct()`
  * Add arguments `$isolate` and `$debug` to `AttributeBag::__construct()`, and `$attributeBagFactory` to `SessionFactory::__construct()`
  * Deprecate saving changes made to session attributes without calling `set()` afterwards
 

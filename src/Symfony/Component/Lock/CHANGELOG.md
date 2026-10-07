@@ -5,10 +5,9 @@ CHANGELOG
 ---
 
  * Add `LockBundle`, which provides the `lock` configuration and the services previously provided by `FrameworkBundle` under `framework.lock`
- * Pick the default lock store when the bundle loads instead of in the config tree; an empty `resources` list now means the default store
- * Add argument `$advisory` to `StoreFactory::createStore()` to use advisory locks when reusing an existing `\PDO` or Doctrine DBAL `Connection`
- * Add `DoctrineDbalMysqlStore` based on MySQL `GET_LOCK()` functionality, usable with the `mysql+advisory://` DSN
- * Add `MysqlStore` based on MySQL `GET_LOCK()` functionality, usable with the `mysql+advisory:` DSN
+ * Make an empty `lock.resources` list use the default lock store
+ * Add the `service_id` and `advisory` options of lock stores and the `$advisory` argument of `StoreFactory::createStore()` to use advisory locks on an existing `\PDO` or Doctrine DBAL connection
+ * Add `MysqlStore` and `DoctrineDbalMysqlStore`, based on MySQL `GET_LOCK()` and usable with the `mysql+advisory:` DSN
  * Add argument `$removeOnRelease` to `FlockStore` and the `flock+remove` DSN to remove the lock file when an exclusive lock is released
 
 8.1

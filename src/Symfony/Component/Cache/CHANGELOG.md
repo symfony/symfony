@@ -5,13 +5,13 @@ CHANGELOG
 ---
 
  * Add `CacheBundle`, which provides the `cache` configuration and the services previously provided by `FrameworkBundle` under `framework.cache`
- * Add the `cache:pool:clear`, `cache:pool:delete`, `cache:pool:invalidate-tags`, `cache:pool:list` and `cache:pool:prune` commands, which `FrameworkBundle` used to provide
- * Add `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, which `FrameworkBundle` used to provide
+ * Add the `cache:pool:clear`, `cache:pool:delete`, `cache:pool:invalidate-tags`, `cache:pool:list` and `cache:pool:prune` commands, `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, which `FrameworkBundle` used to provide
+ * Add the `cache.default_provider` option to configure `cache.app` with a DSN
  * Add `AbstractAdapter::createAdapter()` to create the adapter matching a connection
- * Add `MongoDbAdapter` and `MongoDbTagAwareAdapter`
+ * Add `MongoDbAdapter` and `MongoDbTagAwareAdapter`, the `cache.adapter.mongodb` and `cache.adapter.mongodb_tag_aware` adapters, and the `cache.default_mongodb_provider` option
  * Support the `mongodb:` and `mongodb+srv:` DSN in `AbstractAdapter::createConnection()`
  * Implement `PruneableInterface` on `RedisTagAwareAdapter` to garbage-collect its tag Sets
- * Add `PdoTagAwareAdapter`
+ * Add `PdoTagAwareAdapter` and the `cache.adapter.pdo_tag_aware` adapter
  * Make `AbstractAdapter::createSystemCache()` skip APCu when OPcache is enabled and the cache directory is writable
  * Set `ItemInterface::METADATA_SAVE_FAILED` in the `$metadata` argument of `get()` when the computed value could not be saved
 

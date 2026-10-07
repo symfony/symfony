@@ -7,6 +7,7 @@ CHANGELOG
  * Add `WebLinkBundle`, which provides the `web_link` configuration and the services previously provided by `FrameworkBundle` under `framework.web_link`
  * Add `JsonLinksetSerializer` and `JsonLinksetParser` to write and read `application/linkset+json` documents (RFC 9264)
  * Add `LinkTemplateHeaderSerializer` and `LinkTemplateHeaderParser` to write and read `Link-Template` headers (RFC 9652)
+ * Register the `web_link.json_linkset_serializer`, `web_link.json_linkset_parser`, `web_link.link_template_header_serializer` and `web_link.link_template_header_parser` services
  * Make `AddLinkHeaderListener` send templated links in a `Link-Template` header instead of dropping them
 
 8.1

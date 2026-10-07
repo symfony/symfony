@@ -6,11 +6,8 @@ CHANGELOG
 
  * Deprecate the `JsonStreamWriter` and `JsonStreamReader` autowiring aliases, use `StreamWriterInterface` and `StreamReaderInterface` instead
  * Add `JsonStreamerBundle`, which provides the `json_streamer` configuration and the services previously provided by `FrameworkBundle` under `framework.json_streamer`
- * Drop the streamer cache warmer when no class is streamable
- * Add `BcMath\Number` value object support with `BcMathNumberValueObjectTransformer`
- * Add `GMP` value object support with `GmpNumberValueObjectTransformer`
+ * Add `BcMathNumberValueObjectTransformer`, `GmpNumberValueObjectTransformer`, `UuidValueObjectTransformer` and `UlidValueObjectTransformer` to stream `BcMath\Number`, `GMP`, `Uuid` and `Ulid` value objects
  * Add a `cache_variant` option that partitions the generated code cache, so a custom property metadata loader can produce several payload shapes for the same PHP type
- * Add `Uuid` and `Ulid` value object support with `UuidValueObjectTransformer` and `UlidValueObjectTransformer`
  * Add a `uid_format` option to control the written UID representation
 
 8.1

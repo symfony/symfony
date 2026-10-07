@@ -4,13 +4,12 @@ CHANGELOG
 8.2
 ---
 
- * Add `CompiledEventDispatcher`, which dispatches to listeners a container described at compile time, and `CompileListenersPass`, which describes them
+ * Add `CompiledEventDispatcher` and `CompileListenersPass` to dispatch to the listeners a container describes at compile time
  * Add `ScopedEventDispatcher`, to give listeners the lifetime of a scope without mutating the dispatcher they run next to
- * Add `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`, which `EventDispatcherInterface` extends, to type what reads the listeners of a dispatcher without registering any
+ * Add `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`, extended by `EventDispatcherInterface`, to read the listeners of a dispatcher without registering any
  * Deprecate calling `addListener()`, `addSubscriber()`, `removeListener()` and `removeSubscriber()` on a `CompiledEventDispatcher`, declare the listener in the container or add it to a `ScopedEventDispatcher` instead
  * Allow `getSubscribedEvents()` to name its keys: `['method' => 'onEvent', 'priority' => 10]`
- * Add `before` and `after` to `#[AsEventListener]` and to the named keys of `getSubscribedEvents()` to order listeners
- * Make `AsEventListener::$priority` nullable
+ * Add `before` and `after` to `#[AsEventListener]` and to the named keys of `getSubscribedEvents()` to order listeners, and make `AsEventListener::$priority` nullable
 
 8.1
 ---

@@ -9,8 +9,7 @@ CHANGELOG
  * Add `AdminRecipientsProviderInterface`
  * Deprecate declaring `getAdminRecipients()` without implementing `AdminRecipientsProviderInterface`
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0
- * Add the `ssl` DSN option to send requests over plain HTTP
- * Add `AbstractTransport::setSsl()`, `AbstractTransport::getHttpScheme()`, the `AbstractTransport::SSL` constant and `AbstractTransportFactory::getSsl()`
+ * Add `AbstractTransport::setSsl()`, `AbstractTransport::getHttpScheme()`, the `AbstractTransport::SSL` constant and `AbstractTransportFactory::getSsl()` to support the `ssl` DSN option of the bridges
 
 8.0
 ---

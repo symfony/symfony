@@ -4,17 +4,15 @@ CHANGELOG
 8.2
 ---
 
- * Add IterableToArrayCollectionTransformer for ObjectMapper
- * Throw a `ConstraintDefinitionException` from `UniqueEntity` when a checked field holds an array or is a to-many association, instead of building a query that cannot match
+ * Add the `IterableToArrayCollection` transform for the ObjectMapper component
+ * Throw a `ConstraintDefinitionException` when a field checked by `UniqueEntity` holds an array or is a to-many association
  * Allow using closures with the `#[MapEntity]` attribute
- * Deprecate `DoctrineCloseConnectionMiddleware` in favor of the new `DoctrineDbalCloseConnectionMiddleware`
- * Deprecate `DoctrineOpenTransactionLoggerMiddleware` in favor of the new `DoctrineDbalOpenTransactionLoggerMiddleware`
- * Deprecate `DoctrinePingConnectionMiddleware` in favor of the new `DoctrineDbalPingConnectionMiddleware`
+ * Deprecate `DoctrineCloseConnectionMiddleware`, `DoctrineOpenTransactionLoggerMiddleware` and `DoctrinePingConnectionMiddleware`, use `DoctrineDbalCloseConnectionMiddleware`, `DoctrineDbalOpenTransactionLoggerMiddleware` and `DoctrineDbalPingConnectionMiddleware` instead
  * Add `DoctrineDbalTransactionMiddleware` to wrap all handlers in a single DBAL transaction without requiring the ORM
  * Map the `DatePoint`, `DayPoint` and `TimePoint` property types to their Doctrine types, so schema tools detect them without an explicit `type`
  * Load a list of entities into `array`-typed controller and command arguments with `#[MapEntity]`, using `findBy()`
  * Add the `EntityExists` constraint for validating that a value references an existing entity
- * Add `CollectionDenormalizer` to denormalize arrays into Doctrine collections, defaulting to `ArrayCollection` when the target type is the `Collection` interface
+ * Add `CollectionDenormalizer` to denormalize arrays into Doctrine collections
 
 8.1
 ---

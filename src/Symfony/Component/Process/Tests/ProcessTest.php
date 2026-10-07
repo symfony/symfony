@@ -217,7 +217,6 @@ class ProcessTest extends TestCase
             usleep(10000);
         }
         $this->assertFileExists($marker);
-        unlink($marker);
 
         $calls = 0;
         try {
@@ -232,6 +231,8 @@ class ProcessTest extends TestCase
         }
 
         $p->wait();
+        // touch() creates the file before setting its times, and fails when the file is removed in between
+        unlink($marker);
 
         $this->assertSame(1, $calls);
         $this->assertSame('foobar', $p->getOutput());

@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by Menelion at 2025-10-06T12:48:28Z
+
+Hallelujah! Hope it will get merged soon, thanks @lyrixx for this work! I love the concept of workflows but hate the necessity to write that Yaml config.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2025-10-22T15:53:29Z
+
+I pushed a new version :
+
+* The class that hold `AsWorkflow` attribute does not need to extends anything
+* Optionally, if it use `WorkflowTrait`, it will behave like a Workflow.
+* Add support for workflow metadata
+* Add support for place metadata
+* Add support for many transition with the same name
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-09-21T03:22:08Z
+
+Thank you for the work on this PR and for the design discussion it helped move forward. I’ve opened https://github.com/symfony/symfony/pull/66185 with an alternative implementation that builds on this proposal and incorporates the feedback shared here and in issue #58503.
+
+The main difference is that the enum serves only as a compile-time workflow definition, while applications continue to use the existing `Workflow` or `StateMachine` services through `WorkflowInterface`.
+
+Any feedback on the proposed design and implementation would be greatly appreciated.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-09-22T07:34:35Z
+
+I pushed a reworked version, taking into account the reviews here and the discussion around #66185.
+
+```php
+#[AsWorkflow(supports: Task::class)]
+final class TaskWorkflow
+{
+    use WorkflowTrait;
+
+    #[Transition(from: TaskStep::New, to: TaskStep::Processing)]
+    public const START = 'start';
+
+    #[AsGuardListener(transition: self::START)]
+    public function guardStart(GuardEvent $event): void { /* ... */ }
+}
+```
+
+* The definition lives on a regular class with `#[AsWorkflow]`. Transitions are declared with `#[Transition]` on constants (the constant value is the name, the attribute is repeatable) or in a `transitions:` list. Places are inferred from the transitions; `#[Place]` metadata are read from the string-backed enums used in the definition. Everything the `workflow` configuration offers is available, and a minimal definition only needs the transitions.
+* The class stays an ordinary service with a free constructor. The opt-in `WorkflowTrait` exposes the methods of `Workflow` (a reflection test keeps the signatures in sync), so custom methods like `startProcess()` are straightforward.
+* The `workflow` argument of the `As*Listener` attributes can be omitted inside a class using `#[AsWorkflow]`.
+* YAML and attributes now feed the same `@internal` descriptor and registrar, inside the `WorkflowBundle`. The parameter that crossed the package boundary is gone.
+* The remarks of @stof (repeatable transitions, `from`/`froms`, `name` on constants, array shapes) and @alexandre-daubois (weights, audit trail default, trait detection, name collisions, disabled bundle, `getMarking()` context, error messages) are addressed, with tests at the component level plus a FrameworkBundle functional test.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-09-23T08:36:42Z
+
+Thanks for the review @X-Coder264, I pushed the changes. PHPStan and Psalm are green: the Psalm type issue is fixed, and the `trait.unused` report is ignored in the config since nothing in `src/` can use a trait meant for applications.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-07T11:02:34Z
+
+Rebased, and pushed two more commits, WDYT @lyrixx?
+
+1. `#[Place]` on a class constant is now read (it was silently ignored), a bare `#[AsGuardListener]` in the class now guards its own workflow instead of every workflow of the app, and there's one way to declare things: `transitions:`, the list form of `places:`, `Transition::$name` and `Place::$name` are gone, and `Arc` stays as is since `new Arc(Status::Approved->value, 2)` works in attributes. This commit also covers your comments @stof, including a state machine `#[Transition]` with several places now throwing instead of being split.
+2. The attributes now go through the `workflow` config tree instead of being validated a second time, which removes the descriptors. The config now also accepts workflows with neither `supports` nor `support_strategy`, like the attributes did.

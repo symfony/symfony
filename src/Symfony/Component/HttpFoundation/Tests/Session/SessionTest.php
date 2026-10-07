@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
@@ -266,5 +268,87 @@ class SessionTest extends TestCase
         $storage->registerBag(new SessionBagProxy($bag, $data, $usageIndex, null));
 
         $this->assertSame($bag, (new Session($storage))->getBag('foo'));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testSaveReportsChangesMadeWithoutCallingSet()
+    {
+        $session = new Session(new MockArraySessionStorage(), new AttributeBag('_sf2_attributes', false, true));
+
+        $object = new \stdClass();
+        $object->foo = 'bar';
+        $session->set('set_then_changed', $object);
+        $object->foo = 'baz';
+
+        $session->set('nested', ['list' => [new \stdClass()]]);
+        $session->get('nested')['list'][0]->foo = 'bar';
+
+        $session->set('array_object', new \ArrayObject([1]));
+        $session->get('array_object')[] = 2;
+
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.2: Saving changes made to the value of session attribute "set_then_changed" without calling "set()" afterwards is deprecated; call "set()" with the changed value instead.');
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.2: Saving changes made to the value of session attribute "nested" without calling "set()" afterwards is deprecated; call "set()" with the changed value instead.');
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.2: Saving changes made to the value of session attribute "array_object" without calling "set()" afterwards is deprecated; call "set()" with the changed value instead.');
+
+        $session->save();
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testSaveReportsChangesMadeToValuesReadFromStorage()
+    {
+        $object = new \stdClass();
+        $object->foo = 'bar';
+        $storage = new MockArraySessionStorage();
+        $storage->setSessionData(['_sf2_attributes' => ['obj' => $object]]);
+        $session = new Session($storage, new AttributeBag('_sf2_attributes', false, true));
+
+        $session->all()['obj']->foo = 'baz';
+
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.2: Saving changes made to the value of session attribute "obj" without calling "set()" afterwards is deprecated; call "set()" with the changed value instead.');
+
+        $session->save();
+    }
+
+    #[DataProvider('provideSessionsThatDoNotReportChanges')]
+    public function testSaveDoesNotReportChanges(AttributeBag $attributes, bool $changed)
+    {
+        $session = new Session(new MockArraySessionStorage(), $attributes);
+
+        $object = new \stdClass();
+        $object->foo = 'bar';
+        $object->nan = \NAN;
+        $session->set('obj', $object);
+        $session->set('removed', $object);
+        $session->set('untouched', new \stdClass());
+        $session->get('untouched');
+
+        $object->foo = 'baz';
+        $session->remove('removed');
+        if (!$changed) {
+            $session->set('obj', $object);
+        }
+
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations) {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $session->save();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $deprecations);
+    }
+
+    public static function provideSessionsThatDoNotReportChanges(): iterable
+    {
+        yield 'set after change' => [new AttributeBag('_sf2_attributes', false, true), false];
+        yield 'not in debug mode' => [new AttributeBag(), true];
+        yield 'isolated values' => [new AttributeBag('_sf2_attributes', true, true), true];
     }
 }

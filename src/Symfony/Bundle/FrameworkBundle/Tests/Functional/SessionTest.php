@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 class SessionTest extends AbstractWebTestCase
 {
@@ -46,7 +48,7 @@ class SessionTest extends AbstractWebTestCase
         $crawler = $client->request('GET', '/session');
         $this->assertStringContainsString('You are new here and gave no name.', $crawler->text());
 
-        // prepare session programatically
+        // prepare session programmatically
         $session = $client->getSession();
         $session->set('name', 'drak');
         $session->save();
@@ -56,7 +58,7 @@ class SessionTest extends AbstractWebTestCase
         $session->set('foo', 'bar');
         $session->save();
 
-        // prove remembered name from programatically prepared session
+        // prove remembered name from programmatically prepared session
         $crawler = $client->request('GET', '/session');
         $this->assertStringContainsString('Welcome back drak, nice to meet you.', $crawler->text());
     }
@@ -153,6 +155,49 @@ class SessionTest extends AbstractWebTestCase
 
         $response = $client->getResponse();
         $this->assertSame('public, s-maxage=100', $response->headers->get('cache-control'));
+    }
+
+    public function testChangesWithoutSetAreNotSavedWithIsolatedAttributes()
+    {
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => 'config_isolate_attributes.yml', 'debug' => true]);
+
+        $object = new \stdClass();
+        $object->foo = 'bar';
+        $session = $client->getSession();
+        $session->set('obj', $object);
+        $object->foo = 'baz';
+        $session->save();
+
+        $session = $client->getSession();
+        $this->assertSame('bar', $session->get('obj')->foo);
+        $session->get('obj')->foo = 'baz';
+        $this->assertSame('baz', $session->get('obj')->foo);
+        $session->save();
+
+        $this->assertSame('bar', $client->getSession()->get('obj')->foo);
+        $this->assertNotSame($client->getSession()->getBag('attributes'), $client->getSession()->getBag('attributes'));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testChangesWithoutSetAreReportedInDebugMode()
+    {
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $object = new \stdClass();
+        $object->foo = 'bar';
+        $session = $client->getSession();
+        $session->set('obj', $object);
+        $session->save();
+
+        $session = $client->getSession();
+        $session->get('obj')->foo = 'baz';
+
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.2: Saving changes made to the value of session attribute "obj" without calling "set()" afterwards is deprecated; call "set()" with the changed value instead.');
+
+        $session->save();
+
+        $this->assertSame('baz', $client->getSession()->get('obj')->foo);
     }
 
     public static function getConfigs()

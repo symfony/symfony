@@ -36,6 +36,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
 
     private string $flashName;
     private string $attributeName;
+    private AttributeBagInterface $attributeBag;
     private array $data = [];
     private int $usageIndex = 0;
     private ?\Closure $usageReporter;
@@ -45,7 +46,7 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
         $this->storage = $storage ?? new NativeSessionStorage();
         $this->usageReporter = null === $usageReporter ? null : $usageReporter(...);
 
-        $attributes ??= new AttributeBag();
+        $this->attributeBag = $attributes ??= new AttributeBag();
         $this->attributeName = $attributes->getName();
         $this->registerBag($attributes);
 
@@ -163,6 +164,10 @@ class Session implements FlashBagAwareSessionInterface, \IteratorAggregate, \Cou
 
     public function save(): void
     {
+        if ($this->attributeBag instanceof AttributeBag) {
+            $this->attributeBag->reportChangesWithoutSet();
+        }
+
         $this->storage->save();
     }
 

@@ -327,6 +327,7 @@ class ConfigurationTest extends TestCase
                 'cookie_samesite' => 'lax',
                 'cookie_secure' => 'auto',
                 'metadata_update_threshold' => 0,
+                'isolate_attributes' => false,
             ],
             'request' => [
                 'enabled' => false,

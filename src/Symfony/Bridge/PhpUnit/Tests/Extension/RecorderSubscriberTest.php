@@ -12,10 +12,15 @@
 namespace Symfony\Bridge\PhpUnit\Tests\Extension;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\Extension\RecorderSubscriber;
 use Symfony\Component\HttpClient\Recorder\RecorderMode;
 
+/**
+ * @requires PHPUnit >= 10
+ */
+#[RequiresPhpunit('>=10.0.0')]
 class RecorderSubscriberTest extends TestCase
 {
     protected function setUp(): void
@@ -45,9 +50,6 @@ class RecorderSubscriberTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideResolveRecordPathCases
-     */
     #[DataProvider('provideResolveRecordPathCases')]
     public function testResolveRecordPath(?string $record, int|string|null $dataSetName, ?string $directory, string $expected)
     {
@@ -67,9 +69,6 @@ class RecorderSubscriberTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideIsAbsolutePathCases
-     */
     #[DataProvider('provideIsAbsolutePathCases')]
     public function testIsAbsolutePath(string $path, bool $expected)
     {

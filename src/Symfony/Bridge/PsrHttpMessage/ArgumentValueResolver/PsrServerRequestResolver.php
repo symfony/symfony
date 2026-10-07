@@ -40,7 +40,7 @@ final class PsrServerRequestResolver implements ValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument): \Traversable
     {
-        if (!isset(self::SUPPORTED_TYPES[$argument->getType()])) {
+        if (!isset(self::SUPPORTED_TYPES[$argument->getType() ?? ''])) {
             return;
         }
 

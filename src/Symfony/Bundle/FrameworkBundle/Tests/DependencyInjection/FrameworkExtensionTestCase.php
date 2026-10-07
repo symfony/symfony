@@ -36,6 +36,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
@@ -110,6 +111,10 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\LessThan;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\RangeValidator;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Validation;
@@ -1752,6 +1757,24 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('validation_email_validation_mode');
 
         $this->assertSame('html5-allow-no-tld', $container->getDefinition('validator.email')->getArgument(0));
+    }
+
+    public function testComparisonAndRangeValidatorsUseTheClock()
+    {
+        if (!property_exists(RangeValidator::class, 'clock')) {
+            $this->markTestSkipped('Requires symfony/validator >= 8.1.');
+        }
+
+        $container = $this->createContainerFromFile('validation_attributes', ['kernel.charset' => 'UTF-8'], false, false);
+        $container->register('clock', MockClock::class)->setArguments(['2020-01-01 12:00:00']);
+        $container->compile();
+
+        $validator = $container->get('validator.alias');
+        $value = new \DateTimeImmutable('2020-02-01');
+
+        $this->assertCount(0, $validator->validate($value, new Range(min: '+48 hours', max: '+1 year')));
+        $this->assertCount(0, $validator->validate($value, new GreaterThan('+48 hours')));
+        $this->assertCount(0, $validator->validate($value, new LessThan('+1 year')));
     }
 
     public function testValidationTranslationDomain()

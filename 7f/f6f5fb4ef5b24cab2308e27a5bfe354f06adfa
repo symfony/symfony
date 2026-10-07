@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-07T07:18:22Z
+
+I pushed what I tried on top of your branch, with tests: https://github.com/HypeMC/symfony/compare/as-closure-service...nicolas-grekas:symfony:as-closure-service-adapters
+It also moves the integration tests into `IntegrationTest`, and rejects `id` and `target` on interface methods. Feel free to borrow!
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-07T12:58:34Z
+
+@nicolas-grekas Thanks for the review, and for pushing the adapters branch. I cherry-picked both your commits.
+
+Done:
+
+* Removed `TARGET_CLASS`, the attribute is method-only now. The `__invoke()` shorthand is gone along with its fixtures and tests.
+* `@internal` on both passes, and dropped the now redundant `@internal` on the `TAG` constant.
+
+The interface adapters, the `#[Target]` aliases, the `id`/`target` rejection on abstract methods and the `IntegrationTest` move all came in with your commits.
+
+On the second half of your `id` note, that the error names the implementing class rather than the interface: the same happened one level down, for a concrete method inherited by two subclasses.
+
+```php
+class Base { #[AsService(id: 'fixed')] public function run() {} }
+class ChildA extends Base {}
+class ChildB extends Base {}
+```
+
+Both children got tagged directly and the collision named `ChildB::run()`, where the `id` is written on `Base`. Rather than fix the message I made it consistent with your check: `id` and `target` are now rejected on an inherited method too, for the same reason you reject them on an abstract one, since `Base` cannot know who extends it any more than an interface can know who implements it. The condition is `$method->isAbstract() || $declaredBy !== $r->name`.
+
+On the name: you are right that `#[AsClosureService]` stops being accurate once `lazy: SomeInterface::class` makes the service an adapter rather than a closure. I renamed it to `#[AsService]`, as the only candidate that stays true in both shapes. Please let me know if `AsService` is too broad a name to claim.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-07T13:17:35Z
+
+@nicolas-grekas Renamed to `#[AsCallable]`, and the rest followed: `container.callable_service`, `RegisterAsCallableAttributesPass`, `RegisterCallableServicesPass`, and the test and fixtures named after the pass. The texts that said "closure service" now say "service", in the attribute docblock, the `@param` descriptions, the CHANGELOG and the "Cannot register the service" message.

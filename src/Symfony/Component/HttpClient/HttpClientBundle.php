@@ -92,6 +92,24 @@ class HttpClientBundle extends AbstractBundle
                 ->integerNode('max_host_connections')
                     ->info('The maximum number of connections to a single host.')
                 ->end()
+                ->arrayNode('recorder')
+                    ->info('Record HTTP exchanges into HAR files and replay them in tests (see RecorderHttpClient).')
+                    ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('redactor')
+                            ->info('Service id of a RedactorInterface; when set, "redact" and "redact_except" are ignored.')
+                            ->defaultNull()
+                        ->end()
+                        ->arrayNode('redact')
+                            ->info('Header, query-string, form and JSON field names masked in recorded files, in addition to the built-in ones.')
+                            ->scalarPrototype()->end()
+                        ->end()
+                        ->arrayNode('redact_except')
+                            ->info('Names never masked, removed from the built-in lists.')
+                            ->scalarPrototype()->end()
+                        ->end()
+                    ->end()
+                ->end()
                 ->arrayNode('default_options')
                     ->children()
                         ->arrayNode('vars', 'var')
@@ -357,6 +375,22 @@ class HttpClientBundle extends AbstractBundle
                     ->replaceArgument(0, new Reference($name));
 
                 $container->registerAliasForArgument('httplug.'.$name, HttpAsyncClient::class, $name);
+            }
+        }
+
+        $recorder = $config['recorder'];
+
+        if ($recorder['enabled']) {
+            $configurator->import('Resources/config/http_client_recorder.php');
+
+            $container->getDefinition('http_client.recorder')
+                ->replaceArgument(3, $container->getDefinition('http_client.transport')->getArgument(0));
+
+            $container->getDefinition('http_client.recorder.redactor')
+                ->setArguments([$recorder['redact'], $recorder['redact_except']]);
+
+            if ($recorder['redactor']) {
+                $container->setAlias('http_client.recorder.redactor', $recorder['redactor']);
             }
         }
     }

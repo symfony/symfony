@@ -22,6 +22,8 @@ use PHPUnit\Event\Test\Finished;
 use PHPUnit\Event\Test\FinishedSubscriber;
 use PHPUnit\Event\Test\Skipped;
 use PHPUnit\Event\Test\SkippedSubscriber;
+use PHPUnit\Event\TestRunner\ExecutionFinished;
+use PHPUnit\Event\TestRunner\ExecutionFinishedSubscriber;
 use PHPUnit\Metadata\Group;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
@@ -30,10 +32,12 @@ use PHPUnit\TextUI\Configuration\Configuration;
 use Symfony\Bridge\PhpUnit\Attribute\DnsSensitive;
 use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
 use Symfony\Bridge\PhpUnit\Extension\EnableClockMockSubscriber;
+use Symfony\Bridge\PhpUnit\Extension\RecorderSubscriber;
 use Symfony\Bridge\PhpUnit\Extension\RegisterClockMockSubscriber;
 use Symfony\Bridge\PhpUnit\Extension\RegisterDnsMockSubscriber;
 use Symfony\Bridge\PhpUnit\Metadata\AttributeReader;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
+use Symfony\Component\HttpClient\RecorderHttpClient;
 
 class SymfonyExtension implements Extension
 {
@@ -126,6 +130,27 @@ class SymfonyExtension implements Extension
         }
 
         $facade->registerSubscriber(new RegisterDnsMockSubscriber($reader));
+
+        if (class_exists(RecorderHttpClient::class)) {
+            $directory = $parameters->has('http-recorder-directory') ? $parameters->get('http-recorder-directory') : null;
+
+            // relative directories are resolved against the PHPUnit configuration file, not the current working directory
+            if (null !== $directory && !RecorderSubscriber::isAbsolutePath($directory)) {
+                $directory = ($configuration->hasConfigurationFile() ? \dirname($configuration->configurationFile()) : (getcwd() ?: '.')).'/'.$directory;
+            }
+
+            $facade->registerSubscriber($recorderSubscriber = new RecorderSubscriber($reader, null !== $directory ? rtrim($directory, '/\\') : null, $_SERVER['SYMFONY_HTTP_RECORDER'] ?? getenv('SYMFONY_HTTP_RECORDER') ?: ''));
+            $facade->registerSubscriber(new class($recorderSubscriber) implements ExecutionFinishedSubscriber {
+                public function __construct(private RecorderSubscriber $recorderSubscriber)
+                {
+                }
+
+                public function notify(ExecutionFinished $event): void
+                {
+                    $this->recorderSubscriber->reportMisses();
+                }
+            });
+        }
     }
 
     /**

@@ -73,6 +73,7 @@ class HarFileResponseFactoryTest extends TestCase
     public function testFactoryThrowsWhenUnableToMatchResponse()
     {
         $this->expectException(TransportException::class);
+        $this->expectExceptionMessage(\sprintf('File "%s/symfony.com_archive.har" does not contain a response for HTTP request "GET" "https://symfony.com/not-found".', $this->fixtureDir));
         $factory = new HarFileResponseFactory("{$this->fixtureDir}/symfony.com_archive.har");
         $client = new MockHttpClient($factory, 'https://symfony.com');
 
@@ -86,5 +87,26 @@ class HarFileResponseFactoryTest extends TestCase
         $client = new MockHttpClient($factory, 'https://symfony.com');
 
         $client->request('GET', '/releases.json');
+    }
+
+    public function testRepeatedEntriesAreReplayedInOrder()
+    {
+        $entry = static fn (int $status) => [
+            'startedDateTime' => '2026-01-01T00:00:00.000Z',
+            'request' => ['method' => 'GET', 'url' => 'https://symfony.com/poll'],
+            'response' => ['status' => $status, 'headers' => [], 'content' => ['text' => '']],
+        ];
+        $file = tempnam(sys_get_temp_dir(), 'har');
+        file_put_contents($file, json_encode(['log' => ['entries' => [$entry(202), $entry(200)]]]));
+
+        try {
+            $client = new MockHttpClient(new HarFileResponseFactory($file));
+
+            $this->assertSame(202, $client->request('GET', 'https://symfony.com/poll')->getStatusCode());
+            $this->assertSame(200, $client->request('GET', 'https://symfony.com/poll')->getStatusCode());
+            $this->assertSame(200, $client->request('GET', 'https://symfony.com/poll')->getStatusCode());
+        } finally {
+            unlink($file);
+        }
     }
 }

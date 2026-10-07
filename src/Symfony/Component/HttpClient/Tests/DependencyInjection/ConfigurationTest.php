@@ -21,7 +21,24 @@ class ConfigurationTest extends TestCase
 {
     public function testDefaultConfig()
     {
-        $this->assertSame(['enabled' => true, 'scoped_clients' => []], $this->process([]));
+        $this->assertSame([
+            'enabled' => true,
+            'recorder' => [
+                'enabled' => false,
+                'redactor' => null,
+                'redact' => [],
+                'redact_except' => [],
+            ],
+            'scoped_clients' => [],
+        ], $this->process([]));
+    }
+
+    public function testRecorderShortcuts()
+    {
+        $this->assertTrue($this->process(['recorder' => true])['recorder']['enabled']);
+        $this->assertTrue($this->process(['recorder' => null])['recorder']['enabled']);
+        $this->assertFalse($this->process(['recorder' => false])['recorder']['enabled']);
+        $this->assertTrue($this->process(['recorder' => ['redact' => ['pin']]])['recorder']['enabled']);
     }
 
     public function testScopedClientsInheritRateLimiterAndRetryFailedConfiguration()

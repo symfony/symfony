@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\HttpClientBundle;
+use Symfony\Component\HttpClient\RecorderHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -113,6 +114,55 @@ class HttpClientBundleTest extends TestCase
         $this->assertFalse($container->hasDefinition('http_client'));
         $this->assertFalse($container->hasDefinition('http_client.transport'));
         $this->assertFalse($container->hasDefinition('cache.http_client'));
+    }
+
+    public function testTheRecorderIsWiredWhenEnabled()
+    {
+        $container = $this->loadExtension([
+            'default_options' => ['headers' => ['X-Foo' => 'bar']],
+            'recorder' => [
+                'enabled' => true,
+                'redact' => ['X-Custom-Secret', 'sig'],
+                'redact_except' => ['code'],
+            ],
+        ]);
+
+        $this->assertTrue($container->hasDefinition('http_client.recorder'));
+        $definition = $container->getDefinition('http_client.recorder');
+        $this->assertSame(RecorderHttpClient::class, $definition->getClass());
+
+        $this->assertSame(['http_client.transport', null, 100], $definition->getDecoratedService());
+
+        $arguments = $definition->getArguments();
+        $this->assertCount(4, $arguments);
+        $this->assertSame('.inner', (string) $arguments[0]);
+        $this->assertSame('http_client.recorder.configuration', (string) $arguments[1]);
+        $this->assertSame('http_client.recorder.redactor', (string) $arguments[2]);
+
+        $this->assertSame($container->getDefinition('http_client.transport')->getArgument(0), $arguments[3]);
+        $this->assertSame('bar', $arguments[3]['headers']['X-Foo'] ?? null);
+
+        $this->assertSame([['X-Custom-Secret', 'sig'], ['code']], $container->getDefinition('http_client.recorder.redactor')->getArguments());
+    }
+
+    public function testTheRecorderRedactorCanBeReplaced()
+    {
+        $container = $this->loadExtension(['recorder' => ['enabled' => true, 'redactor' => 'my_redactor']]);
+
+        $this->assertSame('my_redactor', (string) $container->getAlias('http_client.recorder.redactor'));
+    }
+
+    public function testTheRecorderIsDisabledByDefault()
+    {
+        $this->assertFalse($this->loadExtension([])->hasDefinition('http_client.recorder'));
+    }
+
+    private function loadExtension(array $config): ContainerBuilder
+    {
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
+        new HttpClientBundle()->getContainerExtension()->load([$config], $container);
+
+        return $container;
     }
 }
 

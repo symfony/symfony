@@ -4,6 +4,10 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `#[AsWorkflow]`, `#[Place]` and `#[Transition]` attributes and the `WorkflowTrait` to define workflows and state machines in a class
+ * Make the `As*Listener` attributes listen to the workflow of their class by default when it uses `#[AsWorkflow]`
+ * Add the `WorkflowType` enum
+ * Allow configuring a workflow without `supports` nor `support_strategy`, to use it by injection only
  * Add argument `$context` to `WorkflowInterface::getMarking()`
  * Cache the parsed guard expressions in a `cache.system` pool, and compile them when warming up the cache
  * Accept any `ExpressionLanguage` in `GuardListener`

@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -38,11 +39,15 @@ final class ProfilerLinkLogListener implements EventSubscriberInterface
             return;
         }
 
-        // the "X-Debug-Token-Link" header holds the same URL, but it is set by
-        // WebDebugToolbarListener, which is only registered when the toolbar is enabled
-        $this->logger->debug('See profiler at {profiler_url}', [
-            'profiler_url' => $this->urlGenerator->generate('_profiler', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL),
-        ]);
+        try {
+            // the "X-Debug-Token-Link" header holds the same URL, but it is set by
+            // WebDebugToolbarListener, which is only registered when the toolbar is enabled
+            $url = $this->urlGenerator->generate('_profiler', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+        } catch (RouteNotFoundException) {
+            return;
+        }
+
+        $this->logger->debug('See profiler at {profiler_url}', ['profiler_url' => $url]);
     }
 
     public static function getSubscribedEvents(): array

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -65,6 +66,21 @@ final class ProfilerLinkLogListenerTest extends TestCase
         $logger->expects($this->never())->method('debug');
 
         (new ProfilerLinkLogListener($logger, $this->createUrlGenerator(false)))->onKernelResponse($this->createEvent([]));
+    }
+
+    public function testProfilerLinkLogShouldNotLogWhenProfilerRouteIsNotLoaded()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())->method('debug');
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->willThrowException(new RouteNotFoundException('Unable to generate a URL for the named route "_profiler" as such route does not exist.'))
+        ;
+
+        (new ProfilerLinkLogListener($logger, $urlGenerator))->onKernelResponse($this->createEvent(['X-Debug-Token' => '04bb3f']));
     }
 
     private function createUrlGenerator(bool $expectCall = true): UrlGeneratorInterface

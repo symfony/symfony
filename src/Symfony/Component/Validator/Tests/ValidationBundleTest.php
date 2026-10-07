@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
@@ -23,6 +24,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\LessThan;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\ValidationBundle;
@@ -243,6 +247,21 @@ class ValidationBundleTest extends TestCase
         $container->compile();
 
         $this->assertInstanceOf(ValidatorInterface::class, $container->get('validator.alias'));
+    }
+
+    public function testComparisonAndRangeValidatorsUseTheClock()
+    {
+        $container = $this->load([], merge: false);
+        $container->register('clock', MockClock::class)->setArguments(['2020-01-01 12:00:00']);
+        $container->setAlias('validator.alias', 'validator')->setPublic(true);
+        $container->compile();
+
+        $validator = $container->get('validator.alias');
+        $value = new \DateTimeImmutable('2020-02-01');
+
+        $this->assertCount(0, $validator->validate($value, new Range(min: '+48 hours', max: '+1 year')));
+        $this->assertCount(0, $validator->validate($value, new GreaterThan('+48 hours')));
+        $this->assertCount(0, $validator->validate($value, new LessThan('+1 year')));
     }
 
     /**

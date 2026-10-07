@@ -372,6 +372,7 @@ class ProfilerControllerTest extends WebTestCase
         $client->request('GET', '/_profiler/phpinfo');
 
         $this->assertStringContainsString('PHP Credits', $client->getResponse()->getContent());
+        $this->assertSame('text/plain; charset=UTF-8', $client->getResponse()->headers->get('Content-Type'));
     }
 
     public function testFontActionWithProfilerDisabled()

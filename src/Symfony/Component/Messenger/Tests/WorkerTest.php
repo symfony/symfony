@@ -1625,6 +1625,43 @@ class WorkerTest extends TestCase
         $this->assertSame(0, $receiver->getRejectCount());
     }
 
+    public function testAFailingAckIsNotReportedAsAHandlingFailure()
+    {
+        $receiver = new ThrowingAckReceiver([[new Envelope(new DummyMessage('Hey'))]]);
+
+        $handlerCalls = 0;
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor(static function () use (&$handlerCalls) {
+                ++$handlerCalls;
+            })],
+        ]))]);
+
+        $events = [];
+        $dispatcher = $this->createStoppingDispatcher(1);
+        $dispatcher->addListener(WorkerMessageHandledEvent::class, static function () use (&$events) {
+            $events[] = WorkerMessageHandledEvent::class;
+        });
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function () use (&$events) {
+            $events[] = WorkerMessageFailedEvent::class;
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
+        $failure = null;
+
+        try {
+            $worker->run();
+        } catch (TransportException $failure) {
+        }
+
+        $this->assertInstanceOf(TransportException::class, $failure);
+        $this->assertSame('Could not acknowledge the message.', $failure->getMessage());
+
+        $this->assertSame(1, $handlerCalls);
+        $this->assertSame([WorkerMessageHandledEvent::class], $events);
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
+    }
+
     private function createBatchBus(?int $delay = null): MessageBus
     {
         return new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
@@ -1684,6 +1721,16 @@ class ThrowingKeepaliveReceiver extends DummyReceiver implements KeepaliveReceiv
     public function keepalive(Envelope $envelope, ?int $seconds = null): void
     {
         throw new TransportException('Connection to the broker was lost.');
+    }
+}
+
+class ThrowingAckReceiver extends DummyReceiver
+{
+    public function ack(Envelope $envelope): void
+    {
+        parent::ack($envelope);
+
+        throw new TransportException('Could not acknowledge the message.');
     }
 }
 

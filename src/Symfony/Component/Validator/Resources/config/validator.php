@@ -12,16 +12,24 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Component\Validator\Constraints\EmailValidator;
+use Symfony\Component\Validator\Constraints\EqualToValidator;
 use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqualValidator;
+use Symfony\Component\Validator\Constraints\GreaterThanValidator;
+use Symfony\Component\Validator\Constraints\IdenticalToValidator;
+use Symfony\Component\Validator\Constraints\LessThanOrEqualValidator;
+use Symfony\Component\Validator\Constraints\LessThanValidator;
 use Symfony\Component\Validator\Constraints\NoSuspiciousCharactersValidator;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
+use Symfony\Component\Validator\Constraints\NotEqualToValidator;
+use Symfony\Component\Validator\Constraints\NotIdenticalToValidator;
+use Symfony\Component\Validator\Constraints\RangeValidator;
 use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
@@ -82,11 +90,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Constraint validators locator'),
             ])
 
+        // lists the built-in constraints for the translation extractor; as excluded definitions, they are never instantiated
         ->load('Symfony\Component\Validator\Constraints\\', $validatorsDir.'/*Validator.php')
             ->abstract()
             ->tag('container.excluded')
             ->tag('validator.constraint_validator')
-            ->bind(ClockInterface::class, service('clock')->nullOnInvalid())
 
         ->set('validator.expression', ExpressionValidator::class)
             ->args([service('validator.expression_language')->nullOnInvalid()])
@@ -134,6 +142,42 @@ return static function (ContainerConfigurator $container) {
             ->tag('validator.constraint_validator', [
                 'alias' => NoSuspiciousCharactersValidator::class,
             ])
+
+        ->set('validator.equal_to', EqualToValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
+
+        ->set('validator.not_equal_to', NotEqualToValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
+
+        ->set('validator.identical_to', IdenticalToValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
+
+        ->set('validator.not_identical_to', NotIdenticalToValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
+
+        ->set('validator.less_than', LessThanValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
+
+        ->set('validator.less_than_or_equal', LessThanOrEqualValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
+
+        ->set('validator.greater_than', GreaterThanValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
+
+        ->set('validator.greater_than_or_equal', GreaterThanOrEqualValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
+
+        ->set('validator.range', RangeValidator::class)
+            ->args([null, service('clock')->nullOnInvalid()])
+            ->tag('validator.constraint_validator')
 
         ->set('validator.property_info_loader', PropertyInfoLoader::class)
             ->args([

@@ -963,9 +963,25 @@ class AnsiUtilsTest extends TestCase
         $this->assertSame(1, AnsiUtils::graphemeWidth("\xC3\u{0301}"));
     }
 
-    public function testGraphemeWidthOfBytesThatCarryNoCharacterIsZero()
+    public function testGraphemeWidthCountsAColumnPerInvalidSequence()
     {
-        $this->assertSame(0, AnsiUtils::graphemeWidth("\xC3\xC3"));
+        $this->assertSame(2, AnsiUtils::graphemeWidth("\xC3\xC3"));
+    }
+
+    #[DataProvider('visibleWidthOfMalformedUtf8Provider')]
+    public function testVisibleWidthCountsAColumnPerInvalidSequence(string $text, int $expected)
+    {
+        $this->assertSame($expected, AnsiUtils::visibleWidth($text));
+    }
+
+    public static function visibleWidthOfMalformedUtf8Provider(): iterable
+    {
+        // "crème café" in ISO-8859-1
+        yield 'ending with an invalid byte' => ["cr\xE8me caf\xE9", 10];
+        yield 'followed by spaces' => ["cr\xE8me caf\xE9   ", 13];
+        yield 'with ANSI codes' => ["\x1b[90mcr\xE8me caf\xE9\x1b[0m", 10];
+        yield 'truncated sequence' => ["a\xF0\x9F\x98", 2];
+        yield 'with a wide character' => ["\xE9\u{65E5}", 3];
     }
 
     public function testSliceByColumnKeepsSlicingMalformedUtf8()

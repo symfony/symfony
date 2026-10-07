@@ -116,6 +116,10 @@ class MarkdownTest extends TestCase
         // Also via setText()
         $md->setText("Foo \xC0\xC1 Bar");
         $this->assertSame('Foo  Bar', $md->getText());
+
+        // "crème café" in ISO-8859-1
+        $md->setText("cr\xE8me caf\xE9");
+        $this->assertSame('crme caf', $md->getText());
     }
 
     public function testSetTextPreservesValidUtf8()

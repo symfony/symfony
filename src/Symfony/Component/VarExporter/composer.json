@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.4.1",
         "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/polyfill-deepclone": "^1.40"
+        "symfony/polyfill-deepclone": "^1.43.1"
     },
     "require-dev": {
         "symfony/property-access": "^7.4|^8.0",

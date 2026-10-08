@@ -302,7 +302,7 @@ class Request
         if (\PHP_VERSION_ID < 80400) {
             if (!isset($_SERVER['CONTENT_TYPE']) || str_starts_with($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded')) {
                 $content = file_get_contents('php://input');
-                parse_str($content, $post);
+                @parse_str($content, $post);
             } else {
                 $content = null;
                 $post = $_POST;
@@ -312,7 +312,7 @@ class Request
         }
 
         try {
-            [$post, $files] = request_parse_body();
+            [$post, $files] = @request_parse_body();
         } catch (\RequestParseBodyException) {
             $post = $_POST;
             $files = $_FILES;
@@ -444,7 +444,7 @@ class Request
 
         $queryString = '';
         if (isset($components['query'])) {
-            parse_str(html_entity_decode($components['query']), $qs);
+            @parse_str(html_entity_decode($components['query']), $qs);
 
             if ($query) {
                 $query = array_replace($qs, $query);

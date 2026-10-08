@@ -14,7 +14,9 @@ namespace Symfony\Component\Clock\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\DatePoint;
+use Symfony\Component\Clock\NativeClock;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 
 class DatePointTest extends TestCase
@@ -33,6 +35,21 @@ class DatePointTest extends TestCase
 
         $date = new DatePoint('2022-01-28 15:00:00 Europe/Paris');
         $this->assertSame('2022-01-28 15:00:00 Europe/Paris', $date->format('Y-m-d H:i:s e'));
+    }
+
+    public function testNowWithNativeClock()
+    {
+        Clock::set(new NativeClock('Asia/Tokyo'));
+
+        $before = new \DateTimeImmutable();
+        $date = new DatePoint();
+        $after = new \DateTimeImmutable();
+
+        $this->assertSame('Asia/Tokyo', $date->getTimezone()->getName());
+        $this->assertGreaterThanOrEqual($before, $date);
+        $this->assertLessThanOrEqual($after, $date);
+
+        $this->assertSame('UTC', (new DatePoint('now', new \DateTimeZone('UTC')))->getTimezone()->getName());
     }
 
     public function testCreateFromFormat()

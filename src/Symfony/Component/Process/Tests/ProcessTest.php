@@ -1583,6 +1583,37 @@ class ProcessTest extends TestCase
         unset($_ENV['FOO']);
     }
 
+    #[DataProvider('provideSymfonyDotenvVarsPassedToSubprocess')]
+    public function testSymfonyDotenvVarsDoesNotListExplicitlyPassedVars(?array $constructorEnv, array $startEnv, string|false $expected)
+    {
+        putenv('SYMFONY_DOTENV_VARS=FOO,BAR,BAZ');
+        $_ENV['SYMFONY_DOTENV_VARS'] = 'FOO,BAR,BAZ';
+
+        try {
+            $process = $this->getProcessForCode('echo var_export(getenv("SYMFONY_DOTENV_VARS"), true);', null, $constructorEnv);
+            $process->start(null, $startEnv);
+            $process->wait();
+
+            $this->assertTrue($process->isSuccessful(), $process->getErrorOutput());
+            $this->assertSame(var_export($expected, true), $process->getOutput());
+        } finally {
+            putenv('SYMFONY_DOTENV_VARS');
+            unset($_ENV['SYMFONY_DOTENV_VARS']);
+        }
+    }
+
+    public static function provideSymfonyDotenvVarsPassedToSubprocess()
+    {
+        yield 'inherited as is' => [null, [], 'FOO,BAR,BAZ'];
+        yield 'var passed to the constructor' => [['FOO' => 'explicit'], [], 'BAR,BAZ'];
+        yield 'var passed to start()' => [null, ['BAR' => 'explicit'], 'FOO,BAZ'];
+        yield 'var removed explicitly' => [['BAZ' => false], [], 'FOO,BAR'];
+        yield 'unrelated var' => [['QUX' => 'explicit'], [], 'FOO,BAR,BAZ'];
+        yield 'all vars passed' => [['FOO' => 'a', 'BAR' => 'b', 'BAZ' => 'c'], [], ''];
+        yield 'SYMFONY_DOTENV_VARS passed explicitly' => [['FOO' => 'explicit', 'SYMFONY_DOTENV_VARS' => 'FOO'], [], 'FOO'];
+        yield 'SYMFONY_DOTENV_VARS removed explicitly' => [['SYMFONY_DOTENV_VARS' => false], [], false];
+    }
+
     public function testGetCommandLine()
     {
         $p = new Process(['/usr/bin/php']);

@@ -241,7 +241,7 @@ class HeaderUtils
             return $q;
         }
 
-        parse_str(implode('&', $q), $q);
+        @parse_str(implode('&', $q), $q);
 
         $query = [];
 

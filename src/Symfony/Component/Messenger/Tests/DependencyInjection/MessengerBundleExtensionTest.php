@@ -60,6 +60,11 @@ class MessengerBundleExtensionTest extends TestCase
 {
     use ExpectUserDeprecationMessageTrait;
 
+    private const DEDUPLICATION_SERVICES = [
+        'messenger.middleware.deduplicate_middleware',
+        'messenger.failure.release_deduplication_lock_on_failure_listener',
+    ];
+
     public function testMessengerServicesRemovedWhenDisabled()
     {
         $container = $this->createContainerFromFile('messenger_disabled');
@@ -837,6 +842,28 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertEquals(new Reference('serializer.api'), $serializerTransportDefinition->getArgument(0));
         $this->assertSame('json', $serializerTransportDefinition->getArgument(1));
         $this->assertSame([], $serializerTransportDefinition->getArgument(2));
+    }
+
+    public function testDeduplicationUsesTheDefaultLockFactory()
+    {
+        $container = $this->createContainerFromFile('messenger');
+
+        foreach (self::DEDUPLICATION_SERVICES as $id) {
+            $definition = $container->getDefinition($id);
+            $this->assertEquals(new Reference('lock.factory'), $definition->getArgument(0), $id);
+            $this->assertTrue($definition->hasTag('container.remove_if_missing'), $id);
+        }
+    }
+
+    public function testDeduplicationUsesTheConfiguredLockFactory()
+    {
+        $container = $this->createContainerFromFile('messenger_deduplication_lock_factory');
+
+        foreach (self::DEDUPLICATION_SERVICES as $id) {
+            $definition = $container->getDefinition($id);
+            $this->assertEquals(new Reference('lock.dedup.factory'), $definition->getArgument(0), $id);
+            $this->assertFalse($definition->hasTag('container.remove_if_missing'), $id);
+        }
     }
 
     public function testMessengerWithAddBusNameStampMiddleware()

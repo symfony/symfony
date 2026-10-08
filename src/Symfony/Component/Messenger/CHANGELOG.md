@@ -58,6 +58,7 @@ CHANGELOG
  * Make `OutboxSender` implement `BatchSenderInterface`, storing the new messages of a batch with as few requests as the outbox transport allows
  * Add an optional `receivers` argument to the `messenger:stop-workers` command to stop only the workers that consume these transports
  * Add the invokable `WorkerRestarter` service to stop the workers of some or all transports from code
+ * Add the `messenger.deduplication.lock_factory` option to take the deduplication locks from another lock factory than `lock.factory`
 
 8.1
 ---

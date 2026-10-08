@@ -27,8 +27,13 @@ final class DatePoint extends \DateTimeImmutable
             $clock = Clock::get();
 
             // copying the clock's date into $this goes through its local time, which is ambiguous during the DST fall-back hour
-            if ('now' === $datetime && $clock instanceof NativeClock) {
-                parent::__construct('now', $timezone ?? $clock->now()->getTimezone());
+            if ('' !== $datetime && $clock instanceof NativeClock) {
+                parent::__construct($datetime, $timezone ??= $clock->getTimezone());
+
+                // the current time is read in the timezone passed to the constructor, not in the one found in $datetime
+                if ($timezone->getName() !== $this->getTimezone()->getName()) {
+                    parent::__construct($datetime, $this->getTimezone());
+                }
 
                 return;
             }

@@ -33,6 +33,11 @@ final class NativeClock implements ClockInterface
         return DatePoint::createFromInterface(new \DateTimeImmutable('now', $this->timezone));
     }
 
+    public function getTimezone(): \DateTimeZone
+    {
+        return $this->timezone;
+    }
+
     public function sleep(float|int $seconds): void
     {
         if (0 < $s = (int) $seconds) {

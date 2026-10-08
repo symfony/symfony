@@ -42,6 +42,13 @@ class NativeClockTest extends TestCase
         $this->assertLessThan($after, $now);
     }
 
+    public function testGetTimezone()
+    {
+        $this->assertSame('Europe/Paris', (new NativeClock('Europe/Paris'))->getTimezone()->getName());
+        $this->assertSame(date_default_timezone_get(), (new NativeClock())->getTimezone()->getName());
+        $this->assertSame('UTC', (new NativeClock('Europe/Paris'))->withTimeZone('UTC')->getTimezone()->getName());
+    }
+
     public function testSleep()
     {
         $clock = new NativeClock();

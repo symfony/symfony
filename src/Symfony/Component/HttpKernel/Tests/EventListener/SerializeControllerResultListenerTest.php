@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\Serialize;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -19,8 +20,10 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
+use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\SerializeControllerResultAttributeListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class SerializeControllerResultListenerTest extends TestCase
@@ -67,6 +70,87 @@ class SerializeControllerResultListenerTest extends TestCase
         self::assertSame($responseBody, $response->getContent());
         self::assertSame('abc', $response->headers->get('X-Test-Header'));
     }
+
+    public function testSerializeAttributeOnClass()
+    {
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = new Request();
+        $controller = new ClassLevelSerializeController();
+        $requestType = HttpKernelInterface::MAIN_REQUEST;
+
+        $controllerEvent = new ControllerEvent($kernel, $controller, $request, $requestType);
+        $attributes = $controllerEvent->getAttributes(Serialize::class);
+
+        self::assertCount(1, $attributes);
+        self::assertSame(201, $attributes[0]->code);
+
+        $controllerResult = new ProductCreated(10);
+        $responseBody = '{"productId": 10}';
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())
+            ->method('serialize')
+            ->with($controllerResult, 'json', ['foo' => 'bar'])
+            ->willReturn($responseBody);
+
+        $viewEvent = new ViewEvent(
+            $kernel,
+            $request,
+            $requestType,
+            $controllerResult,
+            new ControllerArgumentsMetadata(
+                $controllerEvent,
+                new ControllerArgumentsEvent($kernel, $controller, [], $request, $requestType),
+            ),
+        );
+
+        $listener = new SerializeControllerResultAttributeListener($serializer);
+        $listener->onView(new ControllerAttributeEvent($attributes[0], $viewEvent));
+
+        $response = $viewEvent->getResponse();
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame($responseBody, $response->getContent());
+    }
+
+    public function testMethodLevelAttributeTakesPrecedenceOverClassLevel()
+    {
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = new Request();
+        $controller = new BothLevelsSerializeController();
+        $requestType = HttpKernelInterface::MAIN_REQUEST;
+        $controllerResult = new ProductCreated(10);
+        $responseBody = '{"productId": 10}';
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())
+            ->method('serialize')
+            ->with($controllerResult, 'json', ['level' => 'method'])
+            ->willReturn($responseBody);
+
+        $controllerEvent = new ControllerEvent($kernel, $controller, $request, $requestType);
+        $viewEvent = new ViewEvent(
+            $kernel,
+            $request,
+            $requestType,
+            $controllerResult,
+            new ControllerArgumentsMetadata(
+                $controllerEvent,
+                new ControllerArgumentsEvent($kernel, $controller, [], $request, $requestType),
+            ),
+        );
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SerializeControllerResultAttributeListener($serializer));
+
+        $listener = new ControllerAttributesListener([KernelEvents::VIEW => [Serialize::class => true]]);
+        $listener->afterController($viewEvent, KernelEvents::VIEW, $dispatcher);
+
+        $response = $viewEvent->getResponse();
+
+        self::assertSame(202, $response->getStatusCode());
+        self::assertSame($responseBody, $response->getContent());
+    }
 }
 
 class ProductCreated
@@ -79,6 +163,25 @@ class ProductCreated
 class GetApiController
 {
     #[Serialize(201, ['X-Test-Header' => 'abc'], ['foo' => 'bar'])]
+    public function __invoke(): ProductCreated
+    {
+        return new ProductCreated(10);
+    }
+}
+
+#[Serialize(201, context: ['foo' => 'bar'])]
+class ClassLevelSerializeController
+{
+    public function __invoke(): ProductCreated
+    {
+        return new ProductCreated(10);
+    }
+}
+
+#[Serialize(201, context: ['level' => 'class'])]
+class BothLevelsSerializeController
+{
+    #[Serialize(202, context: ['level' => 'method'])]
     public function __invoke(): ProductCreated
     {
         return new ProductCreated(10);

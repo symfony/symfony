@@ -330,7 +330,16 @@ class Process implements \IteratorAggregate
             $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->env, $env, 'strcasecmp') : $this->env;
         }
 
-        $env += '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->getDefaultEnv(), $env, 'strcasecmp') : $this->getDefaultEnv();
+        $defaultEnv = '\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($this->getDefaultEnv(), $env, 'strcasecmp') : array_diff_key($this->getDefaultEnv(), $env);
+
+        // Vars passed explicitly are not loaded by Dotenv: don't let the child's Dotenv override them
+        if (isset($defaultEnv['SYMFONY_DOTENV_VARS']) && $env) {
+            $dotenvVars = explode(',', $defaultEnv['SYMFONY_DOTENV_VARS']);
+            $dotenvVars = '\\' === \DIRECTORY_SEPARATOR ? array_udiff($dotenvVars, array_keys($env), 'strcasecmp') : array_diff($dotenvVars, array_keys($env));
+            $defaultEnv['SYMFONY_DOTENV_VARS'] = implode(',', $dotenvVars);
+        }
+
+        $env += $defaultEnv;
 
         if (\is_array($commandline = $this->commandline)) {
             $commandline = array_values(array_map(strval(...), $commandline));

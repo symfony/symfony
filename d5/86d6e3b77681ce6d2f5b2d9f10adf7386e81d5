@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-08T16:42:00Z
+
+> Thanks! On 8.2, let's write the example with the root keys (the docs PR will need the same):
+>
+> ```yaml
+> lock:
+>     resources:
+>         app: 'redis://localhost'
+>         dedup: 'redis://localhost/1'
+>
+> messenger:
+>     deduplication:
+>         lock_factory: lock.dedup.factory
+> ```
+
+@nicolas-grekas Good point, I've updated the example.

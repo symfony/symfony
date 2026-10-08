@@ -169,7 +169,7 @@ class UriSigner
         $params = [];
 
         if (isset($url['query'])) {
-            parse_str($url['query'], $params);
+            @parse_str($url['query'], $params);
         }
 
         if (!\is_string($hash = $params[$this->hashParameter] ?? null) || '' === $hash) {

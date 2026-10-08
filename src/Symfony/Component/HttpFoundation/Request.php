@@ -342,7 +342,7 @@ class Request
         }
 
         try {
-            [$post, $files] = request_parse_body();
+            [$post, $files] = @request_parse_body();
         } catch (\RequestParseBodyException) {
             $post = $_POST;
             $files = $_FILES;
@@ -474,7 +474,7 @@ class Request
 
         $queryString = '';
         if (isset($components['query'])) {
-            parse_str(html_entity_decode($components['query']), $qs);
+            @parse_str(html_entity_decode($components['query']), $qs);
 
             if ($query) {
                 $query = array_replace($qs, $query);

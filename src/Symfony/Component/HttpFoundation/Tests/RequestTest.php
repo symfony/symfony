@@ -1429,6 +1429,45 @@ b'])]
         $this->disableHttpMethodParameterOverride();
     }
 
+    public function testCreateDoesNotWarnAboutQueryKeysNestedBeyondMaxInputNestingLevel()
+    {
+        $request = $this->withDisplayErrorsOff(static fn () => Request::create('/?'.self::deeplyNestedKey().'=1&x=2'), $warnings);
+
+        $this->assertSame([], $warnings);
+        $this->assertSame(['x' => '2'], $request->query->all());
+    }
+
+    private static function deeplyNestedKey(): string
+    {
+        return 'a'.str_repeat('[b]', (int) \ini_get('max_input_nesting_level') + 1);
+    }
+
+    private function withDisplayErrorsOff(callable $callback, ?array &$warnings = null): mixed
+    {
+        // parse_str() only warns when display_errors is off, which is the case in production
+        $displayErrors = ini_set('display_errors', '0');
+        // PHPUnit 10+ leaves E_WARNING out of error_reporting() while a test runs
+        $errorReporting = error_reporting(-1);
+        $warnings = [];
+        set_error_handler(static function (int $type, string $message) use (&$warnings): bool {
+            if (!(error_reporting() & $type)) {
+                return false;
+            }
+
+            $warnings[] = $message;
+
+            return true;
+        });
+
+        try {
+            return $callback();
+        } finally {
+            restore_error_handler();
+            error_reporting($errorReporting);
+            ini_set('display_errors', $displayErrors);
+        }
+    }
+
     public function testOverrideGlobals()
     {
         $request = new Request();

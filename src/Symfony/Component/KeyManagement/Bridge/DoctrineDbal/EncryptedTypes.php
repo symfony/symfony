@@ -32,6 +32,8 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  *                 encrypted_email: { type: string, key: 'user.email' }
  *                 encrypted_notes: { type: text, key: 'user.notes' }
  *
+ * Add `context: false` to a declaration whose backend refuses authenticated data.
+ *
  * and calls once the container is built, which in a Symfony application means booting:
  *
  *     public function boot(): void
@@ -53,7 +55,7 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 final class EncryptedTypes
 {
     /**
-     * @param array<string, array{type: string, key: string}> $types Name of the type to declare, mapped to the Doctrine type it wraps and to the key or scope it encrypts under
+     * @param array<string, array{type: string, key: string, context?: bool}> $types Name of the type to declare, mapped to the Doctrine type it wraps, to the key or scope it encrypts under, and to whether it authenticates its own context, {@see EncryptedType}
      */
     public function __construct(
         private readonly EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $envelopes,
@@ -68,6 +70,9 @@ final class EncryptedTypes
      * container, so the types of the previous one are still there, pointing at encrypters nothing
      * else uses any more.
      *
+     * The name a type is registered under is what it authenticates its values with, so renaming one
+     * makes the values written under the former name unreadable.
+     *
      * @throws InvalidArgumentException If a declaration names no Doctrine type or no key
      */
     public function register(): void
@@ -81,7 +86,11 @@ final class EncryptedTypes
                 }
             }
 
-            $type = new EncryptedType($registry->get($definition['type']), $this->envelopes, $definition['key']);
+            if (isset($definition['context']) && !\is_bool($definition['context'])) {
+                throw new InvalidArgumentException(\sprintf('The encrypted type "%s" must declare its "context" as a boolean.', $name));
+            }
+
+            $type = new EncryptedType($registry->get($definition['type']), $this->envelopes, $definition['key'], $name, $definition['context'] ?? true);
 
             $registry->has($name) ? $registry->override($name, $type) : $registry->register($name, $type);
         }

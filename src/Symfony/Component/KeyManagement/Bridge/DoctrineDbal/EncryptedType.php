@@ -53,6 +53,14 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * once per data key and per process, and that key can later be rewrapped under
  * another provider without rewriting a single row.
  *
+ * The name this type is registered under is authenticated as the AAD of both paths, so
+ * that two types sharing a key refuse each other's values. The key itself is deliberately
+ * left out of that AAD, where it would make moving a column to another key or scope a
+ * rewrite of every value instead of a change of configuration. Row identity is out of
+ * reach either way: a DBAL type never sees which row it is converting. `bindContext: false`
+ * turns it off for a backend that refuses authenticated data, which the self-contained
+ * encrypter hands to the KMS as well as to the local cipher.
+ *
  * Needs the `Type` constructor that DBAL 4.3 unsealed, so that a subclass may
  * declare its own parameters.
  *
@@ -67,6 +75,7 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  *         Type::getTypeRegistry()->get('string'),
  *         $container->get(EnvelopeEncrypterInterface::class),
  *         'alias/app-key',
+ *         'app_user_email',
  *     );
  *     Type::getTypeRegistry()->register('app_user_email', $type);
  *
@@ -83,11 +92,25 @@ class EncryptedType extends Type
 {
     use BinaryColumn;
 
+    /**
+     * Tells this context from anything else authenticated under the same key.
+     */
+    private const string CONTEXT_LABEL = 'symfony/key-management/doctrine-dbal/encrypted-type/v1';
+
+    private readonly string $context;
+
+    /**
+     * @param string $name        What tells this type from another one sharing its key, usually the name it is registered under
+     * @param bool   $bindContext Whether that name is authenticated with every value
+     */
     public function __construct(
         private readonly Type $parentType,
         private readonly EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $envelopes,
         private readonly string $key,
+        private readonly string $name,
+        bool $bindContext = true,
     ) {
+        $this->context = $bindContext ? self::CONTEXT_LABEL.pack('n', \strlen($name)).$name : '';
     }
 
     public function convertToDatabaseValue(#[\SensitiveParameter] mixed $value, AbstractPlatform $platform): mixed
@@ -107,7 +130,7 @@ class EncryptedType extends Type
             $plaintext = var_export($plaintext, true);
         }
 
-        return $this->envelopes->encrypt($this->key, self::bytes($plaintext));
+        return $this->envelopes->encrypt($this->key, self::bytes($plaintext), $this->context);
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
@@ -124,7 +147,7 @@ class EncryptedType extends Type
             throw new ValueNotConvertible('Stored value is not a valid KeyManagement envelope.', 0, $e);
         }
 
-        return $this->parentType->convertToPHPValue($this->envelopes->decrypt($envelope), $platform);
+        return $this->parentType->convertToPHPValue($this->envelopes->decrypt($envelope, $this->context), $platform);
     }
 
     public function getBindingType(): ParameterType

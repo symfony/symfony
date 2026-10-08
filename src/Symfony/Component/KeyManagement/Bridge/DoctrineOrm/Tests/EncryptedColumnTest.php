@@ -29,7 +29,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\EncryptedColumnEntity;
-use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 
@@ -52,7 +51,7 @@ class EncryptedColumnTest extends TestCase
         $this->connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
 
         $registry = Type::getTypeRegistry();
-        $type = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($this->store()), 'user.email');
+        $type = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($this->store()), 'user.email', 'encrypted_email');
         $registry->has(EncryptedColumnEntity::TYPE) ? $registry->override(EncryptedColumnEntity::TYPE, $type) : $registry->register(EncryptedColumnEntity::TYPE, $type);
 
         $this->config = ORMSetup::createConfiguration(true);
@@ -83,9 +82,9 @@ class EncryptedColumnTest extends TestCase
         $manager->flush();
 
         $stored = $this->connection->fetchOne('SELECT email FROM EncryptedColumnEntity');
-        $elsewhere = new StoredEnvelopeEncrypter($this->store());
+        $elsewhere = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($this->store()), 'user.email', 'encrypted_email');
 
-        $this->assertSame('john@example.com', $elsewhere->decrypt(Envelope::fromBytes($stored)));
+        $this->assertSame('john@example.com', $elsewhere->convertToPHPValue($stored, $this->connection->getDatabasePlatform()));
         $this->assertSame(1, $this->keyRows());
     }
 

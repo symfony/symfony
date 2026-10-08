@@ -175,7 +175,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
      */
     private function willMakeFinalResponseUncacheable(Response $response): bool
     {
-        // RFC2616: A response received with a status code of 200, 203, 300, 301 or 410
+        // RFC2616: A response received with a status code of 200, 203, 300, 301 or 410 (RFC 9110 adds 308)
         // MAY be stored by a cache […] unless a cache-control directive prohibits caching.
         if ($response->headers->hasCacheControlDirective('no-cache')
             || $response->headers->hasCacheControlDirective('no-store')
@@ -185,7 +185,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
 
         // Etag headers cannot be merged, they render the response uncacheable
         // by default (except if the response also has max-age etc.).
-        if (null === $response->getEtag() && \in_array($response->getStatusCode(), [200, 203, 300, 301, 410], true)) {
+        if (null === $response->getEtag() && \in_array($response->getStatusCode(), [200, 203, 300, 301, 308, 410], true)) {
             return false;
         }
 

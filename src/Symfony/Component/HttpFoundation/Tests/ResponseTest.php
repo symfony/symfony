@@ -97,6 +97,19 @@ class ResponseTest extends ResponseTestCase
         $this->assertTrue($response->isCacheable());
     }
 
+    #[DataProvider('providePermanentRedirectStatusCodes')]
+    public function testIsCacheableWithPermanentRedirect(int $statusCode)
+    {
+        $response = new Response('', $statusCode, ['Cache-Control' => 'public, max-age=3600']);
+        $this->assertTrue($response->isCacheable());
+    }
+
+    public static function providePermanentRedirectStatusCodes(): iterable
+    {
+        yield [301];
+        yield [308];
+    }
+
     public function testMustRevalidate()
     {
         $response = new Response();

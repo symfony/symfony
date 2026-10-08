@@ -82,4 +82,17 @@ class RedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar', 302);
         $this->assertTrue($response->headers->hasCacheControlDirective('no-cache'));
     }
+
+    public function testPermanentRedirectKeepingTheMethodHasNoDefaultCacheHeaders()
+    {
+        $response = new RedirectResponse('foo.bar', 308);
+        $this->assertFalse($response->headers->has('Cache-Control'));
+
+        $response = new RedirectResponse('foo.bar', 308, ['Cache-Control' => 'max-age=86400']);
+        $this->assertTrue($response->headers->hasCacheControlDirective('max-age'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('no-cache'));
+
+        $response = new RedirectResponse('foo.bar', 307);
+        $this->assertTrue($response->headers->hasCacheControlDirective('no-cache'));
+    }
 }

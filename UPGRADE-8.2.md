@@ -271,6 +271,7 @@ HttpFoundation
    $cart->add($item);
    $session->set('cart', $cart);
    ```
+ * `RedirectResponse` no longer adds a default `Cache-Control: no-cache, private` header to 308 responses, as for 301 responses, so browsers can cache them. Pass `['Cache-Control' => 'no-cache, private']` as the `$headers` argument to keep the previous behavior.
 
 HttpKernel
 ----------
@@ -293,6 +294,7 @@ HttpKernel
    bundles that have nothing to do at boot time are not instantiated
  * `#[RateLimit]` now consumes its tokens on `kernel.controller`, before the controller arguments are resolved, unless its key is a Closure or an Expression that uses `args`.
    Such a limit now runs before the attributes handled on `kernel.controller_arguments`, like `#[IsGranted]`, whatever their order, so the requests they deny consume tokens too
+ * `#[Cache]` now applies to 308 responses, as to 301 responses, so a controller returning a 308 gets the cache headers declared by the attribute.
 
 JsonStreamer
 ------------

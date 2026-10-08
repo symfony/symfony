@@ -29,6 +29,8 @@ CHANGELOG
  * Add argument `$expressionLanguage` to `RateLimitAttributeListener`
  * Add the `$if` argument to `#[RateLimit]`
  * Add the `#[Lock]` attribute and `ConcurrentRequestHttpException` to reject or delay concurrent requests to a controller
+ * Apply the `#[Cache]` attribute to 308 responses
+ * Treat 308 responses like 301 ones in `ResponseCacheStrategy`
 
 8.1
 ---

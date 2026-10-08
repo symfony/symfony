@@ -13,7 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy;
 
@@ -261,6 +263,21 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertTrue($mainResponse->headers->hasCacheControlDirective('no-cache'));
         $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertFalse($mainResponse->isFresh());
+    }
+
+    #[TestWith([301])]
+    #[TestWith([308])]
+    public function testPermanentRedirectWithoutCacheControlIsMergedAsHeuristicallyCacheable(int $statusCode)
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $mainResponse = new Response();
+        $mainResponse->setSharedMaxAge(3600);
+
+        $cacheStrategy->add(new RedirectResponse('/target', $statusCode));
+        $cacheStrategy->update($mainResponse);
+
+        $this->assertSame('no-cache, private', $mainResponse->headers->get('Cache-Control'));
     }
 
     public function testEmbeddingPrivateResponseMakesMainResponsePrivate()

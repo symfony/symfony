@@ -12,44 +12,12 @@
 namespace Symfony\Component\JsonSchema;
 
 /**
- * Writes the keywords whose spelling differs from one dialect to another.
+ * Writes the keywords that do not depend on the dialect.
  *
  * @internal
  */
 final class DialectKeywords
 {
-    /**
-     * @return array<string, mixed>
-     */
-    public static function constant(mixed $value, Dialect $dialect): array
-    {
-        return $dialect->supportsConst ? ['const' => $value] : ['enum' => [$value]];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public static function exclusiveMinimum(int|float $value, Dialect $dialect): array
-    {
-        return $dialect->supportsExclusiveMinAsNumber ? ['exclusiveMinimum' => $value] : ['minimum' => $value, 'exclusiveMinimum' => true];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public static function exclusiveMaximum(int|float $value, Dialect $dialect): array
-    {
-        return $dialect->supportsExclusiveMinAsNumber ? ['exclusiveMaximum' => $value] : ['maximum' => $value, 'exclusiveMaximum' => true];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public static function example(mixed $value, Dialect $dialect): array
-    {
-        return $dialect->supportsExamples ? ['examples' => [$value]] : ['example' => $value];
-    }
-
     /**
      * @param array<string, mixed> $schema
      * @param list<mixed>          $values
@@ -70,6 +38,8 @@ final class DialectKeywords
      */
     public static function allowsNull(array $schema): bool
     {
-        return true === ($schema['nullable'] ?? false) || 'null' === ($schema['type'] ?? null) || \in_array('null', (array) ($schema['type'] ?? []), true);
+        return true === ($schema['nullable'] ?? false)
+            || \in_array('null', (array) ($schema['type'] ?? []), true)
+            || array_any($schema['anyOf'] ?? [], static fn (array $branch): bool => self::allowsNull($branch));
     }
 }

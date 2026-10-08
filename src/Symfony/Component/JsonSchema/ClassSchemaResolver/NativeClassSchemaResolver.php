@@ -16,6 +16,7 @@ use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @experimental
@@ -28,7 +29,10 @@ final class NativeClassSchemaResolver implements ClassSchemaResolverInterface
             is_a($class, \DateTimeInterface::class, true) => ['type' => 'string', 'format' => 'date-time'],
             is_a($class, \DateInterval::class, true) => ['type' => 'string', 'format' => 'duration'],
             is_a($class, \SplFileInfo::class, true) => ['type' => 'string', 'format' => 'binary'],
-            is_a($class, Number::class, true) => ['type' => 'string'],
+            is_a($class, \DateTimeZone::class, true),
+            is_a($class, Number::class, true),
+            is_a($class, \GMP::class, true),
+            is_a($class, TranslatableInterface::class, true) => ['type' => 'string'],
             is_a($class, Uuid::class, true) => ['type' => 'string', 'format' => 'uuid'],
             is_a($class, Ulid::class, true) => ['type' => 'string', 'format' => 'ulid'],
             is_a($class, \BackedEnum::class, true) => [

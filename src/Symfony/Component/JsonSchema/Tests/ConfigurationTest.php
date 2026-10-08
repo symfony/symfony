@@ -31,4 +31,11 @@ class ConfigurationTest extends TestCase
         $this->assertNull($config->definitionPrefix);
         $this->assertNull($config->format);
     }
+
+    public function testClosureValidationGroupsAreRejected()
+    {
+        $this->expectException(\TypeError::class);
+
+        new Configuration(validationGroups: static fn (): array => ['create']);
+    }
 }

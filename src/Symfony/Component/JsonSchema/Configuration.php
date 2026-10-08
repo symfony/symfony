@@ -21,11 +21,11 @@ final class Configuration
     public readonly Dialect $dialect;
 
     /**
-     * @param list<string>                                                         $groups
-     * @param array<int|string, mixed>|null                                        $attributes
-     * @param list<string>                                                         $ignoredAttributes
-     * @param array<string|GroupSequence|array<mixed>>|GroupSequence|\Closure|null $validationGroups
-     * @param string|null                                                          $format            The serializer format (e.g. "json"), unrelated to the dialect
+     * @param list<string>                                                $groups
+     * @param array<int|string, mixed>|null                               $attributes
+     * @param list<string>                                                $ignoredAttributes
+     * @param array<string|GroupSequence|array<mixed>>|GroupSequence|null $validationGroups
+     * @param string|null                                                 $format            The serializer format (e.g. "json"), unrelated to the dialect
      */
     public function __construct(
         ?Dialect $dialect = null,
@@ -33,7 +33,7 @@ final class Configuration
         public readonly ?array $attributes = null,
         public readonly array $ignoredAttributes = [],
         public readonly bool $allowExtraAttributes = true,
-        public readonly array|GroupSequence|\Closure|null $validationGroups = null,
+        public readonly array|GroupSequence|null $validationGroups = null,
         public readonly ?string $definitionName = null,
         public readonly ?string $definitionPrefix = null,
         public readonly ?string $format = null,

@@ -53,10 +53,10 @@ final class AttributePropertySchemaEnricher implements PropertySchemaEnricherInt
 
             $schema = match ($keyword) {
                 'enum' => DialectKeywords::enum($schema, $value),
-                'const' => [...$schema, ...DialectKeywords::constant($value, $config->dialect)],
-                'exclusiveMinimum' => [...$schema, ...DialectKeywords::exclusiveMinimum($value, $config->dialect)],
-                'exclusiveMaximum' => [...$schema, ...DialectKeywords::exclusiveMaximum($value, $config->dialect)],
-                'example' => [...$schema, ...DialectKeywords::example($value, $config->dialect)],
+                'const' => [...$schema, ...$config->dialect->const($value)],
+                'exclusiveMinimum' => [...$schema, ...$config->dialect->exclusiveMinimum($value)],
+                'exclusiveMaximum' => [...$schema, ...$config->dialect->exclusiveMaximum($value)],
+                'example' => [...$schema, ...$config->dialect->example($value)],
                 default => [...$schema, $keyword => $value],
             };
         }

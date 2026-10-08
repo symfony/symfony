@@ -37,7 +37,6 @@ class ShortNameDefinitionPolicyTest extends TestCase
         yield 'validation groups' => [new Configuration(validationGroups: ['create', ['strict']]), 'Author-validation.create_strict'];
         yield 'group sequence' => [new Configuration(validationGroups: new GroupSequence(['create', 'strict'])), 'Author-validation.create_strict'];
         yield 'empty validation groups' => [new Configuration(validationGroups: []), 'Author-validation.none'];
-        yield 'closure validation groups' => [new Configuration(validationGroups: static fn (): array => ['create']), 'Author'];
         yield 'groups and validation groups' => [new Configuration(groups: ['write'], validationGroups: ['create']), 'Author-write_validation.create'];
         yield 'definition name' => [new Configuration(groups: ['write'], definitionName: 'Custom'), 'Author-Custom'];
         yield 'empty definition name' => [new Configuration(groups: ['write'], definitionName: ''), 'Author'];
@@ -51,6 +50,17 @@ class ShortNameDefinitionPolicyTest extends TestCase
         $this->assertSame('Product', $policy->nameFor(CatalogProduct::class, new Configuration()));
         $this->assertSame('Inventory.Product', $policy->nameFor(InventoryProduct::class, new Configuration()));
         $this->assertSame('Product', $policy->nameFor(CatalogProduct::class, new Configuration()));
+    }
+
+    public function testResetGivesTheShortNameBackToTheNextClassClaimingIt()
+    {
+        $policy = new ShortNameDefinitionPolicy();
+        $policy->nameFor(CatalogProduct::class, new Configuration());
+        $this->assertSame('Inventory.Product', $policy->nameFor(InventoryProduct::class, new Configuration()));
+
+        $policy->reset();
+
+        $this->assertSame('Product', $policy->nameFor(InventoryProduct::class, new Configuration()));
     }
 
     public function testPrefixCollisionFallsBackToTheClassName()

@@ -14,6 +14,7 @@ namespace Symfony\Component\JsonSchema\Tests\Fixtures;
 use BcMath\Number;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 class NativeObjectProperties
 {
@@ -26,4 +27,7 @@ class NativeObjectProperties
     public Color $color;
     public \SplFileInfo $file;
     public Number $amount;
+    public \GMP $bigAmount;
+    public \DateTimeZone $timezone;
+    public TranslatableInterface $label;
 }

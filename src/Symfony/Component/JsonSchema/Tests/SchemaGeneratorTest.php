@@ -19,14 +19,18 @@ use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\Dialect;
 use Symfony\Component\JsonSchema\Enricher\AttributePropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
+use Symfony\Component\JsonSchema\Exception\LogicException;
 use Symfony\Component\JsonSchema\Schema;
 use Symfony\Component\JsonSchema\SchemaGenerator;
 use Symfony\Component\JsonSchema\Tests\Fixtures\AccountWithAccessors;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Author;
+use Symfony\Component\JsonSchema\Tests\Fixtures\AuthorSpotlight;
 use Symfony\Component\JsonSchema\Tests\Fixtures\BookWithAuthors;
 use Symfony\Component\JsonSchema\Tests\Fixtures\CamelCaseProperties;
+use Symfony\Component\JsonSchema\Tests\Fixtures\ConstructorInitializedShipment;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ContactWithFormatConstraints;
 use Symfony\Component\JsonSchema\Tests\Fixtures\DocumentedArticle;
+use Symfony\Component\JsonSchema\Tests\Fixtures\EnumCollectionDefaults;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\GroupedProduct;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IdentifierDefinitionProcessor;
@@ -36,6 +40,8 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NativeObjectProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NestedAttributesBook;
 use Symfony\Component\JsonSchema\Tests\Fixtures\NonSerializableProperties;
+use Symfony\Component\JsonSchema\Tests\Fixtures\NullableUnionChoice;
+use Symfony\Component\JsonSchema\Tests\Fixtures\PrivatelyConstructedSnapshot;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ProductPair;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionPolicy;
@@ -87,6 +93,20 @@ class SchemaGeneratorTest extends TestCase
         $this->assertArrayNotHasKey('required', $definition);
     }
 
+    public function testConstructorArgumentsWithoutDefaultValueAreRequired()
+    {
+        $definition = SchemaGenerator::create()->generate(Type::object(ConstructorInitializedShipment::class))->getDefinitions()['ConstructorInitializedShipment'];
+
+        $this->assertSame(['label', 'reference', 'note'], $definition['required']);
+    }
+
+    public function testArgumentsOfANonPublicConstructorAreNotRequired()
+    {
+        $definition = SchemaGenerator::create()->generate(Type::object(PrivatelyConstructedSnapshot::class))->getDefinitions()['PrivatelyConstructedSnapshot'];
+
+        $this->assertArrayNotHasKey('required', $definition);
+    }
+
     public function testNestedObjectsAndCollectionsAreReferenced()
     {
         $schema = SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class));
@@ -108,6 +128,43 @@ class SchemaGeneratorTest extends TestCase
                 'properties' => ['name' => ['type' => 'string']],
             ],
         ], $schema->getDefinitions());
+    }
+
+    public function testDifferentShapesNamedAlikeThrow()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Definition "Author-first_name"');
+
+        SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class), new Configuration(attributes: ['author' => ['first_name'], 'coAuthor' => ['first', 'name']]));
+    }
+
+    public function testSameShapeReachedTwiceSharesOneDefinition()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class), new Configuration(attributes: ['author' => ['name'], 'coAuthor' => ['name']]));
+
+        $this->assertSame(['BookWithAuthors-author.name_coAuthor.name', 'Author-name'], array_keys($schema->getDefinitions()));
+    }
+
+    public function testReferenceSiblingsAreWrappedInAllOfForOpenApi30()
+    {
+        $definition = SchemaGenerator::create()->generate(Type::object(AuthorSpotlight::class), new Configuration(Dialect::openApi30()))->getDefinitions()['AuthorSpotlight'];
+
+        $this->assertSameSchema([
+            'allOf' => [['$ref' => '#/components/schemas/Author']],
+            'readOnly' => true,
+            'description' => 'The highlighted author.',
+        ], $definition['properties']['author']);
+    }
+
+    public function testReferenceSiblingsAreKeptForOpenApi31()
+    {
+        $definition = SchemaGenerator::create()->generate(Type::object(AuthorSpotlight::class), new Configuration(Dialect::openApi31()))->getDefinitions()['AuthorSpotlight'];
+
+        $this->assertSameSchema([
+            '$ref' => '#/components/schemas/Author',
+            'readOnly' => true,
+            'description' => 'The highlighted author.',
+        ], $definition['properties']['author']);
     }
 
     public function testListRootTypeBecomesAnArrayOfReferences()
@@ -275,7 +332,21 @@ class SchemaGeneratorTest extends TestCase
             'color' => ['type' => 'string', 'enum' => ['Red', 'Green']],
             'file' => ['type' => 'string', 'format' => 'binary'],
             'amount' => ['type' => 'string'],
+            'bigAmount' => ['type' => 'string'],
+            'timezone' => ['type' => 'string'],
+            'label' => ['type' => 'string'],
         ], $schema->getDefinitions()['NativeObjectProperties']['properties']);
+    }
+
+    public function testEnumsInsideArrayDefaultsAreNormalizedAndObjectsDropTheDefault()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::object(EnumCollectionDefaults::class));
+        $properties = $schema->getDefinitions()['EnumCollectionDefaults']['properties'];
+
+        $this->assertSame(['hearts'], $properties['suits']['default']);
+        $this->assertSame(['warm' => ['Red']], $properties['palettes']['default']);
+        $this->assertArrayNotHasKey('default', $properties['milestones']);
+        $this->assertNotFalse(json_encode($schema));
     }
 
     public function testUnionTypesBecomeAnyOf()
@@ -617,6 +688,16 @@ class SchemaGeneratorTest extends TestCase
         ], $definition);
     }
 
+    public function testChoiceOnANullableUnionKeepsNullAllowed()
+    {
+        $definition = SchemaGenerator::create()->generate(Type::object(NullableUnionChoice::class))->getDefinitions()['NullableUnionChoice'];
+
+        $this->assertSameSchema([
+            'anyOf' => [['type' => 'integer'], ['type' => 'string'], ['type' => 'null']],
+            'enum' => [1, 'one', null],
+        ], $definition['properties']['rank']);
+    }
+
     public function testValidatorFormatConstraintsAndMultipleChoice()
     {
         $properties = SchemaGenerator::create()->generate(Type::object(ContactWithFormatConstraints::class))->getDefinitions()['ContactWithFormatConstraints']['properties'];
@@ -650,13 +731,6 @@ class SchemaGeneratorTest extends TestCase
         $schema = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(validationGroups: new GroupSequence(['registration:create'])));
 
         $this->assertSame(['invitationCode'], $schema->getDefinitions()['ValidatedRegistration-validation.registration.create']['required']);
-    }
-
-    public function testClosureValidationGroupsFallBackToTheDefaultGroup()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(validationGroups: static fn (): array => ['registration:create']));
-
-        $this->assertSame(['username'], $schema->getDefinitions()['ValidatedRegistration']['required']);
     }
 
     public function testClassGroupSequenceIsUsedWhenNoValidationGroupsAreGiven()

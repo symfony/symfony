@@ -19,7 +19,9 @@ use Symfony\Component\JsonSchema\Configuration;
  * The name is the identity of a definition: it is called every time a class is reached
  * and a definition is only built for the first occurrence of a name, with that occurrence's
  * parent. Anything that changes the shape of the definition (groups, attributes, a format,
- * the owning property...) must therefore be part of the name, otherwise the first shape wins.
+ * the owning property...) must therefore be part of the name. The generator throws when two different
+ * shapes (class or shape-relevant configuration) get the same name; a difference coming only from the
+ * parent cannot be detected and the first occurrence wins.
  *
  * The name is reserved before the class properties are visited, which is what stops
  * self-referencing classes from recursing forever.

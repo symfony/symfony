@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonSchema\DefinitionPolicy;
 
 use Symfony\Component\JsonSchema\Configuration;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Names definitions after the class short name (or the configured prefix for the root definition),
@@ -22,13 +23,16 @@ use Symfony\Component\JsonSchema\Configuration;
  *
  * @experimental
  */
-final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface
+final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface, ResetInterface
 {
     private const GLUE = '.';
 
     /**
      * Definition name prefix => class that claimed it first, so two classes sharing a short name
      * (App\Input\Book, App\Output\Book) never end up under the same definition.
+     *
+     * Names are stable across the generate() calls sharing this instance, as they describe one document;
+     * reset() starts a new one.
      *
      * @var array<string, class-string>
      */
@@ -59,6 +63,11 @@ final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface
         }
 
         return (string) preg_replace('/[^a-zA-Z0-9.\-_]/', self::GLUE, $name);
+    }
+
+    public function reset(): void
+    {
+        $this->owners = [];
     }
 
     private function claim(string $name, string $class): ?string

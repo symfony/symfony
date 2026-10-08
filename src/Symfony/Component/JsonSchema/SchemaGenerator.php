@@ -25,6 +25,7 @@ use Symfony\Component\JsonSchema\Enricher\PropertySchemaEnricherInterface;
 use Symfony\Component\JsonSchema\Enricher\PropertySchemaProviderInterface;
 use Symfony\Component\JsonSchema\Enricher\ValidatorPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Exception\InvalidArgumentException;
+use Symfony\Component\JsonSchema\Exception\LogicException;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
@@ -53,6 +54,18 @@ use Symfony\Component\Validator\Validation;
  */
 final class SchemaGenerator implements SchemaGeneratorInterface
 {
+    /**
+     * @var array<class-string, list<string>>
+     */
+    private array $mandatoryConstructorArguments = [];
+
+    /**
+     * Definition name => class and shape-relevant configuration it was built from, for the generate() call in progress.
+     *
+     * @var array<string, array{class-string, string}>
+     */
+    private array $definitionInputs = [];
+
     /**
      * @param iterable<ClassSchemaResolverInterface>    $classSchemaResolvers
      * @param iterable<PropertySchemaProviderInterface> $propertySchemaProviders
@@ -104,7 +117,14 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     public function generate(Type $type, Configuration $config = new Configuration()): Schema
     {
         $definitions = [];
-        $schema = $this->buildTypeSchema($type, $config, null, $definitions);
+        $previousDefinitionInputs = $this->definitionInputs;
+        $this->definitionInputs = [];
+
+        try {
+            $schema = $this->buildTypeSchema($type, $config, null, $definitions);
+        } finally {
+            $this->definitionInputs = $previousDefinitionInputs;
+        }
 
         return new Schema($schema, $definitions, $config->dialect);
     }
@@ -284,8 +304,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             TypeIdentifier::INT => ['type' => 'integer'],
             TypeIdentifier::FLOAT => ['type' => 'number'],
             TypeIdentifier::BOOL => ['type' => 'boolean'],
-            TypeIdentifier::TRUE => ['type' => 'boolean', ...DialectKeywords::constant(true, $dialect)],
-            TypeIdentifier::FALSE => ['type' => 'boolean', ...DialectKeywords::constant(false, $dialect)],
+            TypeIdentifier::TRUE => ['type' => 'boolean', ...$dialect->const(true)],
+            TypeIdentifier::FALSE => ['type' => 'boolean', ...$dialect->const(false)],
             TypeIdentifier::STRING => ['type' => 'string'],
             TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE => ['type' => 'array'],
             TypeIdentifier::OBJECT => ['type' => 'object'],
@@ -310,6 +330,12 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         }
 
         $name = $this->definitionPolicy->nameFor($class, $config, $parent);
+        $fingerprint = serialize([$class, $config->groups, $config->attributes, $config->ignoredAttributes, $config->allowExtraAttributes, $config->getValidationGroupNames(), $config->format]);
+        [$definedClass, $definedFingerprint] = $this->definitionInputs[$name] ??= [$class, $fingerprint];
+
+        if ($definedFingerprint !== $fingerprint) {
+            throw new LogicException(\sprintf('Definition "%s" already describes class "%s" with a different configuration, it cannot also describe class "%s". Set a distinct "definitionName" in the configuration or use a custom "%s".', $name, $definedClass, $class, DefinitionPolicyInterface::class));
+        }
 
         if (!isset($definitions[$name])) {
             $definitions[$name] = [];
@@ -334,9 +360,6 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     private function buildDefinition(string $class, Configuration $config, ?DefinitionParent $parent, array &$definitions): array
     {
         $context = ['serializer_groups' => $config->groups ?: null];
-        if (null !== $config->attributes) {
-            $context['serializer_attributes'] = $config->attributes;
-        }
 
         $nameConverterContext = array_filter(['groups' => $config->groups, 'attributes' => $config->attributes], static fn (?array $value): bool => null !== $value && [] !== $value);
         $definition = ['type' => 'object'];
@@ -382,13 +405,13 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 $schema['description'] = $description;
             }
 
-            $propertySchema = new PropertySchema($class, $property, $type, $schema, false);
+            $propertySchema = new PropertySchema($class, $property, $type, $schema, \in_array($property, $this->getMandatoryConstructorArguments($class), true));
             foreach ($this->propertySchemaEnrichers as $enricher) {
                 $propertySchema = $enricher->enrich($propertySchema, $config);
             }
 
             $name = $this->nameConverter?->normalize($property, $class, $config->format, $nameConverterContext) ?? $property;
-            $definition['properties'][$name] = $propertySchema->schema;
+            $definition['properties'][$name] = self::wrapReferenceSiblings($propertySchema->schema, $config->dialect);
 
             if ($propertySchema->required) {
                 $required[] = $name;
@@ -420,6 +443,20 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $schema
+     *
+     * @return array<string, mixed>
+     */
+    private static function wrapReferenceSiblings(array $schema, Dialect $dialect): array
+    {
+        if ($dialect->supportsRefSiblings || !isset($schema['$ref']) || 1 === \count($schema)) {
+            return $schema;
+        }
+
+        return ['allOf' => [['$ref' => $schema['$ref']]], ...array_diff_key($schema, ['$ref' => true])];
     }
 
     private static function isRepresentable(Type $type): bool
@@ -460,6 +497,27 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         return null === $attributes || \in_array($property, $attributes, true) || \array_key_exists($property, $attributes);
     }
 
+    /**
+     * The serializer cannot instantiate the class without these arguments; it bypasses non-public constructors.
+     *
+     * @param class-string $class
+     *
+     * @return list<string>
+     */
+    private function getMandatoryConstructorArguments(string $class): array
+    {
+        if (isset($this->mandatoryConstructorArguments[$class])) {
+            return $this->mandatoryConstructorArguments[$class];
+        }
+
+        $constructor = (new \ReflectionClass($class))->getConstructor();
+
+        return $this->mandatoryConstructorArguments[$class] = $constructor?->isPublic() ? array_values(array_map(
+            static fn (\ReflectionParameter $parameter): string => $parameter->name,
+            array_filter($constructor->getParameters(), static fn (\ReflectionParameter $parameter): bool => !$parameter->isDefaultValueAvailable() && !$parameter->isVariadic()),
+        )) : [];
+    }
+
     private static function getDefaultValue(string $class, string $property): mixed
     {
         if (!property_exists($class, $property)) {
@@ -481,10 +539,24 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
     private static function normalizeDefaultValue(mixed $value): mixed
     {
+        return [] !== $value && self::isEncodableDefaultValue($value) ? self::normalizeEnums($value) : null;
+    }
+
+    private static function isEncodableDefaultValue(mixed $value): bool
+    {
+        return match (true) {
+            $value instanceof \UnitEnum => true,
+            \is_array($value) => array_all($value, self::isEncodableDefaultValue(...)),
+            default => !\is_object($value),
+        };
+    }
+
+    private static function normalizeEnums(mixed $value): mixed
+    {
         return match (true) {
             $value instanceof \BackedEnum => $value->value,
             $value instanceof \UnitEnum => $value->name,
-            \is_object($value), [] === $value => null,
+            \is_array($value) => array_map(self::normalizeEnums(...), $value),
             default => $value,
         };
     }

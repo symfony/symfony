@@ -20,8 +20,9 @@ final class Dialect
         public readonly string $refPath,
         public readonly NullSyntax $nullSyntax,
         public readonly bool $supportsConst = true,
-        public readonly bool $supportsExclusiveMinAsNumber = true,
+        public readonly bool $supportsNumericExclusiveBounds = true,
         public readonly bool $supportsExamples = true,
+        public readonly bool $supportsRefSiblings = true,
         public readonly ?string $schemaUri = null,
     ) {
     }
@@ -42,8 +43,9 @@ final class Dialect
             '#/components/schemas/',
             NullSyntax::NullableFlag,
             supportsConst: false,
-            supportsExclusiveMinAsNumber: false,
+            supportsNumericExclusiveBounds: false,
             supportsExamples: false,
+            supportsRefSiblings: false,
         );
     }
 
@@ -53,8 +55,41 @@ final class Dialect
             '#/definitions/',
             NullSyntax::Unsupported,
             supportsConst: false,
-            supportsExclusiveMinAsNumber: false,
+            supportsNumericExclusiveBounds: false,
             supportsExamples: false,
+            supportsRefSiblings: false,
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function const(mixed $value): array
+    {
+        return $this->supportsConst ? ['const' => $value] : ['enum' => [$value]];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function exclusiveMinimum(int|float $value): array
+    {
+        return $this->supportsNumericExclusiveBounds ? ['exclusiveMinimum' => $value] : ['minimum' => $value, 'exclusiveMinimum' => true];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function exclusiveMaximum(int|float $value): array
+    {
+        return $this->supportsNumericExclusiveBounds ? ['exclusiveMaximum' => $value] : ['maximum' => $value, 'exclusiveMaximum' => true];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function example(mixed $value): array
+    {
+        return $this->supportsExamples ? ['examples' => [$value]] : ['example' => $value];
     }
 }

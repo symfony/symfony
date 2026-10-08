@@ -1874,6 +1874,80 @@ class ParserTest extends TestCase
     }
 
     /**
+     * @dataProvider foldedQuotedStringsProvider
+     */
+    public function testWhiteSpaceIsFoldedInMultiLineQuotedString(string $yaml, array $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public static function foldedQuotedStringsProvider()
+    {
+        return [
+            'double-quoted, trailing spaces' => [
+                "key: \"foo   \n  bar\"",
+                ['key' => 'foo bar'],
+            ],
+            'double-quoted, trailing and leading tab' => [
+                "key: \"foo\t \n \tbar\"",
+                ['key' => 'foo bar'],
+            ],
+            'single-quoted, trailing spaces' => [
+                "key: 'foo   \n  bar'",
+                ['key' => 'foo bar'],
+            ],
+            'single-quoted, trailing and leading tab' => [
+                "key: 'foo\t \n \tbar'",
+                ['key' => 'foo bar'],
+            ],
+            'double-quoted, empty line' => [
+                "key: \"a  \n\n  b\"",
+                ['key' => "a\nb"],
+            ],
+            'single-quoted, empty line' => [
+                "key: 'a  \n\n  b'",
+                ['key' => "a\nb"],
+            ],
+            'double-quoted, line of spaces and tabs' => [
+                "key: \"a\n \t \n  b\"",
+                ['key' => "a\nb"],
+            ],
+            'single-quoted, line of tabs' => [
+                "key: 'a\n  \t\n  b'",
+                ['key' => "a\nb"],
+            ],
+            'double-quoted, escaped trailing space' => [
+                "key: \"foo\\ \n  bar\"",
+                ['key' => 'foo  bar'],
+            ],
+            'double-quoted, escaped trailing tab' => [
+                "key: \"foo\\\t\n  bar\"",
+                ['key' => "foo\t bar"],
+            ],
+            'double-quoted, tab escape sequence' => [
+                "key: \"foo\\t\n bar\"",
+                ['key' => "foo\t bar"],
+            ],
+            'double-quoted, escaped line break' => [
+                "key: \"foo\\\n  bar\"",
+                ['key' => 'foobar'],
+            ],
+            'double-quoted, white space before an escaped line break' => [
+                "key: \"foo  \\\n  bar\"",
+                ['key' => 'foo  bar'],
+            ],
+            'double-quoted, single line' => [
+                'key: "foo   bar"',
+                ['key' => 'foo   bar'],
+            ],
+            'single-quoted, single line' => [
+                "key: 'foo   bar'",
+                ['key' => 'foo   bar'],
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider wrappedUnquotedStringsProvider
      */
     public function testWrappedUnquotedStringWithMultipleSpacesInValue(string $yaml, array $expected)

@@ -487,6 +487,10 @@ Security
  * [BC BREAK] An `#[IsGranted]` attribute whose subject reads an argument mapped with `#[MapRequestPayload]`, `#[MapQueryString]` or `#[MapUploadedFile]` now maps and validates that argument before voting.
    Voters receive the mapped value instead of the attribute, and the attributes declared before it still run before the request is mapped.
    A voter that read the attribute, for instance its `metadata` property, to vote before the request is mapped needs a subject that does not read the mapped argument instead
+ * `OidcTokenHandler` logs the tokens it rejects at the `debug` level instead of `error`, including the plain tokens it refuses when encryption is required.
+   They no longer activate a `fingers_crossed` handler whose `action_level` is `error`, as in the Monolog recipe.
+   A configured key that does not match the one of the provider, for instance after a key rotation, now shows up at that level too, and as "Authenticator failed." at the `info` level.
+   Errors while fetching the discovery document or the JWKS are still logged at the `error` level
 
 SecurityBundle
 --------------

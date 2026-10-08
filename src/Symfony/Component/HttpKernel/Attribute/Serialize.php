@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\Attribute;
  *
  * @author Konstantin Myakshin <molodchick@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
 final class Serialize
 {
     /**

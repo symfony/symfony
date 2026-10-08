@@ -41,6 +41,11 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  *
  * This mapping can be customized with the $verbosityLevelMap constructor parameter.
  *
+ * Logs can also be restricted to a subset of channels with the SYMFONY_CONSOLE_LOG_CHANNELS
+ * environment variable, which takes a comma-separated list of channels and is read when a
+ * command runs. Prefixing every channel with `!` excludes them instead. Included and excluded
+ * channels cannot be combined.
+ *
  * @author Tobias Schultze <http://tobion.de>
  */
 final class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
@@ -55,6 +60,10 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
 
     private ?InputInterface $input = null;
     private int $nestedCommandDepth = 0;
+
+    /** @var array<string, true> */
+    private array $channels = [];
+    private bool $excludeChannels = false;
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -82,6 +91,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
         return
             $this->updateLevel()
             && parent::isHandling($record)
+            && $this->isHandlingChannel($record->channel)
             && (!$this->interactiveOnly || $this->input?->isInteractive())
         ;
     }
@@ -143,6 +153,10 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
             return;
         }
 
+        if (\is_string($channels = $_ENV['SYMFONY_CONSOLE_LOG_CHANNELS'] ?? $_SERVER['SYMFONY_CONSOLE_LOG_CHANNELS'] ?? getenv('SYMFONY_CONSOLE_LOG_CHANNELS'))) {
+            $this->setChannels(explode(',', $channels));
+        }
+
         $output = $event->getOutput();
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -188,6 +202,41 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
             'colors' => $this->output->isDecorated(),
             'multiline' => OutputInterface::VERBOSITY_DEBUG <= $this->output->getVerbosity(),
         ], $this->consoleFormatterOptions));
+    }
+
+    /**
+     * @param string[] $channels
+     */
+    private function setChannels(array $channels): void
+    {
+        $this->channels = [];
+        $this->excludeChannels = false;
+
+        foreach ($channels as $channel) {
+            if ('' === $channel = trim($channel)) {
+                continue;
+            }
+
+            if ($exclude = str_starts_with($channel, '!')) {
+                $channel = substr($channel, 1);
+            }
+
+            if ($this->channels && $exclude !== $this->excludeChannels) {
+                throw new \InvalidArgumentException('Cannot combine included and excluded channels in "SYMFONY_CONSOLE_LOG_CHANNELS".');
+            }
+
+            $this->excludeChannels = $exclude;
+            $this->channels[$channel] = true;
+        }
+    }
+
+    private function isHandlingChannel(string $channel): bool
+    {
+        if (!$this->channels) {
+            return true;
+        }
+
+        return $this->excludeChannels !== isset($this->channels[$channel]);
     }
 
     /**

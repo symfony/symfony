@@ -1,0 +1,71 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/UnionProperties",
+    "$defs": {
+        "UnionProperties": {
+            "type": "object",
+            "properties": {
+                "identifier": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "optionalIdentifier": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "owner": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/Author"
+                        },
+                        {
+                            "$ref": "#/$defs/SelfReferencingCategory"
+                        }
+                    ]
+                },
+                "anything": {}
+            }
+        },
+        "Author": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "SelfReferencingCategory": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "parent": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/SelfReferencingCategory"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

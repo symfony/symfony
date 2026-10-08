@@ -1,0 +1,29 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/NullableUnionChoice",
+    "$defs": {
+        "NullableUnionChoice": {
+            "type": "object",
+            "properties": {
+                "rank": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "enum": [
+                        1,
+                        "one",
+                        null
+                    ]
+                }
+            }
+        }
+    }
+}

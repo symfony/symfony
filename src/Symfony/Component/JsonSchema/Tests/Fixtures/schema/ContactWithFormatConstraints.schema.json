@@ -1,0 +1,86 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/ContactWithFormatConstraints",
+    "$defs": {
+        "ContactWithFormatConstraints": {
+            "type": "object",
+            "properties": {
+                "ipv4": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "ipv4"
+                },
+                "ipv6": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "ipv6"
+                },
+                "anyIp": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "host": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "hostname"
+                },
+                "birthday": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date"
+                },
+                "lastSeen": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date-time"
+                },
+                "wakeUp": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "time"
+                },
+                "uuid": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "uuid"
+                },
+                "ulid": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "ulid"
+                },
+                "channels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "email",
+                            "sms",
+                            "push"
+                        ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 2
+                }
+            }
+        }
+    }
+}

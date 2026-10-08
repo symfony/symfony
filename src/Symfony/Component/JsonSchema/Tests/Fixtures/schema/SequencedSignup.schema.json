@@ -1,0 +1,31 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/SequencedSignup",
+    "$defs": {
+        "SequencedSignup": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "default": "",
+                    "maxLength": 50
+                },
+                "email": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "nickname": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "email"
+            ]
+        }
+    }
+}

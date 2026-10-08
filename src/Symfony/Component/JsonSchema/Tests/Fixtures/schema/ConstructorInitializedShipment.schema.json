@@ -1,0 +1,35 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/ConstructorInitializedShipment",
+    "$defs": {
+        "ConstructorInitializedShipment": {
+            "type": "object",
+            "properties": {
+                "carrier": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "quantity": {
+                    "type": "integer",
+                    "default": 1
+                }
+            },
+            "required": [
+                "label",
+                "reference",
+                "note"
+            ]
+        }
+    }
+}

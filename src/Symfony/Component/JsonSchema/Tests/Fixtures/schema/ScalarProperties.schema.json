@@ -1,0 +1,36 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/ScalarProperties",
+    "$defs": {
+        "ScalarProperties": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "nickname": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "active": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "price": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string",
+                    "default": "untitled"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "const": true,
+                    "default": true
+                }
+            }
+        }
+    }
+}

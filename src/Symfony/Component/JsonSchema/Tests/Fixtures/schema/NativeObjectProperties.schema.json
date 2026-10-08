@@ -1,0 +1,65 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/NativeObjectProperties",
+    "$defs": {
+        "NativeObjectProperties": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "duration": {
+                    "type": "string",
+                    "format": "duration"
+                },
+                "uuid": {
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "ulid": {
+                    "type": "string",
+                    "format": "ulid"
+                },
+                "suit": {
+                    "type": "string",
+                    "enum": [
+                        "hearts",
+                        "spades"
+                    ],
+                    "default": "hearts"
+                },
+                "priority": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2
+                    ]
+                },
+                "color": {
+                    "type": "string",
+                    "enum": [
+                        "Red",
+                        "Green"
+                    ]
+                },
+                "file": {
+                    "type": "string",
+                    "format": "binary"
+                },
+                "amount": {
+                    "type": "string"
+                },
+                "bigAmount": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

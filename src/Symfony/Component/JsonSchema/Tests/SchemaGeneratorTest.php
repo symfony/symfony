@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonSchema\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
 use Symfony\Component\JsonSchema\Configuration;
@@ -25,8 +26,10 @@ use Symfony\Component\JsonSchema\SchemaGenerator;
 use Symfony\Component\JsonSchema\Tests\Fixtures\AccountWithAccessors;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Author;
 use Symfony\Component\JsonSchema\Tests\Fixtures\AuthorSpotlight;
+use Symfony\Component\JsonSchema\Tests\Fixtures\AuthorWithBiography;
 use Symfony\Component\JsonSchema\Tests\Fixtures\BookWithAuthors;
 use Symfony\Component\JsonSchema\Tests\Fixtures\CamelCaseProperties;
+use Symfony\Component\JsonSchema\Tests\Fixtures\Catalog;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ConstructorInitializedShipment;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ContactWithFormatConstraints;
 use Symfony\Component\JsonSchema\Tests\Fixtures\DocumentedArticle;
@@ -34,6 +37,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\EnumCollectionDefaults;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\GroupedProduct;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IdentifierDefinitionProcessor;
+use Symfony\Component\JsonSchema\Tests\Fixtures\Inventory;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IriReferenceClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Library;
 use Symfony\Component\JsonSchema\Tests\Fixtures\MarkingPropertySchemaEnricher;
@@ -66,68 +70,59 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 
 class SchemaGeneratorTest extends TestCase
 {
-    public function testScalarPropertiesBecomeADefinitionReferencedFromTheRoot()
+    #[DataProvider('provideFixtureClasses')]
+    public function testGeneratesTheExpectedSchema(string $class)
     {
-        $schema = SchemaGenerator::create()->generate(Type::object(ScalarProperties::class));
+        $schema = SchemaGenerator::create()->generate(Type::object($class));
 
-        $this->assertSameSchema(['$ref' => '#/$defs/ScalarProperties'], $schema->getRoot());
-        $this->assertSameSchema([
-            'ScalarProperties' => [
-                'type' => 'object',
-                'properties' => [
-                    'id' => ['type' => 'integer'],
-                    'nickname' => ['type' => ['string', 'null']],
-                    'active' => ['type' => 'boolean', 'default' => true],
-                    'price' => ['type' => 'number'],
-                    'title' => ['type' => 'string', 'default' => 'untitled'],
-                    'enabled' => ['type' => 'boolean', 'const' => true, 'default' => true],
-                ],
-            ],
-        ], $schema->getDefinitions());
+        $expectedFile = __DIR__.'/Fixtures/schema/'.str_replace('\\', '/', substr($class, \strlen('Symfony\\Component\\JsonSchema\\Tests\\Fixtures\\'))).'.schema.json';
+        $json = json_encode($schema, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_PRESERVE_ZERO_FRACTION)."\n";
+
+        if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
+            if (!is_dir(\dirname($expectedFile))) {
+                mkdir(\dirname($expectedFile), recursive: true);
+            }
+            file_put_contents($expectedFile, $json);
+            $this->markTestIncomplete('TEST_GENERATE_FIXTURES is set');
+        }
+
+        $this->assertStringEqualsFile($expectedFile, $json);
     }
 
-    public function testNonNullablePropertyWithoutDefaultOrConstraintIsNotRequired()
+    public static function provideFixtureClasses(): iterable
     {
-        $definition = SchemaGenerator::create()->generate(Type::object(ScalarProperties::class))->getDefinitions()['ScalarProperties'];
-
-        $this->assertArrayNotHasKey('required', $definition);
-    }
-
-    public function testConstructorArgumentsWithoutDefaultValueAreRequired()
-    {
-        $definition = SchemaGenerator::create()->generate(Type::object(ConstructorInitializedShipment::class))->getDefinitions()['ConstructorInitializedShipment'];
-
-        $this->assertSame(['label', 'reference', 'note'], $definition['required']);
-    }
-
-    public function testArgumentsOfANonPublicConstructorAreNotRequired()
-    {
-        $definition = SchemaGenerator::create()->generate(Type::object(PrivatelyConstructedSnapshot::class))->getDefinitions()['PrivatelyConstructedSnapshot'];
-
-        $this->assertArrayNotHasKey('required', $definition);
-    }
-
-    public function testNestedObjectsAndCollectionsAreReferenced()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class));
-
-        $this->assertSameSchema([
-            'BookWithAuthors' => [
-                'type' => 'object',
-                'properties' => [
-                    'title' => ['type' => 'string'],
-                    'author' => ['$ref' => '#/$defs/Author'],
-                    'coAuthor' => ['anyOf' => [['$ref' => '#/$defs/Author'], ['type' => 'null']]],
-                    'reviewers' => ['type' => 'array', 'items' => ['$ref' => '#/$defs/Author']],
-                    'authorsByRole' => ['type' => 'object', 'additionalProperties' => ['$ref' => '#/$defs/Author']],
-                    'tags' => ['type' => 'array', 'items' => ['type' => 'string']],
-                ],
-            ],
-            'Author' => [
-                'type' => 'object',
-                'properties' => ['name' => ['type' => 'string']],
-            ],
-        ], $schema->getDefinitions());
+        foreach ([
+            AccountWithAccessors::class,
+            Author::class,
+            AuthorSpotlight::class,
+            AuthorWithBiography::class,
+            BookWithAuthors::class,
+            CamelCaseProperties::class,
+            Catalog\Product::class,
+            ConstructorInitializedShipment::class,
+            ContactWithFormatConstraints::class,
+            DocumentedArticle::class,
+            EnumCollectionDefaults::class,
+            GroupedProduct::class,
+            Inventory\Product::class,
+            Library::class,
+            NativeObjectProperties::class,
+            NestedAttributesBook::class,
+            NonSerializableProperties::class,
+            NullableUnionChoice::class,
+            PrivatelyConstructedSnapshot::class,
+            ProductPair::class,
+            ScalarProperties::class,
+            SelfReferencingCategory::class,
+            SequencedSignup::class,
+            SerializerMappedAccount::class,
+            Shelf::class,
+            StrictInput::class,
+            UnionProperties::class,
+            ValidatedRegistration::class,
+        ] as $class) {
+            yield $class => [$class];
+        }
     }
 
     public function testDifferentShapesNamedAlikeThrow()
@@ -233,36 +228,6 @@ class SchemaGeneratorTest extends TestCase
         SchemaGenerator::create()->generate(Type::builtin(TypeIdentifier::CALLABLE));
     }
 
-    public function testCallableAndResourcePropertiesAreSkippedAndUnsupportedUnionBranchesDropped()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(NonSerializableProperties::class));
-
-        $this->assertSameSchema([
-            'NonSerializableProperties' => [
-                'type' => 'object',
-                'properties' => [
-                    'name' => ['type' => 'string'],
-                    'retryPolicy' => ['type' => 'integer'],
-                ],
-            ],
-        ], $schema->getDefinitions());
-    }
-
-    public function testSelfReferencingClassReferencesItsOwnDefinition()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(SelfReferencingCategory::class));
-
-        $this->assertSameSchema([
-            'SelfReferencingCategory' => [
-                'type' => 'object',
-                'properties' => [
-                    'name' => ['type' => 'string'],
-                    'parent' => ['anyOf' => [['$ref' => '#/$defs/SelfReferencingCategory'], ['type' => 'null']]],
-                ],
-            ],
-        ], $schema->getDefinitions());
-    }
-
     public function testFlattenProducesNoReferencesWhenAcyclic()
     {
         $schema = SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class))->flatten();
@@ -317,73 +282,12 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['$ref' => '#/definitions/Author'], $schema->getDefinitions()['BookWithAuthors']['properties']['coAuthor']);
     }
 
-    public function testNativeObjectsAreResolvedWithoutDefinitions()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(NativeObjectProperties::class));
-
-        $this->assertSame(['NativeObjectProperties'], array_keys($schema->getDefinitions()));
-        $this->assertSameSchema([
-            'createdAt' => ['type' => 'string', 'format' => 'date-time'],
-            'duration' => ['type' => 'string', 'format' => 'duration'],
-            'uuid' => ['type' => 'string', 'format' => 'uuid'],
-            'ulid' => ['type' => 'string', 'format' => 'ulid'],
-            'suit' => ['type' => 'string', 'enum' => ['hearts', 'spades'], 'default' => 'hearts'],
-            'priority' => ['type' => 'integer', 'enum' => [1, 2]],
-            'color' => ['type' => 'string', 'enum' => ['Red', 'Green']],
-            'file' => ['type' => 'string', 'format' => 'binary'],
-            'amount' => ['type' => 'string'],
-            'bigAmount' => ['type' => 'string'],
-            'timezone' => ['type' => 'string'],
-            'label' => ['type' => 'string'],
-        ], $schema->getDefinitions()['NativeObjectProperties']['properties']);
-    }
-
-    public function testEnumsInsideArrayDefaultsAreNormalizedAndObjectsDropTheDefault()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(EnumCollectionDefaults::class));
-        $properties = $schema->getDefinitions()['EnumCollectionDefaults']['properties'];
-
-        $this->assertSame(['hearts'], $properties['suits']['default']);
-        $this->assertSame(['warm' => ['Red']], $properties['palettes']['default']);
-        $this->assertArrayNotHasKey('default', $properties['milestones']);
-        $this->assertNotFalse(json_encode($schema));
-    }
-
-    public function testUnionTypesBecomeAnyOf()
-    {
-        $properties = SchemaGenerator::create()->generate(Type::object(UnionProperties::class))->getDefinitions()['UnionProperties']['properties'];
-
-        $this->assertSameSchema([
-            'identifier' => ['anyOf' => [['type' => 'integer'], ['type' => 'string']]],
-            'optionalIdentifier' => ['anyOf' => [['type' => 'integer'], ['type' => 'string'], ['type' => 'null']]],
-            'owner' => ['anyOf' => [['$ref' => '#/$defs/Author'], ['$ref' => '#/$defs/SelfReferencingCategory']]],
-            'anything' => [],
-        ], $properties);
-    }
-
     public function testIntersectionTypesBecomeAllOfAndKeepMemberDefinitions()
     {
         $schema = SchemaGenerator::create()->generate(Type::intersection(Type::object(Author::class), Type::object(SelfReferencingCategory::class)));
 
         $this->assertSameSchema(['allOf' => [['$ref' => '#/$defs/Author'], ['$ref' => '#/$defs/SelfReferencingCategory']]], $schema->getRoot());
         $this->assertSame(['Author', 'SelfReferencingCategory'], array_keys($schema->getDefinitions()));
-    }
-
-    public function testEmptySchemasAreSerializedAsObjects()
-    {
-        $json = json_encode(SchemaGenerator::create()->generate(Type::object(UnionProperties::class)));
-
-        $this->assertStringContainsString('"anything":{}', $json);
-    }
-
-    public function testSerializerMetadataAppliesWithoutGroups()
-    {
-        $properties = SchemaGenerator::create()->generate(Type::object(SerializerMappedAccount::class))->getDefinitions()['SerializerMappedAccount']['properties'];
-
-        $this->assertSameSchema([
-            'email' => ['type' => 'string'],
-            'display_name' => ['type' => 'string'],
-        ], $properties);
     }
 
     public function testGroupsFilterPropertiesAndSuffixTheDefinitionName()
@@ -624,14 +528,6 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'string'], $definition['properties']['shelf']);
     }
 
-    public function testClassesSharingAShortNameGetDistinctDefinitions()
-    {
-        $schema = SchemaGenerator::create()->generate(Type::object(ProductPair::class));
-
-        $this->assertSame(['ProductPair', 'Product', 'Inventory.Product'], array_keys($schema->getDefinitions()));
-        $this->assertSameSchema(['$ref' => '#/$defs/Inventory.Product'], $schema->getDefinitions()['ProductPair']['properties']['inventory']);
-    }
-
     public function testDefinitionNameReplacesTheGroupsSuffix()
     {
         $schema = SchemaGenerator::create()->generate(Type::object(GroupedProduct::class), new Configuration(groups: ['product:read'], definitionName: 'Custom'));
@@ -646,17 +542,6 @@ class SchemaGeneratorTest extends TestCase
         $this->assertFalse($schema->getDefinitions()['StrictInput']['additionalProperties']);
     }
 
-    public function testAccessMetadataFlagsReadOnlyAndWriteOnlyProperties()
-    {
-        $properties = SchemaGenerator::create()->generate(Type::object(AccountWithAccessors::class))->getDefinitions()['AccountWithAccessors']['properties'];
-
-        $this->assertSameSchema([
-            'email' => ['type' => 'string'],
-            'id' => ['type' => 'integer', 'readOnly' => true],
-            'password' => ['type' => 'string', 'writeOnly' => true],
-        ], $properties);
-    }
-
     public function testListedPropertyWithoutAnyAccessIsKeptWithoutFlags()
     {
         $properties = SchemaGenerator::create()->generate(Type::object(AccountWithAccessors::class), new Configuration(groups: ['account:internal']))->getDefinitions()['AccountWithAccessors-account.internal']['properties'];
@@ -664,55 +549,6 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema([
             'email' => ['type' => 'string'],
             'auditTrail' => ['type' => 'string'],
-        ], $properties);
-    }
-
-    public function testValidatorConstraintsEnrichProperties()
-    {
-        $definition = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class))->getDefinitions()['ValidatedRegistration'];
-
-        $this->assertSameSchema([
-            'type' => 'object',
-            'properties' => [
-                'username' => ['type' => 'string', 'default' => '', 'minLength' => 3, 'maxLength' => 20],
-                'email' => ['type' => ['string', 'null'], 'format' => 'email'],
-                'age' => ['type' => ['integer', 'null'], 'minimum' => 18, 'maximum' => 130],
-                'score' => ['type' => ['integer', 'null'], 'exclusiveMinimum' => 0],
-                'countryCode' => ['type' => ['string', 'null'], 'pattern' => '^([A-Z]{2})$'],
-                'plan' => ['type' => ['string', 'null'], 'enum' => ['basic', 'premium', null]],
-                'interests' => ['type' => 'array', 'items' => ['type' => 'string'], 'minItems' => 1, 'maxItems' => 5, 'uniqueItems' => true],
-                'website' => ['type' => ['string', 'null'], 'format' => 'uri'],
-                'invitationCode' => ['type' => ['string', 'null']],
-            ],
-            'required' => ['username'],
-        ], $definition);
-    }
-
-    public function testChoiceOnANullableUnionKeepsNullAllowed()
-    {
-        $definition = SchemaGenerator::create()->generate(Type::object(NullableUnionChoice::class))->getDefinitions()['NullableUnionChoice'];
-
-        $this->assertSameSchema([
-            'anyOf' => [['type' => 'integer'], ['type' => 'string'], ['type' => 'null']],
-            'enum' => [1, 'one', null],
-        ], $definition['properties']['rank']);
-    }
-
-    public function testValidatorFormatConstraintsAndMultipleChoice()
-    {
-        $properties = SchemaGenerator::create()->generate(Type::object(ContactWithFormatConstraints::class))->getDefinitions()['ContactWithFormatConstraints']['properties'];
-
-        $this->assertSameSchema([
-            'ipv4' => ['type' => ['string', 'null'], 'format' => 'ipv4'],
-            'ipv6' => ['type' => ['string', 'null'], 'format' => 'ipv6'],
-            'anyIp' => ['type' => ['string', 'null']],
-            'host' => ['type' => ['string', 'null'], 'format' => 'hostname'],
-            'birthday' => ['type' => ['string', 'null'], 'format' => 'date'],
-            'lastSeen' => ['type' => ['string', 'null'], 'format' => 'date-time'],
-            'wakeUp' => ['type' => ['string', 'null'], 'format' => 'time'],
-            'uuid' => ['type' => ['string', 'null'], 'format' => 'uuid'],
-            'ulid' => ['type' => ['string', 'null'], 'format' => 'ulid'],
-            'channels' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['email', 'sms', 'push']], 'minItems' => 1, 'maxItems' => 2],
         ], $properties);
     }
 
@@ -731,40 +567,6 @@ class SchemaGeneratorTest extends TestCase
         $schema = SchemaGenerator::create()->generate(Type::object(ValidatedRegistration::class), new Configuration(validationGroups: new GroupSequence(['registration:create'])));
 
         $this->assertSame(['invitationCode'], $schema->getDefinitions()['ValidatedRegistration-validation.registration.create']['required']);
-    }
-
-    public function testClassGroupSequenceIsUsedWhenNoValidationGroupsAreGiven()
-    {
-        $definition = SchemaGenerator::create()->generate(Type::object(SequencedSignup::class))->getDefinitions()['SequencedSignup'];
-
-        $this->assertSameSchema([
-            'type' => 'object',
-            'properties' => [
-                'name' => ['type' => 'string', 'default' => '', 'maxLength' => 50],
-                'email' => ['type' => ['string', 'null']],
-                'nickname' => ['type' => ['string', 'null']],
-            ],
-            'required' => ['email'],
-        ], $definition);
-    }
-
-    public function testJsonSchemaConstraintAttributeAndPhpDocEnrichProperties()
-    {
-        $definition = SchemaGenerator::create()->generate(Type::object(DocumentedArticle::class))->getDefinitions()['DocumentedArticle'];
-
-        $this->assertSameSchema([
-            'type' => 'object',
-            'properties' => [
-                'headline' => ['type' => 'string', 'description' => 'The article headline.'],
-                'slug' => ['type' => 'string', 'title' => 'Slug', 'description' => 'URL fragment.', 'pattern' => '^[a-z-]+$', 'minLength' => 1, 'maxLength' => 64, 'examples' => ['hello-world'], 'deprecated' => true],
-                'rating' => ['type' => 'number', 'minimum' => 0, 'exclusiveMaximum' => 10, 'multipleOf' => 0.5],
-                'contact' => ['type' => 'string', 'format' => 'email', 'readOnly' => true],
-                'keywords' => ['type' => 'array', 'items' => ['type' => 'string'], 'minItems' => 1, 'uniqueItems' => true],
-                'views' => ['type' => 'integer', 'exclusiveMinimum' => 0],
-                'kind' => ['type' => 'string', 'const' => 'article'],
-            ],
-            'required' => ['kind'],
-        ], $definition);
     }
 
     public function testJsonSchemaConstraintAttributeFollowsTheDialect()

@@ -23,7 +23,20 @@ final class DatePoint extends \DateTimeImmutable
      */
     public function __construct(string $datetime = 'now', ?\DateTimeZone $timezone = null, ?parent $reference = null)
     {
-        $now = $reference ?? Clock::get()->now();
+        if (null === $reference) {
+            $clock = Clock::get();
+
+            // copying the clock's date into $this goes through its local time, which is ambiguous during the DST fall-back hour
+            if ('now' === $datetime && $clock instanceof NativeClock) {
+                parent::__construct('now', $timezone ?? $clock->now()->getTimezone());
+
+                return;
+            }
+
+            $reference = $clock->now();
+        }
+
+        $now = $reference;
 
         if ('now' !== $datetime) {
             if (!$now instanceof static) {

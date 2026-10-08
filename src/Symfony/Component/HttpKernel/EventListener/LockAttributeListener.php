@@ -119,7 +119,7 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
 
         // the same lock is already held for the main request, e.g. when the attribute is set on both the class and the method,
         // or when a fragment is rendered from a controller locked with the same key
-        if ($lock = $locks[$id]['lock'] ?? null) {
+        if (($lock = $locks[$id]['lock'] ?? null) && $lock->isAcquired()) {
             // a write lock is needed while only a read lock is held: promote it without waiting,
             // as two requests promoting their read locks would wait for each other
             if (!$attribute->read && isset($this->readLocks[$lock])) {
@@ -190,6 +190,18 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         $this->streamedRequests = new \WeakMap();
 
         self::release($locks);
+    }
+
+    /**
+     * @return list<SharedLockInterface>
+     *
+     * @internal
+     */
+    public function getAcquiredLocks(Request $request): array
+    {
+        $mainRequest = $this->requestStack->getMainRequest() ?? $request;
+
+        return array_column(array_filter($this->locks[$mainRequest] ?? [], static fn (array $entry): bool => $request === $entry['owner']), 'lock');
     }
 
     public static function getSubscribedEvents(): array

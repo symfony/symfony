@@ -31,6 +31,7 @@ CHANGELOG
  * Add the `#[Lock]` attribute and `ConcurrentRequestHttpException` to reject or delay concurrent requests to a controller
  * Apply the `#[Cache]` attribute to 308 responses
  * Treat 308 responses like 301 ones in `ResponseCacheStrategy`
+ * Add `LockValueResolver` to inject the lock acquired by `#[Lock]` into the `LockInterface` and `SharedLockInterface` controller arguments
 
 8.1
 ---

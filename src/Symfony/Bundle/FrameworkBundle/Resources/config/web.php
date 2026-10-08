@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\LockValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
@@ -188,6 +189,14 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_subscriber')
             ->tag('kernel.reset', ['method' => 'reset'])
             ->tag('container.remove_if_missing', ['service' => 'lock.factory.abstract'])
+
+        ->set('argument_resolver.lock', LockValueResolver::class)
+            ->args([
+                service('lock.attribute_listener'),
+            ])
+            ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => LockValueResolver::class])
+            ->tag('kernel.event_subscriber')
+            ->tag('container.remove_if_missing', ['service' => 'lock.attribute_listener'])
 
         ->set('controller.helper', ControllerHelper::class)
             ->tag('container.service_subscriber')

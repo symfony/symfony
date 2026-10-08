@@ -448,6 +448,7 @@ class LockAttributeListenerTest extends TestCase
     public function testBlockingSubRequestDoesNotWaitForTheLockHeldByItsMainRequest()
     {
         $lock = $this->createMock(SharedLockInterface::class);
+        $lock->method('isAcquired')->willReturn(true);
         $lock->expects($this->once())->method('acquire')->willReturn(true);
 
         $factory = $this->createStub(LockFactory::class);
@@ -510,6 +511,28 @@ class LockAttributeListenerTest extends TestCase
 
         $listener->releaseLocks($this->makeReleaseEvent($sub, requestType: HttpKernelInterface::SUB_REQUEST));
         $this->assertFalse($this->isLocked('foo'));
+    }
+
+    public function testSubRequestAcquiresAgainALockThatIsNoLongerHeld()
+    {
+        $expiredLock = $this->createMock(SharedLockInterface::class);
+        $expiredLock->expects($this->once())->method('acquire')->willReturn(true);
+        $expiredLock->method('isAcquired')->willReturn(false);
+
+        $lock = $this->createMock(SharedLockInterface::class);
+        $lock->expects($this->once())->method('acquire')->willReturn(true);
+        $lock->expects($this->once())->method('release');
+
+        $factory = $this->createMock(LockFactory::class);
+        $factory->expects($this->exactly(2))->method('createLock')->willReturn($expiredLock, $lock);
+
+        $listener = $this->makeListener(['default' => $factory]);
+        $this->requestStack->push($main = Request::create('/'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $main));
+        $this->requestStack->push($sub = Request::create('/fragment'));
+        $listener->onKernelControllerAttribute($this->makeEvent(new Lock('foo'), $sub));
+
+        $listener->releaseLocks($this->makeReleaseEvent($sub, requestType: HttpKernelInterface::SUB_REQUEST));
     }
 
     public function testKernelSubRequestReusesTheLockHeldByItsMainRequest()
@@ -580,6 +603,7 @@ class LockAttributeListenerTest extends TestCase
     public function testSubRequestReusesTheWriteLockOfItsMainRequestForReading()
     {
         $lock = $this->createMock(SharedLockInterface::class);
+        $lock->method('isAcquired')->willReturn(true);
         $lock->expects($this->once())->method('acquire')->willReturn(true);
         $lock->expects($this->never())->method('acquireRead');
 
@@ -614,6 +638,7 @@ class LockAttributeListenerTest extends TestCase
     public function testReadLockIsPromotedOnce()
     {
         $lock = $this->createMock(SharedLockInterface::class);
+        $lock->method('isAcquired')->willReturn(true);
         $lock->expects($this->once())->method('acquireRead')->willReturn(true);
         $lock->expects($this->once())->method('acquire')->willReturn(true);
 
@@ -854,6 +879,7 @@ class LockAttributeListenerTest extends TestCase
     public function testPromotionDoesNotWait()
     {
         $lock = $this->createMock(SharedLockInterface::class);
+        $lock->method('isAcquired')->willReturn(true);
         $lock->expects($this->once())->method('acquireRead')->with(true)->willReturn(true);
         $lock->expects($this->once())->method('acquire')->with(false)->willReturn(false);
 

@@ -74,6 +74,7 @@ use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\Lock;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\LockValueResolver;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
@@ -702,6 +703,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('legacy_lock_disabled');
 
         $this->assertFalse($container->hasDefinition('lock.attribute_listener'));
+        $this->assertFalse($container->hasDefinition('argument_resolver.lock'));
+    }
+
+    public function testLockValueResolver()
+    {
+        $container = $this->createContainerFromFile('legacy_lock');
+
+        $definition = $container->getDefinition('argument_resolver.lock');
+        $this->assertSame(LockValueResolver::class, $definition->getClass());
+        $this->assertEquals([new Reference('lock.attribute_listener')], $definition->getArguments());
+        $this->assertSame([['priority' => 100, 'name' => LockValueResolver::class]], $definition->getTag('controller.argument_value_resolver'));
+        $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
     }
 
     public function testEnabledPhpErrorsConfig()

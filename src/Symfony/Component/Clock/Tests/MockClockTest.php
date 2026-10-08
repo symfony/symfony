@@ -64,6 +64,30 @@ class MockClockTest extends TestCase
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 
+    /**
+     * @dataProvider provideSleepDurations
+     */
+    public function testSleepCarriesSecondsAndKeepsTimezone(string $now, string $timezone, float|int $seconds, string $expected)
+    {
+        $clock = new MockClock(new \DateTimeImmutable($now), $timezone);
+
+        $clock->sleep($seconds);
+
+        $this->assertSame($expected, $clock->now()->format('Y-m-d\TH:i:s.uP'));
+        $this->assertSame($timezone, $clock->now()->getTimezone()->getName());
+    }
+
+    public static function provideSleepDurations(): iterable
+    {
+        yield 'integer' => ['2024-01-01T00:00:00.5Z', 'UTC', 3, '2024-01-01T00:00:03.500000+00:00'];
+        yield 'microsecond carry' => ['2024-01-01T00:00:00.999999Z', 'UTC', 0.000002, '2024-01-01T00:00:01.000001+00:00'];
+        yield 'below one microsecond' => ['2024-01-01T00:00:00.5Z', 'UTC', 0.0000004, '2024-01-01T00:00:00.500000+00:00'];
+        yield 'more than 2^31 microseconds' => ['2024-01-01T00:00:00.5Z', 'UTC', 3600, '2024-01-01T01:00:00.500000+00:00'];
+        yield 'before 1970' => ['1969-12-31T23:59:59.5Z', 'UTC', 0.75, '1970-01-01T00:00:00.250000+00:00'];
+        yield 'long before 1970' => ['1961-07-09T12:00:31.961111Z', 'UTC', 0.5, '1961-07-09T12:00:32.461111+00:00'];
+        yield 'DST fall-back' => ['2026-10-25T00:59:59.9Z', 'Europe/Madrid', 0.2, '2026-10-25T02:00:00.100000+01:00'];
+    }
+
     public static function provideValidModifyStrings(): iterable
     {
         yield 'absolute datetime value' => [

@@ -21,6 +21,14 @@ parameters:
         # these templates are include()'d in HtmlErrorRenderer's scope, so they can't be analyzed standalone
         - src/Symfony/Component/ErrorHandler/Resources/views/*
     ignoreErrors:
+        # DBAL 4.3 needs the static lookup; DBAL 4.6 uses the connection's type provider.
+        # Both branches are covered by dependency-version tests.
+        -
+            message: '#^Call to deprecated method getType\(\) of class Doctrine\\DBAL\\Types\\Type:#'
+            path: src/Symfony/Bridge/Doctrine/Form/EntityExistsTypeGuesser.php
+        -
+            message: "#^Call to function method_exists\\(\\) with Doctrine\\\\DBAL\\\\Configuration and 'getTypeProvider' will always evaluate to true\\.$#"
+            path: src/Symfony/Bridge/Doctrine/Form/EntityExistsTypeGuesser.php
         # Added in PHP 8.4
         - '#^Class BcMath\\Number not found\.$#'
         # DeferredBatchMessage::$acked aliases a bool that batch handlers flip during dispatch()

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-08T04:58:32Z
+
++1 to @phcorp's review: passing the marker to subprocesses is by design since #23799. Note that the code suggestion is anchored in `getDefaultEnv()`, while it belongs to `start()`, where `$env` holds the explicitly passed vars - committing it as is would make `getDefaultEnv()` call itself.
+
+---------------------------------------------------------------------------
+
+by KalimeroMK at 2026-10-08T05:06:56Z
+
+Thanks @phcorp and @nicolas-grekas — reworked as suggested: the marker now propagates unchanged, and `start()` removes only the explicitly passed names from it (with the Windows case-insensitive comparison). Test replaced with the dataProvider version covering constructor/`start()`/explicit-removal cases. The `Unit Tests (8.4)` failure is unrelated — `FrameworkBundle\TranslatorTest::testEnabledLocales` and Translation errors, no Process failures.

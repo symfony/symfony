@@ -10,7 +10,7 @@ CHANGELOG
  * Deprecate the `Symfony\Component\Security\Http\Firewall` autowiring alias
  * Add the `user_checker_on_refresh` firewall option, running its user checker again when the user is refreshed from the session
  * Deprecate passing an event dispatcher as the 2nd argument of `FirewallListener::__construct()`, which now takes the logout URL generator there
- * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service started when a denied vote requests a re-authentication
+ * Add the `re_authentication_entry_point` firewall option, naming an authenticator of the firewall or a `ReAuthenticationEntryPointInterface` service to start when a denied vote requests a re-authentication
  * Add the `recent_authentication_lifetime` and `very_recent_authentication_lifetime` options, the number of seconds an interactive authentication keeps granting `IS_AUTHENTICATED_RECENTLY` and `IS_AUTHENTICATED_VERY_RECENTLY`
  * Add the `security.expression_language_provider` service to evaluate the security functions outside of authorization expressions
  * Add the `debug:roles` command to inspect the role hierarchy

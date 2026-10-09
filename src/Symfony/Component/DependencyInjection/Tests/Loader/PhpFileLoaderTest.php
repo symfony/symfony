@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\Filesystem\Filesystem;
 
 class PhpFileLoaderTest extends TestCase
 {
@@ -164,6 +165,30 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame([['foo' => 'bar']], $def->getTag('my.tag'));
         $this->assertSame([[]], $def->getTag('another.tag'));
         $this->assertFalse($def->isAbstract());
+    }
+
+    public function testAnonymousServicesIdsDoNotDependOnTheProjectDirectory()
+    {
+        $filesystem = new Filesystem();
+        $ids = [];
+
+        foreach (['project_a', 'project_b'] as $project) {
+            $dir = sys_get_temp_dir().'/sf_anonymous_services_'.$project;
+            $filesystem->copy(__DIR__.'/../Fixtures/config/anonymous.php', $dir.'/config/services.php', true);
+
+            $container = new ContainerBuilder();
+            $container->setParameter('kernel.project_dir', $dir);
+
+            try {
+                (new PhpFileLoader($container, new FileLocator($dir.'/config')))->load('services.php');
+            } finally {
+                $filesystem->remove($dir);
+            }
+
+            $ids[$project] = array_keys($container->getDefinitions());
+        }
+
+        $this->assertSame($ids['project_a'], $ids['project_b']);
     }
 
     public function testAutoConfigureAndChildDefinition()

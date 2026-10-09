@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-08T16:28:04Z
+
+> `SYMFONY_LOG_CHANNELS` reads as if it filtered all logs, while it only filters what the console displays. What about `SYMFONY_CONSOLE_LOG_CHANNELS`? WDYT?
+
+@nicolas-grekas Agreed, renamed to `SYMFONY_CONSOLE_LOG_CHANNELS`.

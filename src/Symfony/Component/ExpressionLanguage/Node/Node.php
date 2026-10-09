@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\Exception\BadMethodCallException;
 
 /**
  * Represents a node in the AST.
@@ -79,7 +80,7 @@ class Node
      */
     public function toArray(): array
     {
-        throw new \BadMethodCallException(\sprintf('Dumping a "%s" instance is not supported yet.', static::class));
+        throw new BadMethodCallException(\sprintf('Dumping a "%s" instance is not supported yet.', static::class));
     }
 
     public function dump(): string

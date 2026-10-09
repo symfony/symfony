@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\ExpressionLanguage;
 
+use Symfony\Component\ExpressionLanguage\Exception\InvalidArgumentException;
+use Symfony\Component\ExpressionLanguage\Exception\RuntimeException;
+use Symfony\Component\ExpressionLanguage\Exception\TypeError;
+
 /**
  * Provides the constant() and enum() functions, restricted to a list of allowed constants.
  *
@@ -33,7 +37,7 @@ final class ConstantFunctionProvider implements ExpressionFunctionProviderInterf
 
         foreach ($allowedConstants as $constant) {
             if (!str_contains($constant, '::') && !str_contains($constant, '*') && (class_exists($constant) || interface_exists($constant))) {
-                throw new \InvalidArgumentException(\sprintf('"%1$s" is a class name, use "%1$s::*" to allow its constants.', $constant));
+                throw new InvalidArgumentException(\sprintf('"%1$s" is a class name, use "%1$s::*" to allow its constants.', $constant));
             }
 
             $pattern = str_replace('\*', '[^:]*', preg_quote(ltrim($constant, '\\')));
@@ -57,7 +61,7 @@ final class ConstantFunctionProvider implements ExpressionFunctionProviderInterf
     public static function getConstant(string $name, string $regexp): mixed
     {
         if (!preg_match($regexp, $name)) {
-            throw new \RuntimeException(\sprintf('Constant "%s" is not allowed.', $name));
+            throw new RuntimeException(\sprintf('Constant "%s" is not allowed.', $name));
         }
 
         return \constant($name);
@@ -69,11 +73,11 @@ final class ConstantFunctionProvider implements ExpressionFunctionProviderInterf
     public static function getEnumCase(string $name, string $regexp): \UnitEnum
     {
         if (!preg_match($regexp, $name)) {
-            throw new \RuntimeException(\sprintf('Enum case "%s" is not allowed.', $name));
+            throw new RuntimeException(\sprintf('Enum case "%s" is not allowed.', $name));
         }
 
         if (!($value = \constant($name)) instanceof \UnitEnum) {
-            throw new \TypeError(\sprintf('The string "%s" is not the name of a valid enum case.', $name));
+            throw new TypeError(\sprintf('The string "%s" is not the name of a valid enum case.', $name));
         }
 
         return $value;
@@ -96,7 +100,7 @@ final class ConstantFunctionProvider implements ExpressionFunctionProviderInterf
     private function compileEnum(string $name): string
     {
         if (null !== $literal = self::parseStringLiteral($name)) {
-            return preg_match($this->regexp, $literal) ? \sprintf('(\constant(%1$s) instanceof \UnitEnum ? \constant(%1$s) : throw new \TypeError(%2$s))', $name, var_export(\sprintf('The string "%s" is not the name of a valid enum case.', $literal), true)) : self::compileNotAllowed('Enum case', $literal);
+            return preg_match($this->regexp, $literal) ? \sprintf('(\constant(%1$s) instanceof \UnitEnum ? \constant(%1$s) : throw new \%2$s(%3$s))', $name, TypeError::class, var_export(\sprintf('The string "%s" is not the name of a valid enum case.', $literal), true)) : self::compileNotAllowed('Enum case', $literal);
         }
 
         return \sprintf('\%s::getEnumCase(%s, %s)', self::class, $name, var_export($this->regexp, true));
@@ -117,6 +121,6 @@ final class ConstantFunctionProvider implements ExpressionFunctionProviderInterf
 
     private static function compileNotAllowed(string $kind, string $name): string
     {
-        return \sprintf('(throw new \RuntimeException(%s))', var_export(\sprintf('%s "%s" is not allowed.', $kind, $name), true));
+        return \sprintf('(throw new \%s(%s))', RuntimeException::class, var_export(\sprintf('"%s" "%s" is not allowed.', $kind, $name), true));
     }
 }

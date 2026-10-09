@@ -13,6 +13,8 @@ namespace Symfony\Component\ExpressionLanguage;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\ExpressionLanguage\Exception\LogicException;
+use Symfony\Component\ExpressionLanguage\Exception\TypeError;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(ParsedExpression::class);
@@ -137,7 +139,7 @@ class ExpressionLanguage
     public function register(string $name, callable $compiler, callable $evaluator): void
     {
         if (isset($this->parser)) {
-            throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
+            throw new LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
         }
 
         $this->functions[$name] = ['compiler' => $compiler, 'evaluator' => $evaluator];
@@ -163,12 +165,12 @@ class ExpressionLanguage
         }
 
         $this->addFunction(new ExpressionFunction('enum',
-            static fn ($str): string => \sprintf("(\constant(\$v = (%s))) instanceof \UnitEnum ? \constant(\$v) : throw new \TypeError(\sprintf('The string \"%%s\" is not the name of a valid enum case.', \$v))", $str),
+            static fn ($str): string => \sprintf("(\constant(\$v = (%s))) instanceof \UnitEnum ? \constant(\$v) : throw new \%s(\sprintf('The string \"%%s\" is not the name of a valid enum case.', \$v))", $str, TypeError::class),
             static function ($arguments, $str): \UnitEnum {
                 $value = \constant($str);
 
                 if (!$value instanceof \UnitEnum) {
-                    throw new \TypeError(\sprintf('The string "%s" is not the name of a valid enum case.', $str));
+                    throw new TypeError(\sprintf('The string "%s" is not the name of a valid enum case.', $str));
                 }
 
                 return $value;

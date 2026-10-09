@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\ExpressionLanguage;
 
-class SyntaxError extends \LogicException
+use Symfony\Component\ExpressionLanguage\Exception\ExceptionInterface;
+
+class SyntaxError extends \LogicException implements ExceptionInterface
 {
     public function __construct(string $message, int $cursor = 0, string $expression = '', ?string $subject = null, ?array $proposals = null)
     {

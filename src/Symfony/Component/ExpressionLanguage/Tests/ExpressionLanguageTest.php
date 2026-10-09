@@ -19,6 +19,12 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;
+use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
+use Symfony\Component\ExpressionLanguage\Exception\DivisionByZeroError;
+use Symfony\Component\ExpressionLanguage\Exception\ExceptionInterface;
+use Symfony\Component\ExpressionLanguage\Exception\LogicException;
+use Symfony\Component\ExpressionLanguage\Exception\RuntimeException;
+use Symfony\Component\ExpressionLanguage\Exception\TypeError;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
@@ -369,7 +375,7 @@ class ExpressionLanguageTest extends TestCase
     #[DataProvider('getRegisterCallbacks')]
     public function testRegisterAfterParse($registerCallback)
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $el = new ExpressionLanguage();
         $el->parse('1 + 1', []);
         $registerCallback($el);
@@ -378,7 +384,7 @@ class ExpressionLanguageTest extends TestCase
     #[DataProvider('getRegisterCallbacks')]
     public function testRegisterAfterEval($registerCallback)
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $el = new ExpressionLanguage();
         $el->evaluate('1 + 1');
         $registerCallback($el);
@@ -554,7 +560,7 @@ class ExpressionLanguageTest extends TestCase
     #[DataProvider('getRegisterCallbacks')]
     public function testRegisterAfterCompile($registerCallback)
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
         $registerCallback($el);
@@ -662,5 +668,37 @@ class ExpressionLanguageTest extends TestCase
         $language = new ExpressionLanguage();
         $this->assertSame(3, $language->evaluate('count([1, 2, 3])'));
         $this->assertSame(0, $language->evaluate('count([])'));
+    }
+
+    /**
+     * @param class-string<ExceptionInterface> $class
+     */
+    #[DataProvider('provideFailingExpressions')]
+    public function testEvaluateThrowsAnExceptionOfTheComponent(string $expression, array $values, string $class)
+    {
+        $expressionLanguage = new ExpressionLanguage(null, [new ConstantFunctionProvider(['PHP_VERSION'])]);
+
+        try {
+            $expressionLanguage->evaluate($expression, $values);
+            $this->fail('An exception should have been thrown.');
+        } catch (ExceptionInterface $e) {
+            $this->assertSame($class, $e::class);
+        }
+    }
+
+    public static function provideFailingExpressions(): iterable
+    {
+        yield 'syntax' => ['1 +', [], SyntaxError::class];
+        yield 'unknown variable' => ['foo', [], SyntaxError::class];
+        yield 'invalid regexp' => ['"a" matches foo', ['foo' => 'not a regexp'], SyntaxError::class];
+        yield 'property of non-object' => ['foo.bar', ['foo' => null], RuntimeException::class];
+        yield 'method of non-object' => ['foo.bar()', ['foo' => null], RuntimeException::class];
+        yield 'undefined method' => ['foo.bar()', ['foo' => new \stdClass()], RuntimeException::class];
+        yield 'item of non-array' => ['foo["bar"]', ['foo' => null], RuntimeException::class];
+        yield 'not allowed constant' => ['constant("E_ALL")', [], RuntimeException::class];
+        yield 'not allowed enum case' => ['enum("E_ALL")', [], RuntimeException::class];
+        yield 'not an enum case' => ['enum("PHP_VERSION")', [], TypeError::class];
+        yield 'division by zero' => ['1 / 0', [], DivisionByZeroError::class];
+        yield 'modulo by zero' => ['1 % 0', [], DivisionByZeroError::class];
     }
 }

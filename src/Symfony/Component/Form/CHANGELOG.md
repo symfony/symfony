@@ -20,6 +20,8 @@ CHANGELOG
  * Add the `FormEvents::POST_VALIDATE` event, dispatched on each form of the tree after the validation of the root form
  * Deprecate the `FormTypePasswordHasherExtension` class and the `registerPassword()` and `hashPasswords()` methods of `PasswordHasherListener`, passwords are now hashed during the `form.post_validate` event
  * Add the `entry_name` option to `CollectionType` and `PolymorphicCollectionType` to name the entry forms after a property of the entries instead of their keys
+ * Pass the data of the fields to the constructor of the `data_class` when it has required arguments or promoted readonly properties
+ * Replace the data of a form with a new instance when a field mapped to one of its promoted readonly properties changes
 
 8.1
 ---

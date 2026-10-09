@@ -50,9 +50,6 @@
                 "amount": {
                     "type": "string"
                 },
-                "bigAmount": {
-                    "type": "string"
-                },
                 "timezone": {
                     "type": "string"
                 },

@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonSchema\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
 use Symfony\Component\JsonSchema\Configuration;
@@ -123,6 +124,12 @@ class SchemaGeneratorTest extends TestCase
         ] as $class) {
             yield $class => [$class];
         }
+    }
+
+    #[RequiresPhpExtension('gmp')]
+    public function testGmpIsAString()
+    {
+        $this->assertSame(['type' => 'string'], SchemaGenerator::create()->generate(Type::object(\GMP::class))->getRoot());
     }
 
     public function testDifferentShapesNamedAlikeThrow()

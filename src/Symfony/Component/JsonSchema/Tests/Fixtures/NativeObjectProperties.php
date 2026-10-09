@@ -27,7 +27,6 @@ class NativeObjectProperties
     public Color $color;
     public \SplFileInfo $file;
     public Number $amount;
-    public \GMP $bigAmount;
     public \DateTimeZone $timezone;
     public TranslatableInterface $label;
 }

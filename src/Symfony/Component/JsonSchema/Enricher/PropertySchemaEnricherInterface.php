@@ -22,7 +22,7 @@ use Symfony\Component\JsonSchema\Configuration;
  * "nullable", or "allOf" around a reference depending on the dialect), keywords that only make sense on
  * the value type must account for it.
  *
- * {@see PropertySchema::$required} starts as true for a public constructor argument without default value
+ * {@see PropertySchema::$required} starts as true for a public constructor argument that has no default value and does not accept null
  * (the serializer cannot instantiate the class without it) and false otherwise; enrichers can override it.
  * A nullable property can still be required.
  *

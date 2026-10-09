@@ -27,8 +27,7 @@
             },
             "required": [
                 "label",
-                "reference",
-                "note"
+                "reference"
             ]
         }
     }

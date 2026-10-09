@@ -498,7 +498,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
-     * The serializer cannot instantiate the class without these arguments; it bypasses non-public constructors.
+     * The serializer cannot instantiate the class without these arguments: it passes null to nullable ones and bypasses non-public constructors.
      *
      * @param class-string $class
      *
@@ -514,7 +514,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
         return $this->mandatoryConstructorArguments[$class] = $constructor?->isPublic() ? array_values(array_map(
             static fn (\ReflectionParameter $parameter): string => $parameter->name,
-            array_filter($constructor->getParameters(), static fn (\ReflectionParameter $parameter): bool => !$parameter->isDefaultValueAvailable() && !$parameter->isVariadic()),
+            array_filter($constructor->getParameters(), static fn (\ReflectionParameter $parameter): bool => !$parameter->isDefaultValueAvailable() && !$parameter->isVariadic() && !$parameter->getType()?->allowsNull()),
         )) : [];
     }
 

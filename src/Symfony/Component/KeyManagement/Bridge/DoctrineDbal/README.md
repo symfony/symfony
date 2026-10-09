@@ -147,13 +147,18 @@ Type::getTypeRegistry()->register('app_user_email', new EncryptedType(
 
 Rows of that column then share one data key and carry a 16-byte reference to
 it. To migrate a column that already holds self-contained envelopes, give the
-store-backed encrypter a fallback and keep the same registered name: rows
-written before are still read through the KMS, and rows written afterwards refer
-to the stored key.
+store-backed encrypter a fallback, `read_self_contained: true` in the bundle, and
+keep the same registered name: rows written before are still read through the KMS,
+and rows written afterwards refer to the stored key.
 
 ```php
 $encrypter = new StoredEnvelopeEncrypter($store, new EnvelopeEncrypter($kms));
 ```
+
+Turn it off once the migration is over. Such a payload carries its own wrapped
+data key, so it resolves no row: the store, the scope it states and the binding it
+carries have nothing to say about it, and the wrapped key of a row pasted in front
+of a stored payload's bytes reads as one.
 
 The table holds exactly what the store needs and nothing else:
 

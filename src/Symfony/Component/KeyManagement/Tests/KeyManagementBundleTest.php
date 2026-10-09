@@ -231,7 +231,7 @@ class TestKeyManagementKernel extends AbstractKernel
                 ->factory([DriverManager::class, 'getConnection'])
                 ->args([['driver' => 'pdo_sqlite', 'memory' => true]]);
             $services->alias('test.stored_envelope_encrypter', 'key_management.stored_envelope_encrypter')->public();
-            $config['store'] = ['connection' => 'test.dbal', 'client' => 'default', 'key_id' => 'app'];
+            $config['store'] = ['connection' => 'test.dbal', 'client' => 'default', 'key_id' => 'app', 'read_self_contained' => true];
         }
 
         $container->extension('key_management', $config);

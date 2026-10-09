@@ -187,6 +187,34 @@ class StoredEnvelopeEncrypterTest extends TestCase
         (new StoredEnvelopeEncrypter($store))->decrypt($foreign);
     }
 
+    /**
+     * The envelope is assembled out of pieces on purpose: a row's master key id and wrapped data key,
+     * then a stored payload's iv, tag and ciphertext.
+     */
+    public function testAPayloadConvertedToTheOtherFormatIsRefusedWithoutAFallback()
+    {
+        $envelope = $this->encrypter->encrypt('user.email', 'jane@example.com');
+        $row = iterator_to_array($this->store->all(), false)[0];
+        $converted = Envelope::selfContained($row->wrapped->keyId, $row->wrapped->blob, $envelope->iv, $envelope->tag, $envelope->ciphertext);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The envelope carries its own data key');
+        $this->encrypter->decrypt($converted);
+    }
+
+    public function testAFallbackReadsAPayloadConvertedToTheOtherFormat()
+    {
+        $kms = new InMemoryKms();
+        $store = new InMemoryDataKeyStore(['default' => $kms]);
+        $encrypter = new StoredEnvelopeEncrypter($store, new EnvelopeEncrypter($kms));
+
+        $envelope = $encrypter->encrypt('user.email', 'jane@example.com');
+        $row = iterator_to_array($store->all(), false)[0];
+        $converted = Envelope::selfContained($row->wrapped->keyId, $row->wrapped->blob, $envelope->iv, $envelope->tag, $envelope->ciphertext);
+
+        $this->assertSame('jane@example.com', $encrypter->decrypt($converted), 'what a deployment accepts by turning the fallback on: this payload resolves no row, so nothing the store checks applies to it.');
+    }
+
     public function testAnEnvelopeRePointedAtAnotherScopesKeyDoesNotDecrypt()
     {
         $envelope = $this->encrypter->encrypt('user.email', 'hello');

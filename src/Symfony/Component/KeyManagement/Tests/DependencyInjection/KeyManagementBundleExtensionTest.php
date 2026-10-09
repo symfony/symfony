@@ -249,7 +249,25 @@ class KeyManagementBundleExtensionTest extends TestCase
 
         $encrypter = $container->getDefinition('key_management.stored_envelope_encrypter')->getArguments();
         $this->assertSame('key_management.store', (string) $encrypter[0]);
-        $this->assertSame('key_management.envelope_encrypter.app', (string) $encrypter[1], 'the default client provides the fallback that reads self-contained envelopes.');
+        $this->assertNull($encrypter[1], 'a payload carrying its own data key bypasses the store, so reading one is asked for rather than inherited from having a default client.');
+    }
+
+    public function testReadingSelfContainedPayloadsNeedsAClientToReadThemWith()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "key_management.store.read_self_contained" option needs a client to read those payloads with');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA', 'other' => 'sodium://?keys[other]=AAAA'],
+                'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key', 'read_self_contained' => true],
+            ]);
+        });
     }
 
     public function testStoreBringsTheListenerThatPutsItsTableInTheSchema()
@@ -472,7 +490,7 @@ class KeyManagementBundleExtensionTest extends TestCase
             $container->register('app.dbal', \stdClass::class);
             $container->loadFromExtension('key_management', [
                 'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
-                'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key'],
+                'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key', 'read_self_contained' => true],
             ]);
         }, true);
 
@@ -521,7 +539,7 @@ class KeyManagementBundleExtensionTest extends TestCase
                     'main' => ['members' => ['aws' => null, 'azure' => 'backup']],
                 ],
                 'default_client' => 'main',
-                'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key'],
+                'store' => ['connection' => 'app.dbal', 'key_id' => 'alias/app-key', 'read_self_contained' => true],
             ]);
         });
 

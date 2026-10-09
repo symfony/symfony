@@ -544,7 +544,7 @@ class Response
      */
     public function isCacheable(): bool
     {
-        if (!\in_array($this->statusCode, [200, 203, 300, 301, 302, 404, 410], true)) {
+        if (!\in_array($this->statusCode, [200, 203, 300, 301, 302, 308, 404, 410], true)) {
             return false;
         }
 

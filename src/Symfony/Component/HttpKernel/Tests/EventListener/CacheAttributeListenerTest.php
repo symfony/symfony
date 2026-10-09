@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -50,6 +51,32 @@ class CacheAttributeListenerTest extends TestCase
         $this->listener->onKernelResponse($this->event);
 
         $this->assertSame($response, $this->event->getResponse());
+    }
+
+    #[TestWith([301])]
+    #[TestWith([308])]
+    public function testCacheAttributeIsAppliedToPermanentRedirect(int $statusCode)
+    {
+        $request = $this->createRequest(new Cache(public: true, maxage: 3600));
+        $response = new Response('', $statusCode);
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertSame('3600', $response->headers->getCacheControlDirective('max-age'));
+    }
+
+    #[TestWith([301])]
+    #[TestWith([308])]
+    public function testCacheAttributeEventIsAppliedToPermanentRedirect(int $statusCode)
+    {
+        $cache = new Cache(public: true, maxage: 3600);
+        $response = new Response('', $statusCode);
+
+        $this->listener->onKernelControllerAttribute(new ControllerAttributeEvent($cache, $this->createEventMock(new Request(), $response)));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertSame('3600', $response->headers->getCacheControlDirective('max-age'));
     }
 
     public function testWontReassignResponseWhenNoConfigurationIsPresent()

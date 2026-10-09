@@ -19,6 +19,8 @@ CHANGELOG
  * `StreamedResponse::__construct()` now accepts a `ResponseHeaderBag` as its third argument
  * Add arguments `$isolate` and `$debug` to `AttributeBag::__construct()`, and `$attributeBagFactory` to `SessionFactory::__construct()`
  * Deprecate saving changes made to session attributes without calling `set()` afterwards
+ * Accept the 308 status code in `Response::isCacheable()`
+ * Stop adding a default `Cache-Control: no-cache, private` header to 308 `RedirectResponse` instances
 
 8.1
 ---

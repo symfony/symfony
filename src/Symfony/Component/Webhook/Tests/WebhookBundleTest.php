@@ -100,6 +100,14 @@ class WebhookBundleTest extends TestCase
         $this->assertFalse($container->hasDefinition('webhook.request_parser'));
     }
 
+    public function testRoutingEntriesUseTheRequestParserOfTheComponentByDefault()
+    {
+        $container = new ContainerBuilder();
+        new WebhookBundle()->getContainerExtension()->load([['routing' => ['payments' => ['secret' => 'the-secret']]]], $container);
+
+        $this->assertEquals(['payments' => ['parser' => new Reference('webhook.request_parser'), 'secret' => 'the-secret']], $container->getDefinition('webhook.controller')->getArgument(0));
+    }
+
     public function testTheRequestParserIsAutowiredByTarget()
     {
         $container = new ContainerBuilder();

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
-use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Stamp\SenderStampInterface;
 
-final class AmazonSqsFifoStamp implements NonSendableStampInterface
+final class AmazonSqsFifoStamp implements SenderStampInterface
 {
     public function __construct(
         private ?string $messageGroupId = null,

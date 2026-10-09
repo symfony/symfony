@@ -10,6 +10,7 @@ CHANGELOG
  * Pass the routing key to the serializer as `extra[routing_key]` when decoding
  * Add `bindings` option to `queues` to configure additional exchange-queue bindings
  * Make `AmqpSender` and `AmqpTransport` implement `BatchSenderInterface`, waiting once for the publisher confirms of a batch when `confirm_timeout` is set
+ * Make `AmqpStamp` implement `SenderStampInterface` so that an outbox keeps it
 
 8.1
 ---

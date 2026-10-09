@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Add the `#[AsWorkflow]`, `#[Place]` and `#[Transition]` attributes and the `WorkflowTrait` to define workflows and state machines in a class
+ * Add the `#[AsWorkflow]`, `#[Place]` and `#[Transition]` attributes and the `WorkflowTrait` to define workflows and state machines in a class; these attributes can be extended to carry typed metadata
  * Make the `As*Listener` attributes listen to the workflow of their class by default when it uses `#[AsWorkflow]`
  * Add the `WorkflowType` enum
  * Allow configuring a workflow without `supports` nor `support_strategy`, to use it by injection only

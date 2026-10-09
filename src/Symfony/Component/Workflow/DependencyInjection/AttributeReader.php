@@ -60,7 +60,7 @@ final class AttributeReader
         $transitions = [];
         $placeConstants = [];
         foreach ($class->getReflectionConstants() as $constant) {
-            foreach ($constant->getAttributes(Transition::class) as $reflectionAttribute) {
+            foreach ($constant->getAttributes(Transition::class, \ReflectionAttribute::IS_INSTANCEOF) as $reflectionAttribute) {
                 if (!\is_string($transitionName = $constant->getValue())) {
                     throw new LogicException(\sprintf('The value of "%s::%s" must be a string to be used as the name of a transition, "%s" given.', $constant->class, $constant->name, get_debug_type($transitionName)));
                 }
@@ -80,7 +80,7 @@ final class AttributeReader
                 $transitions[] = $transitionConfig;
             }
 
-            if ($placeAttribute = $constant->getAttributes(Place::class)[0] ?? null) {
+            if ($placeAttribute = $this->getPlaceAttribute($constant)) {
                 if (!\is_string($placeName = $constant->getValue()) && !$placeName instanceof \BackedEnum) {
                     throw new LogicException(\sprintf('The value of "%s::%s" must be a string or a string-backed enum case to be used as the name of a place, "%s" given.', $constant->class, $constant->name, get_debug_type($placeName)));
                 }
@@ -203,10 +203,23 @@ final class AttributeReader
     {
         foreach ($enums as $enum) {
             if (null !== $case = $enum::tryFrom($place)) {
-                return ((new \ReflectionEnumBackedCase($enum, $case->name))->getAttributes(Place::class)[0] ?? null)?->newInstance();
+                return $this->getPlaceAttribute(new \ReflectionEnumBackedCase($enum, $case->name))?->newInstance();
             }
         }
 
         return null;
+    }
+
+    /**
+     * @return \ReflectionAttribute<Place>|null
+     */
+    private function getPlaceAttribute(\ReflectionClassConstant $constant): ?\ReflectionAttribute
+    {
+        $attributes = $constant->getAttributes(Place::class, \ReflectionAttribute::IS_INSTANCEOF);
+        if (1 < \count($attributes)) {
+            throw new LogicException(\sprintf('"%s::%s" cannot have several "#[%s]" attributes, including the ones extending it.', $constant->class, $constant->name, Place::class));
+        }
+
+        return $attributes[0] ?? null;
     }
 }

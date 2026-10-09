@@ -23,7 +23,7 @@ use Symfony\Component\Workflow\Arc;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 #[\Attribute(\Attribute::TARGET_CLASS_CONSTANT | \Attribute::IS_REPEATABLE)]
-final class Transition
+class Transition
 {
     /**
      * @param \BackedEnum|Arc|string|non-empty-list<\BackedEnum|Arc|string> $from     The input place(s) of the transition, using an Arc to set a weight

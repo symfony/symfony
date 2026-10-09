@@ -58,7 +58,11 @@ final class WorkflowAttributePass implements CompilerPassInterface
 
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
             $reflection = $container->getReflectionClass($class);
-            if (!$attribute = ($reflection->getAttributes(AsWorkflow::class)[0] ?? null)?->newInstance()) {
+            $attributes = $reflection->getAttributes(AsWorkflow::class, \ReflectionAttribute::IS_INSTANCEOF);
+            if (1 < \count($attributes)) {
+                throw new LogicException(\sprintf('"%s" cannot have several "#[%s]" attributes, including the ones extending it.', $class, AsWorkflow::class));
+            }
+            if (!$attribute = ($attributes[0] ?? null)?->newInstance()) {
                 throw new LogicException(\sprintf('The "%s" service is tagged ".workflow.attribute" but its class "%s" does not use the "#[%s]" attribute.', $id, $class, AsWorkflow::class));
             }
 

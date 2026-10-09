@@ -25,7 +25,7 @@ use Symfony\Component\Workflow\WorkflowType;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class AsWorkflow
+class AsWorkflow
 {
     /**
      * Stands for the name of the workflow in the events listened to by the listeners of a class using this attribute, until it is resolved when the container is compiled.

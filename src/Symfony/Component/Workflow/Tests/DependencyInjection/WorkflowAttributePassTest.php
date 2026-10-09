@@ -122,6 +122,28 @@ class WorkflowAttributePassTest extends TestCase
         $this->assertEquals([['setWorkflow', [new Reference('state_machine.pass_nested_trait')]]], $container->getDefinition(PassNestedTraitWorkflow::class)->getMethodCalls());
     }
 
+    public function testAnAttributeExtendingAsWorkflowDefinesAWorkflow()
+    {
+        $container = $this->createContainer();
+        $container->register(PassDescribedWorkflow::class, PassDescribedWorkflow::class)->setAutoconfigured(true);
+        $container->compile();
+
+        $this->assertSame(['description' => 'Moves from a to b'], $container->getDefinition('state_machine.pass_described.metadata_store')->getArgument(0));
+        $this->assertSame('state_machine.pass_described', (string) $container->getDefinition('workflow.registry')->getMethodCalls()[0][1][0]);
+        $this->assertSame('workflow.pass_described.guard.go', $container->getDefinition(PassDescribedWorkflow::class)->getTag('kernel.event_listener')[0]['event']);
+    }
+
+    public function testAClassCannotHaveSeveralAsWorkflowAttributes()
+    {
+        $container = $this->createContainer();
+        $container->register(PassSeveralAsWorkflowAttributes::class, PassSeveralAsWorkflowAttributes::class)->setAutoconfigured(true);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('"Symfony\Component\Workflow\Tests\DependencyInjection\PassSeveralAsWorkflowAttributes" cannot have several "#[Symfony\Component\Workflow\Attribute\AsWorkflow]" attributes, including the ones extending it.');
+
+        $container->compile();
+    }
+
     public function testRepeatedTransitionsAndJoins()
     {
         $container = $this->createContainer();
@@ -345,6 +367,35 @@ class PassNestedTraitWorkflow
 {
     use PassNestedTrait;
 
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+}
+
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class DescribedWorkflow extends AsWorkflow
+{
+    public function __construct(string $description, string|array $supports = [])
+    {
+        parent::__construct(supports: $supports, metadata: ['description' => $description]);
+    }
+}
+
+#[DescribedWorkflow('Moves from a to b', supports: \stdClass::class)]
+class PassDescribedWorkflow
+{
+    #[Transition(from: 'a', to: 'b')]
+    public const GO = 'go';
+
+    #[AsGuardListener(transition: self::GO)]
+    public function guardGo(GuardEvent $event): void
+    {
+    }
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+#[DescribedWorkflow('Moves from a to b')]
+class PassSeveralAsWorkflowAttributes
+{
     #[Transition(from: 'a', to: 'b')]
     public const GO = 'go';
 }

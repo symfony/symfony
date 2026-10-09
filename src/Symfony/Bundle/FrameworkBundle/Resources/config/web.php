@@ -96,7 +96,8 @@ return static function (ContainerConfigurator $container) {
             ->tag('controller.argument_value_resolver', ['priority' => 120, 'before' => EntityValueResolver::class, 'name' => RequestValueResolver::class])
 
         ->set('argument_resolver.session', SessionValueResolver::class)
-            ->tag('controller.argument_value_resolver', ['priority' => 120, 'name' => SessionValueResolver::class])
+            // type-hinted Session arguments must not trigger entity-manager bootstrap
+            ->tag('controller.argument_value_resolver', ['priority' => 120, 'before' => EntityValueResolver::class, 'name' => SessionValueResolver::class])
 
         ->set('argument_resolver.service', ServiceValueResolver::class)
             ->args([

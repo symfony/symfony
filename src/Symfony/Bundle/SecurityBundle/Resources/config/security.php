@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
 use Symfony\Bundle\SecurityBundle\Routing\LogoutRouteLoader;
 use Symfony\Bundle\SecurityBundle\Routing\OidcLoginRouteLoader;
@@ -119,7 +120,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.token_storage'),
             ])
-            ->tag('controller.argument_value_resolver', ['priority' => 120, 'name' => UserValueResolver::class])
+            // the current user must never be loaded from the request instead
+            ->tag('controller.argument_value_resolver', ['priority' => 120, 'before' => EntityValueResolver::class, 'name' => UserValueResolver::class])
 
         ->set('security.security_token_value_resolver', SecurityTokenValueResolver::class)
             ->args([

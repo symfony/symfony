@@ -71,6 +71,7 @@ CHANGELOG
  * Allow keying the clients passed to `OidcTokenHandler::enableDiscovery()` by the issuer their discovery document must announce
  * Add `TlsClientAuth`, `SelfSignedTlsClientAuth`, the `$certificateOptions` argument of `OidcClient` and the `$checkedMtlsAliases` argument of `OidcDiscovery` (RFC 8705)
  * Add the `$limiterName` argument to `LoginThrottlingListener`, which dispatches `RateLimitExceededEvent` when login throttling rejects an attempt
+ * Add `#[FirewallListenerOrder]` to declare the firewall listeners a listener runs before or after
 
 8.1
 ---

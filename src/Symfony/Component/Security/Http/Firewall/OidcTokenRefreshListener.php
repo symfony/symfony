@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Attribute\FirewallListenerOrder;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcTokenRefresher;
 use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
 
@@ -29,6 +30,7 @@ use Symfony\Component\Security\Http\Exception\OidcInvalidGrantException;
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  */
+#[FirewallListenerOrder(after: ContextListener::class)]
 final class OidcTokenRefreshListener extends AbstractListener
 {
     public function __construct(

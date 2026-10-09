@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-09T07:33:58Z
+
+Thanks @SulimanAbdulrazzaq, I pushed two changes:
+- each line is now built in its own buffer and trimmed before being appended: rebuilding `$value` with `substr()` on every folded line made parsing quadratic (a quoted scalar of 40000 lines took 4.6s instead of 0.17s)
+- a line made only of spaces and tabs is an empty line too (`isCurrentLineBlank()` only looks for spaces), so `'a\n  \t\n  b'` now gives `"a\nb"` instead of `"a b"`, like PyYAML; this also un-skips 5GBF on 8.2

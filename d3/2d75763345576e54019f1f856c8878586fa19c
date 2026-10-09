@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-08T16:01:39Z
+
+Thanks @javiereguiluz, I took over to finish this:
+- the two bug fixes now live on 6.4 in #66708 and #66707, so that they ship in patch releases. This PR doesn't touch `MockClock::sleep()` anymore: its integer math broke the x86 job (`getTimestamp()` throws after 2038 on 32-bit PHP, and `$seconds * 1e6` overflows for sleeps longer than ~35 minutes)
+- `new DatePoint('+1 day Asia/Tokyo')` was off by the difference between the two timezones when the clock uses another one: PHP reads the current time in the timezone passed to the constructor, not in the one found in the string. The string is now parsed again with its own timezone in that case, and the provider covers it
+- `NativeClock::getTimezone()` is public

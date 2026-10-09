@@ -14,16 +14,23 @@ namespace Symfony\Bundle\SecurityBundle\Command;
 use Symfony\Bundle\SecurityBundle\Debug\DebugRoleHierarchy;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidOptionException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Security\Core\Dumper\MermaidDirection;
+use Symfony\Component\Security\Core\Dumper\MermaidDumper;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
-#[AsCommand(name: 'debug:roles', description: 'Debug the role hierarchy configuration.')]
+#[AsCommand(name: 'debug:roles', description: 'Display the role hierarchy')]
 final class DebugRolesCommand extends Command
 {
+    private const FORMATS = ['txt', 'mermaid'];
+
     public function __construct(private readonly RoleHierarchyInterface $roleHierarchy)
     {
         parent::__construct();
@@ -32,7 +39,7 @@ final class DebugRolesCommand extends Command
     protected function configure(): void
     {
         $this->setHelp(<<<EOF
-            This <info>%command.name%</info> command display the current role hierarchy:
+            The <info>%command.name%</info> command displays the current role hierarchy:
 
                 <info>php %command.full_name%</info>
 
@@ -45,18 +52,34 @@ final class DebugRolesCommand extends Command
                 <info>php %command.full_name% --tree</info>
                 <info>php %command.full_name% ROLE_USER --tree</info>
 
-            <comment>Note:</comment> With a custom implementation for <info>security.role_hierarchy</info>, the <info>--tree</info> option is ignored and the <info>roles</info> argument is required.
+            To dump the hierarchy as a Mermaid flowchart, use the <info>mermaid</info> format:
+
+                <info>php %command.full_name% --format=mermaid > roles.mmd</info>
+                <info>php %command.full_name% --format=mermaid --direction=BT > roles.mmd</info>
+
+            <comment>Note:</comment> With a custom implementation for <info>security.role_hierarchy</info>, the <info>--tree</info> option is ignored and the <info>roles</info> argument is required; the <info>mermaid</info> format is available only if it extends <info>RoleHierarchy</info>.
 
             EOF
         )
             ->setDefinition([
-                new InputArgument('roles', ($this->isBuiltInRoleHierarchy() ? InputArgument::OPTIONAL : InputArgument::REQUIRED) | InputArgument::IS_ARRAY, 'The role(s) to resolve'),
+                new InputArgument('roles', ($this->roleHierarchy instanceof RoleHierarchy ? InputArgument::OPTIONAL : InputArgument::REQUIRED) | InputArgument::IS_ARRAY, 'The role(s) to resolve'),
                 new InputOption('tree', 't', InputOption::VALUE_NONE, 'Show the hierarchy in a tree view'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', self::FORMATS)), 'txt', self::FORMATS),
+                new InputOption('direction', null, InputOption::VALUE_REQUIRED, \sprintf('The direction of the Mermaid flowchart ("%s")', implode('", "', array_column(MermaidDirection::cases(), 'value'))), MermaidDirection::TOP_TO_BOTTOM->value, array_column(MermaidDirection::cases(), 'value')),
             ]);
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
+        if (!\in_array($input->getOption('format'), self::FORMATS, true)) {
+            throw new InvalidOptionException(\sprintf('Supported formats are "%s".', implode('", "', self::FORMATS)));
+        }
+
+        // the dumper reads the map of any RoleHierarchy, subclasses included
+        if ('mermaid' === $input->getOption('format') && !$this->roleHierarchy instanceof RoleHierarchy) {
+            throw new InvalidOptionException(\sprintf('The "mermaid" format requires the role hierarchy to extend "%s".', RoleHierarchy::class));
+        }
+
         if (!$this->isBuiltInRoleHierarchy()) {
             $io = new SymfonyStyle($input, $output);
 
@@ -69,18 +92,17 @@ final class DebugRolesCommand extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        if (!$this->isBuiltInRoleHierarchy() && empty($input->getArgument('roles'))) {
+        if (!$this->isBuiltInRoleHierarchy() && !$input->getArgument('roles') && 'mermaid' !== $input->getOption('format')) {
             $io = new SymfonyStyle($input, $output);
 
             $roles[] = $io->ask('Enter a role to debug', validator: static function (?string $role) {
-                $role = trim($role);
-                if (empty($role)) {
+                if ('' === $role = trim($role ?? '')) {
                     throw new \RuntimeException('You must enter a non empty role name.');
                 }
 
                 return $role;
             });
-            while ($role = trim($io->ask('Add another role? (press enter to skip)') ?? '')) {
+            while ('' !== $role = trim($io->ask('Add another role? (press enter to skip)') ?? '')) {
                 $roles[] = $role;
             }
 
@@ -94,7 +116,31 @@ final class DebugRolesCommand extends Command
 
         $roles = $input->getArgument('roles');
 
-        if (empty($roles)) {
+        if ('mermaid' === $input->getOption('format')) {
+            if ($roles) {
+                $io->getErrorStyle()->error('The "mermaid" format dumps the whole role hierarchy, it does not take role names.');
+
+                return self::FAILURE;
+            }
+
+            if (!$direction = MermaidDirection::tryFrom($input->getOption('direction'))) {
+                $io->getErrorStyle()->error(\sprintf('Invalid direction, available options are "%s".', implode('", "', array_column(MermaidDirection::cases(), 'value'))));
+
+                return self::FAILURE;
+            }
+
+            foreach (explode("\n", (new MermaidDumper())->dump($this->roleHierarchy, $direction)) as $line) {
+                $output->writeln($line, OutputInterface::OUTPUT_RAW);
+            }
+
+            return self::SUCCESS;
+        }
+
+        if (!$roles && !$this->isBuiltInRoleHierarchy()) {
+            throw new RuntimeException('Not enough arguments (missing: "roles").');
+        }
+
+        if (!$roles) {
             // Full configuration output
             $io->title('Current role hierarchy configuration:');
 

@@ -13,7 +13,8 @@ CHANGELOG
  * Add the `re_authentication_entry_point` firewall option, pointing at a `ReAuthenticationEntryPointInterface` service started when a denied vote requests a re-authentication
  * Add the `recent_authentication_lifetime` and `very_recent_authentication_lifetime` options, the number of seconds an interactive authentication keeps granting `IS_AUTHENTICATED_RECENTLY` and `IS_AUTHENTICATED_VERY_RECENTLY`
  * Add the `security.expression_language_provider` service to evaluate the security functions outside of authorization expressions
- * Add the `debug:roles` command to inspect the role hierarchy
+ * Add the `debug:roles` command to inspect the role hierarchy, as text or as a Mermaid flowchart with `--format=mermaid`
+ * Deprecate the `debug:security:role-hierarchy` command, use `debug:roles --format=mermaid` instead
  * Add `allowed_time_drift` option to the OIDC token handler configuration
  * Default the `algorithms` option of the `oidc` token handler to `RS256`
  * Require OAuth2 scopes of the access token with an `OAUTH2_SCOPE(...)` attribute, and answer a denial with the RFC 6750 `insufficient_scope` challenge

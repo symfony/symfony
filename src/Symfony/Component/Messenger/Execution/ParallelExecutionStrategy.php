@@ -85,6 +85,8 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
 
     public function execute(Envelope $envelope, string $transportName, callable $onHandled): void
     {
+        $settlementFailure = null;
+
         try {
             $affinityKey = $this->getAffinityKey($envelope);
             $keyMode = $this->keyModes[$affinityKey] ?? null;
@@ -99,7 +101,12 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             } catch (SerializationException $e) {
                 throw $e;
             } catch (\Throwable $e) {
-                $this->removeChannel($channelId, $onHandled, $e);
+                try {
+                    $this->removeChannel($channelId, $onHandled, $e);
+                } catch (\Throwable $settlementFailure) {
+                    throw $settlementFailure;
+                }
+
                 $channel = $this->getChannel($affinityKey, $keyMode);
                 $channelId = spl_object_id($channel);
                 $channel->send($message);
@@ -113,14 +120,22 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             }
 
             $this->armChannel($channelId);
-            $this->drainReadyResponses($onHandled);
         } catch (SerializationException $e) {
             // stopping leaves the message on its transport: a stamp that a transport adds is on every message, failing them would drain the queue
             throw self::createSerializationFailure($envelope, $e);
         } catch (\Throwable $e) {
+            // settling the requests of a dead worker failed: that is not a failure of this message
+            if ($e === $settlementFailure) {
+                throw $e;
+            }
+
             $acked = false;
             $onHandled($envelope, $transportName, $acked, $e);
+
+            return;
         }
+
+        $this->drainReadyResponses($onHandled);
     }
 
     public function shouldPauseConsumption(): bool

@@ -464,6 +464,28 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertFalse($ext->getConfig()['section']['enabled']);
     }
 
+    public function testEnvVarsResolvedAtCompileTimeAreLogged()
+    {
+        $_ENV['LOGGED_LEVEL'] = 'notice';
+
+        $container = new ContainerBuilder();
+        $container->registerExtension(new EnvExtension(new ConfigurationWithInlinedEnvVars()));
+        $container->registerExtension(new ResolvingEnvExtension());
+        $container->prependExtensionConfig('env_extension', ['level' => '%env(LOGGED_LEVEL)%', 'dynamic' => '%env(LOGGED_LEVEL)%']);
+        $container->prependExtensionConfig('resolving_env_extension', ['level' => '%env(LOGGED_LEVEL)%']);
+
+        try {
+            (new MergeExtensionConfigurationPass())->process($container);
+        } finally {
+            unset($_ENV['LOGGED_LEVEL']);
+        }
+
+        $this->assertSame([
+            MergeExtensionConfigurationPass::class.': Inlined env var "%env(LOGGED_LEVEL)%" into option "env_extension.level".',
+            MergeExtensionConfigurationPass::class.': Inlined env var "%env(LOGGED_LEVEL)%" while loading extension "resolving_env_extension".',
+        ], $container->getCompiler()->getLog());
+    }
+
     private function doProcess(ContainerBuilder $container): void
     {
         (new MergeExtensionConfigurationPass())->process($container);
@@ -619,5 +641,18 @@ class EnvExtension extends Extension
     public function getConfig()
     {
         return $this->config;
+    }
+}
+
+class ResolvingEnvExtension extends Extension
+{
+    public function getAlias(): string
+    {
+        return 'resolving_env_extension';
+    }
+
+    public function load(array $configs, ContainerBuilder $container): void
+    {
+        $container->setParameter('resolved_level', $container->resolveEnvPlaceholders($configs[0]['level'], true));
     }
 }

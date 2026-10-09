@@ -137,6 +137,20 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame(FooBackedEnum::Bar, $result);
     }
 
+    public function testCompiledEnumFunctionInsideExpression()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $enum = 'enum("Symfony\\\\Component\\\\ExpressionLanguage\\\\Tests\\\\Fixtures\\\\FooEnum::Foo")';
+        $foo = null;
+        $v = 'bar';
+
+        $this->assertFalse(eval(\sprintf('return %s;', $expressionLanguage->compile($enum.' == foo', ['foo']))));
+        $this->assertFalse(eval(\sprintf('return %s;', $expressionLanguage->compile('foo == '.$enum, ['foo']))));
+        $this->assertSame('Foobar', eval(\sprintf('return %s;', $expressionLanguage->compile($enum.'.name ~ v', ['v']))));
+        $this->assertSame([FooEnum::Foo, 'bar'], eval(\sprintf('return %s;', $expressionLanguage->compile('['.$enum.', v]', ['v']))));
+        $this->assertSame('bar', $v);
+    }
+
     #[DataProvider('providerTestCases')]
     public function testProviders(iterable $providers)
     {
@@ -435,6 +449,16 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame(eval(\sprintf('return %s;', $expressionLanguage->compile($expression, ['foo' => 'foo']))), 'default');
     }
 
+    public function testNullCoalescingEvaluateFailsOnObjectWithoutArrayAccess()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to get an item of non-array "foo".');
+
+        $expressionLanguage->evaluate('foo["bar"] ?? "default"', ['foo' => new \stdClass()]);
+    }
+
     public static function provideNullCoalescing()
     {
         $foo = new class extends \stdClass {
@@ -457,6 +481,12 @@ class ExpressionLanguageTest extends TestCase
         yield ['foo.bar.baz.bam ?? "default"', (object) ['bar' => null]];
         yield ['foo?.bar?.baz?.qux ?? "default"', (object) ['bar' => null]];
         yield ['foo[123][456][789] ?? "default"', [123 => []]];
+        yield ['foo.bar ?? "default"', 'foo'];
+        yield ['foo.bar ?? "default"', 123];
+        yield ['foo.bar.baz ?? "default"', (object) ['bar' => 'foo']];
+        yield ['foo["bar"] ?? "default"', 'foo'];
+        yield ['foo[0] ?? "default"', 123];
+        yield ['foo[0]["bar"] ?? "default"', ['foo']];
     }
 
     #[DataProvider('getRegisterCallbacks')]

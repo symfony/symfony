@@ -51,7 +51,7 @@ class EncryptedColumnTest extends TestCase
         $this->kms = new InMemoryKms();
         $this->connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
 
-        $registry = Type::getTypeRegistry();
+        $registry = method_exists($this->connection->getConfiguration(), 'getTypeProvider') ? $this->connection->getConfiguration()->getTypeProvider() : Type::getTypeRegistry();
         $type = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($this->store()), 'user.email');
         $registry->has(EncryptedColumnEntity::TYPE) ? $registry->override(EncryptedColumnEntity::TYPE, $type) : $registry->register(EncryptedColumnEntity::TYPE, $type);
 

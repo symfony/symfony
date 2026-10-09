@@ -483,10 +483,11 @@ class DataKeyStoreTest extends TestCase
         $schema = $this->storeWithoutTable()->configureSchema(new Schema(), static fn (): bool => true);
 
         $table = $schema->getTable(DataKeyStore::DEFAULT_TABLE);
+        $types = method_exists($this->connection->getConfiguration(), 'getTypeProvider') ? $this->connection->getConfiguration()->getTypeProvider() : Type::getTypeRegistry();
         $columns = [];
         foreach (['id', 'scope', 'key_material', 'master_key_id', 'client', 'binding'] as $name) {
             $column = $table->getColumn($name);
-            $type = method_exists($column, 'getTypeName') ? Type::getType($column->getTypeName()) : $column->getType();
+            $type = method_exists($column, 'getTypeName') ? $types->get($column->getTypeName()) : $column->getType();
             $columns[$name] = [$type::class, $column->getLength()];
         }
 

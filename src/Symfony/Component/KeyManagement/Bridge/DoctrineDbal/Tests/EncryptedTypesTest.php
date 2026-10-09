@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineDbal\Tests;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -47,7 +48,7 @@ class EncryptedTypesTest extends TestCase
 
         (new EncryptedTypes($this->envelopes, [$name => ['type' => 'string', 'key' => 'app']]))->register();
 
-        $type = Type::getType($name);
+        $type = self::type($name);
         $this->assertInstanceOf(EncryptedType::class, $type);
 
         $platform = new SQLitePlatform();
@@ -67,8 +68,8 @@ class EncryptedTypesTest extends TestCase
             $text => ['type' => 'text', 'key' => 'other'],
         ]))->register();
 
-        $this->assertSame('app', Envelope::fromBytes(Type::getType($string)->convertToDatabaseValue('x', new SQLitePlatform()))->keyId);
-        $this->assertSame('other', Envelope::fromBytes(Type::getType($text)->convertToDatabaseValue('x', new SQLitePlatform()))->keyId);
+        $this->assertSame('app', Envelope::fromBytes(self::type($string)->convertToDatabaseValue('x', new SQLitePlatform()))->keyId);
+        $this->assertSame('other', Envelope::fromBytes(self::type($text)->convertToDatabaseValue('x', new SQLitePlatform()))->keyId);
     }
 
     public function testDeclaringTwiceReplacesTheTypeInsteadOfFailing()
@@ -77,12 +78,12 @@ class EncryptedTypesTest extends TestCase
         $types = new EncryptedTypes($this->envelopes, [$name => ['type' => 'string', 'key' => 'app']]);
 
         $types->register();
-        $first = Type::getType($name);
+        $first = self::type($name);
 
         $types->register();
 
-        $this->assertNotSame($first, Type::getType($name));
-        $this->assertSame('x', Type::getType($name)->convertToPHPValue(Type::getType($name)->convertToDatabaseValue('x', new SQLitePlatform()), new SQLitePlatform()));
+        $this->assertNotSame($first, self::type($name));
+        $this->assertSame('x', self::type($name)->convertToPHPValue(self::type($name)->convertToDatabaseValue('x', new SQLitePlatform()), new SQLitePlatform()));
     }
 
     public function testADeclarationWithoutAKeyIsReported()
@@ -111,5 +112,10 @@ class EncryptedTypesTest extends TestCase
     private static function uniqueName(): string
     {
         return 'encrypted_'.bin2hex(random_bytes(6));
+    }
+
+    private static function type(string $name): Type
+    {
+        return method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider()->get($name) : Type::getType($name);
     }
 }

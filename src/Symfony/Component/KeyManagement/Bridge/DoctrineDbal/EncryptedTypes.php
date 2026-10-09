@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineDbal;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
@@ -72,7 +73,7 @@ final class EncryptedTypes
      */
     public function register(): void
     {
-        $registry = Type::getTypeRegistry();
+        $registry = method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider() : Type::getTypeRegistry();
 
         foreach ($this->types as $name => $definition) {
             foreach (['type', 'key'] as $required) {

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `#[AsMessageMiddleware]` and the `messenger.middleware` tag to add a middleware to a bus, placed with `before` and `after`
+ * Add `before` and `after` to `#[AsMessageHandler]` and the `messenger.message_handler` tag to order handlers
  * Add the `messages` option of buses, to restrict the types of the messages the application can dispatch on them
  * Add the `unwrap_exceptions` option of buses, to throw the exception of the failing handler instead of `HandlerFailedException` when the application dispatches a message
  * Add the `$messageTypes` and `$unwrapExceptions` arguments to `MessageBus`

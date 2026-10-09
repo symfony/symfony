@@ -117,6 +117,8 @@ class MessengerPass implements CompilerPassInterface
 
                 $message = null;
                 $handlerBuses = (array) ($tag['bus'] ?? $busIds);
+                $declaredPriority = $tag['priority'] ?? null;
+                $constraints = array_filter(['before' => (array) ($tag['before'] ?? []), 'after' => (array) ($tag['after'] ?? [])]);
 
                 foreach ($handles as $message => $options) {
                     $buses = $handlerBuses;
@@ -135,7 +137,7 @@ class MessengerPass implements CompilerPassInterface
                     }
 
                     $options += array_filter($tag);
-                    unset($options['handles']);
+                    unset($options['handles'], $options['before'], $options['after']);
 
                     if (null !== $transport = $options['transport'] ?? null) {
                         if (isset($options['from_transport']) && $transport !== $options['from_transport']) {
@@ -195,7 +197,7 @@ class MessengerPass implements CompilerPassInterface
                     $handlerToOriginalServiceIdMapping[$definitionId] = $serviceId;
 
                     foreach ($buses as $handlerBus) {
-                        $handlersByBusAndMessage[$handlerBus][$message][$priority][] = [$definitionId, $options];
+                        $handlersByBusAndMessage[$handlerBus][$message][$priority][] = [$definitionId, $options, $declaredPriority, $constraints];
                     }
 
                     if ($sign && '*' !== $message) {
@@ -212,10 +214,11 @@ class MessengerPass implements CompilerPassInterface
         foreach ($handlersByBusAndMessage as $bus => $handlersByMessage) {
             foreach ($handlersByMessage as $message => $handlersByPriority) {
                 krsort($handlersByPriority);
-                $handlers = array_merge(...$handlersByPriority);
+                $handlers = $this->sortHandlersByConstraints($container, $bus, $message, array_merge(...$handlersByPriority), $handlerToOriginalServiceIdMapping);
                 $serviceIdsByName = [];
 
                 foreach ($handlers as $key => [$definitionId, $options]) {
+                    $handlers[$key] = [$definitionId, $options];
                     $serviceId = $handlerToOriginalServiceIdMapping[$definitionId];
                     $name = $this->getServiceClass($container, $serviceId).'::'.($options['method'] ?? '__invoke');
                     $serviceIdsByName[$name][$key] = $serviceId;
@@ -322,6 +325,87 @@ class MessengerPass implements CompilerPassInterface
                 }
             }
             $container->getDefinition('console.command.messenger_debug')->replaceArgument(0, $debugCommandMapping);
+        }
+    }
+
+    /**
+     * Reorders the handlers of a message on a bus so that their "before"/"after" constraints are met.
+     *
+     * A declared priority is never crossed; a handler without one goes where its constraints put it.
+     *
+     * @param list<array{0: string, 1: array, 2: int|null, 3: array}> $handlers                          Definition id, options, declared priority and "before"/"after" constraints of each handler, in their default order
+     * @param array<string, string>                                   $handlerToOriginalServiceIdMapping
+     *
+     * @return list<array{0: string, 1: array, 2: int|null, 3: array}>
+     */
+    private function sortHandlersByConstraints(ContainerBuilder $container, string $bus, string $message, array $handlers, array $handlerToOriginalServiceIdMapping): array
+    {
+        if (!array_filter(array_column($handlers, 3))) {
+            return $handlers;
+        }
+
+        $indexes = $priorities = $constraints = $keysById = $aliases = [];
+
+        foreach ($handlers as $i => [$definitionId, $options, $declaredPriority, $handlerConstraints]) {
+            $serviceId = $handlerToOriginalServiceIdMapping[$definitionId];
+            $method = $options['method'] ?? '__invoke';
+
+            // keys show up in error messages: the service id, then "id::method", then a counter for a repeated method
+            for ($n = 0, $key = $serviceId; isset($indexes[$key]); ++$n) {
+                $key = $serviceId.'::'.$method.($n ? '#'.$n : '');
+            }
+
+            $indexes[$key] = $i;
+            $priorities[$key] = $declaredPriority;
+            $keysById[$serviceId][] = $key;
+            $keysById[$serviceId.'::'.$method][] = $key;
+
+            if ($handlerConstraints) {
+                $constraints[$key] = $handlerConstraints;
+            }
+
+            $class = $container->getParameterBag()->resolveValue($this->getServiceClass($container, $serviceId));
+            $aliases[$class][] = $key;
+            $aliases[$class.'::'.$method][] = $key;
+        }
+
+        // a service id always designates its own handlers, whatever class it shares a name with
+        $aliases = $keysById + $aliases;
+
+        $this->checkTargetMethods($constraints, $aliases, $bus, $message);
+
+        try {
+            $sorted = BeforeAfterSorter::sortWithPriorities($priorities, $constraints, $aliases);
+        } catch (InvalidArgumentException $e) {
+            throw new RuntimeException(\sprintf('Cannot order the handlers of "%s" on bus "%s": ', $message, $bus).lcfirst($e->getMessage()), 0, $e);
+        }
+
+        return array_map(static fn ($key) => $handlers[$indexes[$key]], array_keys($sorted));
+    }
+
+    /**
+     * Rejects a "service::method" target naming a method the service does not handle the message with.
+     *
+     * A target whose service part is absent stays ignored: the package declaring it may not be installed.
+     * One that is present has to name one of its handlers, otherwise the constraint would silently do nothing.
+     *
+     * @param array<string, array{before?: list<string>, after?: list<string>}> $constraints
+     * @param array<string, list<string>>                                       $aliases
+     */
+    private function checkTargetMethods(array $constraints, array $aliases, string $bus, string $message): void
+    {
+        foreach ($constraints as $key => $constraint) {
+            foreach ($constraint as $direction => $targets) {
+                foreach ($targets as $target) {
+                    if (isset($aliases[$target]) || false === $i = strrpos($target, '::')) {
+                        continue;
+                    }
+
+                    if (isset($aliases[$service = substr($target, 0, $i)])) {
+                        throw new RuntimeException(\sprintf('Invalid "%s" constraint on handler "%s": "%s" does not handle "%s" on bus "%s" with method "%s".', $direction, $key, $service, $message, $bus, substr($target, 2 + $i)));
+                    }
+                }
+            }
         }
     }
 

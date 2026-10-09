@@ -543,6 +543,131 @@ class MessengerPassTest extends TestCase
         $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, ['handler_a', 'handler_b'], [['alias' => 'first'], ['alias' => 'handler_b']]);
     }
 
+    public function testHandlersWithoutConstraintsKeepTheirOrderAndIds()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => -5]);
+        $container->register('b', DummyHandlerWithTwoMethods::class)
+            ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'method' => 'early'])
+            ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'method' => 'late', 'priority' => 5, 'from_transport' => 'async']);
+        $container->register('c', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => null]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['b::late', 'b::early', 'c', 'a'], $this->getHandlerIds($container, DummyMessage::class));
+        $this->assertTrue($container->hasDefinition('.messenger.method_on_object_wrapper.'.ContainerBuilder::hash(DummyMessage::class.':0:b:early:')));
+        $this->assertTrue($container->hasDefinition('.messenger.method_on_object_wrapper.'.ContainerBuilder::hash(DummyMessage::class.':5:b:late:async')));
+    }
+
+    public function testAHandlerWithoutPriorityCanRunBeforeAnother()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => 10]);
+        $container->register('b', DummyHandler::class)->addTag('messenger.message_handler', ['before' => 'a']);
+        $container->register('c', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => 5]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['b', 'a', 'c'], $this->getHandlerIds($container, DummyMessage::class));
+    }
+
+    public function testAHandlerWithoutPriorityCanRunAfterAnother()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler', ['after' => ['c']]);
+        $container->register('b', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => 10]);
+        $container->register('c', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => -5]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['b', 'c', 'a'], $this->getHandlerIds($container, DummyMessage::class));
+    }
+
+    public function testConstraintsReorderHandlersOfTheSamePriority()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => 10]);
+        $container->register('b', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => 10, 'before' => 'a']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['b', 'a'], $this->getHandlerIds($container, DummyMessage::class));
+    }
+
+    public function testAConstraintContradictingAnExplicitPriorityIsReported()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => 10]);
+        $container->register('b', DummyHandler::class)->addTag('messenger.message_handler', ['priority' => 0, 'before' => 'a']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot order the handlers of "%s" on bus "message_bus": the priority of "b" (0) contradicts its "before" constraint on "a" (10): raise it to 10 or more, remove it, or drop the constraint.', DummyMessage::class));
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testAConstraintCanTargetAClass()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('a', DummyHandlerWithTwoMethods::class)->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'method' => 'early']);
+        $container->register('b', DummyHandler::class)->addTag('messenger.message_handler', ['before' => DummyHandlerWithTwoMethods::class]);
+
+        (new MessengerPass())->process($container);
+
+        $handlerDescriptionMapping = $container->getDefinition('message_bus.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, ['b', ['a', 'early']]);
+    }
+
+    public function testAConstraintCanTargetAMethodOfAHandler()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('multi', DummyHandlerWithTwoMethods::class)
+            ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'method' => 'early', 'priority' => 10])
+            ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'method' => 'late', 'priority' => -10]);
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler', ['after' => 'multi::late']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['multi::early', 'multi::late', 'a'], $this->getHandlerIds($container, DummyMessage::class));
+    }
+
+    public function testAMethodTargetOnAKnownHandlerMustExist()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('multi', DummyHandlerWithTwoMethods::class)->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'method' => 'early']);
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler', ['before' => 'multi::typo']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid "before" constraint on handler "a": "multi" does not handle "%s" on bus "message_bus" with method "typo".', DummyMessage::class));
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testConstraintsTargetingAnAbsentHandlerAreIgnored()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler');
+        $container->register('b', DummyHandler::class)->addTag('messenger.message_handler', ['after' => 'not_installed', 'before' => 'absent::method']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['a', 'b'], $this->getHandlerIds($container, DummyMessage::class));
+    }
+
+    public function testBeforeAndAfterAreReadFromTheAttribute()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('a', DummyHandler::class)->addTag('messenger.message_handler');
+        $container->register('b', OrderedDummyHandler::class)->setAutoconfigured(true);
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['b', 'a'], $this->getHandlerIds($container, DummyMessage::class));
+    }
+
     public function testProcessHandlersByBus()
     {
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');
@@ -1551,6 +1676,24 @@ class MessengerPassTest extends TestCase
         return array_map('strval', $container->getDefinition($busId)->getArgument(0)->getValues());
     }
 
+    /**
+     * @return list<string> The handlers of the message in the order they run, as "service" or "service::method"
+     */
+    private function getHandlerIds(ContainerBuilder $container, string $message): array
+    {
+        return array_map(static function (Reference $descriptor) use ($container): string {
+            $handler = (string) $container->getDefinition((string) $descriptor)->getArgument(0);
+
+            if (!str_starts_with($handler, '.messenger.method_on_object_wrapper.')) {
+                return $handler;
+            }
+
+            [$service, $method] = $container->getDefinition($handler)->getArgument(0);
+
+            return $service.'::'.$method;
+        }, $container->getDefinition('message_bus.messenger.handlers_locator')->getArgument(0)[$message]->getValues());
+    }
+
     private function getContainerBuilder(string $busId = 'message_bus'): ContainerBuilder
     {
         $container = new ContainerBuilder();
@@ -1990,6 +2133,25 @@ class MessengerPassTest extends TestCase
 }
 
 class DummyHandler
+{
+    public function __invoke(DummyMessage $message): void
+    {
+    }
+}
+
+class DummyHandlerWithTwoMethods
+{
+    public function early(DummyMessage $message): void
+    {
+    }
+
+    public function late(DummyMessage $message): void
+    {
+    }
+}
+
+#[AsMessageHandler(before: 'a')]
+class OrderedDummyHandler
 {
     public function __invoke(DummyMessage $message): void
     {

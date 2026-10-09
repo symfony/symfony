@@ -169,7 +169,19 @@ class MessengerBundleExtensionTest extends TestCase
         $definition = new ChildDefinition('');
         $configurators[0]($definition, new AsMessageHandler(transport: 'async'), new \ReflectionClass(DummyMessage::class));
 
-        $this->assertSame([['bus' => null, 'handles' => null, 'method' => null, 'priority' => 0, 'sign' => false, 'transport' => 'async', 'from_transport' => null]], $definition->getTag('messenger.message_handler'));
+        $this->assertSame([['bus' => null, 'handles' => null, 'method' => null, 'priority' => null, 'sign' => false, 'transport' => 'async', 'before' => null, 'after' => null, 'from_transport' => null]], $definition->getTag('messenger.message_handler'));
+    }
+
+    public function testMessengerAsMessageHandlerBeforeAndAfterAreForwardedToTheTag()
+    {
+        $container = $this->createContainerFromFile('messenger', false);
+        $container->compile();
+
+        $definition = new ChildDefinition('');
+        $container->getAttributeAutoconfigurators()[AsMessageHandler::class][0]($definition, new AsMessageHandler(before: 'a', after: ['b', 'c::handle']), new \ReflectionClass(DummyMessage::class));
+
+        $this->assertSame('a', $definition->getTag('messenger.message_handler')[0]['before']);
+        $this->assertSame(['b', 'c::handle'], $definition->getTag('messenger.message_handler')[0]['after']);
     }
 
     public function testMessengerChainMiddleware()

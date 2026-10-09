@@ -379,6 +379,9 @@ Messenger
    Encoding a message with `messenger.default_serializer`, or with another serializer service, does not sign it anymore, and decoding with it does not check the signature.
    Send and receive the messages through their transport instead
  * Add argument `$timeout` to `MessageExecutionStrategyInterface::wait()`
+ * `AsMessageHandler::$priority` is now `?int` and defaults to `null`, which means "no priority declared";
+   the `messenger.message_handler` tags it produces carry `null` too. Code that read the property as an
+   `int` should read `$attribute->priority ?? 0`
 
 Mime
 ----

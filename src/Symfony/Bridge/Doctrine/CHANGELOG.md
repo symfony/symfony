@@ -15,6 +15,7 @@ CHANGELOG
  * Load a list of entities into `array`-typed controller and command arguments with `#[MapEntity]`, using `findBy()`
  * Add the `EntityExists` constraint for validating that a value references an existing entity
  * Add `CollectionDenormalizer` to denormalize arrays into Doctrine collections, defaulting to `ArrayCollection` when the target type is the `Collection` interface
+ * Add `before` and `after` to the `doctrine.event_listener` tag to order listeners
 
 8.1
 ---

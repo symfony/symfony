@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\BeforeAfterSorter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -70,6 +71,8 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
     {
         $listenerRefs = [];
         $managerDefs = [];
+        $registrations = [];
+        $groups = [];
         foreach ($this->findAndSortTags($container) as [$id, $tag]) {
             $connections = isset($tag['connection'])
                 ? [$container->getParameterBag()->resolveValue($tag['connection'])]
@@ -83,28 +86,110 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 }
 
                 if (!isset($managerDefs[$con])) {
-                    $managerDef = $parentDef = $this->getEventManagerDef($container, $con);
-                    while (!$parentDef->getClass() && $parentDef instanceof ChildDefinition) {
-                        $parentDef = $container->findDefinition($parentDef->getParent());
-                    }
-                    $managerClass = $container->getParameterBag()->resolveValue($parentDef->getClass());
-                    $managerDefs[$con] = [$managerDef, $managerClass];
-                } else {
-                    [$managerDef, $managerClass] = $managerDefs[$con];
+                    $managerDef = $this->getEventManagerDef($container, $con);
+                    $managerDefs[$con] = [$managerDef, $this->getClass($container, $managerDef)];
                 }
 
-                if (ContainerAwareEventManager::class === $managerClass) {
-                    $refs = $managerDef->getArguments()[1] ?? [];
+                if (ContainerAwareEventManager::class === $managerDefs[$con][1]) {
                     $listenerRefs[$con][$id] = new Reference($id);
-                    $refs[] = [[$tag['event']], $id];
-                    $managerDef->setArgument(1, $refs);
-                } else {
-                    $managerDef->addMethodCall('addEventListener', [[$tag['event']], new Reference($id)]);
                 }
+
+                $groups[$con."\0".$tag['event']][] = \count($registrations);
+                $registrations[] = [$con, $id, $tag];
+            }
+        }
+
+        // the event managers keep the registration order of each event, so each group is reordered within its own slots
+        foreach ($groups as $group) {
+            foreach ($this->sortByConstraints($container, $registrations, $group) as $i => $registration) {
+                $registrations[$group[$i]] = $registration;
+            }
+        }
+
+        foreach ($registrations as [$con, $id, $tag]) {
+            [$managerDef, $managerClass] = $managerDefs[$con];
+
+            if (ContainerAwareEventManager::class === $managerClass) {
+                $refs = $managerDef->getArguments()[1] ?? [];
+                $refs[] = [[$tag['event']], $id];
+                $managerDef->setArgument(1, $refs);
+            } else {
+                $managerDef->addMethodCall('addEventListener', [[$tag['event']], new Reference($id)]);
             }
         }
 
         return $listenerRefs;
+    }
+
+    /**
+     * Reorders the listeners of one event on one connection so that their "before"/"after" constraints are met.
+     *
+     * A declared priority is never crossed; a listener without one is placed by its constraints.
+     *
+     * @param list<array{0: string, 1: string, 2: array}> $registrations Connection name, service id and tag attributes
+     * @param list<int>                                   $group         The indexes of the registrations to reorder
+     *
+     * @return list<array{0: string, 1: string, 2: array}> The reordered registrations, or none when the group has no constraint
+     */
+    private function sortByConstraints(ContainerBuilder $container, array $registrations, array $group): array
+    {
+        $indexes = [];
+        $priorities = [];
+        $constraints = [];
+        $keysById = [];
+
+        foreach ($group as $i) {
+            [, $id, $tag] = $registrations[$i];
+
+            // keys show up in error messages: the service id, then a counter when it listens more than once
+            for ($n = 1, $key = $id; isset($indexes[$key]); ++$n) {
+                $key = $id.'#'.$n;
+            }
+
+            $indexes[$key] = $i;
+            $priorities[$key] = $tag['priority'] ?? null;
+            $keysById[$id][] = $key;
+
+            foreach (['before', 'after'] as $direction) {
+                if ($targets = (array) ($tag[$direction] ?? [])) {
+                    $constraints[$key][$direction] = $targets;
+                }
+            }
+        }
+
+        if (!$constraints) {
+            return [];
+        }
+
+        $aliases = [];
+
+        foreach ($indexes as $key => $i) {
+            if ($class = $this->getClass($container, $container->getDefinition($registrations[$i][1]))) {
+                $aliases[$class][] = $key;
+            }
+        }
+
+        [$con, , ['event' => $event]] = $registrations[$group[0]];
+
+        // a service id always designates its own registrations, whatever class it shares a name with
+        $aliases = $keysById + $aliases;
+
+        try {
+            $sorted = BeforeAfterSorter::sortWithPriorities($priorities, $constraints, $aliases);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(\sprintf('Cannot order the listeners of event "%s" on connection "%s": ', $event, $con).lcfirst($e->getMessage()), 0, $e);
+        }
+
+        return array_map(static fn ($key) => $registrations[$indexes[$key]], array_keys($sorted));
+    }
+
+    private function getClass(ContainerBuilder $container, Definition $definition): ?string
+    {
+        while (!$definition->getClass() && $definition instanceof ChildDefinition) {
+            $definition = $container->findDefinition($definition->getParent());
+        }
+
+        return $container->getParameterBag()->resolveValue($definition->getClass());
     }
 
     private function getEventManagerDef(ContainerBuilder $container, string $name): Definition

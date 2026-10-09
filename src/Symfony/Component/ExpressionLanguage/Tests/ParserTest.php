@@ -479,11 +479,20 @@ class ParserTest extends TestCase
         yield 'properties' => ['a'.str_repeat('.b', 300)];
         yield 'array accesses' => ['a'.str_repeat('[0]', 300)];
         yield 'ternaries' => [str_repeat('1?', 300).'1'.str_repeat(':1', 300)];
+        yield 'binary operators in nested parentheses' => [str_repeat('(', 20).'1'.str_repeat(str_repeat(' + 1', 20).')', 20)];
+        yield 'properties in nested parentheses' => [str_repeat('(', 20).'a'.str_repeat(str_repeat('.b', 20).')', 20)];
     }
 
     public function testDeepButReasonableExpressionIsAccepted()
     {
         (new Parser([]))->lint((new Lexer())->tokenize(str_repeat('(', 100).'a'.str_repeat(' + 1)', 100)), ['a']);
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testChainedTernariesWithBinaryConditionsAreAccepted()
+    {
+        (new Parser([]))->lint((new Lexer())->tokenize(str_repeat('a and a and a ? 1 : ', 64).'0'), ['a']);
 
         $this->expectNotToPerformAssertions();
     }

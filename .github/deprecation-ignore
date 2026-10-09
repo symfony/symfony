@@ -3,6 +3,11 @@
 # Schema/Table editor API. Symfony's own schema code already uses the editor API.
 %^Doctrine\\DBAL\\Schema\\(Table|Schema)::\w+\(?\)? is deprecated%
 
+# Static type registry deprecations triggered by doctrine/orm on DBAL 4.6+.
+# ORM still resolves types through Type::getType() and Type::hasType() instead
+# of the type provider of the connection.
+%^Doctrine\\DBAL\\Types\\Type::(getType|hasType) is deprecated%
+
 # spl_object_hash() is deprecated as of PHP 8.6. Symfony's own code uses
 # spl_object_id() but some dependencies still call it: masterminds/html5,
 # doctrine/collections, doctrine/dbal and the sebastian/* packages that ship

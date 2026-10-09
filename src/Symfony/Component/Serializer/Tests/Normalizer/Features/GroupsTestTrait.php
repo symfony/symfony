@@ -13,7 +13,10 @@ namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\DefaultGroupsConferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\DefaultGroupsDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\DefaultGroupsTalkDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 
 /**
@@ -204,7 +207,7 @@ trait GroupsTestTrait
             ]),
         );
 
-        // A custom group excludes ungrouped properties even when the flag is on.
+        // Custom groups alone exclude ungrouped properties even when the flag is on.
         $assertNormalizedProperties(
             ['customGroup'],
             $normalizer->normalize(new DefaultGroupsDummy(), context: [
@@ -213,9 +216,6 @@ trait GroupsTestTrait
             ]),
         );
 
-        // groups=[] with flag on: $groupsHasBeenDefined must be captured before the
-        // implicit defaultGroups merge, otherwise properties with non-Default groups
-        // (like customGroup) would wrongly be filtered out.
         $assertNormalizedProperties(
             ['noGroup', 'customGroup', 'defaultGroup', 'classGroup'],
             $normalizer->normalize(new DefaultGroupsDummy(), context: [
@@ -223,5 +223,29 @@ trait GroupsTestTrait
                 'groups' => [],
             ]),
         );
+    }
+
+    public function testNormalizeWithDefaultGroupsAndCustomGroups()
+    {
+        $normalizer = $this->getNormalizerForGroups();
+
+        $context = ['enable_default_groups' => true];
+
+        $this->assertEqualsCanonicalizing(['noGroup', 'customGroup', 'defaultGroup', 'classGroup'], array_keys($normalizer->normalize(new DefaultGroupsDummy(), null, $context + ['groups' => ['Default', 'custom']])));
+        $this->assertEqualsCanonicalizing(['noGroup', 'customGroup', 'defaultGroup', 'classGroup'], array_keys($normalizer->normalize(new DefaultGroupsDummy(), null, $context + ['groups' => ['DefaultGroupsDummy', 'custom']])));
+    }
+
+    public function testNormalizeNestedObjectsWithDefaultGroupsAndCustomGroups()
+    {
+        $normalizer = $this->getNormalizerForGroups();
+        new Serializer([$normalizer]);
+
+        $conference = new DefaultGroupsConferenceDummy();
+        $conference->talks = [new DefaultGroupsTalkDummy()];
+
+        $context = ['enable_default_groups' => true];
+
+        $this->assertSame(['name' => 'SymfonyCon'], $normalizer->normalize($conference, null, $context + ['groups' => ['Default']]));
+        $this->assertSame(['name' => 'SymfonyCon', 'talks' => [['title' => 'Keynote']]], $normalizer->normalize($conference, null, $context + ['groups' => ['Default', 'detail']]));
     }
 }

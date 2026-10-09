@@ -31,6 +31,9 @@ class OtherSerializedNameDummy
     #[Groups(['custom']), SerializedName('renamedCustomGroup')]
     public $customGroup;
 
+    #[SerializedName('renamedInClassGroup', 'OtherSerializedNameDummy')]
+    public $noGroupRenamedInClassGroup;
+
     #[Groups(['a'])]
     private $buz;
 

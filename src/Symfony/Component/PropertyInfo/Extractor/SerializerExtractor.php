@@ -49,9 +49,7 @@ class SerializerExtractor implements PropertyListExtractorInterface
             ? [] !== $groups
             : null !== ($context['serializer_groups'] ?? null);
 
-        $customGroupsHasBeenDefined = (bool) array_diff($groups, $defaultGroups);
-
-        if ($enableDefaultGroups && !$customGroupsHasBeenDefined) {
+        if ($enableDefaultGroups && array_intersect($groups, $defaultGroups)) {
             $groups = array_merge($groups, $defaultGroups);
         }
 
@@ -63,7 +61,7 @@ class SerializerExtractor implements PropertyListExtractorInterface
                 continue;
             }
 
-            if (!($attributeGroups = $serializerAttributeMetadata->getGroups()) && $enableDefaultGroups && !$customGroupsHasBeenDefined) {
+            if (!($attributeGroups = $serializerAttributeMetadata->getGroups()) && $enableDefaultGroups) {
                 $attributeGroups = $defaultGroups;
             }
 

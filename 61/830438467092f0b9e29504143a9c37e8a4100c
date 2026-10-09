@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by Brajk19 at 2026-10-07T21:10:06Z
+
+im not completely sure about throwing exception when request acquired multiple locks.
+maybe #[MapLock] would be useful here
+
+something like:
+```php
+#[Route('/import')]
+#[Lock(key: 'key1', name: 'first')]
+#[Lock(key: 'key2', name: 'second')]
+public function importAction(
+    #[MapLock('first')] LockInterface $lock1,
+    #[MapLock('second')] LockInterface $lock2,
+)
+```
+
+or argument name can match lock name:
+```php
+#[Route('/import')]
+#[Lock(key: 'key1', name: 'first')]
+#[Lock(key: 'key2', name: 'second')]
+public function importAction(
+    #[MapLock] LockInterface $first,
+    #[MapLock] ?LockInterface $second,
+)
+```
+
+some open questions:
+ - should `#[MapLock]` be required even for single lock? so its same pattern no matter how many lock we want to inject
+   - resolver could become targeted value resolver, which is better
+ - should `name` in `#[Lock]` be required whenever you want to inject lock, even if its only lock on that endpoint?
+
+---------------------------------------------------------------------------
+
+by Brajk19 at 2026-10-08T06:17:32Z
+
+@nicolas-grekas makes sense, I applied the `isAcquired()` check
+https://github.com/symfony/symfony/pull/66697/changes/8b9609dbf79c505f252366ecb407fcd06c998677

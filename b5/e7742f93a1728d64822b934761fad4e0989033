@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-09T13:11:39Z
+
+Thanks @lyrixx! The first commit is a clear fix, and opcache preloading hits it too when the preloaded path differs from the loaded one.
+
+I'm fine with the trade-off of the second one, and I amended it: deprecations raised by the compiled code became exceptions, in prod only since debug mode evaluates the nodes. With `ExpressionFunction::fromPhp('strtolower', 'lower')`, `lower(name)` with a null name threw `ErrorException: strtolower(): Passing null to parameter #1 ($string) of type string is deprecated`, where `evaluate()` logs it and returns `''`. Deprecations don't change the result, so they now go to the previous handler.
+
+FTR, implicit calls still run twice: property hooks, `__get()` and `offsetGet()`.

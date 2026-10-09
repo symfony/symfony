@@ -32,6 +32,7 @@ use Symfony\Component\KeyManagement\BlindIndexInterface;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVaultFactory;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory;
@@ -816,6 +817,89 @@ class KeyManagementBundleExtensionTest extends TestCase
             $cipher = (new \ReflectionProperty($kms, 'cipher'))->getValue($kms);
             $this->assertSame($ivLength, (new \ReflectionProperty($cipher, 'ivLength'))->getValue($cipher));
         }
+    }
+
+    public function testDoctrineDbalTypesEncryptWithTheDefaultClientWithoutAStore()
+    {
+        if (!class_exists(EncryptedTypes::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                'doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'app']]],
+            ]);
+        });
+
+        $definition = $container->getDefinition('key_management.doctrine_dbal.encrypted_types');
+        $this->assertSame(EncryptedTypes::class, $definition->getClass());
+        $this->assertTrue($definition->isPublic(), 'the bundle fetches it when the kernel boots.');
+        $this->assertSame('key_management.envelope_encrypter.app', (string) $definition->getArgument(0));
+        $this->assertSame(['encrypted_phone' => ['type' => 'string', 'key' => 'app']], $definition->getArgument(1));
+    }
+
+    public function testWithoutDoctrineDbalTypesNothingIsRegisteredForThem()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=AAAA']]);
+        });
+
+        $this->assertFalse($container->has('key_management.doctrine_dbal.encrypted_types'));
+    }
+
+    public function testDoctrineDbalTypesWithoutAStoreNorADefaultClientAreRefused()
+    {
+        if (!class_exists(EncryptedTypes::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "key_management.doctrine_dbal.types" need an envelope encrypter: configure "key_management.store", or set "key_management.default_client".');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                ],
+                'doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'main']]],
+            ]);
+        });
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[DataProvider('provideMissingDoctrineDbalTypesPackages')]
+    public function testDoctrineDbalTypesNameThePackageTheyNeed(string $namespace, string $package)
+    {
+        $loaders = spl_autoload_functions();
+        foreach ($loaders as $loader) {
+            spl_autoload_unregister($loader);
+        }
+        foreach ($loaders as $loader) {
+            spl_autoload_register(static function (string $class) use ($loader, $namespace): void {
+                if (!str_starts_with($class, $namespace)) {
+                    $loader($class);
+                }
+            });
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('Configuring "key_management.doctrine_dbal.types" requires the "%1$s" package. Try running "composer require %1$s".', $package));
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                'doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'app']]],
+            ]);
+        });
+    }
+
+    public static function provideMissingDoctrineDbalTypesPackages(): iterable
+    {
+        yield 'the bridge' => ['Symfony\\Component\\KeyManagement\\Bridge\\DoctrineDbal\\', 'symfony/doctrine-dbal-key-management'];
+        yield 'DBAL' => ['Doctrine\\DBAL\\', 'doctrine/dbal'];
     }
 
     #[RunInSeparateProcess]

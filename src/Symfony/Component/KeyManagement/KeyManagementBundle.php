@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement;
 
+use Doctrine\DBAL\Types\Type;
 use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Console\Application;
@@ -29,6 +30,7 @@ use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
@@ -60,6 +62,16 @@ class KeyManagementBundle extends AbstractBundle
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
+    }
+
+    /**
+     * Declares the encrypted Doctrine DBAL types, which must be known before any entry point runs its first query.
+     */
+    public function boot(): void
+    {
+        if ($this->container->has('key_management.doctrine_dbal.encrypted_types')) {
+            $this->container->get('key_management.doctrine_dbal.encrypted_types')->register();
+        }
     }
 
     public function build(ContainerBuilder $container): void
@@ -195,6 +207,29 @@ class KeyManagementBundle extends AbstractBundle
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('doctrine_dbal')
+                    ->children()
+                        ->arrayNode('types', 'type')
+                            ->info('Encrypted Doctrine DBAL types by name, declared when the kernel boots.')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->stringNode('type')
+                                        ->info('Doctrine type converting the value before it is encrypted.')
+                                        ->isRequired()
+                                        ->cannotBeEmpty()
+                                    ->end()
+                                    ->stringNode('key')
+                                        ->info('Master key encrypting the values, or the scope of their data key when "store" is configured.')
+                                        ->isRequired()
+                                        ->cannotBeEmpty()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
     }
@@ -286,6 +321,10 @@ class KeyManagementBundle extends AbstractBundle
 
         if (isset($config['store']['key_id'])) {
             $this->registerStore($config['store'], array_keys($clients), $defaultName, $container);
+        }
+
+        if ($config['doctrine_dbal']['types'] ?? []) {
+            $this->registerDoctrineDbalTypes($config['doctrine_dbal']['types'], isset($config['store']['key_id']), $defaultName, $container);
         }
     }
 
@@ -396,5 +435,33 @@ class KeyManagementBundle extends AbstractBundle
                 ->setArguments([new IteratorArgument([new Reference('key_management.store')])])
                 ->addTag('doctrine.event_listener', ['event' => 'postGenerateSchema']);
         }
+    }
+
+    /**
+     * Registers the encrypted Doctrine DBAL types that boot() declares.
+     *
+     * They encrypt with the encrypter the envelope interfaces resolve to: the store-backed one when a store is configured, the default client's otherwise.
+     *
+     * @param array<string, array{type: string, key: string}> $types
+     */
+    private function registerDoctrineDbalTypes(array $types, bool $hasStore, ?string $defaultName, ContainerBuilder $container): void
+    {
+        if (!ContainerBuilder::willBeAvailable('symfony/doctrine-dbal-key-management', EncryptedTypes::class, ['symfony/key-management'])) {
+            throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "symfony/doctrine-dbal-key-management" package. Try running "composer require symfony/doctrine-dbal-key-management".');
+        }
+
+        if (!ContainerBuilder::willBeAvailable('doctrine/dbal', Type::class, ['symfony/doctrine-dbal-key-management', 'symfony/key-management'])) {
+            throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "doctrine/dbal" package. Try running "composer require doctrine/dbal".');
+        }
+
+        $encrypter = match (true) {
+            $hasStore => 'key_management.stored_envelope_encrypter',
+            null !== $defaultName => 'key_management.envelope_encrypter.'.$defaultName,
+            default => throw new LogicException('The "key_management.doctrine_dbal.types" need an envelope encrypter: configure "key_management.store", or set "key_management.default_client".'),
+        };
+
+        $container->register('key_management.doctrine_dbal.encrypted_types', EncryptedTypes::class)
+            ->setArguments([new Reference($encrypter), $types])
+            ->setPublic(true);
     }
 }

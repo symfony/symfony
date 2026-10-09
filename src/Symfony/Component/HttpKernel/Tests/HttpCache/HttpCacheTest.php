@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
@@ -623,6 +624,44 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertSame('Hello World', ob_get_clean());
 
         unlink($file);
+    }
+
+    public function testDoesNotCacheStreamedResponses()
+    {
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel->expects($this->exactly(2))
+            ->method('handle')
+            ->willReturnCallback(static fn () => new StreamedResponse(static function () { echo 'Hello World'; }, 200, ['Cache-Control' => 'public, max-age=300']));
+
+        $cache = new HttpCache($kernel, $this->createStore());
+
+        $response = $cache->handle(Request::create('/'));
+        $this->assertSame(['miss'], current($cache->getTraces()));
+        $this->assertFalse($response->headers->has('Age'));
+
+        $cache->handle(Request::create('/'));
+        $this->assertSame(['miss'], current($cache->getTraces()));
+    }
+
+    public function testTracesStoreWhenTheStoreDigestsAResponseWithoutContent()
+    {
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $kernel->method('handle')->willReturn(new StreamedResponse(static function () { echo 'Hello World'; }, 200, ['Cache-Control' => 'public, max-age=300']));
+
+        $store = $this->createMock(StoreInterface::class);
+        $store->expects($this->once())
+            ->method('write')
+            ->willReturnCallback(static function (Request $request, Response $response): string {
+                $response->headers->set('X-Content-Digest', 'en-digest');
+
+                return 'key';
+            });
+
+        $cache = new HttpCache($kernel, $store);
+        $response = $cache->handle(Request::create('/'));
+
+        $this->assertSame(['miss', 'store'], current($cache->getTraces()));
+        $this->assertTrue($response->headers->has('Age'));
     }
 
     public function testCachesResponsesWithExplicitNoCacheDirective()

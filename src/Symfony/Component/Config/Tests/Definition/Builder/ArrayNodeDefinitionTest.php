@@ -447,6 +447,75 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode()->finalize([]);
     }
 
+    #[DataProvider('provideArraysWrappedIntoAChild')]
+    public function testAcceptAndWrapArraysIntoAChild(array $config, array $expected)
+    {
+        $node = (new ArrayNodeDefinition('root'))
+            ->canBeDisabled()
+            ->acceptAndWrap(['array'], 'items')
+            ->children()
+                ->arrayNode('options', 'option')->scalarPrototype()->end()->end()
+                ->arrayNode('items', 'item')->useAttributeAsKey('name')->scalarPrototype()->end()->end()
+            ->end()
+        ;
+
+        $this->assertEquals($expected, (new Processor())->process($node->getNode(), [$config]));
+    }
+
+    public static function provideArraysWrappedIntoAChild(): iterable
+    {
+        yield 'the entries go into the child' => [['foo' => 'a', 'bar' => 'b'], ['enabled' => true, 'options' => [], 'items' => ['foo' => 'a', 'bar' => 'b']]];
+        yield 'the other children stay' => [['enabled' => false, 'options' => ['x'], 'foo' => 'a'], ['enabled' => false, 'options' => ['x'], 'items' => ['foo' => 'a']]];
+        yield 'the singular of another child stays' => [['option' => 'x', 'foo' => 'a'], ['enabled' => true, 'options' => ['x'], 'items' => ['foo' => 'a']]];
+        yield 'an array setting the child is not wrapped' => [['items' => ['foo' => 'a'], 'options' => ['x']], ['enabled' => true, 'options' => ['x'], 'items' => ['foo' => 'a']]];
+        yield 'an array setting the singular of the child is not wrapped' => [['item' => [['name' => 'foo', 'value' => 'a']]], ['enabled' => true, 'options' => [], 'items' => ['foo' => 'a']]];
+    }
+
+    public function testAcceptAndWrapArraysRequiresTheChildToWrapThemInto()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Wrapping arrays requires the name of the child to wrap them into.');
+
+        (new ArrayNodeDefinition('root'))->acceptAndWrap(['array']);
+    }
+
+    public function testAcceptAndWrapArraysIntoAMissingChild()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('->acceptAndWrap() cannot wrap arrays into "items" as it is not a child of the node at path "root".');
+
+        (new ArrayNodeDefinition('root'))
+            ->acceptAndWrap(['array'], 'items')
+            ->children()
+                ->scalarNode('item')->end()
+            ->end()
+            ->getNode();
+    }
+
+    public function testAcceptAndWrapArraysIsNotApplicableToPrototypeNodes()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('->acceptAndWrap() cannot wrap arrays into a prototype node at path "root".');
+
+        (new ArrayNodeDefinition('root'))
+            ->acceptAndWrap(['array'], 'items')
+            ->useAttributeAsKey('name')
+            ->scalarPrototype()->end()
+            ->getNode();
+    }
+
+    public function testAcceptAndWrapDoesNotHideTheClosuresThatAcceptAnyValue()
+    {
+        $node = (new ArrayNodeDefinition('root'))
+            ->acceptAndWrap(['string'])
+            ->beforeNormalization()->ifNull()->then(static fn () => ['null'])->end()
+            ->beforeNormalization()->ifTrue(static fn ($v) => \is_array($v) && isset($v['id']))->then(static fn ($v) => [$v])->end()
+            ->variablePrototype()->end()
+        ;
+
+        $this->assertSame(['string', 'any', 'array'], $node->getNode()->getNormalizedTypes());
+    }
+
     public function testFindShouldThrowExceptionIfNodeDoesNotExistInRootNode()
     {
         $this->expectException(\RuntimeException::class);

@@ -87,8 +87,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Allows alternative types and wraps them into arrays.
      *
-     * @param list<ExprBuilder::TYPE_INT|ExprBuilder::TYPE_STRING|ExprBuilder::TYPE_BOOL|ExprBuilder::TYPE_NULL|ExprBuilder::TYPE_BACKED_ENUM> $allowedTypes
-     * @param string|null                                                                                                                      $key          The key to wrap the value in
+     * An array is wrapped into the child named by the key when it does not set this child, except for its keys that name other children.
+     *
+     * @param list<ExprBuilder::TYPE_INT|ExprBuilder::TYPE_STRING|ExprBuilder::TYPE_BOOL|ExprBuilder::TYPE_NULL|ExprBuilder::TYPE_BACKED_ENUM|ExprBuilder::TYPE_ARRAY> $allowedTypes
+     * @param string|null                                                                                                                                              $key          The key to wrap the value in
      *
      * @return $this
      */
@@ -97,13 +99,19 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $this->allowedTypes = $allowedTypes;
 
         foreach ($allowedTypes as $type) {
+            if (ExprBuilder::TYPE_ARRAY === $type) {
+                $this->attribute('wraps_arrays_into', $key ?? throw new \InvalidArgumentException('Wrapping arrays requires the name of the child to wrap them into.'));
+
+                continue;
+            }
+
             $this->beforeNormalization()->ifTrue(match ($type) {
                 ExprBuilder::TYPE_INT => is_int(...),
                 ExprBuilder::TYPE_STRING => is_string(...),
                 ExprBuilder::TYPE_BOOL => is_bool(...),
                 ExprBuilder::TYPE_NULL => is_null(...),
                 ExprBuilder::TYPE_BACKED_ENUM => static fn ($v) => $v instanceof \BackedEnum,
-            })->then(static fn ($v) => [$key ?? 0 => $v]);
+            })->then(static fn ($v) => [$key ?? 0 => $v])->allowedTypes = $type;
         }
 
         return $this;
@@ -531,7 +539,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $normalizedTypes = $this->allowedTypes ?? [];
 
         if (isset($this->normalization)) {
-            $normalizedTypes = $normalizedTypes ?: $this->normalization->declaredTypes;
+            if (!$normalizedTypes) {
+                $normalizedTypes = $this->normalization->declaredTypes;
+            } elseif (\in_array(ExprBuilder::TYPE_ANY, $this->normalization->declaredTypes, true)) {
+                // the types listed by acceptAndWrap() replace the declared ones, but cannot tell what a closure accepting any value does
+                $normalizedTypes[] = ExprBuilder::TYPE_ANY;
+            }
+
             $node->setNormalizationClosures($this->normalization->before);
             $node->setXmlRemappings($this->normalization->remappings);
         }
@@ -586,6 +600,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         if (false !== $this->addDefaultChildren) {
             throw new InvalidDefinitionException(\sprintf('->addDefaultChildrenIfNoneSet() is not applicable to concrete nodes at path "%s".', $path));
         }
+
+        if (isset($this->attributes['wraps_arrays_into']) && !isset($this->children[$this->attributes['wraps_arrays_into']])) {
+            throw new InvalidDefinitionException(\sprintf('->acceptAndWrap() cannot wrap arrays into "%s" as it is not a child of the node at path "%s".', $this->attributes['wraps_arrays_into'], $path));
+        }
     }
 
     /**
@@ -599,6 +617,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
         if ($this->addDefaults) {
             throw new InvalidDefinitionException(\sprintf('->addDefaultsIfNotSet() is not applicable to prototype nodes at path "%s".', $path));
+        }
+
+        if (isset($this->attributes['wraps_arrays_into'])) {
+            throw new InvalidDefinitionException(\sprintf('->acceptAndWrap() cannot wrap arrays into a prototype node at path "%s".', $path));
         }
 
         if (false !== $this->addDefaultChildren) {

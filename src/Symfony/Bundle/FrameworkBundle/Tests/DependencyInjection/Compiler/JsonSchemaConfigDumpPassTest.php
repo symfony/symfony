@@ -28,7 +28,10 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Lock\LockBundle;
 use Symfony\Component\Messenger\MessengerBundle;
+use Symfony\Component\RateLimiter\RateLimiterBundle;
+use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Serializer\SerializerBundle;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
 use Symfony\Component\Yaml\Yaml;
@@ -236,6 +239,68 @@ class JsonSchemaConfigDumpPassTest extends TestCase
             YAML);
 
         $this->assertSame([], (new SchemaValidator())->validate($config, $schemaFile));
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    #[RequiresMethod(SchemaValidator::class, 'validate')]
+    public function testGeneratedSchemaAcceptsTheCollectionOfASectionGivenDirectlyUnderItsRoot()
+    {
+        $schemaFile = $this->tempDir.'/shorthand_schema.json';
+        $container = new ContainerBuilder();
+
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([RateLimiterBundle::class => ['all' => true], LockBundle::class => ['all' => true], SemaphoreBundle::class => ['all' => true]])))->process($container);
+
+        $config = Yaml::parse(<<<YAML
+            rate_limiter:
+                builder:
+                    cache_pool: cache.app
+                mailer:
+                    policy: sliding_window
+                    limit: 60
+                    interval: '1 minute'
+            lock:
+                service_id: doctrine.dbal.default_connection
+                advisory: true
+            semaphore:
+                enabled: true
+                invoice: 'redis://r2.docker'
+            when@test:
+                lock:
+                    invoice: ['semaphore', 'redis://r2.docker']
+                    report: semaphore
+            YAML);
+
+        $this->assertSame([], (new SchemaValidator())->validate($config, $schemaFile));
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    #[RequiresMethod(SchemaValidator::class, 'validate')]
+    public function testGeneratedSchemaRejectsUnknownKeysNextToTheCollectionOfASection()
+    {
+        $schemaFile = $this->tempDir.'/shorthand_schema.json';
+        $container = new ContainerBuilder();
+
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([RateLimiterBundle::class => ['all' => true], LockBundle::class => ['all' => true]])))->process($container);
+
+        $config = Yaml::parse(<<<YAML
+            rate_limiter:
+                limiters:
+                    mailer:
+                        policy: no_limit
+                unknown:
+                    cache_pool: cache.app
+            YAML);
+
+        $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));
+
+        $config = Yaml::parse(<<<YAML
+            lock:
+                resources:
+                    invoice: semaphore
+                report: semaphore
+            YAML);
+
+        $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));
     }
 
     public function testProcessIgnoresFileWriteErrors()

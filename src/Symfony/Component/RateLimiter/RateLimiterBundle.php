@@ -45,24 +45,7 @@ class RateLimiterBundle extends AbstractBundle
     {
         $definition->rootNode()
             ->canBeDisabled()
-            ->beforeNormalization()
-                ->ifArray()
-                ->then(static function ($v) {
-                    if (!isset($v['limiters']) && !isset($v['limiter'])) {
-                        $v = ['limiters' => $v];
-
-                        // hoist back the keys the shorthand would otherwise read as limiter names
-                        foreach (['enabled', 'builder'] as $key) {
-                            if (\array_key_exists($key, $v['limiters'])) {
-                                $v[$key] = $v['limiters'][$key];
-                                unset($v['limiters'][$key]);
-                            }
-                        }
-                    }
-
-                    return $v;
-                })
-            ->end()
+            ->acceptAndWrap(['array'], 'limiters')
             ->children()
                 ->arrayNode('builder')
                     ->info('Configuration for the RateLimiterBuilder service.')

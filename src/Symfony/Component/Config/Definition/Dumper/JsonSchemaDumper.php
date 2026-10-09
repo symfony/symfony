@@ -165,6 +165,10 @@ final class JsonSchemaDumper
             if (isset($schema['properties'])) {
                 $schema['additionalProperties'] = $node->shouldIgnoreExtraKeys();
             }
+
+            if (null !== $key = $node->getAttribute('wraps_arrays_into')) {
+                $schema = ['anyOf' => [$schema, ...$this->dumpWrappedArrays($node, $key, $schema)]];
+            }
         } elseif ($node instanceof BooleanNode) {
             $schema = ['$ref' => $node->isNullable() ? '#/$defs/types/boolean_null' : '#/$defs/types/boolean'];
         } elseif ($node instanceof StringNode) {
@@ -281,6 +285,51 @@ final class JsonSchemaDumper
         } finally {
             $this->inListItem = $inListItem;
         }
+    }
+
+    /**
+     * Describes the arrays that normalization wraps into the given child, as they do not set it.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function dumpWrappedArrays(ArrayNode $node, string $key, array $schema): array
+    {
+        $excludedKeys = [$key];
+        foreach ($node->getXmlRemappings() as [$singular, $plural]) {
+            if ($key === $plural) {
+                $excludedKeys[] = $singular;
+                unset($schema['patternProperties']['^'.preg_quote($singular).'$']);
+            }
+        }
+
+        $wrapped = $schema['properties'][$key];
+        unset($schema['properties'][$key]);
+
+        $schemas = [];
+        foreach ($wrapped['anyOf'] ?? [$wrapped] as $wrappedSchema) {
+            $ref = $wrappedSchema['$ref'] ?? '';
+
+            if (str_starts_with($ref, '#/$defs/types/array')) {
+                // a list goes into the child as a whole
+                $schemas[] = $wrappedSchema;
+            } elseif (str_starts_with($ref, '#/$defs/types/object')) {
+                unset($wrappedSchema['default'], $wrappedSchema['description'], $wrappedSchema['examples'], $wrappedSchema['deprecated']);
+
+                // the keys that name the other children are not wrapped
+                if ($properties = $schema['properties'] + ($wrappedSchema['properties'] ?? [])) {
+                    $wrappedSchema['properties'] = $properties;
+                }
+
+                if ($patternProperties = ($schema['patternProperties'] ?? []) + ($wrappedSchema['patternProperties'] ?? [])) {
+                    $wrappedSchema['patternProperties'] = $patternProperties;
+                }
+
+                $wrappedSchema['propertyNames'] = ['not' => ['enum' => $excludedKeys]];
+                $schemas[] = $wrappedSchema;
+            }
+        }
+
+        return $schemas;
     }
 
     /** @return array<string, mixed> */

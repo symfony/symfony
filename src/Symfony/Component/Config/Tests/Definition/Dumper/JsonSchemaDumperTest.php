@@ -164,10 +164,73 @@ class JsonSchemaDumperTest extends TestCase
         $child->setRequired(true);
         $root = new ArrayNode('root');
         $root->addChild($child);
-        yield [$root, [
+        yield 'a required child can come from another file' => [$root, [
             '$ref' => '#/$defs/types/object',
             'properties' => ['node' => ['$ref' => '#/$defs/types/boolean']],
-            'required' => ['node'],
+            'additionalProperties' => false,
+        ]];
+
+        $list = (new ArrayNodeDefinition('list'))
+            ->arrayPrototype()
+                ->children()
+                    ->booleanNode('node')->isRequired()->end()
+                ->end()
+            ->end()
+            ->getNode();
+        yield 'a required child is required in the items of a list' => [$list, [
+            '$ref' => '#/$defs/types/array_null',
+            'items' => [
+                '$ref' => '#/$defs/types/object_null',
+                'properties' => ['node' => ['$ref' => '#/$defs/types/boolean']],
+                'required' => ['node'],
+                'additionalProperties' => false,
+            ],
+        ]];
+
+        $shortcut = (new ArrayNodeDefinition('node'))
+            ->beforeNormalization()
+                ->ifTrue(static fn ($v) => \is_array($v) && !isset($v['connections']))
+                ->then(static fn ($v) => ['connections' => [$v]])
+            ->end()
+            ->children()
+                ->variableNode('connections')->end()
+            ->end()
+            ->getNode();
+        yield 'a node normalized from any value accepts any value' => [$shortcut, ['$ref' => '#/$defs/types/variable']];
+
+        $castToArray = (new ArrayNodeDefinition('node'))->beforeNormalization()->castToArray()->end()->scalarPrototype()->end()->getNode();
+        yield 'a list cast from any value accepts any value' => [$castToArray, ['$ref' => '#/$defs/types/variable']];
+
+        $remapped = (new ArrayNodeDefinition('node'))
+            ->fixXmlConfig('adapter')
+            ->fixXmlConfig('connection')
+            ->children()
+                ->arrayNode('adapters')->scalarPrototype()->end()->end()
+                ->arrayNode('connections')->useAttributeAsKey('name')->scalarPrototype()->end()->end()
+            ->end()
+            ->getNode();
+        yield 'the singular key of a remapped node is accepted' => [$remapped, [
+            '$ref' => '#/$defs/types/object_null',
+            'properties' => [
+                'adapters' => [
+                    '$ref' => '#/$defs/types/array_null',
+                    'items' => ['$ref' => '#/$defs/types/scalar'],
+                ],
+                'connections' => [
+                    '$ref' => '#/$defs/types/object_null',
+                    'additionalProperties' => ['$ref' => '#/$defs/types/scalar'],
+                ],
+            ],
+            'patternProperties' => [
+                '^adapter$' => ['anyOf' => [
+                    ['$ref' => '#/$defs/types/scalar'],
+                    [
+                        '$ref' => '#/$defs/types/array_null',
+                        'items' => ['$ref' => '#/$defs/types/scalar'],
+                    ],
+                ]],
+                '^connection$' => ['$ref' => '#/$defs/types/variable'],
+            ],
             'additionalProperties' => false,
         ]];
 
@@ -257,7 +320,6 @@ class JsonSchemaDumperTest extends TestCase
                             'name' => ['$ref' => '#/$defs/types/string_null'],
                             'price' => ['$ref' => '#/$defs/types/number'],
                         ],
-                        'required' => ['price'],
                         'additionalProperties' => false,
                     ],
                     [
@@ -328,6 +390,10 @@ class JsonSchemaDumperTest extends TestCase
         $this->assertSame(['type' => 'string'], $types['string']);
         $this->assertSame(['type' => 'boolean'], $types['boolean']);
         $this->assertSame(['type' => 'integer'], $types['integer']);
+
+        // PHP decodes an empty map and an empty list to the same array
+        $this->assertSame(['type' => ['object', 'array'], 'maxItems' => 0], $types['object']);
+        $this->assertSame(['type' => ['object', 'array', 'null'], 'maxItems' => 0], $types['object_null']);
 
         // With parameterSchemas: anyOf with param
         $param = self::param();

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Dumper\JsonSchemaDumper;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -105,6 +107,16 @@ class RouterBundleTest extends TestCase
         $this->expectExceptionMessage('The child config "resource" under "router" must be configured.');
 
         $this->load(['enabled' => true]);
+    }
+
+    #[RequiresMethod(JsonSchemaDumper::class, 'dumpNode')]
+    public function testTheJsonSchemaDescribesTheConfiguration()
+    {
+        $tree = new RouterBundle()->getContainerExtension()->getConfiguration([], new ContainerBuilder())->getConfigTreeBuilder()->buildTree();
+
+        $schema = new JsonSchemaDumper()->dumpNode($tree);
+
+        $this->assertArrayHasKey('resource', $schema['anyOf'][0]['properties'] ?? []);
     }
 
     /**

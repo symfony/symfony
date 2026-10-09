@@ -12,6 +12,8 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\Exception\DivisionByZeroError;
+use Symfony\Component\ExpressionLanguage\Exception\LogicException;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 /**
@@ -164,13 +166,13 @@ class BinaryNode extends Node
                 return $left * $right;
             case '/':
                 if (0 == $right) {
-                    throw new \DivisionByZeroError('Division by zero.');
+                    throw new DivisionByZeroError('Division by zero.');
                 }
 
                 return $left / $right;
             case '%':
                 if (0 == $right) {
-                    throw new \DivisionByZeroError('Modulo by zero.');
+                    throw new DivisionByZeroError('Modulo by zero.');
                 }
 
                 return $left % $right;
@@ -178,7 +180,7 @@ class BinaryNode extends Node
                 return $this->evaluateMatches($right, $left);
         }
 
-        throw new \LogicException(\sprintf('"%s" does not support the "%s" operator.', __CLASS__, $operator));
+        throw new LogicException(\sprintf('"%s" does not support the "%s" operator.', __CLASS__, $operator));
     }
 
     public function toArray(): array

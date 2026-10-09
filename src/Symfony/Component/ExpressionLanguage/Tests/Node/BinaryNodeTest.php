@@ -13,6 +13,7 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\Exception\LogicException;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
@@ -283,7 +284,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
     {
         $node = new BinaryNode('unsupported', new ConstantNode(1), new ConstantNode(2));
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('"Symfony\Component\ExpressionLanguage\Node\BinaryNode" does not support the "unsupported" operator.');
 
         $node->evaluate([], []);

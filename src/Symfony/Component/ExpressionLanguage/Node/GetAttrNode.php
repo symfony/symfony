@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\Exception\RuntimeException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -108,7 +109,7 @@ class GetAttrNode extends Node
             return $value;
         }
 
-        throw new \RuntimeException(\sprintf('Unable to get an item of non-array "%s".', $nodeDump));
+        throw new RuntimeException(\sprintf('Unable to get an item of non-array "%s".', $nodeDump));
     }
 
     public function toArray(): array
@@ -159,7 +160,7 @@ class GetAttrNode extends Node
                 }
 
                 if (!\is_object($value)) {
-                    throw new \RuntimeException(\sprintf('Unable to get property "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
+                    throw new RuntimeException(\sprintf('Unable to get property "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }
 
                 $property = $this->nodes['attribute']->attributes['value'];
@@ -181,10 +182,10 @@ class GetAttrNode extends Node
                 }
 
                 if (!\is_object($value)) {
-                    throw new \RuntimeException(\sprintf('Unable to call method "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
+                    throw new RuntimeException(\sprintf('Unable to call method "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }
                 if (!\is_callable($toCall = [$value, $this->nodes['attribute']->attributes['value']])) {
-                    throw new \RuntimeException(\sprintf('Unable to call method "%s" of object "%s".', $this->nodes['attribute']->attributes['value'], get_debug_type($value)));
+                    throw new RuntimeException(\sprintf('Unable to call method "%s" of object "%s".', $this->nodes['attribute']->attributes['value'], get_debug_type($value)));
                 }
 
                 return $toCall(...array_values($this->nodes['arguments']->evaluate($functions, $values)));
@@ -197,7 +198,7 @@ class GetAttrNode extends Node
                 }
 
                 if (!\is_array($value) && !$value instanceof \ArrayAccess && !(null === $value && $this->attributes['is_null_coalesce'])) {
-                    throw new \RuntimeException(\sprintf('Unable to get an item of non-array "%s".', $this->nodes['node']->dump()));
+                    throw new RuntimeException(\sprintf('Unable to get an item of non-array "%s".', $this->nodes['node']->dump()));
                 }
 
                 if ($this->attributes['is_null_coalesce']) {

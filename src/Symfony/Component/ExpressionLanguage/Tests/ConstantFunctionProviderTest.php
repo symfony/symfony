@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\CompiledExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
+use Symfony\Component\ExpressionLanguage\Exception\InvalidArgumentException;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\FooBackedEnum;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\FooConstants;
@@ -135,9 +136,9 @@ class ConstantFunctionProviderTest extends TestCase
         $expressionLanguage = new ExpressionLanguage(null, [new ConstantFunctionProvider(['PHP_VERSION'])]);
 
         $this->assertSame('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
-        $this->assertSame('(\constant("PHP_VERSION") instanceof \UnitEnum ? \constant("PHP_VERSION") : throw new \TypeError(\'The string "PHP_VERSION" is not the name of a valid enum case.\'))', $expressionLanguage->compile('enum("PHP_VERSION")'));
-        $this->assertSame('(throw new \RuntimeException(\'Constant "E_ALL" is not allowed.\'))', $expressionLanguage->compile('constant("E_ALL")'));
-        $this->assertSame('(throw new \RuntimeException(\'Enum case "E_ALL" is not allowed.\'))', $expressionLanguage->compile('enum("E_ALL")'));
+        $this->assertSame('(\constant("PHP_VERSION") instanceof \UnitEnum ? \constant("PHP_VERSION") : throw new \Symfony\Component\ExpressionLanguage\Exception\TypeError(\'The string "PHP_VERSION" is not the name of a valid enum case.\'))', $expressionLanguage->compile('enum("PHP_VERSION")'));
+        $this->assertSame('(throw new \Symfony\Component\ExpressionLanguage\Exception\RuntimeException(\'Constant "E_ALL" is not allowed.\'))', $expressionLanguage->compile('constant("E_ALL")'));
+        $this->assertSame('(throw new \Symfony\Component\ExpressionLanguage\Exception\RuntimeException(\'Enum case "E_ALL" is not allowed.\'))', $expressionLanguage->compile('enum("E_ALL")'));
         $this->assertTrue(eval('return '.$expressionLanguage->compile('true or constant("E_ALL")').';'));
     }
 
@@ -158,7 +159,7 @@ class ConstantFunctionProviderTest extends TestCase
     #[DataProvider('provideClassNames')]
     public function testClassNameWithoutConstantIsRejected(string $class)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('"%1$s" is a class name, use "%1$s::*" to allow its constants.', $class));
 
         new ConstantFunctionProvider([$class]);

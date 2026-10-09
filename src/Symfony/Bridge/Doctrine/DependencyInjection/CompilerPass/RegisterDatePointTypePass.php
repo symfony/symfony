@@ -17,8 +17,6 @@ use Symfony\Bridge\Doctrine\Types\DatePointType;
 use Symfony\Bridge\Doctrine\Types\DayPointType;
 use Symfony\Bridge\Doctrine\Types\TimePointType;
 use Symfony\Component\Clock\DatePoint;
-use Symfony\Component\Clock\DayPoint;
-use Symfony\Component\Clock\TimePoint;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -47,7 +45,7 @@ final class RegisterDatePointTypePass implements CompilerPassInterface
             return;
         }
 
-        $mapperDefinition = new Definition(DefaultTypedFieldMapper::class, [[DatePoint::class => 'date_point', DayPoint::class => 'day_point', TimePoint::class => 'time_point']]);
+        $mapperDefinition = new Definition(DefaultTypedFieldMapper::class, [[DatePoint::class => 'date_point']]);
 
         foreach ($container->getDefinitions() as $id => $configuration) {
             if (!preg_match('/^doctrine\.orm\.\w+_configuration$/D', $id)) {

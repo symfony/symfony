@@ -19,8 +19,6 @@ use Symfony\Bridge\Doctrine\Types\DatePointType;
 use Symfony\Bridge\Doctrine\Types\DayPointType;
 use Symfony\Bridge\Doctrine\Types\TimePointType;
 use Symfony\Component\Clock\DatePoint;
-use Symfony\Component\Clock\DayPoint;
-use Symfony\Component\Clock\TimePoint;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -56,7 +54,7 @@ class RegisterDatePointTypePassTest extends TestCase
         $this->assertCount(1, $calls);
         $mapperDef = array_values($calls)[0][1][0];
         $this->assertSame(DefaultTypedFieldMapper::class, $mapperDef->getClass());
-        $this->assertSame([[DatePoint::class => 'date_point', DayPoint::class => 'day_point', TimePoint::class => 'time_point']], $mapperDef->getArguments());
+        $this->assertSame([[DatePoint::class => 'date_point']], $mapperDef->getArguments());
     }
 
     public function testAMapperConfiguredByTheApplicationIsChainedFirst()

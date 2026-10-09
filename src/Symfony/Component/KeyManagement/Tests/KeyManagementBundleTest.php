@@ -30,7 +30,12 @@ use Symfony\Component\KeyManagement\Debug\TraceableKms;
 use Symfony\Component\KeyManagement\DependencyInjection\KeyManagementPass;
 use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
+use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
+use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\KeyManagementBundle;
+use Symfony\Component\KeyManagement\Local\SodiumKms;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\inline_service;
 
 class KeyManagementBundleTest extends TestCase
 {
@@ -43,6 +48,7 @@ class KeyManagementBundleTest extends TestCase
 
     protected function tearDown(): void
     {
+        unset($_SERVER['KMS_TEST_DSN']);
         new Filesystem()->remove($this->varDir);
     }
 
@@ -60,6 +66,44 @@ class KeyManagementBundleTest extends TestCase
         $envelopeEncrypter = $container->get('test.envelope_encrypter');
         $this->assertInstanceOf(EnvelopeEncrypterInterface::class, $envelopeEncrypter);
         $this->assertSame('secret', $envelopeEncrypter->decrypt($envelopeEncrypter->encrypt('app', 'secret')));
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    public function testAClientReadsItsDsnFromAnEnvVar()
+    {
+        $_SERVER['KMS_TEST_DSN'] = 'sodium://default?keys[app]='.Base64UrlSafe::encode(random_bytes(32));
+
+        $kernel = new TestKeyManagementKernel('env_dsn', false, $this->varDir);
+        $kernel->boot();
+
+        $kms = $kernel->getContainer()->get('test.kms');
+        $this->assertSame('secret', $kms->decrypt($kms->encrypt('app', 'secret')));
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    public function testAServiceDsnTakesTheClientTheApplicationRegistered()
+    {
+        $kernel = new TestKeyManagementKernel('service', false, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $kms = $container->get('test.kms');
+        $this->assertSame($container->get('app.kms'), $kms);
+        $this->assertSame('secret', $kms->decrypt($kms->encrypt('app', 'secret')));
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    public function testAServiceDsnCannotBeReadFromAnEnvVar()
+    {
+        $_SERVER['KMS_TEST_DSN'] = 'service://app.kms';
+
+        $kernel = new TestKeyManagementKernel('env_service', false, $this->varDir);
+        $kernel->boot();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A "service://" KMS DSN is resolved when the container is compiled, so it cannot be read from an environment variable.');
+
+        $kernel->getContainer()->get('test.kms');
     }
 
     #[RequiresPhpExtension('sodium')]
@@ -218,6 +262,20 @@ class TestKeyManagementKernel extends AbstractKernel
                 ->alias('test.redundant_kms', 'key_management.redundant')->public()
                 ->alias('test.envelope_encrypter', EnvelopeEncrypterInterface::class)->public()
             ;
+        }
+
+        if (\in_array($this->environment, ['env_dsn', 'env_service'], true)) {
+            $config = ['clients' => ['default' => '%env(KMS_TEST_DSN)%']];
+        }
+
+        if (\in_array($this->environment, ['service', 'env_service'], true)) {
+            $services->set('app.kms', SodiumKms::class)
+                ->args([inline_service(InMemoryKeyLoader::class)->args([['app' => random_bytes(32)]])])
+                ->public();
+        }
+
+        if ('service' === $this->environment) {
+            $config = ['clients' => 'service://app.kms'];
         }
 
         if ($this->isDebug()) {

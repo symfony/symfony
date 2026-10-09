@@ -130,12 +130,8 @@ class KeyManagementBundle extends AbstractBundle
                             ->thenInvalid('A KMS client with a DSN cannot have retired members.')
                         ->end()
                         ->children()
-                            ->scalarNode('dsn')
+                            ->stringNode('dsn')
                                 ->cannotBeEmpty()
-                                ->validate()
-                                    ->ifTrue(static fn ($dsn): bool => !\is_string($dsn))
-                                    ->thenInvalid('The DSN of a KMS client must be a string, got %s.')
-                                ->end()
                             ->end()
                             ->arrayNode('members', 'member')
                                 ->info('Map of member name to the master key it wraps under, null for the key id given to each call. Everything the composite client encrypts is wrapped by each member and read back through the first one that answers, the first member minting the data keys, so that losing one provider loses nothing. Each member is a full path to the data.')
@@ -207,9 +203,8 @@ class KeyManagementBundle extends AbstractBundle
      * A client the application built itself is named in "clients" through a "service://<id>" DSN.
      *
      * That scheme is resolved here, when the container is built, so it never reaches the factory
-     * registry: an application that hides it behind an environment variable gets an unsupported
-     * scheme at runtime instead, since nothing can be referenced from a value that is unknown until
-     * then.
+     * registry: an application that hides it behind an environment variable gets an exception at
+     * runtime instead, since nothing can be referenced from a value that is unknown until then.
      *
      * What the scheme registers is a definition rather than an alias, and that is the point: the
      * client keeps the tag the console commands look it up by, the profiler decorates it, and it

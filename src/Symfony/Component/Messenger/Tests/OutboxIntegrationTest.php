@@ -75,7 +75,7 @@ class OutboxIntegrationTest extends TestCase
         $this->handler = new OutboxTestHandler();
 
         $senders = new Container();
-        $senders->set('orders', new OutboxSender($this->targetSender, $this->outboxSender, 'orders'));
+        $senders->set('orders', new OutboxSender($this->targetSender, $this->outboxSender, 'orders', 'outbox', 'failed'));
         $senders->set('outbox', $this->outbox);
         $senders->set('failed', $this->failed);
 
@@ -221,7 +221,7 @@ class OutboxIntegrationTest extends TestCase
         $this->outbox = new InMemoryTransport($outboxSerializer, $this->clock);
 
         $senders = new Container();
-        $senders->set('orders', new OutboxSender($this->target, $this->outbox, 'orders'));
+        $senders->set('orders', new OutboxSender($this->target, $this->outbox, 'orders', 'outbox'));
         $senders->set('outbox', $this->outbox);
         $this->bus = new MessageBus([
             new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['orders']], $senders)),

@@ -71,7 +71,7 @@ class DoctrineOutboxIntegrationTest extends TestCase
         $this->outbox->setup();
         $this->target = new InMemoryTransport();
 
-        $senders = new class(['orders' => new OutboxSender($this->target, $this->outbox, 'orders')]) implements ContainerInterface {
+        $senders = new class(['orders' => new OutboxSender($this->target, $this->outbox, 'orders', 'outbox')]) implements ContainerInterface {
             public function __construct(private array $senders)
             {
             }

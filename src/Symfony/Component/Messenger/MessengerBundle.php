@@ -648,7 +648,7 @@ class MessengerBundle extends AbstractBundle
                 }
 
                 $container->setDefinition($outboxSenderId = '.messenger.transport.'.$name.'.outbox_sender', (new Definition(OutboxSender::class))
-                    ->setArguments([new Reference($senderAliases[$name]), new Reference($senderAliases[$transport['outbox']]), $name]));
+                    ->setArguments([new Reference($senderAliases[$name]), new Reference($senderAliases[$transport['outbox']]), $name, $transport['outbox'], $config['transports'][$transport['outbox']]['failure_transport'] ?? $config['failure_transport']]));
                 $senderReferences[$name] = $senderReferences[$senderAliases[$name]] = new Reference($outboxSenderId);
             }
         }

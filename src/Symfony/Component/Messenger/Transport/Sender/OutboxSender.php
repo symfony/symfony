@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SenderStampInterface;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -30,11 +31,38 @@ use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
  */
 final class OutboxSender implements BatchSenderInterface
 {
+    /**
+     * @param string      $outboxName           The name of the outbox transport
+     * @param string|null $failureTransportName The name of the failure transport of the outbox transport
+     */
     public function __construct(
         private SenderInterface $target,
         private SenderInterface $outbox,
         private string $targetName,
+        private string $outboxName,
+        private ?string $failureTransportName = null,
     ) {
+    }
+
+    /**
+     * Tells whether a received message that carries an OutboxStamp was stored by this outbox.
+     *
+     * @internal
+     */
+    public function canForward(Envelope $envelope): bool
+    {
+        $transportName = $envelope->last(ReceivedStamp::class)?->getTransportName();
+
+        if (null === $transportName) {
+            return false;
+        }
+
+        if ($this->outboxName === $transportName) {
+            return true;
+        }
+
+        // retrying the failure transport gives back the messages that the outbox failed to forward
+        return $this->failureTransportName === $transportName && $this->outboxName === $envelope->last(SentToFailureTransportStamp::class)?->getOriginalReceiverName();
     }
 
     public function send(Envelope $envelope): Envelope

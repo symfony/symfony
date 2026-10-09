@@ -35,7 +35,7 @@
         "symfony/cache": "^7.4|^8.0",
         "symfony/config": "^7.4|^8.0",
         "symfony/console": "^8.1",
-        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.2",
         "symfony/doctrine-messenger": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",
         "symfony/form": "^7.4|^8.0",
@@ -58,6 +58,7 @@
         "doctrine/dbal": "<4.3",
         "doctrine/lexer": "<1.1",
         "doctrine/orm": "<3.4",
+        "symfony/dependency-injection": "<8.2",
         "symfony/event-dispatcher": "<8.2",
         "symfony/property-info": "<8.0",
         "symfony/validator": "<7.4.17|>=8.0,<8.1.5"

@@ -50,6 +50,8 @@ class JsonStreamerTest extends AbstractWebTestCase
 
     public function testWarmupStreamableClasses()
     {
+        static::bootKernel(['test_case' => 'JsonStreamer', 'debug' => true]);
+
         /** @var Filesystem $fs */
         $fs = static::getContainer()->get('filesystem');
 

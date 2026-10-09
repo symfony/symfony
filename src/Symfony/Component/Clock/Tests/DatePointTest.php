@@ -37,6 +37,65 @@ class DatePointTest extends TestCase
         $this->assertSame('2022-01-28 15:00:00 Europe/Paris', $date->format('Y-m-d H:i:s e'));
     }
 
+    #[DataProvider('provideDatetimeStrings')]
+    public function testNativeClockGivesSameResultAsReferenceDate(string $datetime, ?string $timezone)
+    {
+        Clock::set(new NativeClock('Europe/Madrid'));
+        $timezone = null === $timezone ? null : new \DateTimeZone($timezone);
+
+        $reference = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Madrid'));
+        $expected = new DatePoint($datetime, $timezone, $reference);
+        $date = new DatePoint($datetime, $timezone);
+
+        $this->assertSame($expected->getTimezone()->getName(), $date->getTimezone()->getName());
+        $this->assertSame('000000' === $expected->format('u'), '000000' === $date->format('u'));
+        $this->assertEqualsWithDelta($expected->getTimestamp(), $date->getTimestamp(), 1);
+    }
+
+    public static function provideDatetimeStrings(): iterable
+    {
+        foreach ([null, 'America/New_York'] as $timezone) {
+            yield ['now', $timezone];
+            yield ['+1 day', $timezone];
+            yield ['+90 minutes', $timezone];
+            yield ['2024-01-01', $timezone];
+            yield ['2024-01-01 10:00', $timezone];
+            yield ['2024-03-31 02:30', $timezone];
+            yield ['10:00', $timezone];
+            yield ['tomorrow', $timezone];
+            yield ['midnight', $timezone];
+            yield ['noon', $timezone];
+            yield ['yesterday 14:00', $timezone];
+            yield ['first day of next month', $timezone];
+            yield ['last monday', $timezone];
+            yield ['2024-01-01 10:00 Europe/Paris', $timezone];
+            yield ['now Asia/Tokyo', $timezone];
+            yield ['+1 day Asia/Tokyo', $timezone];
+            yield ['10:00 Asia/Tokyo', $timezone];
+            yield ['+1 hour +05:00', $timezone];
+            yield ['2024-01-01T10:00:00+05:00', $timezone];
+            yield ['@1700000000', $timezone];
+        }
+    }
+
+    public function testEmptyStringIsRejectedWithNativeClock()
+    {
+        Clock::set(new NativeClock());
+
+        $this->expectException(\DateMalformedStringException::class);
+
+        new DatePoint('');
+    }
+
+    public function testUsesTimezoneOfGlobalNativeClock()
+    {
+        Clock::set(new NativeClock('Asia/Tokyo'));
+
+        $this->assertSame('Asia/Tokyo', (new DatePoint())->getTimezone()->getName());
+        $this->assertSame('Asia/Tokyo', (new DatePoint('+1 day'))->getTimezone()->getName());
+        $this->assertSame('UTC', (new DatePoint('now', new \DateTimeZone('UTC')))->getTimezone()->getName());
+    }
+
     public function testNowWithNativeClock()
     {
         Clock::set(new NativeClock('Asia/Tokyo'));

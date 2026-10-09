@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `#[\NoDiscard]` to the methods of `DatePoint` that return a new instance
+ * Add `NativeClock::getTimezone()`
 
 7.1
 ---

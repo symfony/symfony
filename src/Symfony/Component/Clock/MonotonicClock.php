@@ -50,13 +50,7 @@ final class MonotonicClock implements ClockInterface
             $us += 1000000;
         }
 
-        if (6 !== \strlen($now = (string) $us)) {
-            $now = str_pad($now, 6, '0', \STR_PAD_LEFT);
-        }
-
-        $now = '@'.($s + $this->sOffset).'.'.$now;
-
-        return DatePoint::createFromInterface(new \DateTimeImmutable($now, $this->timezone))->setTimezone($this->timezone);
+        return DatePoint::createFromTimestamp($s + $this->sOffset)->setMicrosecond($us)->setTimezone($this->timezone);
     }
 
     public function sleep(float|int $seconds): void

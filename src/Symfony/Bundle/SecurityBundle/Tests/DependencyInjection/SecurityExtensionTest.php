@@ -37,6 +37,8 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
@@ -51,6 +53,7 @@ use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
@@ -108,9 +111,22 @@ class SecurityExtensionTest extends TestCase
         ]);
         $container->compile();
 
-        $this->assertTrue($container->getDefinition('security.expression_language')->hasTag('expression_language.compiled'));
-        $this->assertTrue($container->getDefinition('security.is_granted_attribute_expression_language')->hasTag('expression_language.compiled'));
-        $this->assertTrue($container->getDefinition('security.is_csrf_token_valid_attribute_expression_language')->hasTag('expression_language.compiled'));
+        $this->assertSame([IsGranted::class => ['attribute']], $container->getDefinition('security.expression_language')->getTag('expression_language.compiled')[0]['attributes']);
+
+        $expressionLanguage = new class extends ExpressionLanguage {
+            public array $variables = [];
+
+            public function evaluate(Expression|string $expression, array $values = []): mixed
+            {
+                $this->variables = array_keys($values);
+
+                return null;
+            }
+        };
+        (new ControllerArgumentsEvent($this->createStub(HttpKernelInterface::class), static fn () => null, [], new Request(), HttpKernelInterface::MAIN_REQUEST))->evaluate(new Expression('true'), $expressionLanguage);
+
+        $this->assertSame([['attributes' => [IsGranted::class => ['subject']], 'variables' => $expressionLanguage->variables]], $container->getDefinition('security.is_granted_attribute_expression_language')->getTag('expression_language.compiled'));
+        $this->assertSame([['attributes' => [IsCsrfTokenValid::class => ['id']], 'variables' => $expressionLanguage->variables]], $container->getDefinition('security.is_csrf_token_valid_attribute_expression_language')->getTag('expression_language.compiled'));
     }
 
     public function testAccessControlExpressionsAreCompiled()
@@ -126,8 +142,10 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $tags = $container->getDefinition('security.expression_language')->getTag('expression_language.compiled');
-        $this->assertSame(['attributes' => [IsGranted::class => ['attribute']]], $tags[0]);
-        $this->assertSame(['is_granted("ROLE_ADMIN")', 'request.isSecure()'], $tags[1]['expressions']);
+        $this->assertCount(1, $tags);
+        $this->assertSame([IsGranted::class => ['attribute']], $tags[0]['attributes']);
+        $this->assertSame(['is_granted("ROLE_ADMIN")', 'request.isSecure()'], $tags[0]['expressions']);
+        $this->assertSame('security.access_control', $tags[0]['source']);
 
         $expressionLanguage = new class extends ExpressionLanguage {
             public array $variables = [];
@@ -141,7 +159,7 @@ class SecurityExtensionTest extends TestCase
         };
         (new ExpressionVoter($expressionLanguage, new AuthenticationTrustResolver(), $this->createStub(AuthorizationCheckerInterface::class)))->vote(new NullToken(), new Request(), [new Expression('true')]);
 
-        $this->assertEqualsCanonicalizing($expressionLanguage->variables, $tags[1]['variables']);
+        $this->assertEqualsCanonicalizing($expressionLanguage->variables, $tags[0]['variables']);
     }
 
     public function testLdapUsersOnlyReachesTheCredentialsListener()

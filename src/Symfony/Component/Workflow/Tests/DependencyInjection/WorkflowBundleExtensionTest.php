@@ -365,6 +365,7 @@ class WorkflowBundleExtensionTest extends TestCase
         $this->assertEquals(new Reference('cache.workflow_expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE), $expressionLanguage->getArgument(0));
         $tags = $expressionLanguage->getTag('expression_language.compiled');
         $this->assertSame(['!!true', '!!false'], $tags[0]['expressions']);
+        $this->assertSame('the guards of the "article" workflow', $tags[0]['source']);
 
         $spy = new class extends ExpressionLanguage {
             public array $variables = [];

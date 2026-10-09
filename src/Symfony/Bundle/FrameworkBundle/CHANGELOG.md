@@ -4,7 +4,8 @@ CHANGELOG
 8.2
 ---
 
- * Add the `expression_language.compiled` tag, to decorate an expression language with `CompiledExpressionLanguage`; its `attributes`, `string_expressions` and `expressions` attributes list the expressions to compile when warming up the cache, and `variables` the ones the listed expressions can read
+ * Add the `expression_language.compiled` tag, to decorate an expression language with `CompiledExpressionLanguage`; its `attributes`, `string_expressions` and `expressions` attributes list the expressions to compile when warming up the cache, `variables` the variables these expressions can read and `source` where the listed ones come from
+ * Register the `lint:expressions` command
  * Add the `framework.session.isolate_attributes` option to deep-clone the values read from and passed to session attributes
  * List deprecated aliases in `debug:autowiring` only when the `--all` option is passed
  * Register the security expression functions on `controller.expression_language`

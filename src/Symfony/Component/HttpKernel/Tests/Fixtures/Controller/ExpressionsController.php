@@ -29,6 +29,11 @@ class ExpressionsController
     {
     }
 
+    #[Cache(maxage: [])]
+    public function invalid()
+    {
+    }
+
     #[Cache(etag: new Expression('"private"'))]
     private function hidden()
     {

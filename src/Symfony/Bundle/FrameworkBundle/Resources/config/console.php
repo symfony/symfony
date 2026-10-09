@@ -37,6 +37,7 @@ use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\Form\Command\DebugCommand;
+use Symfony\Component\HttpKernel\Command\ExpressionLintCommand;
 use Symfony\Component\Serializer\Command\DebugCommand as SerializerDebugCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
 use Symfony\Component\Validator\Command\DebugCommand as ValidatorDebugCommand;
@@ -92,6 +93,13 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('console.command.container_lint', ContainerLintCommand::class)
+            ->tag('console.command')
+
+        ->set('console.command.expression_lint', ExpressionLintCommand::class)
+            ->args([
+                abstract_arg('expression languages, set in RegisterCompiledExpressionLanguagesPass'),
+                service('expression_language.collector'),
+            ])
             ->tag('console.command')
 
         ->set('console.command.debug_autowiring', DebugAutowiringCommand::class)

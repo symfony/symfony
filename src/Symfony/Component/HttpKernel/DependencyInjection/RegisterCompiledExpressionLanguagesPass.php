@@ -21,7 +21,7 @@ use Symfony\Component\ExpressionLanguage\CompiledExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
- * Decorates the expression languages tagged "expression_language.compiled" with a CompiledExpressionLanguage, which loads the expressions compiled when warming up the cache outside of debug mode.
+ * Decorates the expression languages tagged "expression_language.compiled" with a CompiledExpressionLanguage, which loads the expressions compiled when warming up the cache outside of debug mode, and tells the collector of their expressions which ones they evaluate.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -31,18 +31,14 @@ final class RegisterCompiledExpressionLanguagesPass implements CompilerPassInter
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('expression_language.cache_warmer')) {
-            return;
-        }
-
-        if (!class_exists(CompiledExpressionLanguage::class)) {
-            $container->removeDefinition('expression_language.cache_warmer');
+        if (!$container->hasDefinition('expression_language.collector') || !class_exists(CompiledExpressionLanguage::class)) {
+            self::removeServices($container);
 
             return;
         }
 
         $debug = $container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug');
-        $expressionLanguages = $attributes = $expressions = [];
+        $expressionLanguages = $files = $attributes = $expressions = [];
 
         foreach ($container->findTaggedServiceIds('expression_language.compiled') as $id => $tags) {
             if (!$r = $container->getReflectionClass($class = self::getClass($container, $id), false)) {
@@ -60,41 +56,43 @@ final class RegisterCompiledExpressionLanguagesPass implements CompilerPassInter
                 ->setArguments([new Reference('.inner'), $file])
                 ->setLazy($container->getDefinition($id)->isLazy());
 
-            if ($debug) {
-                continue;
+            $expressionLanguages[$id] = new Reference($id);
+
+            if (!$debug) {
+                $files[$id] = $file;
             }
 
-            $expressionLanguages[$file] = new Reference($id);
-
             foreach ($tags as $tag) {
+                $variables = $tag['variables'] ?? null;
+
                 foreach ($tag['attributes'] ?? [] as $class => $properties) {
                     foreach ($properties as $property) {
-                        $attributes[$file][$class][$property] ??= false;
+                        [$stringsAreExpressions, $boundVariables] = $attributes[$id][$class][$property] ?? [false, $variables];
+                        $attributes[$id][$class][$property] = [$stringsAreExpressions, self::mergeVariables($boundVariables, $variables)];
                     }
                 }
 
                 foreach ($tag['string_expressions'] ?? [] as $class => $properties) {
                     foreach ($properties as $property) {
-                        $attributes[$file][$class][$property] = true;
+                        $boundVariables = ($attributes[$id][$class][$property] ?? [true, $variables])[1];
+                        $attributes[$id][$class][$property] = [true, self::mergeVariables($boundVariables, $variables)];
                     }
                 }
 
-                // an expression listed by several tags can read the variables of all of them, or any variable when one of them doesn't list its variables
-                $variables = $tag['variables'] ?? null;
                 foreach ($tag['expressions'] ?? [] as $expression) {
-                    if (!\array_key_exists($expression, $expressions[$file] ?? [])) {
-                        $expressions[$file][$expression] = $variables;
-                    } elseif (null === $variables || null === $expressions[$file][$expression]) {
-                        $expressions[$file][$expression] = null;
-                    } else {
-                        $expressions[$file][$expression] = array_values(array_unique([...$expressions[$file][$expression], ...$variables]));
+                    [$listedVariables, $sources] = $expressions[$id][$expression] ?? [$variables, []];
+
+                    if (isset($tag['source'])) {
+                        $sources[] = $tag['source'];
                     }
+
+                    $expressions[$id][$expression] = [self::mergeVariables($listedVariables, $variables), $sources];
                 }
             }
         }
 
         if (!$expressionLanguages) {
-            $container->removeDefinition('expression_language.cache_warmer');
+            self::removeServices($container);
 
             return;
         }
@@ -106,11 +104,42 @@ final class RegisterCompiledExpressionLanguagesPass implements CompilerPassInter
             }
         }
 
-        $container->getDefinition('expression_language.cache_warmer')
-            ->replaceArgument(0, new IteratorArgument($expressionLanguages))
-            ->replaceArgument(1, array_values(array_unique($controllers)))
-            ->replaceArgument(2, $attributes)
-            ->replaceArgument(3, $expressions);
+        $container->getDefinition('expression_language.collector')
+            ->replaceArgument(0, array_values(array_unique($controllers)))
+            ->replaceArgument(1, $attributes)
+            ->replaceArgument(2, $expressions);
+
+        if (!$debug && $container->hasDefinition('expression_language.cache_warmer')) {
+            $container->getDefinition('expression_language.cache_warmer')
+                ->replaceArgument(0, new IteratorArgument($expressionLanguages))
+                ->replaceArgument(1, $files);
+        } else {
+            $container->removeDefinition('expression_language.cache_warmer');
+        }
+
+        if ($container->hasDefinition('console.command.expression_lint')) {
+            $container->getDefinition('console.command.expression_lint')
+                ->replaceArgument(0, new IteratorArgument($expressionLanguages));
+        }
+    }
+
+    /**
+     * An expression bound or listed by several tags can read the variables of all of them, or any variable when one of them doesn't list its variables.
+     */
+    private static function mergeVariables(?array $variables, ?array $moreVariables): ?array
+    {
+        if (null === $variables || null === $moreVariables) {
+            return null;
+        }
+
+        return array_values(array_unique([...$variables, ...$moreVariables]));
+    }
+
+    private static function removeServices(ContainerBuilder $container): void
+    {
+        $container->removeDefinition('expression_language.collector');
+        $container->removeDefinition('expression_language.cache_warmer');
+        $container->removeDefinition('console.command.expression_lint');
     }
 
     private static function getClass(ContainerBuilder $container, string $id): ?string

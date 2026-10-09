@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
+use Symfony\Component\HttpKernel\CacheWarmer\ExpressionCollector;
 use Symfony\Component\HttpKernel\CacheWarmer\ExpressionLanguageCacheWarmer;
 use Symfony\Component\HttpKernel\Config\FileLocator as LegacyFileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface as LegacyServicesResetterInterface;
@@ -93,12 +94,18 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('container.no_preload')
 
+        ->set('expression_language.collector', ExpressionCollector::class)
+            ->args([
+                abstract_arg('controller classes, set in RegisterCompiledExpressionLanguagesPass'),
+                abstract_arg('controller attributes holding expressions, set in RegisterCompiledExpressionLanguagesPass'),
+                abstract_arg('more expressions, set in RegisterCompiledExpressionLanguagesPass'),
+            ])
+
         ->set('expression_language.cache_warmer', ExpressionLanguageCacheWarmer::class)
             ->args([
                 abstract_arg('expression languages, set in RegisterCompiledExpressionLanguagesPass'),
-                abstract_arg('controller classes, set in RegisterCompiledExpressionLanguagesPass'),
-                abstract_arg('controller attributes holding expressions, set in RegisterCompiledExpressionLanguagesPass'),
-                abstract_arg('more expressions to compile, set in RegisterCompiledExpressionLanguagesPass'),
+                abstract_arg('files to compile the expressions into, set in RegisterCompiledExpressionLanguagesPass'),
+                service('expression_language.collector'),
             ])
             ->tag('kernel.cache_warmer')
 

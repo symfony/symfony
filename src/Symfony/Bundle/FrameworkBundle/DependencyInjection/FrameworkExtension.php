@@ -119,6 +119,7 @@ class FrameworkExtension extends Extension
 
         if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/framework-bundle'])) {
             $container->removeDefinition('controller.expression_language');
+            $container->removeDefinition('expression_language.collector');
             $container->removeDefinition('expression_language.cache_warmer');
         }
 

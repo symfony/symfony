@@ -154,6 +154,8 @@ class Parser
             }
 
             if (0 === $precedence) {
+                $this->nestingLevel = $nestingLevel + 1;
+
                 return $this->parseConditionalExpression($expr);
             }
 

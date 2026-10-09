@@ -38,6 +38,10 @@ class ExpressionValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Expression::class);
         }
 
+        if ($constraint->skipOnEmpty && (null === $value || '' === $value)) {
+            return;
+        }
+
         $variables = $constraint->values;
         $variables['value'] = $value;
         $variables['this'] = $this->context->getObject();

@@ -39,12 +39,14 @@ class Expression extends Constraint
     public string|ExpressionObject|null $expression = null;
     public array $values = [];
     public bool $negate = true;
+    public bool $skipOnEmpty = false;
 
     /**
-     * @param string|ExpressionObject|null $expression The expression to evaluate
-     * @param array<string,mixed>|null     $values     The values of the custom variables used in the expression (defaults to an empty array)
+     * @param string|ExpressionObject|null $expression  The expression to evaluate
+     * @param array<string,mixed>|null     $values      The values of the custom variables used in the expression (defaults to an empty array)
      * @param string[]|null                $groups
-     * @param bool|null                    $negate     Whether to fail if the expression evaluates to true (defaults to false)
+     * @param bool|null                    $negate      Whether to fail if the expression evaluates to true (defaults to false)
+     * @param bool|null                    $skipOnEmpty Whether to skip the evaluation of the expression when the value is null or an empty string (defaults to false)
      */
     public function __construct(
         string|ExpressionObject|null $expression,
@@ -54,6 +56,7 @@ class Expression extends Constraint
         mixed $payload = null,
         ?array $options = null,
         ?bool $negate = null,
+        ?bool $skipOnEmpty = null,
     ) {
         if (!class_exists(ExpressionLanguage::class)) {
             throw new LogicException(\sprintf('The "symfony/expression-language" component is required to use the "%s" constraint. Try running "composer require symfony/expression-language".', __CLASS__));
@@ -73,6 +76,7 @@ class Expression extends Constraint
         $this->expression = $expression;
         $this->values = $values ?? $this->values;
         $this->negate = $negate ?? $this->negate;
+        $this->skipOnEmpty = $skipOnEmpty ?? $this->skipOnEmpty;
     }
 
     public function getTargets(): string|array

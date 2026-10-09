@@ -21,6 +21,7 @@ CHANGELOG
  * Add support for reading objects properties with `Unique` constraint `fields` option
  * Add an optional `$mappedClasses` argument to `Mapping\Loader\LoaderChain::__construct()`, to declare which classes each loader maps
  * Add `ValidatorBuilder::addMappedClasses()`, to declare which classes each mapping file maps
+ * Add the `skipOnEmpty` option to the `Expression` constraint, to skip the evaluation of the expression when the value is `null` or an empty string
 
 8.1
 ---

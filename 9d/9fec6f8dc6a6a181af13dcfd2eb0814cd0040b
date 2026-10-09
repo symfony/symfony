@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-08T15:22:38Z
+
+I'd be fine with one PR to do them all.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-08T16:34:16Z
+
+On branch 8.2 would be a better fit IMHO.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-10-08T18:51:18Z
+
+Done, retargeted to 8.2 with everything in it: `isCacheable()`, both status lists of `CacheAttributeListener` (8.2 has one per path), and `RedirectResponse` no longer adding `no-cache, private` to a 308, with CHANGELOG and UPGRADE entries.
+
+I left `ResponseCacheStrategy` as is: with 200, 301, 307 and 308 embedded responses (no headers, `Last-Modified`, `ETag`), the merged response is the same in every case, since a response without cache headers gets `no-cache, private` before the status list is checked.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-09T12:35:13Z
+
+`ResponseCacheStrategy` now treats 308 like 301 too: with this PR a bare `RedirectResponse(308)` has no `Cache-Control` header, which is exactly the case its status list decides, so the title holds everywhere.

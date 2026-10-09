@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\GuidType;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Query;
@@ -37,11 +36,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 {
     protected function tearDown(): void
     {
-        // Only doctrine/dbal versions without a per-connection registry leak the type declared by
-        // a test into the next one.
-        if (!method_exists(Configuration::class, 'setTypeProvider') && Type::hasType('uuid')) {
-            Type::overrideType('uuid', GuidType::class);
-        }
+        DoctrineTestHelper::registerTypes(new Configuration(), ['uuid' => GuidType::class]);
     }
 
     public function testIdentifierTypeIsStringArray()

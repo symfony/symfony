@@ -87,7 +87,7 @@ class TemplateIterator implements \IteratorAggregate
         }
 
         $templates = [];
-        foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs)->name($this->namePatterns) as $file) {
+        foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs)->name($this->namePatterns)->sortByName() as $file) {
             $templates[] = (null !== $namespace ? '@'.$namespace.'/' : '').str_replace('\\', '/', $file->getRelativePathname());
         }
 

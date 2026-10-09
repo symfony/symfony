@@ -52,6 +52,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\RemoteCaller;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\RemoteCallerHttp;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\RemoteCallerSocket;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Filesystem\Filesystem;
 
 #[IgnoreDeprecations]
 #[Group('legacy')]
@@ -316,6 +317,30 @@ class XmlFileLoaderTest extends TestCase
         $fooArgs = $services['foo']->getArguments();
         $barArgs = $services['bar']->getArguments();
         $this->assertSame($fooArgs[0], $barArgs[0]);
+    }
+
+    public function testAnonymousServicesIdsDoNotDependOnTheProjectDirectory()
+    {
+        $filesystem = new Filesystem();
+        $ids = [];
+
+        foreach (['project_a', 'project_b'] as $project) {
+            $dir = sys_get_temp_dir().'/sf_anonymous_services_'.$project;
+            $filesystem->copy(self::$fixturesPath.'/xml/services5.xml', $dir.'/config/services.xml', true);
+
+            $container = new ContainerBuilder();
+            $container->setParameter('kernel.project_dir', $dir);
+
+            try {
+                (new XmlFileLoader($container, new FileLocator($dir.'/config')))->load('services.xml');
+            } finally {
+                $filesystem->remove($dir);
+            }
+
+            $ids[$project] = array_keys($container->getDefinitions());
+        }
+
+        $this->assertSame($ids['project_a'], $ids['project_b']);
     }
 
     public function testLoadAnonymousServicesWithoutId()

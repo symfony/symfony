@@ -94,7 +94,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
 
         $value->setArgument(0, $services);
 
-        $id = '.service_locator.'.ContainerBuilder::hash($value);
+        $id = self::getLocatorId($this->container, $value, $this->currentId);
 
         if ($isRoot) {
             if ($id !== $this->currentId) {
@@ -123,7 +123,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             $locator->setBindings($container->getDefinition($callerId)->getBindings());
         }
 
-        if (!$container->hasDefinition($id = '.service_locator.'.ContainerBuilder::hash($locator))) {
+        if (!$container->hasDefinition($id = self::getLocatorId($container, $locator, $callerId))) {
             $container->setDefinition($id, $locator);
         }
 
@@ -140,5 +140,23 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         }
 
         return new Reference($id);
+    }
+
+    private static function getLocatorId(ContainerBuilder $container, Definition $locator, ?string $consumerId): string
+    {
+        $values = $bindingIds = [];
+        foreach ($locator->getBindings() as $key => $binding) {
+            [$values[$key], $bindingIds[$key]] = $binding->getValues();
+        }
+
+        // The file declaring a binding and its usage-tracking id are not hashed, so that the id depends neither on the project directory nor on what else the process compiled
+        $hash = ContainerBuilder::hash($values ? [(clone $locator)->setBindings([]), $values] : $locator);
+        $id = '.service_locator.'.$hash;
+
+        if (null !== $consumerId && $container->hasDefinition($id) && $bindingIds !== array_map(static fn ($binding) => $binding->getValues()[1], $container->getDefinition($id)->getBindings())) {
+            $id = '.service_locator.'.ContainerBuilder::hash([$hash, $consumerId]);
+        }
+
+        return $id;
     }
 }

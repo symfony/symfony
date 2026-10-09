@@ -170,6 +170,41 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertInstanceOf(BoundArgument::class, $locator->getBindings()['foo']);
     }
 
+    public function testLocatorIdDoesNotDependOnTheFileDeclaringBindings()
+    {
+        $this->assertSame(
+            $this->registerLocatorWithBinding(new BoundArgument('bar', true, BoundArgument::DEFAULTS_BINDING, '/project-a/config/services.yaml')),
+            $this->registerLocatorWithBinding(new BoundArgument('bar', true, BoundArgument::DEFAULTS_BINDING, '/project-b/config/services.yaml'))
+        );
+    }
+
+    public function testLocatorIdDoesNotDependOnPreviouslyCreatedBindings()
+    {
+        $id = $this->registerLocatorWithBinding(new BoundArgument('bar', true, BoundArgument::DEFAULTS_BINDING));
+        new BoundArgument('baz');
+
+        $this->assertSame($id, $this->registerLocatorWithBinding(new BoundArgument('bar', true, BoundArgument::DEFAULTS_BINDING)));
+    }
+
+    public function testLocatorsAreSharedOnlyByServicesSharingTheSameBindings()
+    {
+        $container = new ContainerBuilder();
+        $bindings = ['$bar' => new BoundArgument('bar', true, BoundArgument::DEFAULTS_BINDING)];
+        $container->register('foo1')->setBindings($bindings);
+        $container->register('foo2')->setBindings($bindings);
+        $container->register('foo3')->setBindings(['$bar' => new BoundArgument('bar', true, BoundArgument::DEFAULTS_BINDING)]);
+
+        $locators = [];
+        foreach (['foo1', 'foo2', 'foo3'] as $id) {
+            $locator = ServiceLocatorTagPass::register($container, ['baz' => new Reference('baz')], $id);
+            $locators[$id] = (string) $container->getDefinition($locator)->getFactory()[0];
+        }
+
+        $this->assertSame($locators['foo1'], $locators['foo2']);
+        $this->assertNotSame($locators['foo1'], $locators['foo3']);
+        $this->assertSame($container->getDefinition('foo3')->getBindings(), $container->getDefinition($locators['foo3'])->getBindings());
+    }
+
     public function testTaggedServices()
     {
         $container = new ContainerBuilder();
@@ -362,6 +397,14 @@ class ServiceLocatorTagPassTest extends TestCase
         (new ServiceLocatorTagPass())->process($container);
 
         $this->assertInstanceOf(Reference::class, $definition->getBindings()['foo']->getValues()[0]);
+    }
+
+    private function registerLocatorWithBinding(BoundArgument $binding): string
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo')->setBindings(['$bar' => $binding]);
+
+        return (string) ServiceLocatorTagPass::register($container, ['baz' => new Reference('baz')], 'foo');
     }
 }
 

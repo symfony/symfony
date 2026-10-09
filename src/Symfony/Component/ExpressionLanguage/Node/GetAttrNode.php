@@ -159,7 +159,7 @@ class GetAttrNode extends Node
                     return null;
                 }
 
-                if (!\is_object($value)) {
+                if (!\is_object($value) && !$this->attributes['is_null_coalesce']) {
                     throw new RuntimeException(\sprintf('Unable to get property "%s" of non-object "%s".', $this->nodes['attribute']->dump(), $this->nodes['node']->dump()));
                 }
 
@@ -197,7 +197,7 @@ class GetAttrNode extends Node
                     return null;
                 }
 
-                if (!\is_array($value) && !$value instanceof \ArrayAccess && !(null === $value && $this->attributes['is_null_coalesce'])) {
+                if (!\is_array($value) && !$value instanceof \ArrayAccess && (!$this->attributes['is_null_coalesce'] || \is_object($value))) {
                     throw new RuntimeException(\sprintf('Unable to get an item of non-array "%s".', $this->nodes['node']->dump()));
                 }
 

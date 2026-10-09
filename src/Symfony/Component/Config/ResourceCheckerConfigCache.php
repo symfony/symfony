@@ -58,11 +58,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             return false;
         }
 
-        if ($this->resourceCheckers instanceof \Traversable && !$this->resourceCheckers instanceof \Countable) {
-            $this->resourceCheckers = iterator_to_array($this->resourceCheckers);
-        }
-
-        if (!\count($this->resourceCheckers)) {
+        if (!$this->hasResourceCheckers()) {
             return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 
@@ -117,7 +113,10 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             // discard chmod failure (some filesystem may not support it)
         }
 
-        if (null !== $metadata) {
+        if (null !== $metadata && !$this->hasResourceCheckers()) {
+            // nothing reads the meta files when there are no checkers
+            $filesystem->remove([$this->metaFile, $this->metaFile.'.json']);
+        } elseif (null !== $metadata) {
             $filesystem->dumpFile($this->metaFile, $ser = serialize($metadata));
             try {
                 $filesystem->chmod($this->metaFile, $mode, $umask);
@@ -179,5 +178,14 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
     public static function handleUnserializeCallback(string $class): void
     {
         trigger_error('Class not found: '.$class);
+    }
+
+    private function hasResourceCheckers(): bool
+    {
+        if ($this->resourceCheckers instanceof \Traversable && !$this->resourceCheckers instanceof \Countable) {
+            $this->resourceCheckers = iterator_to_array($this->resourceCheckers);
+        }
+
+        return \count($this->resourceCheckers);
     }
 }

@@ -41,7 +41,8 @@ class FileResource implements SelfCheckingResourceInterface
         $this->resource = $resolvedResource;
 
         // mtimes have a one-second resolution: remember the content of recently modified files to tell if they change again in the same second
-        if (time() - 1 <= @filemtime($resolvedResource)) {
+        // Reproducible builds skip this: whether a file is recent depends on when the build runs
+        if (!isset($_SERVER['SOURCE_DATE_EPOCH']) && time() - 1 <= @filemtime($resolvedResource)) {
             $this->hash = @hash_file('xxh128', $resolvedResource) ?: null;
         }
     }

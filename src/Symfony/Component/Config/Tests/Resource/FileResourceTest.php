@@ -104,6 +104,21 @@ class FileResourceTest extends TestCase
         $this->assertSame(realpath($this->file), $this->resource->getResource());
     }
 
+    public function testSerializedFormDoesNotDependOnModificationTimeWhenSourceDateEpochIsSet()
+    {
+        $_SERVER['SOURCE_DATE_EPOCH'] = '1700000000';
+
+        try {
+            $this->touch($this->time - 10);
+            $serialized = serialize(new FileResource($this->file));
+            $this->touch($this->time);
+
+            $this->assertSame($serialized, serialize(new FileResource($this->file)));
+        } finally {
+            unset($_SERVER['SOURCE_DATE_EPOCH']);
+        }
+    }
+
     private function touch(int $time): void
     {
         touch($this->file, $time);

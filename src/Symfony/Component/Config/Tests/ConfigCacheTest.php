@@ -31,7 +31,7 @@ class ConfigCacheTest extends TestCase
 
     protected function tearDown(): void
     {
-        $files = [$this->cacheFile, $this->cacheFile.'.meta', $this->metaFile];
+        $files = [$this->cacheFile, $this->cacheFile.'.meta', $this->cacheFile.'.meta.json', $this->metaFile, $this->metaFile.'.json'];
 
         foreach ($files as $file) {
             if (file_exists($file)) {
@@ -108,9 +108,18 @@ class ConfigCacheTest extends TestCase
     {
         $this->assertStringEqualsFile($this->metaFile, '');
 
-        $cache = new ConfigCache($this->cacheFile, false, $this->metaFile);
+        $cache = new ConfigCache($this->cacheFile, true, $this->metaFile);
         $cache->write('foo', [new FileResource(__FILE__)]);
 
         $this->assertStringNotEqualsFile($this->metaFile, '');
+    }
+
+    public function testMetaFileIsNotWrittenInProduction()
+    {
+        $cache = new ConfigCache($this->cacheFile, false);
+        $cache->write('foo', [new FileResource(__FILE__)]);
+
+        $this->assertFileDoesNotExist($this->cacheFile.'.meta');
+        $this->assertTrue($cache->isFresh());
     }
 }

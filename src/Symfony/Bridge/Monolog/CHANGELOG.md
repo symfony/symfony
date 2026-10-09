@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Restrict the logs `ConsoleHandler` writes to a subset of the channels with the `SYMFONY_CONSOLE_LOG_CHANNELS` env var
+
 8.1
 ---
 

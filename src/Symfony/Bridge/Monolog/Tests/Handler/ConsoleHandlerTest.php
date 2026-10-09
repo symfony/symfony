@@ -326,4 +326,86 @@ class ConsoleHandlerTest extends TestCase
         $dispatcher->dispatch(new ConsoleTerminateEvent(new Command('messenger:consume'), $parentInput, $output, Command::SUCCESS), ConsoleEvents::TERMINATE);
         $this->assertFalse($handler->isHandling(RecordFactory::create(Logger::DEBUG)), 'Handler must be closed after main command terminates');
     }
+
+    #[DataProvider('provideChannelFilters')]
+    public function testChannelFiltering(array $channels, string $channel, bool $isHandling)
+    {
+        $handler = self::createHandler($channels, new BufferedOutput(OutputInterface::VERBOSITY_DEBUG));
+
+        $this->assertSame($isHandling, $handler->isHandling(RecordFactory::create(Level::Info, 'My info message', $channel)),
+            'SYMFONY_CONSOLE_LOG_CHANNELS selects the channels written to the console'
+        );
+    }
+
+    public static function provideChannelFilters(): iterable
+    {
+        yield 'no channel selected' => [[], 'app', true];
+        yield 'the channel is included' => [['app'], 'app', true];
+        yield 'another channel is included' => [['app'], 'doctrine', false];
+        yield 'the channel is one of the included ones' => [['app', 'doctrine'], 'doctrine', true];
+        yield 'the channel is excluded' => [['!event'], 'event', false];
+        yield 'another channel is excluded' => [['!event'], 'app', true];
+        yield 'the channel is one of the excluded ones' => [['!event', '!php'], 'php', false];
+    }
+
+    #[DataProvider('provideCombinedChannels')]
+    public function testIncludedAndExcludedChannelsCannotBeCombined(array $channels)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot combine included and excluded channels in "SYMFONY_CONSOLE_LOG_CHANNELS".');
+
+        self::createHandler($channels, new BufferedOutput(OutputInterface::VERBOSITY_DEBUG));
+    }
+
+    public static function provideCombinedChannels(): iterable
+    {
+        yield 'an excluded channel after an included one' => [['app', '!event']];
+        yield 'an included channel after an excluded one' => [['!event', 'app']];
+    }
+
+    public function testChannelsAreNotReadWhenTheHandlerIsBuilt()
+    {
+        $env = $_ENV;
+        $_ENV['SYMFONY_CONSOLE_LOG_CHANNELS'] = '!app';
+
+        try {
+            $handler = new ConsoleHandler(new BufferedOutput(OutputInterface::VERBOSITY_DEBUG));
+        } finally {
+            $_ENV = $env;
+        }
+
+        $this->assertTrue($handler->isHandling(RecordFactory::create(Level::Info, 'My info message', 'app')),
+            'the channels are only read when a command runs, so building the logger for a web request cannot fail on them'
+        );
+    }
+
+    public function testChannelFilteringAllowsPropagation()
+    {
+        $consoleHandler = self::createHandler(['app'], new BufferedOutput(OutputInterface::VERBOSITY_DEBUG), false);
+
+        $sibling = new TestHandler();
+        $logger = new Logger('doctrine', [$consoleHandler, $sibling]);
+
+        $logger->warning('hello');
+
+        self::assertTrue(
+            $sibling->hasWarningRecords(),
+            'sibling handler must still receive the records of the channels filtered out of the console',
+        );
+    }
+
+    private static function createHandler(array $channels, OutputInterface $output, bool $bubble = true): ConsoleHandler
+    {
+        $env = $_ENV;
+        $_ENV['SYMFONY_CONSOLE_LOG_CHANNELS'] = implode(', ', $channels);
+
+        try {
+            $handler = new ConsoleHandler(null, $bubble);
+            $handler->onCommand(new ConsoleCommandEvent(new Command('foo'), new ArrayInput([]), $output));
+
+            return $handler;
+        } finally {
+            $_ENV = $env;
+        }
+    }
 }

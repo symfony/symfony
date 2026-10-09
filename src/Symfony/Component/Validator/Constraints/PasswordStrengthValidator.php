@@ -32,7 +32,7 @@ final class PasswordStrengthValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, PasswordStrength::class);
         }
 
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return;
         }
 

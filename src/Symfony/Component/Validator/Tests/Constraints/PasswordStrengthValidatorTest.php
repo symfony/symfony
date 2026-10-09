@@ -22,6 +22,20 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
         return new PasswordStrengthValidator();
     }
 
+    public function testNullIsValid()
+    {
+        $this->validator->validate(null, new PasswordStrength());
+
+        $this->assertNoViolation();
+    }
+
+    public function testEmptyStringIsValid()
+    {
+        $this->validator->validate('', new PasswordStrength());
+
+        $this->assertNoViolation();
+    }
+
     /**
      * @dataProvider getValidValues
      */

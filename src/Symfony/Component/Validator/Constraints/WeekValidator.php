@@ -27,7 +27,7 @@ final class WeekValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Week::class);
         }
 
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return;
         }
 

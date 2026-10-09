@@ -37,8 +37,6 @@ class StreamablePass implements CompilerPassInterface
                 'object' => $tag[0]['object'],
                 'list' => $tag[0]['list'],
             ];
-
-            $container->removeDefinition($id);
         }
 
         if (!$container->hasDefinition('.json_streamer.cache_warmer.streamer')) {

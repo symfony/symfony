@@ -25,6 +25,20 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
         return new WeekValidator();
     }
 
+    public function testNullIsValid()
+    {
+        $this->validator->validate(null, new Week());
+
+        $this->assertNoViolation();
+    }
+
+    public function testEmptyStringIsValid()
+    {
+        $this->validator->validate('', new Week());
+
+        $this->assertNoViolation();
+    }
+
     #[DataProvider('provideWeekNumber')]
     public function testWeekIsValidWeekNumber(string|\Stringable $value, bool $expectedViolation)
     {

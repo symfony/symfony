@@ -96,6 +96,25 @@ class TemplateIteratorTest extends TestCase
         );
     }
 
+    public function testGetIteratorListsTemplatesSortedByName()
+    {
+        $dir = sys_get_temp_dir().'/sf_template_iterator_'.bin2hex(random_bytes(4));
+        mkdir($dir);
+
+        try {
+            foreach (range('j', 'a') as $letter) {
+                touch($dir.'/'.$letter.'.html.twig');
+            }
+
+            $iterator = new TemplateIterator($this->createStub(Kernel::class), [], $dir);
+
+            $this->assertSame(array_map(static fn ($letter) => $letter.'.html.twig', range('a', 'j')), iterator_to_array($iterator, false));
+        } finally {
+            array_map('unlink', glob($dir.'/*'));
+            rmdir($dir);
+        }
+    }
+
     private function createKernelMock(): Kernel
     {
         $bundle = $this->createStub(BundleInterface::class);

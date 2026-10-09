@@ -43,6 +43,7 @@ class DebugCommandTest extends TestCase
             |               |                                                    |                        |   "message" => "This value is not valid.",                 |
             |               |                                                    |                        |   "negate" => true,                                        |
             |               |                                                    |                        |   "payload" => null,                                       |
+            |               |                                                    |                        |   "skipOnEmpty" => false,                                  |
             |               |                                                    |                        |   "values" => []                                           |
             |               |                                                    |                        | ]                                                          |
             | code          | property options                                   |                        | [                                                          |
@@ -99,6 +100,7 @@ class DebugCommandTest extends TestCase
             |               |                                                    |                        |   "message" => "This value is not valid.",                 |
             |               |                                                    |                        |   "negate" => true,                                        |
             |               |                                                    |                        |   "payload" => null,                                       |
+            |               |                                                    |                        |   "skipOnEmpty" => false,                                  |
             |               |                                                    |                        |   "values" => []                                           |
             |               |                                                    |                        | ]                                                          |
             | code          | property options                                   |                        | [                                                          |
@@ -141,6 +143,7 @@ class DebugCommandTest extends TestCase
             |               |                                                    |                        |   "message" => "This value is not valid.",                 |
             |               |                                                    |                        |   "negate" => true,                                        |
             |               |                                                    |                        |   "payload" => null,                                       |
+            |               |                                                    |                        |   "skipOnEmpty" => false,                                  |
             |               |                                                    |                        |   "values" => []                                           |
             |               |                                                    |                        | ]                                                          |
             | code          | property options                                   |                        | [                                                          |

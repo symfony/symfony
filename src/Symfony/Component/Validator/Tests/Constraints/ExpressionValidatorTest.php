@@ -67,6 +67,52 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    #[DataProvider('provideEmptyValues')]
+    public function testExpressionIsNotEvaluatedWithEmptyValueWhenSkipOnEmpty(?string $value)
+    {
+        $constraint = new Expression(
+            expression: 'false',
+            message: 'myMessage',
+            skipOnEmpty: true,
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public static function provideEmptyValues(): iterable
+    {
+        yield 'null' => [null];
+        yield 'empty string' => [''];
+    }
+
+    #[DataProvider('provideNonEmptyValues')]
+    public function testExpressionIsEvaluatedWithNonEmptyValueWhenSkipOnEmpty(mixed $value, string $formattedValue)
+    {
+        $constraint = new Expression(
+            expression: 'false',
+            message: 'myMessage',
+            skipOnEmpty: true,
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
+            ->assertRaised();
+    }
+
+    public static function provideNonEmptyValues(): iterable
+    {
+        yield 'whitespace' => [' ', '" "'];
+        yield 'zero string' => ['0', '"0"'];
+        yield 'zero' => [0, '0'];
+        yield 'false' => [false, 'false'];
+        yield 'empty array' => [[], 'array'];
+    }
+
     public function testSucceedingExpressionAtObjectLevel()
     {
         $constraint = new Expression('this.data == 1');

@@ -28,6 +28,7 @@ class ExpressionTest extends TestCase
         self::assertSame('value == "1"', $aConstraint->expression);
         self::assertSame([], $aConstraint->values);
         self::assertTrue($aConstraint->negate);
+        self::assertFalse($aConstraint->skipOnEmpty);
 
         [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame('value == "1"', $bConstraint->expression);
@@ -41,6 +42,7 @@ class ExpressionTest extends TestCase
         self::assertSame(['foo'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
         self::assertFalse($cConstraint->negate);
+        self::assertTrue($cConstraint->skipOnEmpty);
     }
 
     public function testMissingPattern()
@@ -60,6 +62,6 @@ class ExpressionDummy
     #[Expression(expression: 'value == "1"', message: 'myMessage', negate: true)]
     private $b;
 
-    #[Expression(expression: 'value == someVariable', values: ['someVariable' => 42], groups: ['foo'], payload: 'some attached data', negate: false)]
+    #[Expression(expression: 'value == someVariable', values: ['someVariable' => 42], groups: ['foo'], payload: 'some attached data', negate: false, skipOnEmpty: true)]
     private $c;
 }

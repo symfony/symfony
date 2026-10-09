@@ -39,4 +39,20 @@ class StreamablePassTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $pass->process($container);
     }
+
+    public function testKeepsStreamableResourcesForOtherPasses()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('json_streamer.stream_writer');
+        $container->register('.json_streamer.cache_warmer.streamer')->setArguments([null]);
+
+        $container->register('streamable')->setClass('Foo')
+            ->addResourceTag('json_streamer.streamable', ['object' => true, 'list' => true])
+            ->addResourceTag('app.mapped', ['target' => 'Bar']);
+
+        (new StreamablePass())->process($container);
+
+        $this->assertSame(['streamable' => [['target' => 'Bar']]], $container->findTaggedResourceIds('app.mapped'));
+    }
 }

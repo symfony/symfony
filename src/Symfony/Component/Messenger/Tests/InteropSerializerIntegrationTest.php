@@ -74,7 +74,7 @@ class InteropSerializerIntegrationTest extends TestCase
     {
         $transport = new InMemoryTransport(new InteropSerializer(Serializer::create()));
         $outbox = new InMemoryTransport();
-        $ordersSender = new OutboxSender($transport, $outbox, 'orders');
+        $ordersSender = new OutboxSender($transport, $outbox, 'orders', 'outbox');
 
         $this->sendFromAppA($ordersSender, $message = new DummyMessage('Hello'));
 

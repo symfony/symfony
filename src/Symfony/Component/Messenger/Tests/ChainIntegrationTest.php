@@ -218,7 +218,7 @@ class ChainIntegrationTest extends TestCase
     public function testTheChainStartsWhereTheMessageIsHandledAndNotWhereItIsRelayed()
     {
         $outbox = $this->addTransport('outbox');
-        $this->senders->set('async', new OutboxSender($this->transport, $outbox, 'async'));
+        $this->senders->set('async', new OutboxSender($this->transport, $outbox, 'async', 'outbox'));
         $bus = $this->createBus([DummyMessage::class => ['async']]);
 
         $bus->dispatch($first = new DummyMessage('first'), [new ChainStamp($second = new SecondMessage())]);

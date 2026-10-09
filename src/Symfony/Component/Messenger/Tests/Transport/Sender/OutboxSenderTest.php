@@ -42,7 +42,7 @@ class OutboxSenderTest extends TestCase
         $target->expects($this->never())->method('send');
         $outbox = new InMemoryTransport();
 
-        $envelope = (new OutboxSender($target, $outbox, 'orders'))->send(new Envelope(new DummyMessage('Hey')));
+        $envelope = (new OutboxSender($target, $outbox, 'orders', 'outbox'))->send(new Envelope(new DummyMessage('Hey')));
 
         $this->assertCount(1, $stored = $outbox->getSent());
         $this->assertSame('orders', $stored[0]->last(OutboxStamp::class)?->getTransportName());
@@ -57,7 +57,7 @@ class OutboxSenderTest extends TestCase
         $outbox->expects($this->never())->method('send');
         $received = (new Envelope(new DummyMessage('Hey')))->with(new OutboxStamp('orders'), new TransportMessageIdStamp(42), new ReceivedStamp('outbox'));
 
-        $envelope = (new OutboxSender($target, $outbox, 'orders'))->send($received);
+        $envelope = (new OutboxSender($target, $outbox, 'orders', 'outbox'))->send($received);
 
         $this->assertCount(1, $forwarded = $target->getSent());
         $this->assertNull($forwarded[0]->last(OutboxStamp::class));
@@ -74,7 +74,7 @@ class OutboxSenderTest extends TestCase
         $stamps = [new OutboxStamp('orders'), new DelayStamp(1000), new RedeliveryStamp(2), new ErrorDetailsStamp('Exception', 0, 'relay failed'), new SentToFailureTransportStamp('outbox'), new ReceivedStamp('outbox')];
         $received = (new Envelope(new DummyMessage('Hey')))->with(...$stamps);
 
-        $envelope = (new OutboxSender($target, $outbox, 'orders'))->send($received);
+        $envelope = (new OutboxSender($target, $outbox, 'orders', 'outbox'))->send($received);
 
         foreach ([OutboxStamp::class, DelayStamp::class, RedeliveryStamp::class, ErrorDetailsStamp::class, SentToFailureTransportStamp::class] as $stampFqcn) {
             $this->assertNull($target->getSent()[0]->last($stampFqcn), $stampFqcn.' must not reach the target');
@@ -87,7 +87,7 @@ class OutboxSenderTest extends TestCase
     {
         $target = new InMemoryTransport();
         $outbox = new InMemoryTransport($serializer);
-        $sender = new OutboxSender($target, $outbox, 'orders');
+        $sender = new OutboxSender($target, $outbox, 'orders', 'outbox');
 
         $sender->send(new Envelope(new DummyMessage('Hey'), [new DummySenderStamp('a'), new DummySenderStamp('b')]));
         $sender->send($outbox->get()[0]);
@@ -105,7 +105,7 @@ class OutboxSenderTest extends TestCase
     {
         $target = new InMemoryTransport();
         $outbox = new OutboxSenderTestBatchSender();
-        $sender = new OutboxSender($target, $outbox, 'orders');
+        $sender = new OutboxSender($target, $outbox, 'orders', 'outbox');
         $serializer = new PhpSerializer();
 
         $sender->sendBatch(['a' => new Envelope(new DummyMessage('a'), [new DummySenderStamp('a')])]);
@@ -120,7 +120,7 @@ class OutboxSenderTest extends TestCase
         $received = (new Envelope(new DummyMessage('Hey')))->with(new OutboxStamp('orders', [\ArrayObject::class => base64_encode(serialize([new \ArrayObject()]))]), new ReceivedStamp('outbox'));
 
         try {
-            (new OutboxSender($target, new InMemoryTransport(), 'orders'))->send($received);
+            (new OutboxSender($target, new InMemoryTransport(), 'orders', 'outbox'))->send($received);
             $this->fail('A stamp that is not a sender stamp must not be restored.');
         } catch (UnrecoverableMessageHandlingException $e) {
             $this->assertSame('The outbox stamp of the message carries invalid "ArrayObject" stamps.', $e->getMessage());
@@ -137,7 +137,7 @@ class OutboxSenderTest extends TestCase
         $this->expectException(UnrecoverableMessageHandlingException::class);
         $this->expectExceptionMessage(\sprintf('The outbox stamp of the message carries invalid "%s" stamps.', DummySenderStamp::class));
 
-        (new OutboxSender($target, new InMemoryTransport(), 'orders'))->send($received);
+        (new OutboxSender($target, new InMemoryTransport(), 'orders', 'outbox'))->send($received);
     }
 
     public function testItSendsARedeliveredMessageToTheTargetDirectly()
@@ -147,7 +147,7 @@ class OutboxSenderTest extends TestCase
         $outbox->expects($this->never())->method('send');
         $redelivered = (new Envelope(new DummyMessage('Hey')))->with(new RedeliveryStamp(1), new DelayStamp(1000));
 
-        $envelope = (new OutboxSender($target, $outbox, 'orders'))->send($redelivered);
+        $envelope = (new OutboxSender($target, $outbox, 'orders', 'outbox'))->send($redelivered);
 
         $this->assertCount(1, $target->getSent());
         $this->assertSame(1, $target->getSent()[0]->last(RedeliveryStamp::class)?->getRetryCount());
@@ -162,7 +162,7 @@ class OutboxSenderTest extends TestCase
         $target->expects($this->never())->method('send');
         $outbox = new OutboxSenderTestBatchSender();
 
-        $envelopes = (new OutboxSender($target, $outbox, 'orders'))->sendBatch([
+        $envelopes = (new OutboxSender($target, $outbox, 'orders', 'outbox'))->sendBatch([
             'a' => new Envelope(new DummyMessage('a')),
             'b' => new Envelope(new DummyMessage('b'), [new DelayStamp(1000)]),
         ]);
@@ -184,7 +184,7 @@ class OutboxSenderTest extends TestCase
         $target = new InMemoryTransport();
         $outbox = new OutboxSenderTestBatchSender();
 
-        $envelopes = (new OutboxSender($target, $outbox, 'orders'))->sendBatch([
+        $envelopes = (new OutboxSender($target, $outbox, 'orders', 'outbox'))->sendBatch([
             'relayed' => (new Envelope(new DummyMessage('relayed')))->with(new OutboxStamp('orders'), new DelayStamp(1000), new TransportMessageIdStamp(42), new ReceivedStamp('outbox')),
             'new' => new Envelope(new DummyMessage('new')),
             'redelivered' => (new Envelope(new DummyMessage('redelivered')))->with(new RedeliveryStamp(1)),
@@ -208,7 +208,7 @@ class OutboxSenderTest extends TestCase
         $outbox = $this->createMock(SenderInterface::class);
         $outbox->expects($this->exactly(2))->method('send')->willReturnCallback(static fn (Envelope $envelope) => $envelope->with(new TransportMessageIdStamp($envelope->last(OutboxStamp::class)?->getTransportName().'-'.$envelope->getMessage()->getMessage())));
 
-        $envelopes = (new OutboxSender($target, $outbox, 'orders'))->sendBatch(['a' => new Envelope(new DummyMessage('a')), 'b' => new Envelope(new DummyMessage('b'))]);
+        $envelopes = (new OutboxSender($target, $outbox, 'orders', 'outbox'))->sendBatch(['a' => new Envelope(new DummyMessage('a')), 'b' => new Envelope(new DummyMessage('b'))]);
 
         $this->assertSame(['a', 'b'], array_keys($envelopes));
         $this->assertSame('orders-a', $envelopes['a']->last(TransportMessageIdStamp::class)?->getId());
@@ -223,7 +223,7 @@ class OutboxSenderTest extends TestCase
         $outbox->failures = ['b' => $failure = new TransportException('Refused.')];
 
         try {
-            (new OutboxSender($target, $outbox, 'orders'))->sendBatch([
+            (new OutboxSender($target, $outbox, 'orders', 'outbox'))->sendBatch([
                 'a' => new Envelope(new DummyMessage('a')),
                 'b' => new Envelope(new DummyMessage('b')),
                 'redelivered' => (new Envelope(new DummyMessage('redelivered')))->with(new RedeliveryStamp(1)),
@@ -247,7 +247,7 @@ class OutboxSenderTest extends TestCase
         $outbox->exception = $failure = new TransportException('Down.');
 
         try {
-            (new OutboxSender($target, $outbox, 'orders'))->sendBatch([
+            (new OutboxSender($target, $outbox, 'orders', 'outbox'))->sendBatch([
                 'a' => new Envelope(new DummyMessage('a')),
                 'redelivered' => (new Envelope(new DummyMessage('redelivered')))->with(new RedeliveryStamp(1)),
             ]);
@@ -264,7 +264,7 @@ class OutboxSenderTest extends TestCase
         $outbox = new OutboxSenderTestBatchSender();
 
         try {
-            (new OutboxSender($target, $outbox, 'orders'))->sendBatch([
+            (new OutboxSender($target, $outbox, 'orders', 'outbox'))->sendBatch([
                 'first' => (new Envelope(new DummyMessage('first')))->with(new RedeliveryStamp(1)),
                 'new' => new Envelope(new DummyMessage('new')),
                 'second' => (new Envelope(new DummyMessage('second')))->with(new RedeliveryStamp(1)),

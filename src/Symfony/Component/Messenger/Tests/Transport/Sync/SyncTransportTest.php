@@ -55,6 +55,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
@@ -371,15 +372,16 @@ class SyncTransportTest extends TestCase
             new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () {}]])),
         ]);
         $senders->set('sync', new SyncTransport($bus));
+        $senders->set('relayed', new OutboxSender(new SyncTransport($bus), new InMemoryTransport(), 'relayed', 'outbox'));
 
         $bus->dispatch(new DummyMessage('Hey'));
-        $bus->dispatch(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('outbox'), new OutboxStamp('sync')]));
+        $bus->dispatch(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('outbox'), new OutboxStamp('relayed')]));
 
         [$dispatched, $relayed] = $recorder->envelopes;
 
         $this->assertSame('sync', $dispatched->last(ReceivedStamp::class)?->getTransportName());
         $this->assertTrue($dispatched->last(TrustStamp::class)?->isTrusted());
-        $this->assertSame('sync', $relayed->last(ReceivedStamp::class)?->getTransportName());
+        $this->assertSame('relayed', $relayed->last(ReceivedStamp::class)?->getTransportName());
         $this->assertNull($relayed->last(TrustStamp::class));
     }
 

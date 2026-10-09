@@ -724,7 +724,7 @@ class MessengerBundleExtensionTest extends TestCase
 
         $outboxSender = $container->getDefinition('.messenger.transport.orders.outbox_sender');
         $this->assertSame(OutboxSender::class, $outboxSender->getClass());
-        $this->assertEquals([new Reference('messenger.transport.orders'), new Reference('messenger.transport.outbox'), 'orders'], $outboxSender->getArguments());
+        $this->assertEquals([new Reference('messenger.transport.orders'), new Reference('messenger.transport.outbox'), 'orders', 'outbox', 'failed'], $outboxSender->getArguments());
 
         $sendersLocatorId = (string) $container->getDefinition('messenger.senders_locator')->getArgument(1);
         $senders = $container->getDefinition($sendersLocatorId)->getArgument(0);

@@ -22,8 +22,10 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Workflow\Attribute\AsCompletedListener;
 use Symfony\Component\Workflow\Attribute\AsGuardListener;
 use Symfony\Component\Workflow\Attribute\AsWorkflow;
+use Symfony\Component\Workflow\Attribute\Place;
 use Symfony\Component\Workflow\Attribute\Transition;
 use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\Task;
 use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\TaskStep;
 use Symfony\Component\Workflow\Tests\Fixtures\AttributeWorkflow\TaskWorkflow;
@@ -221,6 +223,17 @@ class WorkflowAttributePassTest extends TestCase
         $container->compile();
     }
 
+    public function testAStateMachineCannotHaveSeveralInitialPlaces()
+    {
+        $container = $this->createContainer();
+        $container->register(PassSeveralInitialPlacesStateMachine::class, PassSeveralInitialPlacesStateMachine::class)->setAutoconfigured(true);
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The state machine "pass_several_initial_places" cannot store many places. But the definition has 2 initial places. Only one is supported.');
+
+        $container->compile();
+    }
+
     public function testWorkflowsMustBeEnabled()
     {
         $container = $this->createContainer(['enabled' => false]);
@@ -410,4 +423,17 @@ class PassOrphanListener
     public function guard(GuardEvent $event): void
     {
     }
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class PassSeveralInitialPlacesStateMachine
+{
+    #[Place(initial: true)]
+    public const A = 'a';
+
+    #[Place(initial: true)]
+    public const B = 'b';
+
+    #[Transition(from: self::A, to: self::B)]
+    public const GO = 'go';
 }

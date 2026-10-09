@@ -145,6 +145,11 @@ class Parser
             throw new SyntaxError(\sprintf('Unexpected token "%s" of value "%s".', $stream->current->type, $stream->current->value), $stream->current->cursor, $stream->getExpression());
         }
 
+        // a node tree is at most one level deeper than its number of tokens
+        if (self::MAX_NESTING_LEVEL <= \strlen($stream->getExpression())) {
+            $this->checkDepth($node);
+        }
+
         unset($this->stream, $this->names);
 
         return $node;
@@ -170,6 +175,8 @@ class Parser
             }
 
             if (0 === $precedence) {
+                $this->nestingLevel = $nestingLevel + 1;
+
                 return $this->parseConditionalExpression($expr);
             }
 
@@ -453,8 +460,7 @@ class Parser
     /**
      * Accounts for one more node on the branch being built.
      *
-     * The nesting level bounds the depth of the resulting node tree. Beyond a few
-     * thousand levels, destroying such a tree overflows the native stack.
+     * The nesting level bounds the recursion of the parser.
      *
      * @throws SyntaxError
      */
@@ -462,6 +468,31 @@ class Parser
     {
         if (self::MAX_NESTING_LEVEL < ++$this->nestingLevel) {
             throw new SyntaxError(\sprintf('Expression is nested too deeply, the maximum nesting level is %d', self::MAX_NESTING_LEVEL), $this->stream->current->cursor, $this->stream->getExpression());
+        }
+    }
+
+    /**
+     * Bounds the depth of the resulting node tree.
+     *
+     * Beyond a few thousand levels, serializing or destroying such a tree overflows the native stack.
+     * The nesting level is not enough: it misses the levels that a chain of binary operators or of property accesses adds above its first operand, as in "((a + b + c) + d + e)".
+     *
+     * @throws SyntaxError
+     */
+    private function checkDepth(Node\Node $node): void
+    {
+        $nodes = [[$node, 1]];
+
+        while ($nodes) {
+            [$node, $depth] = array_pop($nodes);
+
+            if (self::MAX_NESTING_LEVEL < $depth) {
+                throw new SyntaxError(\sprintf('Expression is nested too deeply, the maximum nesting level is %d', self::MAX_NESTING_LEVEL), $this->stream->current->cursor, $this->stream->getExpression());
+            }
+
+            foreach ($node->nodes as $child) {
+                $nodes[] = [$child, $depth + 1];
+            }
         }
     }
 }

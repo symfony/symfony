@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -38,11 +37,10 @@ class EntityExistsValidatorTest extends ConstraintValidatorTestCase
 
     protected function setUp(): void
     {
-        if (!Type::hasType('uuid')) {
-            Type::addType('uuid', UuidType::class);
-        }
+        $config = DoctrineTestHelper::createTestConfiguration();
+        DoctrineTestHelper::registerTypes($config, ['uuid' => UuidType::class]);
 
-        $this->em = DoctrineTestHelper::createTestEntityManager();
+        $this->em = DoctrineTestHelper::createTestEntityManager($config);
         $this->createSchema($this->em);
         $this->registry = $this->createRegistryMock($this->em);
 

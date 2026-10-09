@@ -21,6 +21,8 @@ class UnaryNodeTest extends AbstractNodeTestCase
         return [
             [-1, new UnaryNode('-', new ConstantNode(1))],
             [3, new UnaryNode('+', new ConstantNode(3))],
+            [3, new UnaryNode('+', new ConstantNode('3'))],
+            [1.5, new UnaryNode('+', new ConstantNode('1.5'))],
             [false, new UnaryNode('!', new ConstantNode(true))],
             [false, new UnaryNode('not', new ConstantNode(true))],
             [-6, new UnaryNode('~', new ConstantNode(5))],

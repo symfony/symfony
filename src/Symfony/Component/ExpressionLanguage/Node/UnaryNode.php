@@ -53,6 +53,7 @@ class UnaryNode extends Node
         return match ($this->attributes['operator']) {
             'not',
             '!' => !$value,
+            '+' => +$value,
             '-' => -$value,
             '~' => ~$value,
             default => $value,

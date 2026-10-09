@@ -44,6 +44,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Filesystem\Filesystem;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -795,6 +796,31 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('Quz', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
         $this->assertFalse($anonymous->isAutowired());
+    }
+
+    public function testAnonymousServicesIdsDoNotDependOnTheProjectDirectory()
+    {
+        $filesystem = new Filesystem();
+        $ids = [];
+
+        foreach (['project_a', 'project_b'] as $project) {
+            $dir = sys_get_temp_dir().'/sf_anonymous_services_'.$project;
+            $filesystem->copy(self::$fixturesPath.'/yaml/anonymous_services.yml', $dir.'/config/services.yml', true);
+            $filesystem->copy(self::$fixturesPath.'/yaml/anonymous_services_in_instanceof.yml', $dir.'/config/anonymous_services_in_instanceof.yml', true);
+
+            $container = new ContainerBuilder();
+            $container->setParameter('kernel.project_dir', $dir);
+
+            try {
+                (new YamlFileLoader($container, new FileLocator($dir.'/config')))->load('services.yml');
+            } finally {
+                $filesystem->remove($dir);
+            }
+
+            $ids[$project] = array_keys($container->getDefinitions());
+        }
+
+        $this->assertSame($ids['project_a'], $ids['project_b']);
     }
 
     public function testAnonymousServicesInDifferentFilesWithSameNameDoNotConflict()

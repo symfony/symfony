@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
+namespace Symfony\Component\Messenger\Tests\Fixtures;
 
 use Symfony\Component\Messenger\Stamp\SenderStampInterface;
 
-final class AmazonSqsFairQueueStamp implements SenderStampInterface
+class DummySenderStamp implements SenderStampInterface
 {
     public function __construct(
-        private string $messageGroupId,
+        private string $option,
     ) {
     }
 
-    public function getMessageGroupId(): string
+    public function getOption(): string
     {
-        return $this->messageGroupId;
+        return $this->option;
     }
 }

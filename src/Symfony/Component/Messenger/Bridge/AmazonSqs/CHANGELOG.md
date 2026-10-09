@@ -10,6 +10,7 @@ CHANGELOG
  * Add the `ssl` DSN option, superseding `sslmode`
  * Add `AmazonSqsReceivedStamp::getSystemAttributes()` exposing the SQS system attributes of received messages
  * Make `AmazonSqsSender` and `AmazonSqsTransport` implement `BatchSenderInterface`, sending up to 10 messages per request
+ * Make `AmazonSqsFifoStamp`, `AmazonSqsFairQueueStamp` and `AmazonSqsXrayTraceHeaderStamp` implement `SenderStampInterface` so that an outbox keeps them
 
 7.4
 ---

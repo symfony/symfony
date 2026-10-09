@@ -16,13 +16,25 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class OutboxStamp implements StampInterface
 {
+    /**
+     * @param array<class-string<SenderStampInterface>, string> $senderStamps The sender stamps of the message, serialized and base64-encoded by class
+     */
     public function __construct(
         private string $transportName,
+        private array $senderStamps = [],
     ) {
     }
 
     public function getTransportName(): string
     {
         return $this->transportName;
+    }
+
+    /**
+     * @return array<class-string<SenderStampInterface>, string>
+     */
+    public function getSenderStamps(): array
+    {
+        return $this->senderStamps;
     }
 }

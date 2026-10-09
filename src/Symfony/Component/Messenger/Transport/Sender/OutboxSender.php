@@ -13,10 +13,12 @@ namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\SenderStampInterface;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 
 /**
@@ -37,7 +39,7 @@ final class OutboxSender implements BatchSenderInterface
 
     public function send(Envelope $envelope): Envelope
     {
-        if ($envelope->last(OutboxStamp::class)) {
+        if ($outboxStamp = $envelope->last(OutboxStamp::class)) {
             // the outbox served the delay and the retry history belongs to the relay
             foreach ([OutboxStamp::class, DelayStamp::class, RedeliveryStamp::class, ErrorDetailsStamp::class, SentToFailureTransportStamp::class] as $stampFqcn) {
                 $envelope = $envelope->withoutAll($stampFqcn);
@@ -45,7 +47,7 @@ final class OutboxSender implements BatchSenderInterface
 
             // the relay worker acks the returned envelope on the outbox transport,
             // so the message id given by the target must not shadow the outbox one
-            $this->target->send($envelope);
+            $this->target->send(self::restoreSenderStamps($envelope, $outboxStamp));
 
             return $envelope;
         }
@@ -54,7 +56,7 @@ final class OutboxSender implements BatchSenderInterface
             return $this->target->send($envelope);
         }
 
-        return $this->outbox->send($envelope->with(new OutboxStamp($this->targetName)))->withoutAll(OutboxStamp::class);
+        return $this->outbox->send($this->stampForOutbox($envelope))->withoutAll(OutboxStamp::class);
     }
 
     public function sendBatch(array $envelopes): array
@@ -65,7 +67,7 @@ final class OutboxSender implements BatchSenderInterface
         // storing first keeps an exception other than BatchSendFailedException meaning that no envelope was sent
         if ($new && $this->outbox instanceof BatchSenderInterface) {
             try {
-                $sent = $this->outbox->sendBatch(array_map(fn (Envelope $envelope) => $envelope->with(new OutboxStamp($this->targetName)), $new));
+                $sent = $this->outbox->sendBatch(array_map($this->stampForOutbox(...), $new));
             } catch (BatchSendFailedException $e) {
                 $sent = $e->getEnvelopes();
                 $exceptions = $e->getExceptions();
@@ -88,5 +90,39 @@ final class OutboxSender implements BatchSenderInterface
         }
 
         return $sent;
+    }
+
+    private function stampForOutbox(Envelope $envelope): Envelope
+    {
+        $senderStamps = [];
+
+        // the serializer of the outbox drops non-sendable stamps
+        foreach ($envelope->all() as $class => $stamps) {
+            if (is_a($class, SenderStampInterface::class, true)) {
+                $senderStamps[$class] = base64_encode(serialize($stamps));
+            }
+        }
+
+        return $envelope->with(new OutboxStamp($this->targetName, $senderStamps));
+    }
+
+    private static function restoreSenderStamps(Envelope $envelope, OutboxStamp $outboxStamp): Envelope
+    {
+        foreach ($outboxStamp->getSenderStamps() as $class => $serializedStamps) {
+            $stamps = null;
+
+            // nothing but the sender stamp class named by the key can be unserialized
+            if (is_a($class, SenderStampInterface::class, true) && \is_string($serializedStamps) && false !== $serializedStamps = base64_decode($serializedStamps, true)) {
+                $stamps = @unserialize($serializedStamps, ['allowed_classes' => [$class]]);
+            }
+
+            if (!\is_array($stamps) || !$stamps || array_any($stamps, static fn ($stamp) => !$stamp instanceof $class)) {
+                throw new UnrecoverableMessageHandlingException(\sprintf('The outbox stamp of the message carries invalid "%s" stamps.', $class));
+            }
+
+            $envelope = $envelope->withoutAll($class)->with(...array_values($stamps));
+        }
+
+        return $envelope;
     }
 }

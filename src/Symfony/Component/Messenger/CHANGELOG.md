@@ -60,6 +60,7 @@ CHANGELOG
  * Add an optional `receivers` argument to the `messenger:stop-workers` command to stop only the workers that consume these transports
  * Add the invokable `WorkerRestarter` service to stop the workers of some or all transports from code
  * Add the `messenger.deduplication.lock_factory` option to take the deduplication locks from another lock factory than `lock.factory`
+ * Add `SenderStampInterface` for the non-sendable stamps that an outbox keeps for the sender of the messages it forwards
 
 8.1
 ---

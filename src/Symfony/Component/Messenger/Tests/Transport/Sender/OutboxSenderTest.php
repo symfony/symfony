@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Sender;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\OutboxStamp;
@@ -23,10 +25,14 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummySenderStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class OutboxSenderTest extends TestCase
 {
@@ -74,6 +80,64 @@ class OutboxSenderTest extends TestCase
             $this->assertNull($target->getSent()[0]->last($stampFqcn), $stampFqcn.' must not reach the target');
             $this->assertNull($envelope->last($stampFqcn));
         }
+    }
+
+    #[DataProvider('provideOutboxSerializers')]
+    public function testItGivesTheSenderStampsStoredWithTheMessageToTheTarget(SerializerInterface $serializer)
+    {
+        $target = new InMemoryTransport();
+        $outbox = new InMemoryTransport($serializer);
+        $sender = new OutboxSender($target, $outbox, 'orders');
+
+        $sender->send(new Envelope(new DummyMessage('Hey'), [new DummySenderStamp('a'), new DummySenderStamp('b')]));
+        $sender->send($outbox->get()[0]);
+
+        $this->assertEquals([new DummySenderStamp('a'), new DummySenderStamp('b')], $target->getSent()[0]->all(DummySenderStamp::class));
+    }
+
+    public static function provideOutboxSerializers(): iterable
+    {
+        yield 'PHP serializer' => [new PhpSerializer()];
+        yield 'Symfony serializer' => [Serializer::create()];
+    }
+
+    public function testTheNewMessagesOfABatchKeepTheirSenderStamps()
+    {
+        $target = new InMemoryTransport();
+        $outbox = new OutboxSenderTestBatchSender();
+        $sender = new OutboxSender($target, $outbox, 'orders');
+        $serializer = new PhpSerializer();
+
+        $sender->sendBatch(['a' => new Envelope(new DummyMessage('a'), [new DummySenderStamp('a')])]);
+        $sender->send($serializer->decode($serializer->encode($outbox->batches[0]['a'])));
+
+        $this->assertEquals([new DummySenderStamp('a')], $target->getSent()[0]->all(DummySenderStamp::class));
+    }
+
+    public function testOnlySenderStampsAreRestored()
+    {
+        $target = new InMemoryTransport();
+        $received = (new Envelope(new DummyMessage('Hey')))->with(new OutboxStamp('orders', [\ArrayObject::class => base64_encode(serialize([new \ArrayObject()]))]), new ReceivedStamp('outbox'));
+
+        try {
+            (new OutboxSender($target, new InMemoryTransport(), 'orders'))->send($received);
+            $this->fail('A stamp that is not a sender stamp must not be restored.');
+        } catch (UnrecoverableMessageHandlingException $e) {
+            $this->assertSame('The outbox stamp of the message carries invalid "ArrayObject" stamps.', $e->getMessage());
+        }
+
+        $this->assertSame([], $target->getSent());
+    }
+
+    public function testASenderStampIsRestoredWithoutAnyOtherClass()
+    {
+        $target = new InMemoryTransport();
+        $received = (new Envelope(new DummyMessage('Hey')))->with(new OutboxStamp('orders', [DummySenderStamp::class => base64_encode(serialize([new \ArrayObject()]))]), new ReceivedStamp('outbox'));
+
+        $this->expectException(UnrecoverableMessageHandlingException::class);
+        $this->expectExceptionMessage(\sprintf('The outbox stamp of the message carries invalid "%s" stamps.', DummySenderStamp::class));
+
+        (new OutboxSender($target, new InMemoryTransport(), 'orders'))->send($received);
     }
 
     public function testItSendsARedeliveredMessageToTheTargetDirectly()

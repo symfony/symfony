@@ -290,6 +290,29 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('Unable to find configuration for "framework.secret.foo"', $tester->getDisplay());
     }
 
+    public function testDumpAliasedOption()
+    {
+        $tester = $this->createCommandTester(true);
+
+        $ret = $tester->execute(['name' => 'framework', 'path' => 'cache.app']);
+
+        $this->assertSame(0, $ret);
+        $this->assertStringContainsString('"framework.cache" is an alias of the "cache" configuration.', $tester->getDisplay());
+        $this->assertStringContainsString('Current configuration for "cache.app"', $tester->getDisplay());
+        $this->assertStringContainsString('cache.adapter.filesystem', $tester->getDisplay());
+    }
+
+    public function testDumpAliasedSection()
+    {
+        $tester = $this->createCommandTester(true);
+
+        $ret = $tester->execute(['name' => 'framework', 'path' => 'cache']);
+
+        $this->assertSame(0, $ret);
+        $this->assertStringContainsString('Current configuration for extension with alias "cache"', $tester->getDisplay());
+        $this->assertStringContainsString('app: cache.adapter.filesystem', $tester->getDisplay());
+    }
+
     public function testEnvVarsResolvedFromRunningContainerProcessor()
     {
         // This test reproduces the scenario where an env var is only resolvable via a

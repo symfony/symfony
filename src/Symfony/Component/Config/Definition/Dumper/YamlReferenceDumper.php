@@ -123,6 +123,10 @@ class YamlReferenceDumper
             $comments[] = \sprintf('Deprecated (%s)', $node->getDeprecationMessage($parentNode));
         }
 
+        if ($node instanceof BaseNode && null !== $alias = $node->getAttribute('alias_of')) {
+            $comments[] = \sprintf('Alias of the "%s" configuration', $alias);
+        }
+
         // example
         if ($example && !\is_array($example)) {
             $comments[] = 'Example: '.Inline::dump($example);

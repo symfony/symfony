@@ -11,11 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
@@ -165,6 +168,43 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         if (!$configuration instanceof ConfigurationInterface) {
             throw new \LogicException(\sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable.', get_debug_type($configuration)));
         }
+    }
+
+    /**
+     * Follows a path that goes through a node declared with aliasOf() to the extension that owns the node.
+     *
+     * @return array{ExtensionInterface, string|null, string}|null The extension, the rest of the path and the path of the alias, or null when the path goes through no alias
+     *
+     * @internal
+     */
+    protected function resolveAliasedPath(ExtensionInterface $extension, string $path, ContainerBuilder $container): ?array
+    {
+        $configuration = match (true) {
+            $extension instanceof ConfigurationInterface => $extension,
+            $extension instanceof ConfigurationExtensionInterface => $extension->getConfiguration([], $container),
+            default => null,
+        };
+
+        if (!$configuration instanceof ConfigurationInterface) {
+            return null;
+        }
+
+        $node = $configuration->getConfigTreeBuilder()->buildTree();
+        $steps = explode('.', $path);
+
+        foreach ($steps as $i => $step) {
+            if (!$node instanceof ArrayNode || !$node = $node->getChildren()[$step] ?? null) {
+                return null;
+            }
+
+            if ($node instanceof BaseNode && null !== ($alias = $node->getAttribute('alias_of')) && $container->hasExtension($alias)) {
+                $rest = implode('.', \array_slice($steps, $i + 1));
+
+                return [$container->getExtension($alias), '' === $rest ? null : $rest, $extension->getAlias().'.'.implode('.', \array_slice($steps, 0, $i + 1))];
+            }
+        }
+
+        return null;
     }
 
     private function initializeBundles(): array

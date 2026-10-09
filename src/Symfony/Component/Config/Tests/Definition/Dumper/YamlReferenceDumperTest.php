@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Definition\Dumper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
@@ -25,6 +26,21 @@ class YamlReferenceDumperTest extends TestCase
         $dumper = new YamlReferenceDumper();
 
         $this->assertEquals($this->getConfigurationAsString(), "# \$schema: ExampleConfiguration.schema.json\n".$dumper->dump($configuration));
+    }
+
+    public function testDumpTellsWhichConfigurationANodeIsAnAliasOf()
+    {
+        $treeBuilder = new TreeBuilder('root');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->variableNode('cache')->aliasOf('cache')->end()
+            ->end();
+
+        $this->assertSame(<<<'EOL'
+            root:
+                cache:                ~ # Alias of the "cache" configuration
+
+            EOL, (new YamlReferenceDumper())->dumpNode($treeBuilder->buildTree()));
     }
 
     public static function provideDumpAtPath(): array

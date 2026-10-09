@@ -128,6 +128,20 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         );
     }
 
+    public function testDumpAtAliasedPath()
+    {
+        $tester = $this->createCommandTester(true);
+        $ret = $tester->execute([
+            'name' => 'framework',
+            'path' => 'cache.app',
+        ]);
+
+        $this->assertSame(0, $ret);
+        $this->assertStringContainsString('"framework.cache" is an alias of the "cache" configuration.', $tester->getDisplay());
+        $this->assertStringContainsString('# Default configuration for extension with alias: "cache" at path "app"', $tester->getDisplay());
+        $this->assertStringContainsString('app:                  cache.adapter.filesystem', $tester->getDisplay());
+    }
+
     #[TestWith([true])]
     #[TestWith([false])]
     public function testDumpAtPathXml(bool $debug)

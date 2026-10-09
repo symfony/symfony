@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\UnexpectedEnvelopeException;
 
 /**
  * Envelope encryption over a {@see DataKeyStoreInterface}, in {@see StoredFormat}.
@@ -75,14 +76,26 @@ final class StoredEnvelopeEncrypter implements EnvelopeEncrypterInterface, Envel
     }
 
     /**
-     * @throws LogicException            If the envelope carries its own data key and no fallback decrypter was given
-     * @throws DataKeyNotFoundException  If the store no longer holds the data key the envelope refers to
-     * @throws DecryptionFailedException If the payload is invalid, tampered, or `$aad` does not match
+     * `$key` is the scope the payload is expected to belong to, held against the scope the store
+     * states for the key it hands back. A copied payload resolves a row consistent with itself,
+     * {@see StoredDataKey::$binding} included, so the row is not what tells the two apart.
+     *
+     * The fallback is not given it: it would read a scope as a master key id, and which master key a
+     * payload of the other format may still be read under is the application's to state.
+     *
+     * @throws LogicException              If the envelope carries its own data key and no fallback decrypter was given
+     * @throws DataKeyNotFoundException    If the store no longer holds the data key the envelope refers to
+     * @throws UnexpectedEnvelopeException If the data key the envelope refers to belongs to a scope other than `$key`
+     * @throws DecryptionFailedException   If the payload is invalid, tampered, or `$aad` does not match
      */
-    public function decrypt(Envelope $envelope, string $aad = ''): string
+    public function decrypt(Envelope $envelope, string $aad = '', ?string $key = null): string
     {
         if (null !== $envelope->reference) {
             $dataKey = $this->store->get($envelope->reference);
+
+            if (null !== $key && !hash_equals($key, $dataKey->scope)) {
+                throw UnexpectedEnvelopeException::key($key, $dataKey->scope);
+            }
 
             return $dataKey->use(static fn (#[\SensitiveParameter] string $dek): string => self::open($envelope, $dek, $aad));
         }

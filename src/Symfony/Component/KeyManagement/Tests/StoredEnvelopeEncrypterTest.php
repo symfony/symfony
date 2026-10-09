@@ -18,6 +18,7 @@ use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\UnexpectedEnvelopeException;
 use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 use Symfony\Component\KeyManagement\StoredFormat;
 use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
@@ -194,5 +195,50 @@ class StoredEnvelopeEncrypterTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         $this->encrypter->decrypt($swapped);
+    }
+
+    public function testACompletePayloadOfAnotherScopeIsRefused()
+    {
+        $envelope = $this->encrypter->encrypt('tenant-a.user', 'jane@example.com');
+
+        $this->expectException(UnexpectedEnvelopeException::class);
+        $this->expectExceptionMessage('The payload was written under "tenant-a.user", while "tenant-b.user" was expected.');
+        $this->encrypter->decrypt($envelope, '', 'tenant-b.user');
+    }
+
+    public function testAPayloadReadInItsOwnScopeIsUnchanged()
+    {
+        $envelope = $this->encrypter->encrypt('tenant-a.user', 'jane@example.com');
+
+        $this->assertSame('jane@example.com', $this->encrypter->decrypt($envelope, '', 'tenant-a.user'));
+    }
+
+    public function testTheRefusalNamesTheScopesAndNothingElse()
+    {
+        $envelope = $this->encrypter->encrypt('tenant-a.user', 'jane@example.com');
+
+        try {
+            $this->encrypter->decrypt($envelope, '', 'tenant-b.user');
+            $this->fail('The read was expected to be refused.');
+        } catch (UnexpectedEnvelopeException $e) {
+        }
+
+        $this->assertStringNotContainsString('jane@example.com', $e->getMessage());
+        $this->assertStringNotContainsString(bin2hex($envelope->reference), $e->getMessage(), 'a scope is what the reader named, and naming the row as well would say which key it resolved.');
+    }
+
+    public function testNamingNoScopeStatesNoExpectation()
+    {
+        $envelope = $this->encrypter->encrypt('tenant-a.user', 'jane@example.com');
+
+        $this->assertSame('jane@example.com', $this->encrypter->decrypt($envelope, '', null), 'a reader with nothing to compare against is left as it was.');
+    }
+
+    public function testTheScopeIsTakenFromTheStoreAndNotFromTheEnvelope()
+    {
+        $envelope = $this->encrypter->encrypt('tenant-a.user', 'jane@example.com');
+        $this->store->forget();
+
+        $this->assertSame('jane@example.com', $this->encrypter->decrypt($envelope, '', 'tenant-a.user'), 'the scope is read back from the row, so it holds across the process that wrote it.');
     }
 }

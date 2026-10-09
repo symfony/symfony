@@ -28,6 +28,10 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * The reference is what an envelope records in place of the wrapped key, so a handle always knows
  * which stored data key it came from. Its shape is opaque to callers.
  *
+ * The scope comes along with it so that a reader can hold a payload against it rather than against
+ * what that payload claims. A store states it once it has proven it, {@see StoredDataKey::$binding};
+ * a handle made outside a store leaves it empty, which no expectation matches.
+ *
  * Retained is not the same as printable: the plaintext is not a field of this object, so no dump of
  * it can print the key, see {@see KeyMaterial}.
  *
@@ -48,6 +52,7 @@ final class DataKeyHandle
     public function __construct(
         public readonly string $reference,
         DataKey $dataKey,
+        public readonly string $scope = '',
     ) {
         $this->keepMaterial($dataKey->use(self::claim(...)));
     }

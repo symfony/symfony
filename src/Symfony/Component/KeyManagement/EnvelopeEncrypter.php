@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
+use Symfony\Component\KeyManagement\Exception\UnexpectedEnvelopeException;
 
 /**
  * High-level envelope encryption helper.
@@ -104,13 +105,21 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
     }
 
     /**
-     * @throws LogicException            If the envelope refers to a stored data key, which this encrypter has no store to resolve
-     * @throws DecryptionFailedException If the payload is invalid, tampered, or `$aad` does not match
+     * `$key` is the master key the payload is expected to carry, checked before the KMS is asked
+     * anything: a self-contained envelope opens wherever the master key it names is reachable.
+     *
+     * @throws LogicException              If the envelope refers to a stored data key, which this encrypter has no store to resolve
+     * @throws UnexpectedEnvelopeException If the envelope names a master key other than `$key`
+     * @throws DecryptionFailedException   If the payload is invalid, tampered, or `$aad` does not match
      */
-    public function decrypt(Envelope $envelope, string $aad = ''): string
+    public function decrypt(Envelope $envelope, string $aad = '', ?string $key = null): string
     {
         if (!$envelope->format instanceof SelfContainedFormat) {
             throw new LogicException(\sprintf('The envelope refers to a stored data key, which "%s" cannot resolve.', self::class));
+        }
+
+        if (null !== $key && !hash_equals($key, $envelope->keyId)) {
+            throw UnexpectedEnvelopeException::key($key, $envelope->keyId);
         }
 
         $dataKey = $this->kms->unwrapDataKey(new Ciphertext($envelope->wrappedDek, $envelope->keyId), $aad);

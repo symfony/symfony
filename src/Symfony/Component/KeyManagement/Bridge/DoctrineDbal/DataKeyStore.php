@@ -231,7 +231,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
 
         $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes);
         $reference = Uuid::v7()->toBinary();
-        $handle = new DataKeyHandle($reference, $dataKey);
+        $handle = new DataKeyHandle($reference, $dataKey, $scope);
 
         $this->connection->insert($this->table, [
             'id' => $reference,
@@ -415,7 +415,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             return $this->handles[$row->reference];
         }
 
-        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped));
+        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped), $row->scope);
 
         if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
             $handle->release();

@@ -14,12 +14,19 @@ namespace Symfony\Component\KeyManagement;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\UnexpectedEnvelopeException;
 
 /**
  * Decrypts an {@see Envelope} produced by an {@see EnvelopeEncrypterInterface}.
  *
  * The same `$aad` bytes used at encrypt time MUST be supplied here,
  * otherwise decryption fails.
+ *
+ * `$key` is what the payload is expected to have been written under, read as
+ * {@see EnvelopeEncrypterInterface::encrypt()} reads its own: a master key id, or a scope. An
+ * envelope names the data key that opens it, in bytes whoever wrote the column chose, so a whole
+ * and valid payload moved to another column, tenant or scope opens there unless the reader states
+ * what it expects, from somewhere other than the envelope.
  *
  * An envelope naming a key unknown to the underlying KMS is reported as a
  * {@see DecryptionFailedException}, deliberately indistinguishable from
@@ -39,9 +46,12 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
 interface EnvelopeDecrypterInterface
 {
     /**
-     * @throws DecryptionFailedException If the envelope is invalid, tampered, names an unknown key, or `$aad` does not match
-     * @throws DataKeyNotFoundException  If the envelope refers to a stored data key that the store no longer holds
-     * @throws LogicException            If the envelope is in a format this decrypter has no means to resolve
+     * @param string|null $key What the payload is expected to have been written under, `null` to state no expectation
+     *
+     * @throws DecryptionFailedException   If the envelope is invalid, tampered, names an unknown key, or `$aad` does not match
+     * @throws DataKeyNotFoundException    If the envelope refers to a stored data key that the store no longer holds
+     * @throws UnexpectedEnvelopeException If the envelope was written under something other than `$key`
+     * @throws LogicException              If the envelope is in a format this decrypter has no means to resolve
      */
-    public function decrypt(Envelope $envelope, string $aad = ''): string;
+    public function decrypt(Envelope $envelope, string $aad = '', ?string $key = null): string;
 }

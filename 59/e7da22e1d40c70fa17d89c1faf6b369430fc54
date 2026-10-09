@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by dalerazimov at 2026-10-08T10:21:42Z
+
+Related to #66679
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-09T11:02:58Z
+
+Thanks @dalerazimov. I pushed the other path of the same issue: when sending B to a dead worker fails, `removeChannel()` settles that worker's pending requests inside the same `try`, so a reject failure for one of them was also reported as B's failure. It's now rethrown, with a test for that path, which had none.

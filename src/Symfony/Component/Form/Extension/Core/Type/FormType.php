@@ -15,6 +15,7 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataAccessor\CallbackAccessor;
 use Symfony\Component\Form\Extension\Core\DataAccessor\ChainAccessor;
 use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
+use Symfony\Component\Form\Extension\Core\DataMapper\ConstructorMapper;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -137,7 +138,7 @@ class FormType extends BaseType
             $class = $options['data_class'];
 
             if (null !== $class) {
-                return static fn (FormInterface $form) => $form->isEmpty() && !$form->isRequired() ? null : new $class();
+                return static fn (FormInterface $form) => $form->isEmpty() && !$form->isRequired() ? null : ConstructorMapper::instantiate($class, $form);
             }
 
             return static fn (FormInterface $form) => $form->getConfig()->getCompound() ? [] : '';

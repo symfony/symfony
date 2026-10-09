@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
+use Symfony\Component\Form\Extension\Core\DataMapper\MissingConstructorArgumentsException;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
@@ -171,12 +172,14 @@ class FormValidator extends ConstraintValidator
             // lead to duplicate errors if error bubbling is enabled on the
             // child.
             // See also https://github.com/symfony/symfony/issues/4359
-            if ($childrenSynchronized) {
+            $failure = $form->getTransformationFailure();
+
+            if ($failure instanceof MissingConstructorArgumentsException) {
+                $this->validateEmptyArguments($form, $failure, $formConstraint);
+            } elseif ($childrenSynchronized) {
                 $clientDataAsString = \is_scalar($form->getViewData())
                     ? (string) $form->getViewData()
                     : get_debug_type($form->getViewData());
-
-                $failure = $form->getTransformationFailure();
 
                 $this->context->setConstraint($formConstraint);
                 $this->context->buildViolation($failure->getInvalidMessage() ?? $config->getOption('invalid_message'))
@@ -201,6 +204,56 @@ class FormValidator extends ConstraintValidator
                 ->setInvalidValue($form->getExtraData())
                 ->setCode(Form::NO_SUCH_FIELD_ERROR)
                 ->addViolation();
+        }
+    }
+
+    /**
+     * Reports the fields whose empty data could not be passed to the constructor of the data class.
+     *
+     * There is no object to validate, so the constraints of the property a field is mapped to are validated against its data.
+     * The violations are reported like transformation failures of the field, since its parent form is not synchronized.
+     */
+    private function validateEmptyArguments(FormInterface $form, MissingConstructorArgumentsException $failure, Form $formConstraint): void
+    {
+        $groups = $this->getValidationGroups($form);
+
+        foreach ($failure->emptyForms as $property => $emptyForm) {
+            $path = \sprintf('children[%s]', $emptyForm->getName());
+
+            for ($parent = $emptyForm->getParent(); $parent !== $form; $parent = $parent->getParent()) {
+                $path = \sprintf('children[%s].', $parent->getName()).$path;
+            }
+
+            $violations = $groups ? $this->context->getValidator()->validatePropertyValue($failure->class, $property, $emptyForm->getData(), $groups) : [];
+
+            $this->context->setConstraint($formConstraint);
+
+            foreach ($violations as $violation) {
+                $builder = $this->context->buildViolation($violation->getMessageTemplate(), $violation->getParameters())
+                    ->atPath($path)
+                    ->setInvalidValue($violation->getInvalidValue())
+                    ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
+                    ->setCause($violation);
+
+                if (null !== $plural = $violation->getPlural()) {
+                    $builder->setPlural($plural);
+                }
+
+                $builder->addViolation();
+            }
+
+            if (!\count($violations)) {
+                $config = $emptyForm->getConfig();
+                $viewData = $emptyForm->getViewData();
+
+                $this->context->buildViolation($config->getOption('invalid_message'))
+                    ->atPath($path)
+                    ->setParameters(array_replace(['{{ value }}' => \is_scalar($viewData) ? (string) $viewData : get_debug_type($viewData)], $config->getOption('invalid_message_parameters')))
+                    ->setInvalidValue($viewData)
+                    ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
+                    ->setCause($failure)
+                    ->addViolation();
+            }
         }
     }
 

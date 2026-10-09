@@ -12,9 +12,12 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataMapper\MissingConstructorArgumentsException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -37,8 +40,17 @@ class TransformationFailureListener implements EventSubscriberInterface
     public function convertTransformationFailureToFormError(FormEvent $event): void
     {
         $form = $event->getForm();
+        $failure = $form->getTransformationFailure();
 
-        if (null === $form->getTransformationFailure() || !$form->isValid()) {
+        if ($failure instanceof MissingConstructorArgumentsException) {
+            foreach ($failure->emptyForms as $emptyForm) {
+                $emptyForm->addError($this->createError($emptyForm, $failure));
+            }
+
+            return;
+        }
+
+        if (null === $failure || !$form->isValid()) {
             return;
         }
 
@@ -48,6 +60,11 @@ class TransformationFailureListener implements EventSubscriberInterface
             }
         }
 
+        $form->addError($this->createError($form, $failure));
+    }
+
+    private function createError(FormInterface $form, TransformationFailedException $failure): FormError
+    {
         $clientDataAsString = \is_scalar($form->getViewData()) ? (string) $form->getViewData() : get_debug_type($form->getViewData());
         $messageTemplate = $form->getConfig()->getOption('invalid_message', 'The value {{ value }} is not valid.');
         $messageParameters = array_replace(['{{ value }}' => $clientDataAsString], $form->getConfig()->getOption('invalid_message_parameters', []));
@@ -58,6 +75,6 @@ class TransformationFailureListener implements EventSubscriberInterface
             $message = strtr($messageTemplate, $messageParameters);
         }
 
-        $form->addError(new FormError($message, $messageTemplate, $messageParameters, null, $form->getTransformationFailure()));
+        return new FormError($message, $messageTemplate, $messageParameters, null, $failure);
     }
 }

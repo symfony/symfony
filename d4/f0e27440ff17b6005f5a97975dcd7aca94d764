@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-10-07T14:55:48Z
+
+How would you consume theses property?
+
+---------------------------------------------------------------------------
+
+by tacman at 2026-10-07T17:26:32Z
+
+As I currently do, in the compiler pass.
+
+---------------------------------------------------------------------------
+
+by tacman at 2026-10-09T11:47:38Z
+
+Would it make sense to include `AsWorkflow` in this change too, allowing it to be extended and ensuring derived attributes are recognized by autoconfiguration/discovery?
+
+Our use case is to build a smaller workflow-extras bundle on top of the native attributes, while leaving workflow definition and registration entirely to Symfony. If all three attributes are extensible, we can add convenience arguments such as `description:` to our subclasses and map them to ordinary workflow, place and transition metadata.
+
+We've found these options useful in our tooling, but recognize that some bundle-specific options don't belong in core. Extensibility would let us keep those in our own subclasses and experiment with them without needing a core argument for every enhancement. A workflow-level description used by our explorer and documentation is one simple example; I also opened #66726 to discuss whether descriptions themselves would be useful in core.
+
+Would including `AsWorkflow`, with a regression test that a derived attribute is discovered and registered normally, fit the scope of this PR? Happy to add that coverage if the direction makes sense.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-09T12:34:57Z
+
+One change to your code: a constant or an enum case with several `#[Place]` attributes (child classes included) now throws, because only the first one was read and the others, `initial: true` included, were silently dropped.
+
+`AsWorkflow`: not in this PR. Autoconfiguration already matches child classes of a registered attribute, but `AsWorkflow` is final and `WorkflowAttributePass` reads it by its exact class.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-10-09T12:37:17Z
+
+> Would including `AsWorkflow`, with a regression test that a derived attribute is discovered and registered normally, fit the scope of this PR? Happy to add that coverage if the direction makes sense.
+
+yes let's go. Please ensure you don't erase Nicola's edits. Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-09T12:45:17Z
+
+Alright, lets do it in this PR then :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-09T13:30:27Z
+
+@tacman I added `AsWorkflow` to this PR, so no need to push the same work: it's no longer final, `WorkflowAttributePass` reads it with `IS_INSTANCEOF`, and a class with several of them (child classes included) throws, like for `Place`. The regression test you proposed is in `WorkflowAttributePassTest`.

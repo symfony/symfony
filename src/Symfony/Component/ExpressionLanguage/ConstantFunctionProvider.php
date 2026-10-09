@@ -121,6 +121,6 @@ final class ConstantFunctionProvider implements ExpressionFunctionProviderInterf
 
     private static function compileNotAllowed(string $kind, string $name): string
     {
-        return \sprintf('(throw new \%s(%s))', RuntimeException::class, var_export(\sprintf('"%s" "%s" is not allowed.', $kind, $name), true));
+        return \sprintf('(throw new \%s(%s))', RuntimeException::class, var_export(\sprintf('%s "%s" is not allowed.', $kind, $name), true));
     }
 }

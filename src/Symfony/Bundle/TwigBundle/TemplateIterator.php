@@ -60,7 +60,7 @@ class TemplateIterator implements \IteratorAggregate
 
             $bundleTemplatesDir = is_dir($bundle->getPath().'/Resources/views') ? $bundle->getPath().'/Resources/views' : $bundle->getPath().'/templates';
 
-            $templates[] = $this->findTemplatesInDirectory($bundleTemplatesDir, $name);
+            $templates[] = $bundleTemplates = $this->findTemplatesInDirectory($bundleTemplatesDir, $name);
             if (null !== $this->defaultPath) {
                 $templates[] = $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name);
             }
@@ -69,7 +69,7 @@ class TemplateIterator implements \IteratorAggregate
              * The bundle's own templates are also registered with the "!" prefix namespace - this matches
              * @see \Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension::load()
              */
-            $templates[] = $this->findTemplatesInDirectory($bundleTemplatesDir, '!'.$name);
+            $templates[] = array_map(static fn (string $template) => '@!'.substr($template, 1), $bundleTemplates);
         }
 
         foreach ($this->paths as $dir => $namespace) {

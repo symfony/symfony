@@ -104,6 +104,8 @@ class DirectoryResourceTest extends TestCase
     {
         $resource = new DirectoryResource($this->directory);
         touch($this->directory, $time = time() + 20);
+        // touch() clears the stat cache only as of PHP 8.4.5
+        clearstatcache();
         $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if the directory is modified in the same second');
         $this->assertTrue($resource->isFresh($time + 1), '->isFresh() returns true if the directory is not modified since the previous second');
     }

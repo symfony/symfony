@@ -1244,22 +1244,26 @@ class Parser
 
         do {
             if (++$lineNumber > 1) {
-                $cursor += strspn($this->currentLine, ' ', $cursor);
+                $cursor += strspn($this->currentLine, " \t", $cursor);
             }
 
-            if ($this->isCurrentLineBlank()) {
+            if ($isBlankLine = '' === trim($this->currentLine, " \t")) {
                 $value .= "\n";
             } elseif (!$previousLineWasNewline && !$previousLineWasTerminatedWithBackslash) {
                 $value .= ' ';
             }
 
+            $line = '';
+            $escapedLength = 0;
+
             for (; \strlen($this->currentLine) > $cursor; ++$cursor) {
                 switch ($this->currentLine[$cursor]) {
                     case '\\':
                         if ("'" === $quotation) {
-                            $value .= '\\';
+                            $line .= '\\';
                         } elseif (isset($this->currentLine[++$cursor])) {
-                            $value .= '\\'.$this->currentLine[$cursor];
+                            $line .= '\\'.$this->currentLine[$cursor];
+                            $escapedLength = \strlen($line);
                         }
 
                         break;
@@ -1267,17 +1271,17 @@ class Parser
                         ++$cursor;
 
                         if ("'" === $quotation && isset($this->currentLine[$cursor]) && "'" === $this->currentLine[$cursor]) {
-                            $value .= "''";
+                            $line .= "''";
                             break;
                         }
 
-                        return $value.$quotation;
+                        return $value.$line.$quotation;
                     default:
-                        $value .= $this->currentLine[$cursor];
+                        $line .= $this->currentLine[$cursor];
                 }
             }
 
-            if ($this->isCurrentLineBlank()) {
+            if ($isBlankLine) {
                 $previousLineWasNewline = true;
                 $previousLineWasTerminatedWithBackslash = false;
             } elseif ('"' === $quotation && 1 === (\strlen($this->currentLine) - \strlen(rtrim($this->currentLine, '\\'))) % 2) {
@@ -1286,7 +1290,12 @@ class Parser
             } else {
                 $previousLineWasNewline = false;
                 $previousLineWasTerminatedWithBackslash = false;
+
+                // trailing white space is removed when the line is folded, unless it is escaped
+                $line = substr($line, 0, $escapedLength).rtrim(substr($line, $escapedLength), " \t");
             }
+
+            $value .= $line;
 
             if ($this->hasMoreLines()) {
                 $cursor = 0;

@@ -63,7 +63,7 @@ class CompiledExpressionLanguageTest extends TestCase
 
     public function testEvaluateCompiledExpressionFailsLikeTheEvaluatedOne()
     {
-        $file = $this->dumpCompiled(['not foo.locked', 'foo.lock()']);
+        $file = $this->dumpCompiled(['not foo.locked', 'foo["locked"]']);
         $expressionLanguage = self::createLanguage($file);
 
         try {
@@ -74,9 +74,56 @@ class CompiledExpressionLanguageTest extends TestCase
         }
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Unable to call method "lock" of non-object "foo".');
+        $this->expectExceptionMessage('Unable to get an item of non-array "foo".');
 
-        $expressionLanguage->evaluate('foo.lock()', ['foo' => null]);
+        $expressionLanguage->evaluate('foo["locked"]', ['foo' => null]);
+    }
+
+    public function testEvaluateCompiledExpressionDoesNotCallMethodsAndFunctionsTwice()
+    {
+        $file = $this->dumpCompiled(['counter.tick() * 2', 'arg("counter").tick() * 2']);
+        $expressionLanguage = self::createLanguage($file);
+        $counter = new class {
+            public int $calls = 0;
+
+            public function tick(): string|int
+            {
+                return 1 === ++$this->calls ? 'a' : 3;
+            }
+        };
+
+        foreach (['counter.tick() * 2', 'arg("counter").tick() * 2'] as $expression) {
+            $counter->calls = 0;
+
+            try {
+                $expressionLanguage->evaluate($expression, ['counter' => $counter]);
+                $this->fail('An exception should have been thrown.');
+            } catch (\TypeError $e) {
+                $this->assertSame('Unsupported operand types: string * int', $e->getMessage());
+            }
+
+            $this->assertSame(1, $counter->calls);
+        }
+    }
+
+    public function testEvaluateCompiledExpressionReportsDeprecationsWithoutThrowing()
+    {
+        $file = $this->dumpCompiled(['lower(foo)']);
+
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations) {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_DEPRECATED);
+
+        try {
+            $this->assertSame('', self::createLanguage($file)->evaluate('lower(foo)', ['foo' => null]));
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame(['strtolower(): Passing null to parameter #1 ($string) of type string is deprecated'], $deprecations);
     }
 
     public function testEvaluateCompiledExpressionDoesNotCatchErrorsOfTheCode()
@@ -202,6 +249,21 @@ class CompiledExpressionLanguageTest extends TestCase
         $this->assertSame(4, self::createLanguage($file)->evaluate('twice(2)'));
     }
 
+    public function testEvaluateCompiledExpressionLoadedFromAnotherFileFailsLikeTheEvaluatedOne()
+    {
+        $file = $this->dumpCompiled(['not bar.locked']);
+        $otherFile = $this->dumpCompiled(['not bar.locked']);
+
+        $this->assertFalse(self::createLanguage($file)->evaluate('not bar.locked', ['bar' => new class {
+            public bool $locked = true;
+        }]));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to get property "locked" of non-object "bar".');
+
+        self::createLanguage($otherFile)->evaluate('not bar.locked', ['bar' => null]);
+    }
+
     public function testMissingCompiledExpressionsFile()
     {
         $expressionLanguage = new CompiledExpressionLanguage(new ExpressionLanguage(), sys_get_temp_dir().'/does-not-exist/compiled.php');
@@ -244,6 +306,7 @@ class CompiledExpressionLanguageTest extends TestCase
         $expressionLanguage->addFunction(new ExpressionFunction('evaluated', static fn () => throw new \LogicException('Cannot be compiled.'), static fn () => 'evaluated'));
         $expressionLanguage->addFunction(new ExpressionFunction('self', static fn () => '$this', static fn () => 'evaluated'));
         $expressionLanguage->addFunction(new ExpressionFunction('arg', static fn () => throw new \LogicException('Cannot be compiled.'), static fn (array $values, string $name) => $values[$name]));
+        $expressionLanguage->addFunction(ExpressionFunction::fromPhp('strtolower', 'lower'));
 
         return new CompiledExpressionLanguage($expressionLanguage, $compiledExpressionsFile);
     }

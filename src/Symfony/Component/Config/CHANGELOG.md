@@ -12,6 +12,7 @@ CHANGELOG
  * Add `BaseNode::isNullable()` to check if a node accepts null as input
  * Add `BaseNode::hasNormalizationClosures()` to check if closures are used to normalize the value
  * Add `NodeBuilder::appendFromCallback()` to reuse child node definitions
+ * Skip writing the meta files of `ResourceCheckerConfigCache` when it has no resource checkers
 
 8.0
 ---

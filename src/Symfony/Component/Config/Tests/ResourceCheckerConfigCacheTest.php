@@ -222,6 +222,19 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
+    public function testMetaFilesAreNotWrittenWithoutCheckers()
+    {
+        touch($this->cacheFile.'.meta');
+        touch($this->cacheFile.'.meta.json');
+
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, new \ArrayIterator([]));
+        $cache->write('foo', [new FileResource(__FILE__)]);
+
+        $this->assertFileDoesNotExist($this->cacheFile.'.meta');
+        $this->assertFileDoesNotExist($this->cacheFile.'.meta.json');
+        $this->assertTrue($cache->isFresh());
+    }
+
     public function testCacheWithCustomMetaFile()
     {
         $this->assertStringEqualsFile($this->metaFile, '');
@@ -244,7 +257,8 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testCacheWithResourceWithLongPropertyId()
     {
-        $cache = new ResourceCheckerConfigCache($this->cacheFile);
+        $checker = $this->createStub(ResourceCheckerInterface::class);
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('foo', [new ResourceWithVeryVeryVeryVeryVeryVeryVeryVeryLongName(__FILE__)]);
 
         $this->assertStringNotEqualsFile($this->cacheFile.'.meta', '');

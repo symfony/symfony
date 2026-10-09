@@ -84,7 +84,8 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
     public function __serialize(): array
     {
         if (!isset($this->hash)) {
-            $this->directories = $this->snapshotDirectories();
+            // mtimes and inodes differ from one checkout to another, so they are left out when a reproducible build is requested
+            $this->directories = isset($_SERVER['SOURCE_DATE_EPOCH']) ? null : $this->snapshotDirectories();
             $this->hash = $this->computeHash();
         }
 

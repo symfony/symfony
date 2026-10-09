@@ -3,4 +3,5 @@
 # "hastable" is Doctrine's Schema::hasTable() method
 # "signall" is the $signAll property of Messenger's SigningSerializer
 # "caf" comes from the "café" test fixtures of the HttpClient recorder
-ignore-words-list = smove,hastable,signall,caf
+# "ser" is the $ser variable of Config's ResourceCheckerConfigCache
+ignore-words-list = smove,hastable,signall,caf,ser

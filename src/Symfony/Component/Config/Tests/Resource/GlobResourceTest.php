@@ -449,6 +449,30 @@ class GlobResourceTest extends TestCase
         $this->assertFalse($resource->isFresh(0));
     }
 
+    public function testSerializedFormDoesNotDependOnDirectoryMtimesWhenSourceDateEpochIsSet()
+    {
+        $dir = $this->createTree(time() - 10);
+        $_SERVER['SOURCE_DATE_EPOCH'] = '1700000000';
+
+        try {
+            $serialized = serialize(new GlobResource($dir, '', true));
+
+            foreach (['', '/Foo', '/Foo/Bar', '/Excluded', '/Empty'] as $path) {
+                touch($dir.$path, time() - 20);
+            }
+            clearstatcache();
+
+            $this->assertSame($serialized, serialize(new GlobResource($dir, '', true)));
+        } finally {
+            unset($_SERVER['SOURCE_DATE_EPOCH']);
+        }
+
+        $resource = unserialize($serialized);
+        touch($dir.'/Foo/E.php');
+
+        $this->assertFalse($resource->isFresh(0));
+    }
+
     private function createTree(int $mtime): string
     {
         $dir = $this->tmpDir = sys_get_temp_dir().'/sf_glob_resource_'.bin2hex(random_bytes(4));

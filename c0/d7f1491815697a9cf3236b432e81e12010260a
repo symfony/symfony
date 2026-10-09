@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-10-08T18:02:05Z
+
+The red jobs fail on KeyManagement and the Doctrine bridge (new DBAL deprecations). The same jobs fail on the 8.2 push of the base commit 58a5249, so this change does not cause them.

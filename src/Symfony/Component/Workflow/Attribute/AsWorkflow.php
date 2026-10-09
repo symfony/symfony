@@ -39,7 +39,7 @@ final class AsWorkflow
      * @param WorkflowType                                     $type                 Whether the subject can be in a single place (state machine) or in many places at the same time (workflow)
      * @param class-string|list<class-string>                  $supports             The classes or interfaces of the subjects supported by the workflow; without "supports" nor "supportStrategy", the workflow is not added to the registry and can only be used by injection
      * @param string|null                                      $supportStrategy      The id of a WorkflowSupportStrategyInterface service; cannot be used with "supports"
-     * @param \BackedEnum|string|list<\BackedEnum|string>|null $initialMarking       The initial place(s) of the subjects; defaults to the first case of the "places" enum, or else to the first input place of the first transition
+     * @param \BackedEnum|string|list<\BackedEnum|string>|null $initialMarking       The initial place(s) of the subjects; defaults to the places whose "#[Place]" attribute sets "initial", or else to the first case of the "places" enum, or else to the first input place of the first transition
      * @param string|null                                      $markingProperty      The property or method of the subjects storing their marking, read by a MethodMarkingStore; defaults to "marking"
      * @param string|null                                      $markingStore         The id of a MarkingStoreInterface service; cannot be used with "markingProperty"
      * @param array<string, mixed>                             $metadata             The metadata of the workflow

@@ -45,7 +45,7 @@ final class AttributeReader
 
         // The string-backed enums used by the definition, whose cases may carry a #[Place] attribute
         $enums = [];
-        // The names of the places as keys, their metadata as values (null when not defined explicitly)
+        // The names of the places as keys, the #[Place] attribute of their constant as values (null when there is none)
         $places = [];
 
         if (null !== $placesEnum = $attribute->places) {
@@ -88,7 +88,7 @@ final class AttributeReader
                 if (isset($placeConstants[$placeName])) {
                     throw new LogicException(\sprintf('The place "%s" of the workflow defined by "%s" is defined by both "%s" and "%s::%s".', $placeName, $className, $placeConstants[$placeName][0], $constant->class, $constant->name));
                 }
-                $placeConstants[$placeName] = [$constant->class.'::'.$constant->name, $placeAttribute->newInstance()->metadata ?: null];
+                $placeConstants[$placeName] = [$constant->class.'::'.$constant->name, $placeAttribute->newInstance()];
             }
         }
 
@@ -98,17 +98,22 @@ final class AttributeReader
                 $places[$arc['place']] ??= null;
             }
         }
-        foreach ($placeConstants as $placeName => [, $metadata]) {
-            $places[$placeName] ??= $metadata;
+        foreach ($placeConstants as $placeName => [, $placeAttribute]) {
+            $places[$placeName] ??= $placeAttribute;
         }
 
         $placesConfig = [];
-        foreach ($places as $placeName => $metadata) {
+        $initialPlaces = [];
+        foreach ($places as $placeName => $constantAttribute) {
             $placeName = (string) $placeName;
             if (null !== $placesEnum && null === $placesEnum::tryFrom($placeName)) {
                 throw new LogicException(\sprintf('The place "%s" of the workflow defined by "%s" is not a case of "%s".', $placeName, $className, $placesEnum));
             }
-            $placesConfig[] = ['name' => $placeName, 'metadata' => $metadata ?? $this->readPlaceMetadata($placeName, $enums)];
+            $caseAttribute = $this->readEnumCaseAttribute($placeName, $enums);
+            $placesConfig[] = ['name' => $placeName, 'metadata' => $constantAttribute?->metadata ?: $caseAttribute->metadata ?? []];
+            if ($constantAttribute?->initial || $caseAttribute?->initial) {
+                $initialPlaces[] = $placeName;
+            }
         }
 
         foreach ($enums as $enum) {
@@ -119,7 +124,7 @@ final class AttributeReader
         $config = [
             'type' => $attribute->type->value,
             'supports' => $attribute->supports,
-            'initial_marking' => $attribute->initialMarking ?? [],
+            'initial_marking' => $attribute->initialMarking ?? $initialPlaces,
             'metadata' => $attribute->metadata,
             'audit_trail' => ['enabled' => $attribute->auditTrail],
             'definition_validators' => $attribute->definitionValidators,
@@ -190,18 +195,18 @@ final class AttributeReader
     }
 
     /**
-     * @param array<class-string<\BackedEnum>, class-string<\BackedEnum>> $enums
+     * Reads the #[Place] attribute of the enum case of a place.
      *
-     * @return array<string, mixed>
+     * @param array<class-string<\BackedEnum>, class-string<\BackedEnum>> $enums
      */
-    private function readPlaceMetadata(string $place, array $enums): array
+    private function readEnumCaseAttribute(string $place, array $enums): ?Place
     {
         foreach ($enums as $enum) {
             if (null !== $case = $enum::tryFrom($place)) {
-                return ((new \ReflectionEnumBackedCase($enum, $case->name))->getAttributes(Place::class)[0] ?? null)?->newInstance()->metadata ?? [];
+                return ((new \ReflectionEnumBackedCase($enum, $case->name))->getAttributes(Place::class)[0] ?? null)?->newInstance();
             }
         }
 
-        return [];
+        return null;
     }
 }

@@ -124,6 +124,22 @@ class AttributeReaderTest extends TestCase
         ], $workflow['places']);
     }
 
+    #[DataProvider('provideInitialMarkings')]
+    public function testInitialMarking(string $class, \BackedEnum|array $expectedInitialMarking)
+    {
+        $this->assertSame($expectedInitialMarking, current($this->read($class))['initial_marking']);
+    }
+
+    public static function provideInitialMarkings(): iterable
+    {
+        yield 'no initial place' => [TaskWorkflow::class, []];
+        yield 'initial enum case' => [InitialCaseStateMachine::class, ['draft']];
+        yield 'initial constant' => [InitialConstantStateMachine::class, ['pending']];
+        yield 'several initial places' => [InitialPlacesWorkflow::class, ['draft', 'review']];
+        yield 'explicit initial marking' => [ExplicitInitialMarkingStateMachine::class, ArticleStatus::Published];
+        yield 'initial enum case not used by the workflow' => [UnusedInitialCaseStateMachine::class, []];
+    }
+
     #[DataProvider('provideInvalidDefinitions')]
     public function testInvalidDefinition(string $class, string $expectedMessage)
     {
@@ -168,6 +184,15 @@ enum TaskStep: string
 
     case Done = 'done';
     case Failed = 'failed';
+    case Archived = 'archived';
+}
+
+enum ArticleStatus: string
+{
+    #[Place(initial: true)]
+    case Draft = 'draft';
+
+    case Published = 'published';
     case Archived = 'archived';
 }
 
@@ -355,4 +380,48 @@ class PlaceNotInEnumWorkflow
 {
     #[Transition(from: TaskStep::New, to: 'foreign')]
     public const GO = 'go';
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class InitialCaseStateMachine
+{
+    #[Transition(from: ArticleStatus::Published, to: ArticleStatus::Archived)]
+    public const ARCHIVE = 'archive';
+
+    #[Transition(from: ArticleStatus::Draft, to: ArticleStatus::Published)]
+    public const PUBLISH = 'publish';
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class InitialConstantStateMachine
+{
+    #[Place(initial: true)]
+    public const PENDING = 'pending';
+
+    #[Transition(from: 'new', to: self::PENDING)]
+    public const SUBMIT = 'submit';
+}
+
+#[AsWorkflow(type: WorkflowType::Workflow, supports: \stdClass::class)]
+class InitialPlacesWorkflow
+{
+    #[Place(initial: true)]
+    public const REVIEW = 'review';
+
+    #[Transition(from: [ArticleStatus::Draft, self::REVIEW], to: ArticleStatus::Published)]
+    public const PUBLISH = 'publish';
+}
+
+#[AsWorkflow(supports: \stdClass::class, initialMarking: ArticleStatus::Published)]
+class ExplicitInitialMarkingStateMachine
+{
+    #[Transition(from: ArticleStatus::Draft, to: ArticleStatus::Published)]
+    public const PUBLISH = 'publish';
+}
+
+#[AsWorkflow(supports: \stdClass::class)]
+class UnusedInitialCaseStateMachine
+{
+    #[Transition(from: ArticleStatus::Published, to: ArticleStatus::Archived)]
+    public const ARCHIVE = 'archive';
 }

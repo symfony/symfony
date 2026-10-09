@@ -105,10 +105,19 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                     $tmpContainer->addExpressionLanguageProvider($provider);
                 }
 
+                $inlinedOptions = [];
+
                 if ($configAvailable) {
-                    BaseNode::setPlaceholderResolver(static function (mixed $value, string $path) use ($tmpContainer): mixed {
+                    BaseNode::setPlaceholderResolver(static function (mixed $value, string $path) use ($tmpContainer, &$inlinedOptions): mixed {
                         try {
-                            return $tmpContainer->resolveStaticValue($value);
+                            $usedEnvs = [];
+                            $value = $tmpContainer->resolveStaticValue($value, $usedEnvs);
+
+                            foreach ($usedEnvs as $env) {
+                                $inlinedOptions[$env][$path] = $path;
+                            }
+
+                            return $value;
                         } catch (ExceptionInterface $e) {
                             throw new RuntimeException(\sprintf('The value of the configuration option "%s" must be known when the container is compiled: ', $path).$e->getMessage(), 0, $e);
                         }
@@ -126,6 +135,15 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 if ($configAvailable) {
                     BaseNode::setPlaceholderResolver(null);
                 }
+            }
+
+            foreach ($inlinedOptions as $env => $paths) {
+                foreach ($paths as $path) {
+                    $container->log($this, \sprintf('Inlined env var "%%env(%s)%%" into option "%s".', $env, $path));
+                }
+            }
+            foreach (array_diff($tmpContainer->getInlinedEnvVars(), array_keys($inlinedOptions)) as $env) {
+                $container->log($this, \sprintf('Inlined env var "%%env(%s)%%" while loading extension "%s".', $env, $name));
             }
 
             if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
@@ -347,9 +365,9 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     /**
      * Resolves the env vars referenced by $value, ignoring the restriction that applies to extensions.
      */
-    public function resolveStaticValue(mixed $value): mixed
+    public function resolveStaticValue(mixed $value, ?array &$usedEnvs = null): mixed
     {
-        return parent::resolveEnvPlaceholders($value, true);
+        return parent::resolveEnvPlaceholders($value, true, $usedEnvs);
     }
 
     public function resolveEnvPlaceholders(mixed $value, string|bool|null $format = null, ?array &$usedEnvs = null): mixed

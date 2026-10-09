@@ -43,6 +43,67 @@ class ShortNameDefinitionPolicyTest extends TestCase
         yield 'prefix' => [new Configuration(groups: ['read'], definitionPrefix: 'Writer'), 'Writer-read'];
     }
 
+    public function testDifferentShapesNamedAlikeGetANumberedSuffix()
+    {
+        $policy = new ShortNameDefinitionPolicy();
+
+        $this->assertSame('Author-first_name', $policy->nameFor(Author::class, new Configuration(attributes: ['first_name'])));
+        $this->assertSame('Author-first_name.2', $policy->nameFor(Author::class, new Configuration(attributes: ['first', 'name'])));
+    }
+
+    public function testSameShapeAskedTwiceKeepsItsName()
+    {
+        $policy = new ShortNameDefinitionPolicy();
+
+        $this->assertSame('Author-first_name', $policy->nameFor(Author::class, new Configuration(attributes: ['first_name'])));
+        $this->assertSame('Author-first_name.2', $policy->nameFor(Author::class, new Configuration(attributes: ['first', 'name'])));
+        $this->assertSame('Author-first_name', $policy->nameFor(Author::class, new Configuration(attributes: ['first_name'])));
+        $this->assertSame('Author-first_name.2', $policy->nameFor(Author::class, new Configuration(attributes: ['first', 'name'])));
+    }
+
+    public function testIgnoredAttributesDisambiguateTheName()
+    {
+        $policy = new ShortNameDefinitionPolicy();
+
+        $this->assertSame('Author', $policy->nameFor(Author::class, new Configuration(ignoredAttributes: ['name'])));
+        $this->assertSame('Author.2', $policy->nameFor(Author::class, new Configuration()));
+    }
+
+    public function testEachDistinctShapeGetsTheNextSuffix()
+    {
+        $policy = new ShortNameDefinitionPolicy();
+
+        $this->assertSame('Author', $policy->nameFor(Author::class, new Configuration()));
+        $this->assertSame('Author.2', $policy->nameFor(Author::class, new Configuration(ignoredAttributes: ['name'])));
+        $this->assertSame('Author.3', $policy->nameFor(Author::class, new Configuration(ignoredAttributes: ['id'])));
+    }
+
+    public function testResetForgetsTheShapes()
+    {
+        $policy = new ShortNameDefinitionPolicy();
+        $policy->nameFor(Author::class, new Configuration());
+        $this->assertSame('Author.2', $policy->nameFor(Author::class, new Configuration(ignoredAttributes: ['name'])));
+
+        $policy->reset();
+
+        $this->assertSame('Author', $policy->nameFor(Author::class, new Configuration(ignoredAttributes: ['name'])));
+    }
+
+    #[DataProvider('provideShapesDifferingOutsideTheName')]
+    public function testShapesDifferingOutsideTheNameDisambiguate(Configuration $first, Configuration $second)
+    {
+        $policy = new ShortNameDefinitionPolicy();
+
+        $this->assertSame('Author', $policy->nameFor(Author::class, $first));
+        $this->assertSame('Author.2', $policy->nameFor(Author::class, $second));
+    }
+
+    public static function provideShapesDifferingOutsideTheName(): iterable
+    {
+        yield 'extra attributes' => [new Configuration(allowExtraAttributes: false), new Configuration()];
+        yield 'format' => [new Configuration(format: 'json'), new Configuration()];
+    }
+
     public function testShortNameCollisionUsesMoreNamespaceParts()
     {
         $policy = new ShortNameDefinitionPolicy();

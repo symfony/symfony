@@ -334,7 +334,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         [$definedClass, $definedFingerprint] = $this->definitionInputs[$name] ??= [$class, $fingerprint];
 
         if ($definedFingerprint !== $fingerprint) {
-            throw new LogicException(\sprintf('Definition "%s" already describes class "%s" with a different configuration, it cannot also describe class "%s". Set a distinct "definitionName" in the configuration or use a custom "%s".', $name, $definedClass, $class, DefinitionPolicyInterface::class));
+            throw new LogicException(\sprintf('Definition "%s" already describes class "%s" with a different configuration, it cannot also describe class "%s". Use a custom "%s".', $name, $definedClass, $class, DefinitionPolicyInterface::class));
         }
 
         if (!isset($definitions[$name])) {

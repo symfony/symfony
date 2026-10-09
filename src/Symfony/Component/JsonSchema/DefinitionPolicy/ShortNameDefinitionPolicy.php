@@ -21,6 +21,9 @@ use Symfony\Contracts\Service\ResetInterface;
  * A name is owned by the first class claiming it: another class asking for the same
  * name gets one built from more namespace segments instead.
  *
+ * Within a class, a name is owned by the first shape (configuration) claiming it: a different shape
+ * resolving to the same name gets a numbered suffix (".2", ".3", ...) in order of appearance.
+ *
  * @experimental
  */
 final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface, ResetInterface
@@ -37,6 +40,17 @@ final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface, Rese
      * @var array<string, class-string>
      */
     private array $owners = [];
+
+    /**
+     * Definition name => fingerprint of the shape that claimed it, so shapes that are readably named alike
+     * (attributes ["first_name"] and ["first", "name"], ignored attributes, extra attributes, format)
+     * get ".2", ".3" in order of appearance rather than silently sharing a definition.
+     *
+     * One document per instance: the same shape always gets the same name until reset() starts a new one.
+     *
+     * @var array<string, string>
+     */
+    private array $shapes = [];
 
     public function nameFor(string $class, Configuration $config, ?DefinitionParent $parent = null): string
     {
@@ -62,12 +76,27 @@ final class ShortNameDefinitionPolicy implements DefinitionPolicyInterface, Rese
             $name = $parts ? $prefix.'-'.implode('_', $parts) : $prefix;
         }
 
-        return (string) preg_replace('/[^a-zA-Z0-9.\-_]/', self::GLUE, $name);
+        return $this->claimShape(
+            (string) preg_replace('/[^a-zA-Z0-9.\-_]/', self::GLUE, $name),
+            serialize([$class, $config->groups, $config->attributes, $config->ignoredAttributes, $config->allowExtraAttributes, $config->getValidationGroupNames(), $config->format]),
+        );
     }
 
     public function reset(): void
     {
         $this->owners = [];
+        $this->shapes = [];
+    }
+
+    private function claimShape(string $name, string $fingerprint): string
+    {
+        $candidate = $name;
+
+        for ($suffix = 2; ($this->shapes[$candidate] ??= $fingerprint) !== $fingerprint; ++$suffix) {
+            $candidate = $name.self::GLUE.$suffix;
+        }
+
+        return $candidate;
     }
 
     private function claim(string $name, string $class): ?string

@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionParent;
+use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionPolicyInterface;
 use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\Dialect;
 use Symfony\Component\JsonSchema\Enricher\AttributePropertySchemaEnricher;
@@ -31,6 +32,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\AuthorWithBiography;
 use Symfony\Component\JsonSchema\Tests\Fixtures\BookWithAuthors;
 use Symfony\Component\JsonSchema\Tests\Fixtures\CamelCaseProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Catalog;
+use Symfony\Component\JsonSchema\Tests\Fixtures\ConstantNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ConstructorInitializedShipment;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ContactWithFormatConstraints;
 use Symfony\Component\JsonSchema\Tests\Fixtures\DocumentedArticle;
@@ -135,9 +137,24 @@ class SchemaGeneratorTest extends TestCase
     public function testDifferentShapesNamedAlikeThrow()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Definition "Author-first_name"');
+        $this->expectExceptionMessage('Definition "Shape" already describes class "'.BookWithAuthors::class.'" with a different configuration, it cannot also describe class "'.Author::class.'". Use a custom "'.DefinitionPolicyInterface::class.'".');
 
-        SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class), new Configuration(attributes: ['author' => ['first_name'], 'coAuthor' => ['first', 'name']]));
+        (new SchemaGenerator(self::createReflectionPropertyInfo(), new ConstantNameDefinitionPolicy('Shape')))->generate(Type::object(BookWithAuthors::class));
+    }
+
+    public function testSameClassWithDifferentIgnoredAttributesDoesNotClash()
+    {
+        $generator = SchemaGenerator::create();
+
+        $narrowed = $generator->generate(Type::object(Author::class), new Configuration(ignoredAttributes: ['name']));
+        $full = $generator->generate(Type::object(Author::class));
+
+        $narrowedName = array_key_first($narrowed->getDefinitions());
+        $fullName = array_key_first($full->getDefinitions());
+
+        $this->assertNotSame($narrowedName, $fullName);
+        $this->assertArrayNotHasKey('name', $narrowed->getDefinitions()[$narrowedName]['properties'] ?? []);
+        $this->assertArrayHasKey('name', $full->getDefinitions()[$fullName]['properties']);
     }
 
     public function testSameShapeReachedTwiceSharesOneDefinition()

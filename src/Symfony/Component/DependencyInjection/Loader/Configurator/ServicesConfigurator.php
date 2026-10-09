@@ -41,7 +41,9 @@ class ServicesConfigurator extends AbstractConfigurator
         $this->loader = $loader;
         $this->instanceof = &$instanceof;
         $this->path = $path;
-        $this->anonymousHash = ContainerBuilder::hash($path ?: mt_rand());
+        $projectDir = $container->hasParameter('kernel.project_dir') ? $container->getParameter('kernel.project_dir') : null;
+        // hashing the path relative to the project keeps the ids independent from where the project is
+        $this->anonymousHash = ContainerBuilder::hash($path ? (\is_string($projectDir) && str_starts_with($path, $projectDir) ? substr($path, \strlen($projectDir)) : $path) : mt_rand());
         $this->anonymousCount = &$anonymousCount;
         $instanceof = [];
     }

@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Doctrine\ObjectMapper\Transform;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\ObjectMapper\ObjectMapperAwareInterface;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\Transform\MapCollection;
 use Symfony\Component\ObjectMapper\TransformCallableInterface;
 
@@ -20,10 +22,18 @@ use Symfony\Component\ObjectMapper\TransformCallableInterface;
  *
  * @implements TransformCallableInterface<object, T>
  */
-class IterableToArrayCollection implements TransformCallableInterface
+class IterableToArrayCollection implements TransformCallableInterface, ObjectMapperAwareInterface
 {
     public function __construct(private MapCollection $mapCollection)
     {
+    }
+
+    public function withObjectMapper(ObjectMapperInterface $objectMapper): static
+    {
+        $clone = clone $this;
+        $clone->mapCollection = $this->mapCollection->withObjectMapper($objectMapper);
+
+        return $clone;
     }
 
     public function __invoke(mixed $value, object $source, ?object $target): mixed

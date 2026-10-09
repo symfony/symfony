@@ -110,10 +110,20 @@ class AuthenticatedVoterTest extends TestCase
     public function testUnsupportedOfflineToken(string $attribute)
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+        $token = $this->getToken('offline');
+        $token->setUser(new InMemoryUser('wouter', '', ['ROLE_USER']));
 
         $this->expectException(InvalidArgumentException::class);
 
-        $voter->vote($this->getToken('offline'), null, [$attribute]);
+        $voter->vote($token, null, [$attribute]);
+    }
+
+    #[DataProvider('provideUnsupportedOfflineAttributes')]
+    public function testAGuestIsNotAuthenticated(string $attribute)
+    {
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->getToken('offline'), null, [$attribute]));
     }
 
     public static function provideUnsupportedOfflineAttributes()

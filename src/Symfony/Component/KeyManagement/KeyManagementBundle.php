@@ -189,6 +189,10 @@ class KeyManagementBundle extends AbstractBundle
                             ->defaultValue('key_management_data_keys')
                             ->cannotBeEmpty()
                         ->end()
+                        ->booleanNode('bind_wrapping_context')
+                            ->info('Whether the backend authenticates the reference and the scope of each data key as it wraps it. Off by default: not every backend accepts authenticated data, and turning it on needs the stored keys rewrapped.')
+                            ->defaultFalse()
+                        ->end()
                         ->variableNode('max_age')
                             ->info('Seconds after which the current data key of a scope is retired in favour of a fresh one; the default of 30 days keeps what one key seals under the collision bound of the random 96-bit IV each payload carries. 0 retires the key on every call, null never retires it.')
                             ->defaultValue(2592000)
@@ -368,6 +372,7 @@ class KeyManagementBundle extends AbstractBundle
                 $config['table'],
                 32,
                 $config['max_age'],
+                $config['bind_wrapping_context'],
             ])
             ->addTag('kernel.reset', ['method' => 'forget']);
 

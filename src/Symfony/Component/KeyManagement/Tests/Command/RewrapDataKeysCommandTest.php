@@ -73,6 +73,49 @@ class RewrapDataKeysCommandTest extends TestCase
         $this->assertSame($frozen, (string) $envelope, 'a payload is never rewritten by the migration.');
     }
 
+    public function testTheRowsOfAContextBindingStoreStayReadableAfterTheMove()
+    {
+        $store = new InMemoryDataKeyStore(['aws' => $this->aws, 'azure' => $this->azure], 'aws', 'app', 32, null, true);
+        $handle = $store->current('user.email');
+        $plaintext = $handle->use(static fn (string $key): string => $key);
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, $this->locator()));
+        $tester->execute(['--to' => 'azure', '--key-id' => 'app']);
+        $store->forget();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame($plaintext, $store->get($handle->reference)->use(static fn (string $key): string => $key), 'a row re-wrapped without the context its store binds is one that store can no longer open.');
+    }
+
+    /**
+     * The rows this store wrote are bound on purpose, so unwrapping them as if they were not is refused.
+     */
+    public function testUnboundUnwrapsUnderNoContext()
+    {
+        $store = new InMemoryDataKeyStore(['aws' => $this->aws, 'azure' => $this->azure], 'aws', 'app', 32, null, true);
+        $store->current('user.email');
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, $this->locator()));
+        $exit = $tester->execute(['--to' => 'azure', '--key-id' => 'app', '--unbound' => true]);
+
+        $this->assertSame(Command::FAILURE, $exit);
+        $this->assertStringContainsString('1 left behind', preg_replace('/\s+/', ' ', $tester->getDisplay()));
+        $this->assertSame('aws', iterator_to_array($store->all(), false)[0]->client);
+    }
+
+    public function testARowThatNoLongerMatchesItsKeyIsReportedAndLeftBehind()
+    {
+        $reference = $this->store->current('user.email')->reference;
+        $this->store->rewrap($reference, $this->azure->encrypt('app', random_bytes(32)), 'azure');
+
+        $tester = $this->tester();
+        $exit = $tester->execute(['--to' => 'aws', '--key-id' => 'app']);
+
+        $this->assertSame(Command::FAILURE, $exit);
+        $this->assertStringContainsString('1 left behind', preg_replace('/\s+/', ' ', $tester->getDisplay()));
+        $this->assertSame('azure', iterator_to_array($this->store->all(), false)[0]->client, 'a row whose binding no longer matches the key it holds must not be re-wrapped into one that reads.');
+    }
+
     public function testTheScopeAndTheReferenceAreLeftAlone()
     {
         $reference = $this->store->current('user.email')->reference;
@@ -252,6 +295,11 @@ class RewrapDataKeysCommandTest extends TestCase
                 }
 
                 $this->inner->rewrap($reference, $wrapped, $client);
+            }
+
+            public function wrappingContextOf(StoredDataKey $row): string
+            {
+                return $this->inner->wrappingContextOf($row);
             }
 
             public function current(string $scope): DataKeyHandle

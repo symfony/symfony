@@ -4,10 +4,10 @@ CHANGELOG
 8.2
 ---
 
- * Calling `LocoProvider::read()` without locale now fetch them all
- * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument: it has no effect and can be removed
+ * Make `LocoProvider::read()` fetch every locale when passed none
+ * Deprecate the `$defaultLocale` argument of `LocoProvider` and `LocoProviderFactory`, it has no effect
  * Deprecate passing no domains or `*` to `LocoProvider::read()`, configure your loco provider domains as an associative array with an empty string key and `*` as value
- * Allow to map a tag filter to a domain
+ * Allow mapping a tag filter to a domain
 
 7.2
 ---

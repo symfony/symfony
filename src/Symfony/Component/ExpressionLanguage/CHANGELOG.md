@@ -4,9 +4,9 @@ CHANGELOG
 8.2
 ---
 
- * Keep the last 1024 parsed expressions in memory, so that `parse()` returns the same `ParsedExpression` instance for the same expression and names
- * Add `CompiledExpressionLanguage`, a decorator that evaluates and lints the expressions compiled by its `dumpCompiled()` method without parsing them
- * Add `count()` function to ExpressionLanguage
+ * Keep the last 1024 parsed expressions in memory
+ * Add `CompiledExpressionLanguage` to evaluate and lint the expressions compiled by its `dumpCompiled()` method without parsing them
+ * Add the `count()` function
  * Add `ConstantFunctionProvider` to restrict the `constant()` and `enum()` functions to a list of allowed constants
  * Deprecate the built-in `constant()` and `enum()` functions, register a `ConstantFunctionProvider` instead
  * Add `ExceptionInterface`, implemented by `SyntaxError` and by every exception thrown by the component

@@ -7,21 +7,19 @@ CHANGELOG
  * Add an autowiring alias for `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`
  * Deprecate the `Symfony\Component\EventDispatcher\EventDispatcherInterface` autowiring alias, type the one from the EventDispatcher contracts instead
  * Resolve env vars while the container is compiled for the configuration nodes declared with `NodeDefinition::resolvesAtCompileTime()`
- * Pass top-level extension values that are not arrays to the extension instead of replacing them with an empty array, so that a configuration tree can accept a scalar at its root
- * Add the `before` and `after` tag attributes and `#[AsTaggedItem]` arguments to order tagged services
- * Add `BeforeAfterSorter`
+ * Pass top-level extension values that are not arrays to the extension instead of replacing them with an empty array
+ * Add the `before` and `after` tag attributes and `#[AsTaggedItem]` arguments to order tagged services, and `BeforeAfterSorter`
  * Add `within` and `around` to `#[AsDecorator]` and `#[AsTagDecorator]`, the `decoration_within` and `decoration_around` keys and the `container.decoration_order` tag, to order decorators
  * Name the package to install when an extension is missing, for the configuration keys declared in the `.container.extension_packages` build parameter
  * Add the `container.remove_if_missing` tag to drop a definition when a service, a class or a package it needs is not there
  * Add `ContainerBuilder::setExtensionConfig()`
  * Forward the configuration of the nodes declared with `NodeDefinition::aliasOf()` to the extension with that alias in `MergeExtensionConfigurationPass`
- * Allow computing tag attributes per tagged service when using `#[AutoconfigureTag]`, `#[Autoconfigure]` or `_instanceof`: pass a `\Closure` receiving the concrete class-string (requires PHP 8.5), or a `[class-string, method]` callable resolved against each concrete class (works on PHP 8.4)
+ * Allow computing the attributes of tags and resource tags per class with `#[AutoconfigureTag]`, `#[AutoconfigureResourceTag]`, `#[Autoconfigure]` or `_instanceof`, by passing a `\Closure` or a `[class-string, method]` callable
  * Call `#[Required]` methods in the order defined by the attribute's `$priority` argument
  * Add support for injecting a service as a lazy proxy on a per-argument basis, using the `!lazy_proxy` YAML tag, the `@~` reference prefix or the `lazy_proxy()` function in the PHP-DSL
  * Write a `CACHEDIR.TAG` file in the cache and build directories so backup tools can skip them
  * Add a `factory` argument to the `#[Autoconfigure]` attribute, and support the `factory` key under `_instanceof`
  * Add `Preloader::ignore()` to exclude classes or namespace prefixes from preloading
- * Allow computing resource tag attributes per tagged class when using `#[AutoconfigureResourceTag]`, `#[Autoconfigure]` or `_instanceof`, like for regular tags
  * Add `#[AutowireClassMap]` attribute, `TaggedClassMapArgument`, the `!tagged_class_map` YAML tag and the `tagged_class_map()` PHP-DSL function to inject a map of classes found by resource tag name
  * Instantiate on demand the bundles that have nothing to do when the kernel boots, and add `AbstractKernel::instantiateBundle()` to control how they are created
  * Dump the container's compiler log in all environments, not only when debug mode is enabled

@@ -4,9 +4,9 @@ CHANGELOG
 8.2
 ---
 
-* Allow configuring the SMTP port through the DSN
-* Add support for `RemoteTemplateEmail` to `BrevoApiTransport`
-* Deprecate the "templateid" and "params" email headers, use a `RemoteTemplateEmail` instead
+ * Allow configuring the SMTP port through the DSN
+ * Add support for `RemoteTemplateEmail` to `BrevoApiTransport`
+ * Deprecate the "templateid" and "params" email headers, use a `RemoteTemplateEmail` instead
 
 6.4
 ---

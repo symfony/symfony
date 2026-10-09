@@ -6,28 +6,25 @@ CHANGELOG
 
  * Add the `lint:expressions` command to lint the expressions of controller attributes and the ones listed in the configuration
  * Log exceptions whose HTTP status code is below 500 (client errors) at the `warning` level instead of `error`
- * Add `before` and `after` to `#[AsControllerAttributeListener]`, whose `$priority` is now nullable
  * [BC BREAK] Answer a scheme redirect from `RouterListener` itself, so that no other listener runs on a request whose route is not served over the requested scheme
  * Add the `cache_status` option to `HttpCache` to emit the RFC 9211 `Cache-Status` header
  * Add `#[AsControllerAttributeListener]` attribute to declare event listeners for controller attributes
  * Add the `$expiration` argument to `FragmentUriGenerator::__construct()` and sign fragment URIs with a 5-year expiration by default
- * Add `hasDump()` method to `Profile` to track profiles with dump
+ * Add `Profile::hasDump()` to track profiles with dump
  * Dispatch `RateLimitExceededEvent` from `RateLimitAttributeListener` when the `#[RateLimit]` attribute rejects a request
  * Seed the query bag from the `_query` route default when a route is matched
- * Deserialize the query parameter named by `#[MapQueryString(key:)]` as JSON when it holds a string, e.g. `?filter={"page":1}`
+ * Deserialize the query parameter named by `#[MapQueryString(key:)]` as JSON when it holds a string
  * Prefix the property path to each violation message reported by `RequestPayloadValueResolver`
  * Add `SourceValueResolverInterface` to let a value resolver stage a raw value for the resolvers that follow it, so `#[MapQueryParameter]` accepts any type another resolver can build
  * Deprecate the `HIncludeFragmentRenderer` class, use the `EsiFragmentRenderer` or `InlineFragmentRenderer`, or Symfony UX Turbo, instead
  * Allow union and intersection type-hints when autowiring controller arguments
  * Add the `$excludedPaths` and `$excludedHttpCodes` arguments to `ProfilerListener::__construct()` to skip profiling some requests
- * Make `#[MapRequestPayload]` deserialize any media type carrying a structured syntax suffix with the encoder of the suffix format, e.g. `application/vnd.api+json` with the `json` encoder
- * Add the `$exposeHeaders` argument to `#[RateLimit]`
+ * Make `#[MapRequestPayload]` decode any media type carrying a structured syntax suffix with the encoder of that suffix, e.g. `application/vnd.api+json` with the `json` encoder
+ * Add the `$exposeHeaders` and `$if` arguments to `#[RateLimit]`, and the `$expressionLanguage` argument to `RateLimitAttributeListener`
  * Instantiate on demand the bundles that have nothing to do when the kernel boots
  * Add `PaymentRequiredHttpException`, `RequestTimeoutHttpException`, `ContentTooLargeHttpException`, `RangeNotSatisfiableHttpException`, `ExpectationFailedHttpException`, `FailedDependencyHttpException`, `TooEarlyHttpException`, `UnavailableForLegalReasonsHttpException` and `NotImplementedHttpException`
  * Make `HttpClientKernel` forward the responses that carry the RFC 10036 `Incremental: ?1` header without buffering them
  * Consume the tokens of `#[RateLimit]` before resolving the controller arguments when its key does not read them
- * Add argument `$expressionLanguage` to `RateLimitAttributeListener`
- * Add the `$if` argument to `#[RateLimit]`
  * Add the `#[Lock]` attribute and `ConcurrentRequestHttpException` to reject or delay concurrent requests to a controller
  * Apply the `#[Cache]` attribute to 308 responses
  * Treat 308 responses like 301 ones in `ResponseCacheStrategy`

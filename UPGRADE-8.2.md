@@ -35,11 +35,6 @@ Console
  * The application listing collapses the commands below a registered command to that command's own line;
    `list <namespace>`, the `--raw` option and the `json` and `md` formats keep listing every command
 
-Crowdin Translation Provider
-----------------------------
-
- * Add `$projectId` constructor parameter to `CrowdinProvider`
-
 DependencyInjection
 -------------------
 
@@ -80,14 +75,8 @@ DoctrineBridge
 EventDispatcher
 ---------------
 
- * The `event_dispatcher` service is a `CompiledEventDispatcher`, where it used to be an `EventDispatcher`
-   (in debug, it is the one the `TraceableEventDispatcher` decorates) Both implement `EventDispatcherInterface`,
-   which is what to type against; the compiled one holds the identifier and the method of each listener instead
-   of a closure per listener, and fetches a listener from a service locator when it is about to run
- * `CompileListenersPass` moves the `addListener()` calls of a dispatcher definition into that map. It is
-   registered at `PassConfig::TYPE_AFTER_REMOVING`, so a compiler pass reading those calls still finds them
-   as long as it runs before that. When the definition is a decorator, the calls are compiled into the
-   dispatcher it decorates, so a decorator no longer receives them at runtime
+ * The `event_dispatcher` service is a `CompiledEventDispatcher` instead of an `EventDispatcher`; both implement `EventDispatcherInterface`, which is the type to use
+ * `CompileListenersPass` compiles away the `addListener()` calls of the dispatcher definitions at `PassConfig::TYPE_AFTER_REMOVING`: a compiler pass reading them must run before, and a decorator of the dispatcher no longer receives them at runtime
  * Deprecate calling `addListener()`, `addSubscriber()`, `removeListener()` and `removeSubscriber()` on a
    `CompiledEventDispatcher`, which is what the `event_dispatcher` service is. Declare the listener in the
    container, or add it to a `ScopedEventDispatcher` wrapping the shared one and dispatch through that:
@@ -99,18 +88,9 @@ EventDispatcher
    (new Worker($receivers, $bus, $dispatcher))->run();
    ```
 
-   The listeners of the wrapped dispatcher run as they would have, so only the code that dispatches through the
-   scoped one sees the added ones. A test that adds a listener to the `event_dispatcher` service to watch an
-   event is the most likely place to meet this deprecation; register a listener service in the test container
-   instead, and give it what the test needs to observe
- * `TraceableEventDispatcher` calls the listeners of an event itself, wrapping them as it goes, where it used
-   to swap each one for a wrapper on the dispatcher it decorates and swap it back afterwards. It therefore no
-   longer calls `dispatch()` on that dispatcher, so a custom implementation's own dispatching is bypassed
-   while the profiler is watching
- * `AsEventListener::$priority` is now `?int` and defaults to `null`, which means "no priority declared";
-   the `kernel.event_listener` tags it produces carry `null` too, and so does the `$priority` argument of
-   `AsControllerAttributeListener` and of the Workflow `As*Listener` attributes. Code that read the
-   property as an `int` should read `$attribute->priority ?? 0`
+   A test that adds a listener to the `event_dispatcher` service is the most likely place to meet this deprecation; register a listener service in the test container instead
+ * `TraceableEventDispatcher` calls the listeners itself instead of calling `dispatch()` on the dispatcher it decorates, so the dispatching logic of a custom dispatcher is bypassed in debug mode
+ * `AsEventListener::$priority` and the `$priority` of the Workflow `As*Listener` attributes are now `?int` and default to `null`, which means "no priority declared"; the `kernel.event_listener` tags they produce carry `null` too, and code that read the property as an `int` should read `$attribute->priority ?? 0`
 
 ExpressionLanguage
 ------------------
@@ -179,64 +159,20 @@ FrameworkBundle
    stays off until it is configured, as before
  * Every traceable decorator and data collector the moved sections own is registered in debug mode and dropped
    when the profiler is disabled, where some of them used to follow the profiler alone
- * Beyond moving their section, some of these bundles now decide at compile time what the container can wire:
-    * `AssetMapperBundle` drops the asset package when the Asset component is not enabled, and the cache pool
-      when no `cache.system` pool is registered
-    * `HttpClientBundle` drops the cache pool when no `cache.app` pool is registered
-    * `MailerBundle` drops the message logger listener when neither the profiler nor the test client collects
-      the sent messages, and the notifier email channel when the mailer is missing
-    * `NotifierBundle` drops the notification logger listener when neither the profiler nor the test client
-      consumes what it retains
-    * `SchedulerBundle` drops its services when no Messenger transport factory is registered; enabling
-      Messenger is only required when a schedule or a task is declared
-    * `SerializerBundle` drops the cache pool when no `cache.system` pool is registered, and the translatable
-      normalizer when no translator is
-    * `TranslationBundle` answers with an identity translator whenever translation itself is off, and its
-      `translation:*` console commands are dropped when there is no translator
-    * `ValidationBundle` no longer turns the validator on implicitly when forms are enabled; its cache pools
-      are dropped when no `cache.system` pool is registered, and its property-info loader when no property
-      info extractor is
-    * `WebhookBundle` reports an error from the transport when the configured HTTP client is missing and from
-      the controller when the configured message bus is, and serializes the payload with `json_encode()` when
-      the Serializer component is not enabled
+ * The component bundles drop at compile time the services whose dependencies are missing, for instance their cache pools when no `cache.system` pool is registered
+ * `ValidationBundle` no longer enables the validator when forms are enabled
  * `Console\Application` does not instantiate every bundle anymore, only the ones that override the deprecated
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
- * Deprecate `JsonPathPass`, use the one from the JsonPath component instead
- * Deprecate `Command\RouterMatchCommand`, use `Symfony\Component\Routing\Command\RouterMatchCommand` instead
- * Deprecate the `TranslationLintCommandPass`, `TranslationUpdateCommandPass`, `AssetsContextPass` and
-   `AddValidatorSecurityExpressionLanguageProviderPass` compiler passes, use their counterparts from the
-   Translation, Asset and Validator components instead; each is now registered by the bundle of the
-   component that declares the services it acts on
- * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component
-   instead. Unlike the interface, the attribute is not inherited: a class extending an annotated one has to
-   carry it too
- * Deprecate `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use their counterparts from
-   the Routing component instead. `AsRoutingConditionService` no longer extends `AutoconfigureTag`: it is wired
-   by an autoconfiguration rule that `RouterBundle` registers, so it tags only the classes that carry it and no
-   longer their subclasses, which used to inherit the parent's alias
- * Deprecate `Translation\Translator`, use
-   `Symfony\Component\Translation\DependencyInjection\Translator` instead
- * Deprecate `Controller\TemplateController`, use `Symfony\Bundle\TwigBundle\Controller\TemplateController`
-   instead. Its service is now declared by TwigBundle rather than by the routing configuration, so it exists
-   when TwigBundle is registered instead of whenever routing is; the old service id keeps working as a
-   deprecated alias
- * The `Symfony\Bundle\FrameworkBundle\Controller\RedirectController` service id is deprecated, use
-   `Symfony\Component\Routing\Controller\RedirectController`; the old id, which route definitions
-   reference, keeps working as a deprecated alias
- * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, use
-   their counterparts from the Cache component instead
- * Deprecate `CacheWarmer\SerializerCacheWarmer` and `CacheWarmer\ValidatorCacheWarmer`, use their
-   counterparts from the Serializer and Validator components instead
- * Deprecate `Command\CachePoolClearCommand`, `Command\CachePoolDeleteCommand`,
-   `Command\CachePoolInvalidateTagsCommand`, `Command\CachePoolListCommand` and
-   `Command\CachePoolPruneCommand`, use their counterparts from the Cache component instead
- * Deprecate `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand` and
-   `CacheWarmer\TranslationsCacheWarmer`, use their counterparts from the Translation component instead
- * Deprecate `CacheWarmer\RouterCacheWarmer`, `Controller\RedirectController`,
-   `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader` and
-   `Routing\RedirectableCompiledUrlMatcher`, use their counterparts from the Routing component instead
- * Deprecate not setting the `framework.scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
+ * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer`, `CacheWarmer\CachePoolClearerCacheWarmer`, `Command\CachePoolClearCommand`, `Command\CachePoolDeleteCommand`, `Command\CachePoolInvalidateTagsCommand`, `Command\CachePoolListCommand` and `Command\CachePoolPruneCommand`, use their counterparts from the Cache component instead
+ * Deprecate `CacheWarmer\RouterCacheWarmer`, `Command\RouterMatchCommand`, `Controller\RedirectController`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader`, `Routing\RedirectableCompiledUrlMatcher`, `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use their counterparts from the Routing component instead. The `Symfony\Bundle\FrameworkBundle\Controller\RedirectController` service id, which route definitions reference, keeps working as a deprecated alias, and `AsRoutingConditionService` no longer tags the subclasses of the classes that carry it
+ * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead. Unlike the interface, the attribute is not inherited: a class extending an annotated one has to carry it too
+ * Deprecate `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass` and `Translation\Translator`, use their counterparts from the Translation component instead
+ * Deprecate `CacheWarmer\SerializerCacheWarmer`, use the one from the Serializer component instead
+ * Deprecate `CacheWarmer\ValidatorCacheWarmer`, use the one from the Validator component instead
+ * Deprecate `DependencyInjection\Compiler\AssetsContextPass`, use the one from the Asset component instead
+ * Deprecate `DependencyInjection\Compiler\JsonPathPass`, use the one from the JsonPath component instead
+ * Deprecate `Controller\TemplateController`, use the one from TwigBundle instead. Its service now exists when TwigBundle is registered instead of whenever routing is, and the old service id keeps working as a deprecated alias
  * The secrets vault no longer loads env vars when its directory is in the project but does not exist when the container is built (`config/secrets/` by default). The env var of `framework.secret` is then not derived from `SYMFONY_DECRYPTION_SECRET` anymore when it is empty or not defined: define it, or create the vault. In non-debug environments, clear the cache after creating the first vault
 
 HttpClient
@@ -249,6 +185,7 @@ HttpFoundation
 --------------
 
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
+ * Deprecate not passing an expiration to `UriSigner::sign()` when the signer has no default one; pass it, or set a default with the `$defaultExpiration` argument of `UriSigner::__construct()` or the `framework.uri_signer.expiration` option
  * Deprecate the `Request::$trustedHosts` property, it is never populated anymore since trusted hosts are
    matched against a single combined regexp, and will be removed in 9.0. Populating it makes `getHost()`
    trigger a deprecation; reading it is not reported, since PHP provides no way to intercept access to a
@@ -309,7 +246,7 @@ Lock
 Loco Translation Provider
 -------------------------
 
- * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument. It has no effect and can be removed.
+ * Deprecate the `$defaultLocale` argument of `LocoProvider` and `LocoProviderFactory`, it has no effect and can be removed
  * Deprecate passing no domains or `*` to `LocoProvider::read()`, configure your loco provider domains as an associative array with an empty string key and `*` as value
 
 Mailer
@@ -324,10 +261,9 @@ Mailer
    Set the `on_missing_certificate` option (or the `X-SMime-Encrypt` header) to `fail`, `encrypt` or `skip`:
 
    ```yaml
-   framework:
-       mailer:
-           smime_encrypter:
-               on_missing_certificate: 'fail'
+   mailer:
+       smime_encrypter:
+           on_missing_certificate: 'fail'
    ```
 
  * `DkimSignedMessageListener` now listens with priority `-228` instead of `-128`, so that DKIM signs the
@@ -355,7 +291,7 @@ Messenger
    or with a message implementing `MessageDeduplicationAwareInterface` (together with `AddFifoStampMiddleware`);
    the `ContentBasedDeduplication` attribute of the queue alone is not enough, as an explicit id overrides it.
  * `RedispatchMessage` now dispatches to the senders configured for the message (via
-   `framework.messenger.routing` or `#[AsMessage]`) when `$transportNames` is empty, instead of sending to no
+   `messenger.routing` or `#[AsMessage]`) when `$transportNames` is empty, instead of sending to no
    sender at all. Code that relied on `new RedispatchMessage($message)`, or on an empty array or string, to
    force in-process handling of a message that also has a configured route must now carry an empty
    `TransportNamesStamp` on the inner envelope:
@@ -402,6 +338,8 @@ Notifier
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0. The
    boolean values it accepts are `1`/`0`, `true`/`false`, `on`/`off`, `yes`/`no` and the empty string, which reads as `false`
  * Deprecate the `LineNotify` transport as LINE Notify was shut down, use `LineBot` instead
+ * Deprecate the Firebase `firebase://USERNAME:PASSWORD@default` DSN and the `$token` argument of `FirebaseTransport::__construct()`, use `firebase://PROJECT_ID?client_email=...&private_key_id=...&private_key=...` with the credentials of a service account instead
+ * Deprecate the Firebase `AndroidNotification`, `IOSNotification` and `WebNotification` classes, use `FirebaseOptions` instead
  * Deprecate the autowiring aliases named after the webhook request parsers of the bridges, type `Symfony\Component\Webhook\Client\RequestParserInterface` and select the parser with `#[Target('notifier.twilio')]` for instance
 
 RateLimiter
@@ -413,6 +351,7 @@ RateLimiter
 Scheduler
 ---------
 
+ * Deprecate not setting the `scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
  * Deprecate `Schedule::with()`. It returns an empty schedule, so a lock or a state set on the original
    schedule is silently dropped, and the resulting schedule then runs unlocked.
 
@@ -472,7 +411,6 @@ Security
  * Deprecate not passing the `$enforceAtJwtType` argument to `OidcTokenHandler`; pass `true` to reject
    the tokens whose `typ` header is not `at+jwt` or `application/at+jwt`, as RFC 9068 requires from a
    JWT access token. It defaults to `false` in 8.2 and will default to `true` in 9.0
- * Add argument `$resourceMetadataUri` to `AccessTokenAuthenticator::__construct()`
  * `AccessTokenAuthenticator` now implements `FallbackAuthenticationEntryPointInterface`, so it becomes the
    entry point of a firewall that declares no other one: an unauthenticated request now gets a 401 carrying
    the RFC 6750 `WWW-Authenticate: Bearer` challenge, where it used to get a 401 with no such header
@@ -489,10 +427,7 @@ Security
  * [BC BREAK] An `#[IsGranted]` attribute whose subject reads an argument mapped with `#[MapRequestPayload]`, `#[MapQueryString]` or `#[MapUploadedFile]` now maps and validates that argument before voting.
    Voters receive the mapped value instead of the attribute, and the attributes declared before it still run before the request is mapped.
    A voter that read the attribute, for instance its `metadata` property, to vote before the request is mapped needs a subject that does not read the mapped argument instead
- * `OidcTokenHandler` logs the tokens it rejects at the `debug` level instead of `error`, including the plain tokens it refuses when encryption is required.
-   They no longer activate a `fingers_crossed` handler whose `action_level` is `error`, as in the Monolog recipe.
-   A configured key that does not match the one of the provider, for instance after a key rotation, now shows up at that level too, and as "Authenticator failed." at the `info` level.
-   Errors while fetching the discovery document or the JWKS are still logged at the `error` level
+ * `OidcTokenHandler` logs the tokens it rejects at the `debug` level instead of `error`, including the ones signed with a key that does not match the configured one, after a key rotation for instance; errors while fetching the discovery document or the JWKS are still logged at the `error` level
 
 SecurityBundle
 --------------
@@ -528,8 +463,6 @@ SecurityBundle
 Serializer
 ----------
 
- * `SerializerBundle` provides the `serializer` configuration and the services `FrameworkBundle` used to provide
-   under `framework.serializer`
  * Deprecate denormalizing an array that is not a list into a `list`-typed property, in version 9.0 a `Symfony\Component\Serializer\Exception\NotNormalizableValueException` will be thrown when the input does not satisfy `array_is_list()`
  * Denormalize the elements of a union-typed collection, e.g. `array<Foo|Bar>`, instead of returning the raw data. An element that matches no member of the union, or a key whose type does not match, now throws instead of being returned as-is
  * Deprecate denormalizing a property from its PHP name when a name converter maps it to another key (e.g. with `#[SerializedName]`), in version 9.0 such a key will be handled like any unknown key
@@ -543,8 +476,6 @@ String
 Translation
 -----------
 
- * `TranslationBundle` provides the `translation` configuration and the services `FrameworkBundle` used to
-   provide under `framework.translator`
  * `FilteringProvider::read()` now returns an empty `TranslatorBag` when none of the requested locales match the configured ones, and a bag of empty catalogues when no requested domain matches, instead of delegating to the wrapped provider
  * `CrowdinProvider::write()` now adds the locales missing from the project before uploading, which needs an API
    token with a read and write `project.settings` scope. With a narrower token the failure is logged and those
@@ -580,24 +511,8 @@ Uid
 Validator
 ---------
 
- * `ValidationBundle` provides the `validation` configuration and the services `FrameworkBundle` used to provide
-   under `framework.validation`
- * Add argument `$restrictGroups` to `Valid::__construct()`
  * [BC BREAK] Remove the `GroupSequence::$cascadedGroup` property, it has had no effect since the validator stopped reading it in 2014, and reading it has thrown since 7.4 typed it without a default
- * Add argument `$cascadeCurrentGroup` to `GroupSequenceProvider::__construct()`
- * The `File` constraint no longer narrows the configured `mimeTypes` option with mime types auto-derived from the matched extension when `extensions` is also configured.
-   The two options are now checked independently: `extensions` validates the file extension, and `mimeTypes` validates the detected mime type.
-
-   In previous versions, the effective mime-type list was narrowed to the mime types auto-derived from the matching extension. For example, a CSV file detected as `text/plain` could be rejected by this constraint because the `mimeTypes` list was narrowed to the mime types derived from `csv`:
-
-   ```php
-   #[Assert\File(
-       extensions: ['csv'],
-       mimeTypes: ['text/csv', 'text/plain'],
-   )]
-   ```
-
-   In Symfony 8.2, the configured `mimeTypes` list is used as-is, while the `csv` extension is still enforced separately.
+ * The `File` constraint checks the `extensions` and `mimeTypes` options independently, where the configured `mimeTypes` used to be narrowed to the mime types derived from the matching extension
 
 Webhook
 -------

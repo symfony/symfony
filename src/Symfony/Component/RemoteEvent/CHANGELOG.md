@@ -6,7 +6,7 @@ CHANGELOG
 
  * Add `RemoteEventBundle`, which provides the `remote_event` configuration and the services previously provided by `FrameworkBundle` under `framework.remote_event`
  * Add `clicked` and `unsubscribed` SMS event names
- * Allow repeating `AsRemoteEventConsumer` attribute
+ * Make the `#[AsRemoteEventConsumer]` attribute repeatable
 
 6.4
 ---

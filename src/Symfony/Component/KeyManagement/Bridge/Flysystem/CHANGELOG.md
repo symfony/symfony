@@ -5,4 +5,3 @@ CHANGELOG
 ---
 
  * Add the bridge as experimental
- * Add memoized key reads, `FlysystemKeyLoader::reset()`, and the `reset` DSN option

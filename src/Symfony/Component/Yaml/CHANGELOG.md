@@ -6,8 +6,8 @@ CHANGELOG
 
  * Add support for the `!!null`, `!!bool` and `!!int` tags, and accept quoted values for them and for `!!float`
  * Throw a `ParseException` when the value of a `!!float` tag is not a valid float, instead of casting it to `0.0`
- * Add a `gitlab` output format to the `lint:yaml` command, producing a report in the GitLab Code Quality format
- * Add a `Schema` namespace with a `SchemaValidatorInterface` to validate data against a JSON Schema, a `SchemaResolverInterface` to determine the schema of a document, and their `SchemaValidator` and `FileHeaderSchemaResolver` implementations
+ * Add a `gitlab` output format to the `lint:yaml` command
+ * Add the `Schema` namespace with `SchemaValidatorInterface`, `SchemaResolverInterface` and their `SchemaValidator` and `FileHeaderSchemaResolver` implementations, to validate data against a JSON Schema
  * Add JSON Schema validation to the `lint:yaml` command through the `--check-schema` option or a `# yaml-language-server: $schema=` / `# $schema=` file header
  * Add support for parsing a block scalar, optionally tagged, as the root node of a document
  * Require the `PARSE_CUSTOM_TAGS` flag for custom tags on block scalars, as on other values

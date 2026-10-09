@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Assert each constraint of the DomCrawler and BrowserKit assertions on its own, so that their failure messages describe the failed check instead of dumping the crawler, the response or the client
  * Add the `expression_language.compiled` tag to decorate an expression language with `CompiledExpressionLanguage`
  * Register the `lint:expressions` command
  * Add the `framework.session.isolate_attributes` option to deep-clone the values read from and passed to session attributes

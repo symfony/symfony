@@ -108,10 +108,8 @@ trait BrowserKitAssertionsTrait
 
     public static function assertResponseCookieValueSame(string $name, string $expectedValue, string $path = '/', ?string $domain = null, string $message = ''): void
     {
-        self::assertThatForResponse(LogicalAnd::fromConstraints(
-            new ResponseConstraint\ResponseHasCookie($name, $path, $domain),
-            new ResponseConstraint\ResponseCookieValueSame($name, $expectedValue, $path, $domain)
-        ), $message);
+        self::assertThatForResponse(new ResponseConstraint\ResponseHasCookie($name, $path, $domain), $message);
+        self::assertThatForResponse(new ResponseConstraint\ResponseCookieValueSame($name, $expectedValue, $path, $domain), $message);
     }
 
     public static function assertResponseIsUnprocessable(string $message = '', ?bool $verbose = null): void
@@ -163,10 +161,8 @@ trait BrowserKitAssertionsTrait
 
     public static function assertBrowserCookieValueSame(string $name, string $expectedValue, bool $raw = false, string $path = '/', ?string $domain = null, string $message = ''): void
     {
-        self::assertThatForClient(LogicalAnd::fromConstraints(
-            new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain),
-            new BrowserKitConstraint\BrowserCookieValueSame($name, $expectedValue, $raw, $path, $domain)
-        ), $message);
+        self::assertThatForClient(new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain), $message);
+        self::assertThatForClient(new BrowserKitConstraint\BrowserCookieValueSame($name, $expectedValue, $raw, $path, $domain), $message);
     }
 
     public static function assertRequestAttributeValueSame(string $name, string $expectedValue, string $message = ''): void
@@ -176,16 +172,12 @@ trait BrowserKitAssertionsTrait
 
     public static function assertRouteSame(string $expectedRoute, array $parameters = [], string $message = ''): void
     {
-        $constraint = new ResponseConstraint\RequestAttributeValueSame('_route', $expectedRoute);
-        $constraints = [];
-        foreach ($parameters as $key => $value) {
-            $constraints[] = new ResponseConstraint\RequestAttributeValueSame($key, $value);
-        }
-        if ($constraints) {
-            $constraint = LogicalAnd::fromConstraints($constraint, ...$constraints);
-        }
+        $request = self::getRequest();
+        self::assertThat($request, new ResponseConstraint\RequestAttributeValueSame('_route', $expectedRoute), $message);
 
-        self::assertThat(self::getRequest(), $constraint, $message);
+        foreach ($parameters as $key => $value) {
+            self::assertThat($request, new ResponseConstraint\RequestAttributeValueSame($key, $value), $message);
+        }
     }
 
     public static function assertSessionHasFlashMessage(string $messageType, string|array $messages = ''): void

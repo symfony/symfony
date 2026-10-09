@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -193,8 +194,18 @@ class WebTestCaseTest extends TestCase
 
         $this->getResponseTester($response)->assertResponseCookieValueSame('foo', 'bar');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('has cookie "bar" and has cookie "bar" with value "bar".');
+        $this->expectExceptionMessage('Failed asserting that the Response has cookie "bar".');
         $this->getResponseTester($response)->assertResponseCookieValueSame('bar', 'bar');
+    }
+
+    public function testAssertResponseCookieValueSameWithAnotherValue()
+    {
+        $response = new Response();
+        $response->headers->setCookie(HttpFoundationCookie::create('foo', 'bar'));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Response has cookie "foo" with value "baz".');
+        $this->getResponseTester($response)->assertResponseCookieValueSame('foo', 'baz');
     }
 
     public function testAssertBrowserHasCookie()
@@ -217,8 +228,15 @@ class WebTestCaseTest extends TestCase
     {
         $this->getClientTester()->assertBrowserCookieValueSame('foo', 'bar', false, '/path');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('has cookie "foo" with path "/path" and has cookie "foo" with path "/path" with value "babar".');
+        $this->expectExceptionMessage('Failed asserting that the Browser has cookie "foo" with path "/path" with value "babar".');
         $this->getClientTester()->assertBrowserCookieValueSame('foo', 'babar', false, '/path');
+    }
+
+    public function testAssertBrowserCookieValueSameWithoutCookie()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Browser has cookie "bar".');
+        $this->getClientTester()->assertBrowserCookieValueSame('bar', 'bar');
     }
 
     #[RequiresMethod(History::class, 'isFirstPage')]
@@ -261,7 +279,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<html><body><h1>'))->assertSelectorExists('body > h1');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "body > h1".');
+        $this->expectExceptionMessage('Failed asserting that the Crawler matches selector "body > h1".');
         $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertSelectorExists('body > h1');
     }
 
@@ -269,7 +287,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertSelectorNotExists('body > h1');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('does not match selector "body > h1".');
+        $this->expectExceptionMessage('Failed asserting that the Crawler does not match selector "body > h1".');
         $this->getCrawlerTester(new Crawler('<html><body><h1>'))->assertSelectorNotExists('body > h1');
     }
 
@@ -283,11 +301,27 @@ class WebTestCaseTest extends TestCase
         $this->getCrawlerTester(new Crawler('<html><body><p>Hello</p></body></html>'))->assertSelectorCount(0, 'p');
     }
 
+    public function testAssertSelectorTextContains()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><h1>Foobar'))->assertSelectorTextContains('body > h1', 'Foo');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the text "Foo" of the node matching selector "body > h1" contains "Bar".');
+        $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextContains('body > h1', 'Bar');
+    }
+
+    public function testAssertSelectorTextSame()
+    {
+        $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextSame('body > h1', 'Foo');
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Crawler has a node matching selector "body > h1" with content "Bar".');
+        $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextSame('body > h1', 'Bar');
+    }
+
     public function testAssertSelectorTextNotContains()
     {
         $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Bar');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "body > h1" and the text "Foo" of the node matching selector "body > h1" does not contain "Foo".');
+        $this->expectExceptionMessage('Failed asserting that the text "Foo" of the node matching selector "body > h1" does not contain "Foo".');
         $this->getCrawlerTester(new Crawler('<html><body><h1>Foo'))->assertSelectorTextNotContains('body > h1', 'Foo');
     }
 
@@ -295,7 +329,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo Baz'))->assertAnySelectorTextContains('ul li', 'Foo');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "ul li" and the text of any node matching selector "ul li" contains "Foo".');
+        $this->expectExceptionMessage('Failed asserting that the text of any node matching selector "ul li" contains "Foo".');
         $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextContains('ul li', 'Foo');
     }
 
@@ -303,7 +337,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo'))->assertAnySelectorTextSame('ul li', 'Foo');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "ul li" and has at least a node matching selector "ul li" with content "Foo".');
+        $this->expectExceptionMessage('Failed asserting that the Crawler has at least a node matching selector "ul li" with content "Foo".');
         $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextSame('ul li', 'Foo');
     }
 
@@ -311,7 +345,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Baz'))->assertAnySelectorTextNotContains('ul li', 'Foo');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "ul li" and the text of any node matching selector "ul li" does not contain "Foo".');
+        $this->expectExceptionMessage('Failed asserting that the text of any node matching selector "ul li" does not contain "Foo".');
         $this->getCrawlerTester(new Crawler('<ul><li>Bar</li><li>Foo'))->assertAnySelectorTextNotContains('ul li', 'Foo');
     }
 
@@ -319,7 +353,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleSame('Foo');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "title" and has a node matching selector "title" with content "Bar".');
+        $this->expectExceptionMessage('Failed asserting that the Crawler has a node matching selector "title" with content "Bar".');
         $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleSame('Bar');
     }
 
@@ -327,7 +361,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<html><head><title>Foobar'))->assertPageTitleContains('Foo');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "title" and the text "Foo" of the node matching selector "title" contains "Bar".');
+        $this->expectExceptionMessage('Failed asserting that the text "Foo" of the node matching selector "title" contains "Bar".');
         $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertPageTitleContains('Bar');
     }
 
@@ -335,16 +369,36 @@ class WebTestCaseTest extends TestCase
     {
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="username" value="Fabien">'))->assertInputValueSame('username', 'Fabien');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "input[name="password"]" and has a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
-        $this->getCrawlerTester(new Crawler('<html><head><title>Foo'))->assertInputValueSame('password', 'pa$$');
+        $this->expectExceptionMessage('Failed asserting that the Crawler has a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
+        $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="password" value="secret">'))->assertInputValueSame('password', 'pa$$');
     }
 
     public function testAssertInputValueNotSame()
     {
         $this->getCrawlerTester(new Crawler('<html><body><input type="text" name="username" value="Helene">'))->assertInputValueNotSame('username', 'Fabien');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "input[name="password"]" and does not have a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
+        $this->expectExceptionMessage('Failed asserting that the Crawler does not have a node matching selector "input[name="password"]" with attribute "value" of value "pa$$".');
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="text" name="password" value="pa$$">'))->assertInputValueNotSame('password', 'pa$$');
+    }
+
+    #[DataProvider('provideCrawlerAssertionsOnMissingNode')]
+    public function testCrawlerAssertionOnMissingNode(string $assertion, array $arguments, string $expectedMessage)
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage($expectedMessage);
+        $this->getCrawlerTester(new Crawler('<html><body><p>Foo'))->$assertion(...$arguments);
+    }
+
+    public static function provideCrawlerAssertionsOnMissingNode(): iterable
+    {
+        yield ['assertSelectorTextContains', ['h1', 'Foo'], 'Failed asserting that the Crawler matches selector "h1".'];
+        yield ['assertAnySelectorTextContains', ['h1', 'Foo'], 'Failed asserting that the Crawler matches selector "h1".'];
+        yield ['assertSelectorTextSame', ['h1', 'Foo'], 'Failed asserting that the Crawler matches selector "h1".'];
+        yield ['assertAnySelectorTextSame', ['h1', 'Foo'], 'Failed asserting that the Crawler matches selector "h1".'];
+        yield ['assertSelectorTextNotContains', ['h1', 'Foo'], 'Failed asserting that the Crawler matches selector "h1".'];
+        yield ['assertAnySelectorTextNotContains', ['h1', 'Foo'], 'Failed asserting that the Crawler matches selector "h1".'];
+        yield ['assertInputValueSame', ['password', 'pa$$'], 'Failed asserting that the Crawler matches selector "input[name="password"]".'];
+        yield ['assertInputValueNotSame', ['password', 'pa$$'], 'Failed asserting that the Crawler matches selector "input[name="password"]".'];
     }
 
     public function testAssertCheckboxChecked()
@@ -352,7 +406,7 @@ class WebTestCaseTest extends TestCase
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
         $this->getCrawlerTester(new Crawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxChecked('rememberMe');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('matches selector "input[name="rememberMe"]:checked".');
+        $this->expectExceptionMessage('Failed asserting that the Crawler matches selector "input[name="rememberMe"]:checked".');
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxChecked('rememberMe');
     }
 
@@ -361,7 +415,7 @@ class WebTestCaseTest extends TestCase
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
         $this->getCrawlerTester(new Crawler('<!DOCTYPE html><body><form><input type="checkbox" name="rememberMe">'))->assertCheckboxNotChecked('rememberMe');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('does not match selector "input[name="rememberMe"]:checked".');
+        $this->expectExceptionMessage('Failed asserting that the Crawler does not match selector "input[name="rememberMe"]:checked".');
         $this->getCrawlerTester(new Crawler('<html><body><form><input type="checkbox" name="rememberMe" checked>'))->assertCheckboxNotChecked('rememberMe');
     }
 
@@ -395,6 +449,13 @@ class WebTestCaseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that the Request has attribute "_route" with value "articles".');
         $this->getRequestTester()->assertRouteSame('articles');
+    }
+
+    public function testAssertRouteSameWithParameters()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the Request has attribute "foo" with value "baz".');
+        $this->getRequestTester()->assertRouteSame('homepage', ['foo' => 'baz']);
     }
 
     public function testExceptionOnServerError()

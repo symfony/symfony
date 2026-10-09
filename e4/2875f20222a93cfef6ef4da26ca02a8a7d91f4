@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-09T15:38:59Z
+
+I pushed a fix for the Windows job: touch() clears the stat cache only as of PHP 8.4.5, and the root's `.` entry was what let `testIsFreshModifyDirectoryInSameSecond` see the new mtime there. The test now calls clearstatcache() itself.

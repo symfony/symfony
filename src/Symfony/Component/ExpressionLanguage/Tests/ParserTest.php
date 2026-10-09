@@ -375,4 +375,11 @@ class ParserTest extends TestCase
 
         $this->expectNotToPerformAssertions();
     }
+
+    public function testChainedTernariesWithBinaryConditionsAreAccepted()
+    {
+        (new Parser([]))->lint((new Lexer())->tokenize(str_repeat('a and a and a ? 1 : ', 64).'0'), ['a']);
+
+        $this->expectNotToPerformAssertions();
+    }
 }

@@ -54,7 +54,7 @@ class BoundsType extends AbstractType
         }
 
         // Append generic carry-along options. A bound that bubbles its errors moves them to
-        // the range, which "bounds_row" does not render, so error_bubbling goes down too.
+        // the range, away from the bound they are about, so error_bubbling goes down too.
         foreach (['required', 'translation_domain', 'error_bubbling'] as $passOpt) {
             $fromOptions[$passOpt] = $toOptions[$passOpt] = $options[$passOpt];
         }

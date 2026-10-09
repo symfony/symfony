@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Bridge\Twig\Test\FormLayoutTestCase;
 use Symfony\Component\Form\EntryTypeProviderInterface;
+use Symfony\Component\Form\Extension\Core\Type\BoundsType;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\PolymorphicCollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -459,6 +460,47 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [count(./li)=2]
 '
         );
+    }
+
+    public function testBoundsRow()
+    {
+        if (!class_exists(BoundsType::class)) {
+            $this->markTestSkipped('Requires symfony/form 8.2+.');
+        }
+
+        $form = $this->factory->createNamed('')->add('name', BoundsType::class, [
+            'label' => 'Dates',
+            'help' => 'Help text',
+        ]);
+        $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
+        $html = $this->renderRow($form->get('name')->createView());
+
+        $this->assertMatchesXpath($html,
+            '//*[self::label or self::legend][not(@for)][.="[trans]Dates[/trans]"]
+    /following::*[@id="name"]
+        [.//label[@for="name_from"]/following::input[@id="name_from"]]
+        [.//label[@for="name_to"]/following::input[@id="name_to"]]
+    /following::*[@id="name_help"][.="[trans]Help text[/trans]"]
+'
+        );
+        $this->assertMatchesXpath($html, '//*[text()[contains(., "[trans]Error![/trans]")]]');
+    }
+
+    public function testBoundsRowWithoutLabel()
+    {
+        if (!class_exists(BoundsType::class)) {
+            $this->markTestSkipped('Requires symfony/form 8.2+.');
+        }
+
+        $form = $this->factory->createNamed('')->add('name', BoundsType::class, [
+            'label' => false,
+        ]);
+        $html = $this->renderRow($form->get('name')->createView());
+
+        $this->assertMatchesXpath($html, '//*[@id="name"]');
+        $this->assertMatchesXpath($html, '//label[@for="name_from" or @for="name_to"]', 2);
+        $this->assertMatchesXpath($html, '//label[not(@for)]', 0);
+        $this->assertMatchesXpath($html, '//legend', 0);
     }
 
     public function testOverrideWidgetBlock()

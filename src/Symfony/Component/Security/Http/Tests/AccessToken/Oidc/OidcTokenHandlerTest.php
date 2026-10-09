@@ -95,7 +95,7 @@ class OidcTokenHandlerTest extends TestCase
     public function testThrowsAnErrorIfTokenIsInvalid(string $token)
     {
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error');
+        $loggerMock->expects($this->never())->method('error');
 
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('Invalid credentials.');
@@ -179,7 +179,7 @@ class OidcTokenHandlerTest extends TestCase
     public function testThrowsAnErrorIfUserPropertyIsMissing()
     {
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error');
+        $loggerMock->expects($this->never())->method('error');
 
         $time = time();
         $claims = [
@@ -249,7 +249,7 @@ class OidcTokenHandlerTest extends TestCase
         $token = self::buildJWS(json_encode(self::getValidClaims()), $header);
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error');
+        $loggerMock->expects($this->never())->method('error');
 
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('Invalid credentials.');
@@ -358,6 +358,34 @@ class OidcTokenHandlerTest extends TestCase
         $userBadge = $handler->getUserBadgeFrom((new JweCompactSerializer())->serialize($jwe, 0));
 
         $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
+    }
+
+    public function testRejectsAPlainTokenWhenEncryptionIsRequired()
+    {
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->never())->method('error');
+
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            self::getJWKSet(),
+            self::AUDIENCE,
+            ['https://www.example.com'],
+            'sub',
+            $loggerMock,
+            new Clock(),
+            0,
+            true,
+        );
+        $handler->enableJweSupport(
+            new JWKSet([new JWK(['kty' => 'oct', 'k' => 'V0hBVCBBIExPVkVMWSBLRVkgT0YgMzIgQllURVMh'])]),
+            new AlgorithmManager([new Dir(), new A128CBCHS256()]),
+            true,
+        );
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+
+        $handler->getUserBadgeFrom(self::buildJWS(json_encode(self::getValidClaims())));
     }
 
     public static function getEncryptedTokenTypes(): iterable
@@ -1495,7 +1523,7 @@ class OidcTokenHandlerTest extends TestCase
         $token = self::buildJWS(json_encode($claims));
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error');
+        $loggerMock->expects($this->never())->method('error');
 
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('Invalid credentials.');
@@ -1559,7 +1587,7 @@ class OidcTokenHandlerTest extends TestCase
         $token = self::buildJWS(json_encode($claims));
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error');
+        $loggerMock->expects($this->never())->method('error');
 
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('Invalid credentials.');
@@ -1619,7 +1647,7 @@ class OidcTokenHandlerTest extends TestCase
         $token = self::buildJWS(json_encode(['aud' => $tokenAudience] + self::getValidClaims()));
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error');
+        $loggerMock->expects($this->never())->method('error');
 
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('Invalid credentials.');

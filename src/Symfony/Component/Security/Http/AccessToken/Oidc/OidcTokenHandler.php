@@ -205,7 +205,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
                 return $this->createUser($claims);
             }), $claims);
         } catch (\Exception $e) {
-            $this->logger?->error('An error occurred while decoding and validating the token.', [
+            $this->logger?->debug('An error occurred while decoding and validating the token.', [
                 'error' => $e->getMessage(),
                 'exception' => $e::class,
                 'trace' => $e->getTraceAsString(),
@@ -415,7 +415,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
             return $payload;
         } catch (\InvalidArgumentException|\RuntimeException $e) {
             if ($this->enforceEncryption) {
-                $this->logger?->error('An error occurred while decrypting the token.', [
+                $this->logger?->debug('An error occurred while decrypting the token.', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);

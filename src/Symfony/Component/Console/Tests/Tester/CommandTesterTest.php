@@ -374,7 +374,7 @@ class CommandTesterTest extends TestCase
                   --group-description=GROUP-DESCRIPTION   [default: "Standard Users"]
                   --admin %S
                   --active|--no-active %S
-                  --status=STATUS                         [default: "unverified"]
+                  --status=STATUS                        [possible values: unverified, verified, locked] [default: "unverified"]
             %A
             TXT;
 

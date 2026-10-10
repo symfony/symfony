@@ -383,6 +383,31 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--enums' => ['incorrect']]), new NullOutput());
     }
 
+    public function testEnumInputsListTheirCasesInTheirDescription()
+    {
+        $command = new Command('foo');
+        $command->setCode(
+            /** @param list<StringEnum> $enumList */
+            static fn (
+                #[Argument('The type')] StringEnum $enum,
+                #[Argument] array $enumList = [],
+                #[Option('The other type')] StringEnum $otherEnum = StringEnum::Image,
+                #[Option(suggestedValues: ['video'])] ?StringEnum $suggestedEnum = null,
+                #[Option] StringEnum ...$enums,
+            ): int => 0
+        );
+
+        $definition = $command->getDefinition();
+        self::assertSame('The type [possible values: image, video]', $definition->getArgument('enum')->getDescription());
+        self::assertSame('[possible values: image, video]', $definition->getArgument('enum-list')->getDescription());
+        self::assertSame('The other type [possible values: image, video]', $definition->getOption('other-enum')->getDescription());
+        self::assertSame('[possible values: image, video]', $definition->getOption('suggested-enum')->getDescription());
+        self::assertSame('[possible values: image, video]', $definition->getOption('enums')->getDescription());
+
+        $definition->getOption('suggested-enum')->complete(CompletionInput::fromTokens([], 0), $suggestions = new CompletionSuggestions());
+        self::assertEquals([new Suggestion('video')], $suggestions->getValueSuggestions());
+    }
+
     public function testNumericArgumentIsConvertedOrRejected()
     {
         $command = new Command('foo');

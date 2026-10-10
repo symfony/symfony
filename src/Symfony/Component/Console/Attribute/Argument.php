@@ -34,6 +34,7 @@ class Argument
     public string $typeName = '';
     private ?int $mode = null;
     private ?InteractiveAttributeInterface $interactiveAttribute = null;
+    private array $possibleValues = [];
 
     /**
      * Represents a console command <argument> definition.
@@ -90,12 +91,14 @@ class Argument
             $self->suggestedValues = [$instance, $self->suggestedValues[1]];
         }
 
-        if (is_subclass_of($self->typeName, \BackedEnum::class) && !$self->suggestedValues) {
-            $self->suggestedValues = array_column($self->typeName::cases(), 'value');
+        if (is_subclass_of($self->typeName, \BackedEnum::class)) {
+            $self->possibleValues = array_column($self->typeName::cases(), 'value');
+        } elseif ('array' === $self->typeName && null !== ($itemClass = DocBlockTypeResolver::resolveArrayItemClass($member)) && is_subclass_of($itemClass, \BackedEnum::class)) {
+            $self->possibleValues = array_column($itemClass::cases(), 'value');
         }
 
-        if ('array' === $self->typeName && !$self->suggestedValues && null !== ($itemClass = DocBlockTypeResolver::resolveArrayItemClass($member)) && is_subclass_of($itemClass, \BackedEnum::class)) {
-            $self->suggestedValues = array_column($itemClass::cases(), 'value');
+        if (!$self->suggestedValues) {
+            $self->suggestedValues = $self->possibleValues;
         }
 
         $self->interactiveAttribute = Ask::tryFrom($member, $self->name) ?? AskChoice::tryFrom($member, $self->name);
@@ -115,8 +118,9 @@ class Argument
     public function toInputArgument(): InputArgument
     {
         $suggestedValues = \is_callable($this->suggestedValues) ? ($this->suggestedValues)(...) : $this->suggestedValues;
+        $description = $this->possibleValues ? ('' !== $this->description ? $this->description.' ' : '').'[possible values: '.implode(', ', $this->possibleValues).']' : $this->description;
 
-        return new InputArgument($this->name, $this->mode, $this->description, $this->default, $suggestedValues);
+        return new InputArgument($this->name, $this->mode, $description, $this->default, $suggestedValues);
     }
 
     /**

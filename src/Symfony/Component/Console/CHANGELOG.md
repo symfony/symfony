@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * List the accepted values of `#[Argument]` and `#[Option]` inputs mapped to backed enums in their description, e.g. `[possible values: pending, paid]`
  * Map `#[Argument]` and `#[Option]` arrays to backed enums when their PHPDoc narrows them, e.g. `@param list<Suit> $suits` or `@var Suit[]`
  * Add `LockableTrait::setLockFactory()`, autowired with the lock factory of the resource named `console` when the app declares one
  * Allow `#[AsCommand]` to list `InputOption`s to add after the ones the parameters of the command declare

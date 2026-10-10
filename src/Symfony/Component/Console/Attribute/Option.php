@@ -38,6 +38,7 @@ class Option
     private ?int $mode = null;
     private string $memberName = '';
     private string $sourceName = '';
+    private array $possibleValues = [];
 
     /**
      * Represents a console command --option definition.
@@ -122,12 +123,14 @@ class Option
             $self->suggestedValues = [$instance, $self->suggestedValues[1]];
         }
 
-        if (is_subclass_of($self->typeName, \BackedEnum::class) && !$self->suggestedValues) {
-            $self->suggestedValues = array_column($self->typeName::cases(), 'value');
+        if (is_subclass_of($self->typeName, \BackedEnum::class)) {
+            $self->possibleValues = array_column($self->typeName::cases(), 'value');
+        } elseif ('array' === $self->typeName && null !== ($itemClass = DocBlockTypeResolver::resolveArrayItemClass($member)) && is_subclass_of($itemClass, \BackedEnum::class)) {
+            $self->possibleValues = array_column($itemClass::cases(), 'value');
         }
 
-        if ('array' === $self->typeName && !$self->suggestedValues && null !== ($itemClass = DocBlockTypeResolver::resolveArrayItemClass($member)) && is_subclass_of($itemClass, \BackedEnum::class)) {
-            $self->suggestedValues = array_column($itemClass::cases(), 'value');
+        if (!$self->suggestedValues) {
+            $self->suggestedValues = $self->possibleValues;
         }
 
         return $self;
@@ -143,8 +146,9 @@ class Option
             | ($this->hidden ? InputOption::HIDDEN : 0);
         $default = InputOption::VALUE_NONE === (InputOption::VALUE_NONE & $mode) ? null : $this->default;
         $suggestedValues = \is_callable($this->suggestedValues) ? ($this->suggestedValues)(...) : $this->suggestedValues;
+        $description = $this->possibleValues ? ('' !== $this->description ? $this->description.' ' : '').'[possible values: '.implode(', ', $this->possibleValues).']' : $this->description;
 
-        return new InputOption($this->name, $this->shortcut, $mode, $this->description, $default, $suggestedValues);
+        return new InputOption($this->name, $this->shortcut, $mode, $description, $default, $suggestedValues);
     }
 
     private function handleUnion(\ReflectionUnionType $type): self

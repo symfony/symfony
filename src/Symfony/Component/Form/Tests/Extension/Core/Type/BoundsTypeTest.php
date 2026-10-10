@@ -157,7 +157,7 @@ class BoundsTypeTest extends BaseTypeTestCase
     public function testACompoundInnerTypeDoesNotBubbleItsErrorsToTheRange()
     {
         // FormType bubbles the errors of a compound form by default, which would move them
-        // to the range, where "bounds_row" does not render them
+        // to the range, away from the bound they are about
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'type' => FormType::class,
         ]);

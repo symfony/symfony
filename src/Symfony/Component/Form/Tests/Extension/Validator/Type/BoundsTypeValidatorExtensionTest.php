@@ -60,7 +60,7 @@ class BoundsTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     public function testAViolationOnTheRangeStaysOnTheLowerBoundWithACompoundInnerType()
     {
         // a compound inner type bubbles its errors by default, which would move the violation
-        // back to the range, where "bounds_row" does not render it
+        // back to the range, away from the lower bound
         $form = $this->createForm([
             'type' => FormType::class,
             'constraints' => [new Callback(static function (mixed $range, ExecutionContextInterface $context): void {

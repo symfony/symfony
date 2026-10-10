@@ -242,6 +242,14 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['classGroup', 'renamedClassGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
             ['noGroup', 'renamedNoGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
             ['customGroup', 'renamedCustomGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['noGroupRenamedInClassGroup', 'NOGROUPRENAMEDINCLASSGROUP', ['groups' => ['custom'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['noGroupRenamedInClassGroup', 'renamedInClassGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['noGroupRenamedInClassGroup', 'renamedInClassGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
         ];
     }
 
@@ -267,6 +275,7 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['classGroup', 'renamedClassGroup', ['groups' => [], 'enable_default_groups' => true]],
             ['noGroup', 'renamedNoGroup', ['groups' => [], 'enable_default_groups' => true]],
             ['customgroup', 'customGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => [], 'enable_default_groups' => true]],
 
             ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
             ['classGroup', 'renamedClassGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
@@ -287,6 +296,19 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['classgroup', 'classGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
             ['nogroup', 'noGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
             ['customGroup', 'renamedCustomGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['renamedinclassgroup', 'renamedInClassGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['noGroupRenamedInClassGroup', 'renamedInClassGroup', ['groups' => ['Default', 'custom'], 'enable_default_groups' => true]],
+            ['noGroupRenamedInClassGroup', 'renamedInClassGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['OtherSerializedNameDummy', 'custom'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['OtherSerializedNameDummy', 'custom'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['OtherSerializedNameDummy', 'custom'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['OtherSerializedNameDummy', 'custom'], 'enable_default_groups' => true]],
         ];
     }
 

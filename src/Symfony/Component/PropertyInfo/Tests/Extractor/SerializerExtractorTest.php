@@ -136,4 +136,10 @@ class SerializerExtractorTest extends TestCase
             ]),
         );
     }
+
+    public function testGetPropertiesWithDefaultGroupsAndCustomGroups()
+    {
+        $this->assertSame(['noGroup', 'customGroup', 'defaultGroup', 'classGroup'], $this->extractor->getProperties(GroupPropertyDummy::class, ['enable_default_groups' => true, 'serializer_groups' => ['Default', 'custom']]));
+        $this->assertSame(['noGroup', 'customGroup', 'defaultGroup', 'classGroup'], $this->extractor->getProperties(GroupPropertyDummy::class, ['enable_default_groups' => true, 'serializer_groups' => ['GroupPropertyDummy', 'custom']]));
+    }
 }

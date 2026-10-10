@@ -81,7 +81,7 @@ final class MetadataAwareNameConverter implements NameConverterInterface
 
         if ($context[AbstractNormalizer::ENABLE_DEFAULT_GROUPS] ?? false) {
             $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
-            if (!array_diff($contextGroups, $defaultGroups)) {
+            if (array_intersect($contextGroups, $defaultGroups)) {
                 $contextGroups = array_merge($contextGroups, $defaultGroups);
             }
         }
@@ -129,10 +129,7 @@ final class MetadataAwareNameConverter implements NameConverterInterface
         $groups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
         $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
 
-        $groupsHasBeenDefined = [] !== $groups;
-        $customGroupsHasBeenDefined = (bool) array_diff($groups, $defaultGroups);
-
-        if ($enableDefaultGroups && !$customGroupsHasBeenDefined) {
+        if ($enableDefaultGroups && array_intersect($groups, $defaultGroups)) {
             $groups = array_merge($groups, $defaultGroups);
         }
 
@@ -146,25 +143,18 @@ final class MetadataAwareNameConverter implements NameConverterInterface
                 throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $name, $class));
             }
 
-            $metadataGroups = $metadata->getGroups()
-                ?: ($enableDefaultGroups && !$customGroupsHasBeenDefined ? $defaultGroups : []);
-
-            if (!$groupsHasBeenDefined && !$enableDefaultGroups) {
+            if (!$groups) {
                 $sameNameMetadata = $classMetadata->getAttributesMetadata()[$serializedName] ?? null;
 
                 // without groups to tell them apart, the attribute using that name for itself wins
-                if ($metadataGroups && $sameNameMetadata && null === $sameNameMetadata->getSerializedName($groups)) {
+                if ($metadata->getGroups() && $sameNameMetadata && null === $sameNameMetadata->getSerializedName($groups)) {
                     continue;
                 }
             } else {
-                if ($metadataGroups && !array_intersect(array_merge($metadataGroups, ['*']), $groups)) {
-                    continue;
-                }
+                // without the flag, ungrouped attributes are skipped as soon as groups are requested, even with '*'
+                $metadataGroups = $metadata->getGroups() ?: ($enableDefaultGroups ? $defaultGroups : []);
 
-                // When the flag is off, preserve legacy semantics: any non-empty context
-                // groups (including ['*']) skips ungrouped properties. When the flag is on,
-                // ['*'] keeps them.
-                if (!$metadataGroups && $groupsHasBeenDefined && (!$enableDefaultGroups || !\in_array('*', $groups, true))) {
+                if (!$metadataGroups || !array_intersect(array_merge($metadataGroups, ['*']), $groups)) {
                     continue;
                 }
             }

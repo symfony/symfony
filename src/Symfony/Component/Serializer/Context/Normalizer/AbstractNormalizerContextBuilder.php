@@ -191,8 +191,7 @@ abstract class AbstractNormalizerContextBuilder implements ContextBuilderInterfa
     }
 
     /**
-     * Configures whether 'Default' and class-short-name groups are added when no
-     * custom group is specified.
+     * Configures whether the attributes without explicit groups are put in the 'Default' and class-short-name groups.
      */
     public function withEnableDefaultGroups(?bool $enableDefaultGroups): static
     {

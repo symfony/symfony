@@ -148,7 +148,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const SKIP_INVALID_ATTRIBUTES = 'skip_invalid_attributes';
 
     /**
-     * Add 'Default' and class-short-name groups when no custom group is specified.
+     * Put the attributes without explicit groups in the 'Default' and class-short-name groups.
      */
     public const ENABLE_DEFAULT_GROUPS = 'enable_default_groups';
 
@@ -255,12 +255,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $ignoredGroups = $this->getIgnoredGroups($context);
         $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
 
-        // Capture before the merge below, so it reflects the user's intent rather than
-        // the post-merge state.
-        $groupsHasBeenDefined = [] !== $groups;
-        $customGroupsHasBeenDefined = (bool) array_diff($groups, $defaultGroups);
-
-        if ($enableDefaultGroups && !$customGroupsHasBeenDefined) {
+        if ($enableDefaultGroups && array_intersect($groups, $defaultGroups)) {
             $groups = array_merge($groups, $defaultGroups);
         }
 
@@ -277,7 +272,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 continue;
             }
 
-            if (!($attributeGroups = $attributeMetadata->getGroups()) && $enableDefaultGroups && !$customGroupsHasBeenDefined) {
+            if (!($attributeGroups = $attributeMetadata->getGroups()) && $enableDefaultGroups) {
                 $attributeGroups = $defaultGroups;
             }
 
@@ -286,7 +281,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 continue;
             }
 
-            if (!$groupsHasBeenDefined || \in_array('*', $groups, true) || array_intersect($attributeGroups, $groups)) {
+            if (!$groups || \in_array('*', $groups, true) || array_intersect($attributeGroups, $groups)) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
         }

@@ -146,6 +146,8 @@ final class SecurityExtension extends AbstractExtension
     }
 
     /**
+     * Returns the action and the hidden fields of a form triggering the impersonation.
+     *
      * @return array{action: string, fields: array<string, string>}
      */
     public function getImpersonateForm(string $identifier, ?string $targetUri = null): array
@@ -158,6 +160,8 @@ final class SecurityExtension extends AbstractExtension
     }
 
     /**
+     * Returns the action and the hidden fields of a form exiting the impersonation, the action being empty when the user is not impersonating anyone.
+     *
      * @return array{action: string, fields: array<string, string>}
      */
     public function getImpersonateExitForm(?string $targetUri = null): array

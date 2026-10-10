@@ -75,7 +75,8 @@ class AuthenticatedVoter implements CacheableVoterInterface
                 continue;
             }
 
-            if ($token instanceof OfflineTokenInterface) {
+            // a guest is never authenticated, while how an offline user authenticated is unknown
+            if ($token instanceof OfflineTokenInterface && null !== $token->getUser()) {
                 throw new InvalidArgumentException('Cannot decide on authentication attributes when an offline token is used.');
             }
 

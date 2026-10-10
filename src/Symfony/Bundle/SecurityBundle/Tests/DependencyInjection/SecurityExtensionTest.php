@@ -226,6 +226,18 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('app.confirm_password', (string) $container->getDefinition('security.exception_listener.main')->getArgument(9));
     }
 
+    public function testReAuthenticationEntryPointAcceptsAnAuthenticatorKey()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['form_login' => true, 'http_basic' => true, 'entry_point' => 'http_basic', 're_authentication_entry_point' => 'form_login']],
+        ]);
+        $container->compile();
+
+        $this->assertSame('security.authenticator.form_login.main', (string) $container->getDefinition('security.exception_listener.main')->getArgument(9));
+    }
+
     public function testTheFirewallAliasIsDeprecated()
     {
         $container = $this->getRawContainer();

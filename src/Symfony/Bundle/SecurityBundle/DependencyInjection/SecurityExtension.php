@@ -966,7 +966,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 throw new InvalidConfigurationException(\sprintf('The "re_authentication_entry_point" option cannot be used on the stateless firewall "%s": it has no session to record when the user authenticated, so IS_AUTHENTICATED_RECENTLY is always denied and re-authentication would loop.', $id));
             }
 
-            $listener->replaceArgument(9, new Reference($config['re_authentication_entry_point']));
+            // allow it to be configured by authenticator key (e.g. "form_login"), as the entry point
+            $reAuthenticationEntryPoint = $config['re_authentication_entry_point'];
+            $listener->replaceArgument(9, new Reference($container->getParameter('security.'.$id.'._indexed_authenticators')[$reAuthenticationEntryPoint] ?? $reAuthenticationEntryPoint));
         }
 
         // access denied handler setup

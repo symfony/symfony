@@ -1,0 +1,31 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/NestedAttributesBook",
+    "$defs": {
+        "NestedAttributesBook": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "isbn": {
+                    "type": "string"
+                },
+                "author": {
+                    "$ref": "#/$defs/AuthorWithBiography"
+                }
+            }
+        },
+        "AuthorWithBiography": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "biography": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

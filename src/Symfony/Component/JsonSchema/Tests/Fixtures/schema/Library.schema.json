@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/Library",
+    "$defs": {
+        "Library": {
+            "type": "object",
+            "properties": {
+                "shelf": {
+                    "$ref": "#/$defs/Shelf"
+                }
+            }
+        },
+        "Shelf": {
+            "type": "object",
+            "properties": {
+                "topAuthor": {
+                    "$ref": "#/$defs/Author"
+                }
+            }
+        },
+        "Author": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

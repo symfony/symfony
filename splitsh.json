@@ -34,6 +34,7 @@
         "http-kernel": "src/Symfony/Component/HttpKernel",
         "intl": "src/Symfony/Component/Intl",
         "json-path": "src/Symfony/Component/JsonPath",
+        "json-schema": "src/Symfony/Component/JsonSchema",
         "json-streamer": "src/Symfony/Component/JsonStreamer",
         "key-management": {
             "prefixes": [{ "from": "src/Symfony/Component/KeyManagement", "to": "", "excludes": ["Bridge"] }]

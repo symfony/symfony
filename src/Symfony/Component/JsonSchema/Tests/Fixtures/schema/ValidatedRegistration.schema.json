@@ -1,0 +1,82 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/ValidatedRegistration",
+    "$defs": {
+        "ValidatedRegistration": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "default": "",
+                    "minLength": 3,
+                    "maxLength": 20
+                },
+                "email": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "email"
+                },
+                "age": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "minimum": 18,
+                    "maximum": 130
+                },
+                "score": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "exclusiveMinimum": 0
+                },
+                "countryCode": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "pattern": "^([A-Z]{2})$"
+                },
+                "plan": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "basic",
+                        "premium",
+                        null
+                    ]
+                },
+                "interests": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "maxItems": 5,
+                    "uniqueItems": true
+                },
+                "website": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "uri"
+                },
+                "invitationCode": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "username"
+            ]
+        }
+    }
+}

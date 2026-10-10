@@ -1,0 +1,49 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/EnumCollectionDefaults",
+    "$defs": {
+        "EnumCollectionDefaults": {
+            "type": "object",
+            "properties": {
+                "suits": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "hearts",
+                            "spades"
+                        ]
+                    },
+                    "default": [
+                        "hearts"
+                    ]
+                },
+                "palettes": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "Red",
+                                "Green"
+                            ]
+                        }
+                    },
+                    "default": {
+                        "warm": [
+                            "Red"
+                        ]
+                    }
+                },
+                "milestones": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        }
+    }
+}

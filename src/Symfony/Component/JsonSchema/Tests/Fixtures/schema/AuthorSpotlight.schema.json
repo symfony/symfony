@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/AuthorSpotlight",
+    "$defs": {
+        "AuthorSpotlight": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "$ref": "#/$defs/Author",
+                    "readOnly": true,
+                    "description": "The highlighted author."
+                }
+            }
+        },
+        "Author": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

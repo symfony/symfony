@@ -53,6 +53,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'controller.service_arguments',
         'controller.targeted_value_resolver',
         'data_collector',
+        'debug.section',
         'doctrine.event_listener',
         'doctrine.orm.entity',
         'event_dispatcher.dispatcher',

@@ -162,7 +162,7 @@ return static function (ContainerConfigurator $container) {
             ->args([service('fragment.handler'), service('fragment.uri_generator')->ignoreOnInvalid()])
 
         ->set('twig.extension.httpfoundation', HttpFoundationExtension::class)
-            ->args([service('url_helper')])
+            ->args([service('url_helper'), service('uri_signer')->nullOnInvalid()])
 
         ->set('twig.extension.debug', DebugExtension::class)
 

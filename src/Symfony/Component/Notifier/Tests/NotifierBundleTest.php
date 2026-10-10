@@ -20,10 +20,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Notifier\AdminRecipientsProviderInterface;
 use Symfony\Component\Notifier\Bridge\Twilio\Webhook\TwilioRequestParser;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Notifier\NotifierBundle;
+use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
 
@@ -188,6 +190,18 @@ class NotifierBundleTest extends TestCase
         $this->assertTrue($container->getAlias(TwilioRequestParser::class)->isDeprecated());
     }
 
+    public function testTheAdminRecipientsProviderIsAutowiredToTheNotifier()
+    {
+        $container = $this->load(self::TRANSPORTS);
+        $container->register('test.consumer', NotifierAdminRecipientsConsumer::class)->setAutowired(true);
+
+        new AutowirePass()->process($container);
+
+        [$notifier, $adminRecipients] = $container->getDefinition('test.consumer')->getArguments();
+        $this->assertSame($container->getDefinition('notifier'), $container->findDefinition((string) $notifier));
+        $this->assertSame($container->getDefinition('notifier'), $container->findDefinition((string) $adminRecipients));
+    }
+
     public function testTheDataCollectorIsDroppedWithoutAProfiler()
     {
         $this->assertFalse($this->load(self::TRANSPORTS, ['mailer', 'messenger'], true)->hasDefinition('notifier.data_collector'));
@@ -228,6 +242,15 @@ class NotifierWebhookConsumer
 {
     public function __construct(
         #[Target('notifier.twilio')] public RequestParserInterface $parser,
+    ) {
+    }
+}
+
+class NotifierAdminRecipientsConsumer
+{
+    public function __construct(
+        public NotifierInterface $notifier,
+        public AdminRecipientsProviderInterface $adminRecipients,
     ) {
     }
 }

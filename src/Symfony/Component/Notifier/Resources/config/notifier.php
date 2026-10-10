@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bridge\Monolog\Handler\NotifierHandler;
+use Symfony\Component\Notifier\AdminRecipientsProviderInterface;
 use Symfony\Component\Notifier\Channel\BrowserChannel;
 use Symfony\Component\Notifier\Channel\ChannelPolicy;
 use Symfony\Component\Notifier\Channel\ChatChannel;
@@ -42,6 +43,7 @@ return static function (ContainerConfigurator $container) {
             ->args([tagged_locator('notifier.channel', 'channel'), service('notifier.channel_policy')->ignoreOnInvalid()])
 
         ->alias(NotifierInterface::class, 'notifier')
+        ->alias(AdminRecipientsProviderInterface::class, 'notifier')
 
         ->set('notifier.channel_policy', ChannelPolicy::class)
             ->args([[]])

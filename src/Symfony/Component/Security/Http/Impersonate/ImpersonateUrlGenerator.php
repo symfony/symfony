@@ -64,7 +64,10 @@ class ImpersonateUrlGenerator
      * Returns the action and the hidden fields of a form triggering the impersonation.
      *
      * Unlike the URLs, this keeps the parameters out of the address bar and works with
-     * a path restricted to POST requests.
+     * a path restricted to POST requests. The fields hold the identifier of the user to
+     * switch to, the page to come back to and the CSRF token when enabled, except the
+     * ones the route of the path takes as placeholders. They render like the ones of
+     * {@see \Symfony\Component\Security\Http\Logout\LogoutUrlGenerator::getLogoutForm()}.
      *
      * @return array{action: string, fields: array<string, string>}
      */
@@ -75,6 +78,9 @@ class ImpersonateUrlGenerator
 
     /**
      * Returns the action and the hidden fields of a form exiting the impersonation.
+     *
+     * The action is empty when the current user is not impersonating anyone, so that a
+     * template can skip the form.
      *
      * @return array{action: string, fields: array<string, string>}
      */

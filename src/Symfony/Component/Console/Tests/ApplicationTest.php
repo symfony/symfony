@@ -1144,6 +1144,55 @@ class ApplicationTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_renderexception_linebreaks.txt', $tester->getDisplay(true), '->renderException() keep multiple line breaks');
     }
 
+    #[DataProvider('provideWordWrappedExceptionMessages')]
+    public function testRenderExceptionWrapsLinesOnWordBoundaries(string $message, array $expectedBlock)
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        putenv('COLUMNS=33');
+        $application->register('foo')->setCode(static function () use ($message) {
+            throw new \Exception($message);
+        });
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'foo'], ['decorated' => false, 'capture_stderr_separately' => true]);
+        $this->assertStringMatchesFormat("\nIn ApplicationTest.php line %d:\n".implode("\n", $expectedBlock)."\n\nfoo\n\n", $tester->getErrorOutput(true));
+    }
+
+    public static function provideWordWrappedExceptionMessages(): iterable
+    {
+        yield 'words crossing the width' => ['The value "bogus" is not valid for the "status" option.', [
+            '                                ',
+            '  The value "bogus" is not      ',
+            '  valid for the "status"        ',
+            '  option.                       ',
+            '                                ',
+        ]];
+
+        yield 'word longer than the width' => ['Cannot read /a/very/long/path/to/some/file.yaml now', [
+            '                                ',
+            '  Cannot read                   ',
+            '  /a/very/long/path/to/some/fi  ',
+            '  le.yaml now                   ',
+            '                                ',
+        ]];
+
+        yield 'spaces around the breaks' => ['Errors:'.str_repeat(' ', 30)."\n  The value \"bogus\" is not      valid", [
+            '                                ',
+            '  Errors:                       ',
+            '    The value "bogus" is not    ',
+            '  valid                         ',
+            '                                ',
+        ]];
+
+        yield 'wide characters' => ['The file 設定ファイル.yaml cannot be read', [
+            '                                ',
+            '  The file 設定ファイル.yaml    ',
+            '  cannot be read                ',
+            '                                ',
+        ]];
+    }
+
     #[Group('transient-on-windows')]
     public function testRenderAnonymousException()
     {

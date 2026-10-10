@@ -1371,7 +1371,7 @@ class Application implements ResetInterface
         // additionally, array_slice() is not enough as some character has doubled width.
         // we need a function to split string not by character count but by string width
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
-            return str_split($string, $width);
+            return explode("\n", wordwrap($string, $width, "\n", true));
         }
 
         $utf8String = mb_convert_encoding($string, 'utf8', $encoding);
@@ -1382,16 +1382,27 @@ class Application implements ResetInterface
         while (preg_match('/.{1,10000}/u', $utf8String, $m, 0, $offset)) {
             $offset += \strlen($m[0]);
 
-            foreach (preg_split('//u', $m[0]) as $char) {
-                // test if $char could be appended to current line
-                if (Helper::width($line.$char) <= $width) {
+            foreach (preg_split('//u', $m[0], -1, \PREG_SPLIT_NO_EMPTY) as $char) {
+                // spaces that follow a word never start a new line: they are dropped when the line breaks on them
+                if (' ' === $char && strspn($line, ' ') < \strlen($line) || Helper::width($line.$char) <= $width) {
                     $line .= $char;
                     continue;
                 }
-                // if not, push current line to array and make new line
-                $lines[] = str_pad($line, $width);
-                $line = $char;
+
+                if (false !== ($i = strrpos($line, ' ')) && '' !== $head = rtrim(substr($line, 0, $i), ' ')) {
+                    // break the line after its last word
+                    $lines[] = str_pad($head, $width);
+                    $line = substr($line, $i + 1).$char;
+                } else {
+                    // cut a word that is wider than the line
+                    $lines[] = str_pad($line, $width);
+                    $line = $char;
+                }
             }
+        }
+
+        if (Helper::width($line) > $width) {
+            $line = rtrim($line, ' ');
         }
 
         $lines[] = \count($lines) ? str_pad($line, $width) : $line;

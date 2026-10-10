@@ -1,8 +1,8 @@
 
 In ApplicationTest.php line %d:
                      
-  dont break here <  
-  info>!</info>      
+  dont break here    
+  <info>!</info>     
                      
 
 foo

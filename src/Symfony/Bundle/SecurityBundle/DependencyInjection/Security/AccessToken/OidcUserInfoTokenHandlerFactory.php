@@ -71,7 +71,7 @@ class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
                 ->end()
                 ->children()
                     ->scalarNode('base_uri')
-                        ->info('Base URI of the userinfo endpoint on the OIDC server, or the OIDC server URI to use the discovery (require "discovery" to be configured).')
+                        ->info('Base URI of the userinfo endpoint on the OIDC server, or the OIDC server URI to use the discovery (require "discovery" to be configured). The latter must end with a slash when it has a path, as the discovery path is resolved against it as a relative URL.')
                         ->isRequired()
                         ->cannotBeEmpty()
                     ->end()

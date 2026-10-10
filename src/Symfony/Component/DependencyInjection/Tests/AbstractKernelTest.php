@@ -343,6 +343,31 @@ class AbstractKernelTest extends TestCase
         $this->assertCount(1, $kernel->getBundles(), 'Bundle cache should be used in debug mode when cache is newer than bundles.php');
     }
 
+    public function testBundleCacheIsNotUsedInDebugWhenTheContainerIsStale()
+    {
+        // a project of its own, as the freshness of a container is remembered for the whole process
+        $dir = $this->varDir.'/stale_container';
+        @mkdir($dir.'/config', 0o777, true);
+        file_put_contents($dir.'/config/bundles.php', '<?php return ['.TestAbstractBundle::class.'::class => [\'all\' => true]];');
+        touch($dir.'/config/bundles.php', time() - 10);
+        file_put_contents($dir.'/config/services.yaml', '');
+
+        $kernel = new TestKernel('test', true, $dir);
+        $kernel->boot();
+
+        $this->assertCount(1, $kernel->getBundles());
+        $kernel->shutdown();
+
+        // the cached list misses a bundle, as when the class of an optional required bundle appeared since it was dumped
+        file_put_contents($kernel->getBuildDir().'/'.$kernel->getTestContainerClass().'.bundles.php', '<?php return [[], []];');
+        touch($dir.'/config/services.yaml', time() + 10);
+
+        $kernel = new TestKernel('test', true, $dir);
+        $kernel->boot();
+
+        $this->assertCount(1, $kernel->getBundles());
+    }
+
     public function testBundleCacheIsUsedInNoDebug()
     {
         $dir = $this->varDir;

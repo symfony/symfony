@@ -630,9 +630,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             }
 
             $this->store->write($request, $response);
-            $this->record($request, 'store');
 
-            $response->headers->set('Age', $response->getAge());
+            // A response that cannot provide its content, like StreamedResponse, is stored only if the store gave it a content digest
+            if (false !== $response->getContent() || $response->headers->has('X-Content-Digest')) {
+                $this->record($request, 'store');
+
+                $response->headers->set('Age', $response->getAge());
+            }
         } catch (\Exception $e) {
             $this->record($request, 'store-failed');
 

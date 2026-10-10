@@ -99,7 +99,7 @@ trait KernelTrait
         $cachePath = $this->getEffectiveBuildDir().'/'.$this->getContainerClass().'.bundles.php';
         if (
             is_file($cachePath)
-            && (!$this->debug || is_file($bundlesPath = $this->getBundlesPath()) && filemtime($cachePath) > filemtime($bundlesPath))
+            && (!$this->debug || is_file($bundlesPath = $this->getBundlesPath()) && filemtime($cachePath) > filemtime($bundlesPath) && $this->isContainerFresh())
         ) {
             $cached = require $cachePath;
 
@@ -124,9 +124,7 @@ trait KernelTrait
     {
         $class = $this->getContainerClass();
         $buildDir = $this->getEffectiveBuildDir();
-        $skip = $_SERVER['SYMFONY_DISABLE_RESOURCE_TRACKING'] ?? '';
-        $skip = filter_var($skip, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? explode(',', $skip);
-        $cache = new ConfigCache($buildDir.'/'.$class.'.php', $this->debug, null, \is_array($skip) && ['*'] !== $skip ? $skip : ($skip ? [] : null));
+        $cache = $this->getContainerConfigCache();
 
         $cachePath = $cache->getPath();
 
@@ -488,6 +486,30 @@ trait KernelTrait
     private function getBundlesPath(): string
     {
         return $this->getConfigDir().'/bundles.php';
+    }
+
+    /**
+     * Tells whether the container is fresh, as the list of bundles cached with it cannot be trusted otherwise.
+     *
+     * The bundles required with "ignoreOnInvalid" depend on classes that can appear or disappear after the list was cached.
+     */
+    private function isContainerFresh(): bool
+    {
+        $cache = $this->getContainerConfigCache();
+
+        if (!(self::$freshCache[$cache->getPath()] ?? $cache->isFresh())) {
+            return false;
+        }
+
+        return self::$freshCache[$cache->getPath()] = true;
+    }
+
+    private function getContainerConfigCache(): ConfigCache
+    {
+        $skip = $_SERVER['SYMFONY_DISABLE_RESOURCE_TRACKING'] ?? '';
+        $skip = filter_var($skip, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? explode(',', $skip);
+
+        return new ConfigCache($this->getEffectiveBuildDir().'/'.$this->getContainerClass().'.php', $this->debug, null, \is_array($skip) && ['*'] !== $skip ? $skip : ($skip ? [] : null));
     }
 
     /**

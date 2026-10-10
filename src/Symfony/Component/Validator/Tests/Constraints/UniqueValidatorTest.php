@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\UniqueValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -437,6 +438,104 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ['fieldB' => 1],
             ], ['fieldB'], 'array'],
         ];
+    }
+
+    #[DataProvider('getEqualDateTimes')]
+    public function testEqualDateTimesAreNotUnique(\DateTimeInterface $date1, \DateTimeInterface $date2)
+    {
+        $this->validate([$date1, $date2], new Unique(message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'object')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getEqualDateTimes')]
+    public function testEqualDateTimesInArrayFieldsAreNotUnique(\DateTimeInterface $date1, \DateTimeInterface $date2)
+    {
+        $this->validate([
+            ['room' => 'A', 'startsAt' => $date1],
+            ['room' => 'A', 'startsAt' => $date2],
+        ], new Unique(message: 'myMessage', fields: ['room', 'startsAt']));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getEqualDateTimes')]
+    public function testEqualDateTimesInNestedArraysAreNotUnique(\DateTimeInterface $date1, \DateTimeInterface $date2)
+    {
+        $this->validate([
+            ['A', ['startsAt' => $date1]],
+            ['A', ['startsAt' => $date2]],
+        ], new Unique(message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getEqualDateTimes')]
+    public function testEqualDateTimesInObjectFieldsAreNotUnique(\DateTimeInterface $date1, \DateTimeInterface $date2)
+    {
+        $this->validate([
+            (object) ['room' => 'A', 'startsAt' => $date1],
+            (object) ['room' => 'A', 'startsAt' => $date2],
+        ], new Unique(message: 'myMessage', fields: ['room', 'startsAt']));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public static function getEqualDateTimes(): iterable
+    {
+        yield 'same class' => [new \DateTimeImmutable('2026-05-04 10:00:00'), new \DateTimeImmutable('2026-05-04 10:00:00')];
+        yield 'different classes' => [new \DateTime('2026-05-04 10:00:00 UTC'), new DatePoint('2026-05-04 10:00:00 UTC')];
+        yield 'different timezones' => [new \DateTimeImmutable('2026-05-04 10:00:00', new \DateTimeZone('UTC')), new DatePoint('2026-05-04 12:00:00', new \DateTimeZone('Europe/Paris'))];
+    }
+
+    #[DataProvider('getDistinctDateTimes')]
+    public function testDistinctDateTimesAreUnique(mixed $value1, mixed $value2)
+    {
+        $this->validate([$value1, $value2], new Unique());
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getDistinctDateTimes')]
+    public function testDistinctDateTimesInFieldsAreUnique(mixed $value1, mixed $value2)
+    {
+        $this->validate([
+            ['room' => 'A', 'startsAt' => $value1],
+            (object) ['room' => 'A', 'startsAt' => $value2],
+        ], new Unique(fields: ['room', 'startsAt']));
+
+        $this->assertNoViolation();
+    }
+
+    public static function getDistinctDateTimes(): iterable
+    {
+        yield 'different seconds' => [new \DateTimeImmutable('2026-05-04 10:00:00 UTC'), new \DateTimeImmutable('2026-05-04 10:00:01 UTC')];
+        yield 'different microseconds' => [new \DateTimeImmutable('2026-05-04 10:00:00 UTC'), new \DateTimeImmutable('2026-05-04 10:00:00.000001 UTC')];
+        yield 'same wall time in different timezones' => [new \DateTimeImmutable('2026-05-04 10:00:00', new \DateTimeZone('UTC')), new \DateTimeImmutable('2026-05-04 10:00:00', new \DateTimeZone('Europe/Paris'))];
+        yield 'date and integer' => [new \DateTimeImmutable('@1'), 1];
+        yield 'integer and date' => [1, new \DateTimeImmutable('@1')];
+    }
+
+    public function testFieldsBesideEqualDateTimesAreComparedStrictly()
+    {
+        $this->validate([
+            ['room' => 1, 'startsAt' => new \DateTimeImmutable('2026-05-04 10:00:00 UTC')],
+            ['room' => '1', 'startsAt' => new DatePoint('2026-05-04 10:00:00 UTC')],
+        ], new Unique(fields: ['room', 'startsAt']));
+
+        $this->assertNoViolation();
     }
 
     public function testArrayOfObjectsUnique()

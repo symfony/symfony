@@ -43,24 +43,44 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * If you have a mixed key like foo-bar_moo, it will not be altered.
      * The key will also not be altered if the target key already exists.
+     *
+     * An array that does not set the child declared by the "wraps_arrays_into" attribute is then wrapped into it, except for its keys that name other children.
      */
     protected function preNormalize(mixed $value): mixed
     {
-        if (!$this->normalizeKeys || !\is_array($value)) {
+        if (!\is_array($value)) {
             return $value;
         }
 
-        $normalized = [];
+        if ($this->normalizeKeys) {
+            $normalized = [];
 
-        foreach ($value as $k => $v) {
-            if (str_contains($k, '-') && !str_contains($k, '_') && !\array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)) {
-                $normalized[$normalizedKey] = $v;
-            } else {
-                $normalized[$k] = $v;
+            foreach ($value as $k => $v) {
+                if (str_contains($k, '-') && !str_contains($k, '_') && !\array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)) {
+                    $normalized[$normalizedKey] = $v;
+                } else {
+                    $normalized[$k] = $v;
+                }
+            }
+
+            $value = $normalized;
+        }
+
+        if (null === $key = $this->getAttribute('wraps_arrays_into')) {
+            return $value;
+        }
+
+        $siblings = $this->children;
+
+        foreach ($this->xmlRemappings as [$singular, $plural]) {
+            if ($key !== $plural) {
+                $siblings[$singular] = true;
+            } elseif (\array_key_exists($singular, $value)) {
+                return $value;
             }
         }
 
-        return $normalized;
+        return \array_key_exists($key, $value) ? $value : [$key => array_diff_key($value, $siblings)] + array_intersect_key($value, $siblings);
     }
 
     /**

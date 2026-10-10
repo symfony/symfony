@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add support for the `array` type to `ArrayNodeDefinition::acceptAndWrap()`, to wrap the arrays that do not set the given child into it
  * Add `NodeDefinition::resolvesAtCompileTime()` to resolve the env vars of a node while the container is compiled instead of passing them as placeholders
  * Declare the `enabled` node of the sections created with `canBeEnabled()` or `canBeDisabled()` with `resolvesAtCompileTime()`
  * Add `NodeDefinition::aliasOf()` to declare that the value of a node belongs to the configuration rooted at another name

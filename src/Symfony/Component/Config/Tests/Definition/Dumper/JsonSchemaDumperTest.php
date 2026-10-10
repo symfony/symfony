@@ -234,6 +234,46 @@ class JsonSchemaDumperTest extends TestCase
             'additionalProperties' => false,
         ]];
 
+        $wrapping = (new ArrayNodeDefinition('node'))
+            ->acceptAndWrap(['array'], 'connections')
+            ->children()
+                ->arrayNode('adapters', 'adapter')->scalarPrototype()->end()->end()
+                ->arrayNode('connections', 'connection')->useAttributeAsKey('name')->scalarPrototype()->end()->end()
+            ->end()
+            ->getNode();
+        $adapters = [
+            '$ref' => '#/$defs/types/array_null',
+            'items' => ['$ref' => '#/$defs/types/scalar'],
+        ];
+        yield 'an array that does not set the child declared by acceptAndWrap() goes into that child' => [$wrapping, [
+            'anyOf' => [
+                [
+                    '$ref' => '#/$defs/types/object_null',
+                    'properties' => [
+                        'adapters' => $adapters,
+                        'connections' => [
+                            '$ref' => '#/$defs/types/object_null',
+                            'additionalProperties' => ['$ref' => '#/$defs/types/scalar'],
+                        ],
+                    ],
+                    'patternProperties' => [
+                        '^adapter$' => ['anyOf' => [['$ref' => '#/$defs/types/scalar'], $adapters]],
+                        '^connection$' => ['$ref' => '#/$defs/types/variable'],
+                    ],
+                    'additionalProperties' => false,
+                ],
+                [
+                    '$ref' => '#/$defs/types/object_null',
+                    'properties' => ['adapters' => $adapters],
+                    'patternProperties' => [
+                        '^adapter$' => ['anyOf' => [['$ref' => '#/$defs/types/scalar'], $adapters]],
+                    ],
+                    'additionalProperties' => ['$ref' => '#/$defs/types/scalar'],
+                    'propertyNames' => ['not' => ['enum' => ['connections', 'connection']]],
+                ],
+            ],
+        ]];
+
         $child = new BooleanNode('node');
         $child->setDeprecated('vendor/package', '1.0', 'The "%path%" option is deprecated.');
         $child->setDefaultValue(true);

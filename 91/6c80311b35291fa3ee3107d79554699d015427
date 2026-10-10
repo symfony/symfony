@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-10T15:02:46Z
+
+Thanks @GromNaN, comments addressed: the key is `doctrine_dbal`, and the PR now builds on #66273, with one service tagged `doctrine.dbal.type` per configured type and no `boot()` anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-10T15:04:10Z
+
+Change of plan, so that this does not wait for doctrine/dbal 4.6: the PR is back on 8.2 with the `doctrine_dbal` key and the static registry, and #66273 can switch the configured types to tagged services when it lands, with the same configuration.

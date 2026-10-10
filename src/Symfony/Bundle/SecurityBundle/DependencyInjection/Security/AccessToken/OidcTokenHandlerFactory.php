@@ -162,7 +162,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                         ->children()
                             ->arrayNode('base_uri')
                                 ->acceptAndWrap(['string'])
-                                ->info('Base URI of the OIDC server.')
+                                ->info('Base URI of the OIDC server, e.g. "https://example.com/realms/demo/". The discovery path is resolved against it as a relative URL, so it must end with a slash when it has a path.')
                                 ->isRequired()
                                 ->scalarPrototype()->end()
                             ->end()

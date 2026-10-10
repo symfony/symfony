@@ -47,11 +47,13 @@ final class JsonSchemaDumper
         'scalar' => ['type' => ['boolean', 'null', 'number', 'string']],
         'array' => ['type' => 'array'],
         'array_null' => ['type' => ['array', 'null']],
-        'object' => ['type' => 'object'],
-        'object_null' => ['type' => ['object', 'null']],
+        // PHP decodes an empty map and an empty list to the same array, so a map accepts an empty list
+        'object' => ['type' => ['object', 'array'], 'maxItems' => 0],
+        'object_null' => ['type' => ['object', 'array', 'null'], 'maxItems' => 0],
     ];
 
     private array $typeDefs;
+    private bool $inListItem = false;
 
     /**
      * @param array<array<string, mixed>>             $parameterSchemas additional JSON Schema fragments included as anyOf options for scalar nodes
@@ -92,10 +94,15 @@ final class JsonSchemaDumper
 
     public function dumpNode(NodeInterface $node): array
     {
+        $acceptsAnyValue = $node instanceof BaseNode && \in_array(ExprBuilder::TYPE_ANY, $node->getNormalizedTypes(), true);
+
         if ($node instanceof BaseNode && null !== ($alias = $node->getAttribute('alias_of')) && null !== $ref = $this->resolveAlias?->__invoke($alias)) {
             $schema = ['$ref' => $ref];
+        } elseif ($acceptsAnyValue) {
+            // the closure can turn any value into a valid one
+            $schema = ['$ref' => '#/$defs/types/variable'];
         } elseif ($node instanceof PrototypedArrayNode) {
-            $prototypeSchema = $this->dumpNode($node->getPrototype());
+            $prototypeSchema = $this->dumpPrototype($node);
 
             if ($node->getKeyAttribute()) {
                 $schema = [
@@ -137,10 +144,22 @@ final class JsonSchemaDumper
             foreach ($children as $child) {
                 $schema['properties'] ??= [];
                 $schema['properties'][$child->getName()] = $this->dumpNode($child);
-                if ($child->isRequired()) {
+                // another file can provide the child, except in the items of a list, which are never merged
+                if ($this->inListItem && $child->isRequired()) {
                     $schema['required'] ??= [];
                     $schema['required'][] = $child->getName();
                 }
+            }
+
+            foreach ($node->getXmlRemappings() as [$singular, $plural]) {
+                if (!isset($children[$plural]) || isset($children[$singular])) {
+                    continue;
+                }
+
+                // a pattern accepts the singular key without proposing it to completion
+                $schema['patternProperties']['^'.preg_quote($singular).'$'] = $children[$plural] instanceof PrototypedArrayNode && !$children[$plural]->getKeyAttribute()
+                    ? ['anyOf' => [$this->dumpPrototype($children[$plural]), $schema['properties'][$plural]]]
+                    : ['$ref' => '#/$defs/types/variable'];
             }
 
             if (isset($schema['properties'])) {
@@ -196,7 +215,7 @@ final class JsonSchemaDumper
                 $normalizedTypes[] = 'null';
             }
 
-            if ($normalizedTypes) {
+            if ($normalizedTypes && !$acceptsAnyValue) {
                 $normalizedTypesSchema = [
                     'type' => array_values(
                         array_unique(
@@ -250,6 +269,18 @@ final class JsonSchemaDumper
         }
 
         return $schema;
+    }
+
+    private function dumpPrototype(PrototypedArrayNode $node): array
+    {
+        $inListItem = $this->inListItem;
+        $this->inListItem = $inListItem || !$node->getKeyAttribute();
+
+        try {
+            return $this->dumpNode($node->getPrototype());
+        } finally {
+            $this->inListItem = $inListItem;
+        }
     }
 
     /** @return array<string, mixed> */

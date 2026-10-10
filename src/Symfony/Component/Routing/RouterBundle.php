@@ -61,9 +61,11 @@ class RouterBundle extends AbstractBundle
             ->treatTrueLike(['enabled' => true])
             ->treatNullLike(['enabled' => true])
             ->beforeNormalization()
-                ->ifTrue(static fn ($v) => \is_array($v) && [] !== $v)
+                ->ifArray()
                 ->then(static function ($v) {
-                    $v['enabled'] ??= true;
+                    if ([] !== $v) {
+                        $v['enabled'] ??= true;
+                    }
 
                     return $v;
                 })

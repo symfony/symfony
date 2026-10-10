@@ -31,13 +31,19 @@
                 ]
             },
             "object": {
-                "type": "object"
+                "type": [
+                    "object",
+                    "array"
+                ],
+                "maxItems": 0
             },
             "object_null": {
                 "type": [
                     "object",
+                    "array",
                     "null"
-                ]
+                ],
+                "maxItems": 0
             },
             "string": {
                 "type": "string"
@@ -241,10 +247,6 @@
                                     "$ref": "#/$defs/types/scalar"
                                 }
                             },
-                            "required": [
-                                "title",
-                                "path"
-                            ],
                             "additionalProperties": false
                         }
                     }
@@ -277,9 +279,45 @@
                     "type": "null"
                 }
             },
-            "required": [
-                "scalar_required"
-            ],
+            "patternProperties": {
+                "^parameter$": {
+                    "$ref": "#/$defs/types/variable"
+                },
+                "^connection$": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/types/object_null",
+                            "properties": {
+                                "user": {
+                                    "$ref": "#/$defs/types/scalar"
+                                },
+                                "pass": {
+                                    "$ref": "#/$defs/types/scalar"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        {
+                            "$ref": "#/$defs/types/array_null",
+                            "items": {
+                                "$ref": "#/$defs/types/object_null",
+                                "properties": {
+                                    "user": {
+                                        "$ref": "#/$defs/types/scalar"
+                                    },
+                                    "pass": {
+                                        "$ref": "#/$defs/types/scalar"
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    ]
+                },
+                "^cms_page$": {
+                    "$ref": "#/$defs/types/variable"
+                }
+            },
             "additionalProperties": false
         }
     },

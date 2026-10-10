@@ -39,6 +39,7 @@ use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoTransportFactory;
 use Symfony\Component\Mailer\Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory;
+use Symfony\Component\Mailer\Bridge\ZohoCpaas\Transport\ZohoCpaasTransportFactory;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
@@ -86,6 +87,7 @@ final class Transport
         SesTransportFactory::class,
         SweegoTransportFactory::class,
         TurboSmtpTransportFactory::class,
+        ZohoCpaasTransportFactory::class,
     ];
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, ?EventDispatcherInterface $dispatcher = null, ?HttpClientInterface $client = null, ?LoggerInterface $logger = null): TransportInterface

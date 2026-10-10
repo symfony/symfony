@@ -17,9 +17,9 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 /**
  * Controls per-message open and click tracking; a null flag keeps the provider/transport default.
  *
- * Supported by the AhaSend, Infobip, Mailchimp (Mandrill), Mailgun, Mailjet, Postmark and Sendgrid
- * bridges on both their API and SMTP transports, and by the Azure, Brevo and MailerSend bridges on
- * their API transport. Azure and Brevo only expose a single combined toggle, so tracking is
+ * Supported by the AhaSend, Infobip, Mailchimp (Mandrill), Mailgun, Mailjet, Postmark, Sendgrid and
+ * Zoho CPaaS bridges on both their API and SMTP transports, and by the Azure, Brevo and MailerSend
+ * bridges on their API transport. Azure and Brevo only expose a single combined toggle, so tracking is
  * disabled as soon as either flag is explicitly false, and enabled as soon as either is explicitly
  * true; note that Brevo's toggle anonymises the open/click events rather than disabling them
  * outright. Mandrill's SMTP header can only list the aspects to enable, so when one flag is set

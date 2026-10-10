@@ -78,6 +78,7 @@
         "sendgrid-mailer": "src/Symfony/Component/Mailer/Bridge/Sendgrid",
         "sweego-mailer": "src/Symfony/Component/Mailer/Bridge/Sweego",
         "turbo-smtp-mailer": "src/Symfony/Component/Mailer/Bridge/TurboSmtp",
+        "zoho-cpaas-mailer": "src/Symfony/Component/Mailer/Bridge/ZohoCpaas",
         "messenger": {
             "prefixes": [{ "from": "src/Symfony/Component/Messenger", "to": "", "excludes": ["Bridge"] }]
         },

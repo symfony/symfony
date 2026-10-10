@@ -395,6 +395,7 @@ class MailerBundle extends AbstractBundle
             Bridge\Amazon\Transport\SesTransportFactory::class => ['symfony/amazon-mailer', 'mailer.transport_factory.amazon'],
             Bridge\Sweego\Transport\SweegoTransportFactory::class => ['symfony/sweego-mailer', 'mailer.transport_factory.sweego'],
             Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory::class => ['symfony/turbo-smtp-mailer', 'mailer.transport_factory.turbosmtp'],
+            Bridge\ZohoCpaas\Transport\ZohoCpaasTransportFactory::class => ['symfony/zoho-cpaas-mailer', 'mailer.transport_factory.zohocpaas'],
         ];
 
         foreach ($classToServices as $class => [$package, $service]) {

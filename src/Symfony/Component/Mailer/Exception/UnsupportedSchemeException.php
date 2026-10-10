@@ -116,6 +116,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory::class,
             'package' => 'symfony/turbo-smtp-mailer',
         ],
+        'zohocpaas' => [
+            'class' => Bridge\ZohoCpaas\Transport\ZohoCpaasTransportFactory::class,
+            'package' => 'symfony/zoho-cpaas-mailer',
+        ],
     ];
 
     public function __construct(Dsn $dsn, ?string $name = null, array $supported = [])

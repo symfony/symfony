@@ -439,6 +439,7 @@ Security
 SecurityBundle
 --------------
 
+ * Deprecate the `debug:security:role-hierarchy` command, use `debug:roles --format=mermaid` instead
  * The `oauth2` token handler now reads its configuration, where it used to ignore it. Giving it a string names
    the HTTP client the introspection endpoint is called with, and `oauth2: ~` no longer fails to compile
  * Deprecate the `remember_me` option of the `form_login`, `json_login`, `login_link`, and `access_token` authenticators, as it has no effect

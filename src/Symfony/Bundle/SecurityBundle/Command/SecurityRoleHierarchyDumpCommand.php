@@ -25,6 +25,8 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  * Command to dump the role hierarchy as a Mermaid flowchart.
  *
  * @author Damien Fernandes <damien.fernandes24@gmail.com>
+ *
+ * @deprecated since Symfony 8.2, use the "debug:roles --format=mermaid" command instead
  */
 #[AsCommand(name: 'debug:security:role-hierarchy', description: 'Dump the role hierarchy as a Mermaid flowchart')]
 class SecurityRoleHierarchyDumpCommand extends Command
@@ -62,6 +64,9 @@ class SecurityRoleHierarchyDumpCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $direction = $input->getOption('direction');
+
+        trigger_deprecation('symfony/security-bundle', '8.2', 'The "debug:security:role-hierarchy" command is deprecated, use "debug:roles --format=mermaid" instead.');
+        $io->getErrorStyle()->warning('The "debug:security:role-hierarchy" command is deprecated, use "debug:roles --format=mermaid" instead.');
 
         if (!$direction = MermaidDirection::tryFrom($direction)) {
             $io->getErrorStyle()->writeln(\sprintf('<error>Invalid direction, available options are "%s"</error>', implode('"', array_column(MermaidDirection::cases(), 'value'))));

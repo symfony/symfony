@@ -57,6 +57,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\RichDomainUserView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\SharedSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\SharedTargetWithoutTransform;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\SharedTargetWithTransform;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Talk;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\TalkView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\A as ClassRuleA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\B as ClassRuleB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\C as ClassRuleC;
@@ -1208,6 +1210,30 @@ final class ObjectMapperTest extends TestCase
         $this->assertInstanceOf(AutoNestedFlatTarget::class, $result);
         $this->assertSame('from outer', $result->outer);
         $this->assertSame('from inner', $result->inner);
+    }
+
+    #[DataProvider('provideTalkMappers')]
+    public function testTargetPropertyMapWithoutSourceAppliesItsTransform(ObjectMapper $mapper)
+    {
+        $view = $mapper->map(new Talk('Symfony', new \ArrayIterator(['Alice', 'Bob']), 'draft'), TalkView::class);
+
+        $this->assertSame('Symfony', $view->title);
+        $this->assertSame(['Alice', 'Bob'], $view->speakers);
+    }
+
+    #[DataProvider('provideTalkMappers')]
+    public function testTargetPropertyMapWithoutSourceAppliesItsCondition(ObjectMapper $mapper)
+    {
+        $view = $mapper->map(new Talk('Symfony', ['Alice', 'Bob'], 'draft'), TalkView::class);
+
+        $this->assertSame(['Alice', 'Bob'], $view->speakers);
+        $this->assertNull($view->notes);
+    }
+
+    public static function provideTalkMappers(): iterable
+    {
+        yield 'metadata read from the target' => [new ObjectMapper()];
+        yield 'class map' => [new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), [Talk::class => TalkView::class]))];
     }
 
     public function testMissingSourcePropertiesAreIgnored()

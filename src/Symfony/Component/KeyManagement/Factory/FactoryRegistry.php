@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement\Factory;
 use Symfony\Component\KeyManagement\DecrypterInterface;
 use Symfony\Component\KeyManagement\Dsn;
 use Symfony\Component\KeyManagement\EncrypterInterface;
+use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
 
 /**
@@ -58,6 +59,10 @@ final class FactoryRegistry implements KmsFactoryInterface
             if ($factory->supports($dsn)) {
                 return $factory->create($dsn);
             }
+        }
+
+        if ('service' === $dsn->scheme) {
+            throw new InvalidArgumentException('A "service://" KMS DSN is resolved when the container is compiled, so it cannot be read from an environment variable.');
         }
 
         throw new UnsupportedSchemeException($dsn);

@@ -197,7 +197,7 @@ class ConfigurationTest extends TestCase
     public function testADsnMustBeAString()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "key_management.clients.app.dsn": The DSN of a KMS client must be a string, got 5.');
+        $this->expectExceptionMessage('Invalid type for path "key_management.clients.app.dsn". Expected "string", but got "int".');
 
         $this->process(['clients' => ['app' => ['dsn' => 5]]]);
     }

@@ -217,6 +217,18 @@ class ApiAttributesTest extends AbstractWebTestCase
         ];
     }
 
+    public function testErrorIsServedAsProblemDocument()
+    {
+        $client = self::createClient(['test_case' => 'ApiAttributesTest']);
+
+        $client->request('GET', '/map-query-string-to-nullable-attribute.json', ['filter' => ['status' => 'approved', 'quantity' => '200']]);
+
+        $response = $client->getResponse();
+        self::assertSame(404, $response->getStatusCode());
+        self::assertSame('application/problem+json', $response->headers->get('Content-Type'));
+        self::assertSame('Validation Failed', json_decode($response->getContent(), true)['title']);
+    }
+
     #[DataProvider('mapRequestPayloadProvider')]
     public function testMapRequestPayload(string $uri, string $format, array $parameters, ?string $content, callable $responseAssertion, int $expectedStatusCode)
     {

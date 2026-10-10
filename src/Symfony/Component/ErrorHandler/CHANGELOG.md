@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Serve the problem documents of `SerializerErrorRenderer` as `application/problem+json`, and render them as JSON when the `problem` format is requested
+
 8.1
 ---
 

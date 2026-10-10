@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Tests\DependencyInjection;
 
+use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -821,8 +822,8 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testDoctrineDbalTypesEncryptWithTheDefaultClientWithoutAStore()
     {
-        if (!class_exists(EncryptedTypes::class)) {
-            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        if (!class_exists(Type::class) || !class_exists(EncryptedTypes::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
         }
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -850,8 +851,8 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testDoctrineDbalTypesWithoutAStoreNorADefaultClientAreRefused()
     {
-        if (!class_exists(EncryptedTypes::class)) {
-            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        if (!class_exists(Type::class) || !class_exists(EncryptedTypes::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
         }
 
         $this->expectException(LogicException::class);

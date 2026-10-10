@@ -157,11 +157,12 @@ class KeyManagementBundleTest extends TestCase
         $kernel = new TestKeyManagementKernel('doctrine_dbal_types', false, $this->varDir);
         $kernel->boot();
         $container = $kernel->getContainer();
+        $connection = $container->get('test.dbal');
+        $types = method_exists($connection->getConfiguration(), 'getTypeProvider') ? $connection->getConfiguration()->getTypeProvider() : Type::getTypeRegistry();
 
-        $this->assertInstanceOf(EncryptedType::class, Type::getType('test_encrypted_phone'));
+        $this->assertInstanceOf(EncryptedType::class, $types->get('test_encrypted_phone'));
 
         $container->get('test.store')->createTable();
-        $connection = $container->get('test.dbal');
         $connection->executeStatement('CREATE TABLE speaker (id INTEGER PRIMARY KEY, phone BLOB)');
         $connection->insert('speaker', ['id' => 1, 'phone' => '+33 6 12 34 56 78'], ['phone' => 'test_encrypted_phone']);
 

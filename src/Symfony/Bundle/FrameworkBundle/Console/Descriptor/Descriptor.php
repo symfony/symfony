@@ -34,6 +34,18 @@ use Symfony\Component\Routing\RouteCollection;
  */
 abstract class Descriptor implements DescriptorInterface
 {
+    /**
+     * The env vars that Symfony reads itself, outside the container, and that apps set in their .env files.
+     */
+    private const ENV_VARS_READ_OUTSIDE_THE_CONTAINER = [
+        // the runtime and the kernel
+        'APP_ENV', 'APP_DEBUG', 'APP_RUNTIME', 'APP_RUNTIME_OPTIONS', 'APP_CACHE_DIR', 'APP_BUILD_DIR', 'APP_SHARE_DIR', 'APP_LOG_DIR',
+        // the console, the error handler and the dumper
+        'SHELL_VERBOSITY', 'SYMFONY_IDE', 'VAR_DUMPER_FORMAT', 'VAR_DUMPER_SERVER',
+        // the tests
+        'KERNEL_CLASS', 'SYMFONY_DEPRECATIONS_HELPER', 'SYMFONY_HTTP_RECORDER',
+    ];
+
     protected OutputInterface $output;
 
     public function describe(OutputInterface $output, mixed $object, array $options = []): void
@@ -361,6 +373,10 @@ abstract class Descriptor implements DescriptorInterface
             if (!isset($used[$name])) {
                 $envVars[] = $name;
             }
+        }
+
+        foreach (self::ENV_VARS_READ_OUTSIDE_THE_CONTAINER as $name) {
+            $used[$name] = true;
         }
 
         $inlined = $container->hasParameter('.debug.container.inlined_env_vars') ? array_flip($container->getParameter('.debug.container.inlined_env_vars')) : [];

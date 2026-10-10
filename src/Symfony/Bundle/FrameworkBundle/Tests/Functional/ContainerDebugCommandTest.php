@@ -304,6 +304,33 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         }
     }
 
+    public function testDescribeEnvVarsDoesNotReportTheVariablesReadOutsideTheContainerAsUnused()
+    {
+        $_SERVER['SYMFONY_DOTENV_VARS'] = 'APP_ENV,APP_SHARE_DIR,APP_CACHE_DIR,KERNEL_CLASS,APP_FOO';
+        putenv('APP_ENV=test');
+        putenv('APP_SHARE_DIR=var/share');
+        putenv('APP_CACHE_DIR=var/cache');
+        putenv('KERNEL_CLASS=App\Kernel');
+        putenv('APP_FOO=foo');
+
+        try {
+            $display = $this->runEnvVarsCommand()->getDisplay(true);
+
+            $this->assertMatchesRegularExpression('/^  APP_ENV\s+n\/a\s+"test"\s+yes\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  APP_SHARE_DIR\s+n\/a\s+"var\/share"\s+yes\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  APP_CACHE_DIR\s+n\/a\s+"var\/cache"\s+yes\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  KERNEL_CLASS\s+n\/a\s+"App\\\\Kernel"\s+yes\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  APP_FOO\s+"foo"\s+"foo"\s+no\s+no\s*$/m', $display);
+        } finally {
+            putenv('APP_ENV');
+            putenv('APP_SHARE_DIR');
+            putenv('APP_CACHE_DIR');
+            putenv('KERNEL_CLASS');
+            putenv('APP_FOO');
+            unset($_SERVER['SYMFONY_DOTENV_VARS']);
+        }
+    }
+
     public function testDescribeEnvVarsWithoutDotenv()
     {
         putenv('REAL=value');

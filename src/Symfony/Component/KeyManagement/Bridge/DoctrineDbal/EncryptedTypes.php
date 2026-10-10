@@ -22,13 +22,15 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  *
  * An EncryptedType takes an encrypter, which is a service, so it cannot be declared through
  * `doctrine.dbal.types`: that option names a class and DoctrineBundle instantiates it with no
- * argument. This is what an application declares instead, as one service per encrypter:
+ * argument. KeyManagementBundle declares one from its `key_management.doctrine_dbal.types`
+ * configuration. Without it, this is what an application declares instead, as one service per
+ * encrypter:
  *
  *     app.encrypted_types:
  *         class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes
  *         public: true
  *         arguments:
- *             $envelopes: '@key_management.stored_envelope_encrypter'
+ *             $envelopes: '@app.envelope_encrypter'
  *             $types:
  *                 encrypted_email: { type: string, key: 'user.email' }
  *                 encrypted_notes: { type: text, key: 'user.notes' }

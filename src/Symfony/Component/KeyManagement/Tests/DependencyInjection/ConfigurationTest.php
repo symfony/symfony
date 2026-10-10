@@ -261,6 +261,21 @@ class ConfigurationTest extends TestCase
         $this->process(['store' => ['client' => 'app', 'key_id' => 'k', 'max_age' => '3600']]);
     }
 
+    public function testADoctrineDbalTypeNamesTheTypeItWrapsAndItsKey()
+    {
+        $config = $this->process(['doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone']]]]);
+
+        $this->assertSame(['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone']]], $config['doctrine_dbal']);
+    }
+
+    public function testADoctrineDbalTypeNeedsAKey()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The child config "key" under "key_management.doctrine_dbal.types.encrypted_phone" must be configured');
+
+        $this->process(['doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string']]]]);
+    }
+
     private function process(mixed $config): array
     {
         return new Processor()->processConfiguration(new Configuration(new KeyManagementBundle(), null, 'key_management'), [$config]);

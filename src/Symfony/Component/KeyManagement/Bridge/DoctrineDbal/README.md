@@ -61,17 +61,42 @@ One instance is registered per `(envelope encrypter, master key id, parent
 type)` combination, and the registration must happen before the first query,
 on every request.
 
+In a Symfony application, `KeyManagementBundle` does it from its configuration:
+
+```yaml
+key_management:
+    clients:
+        default: '%env(KMS_DSN)%'
+    store:
+        key_id: 'alias/app-key'
+    doctrine_dbal:
+        types:
+            app_user_email: { type: string, key: 'user.email' }
+            app_user_notes: { type: text, key: 'user.notes' }
+```
+
+The types encrypt with the envelope encrypter that `EnvelopeEncrypterInterface` resolves to.
+When `key_management.store` is configured, this is the store-backed encrypter, and `key` names a scope.
+Otherwise, this is the encrypter of the default client, and `key` names a master key.
+The bundle declares the types when the kernel boots.
+
+Booting is early enough for every entry point at once, the front controller,
+the console with its schema tool and its migrations, and the test kernel, and
+it costs nothing: a DBAL connection only reaches the database on its first
+query. Registering later is what does not work.
+
 In particular, do not defer it to Doctrine ORM's `loadClassMetadata` event: the
 event does not fire when metadata comes from the cache, which DoctrineBundle
 enables in production, so a cached field mapping would reference a type name
 that is missing from the registry and every read of the column would fail with
-`UnknownColumnType`. Declare the types where the application declares the rest
-of its Doctrine configuration instead.
+`UnknownColumnType`. A connection cannot do it either, however tempting
+`doctrine.dbal.connection_factory` looks: a store-backed encrypter needs a
+connection, so asking a connection for the types closes a circle the container
+refuses to compile.
 
-`doctrine.dbal.types` is not that place, and cannot be: it names a class that
-DoctrineBundle instantiates with no argument, while an `EncryptedType` takes an
-encrypter, which is a service. `EncryptedTypes` is what an application declares
-instead, one service per encrypter:
+Without the bundle, the application declares the types itself.
+`doctrine.dbal.types` is not the place for them, and cannot be: it names a class that DoctrineBundle instantiates with no argument, while an `EncryptedType` takes an encrypter, which is a service.
+`EncryptedTypes` is what the application declares instead, one service per encrypter:
 
 ```yaml
 services:
@@ -79,7 +104,7 @@ services:
         class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes
         public: true
         arguments:
-            $envelopes: '@key_management.stored_envelope_encrypter'
+            $envelopes: '@app.envelope_encrypter'
             $types:
                 app_user_email: { type: string, key: 'user.email' }
                 app_user_notes: { type: text, key: 'user.notes' }
@@ -97,17 +122,9 @@ public function boot(): void
 }
 ```
 
-Booting is early enough for every entry point at once, the front controller,
-the console with its schema tool and its migrations, and the test kernel, and
-it costs nothing: a DBAL connection only reaches the database on its first
-query. Registering later is what does not work. A connection cannot do it
-either, however tempting `doctrine.dbal.connection_factory` looks: a store-backed
-encrypter needs a connection, so asking a connection for the types closes a
-circle the container refuses to compile.
-
-Which encrypter a type is given is what decides the regime of the column, so an
-entity holding both is two services, one per encrypter, each registering its own
-names. Swapping one for another environment is then one argument.
+Which encrypter a type is given is what decides the regime of the column.
+The configured types all share one encrypter, so an entity holding both regimes declares the types of the other one with such a service.
+For instance, its `$envelopes` is `@key_management.envelope_encrypter.<client>` for the self-contained envelopes of a client, while the configured types use the store.
 
 Calling `register()` twice is safe and is what a rebooted kernel does: the type
 registry is global and outlives the container, so a name already taken is

@@ -13,6 +13,7 @@ namespace Symfony\Component\KeyManagement\Tests;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,12 +24,15 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\KeyManagement\Base64UrlSafe;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
 use Symfony\Component\KeyManagement\DataCollector\KeyManagementDataCollector;
 use Symfony\Component\KeyManagement\Debug\TraceableKms;
 use Symfony\Component\KeyManagement\DependencyInjection\KeyManagementPass;
 use Symfony\Component\KeyManagement\EncrypterInterface;
+use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
@@ -141,6 +145,29 @@ class KeyManagementBundleTest extends TestCase
         $this->assertSame(2, $collector->getEnvelopeCallCount(), 'the write and the read, not the fallback the read went through.');
         $this->assertSame(['decrypt' => 1], $services['stored']['operations']);
         $this->assertSame(['encrypt' => 1], $services['default']['operations']);
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    public function testTheConfiguredDoctrineDbalTypesAreRegisteredWhenTheKernelBoots()
+    {
+        if (!class_exists(DriverManager::class) || !class_exists(EncryptedTypes::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $kernel = new TestKeyManagementKernel('doctrine_dbal_types', false, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $this->assertInstanceOf(EncryptedType::class, Type::getType('test_encrypted_phone'));
+
+        $container->get('test.store')->createTable();
+        $connection = $container->get('test.dbal');
+        $connection->executeStatement('CREATE TABLE speaker (id INTEGER PRIMARY KEY, phone BLOB)');
+        $connection->insert('speaker', ['id' => 1, 'phone' => '+33 6 12 34 56 78'], ['phone' => 'test_encrypted_phone']);
+
+        $stored = $connection->fetchOne('SELECT phone FROM speaker WHERE id = 1');
+        $this->assertNotNull(Envelope::fromBytes($stored)->reference, 'the type encrypts with the store, as the envelope interfaces do.');
+        $this->assertSame('+33 6 12 34 56 78', $connection->convertToPHPValue($stored, 'test_encrypted_phone'));
     }
 
     #[RequiresPhpExtension('sodium')]
@@ -290,6 +317,16 @@ class TestKeyManagementKernel extends AbstractKernel
                 ->args([['driver' => 'pdo_sqlite', 'memory' => true]]);
             $services->alias('test.stored_envelope_encrypter', 'key_management.stored_envelope_encrypter')->public();
             $config['store'] = ['connection' => 'test.dbal', 'client' => 'default', 'key_id' => 'app'];
+        }
+
+        if ('doctrine_dbal_types' === $this->environment) {
+            $services->set('test.dbal', Connection::class)
+                ->factory([DriverManager::class, 'getConnection'])
+                ->args([['driver' => 'pdo_sqlite', 'memory' => true]])
+                ->public();
+            $services->alias('test.store', 'key_management.store')->public();
+            $config['store'] = ['connection' => 'test.dbal', 'key_id' => 'app'];
+            $config['doctrine_dbal'] = ['types' => ['test_encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone']]];
         }
 
         $container->extension('key_management', $config);

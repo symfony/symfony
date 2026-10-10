@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `Controller\TemplateController`, which `FrameworkBundle` used to provide
  * Warm up only the form themes of `TwigBridge` that the application uses
+ * Add support for the `sign_url` filter of `TwigBridge`
 
 8.1
 ---

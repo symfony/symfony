@@ -20,6 +20,7 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -347,6 +348,16 @@ class TwigExtensionTest extends TestCase
         $bodyRenderer = $container->getDefinition('twig.mime_body_renderer');
         $this->assertCount(3, $bodyRenderer->getArguments());
         $this->assertEquals(new Reference('my_converter'), $bodyRenderer->getArgument('$converter'));
+    }
+
+    public function testHttpFoundationExtensionReceivesTheUriSigner()
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig');
+        $this->compileContainer($container);
+
+        $this->assertEquals(new Reference('uri_signer', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('twig.extension.httpfoundation')->getArgument(1));
     }
 
     public function testDefaultPathContainingAPercentSign()

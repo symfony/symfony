@@ -27,6 +27,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueReso
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\LockValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\MapRateLimitValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
@@ -236,6 +237,10 @@ return static function (ContainerConfigurator $container) {
             service('serializer')->nullOnInvalid(),
         ])
         ->tag('kernel.event_subscriber')
+
+        ->set('argument_resolver.map_rate_limit', MapRateLimitValueResolver::class)
+            ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => MapRateLimitValueResolver::class])
+            ->tag('kernel.event_subscriber')
 
         ->set('rate_limiter.attribute_listener', RateLimitAttributeListener::class)
             ->args([

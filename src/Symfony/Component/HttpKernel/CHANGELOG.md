@@ -29,6 +29,7 @@ CHANGELOG
  * Apply the `#[Cache]` attribute to 308 responses
  * Treat 308 responses like 301 ones in `ResponseCacheStrategy`
  * Add `LockValueResolver` to inject the lock acquired by `#[Lock]` into the `LockInterface` and `SharedLockInterface` controller arguments
+ * Add automatic resolution of `RateLimit` controller arguments and `#[MapRateLimit]` for explicit selection of applied rate limits
 
 8.1
 ---

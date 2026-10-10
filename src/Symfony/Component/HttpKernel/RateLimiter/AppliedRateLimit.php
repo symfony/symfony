@@ -14,8 +14,7 @@ namespace Symfony\Component\HttpKernel\RateLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 
 /**
- * The rate limit that governs the response, out of every #[RateLimit] consumed for the request,
- * along with the number of tokens its matching attribute consumes per call.
+ * The result of applying a #[RateLimit] attribute to a request.
  *
  * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
  *
@@ -26,6 +25,8 @@ final class AppliedRateLimit
     public function __construct(
         public readonly RateLimit $rateLimit,
         public readonly int $tokens,
+        public readonly string $limiter,
+        public readonly bool $exposeHeaders,
     ) {
     }
 

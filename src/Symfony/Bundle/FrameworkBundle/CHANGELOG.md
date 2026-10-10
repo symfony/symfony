@@ -44,6 +44,7 @@ CHANGELOG
  * Don't use the secrets vault as an env var loader when its directory is in the project but does not exist at build time
  * Add the `framework.request.serializer` and `framework.response.serializer` options
  * Add support for the `#[Lock]` attribute on controllers when the Lock component is enabled
+ * Add support for `#[MapRateLimit]` and automatic resolution of `RateLimit` controller arguments
 
 8.1
 ---

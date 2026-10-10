@@ -131,15 +131,15 @@ class HttpFoundationExtensionTest extends TestCase
     {
         $signer = new UriSigner('secret');
 
-        $this->assertSame(htmlspecialchars($signer->sign('https://example.com/ticket/42?lang=en', 4102444800)), $this->renderTemplate($template, $context, $signer));
+        $this->assertSame(htmlspecialchars($signer->sign('https://example.com/ticket/42?lang=en', 2000000000)), $this->renderTemplate($template, $context, $signer));
     }
 
     public static function provideSignUrlTemplates(): iterable
     {
-        yield 'timestamp' => ["{{ 'https://example.com/ticket/42?lang=en'|sign_url(4102444800) }}", []];
-        yield 'date() function' => ["{{ 'https://example.com/ticket/42?lang=en'|sign_url(date('@4102444800')) }}", []];
-        yield 'DateTimeInterface' => ['{{ url|sign_url(expiration) }}', ['url' => 'https://example.com/ticket/42?lang=en', 'expiration' => new \DateTimeImmutable('@4102444800')]];
-        yield 'absolute_url() function' => ["{{ absolute_url('/ticket/42?lang=en')|sign_url(4102444800) }}", []];
+        yield 'timestamp' => ["{{ 'https://example.com/ticket/42?lang=en'|sign_url(2000000000) }}", []];
+        yield 'date() function' => ["{{ 'https://example.com/ticket/42?lang=en'|sign_url(date('@2000000000')) }}", []];
+        yield 'DateTimeInterface' => ['{{ url|sign_url(expiration) }}', ['url' => 'https://example.com/ticket/42?lang=en', 'expiration' => new \DateTimeImmutable('@2000000000')]];
+        yield 'absolute_url() function' => ["{{ absolute_url('/ticket/42?lang=en')|sign_url(2000000000) }}", []];
     }
 
     public function testSignUrlWithTheDefaultExpiration()
@@ -160,7 +160,7 @@ class HttpFoundationExtensionTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The "sign_url" filter requires an absolute URL, "%s" given.', $url));
 
-        $extension->signUrl($url, 4102444800);
+        $extension->signUrl($url, 2000000000);
     }
 
     public static function provideNonAbsoluteUrls(): iterable
@@ -177,7 +177,7 @@ class HttpFoundationExtensionTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(\sprintf('The "sign_url" filter requires an instance of "%s".', UriSigner::class));
 
-        $extension->signUrl('https://example.com/ticket/42', 4102444800);
+        $extension->signUrl('https://example.com/ticket/42', 2000000000);
     }
 
     private function renderTemplate(string $template, array $context, UriSigner $signer): string

@@ -93,8 +93,16 @@ class ConfigDebugCommand extends AbstractConfigCommand
         }
 
         $extension = $this->findExtension($name);
-        $extensionAlias = $extension->getAlias();
         $container = $this->compileContainer();
+        $path = $input->getArgument('path');
+
+        if (null !== $path && null !== $aliased = $this->resolveAliasedPath($extension, $path, $container)) {
+            [$extension, $path, $aliasPath] = $aliased;
+            $name = $extension->getAlias();
+            $errorIo->comment(\sprintf('"%s" is an alias of the "%s" configuration.', $aliasPath, $name));
+        }
+
+        $extensionAlias = $extension->getAlias();
 
         $config = $this->getConfig($extension, $container, $input->getOption('resolve-env'));
 
@@ -106,7 +114,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
             return 1;
         }
 
-        if (null === $path = $input->getArgument('path')) {
+        if (null === $path) {
             if ('txt' === $input->getOption('format')) {
                 $io->title(
                     \sprintf('Current configuration for %s', $name === $extensionAlias ? \sprintf('extension with alias "%s"', $extensionAlias) : \sprintf('"%s"', $name))

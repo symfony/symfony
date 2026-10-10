@@ -89,11 +89,19 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
         }
 
         $extension = $this->findExtension($name);
+        $container = $this->getContainerBuilder($this->getApplication()->getKernel());
+        $path = $input->getArgument('path');
+
+        if (null !== $path && null !== $aliased = $this->resolveAliasedPath($extension, $path, $container)) {
+            [$extension, $path, $aliasPath] = $aliased;
+            $name = $extension->getAlias();
+            $errorIo->comment(\sprintf('"%s" is an alias of the "%s" configuration.', $aliasPath, $name));
+        }
 
         if ($extension instanceof ConfigurationInterface) {
             $configuration = $extension;
         } else {
-            $configuration = $extension->getConfiguration([], $this->getContainerBuilder($this->getApplication()->getKernel()));
+            $configuration = $extension->getConfiguration([], $container);
         }
 
         $this->validateConfiguration($extension, $configuration);
@@ -105,8 +113,6 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
 
             return 1;
         }
-
-        $path = $input->getArgument('path');
 
         if (null !== $path && 'yaml' !== $format) {
             $errorIo->error('The "path" option is only available for the "yaml" format.');

@@ -57,12 +57,17 @@ class SerializerErrorRenderer implements ErrorRendererInterface
 
         try {
             $format = \is_string($this->format) ? $this->format : ($this->format)($flattenException);
+            $format = 'problem' === $format ? 'json' : $format;
             $headers['Content-Type'] = Request::getMimeTypes($format)[0] ?? $format;
 
-            $flattenException->setAsString($this->serializer->serialize($flattenException, $format, [
+            $flattenException->setAsString($content = $this->serializer->serialize($flattenException, $format, [
                 'exception' => $exception,
                 'debug' => $debug,
             ]));
+
+            if ('json' === $format && \is_array($data = json_decode($content, true)) && isset($data['type'], $data['title'], $data['status'])) {
+                $headers['Content-Type'] = 'application/problem+json';
+            }
         } catch (NotEncodableValueException) {
             $flattenException = $this->fallbackErrorRenderer->render($exception);
         }

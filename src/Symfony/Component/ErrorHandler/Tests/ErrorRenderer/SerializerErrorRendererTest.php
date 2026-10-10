@@ -13,7 +13,10 @@ namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -34,6 +37,55 @@ class SerializerErrorRendererTest extends TestCase
             static fn () => 'json'
         );
 
-        $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"An error occurred","status":500,"detail":"Internal Server Error"}', $errorRenderer->render($exception)->getAsString());
+        $flattenException = $errorRenderer->render($exception);
+
+        $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"An error occurred","status":500,"detail":"Internal Server Error"}', $flattenException->getAsString());
+        $this->assertSame('application/problem+json', $flattenException->getHeaders()['Content-Type']);
+    }
+
+    public function testProblemFormatIsRenderedAsJson()
+    {
+        $errorRenderer = new SerializerErrorRenderer(new Serializer([new ProblemNormalizer()], [new JsonEncoder()]), 'problem');
+
+        $flattenException = $errorRenderer->render(new \RuntimeException('Foo'));
+
+        $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"An error occurred","status":500,"detail":"Internal Server Error"}', $flattenException->getAsString());
+        $this->assertSame('application/problem+json', $flattenException->getHeaders()['Content-Type']);
+    }
+
+    public function testCustomNormalizerKeepsJsonContentType()
+    {
+        $normalizer = new class implements NormalizerInterface {
+            public function normalize(mixed $data, ?string $format = null, array $context = []): array
+            {
+                return ['message' => $data->getMessage()];
+            }
+
+            public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
+            {
+                return $data instanceof FlattenException;
+            }
+
+            public function getSupportedTypes(?string $format): array
+            {
+                return [FlattenException::class => true];
+            }
+        };
+        $errorRenderer = new SerializerErrorRenderer(new Serializer([$normalizer, new ProblemNormalizer()], [new JsonEncoder()]), 'json');
+
+        $flattenException = $errorRenderer->render(new \RuntimeException('Foo'));
+
+        $this->assertSame('{"message":"Foo"}', $flattenException->getAsString());
+        $this->assertSame('application/json', $flattenException->getHeaders()['Content-Type']);
+    }
+
+    public function testXmlContentType()
+    {
+        $errorRenderer = new SerializerErrorRenderer(new Serializer([new ProblemNormalizer()], [new XmlEncoder()]), 'xml');
+
+        $flattenException = $errorRenderer->render(new \RuntimeException('Foo'));
+
+        $this->assertStringContainsString('<response><type>', $flattenException->getAsString());
+        $this->assertSame('text/xml', $flattenException->getHeaders()['Content-Type']);
     }
 }

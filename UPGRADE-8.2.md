@@ -72,6 +72,13 @@ DoctrineBridge
    Also note that `DoctrineDbalPingConnectionMiddleware` does not reset closed entity managers as its deprecated
    counterpart did: workers already reset them between messages
 
+ErrorHandler
+------------
+
+ * `SerializerErrorRenderer` serves the problem documents it renders as JSON with the `application/problem+json` content type, as defined by RFC 9457, instead of `application/json`.
+   Only the bodies that hold the `type`, `title` and `status` members, as produced by `ProblemNormalizer`, are affected.
+   A client or a test that compares the header to `application/json`, or that calls `assertResponseFormatSame('json')` on such a response, should accept `application/problem+json`, which `Request::getFormat()` maps to the `problem` format.
+
 EventDispatcher
 ---------------
 

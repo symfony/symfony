@@ -32,16 +32,18 @@ abstract class WebTestCase extends KernelTestCase
     /**
      * Creates a KernelBrowser.
      *
-     * @param array $options An array of options to pass to the createKernel method
+     * Calling this method more than once in the same test will not reboot the kernel; instead,
+     * an additional KernelBrowser bound to the already-booted kernel is returned. This allows
+     * creating several independent clients (for example to simulate multiple users), as documented
+     * in "Testing with Several Clients" without tearing down a client created earlier.
+     *
+     * @param array $options An array of options to pass to the createKernel method; ignored if the
+     *                        kernel has already been booted by a previous createClient() call
      * @param array $server  An array of server parameters
      */
     protected static function createClient(array $options = [], array $server = []): KernelBrowser
     {
-        if (static::$booted) {
-            throw new \LogicException(\sprintf('Booting the kernel before calling "%s()" is not supported, the kernel should only be booted once.', __METHOD__));
-        }
-
-        $kernel = static::bootKernel($options);
+        $kernel = static::$booted ? static::$kernel : static::bootKernel($options);
 
         try {
             $client = $kernel->getContainer()->get('test.client');

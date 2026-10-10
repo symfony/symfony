@@ -70,6 +70,36 @@ class SessionTest extends AbstractWebTestCase
     }
 
     /**
+     * createClient() can be called more than once in the same test, without manually
+     * shutting the kernel down in between, to get several independent clients
+     * (https://github.com/symfony/symfony/issues/36439). Each client keeps its own
+     * cookies/session while sharing the same booted kernel.
+     */
+    public function testCreatingASecondClientDoesNotRequireManuallyShuttingDownTheKernel()
+    {
+        $harry = $this->createClient(['test_case' => 'Session', 'root_config' => 'config.yml']);
+        $sally = $this->createClient(['test_case' => 'Session', 'root_config' => 'config.yml']);
+
+        // both clients share the same booted kernel
+        $this->assertSame($harry->getKernel(), $sally->getKernel());
+        // but each has its own cookie jar / session
+        $this->assertNotSame($harry->getCookieJar(), $sally->getCookieJar());
+
+        $harry->request('GET', '/session/harry');
+        $this->assertStringContainsString('Hello harry, nice to meet you.', $harry->getResponse()->getContent());
+
+        $sally->request('GET', '/session/sally');
+        $this->assertStringContainsString('Hello sally, nice to meet you.', $sally->getResponse()->getContent());
+
+        // sessions remain independent: re-requesting shows each client's own remembered name
+        $crawlerHarry = $harry->request('GET', '/session');
+        $this->assertStringContainsString('Welcome back harry, nice to meet you.', $crawlerHarry->text());
+
+        $crawlerSally = $sally->request('GET', '/session');
+        $this->assertStringContainsString('Welcome back sally, nice to meet you.', $crawlerSally->text());
+    }
+
+    /**
      * See if two separate insulated clients can run without
      * polluting each other's session data.
      *

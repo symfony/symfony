@@ -9,6 +9,7 @@ CHANGELOG
  * Add the `webhook.no_private_network` and `webhook.http_client` options
  * Add a `Webhook-Timestamp` header to webhook requests, and the `webhook.timestamp_header_name` option to name it
  * Add support for the [Standard Webhooks](https://www.standardwebhooks.com/) signature scheme with the `SignatureFormat` enum and the `webhook.signature_format` and `webhook.timestamp_tolerance` options
+ * Make the `webhook.routing.*.service` option default to `webhook.request_parser`
 
 8.0
 ---

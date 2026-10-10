@@ -9,7 +9,7 @@ CHANGELOG
  * Allow using closures with the `#[MapEntity]` attribute
  * Deprecate `DoctrineCloseConnectionMiddleware`, `DoctrineOpenTransactionLoggerMiddleware` and `DoctrinePingConnectionMiddleware`, use `DoctrineDbalCloseConnectionMiddleware`, `DoctrineDbalOpenTransactionLoggerMiddleware` and `DoctrineDbalPingConnectionMiddleware` instead
  * Add `DoctrineDbalTransactionMiddleware` to wrap all handlers in a single DBAL transaction without requiring the ORM
- * Map the `DatePoint`, `DayPoint` and `TimePoint` property types to their Doctrine types, so schema tools detect them without an explicit `type`
+ * Map `DatePoint` properties to the `date_point` Doctrine type, so schema tools detect them without an explicit `type`
  * Load a list of entities into `array`-typed controller and command arguments with `#[MapEntity]`, using `findBy()`
  * Add the `EntityExists` constraint for validating that a value references an existing entity
  * Add `CollectionDenormalizer` to denormalize arrays into Doctrine collections

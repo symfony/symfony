@@ -14,8 +14,11 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Error\SyntaxError;
@@ -542,6 +545,182 @@ class TranslationExtensionTest extends TestCase
             'index' => '{% embed "layout.html.twig" %}{% block content %}{% endblock %}{% endembed %}{% trans_default_domain "foo" for _self %}',
             'layout.html.twig' => '{% block content "" %}',
         ]);
+    }
+
+    #[DataProvider('getTransHtmlTests')]
+    public function testTransHtml(string $template, string $expected, array $variables = [])
+    {
+        $this->assertSame($expected, $this->getTemplate($template, $this->getTransHtmlTranslator())->render($variables));
+    }
+
+    public static function getTransHtmlTests(): iterable
+    {
+        yield 'tag with attributes' => [
+            "{{ 'hello'|trans_html({ '%name%': 'Fabien' }, tags: { strong: { tag: 'span', attr: { class: 'underline' } } }) }}",
+            'Hello <span class="underline">Fabien</span>!',
+        ];
+        yield 'attribute value from a variable is escaped' => [
+            "{{ 'hello'|trans_html({ '%name%': 'Fabien' }, tags: { strong: { tag: 'a', attr: { href: url } } }) }}",
+            'Hello <a href="&quot; onclick=&quot;alert(1)">Fabien</a>!',
+            ['url' => '" onclick="alert(1)'],
+        ];
+        yield 'HTML in the translation is escaped' => [
+            "{{ 'xss'|trans_html(tags: { b: { tag: 'strong' } }) }}",
+            '&lt;script&gt;alert(1)&lt;/script&gt; and <strong>bold</strong>',
+        ];
+
+        yield 'no arguments' => [
+            "{{ 'plain'|trans_html }}",
+            'Tom &amp; Jerry &lt;3',
+        ];
+        yield 'empty message' => [
+            "{{ ''|trans_html }}",
+            '',
+        ];
+        yield 'null message' => [
+            '{{ null|trans_html }}',
+            '',
+        ];
+        yield 'stringable message' => [
+            "{{ message|trans_html({ '%name%': 'Fabien' }, tags: { strong: { tag: 'b' } }) }}",
+            'Hello <b>Fabien</b>!',
+            ['message' => new class {
+                public function __toString(): string
+                {
+                    return 'hello';
+                }
+            }],
+        ];
+
+        yield 'markup parameter is not escaped' => [
+            "{% set inner %}{{ 'inner'|trans_html({ '%name%': '<x>' }, tags: { b: { tag: 'em' } }) }}{% endset %}{{ 'outer'|trans_html({ '%inner%': inner }) }}",
+            'Outer: <em>&lt;x&gt;</em>',
+        ];
+        yield 'nested trans_html result is escaped' => [
+            "{{ 'outer'|trans_html({ '%inner%': 'inner'|trans_html({ '%name%': 'x' }, tags: { b: { tag: 'em' } }) }) }}",
+            'Outer: &lt;em&gt;x&lt;/em&gt;',
+        ];
+        yield 'markup parameter with a declared tag is kept as is' => [
+            "{% set inner %}<b>x</b>{% endset %}{{ 'outer'|trans_html({ '%inner%': inner }, tags: { b: { tag: 'strong' } }) }}",
+            'Outer: <b>x</b>',
+        ];
+        yield 'markup parameter is kept as is in an unbalanced message' => [
+            "{% set name %}<i>x</i>{% endset %}{{ 'unclosed'|trans_html({ '%name%': name }, tags: { strong: { tag: 'b' } }) }}",
+            'Hello &lt;strong&gt;<i>x</i>',
+        ];
+        yield 'several markup parameters' => [
+            "{% set first %}<i>1</i>{% endset %}{% set second %}<i>2</i>{% endset %}{{ 'two_params'|trans_html({ '%first%': first, '%second%': second }) }}",
+            '<i>1</i> <i>2</i>',
+        ];
+        yield 'parameter cannot inject a markup parameter' => [
+            "{% set first %}<em>x</em>{% endset %}{{ 'two_params'|trans_html({ '%first%': first, '%second%': second }) }}",
+            "<em>x</em> \u{E000}0\u{E001}",
+            ['second' => "\u{E000}0\u{E001}"],
+        ];
+
+        yield 'translatable message' => [
+            "{{ t('hello', { '%name%': '<i>' })|trans_html(tags: { strong: { tag: 'b' } }) }}",
+            'Hello <b>&lt;i&gt;</b>!',
+        ];
+        yield 'translatable message with a domain' => [
+            "{{ t('hello', { '%name%': 'Fabien' }, 'custom')|trans_html(tags: { strong: { tag: 'b' } }) }}",
+            'Hi <b>Fabien</b>!',
+        ];
+        yield 'translatable message with a locale' => [
+            "{{ t('hello', { '%name%': 'Fabien' })|trans_html('fr', tags: { strong: { tag: 'b' } }) }}",
+            'Bonjour <b>Fabien</b> !',
+        ];
+        yield 'empty translatable message' => [
+            "{{ t('')|trans_html }}",
+            '',
+        ];
+        yield 'other translatable is escaped' => [
+            "{{ message|trans_html(tags: { b: { tag: 'strong' } }) }}",
+            '&lt;b&gt;x&lt;/b&gt;',
+            ['message' => new class implements TranslatableInterface {
+                public function trans(TranslatorInterface $translator, ?string $locale = null): string
+                {
+                    return '<b>x</b>';
+                }
+            }],
+        ];
+
+        yield 'domain' => [
+            "{{ 'hello'|trans_html({ '%name%': '<i>' }, 'custom', tags: { strong: { tag: 'b' } }) }}",
+            'Hi <b>&lt;i&gt;</b>!',
+        ];
+        yield 'count' => [
+            "{{ 'apples'|trans_html(count: 3, tags: { b: { tag: 'strong' } }) }}",
+            '<strong>3</strong> apples',
+        ];
+        yield 'locale' => [
+            "{{ 'hello'|trans_html({ '%name%': 'Fabien' }, locale: 'fr', tags: { strong: { tag: 'b' } }) }}",
+            'Bonjour <b>Fabien</b> !',
+        ];
+
+        yield 'trans filter is still escaped' => [
+            "{{ 'hello'|trans({ '%name%': 'Fabien' }) }}",
+            'Hello &lt;strong&gt;Fabien&lt;/strong&gt;!',
+        ];
+    }
+
+    public function testTransHtmlIsEscapedInJavaScript()
+    {
+        $template = $this->getTemplate("{% autoescape 'js' %}{{ 'hello'|trans_html({ '%name%': 'Fabien' }, tags: { strong: { tag: 'b' } }) }}|{{ html }}{% endautoescape %}", $this->getTransHtmlTranslator());
+
+        [$transHtml, $expected] = explode('|', $template->render(['html' => 'Hello <b>Fabien</b>!']));
+
+        $this->assertStringNotContainsString('<b>', $transHtml);
+        $this->assertSame($expected, $transHtml);
+    }
+
+    public function testTransHtmlKeepsMarkupParametersWithPseudoLocalization()
+    {
+        $translator = new PseudoLocalizationTranslator(new IdentityTranslator(), ['accents' => true, 'expansion_factor' => 1.0, 'brackets' => false, 'parse_html' => false]);
+        $template = $this->getTemplate("{% set name %}<i>x</i>{% endset %}{{ 'Hi %name%'|trans_html({ '%name%': name }) }}", $translator);
+
+        $this->assertSame("Ĥî\u{2003}<i>x</i>", $template->render());
+    }
+
+    public function testTransHtmlWithDefaultTranslationDomain()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => '<b>foo</b> (messages)'], 'en');
+        $translator->addResource('array', ['foo' => '<b>foo</b> (custom)'], 'en', 'custom');
+        $translator->addResource('array', ['foo' => '<b>foo</b> (foo)'], 'en', 'foo');
+
+        $template = $this->getTemplate('
+            {%- trans_default_domain "foo" %}
+            {{- "foo"|trans_html }}
+            {{- "foo"|trans_html({}, "custom") }}
+            {{- "foo"|trans_html(tags: { b: { tag: "i" } }) }}
+            {{- "foo"|trans_html(domain: "custom", tags: { b: { tag: "i" } }) }}
+        ', $translator);
+
+        $this->assertSame('&lt;b&gt;foo&lt;/b&gt; (foo)&lt;b&gt;foo&lt;/b&gt; (custom)<i>foo</i> (foo)<i>foo</i> (custom)', trim($template->render()));
+    }
+
+    private function getTransHtmlTranslator(): Translator
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', [
+            'hello' => 'Hello <strong>%name%</strong>!',
+            'plain' => 'Tom & Jerry <3',
+            'xss' => '<script>alert(1)</script> and <b>bold</b>',
+            'outer' => 'Outer: %inner%',
+            'inner' => '<b>%name%</b>',
+            'two_params' => '%first% %second%',
+            'unclosed' => 'Hello <strong>%name%',
+            'apples' => '{1} <b>one</b> apple|]1,Inf[ <b>%count%</b> apples',
+        ], 'en');
+        $translator->addResource('array', ['hello' => 'Hi <strong>%name%</strong>!'], 'en', 'custom');
+        $translator->addResource('array', [
+            'hello' => 'Bonjour <strong>%name%</strong> !',
+        ], 'fr');
+
+        return $translator;
     }
 
     private function getTemplate($template, ?TranslatorInterface $translator = null): TemplateWrapper

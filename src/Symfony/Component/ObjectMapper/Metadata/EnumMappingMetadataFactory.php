@@ -36,12 +36,17 @@ final class EnumMappingMetadataFactory implements ObjectMapperMetadataFactoryInt
             return $mappings;
         }
 
-        if (!$mappings) {
-            return $this->createEnumMappingIfNeeded($context['source'], $property, $context['target'], $property);
-        }
+        $hasMappingForTarget = false;
 
         foreach ($mappings as $i => $mapping) {
-            if ($this->hasMapEnum($mapping)) {
+            if ($mapping->targetClass && !is_a($context['target'], $mapping->targetClass, true)) {
+                continue;
+            }
+
+            $hasMappingForTarget = true;
+
+            // a transform receives the enum as is, and a disabled mapping writes nothing
+            if (null !== $mapping->transform || false === $mapping->if) {
                 continue;
             }
 
@@ -61,7 +66,11 @@ final class EnumMappingMetadataFactory implements ObjectMapperMetadataFactoryInt
                 continue;
             }
 
-            $mappings[$i] = $this->injectMapEnum($mapping, $mapEnum);
+            $mappings[$i] = new Mapping($mapping->target, $mapping->source, $mapping->if, $mapEnum, $mapping->targetClass);
+        }
+
+        if (!$hasMappingForTarget) {
+            return [...$mappings, ...$this->createEnumMappingIfNeeded($context['source'], $property, $context['target'], $property)];
         }
 
         return $mappings;
@@ -121,34 +130,6 @@ final class EnumMappingMetadataFactory implements ObjectMapperMetadataFactoryInt
         $backingType = (new \ReflectionEnum($enumClass))->getBackingType();
 
         return $this->backingTypeCache[$enumClass] = $backingType instanceof \ReflectionNamedType ? $backingType->getName() : null;
-    }
-
-    private function hasMapEnum(Mapping $mapping): bool
-    {
-        if (null === $mapping->transform) {
-            return false;
-        }
-
-        $transforms = \is_array($mapping->transform) ? $mapping->transform : [$mapping->transform];
-
-        foreach ($transforms as $transform) {
-            if ($transform instanceof MapEnum) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function injectMapEnum(Mapping $mapping, MapEnum $mapEnum): Mapping
-    {
-        $transforms = match (true) {
-            null === $mapping->transform => $mapEnum,
-            \is_array($mapping->transform) => [$mapEnum, ...$mapping->transform],
-            default => [$mapEnum, $mapping->transform],
-        };
-
-        return new Mapping($mapping->target, $mapping->source, $mapping->if, $transforms);
     }
 
     private function getPropertyTypeName(string $class, string $property): ?string

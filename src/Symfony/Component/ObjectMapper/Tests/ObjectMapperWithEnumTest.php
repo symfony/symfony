@@ -17,17 +17,24 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
 use Symfony\Component\ObjectMapper\Metadata\EnumMappingMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
+use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\EnumFormatter;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\EnumSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\EnumTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\EnumWithExplicitMapSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\EnumWithExplicitMapTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\FormattedStatusTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\ImplicitEnum;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\ImplicitScalar;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\IntLabelTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\IntPriority;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\PureColor;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\ScalarSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\ScalarTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\StatusLabelTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\StatusSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\StatusTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EnumMapping\StringStatus;
 
 final class ObjectMapperWithEnumTest extends TestCase
@@ -322,6 +329,70 @@ final class ObjectMapperWithEnumTest extends TestCase
         $target = $this->createMapper()->map($source, $plainTarget::class);
 
         $this->assertSame('active', $target->status);
+    }
+
+    #[DataProvider('userTransformProvider')]
+    public function testUserTransformReceivesTheEnum(object $target, array $expected)
+    {
+        $source = new class {
+            public StringStatus $status = StringStatus::Active;
+            public PureColor $color = PureColor::Red;
+        };
+
+        $this->assertSame($expected, get_object_vars($this->createMapper()->map($source, $target::class)));
+    }
+
+    public static function userTransformProvider(): iterable
+    {
+        yield 'backed enum to string' => [new class {
+            #[Map(source: 'status', transform: EnumFormatter::class.'::label')]
+            public string $label;
+        }, ['label' => 'Active']];
+
+        yield 'backed enum to string with an array callable' => [new class {
+            #[Map(source: 'status', transform: [EnumFormatter::class, 'label'])]
+            public string $label;
+        }, ['label' => 'Active']];
+
+        yield 'string-backed enum to int' => [new class {
+            #[Map(source: 'status', transform: [EnumFormatter::class, 'length'])]
+            public int $length;
+        }, ['length' => 6]];
+
+        yield 'pure enum to string' => [new class {
+            #[Map(source: 'color', transform: [EnumFormatter::class, 'name'])]
+            public string $color;
+        }, ['color' => 'Red']];
+    }
+
+    public function testDisabledMappingOfAPureEnumIsSkipped()
+    {
+        $source = new class {
+            public PureColor $color = PureColor::Red;
+        };
+        $target = new class {
+            #[Map(if: false)]
+            public string $color = 'none';
+        };
+
+        $this->assertSame('none', $this->createMapper()->map($source, $target::class)->color);
+    }
+
+    #[DataProvider('classMapWithSeveralTargetsProvider')]
+    public function testClassMapWithSeveralTargetsAppliesOnlyTheMappingsOfEachTarget(array $targets, string $targetClass, array $expected)
+    {
+        $mapper = new ObjectMapper(new EnumMappingMetadataFactory(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), [StatusSource::class => $targets])));
+
+        $this->assertSame($expected, get_object_vars($mapper->map(new StatusSource(), $targetClass)));
+    }
+
+    public static function classMapWithSeveralTargetsProvider(): iterable
+    {
+        yield 'own transform' => [[FormattedStatusTarget::class, StatusTarget::class], FormattedStatusTarget::class, ['status' => 'Active']];
+        yield 'transform of another target' => [[FormattedStatusTarget::class, StatusTarget::class], StatusTarget::class, ['status' => 'active']];
+        yield 'own property' => [[StatusLabelTarget::class, IntLabelTarget::class], StatusLabelTarget::class, ['label' => 'active']];
+        yield 'property of another target' => [[StatusLabelTarget::class, IntLabelTarget::class], IntLabelTarget::class, ['label' => 0]];
+        yield 'implicit conversion next to the mapping of another target' => [[StatusLabelTarget::class, StatusTarget::class], StatusTarget::class, ['status' => 'active']];
     }
 
     private function createMapper(): ObjectMapper

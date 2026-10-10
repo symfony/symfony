@@ -28,6 +28,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolv
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\LockValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RateLimitValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
@@ -247,5 +248,10 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
             ->tag('container.remove_if_missing', ['service' => 'limiter'])
+
+        ->set('argument_resolver.rate_limit', RateLimitValueResolver::class)
+            ->tag('controller.argument_value_resolver', ['priority' => 100, 'name' => RateLimitValueResolver::class])
+            ->tag('kernel.event_subscriber')
+            ->tag('container.remove_if_missing', ['service' => 'rate_limiter.attribute_listener'])
     ;
 };

@@ -64,6 +64,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\Attribute\AsFormType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\TypeInfoFormTypeGuesser;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerBundle;
 use Symfony\Component\HttpClient\CachingHttpClient;
@@ -960,6 +961,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame([[]], $definition->getTag('form.data_class'));
         $this->assertCount(1, $definition->getTag('container.excluded'));
+    }
+
+    public function testFormTypeGuesserReadingTheDeclaredTypeOfProperties()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('form.type_guesser.type_info');
+
+        $this->assertSame(TypeInfoFormTypeGuesser::class, $definition->getClass());
+        $this->assertTrue($definition->hasTag('form.type_guesser'));
     }
 
     public function testDoctrineMappedClassAttributesAreForwardedToTheTag()

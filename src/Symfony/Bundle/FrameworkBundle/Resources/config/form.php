@@ -40,6 +40,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
+use Symfony\Component\Form\TypeInfoFormTypeGuesser;
 use Symfony\Component\Form\Util\ServerParams;
 
 return static function (ContainerConfigurator $container) {
@@ -89,6 +90,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('form.type_guesser')
 
         ->set('form.type_guesser.enum_type', EnumFormTypeGuesser::class)
+            ->tag('form.type_guesser')
+
+        ->set('form.type_guesser.type_info', TypeInfoFormTypeGuesser::class)
+            ->args([service('type_info.resolver')->nullOnInvalid()])
             ->tag('form.type_guesser')
 
         ->alias('form.property_accessor', 'property_accessor')

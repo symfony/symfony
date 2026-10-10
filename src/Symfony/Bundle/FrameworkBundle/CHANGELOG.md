@@ -23,6 +23,7 @@ CHANGELOG
  * Register the bundle each installed component now ships: `AssetBundle`, `AssetMapperBundle`, `CacheBundle`, `HtmlSanitizerBundle`, `HttpClientBundle`, `JsonPathBundle`, `JsonStreamerBundle`, `KeyManagementBundle`, `LockBundle`, `MailerBundle`, `MessengerBundle`, `MimeBundle`, `NotifierBundle`, `ObjectMapperBundle`, `ProcessBundle`, `PropertyAccessBundle`, `PropertyInfoBundle`, `RateLimiterBundle`, `RemoteEventBundle`, `RouterBundle`, `SchedulerBundle`, `SemaphoreBundle`, `SerializerBundle`, `TranslationBundle`, `TypeInfoBundle`, `UidBundle`, `ValidationBundle`, `WebLinkBundle`, `WebhookBundle` and `WorkflowBundle`
  * Make every `framework.*` key an alias of the configuration of the bundle that provides it; three are spelled differently at the root: `framework.assets` for `asset`, `framework.translator` for `translation` and `framework.workflows` for `workflow`
  * Auto-configure the `form.data_class` resource tag for classes with the `#[AsFormType]` attribute
+ * Register `TypeInfoFormTypeGuesser` as the `form.type_guesser.type_info` service
  * Add the `http_cache.cache_status` option to emit the RFC 9211 `Cache-Status` header
  * Add the `doctrine.orm.entity` tag to auto-excluded `#[Entity]` and `#[MappedSuperclass]` classes to allow discovering them
  * Make `lint:yaml` validate the routing, service, serializer and validator mapping files against the schemas of their components, and the files of `config/packages` against the generated `config/schema.json`

@@ -6,7 +6,7 @@
   "type": "object",
   "properties": {
     "imports": {
-      "type": "array",
+      "type": ["array", "null"],
       "description": "Import other configuration resources.",
       "$comment": "YAML examples:\n- { resource: 'services.yaml' }\n- { resource: packages/dev/services.yaml, ignore_errors: true }\n- 'other_file.yaml'",
       "items": {
@@ -31,7 +31,7 @@
       }
     },
     "parameters": {
-      "type": "object",
+      "type": ["object", "null"],
       "description": "Defines application-wide parameters.",
       "$comment": "Values support scalars, arrays and objects.",
       "patternProperties": {
@@ -40,7 +40,7 @@
       "additionalProperties": false
     },
     "services": {
-      "type": "object",
+      "type": ["object", "null"],
       "description": "Defines your application services.",
       "$comment": "Service ids accept multiple shapes: object (full definition), '@alias' string (alias), null (empty definition), prototype (resource/namespace), stack, and short array syntax for arguments.",
       "properties": {

@@ -395,6 +395,21 @@ final class ObjectMapperWithEnumTest extends TestCase
         yield 'implicit conversion next to the mapping of another target' => [[StatusLabelTarget::class, StatusTarget::class], StatusTarget::class, ['status' => 'active']];
     }
 
+    public function testDefaultMapperConvertsBetweenBackedEnumAndScalar()
+    {
+        $source = new ImplicitEnum();
+        $source->status = StringStatus::Active;
+        $source->priority = IntPriority::High;
+
+        $scalar = (new ObjectMapper())->map($source, ImplicitScalar::class);
+        $enum = (new ObjectMapper())->map($scalar, ImplicitEnum::class);
+
+        $this->assertSame('active', $scalar->status);
+        $this->assertSame(2, $scalar->priority);
+        $this->assertSame(StringStatus::Active, $enum->status);
+        $this->assertSame(IntPriority::High, $enum->priority);
+    }
+
     private function createMapper(): ObjectMapper
     {
         return new ObjectMapper(new EnumMappingMetadataFactory(new ReflectionObjectMapperMetadataFactory()));

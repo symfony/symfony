@@ -18,6 +18,7 @@ use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchCallableException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchPropertyException;
 use Symfony\Component\ObjectMapper\Metadata\ClassMetadataFactoryInterface;
+use Symfony\Component\ObjectMapper\Metadata\EnumMappingMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\PropertyMetadataFactoryInterface;
@@ -59,7 +60,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     private ?\WeakMap $pendingConstruction = null;
 
     public function __construct(
-        private readonly ObjectMapperMetadataFactoryInterface $metadataFactory = new PropertyTypeMappingMetadataFactory(new ReflectionObjectMapperMetadataFactory()),
+        private readonly ObjectMapperMetadataFactoryInterface $metadataFactory = new PropertyTypeMappingMetadataFactory(new EnumMappingMetadataFactory(new ReflectionObjectMapperMetadataFactory())),
         private readonly ?PropertyAccessorInterface $propertyAccessor = null,
         private readonly ?ContainerInterface $transformCallableLocator = null,
         private readonly ?ContainerInterface $conditionCallableLocator = null,

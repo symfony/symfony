@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
+use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Composite;
@@ -53,8 +54,8 @@ class FormValidator extends ConstraintValidator
             }
 
             $data = $form->getData();
-            // Validate the data against its own constraints
-            $validateDataGraph = $form->isRoot()
+            // Validate the data of the root form and of the current step of a flow against its own constraints
+            $validateDataGraph = ($form->isRoot() || (self::isCurrentFlowStep($form) && !$config->getInheritData()))
                 && (\is_object($data) || \is_array($data))
                 && (\is_array($groups) || ($groups instanceof GroupSequence && $groups->groups))
             ;
@@ -257,6 +258,13 @@ class FormValidator extends ConstraintValidator
         }
 
         return (array) $groups;
+    }
+
+    private static function isCurrentFlowStep(FormInterface $form): bool
+    {
+        $parent = $form->getParent();
+
+        return $parent instanceof FormFlowInterface && $form->getName() === $parent->getCursor()->getCurrentStep();
     }
 
     private static function getConstraintsInGroups(array $constraints, string|array $group): array

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -21,6 +22,8 @@ use Symfony\Component\Form\Attribute\FormField;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -29,6 +32,7 @@ use Symfony\Component\Form\Tests\Fixtures\AsFormType\AdminData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\CarData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\UserData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\VehicleData;
+use Symfony\Component\Form\TypeInfoFormTypeGuesser;
 
 class DataClassFormIntegrationTest extends TestCase
 {
@@ -156,6 +160,28 @@ class DataClassFormIntegrationTest extends TestCase
         $this->assertNull($data->internalNickname);
     }
 
+    public function testFieldTypesAreGuessedFromTheDeclaredTypesOfTheProperties()
+    {
+        $factory = $this->createFormFactory(static function (ContainerBuilder $container) {
+            $container->register('form.type_guesser.type_info', TypeInfoFormTypeGuesser::class)->addTag('form.type_guesser');
+            $container->register(TypedFieldsData::class, TypedFieldsData::class)->addResourceTag('form.data_class');
+        });
+
+        $data = new TypedFieldsData();
+        $form = $factory->create(TypedFieldsData::class, $data);
+
+        $this->assertInstanceOf(IntegerType::class, $form->get('minutes')->getConfig()->getType()->getInnerType());
+        $this->assertFalse($form->get('minutes')->isRequired());
+        $this->assertInstanceOf(DateTimeType::class, $form->get('startsAt')->getConfig()->getType()->getInnerType());
+
+        $form->submit(['minutes' => '90', 'startsAt' => '2026-10-10T18:30']);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame(90, $data->minutes);
+        $this->assertInstanceOf(DatePoint::class, $data->startsAt);
+        $this->assertSame('2026-10-10 18:30', $data->startsAt->format('Y-m-d H:i'));
+    }
+
     public function testUndiscoveredDataClassGetsADedicatedError()
     {
         $factory = $this->createFormFactory();
@@ -257,4 +283,14 @@ class RenamedFieldData
 
     #[FormField(name: 'publicNickname')]
     public ?string $internalNickname = 'bar';
+}
+
+#[AsFormType]
+class TypedFieldsData
+{
+    #[FormField]
+    public ?int $minutes = null;
+
+    #[FormField]
+    public ?DatePoint $startsAt = null;
 }

@@ -62,10 +62,10 @@ final class EmptyDataGuesser
     }
 
     /**
-     * Resolves the type of the target that PropertyAccessor writes the mapped value to.
+     * Resolves the type of the target that the mapped value is written to.
      *
-     * Only a publicly writable mutator method or property is a write target. The type of an accessor
-     * or of a constructor argument says nothing about what the value is written through.
+     * Only a publicly writable mutator method or property is a write target, or the constructor argument of a promoted readonly property.
+     * The type of an accessor or of another constructor argument says nothing about what the value is written through.
      */
     private function getWriteTargetType(string $class, string $property): ?\ReflectionType
     {
@@ -92,7 +92,7 @@ final class EmptyDataGuesser
 
         // the visibility is carried by the write info only, the target does not tell whether it can be written to
         if (null === $target || PropertyWriteInfo::VISIBILITY_PUBLIC !== $writeInfo->getVisibility()) {
-            return null;
+            return $this->getPromotedReadonlyPropertyType($class, $property);
         }
 
         if ($target instanceof \ReflectionProperty) {
@@ -100,5 +100,19 @@ final class EmptyDataGuesser
         }
 
         return $target->getType();
+    }
+
+    /**
+     * Resolves the type of a promoted readonly property, which the form writes to through the constructor.
+     */
+    private function getPromotedReadonlyPropertyType(string $class, string $property): ?\ReflectionType
+    {
+        try {
+            $property = new \ReflectionProperty($class, $property);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        return $property->isPromoted() && $property->isReadOnly() ? $property->getType() : null;
     }
 }

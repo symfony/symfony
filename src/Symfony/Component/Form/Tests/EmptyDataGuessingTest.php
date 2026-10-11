@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
@@ -21,6 +22,7 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\ReadonlyPerson;
 use Symfony\Component\Form\Tests\Fixtures\TypedProperties;
 use Symfony\Component\Form\Tests\Fixtures\WriteTargetTypedProperties;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
@@ -204,6 +206,19 @@ class EmptyDataGuessingTest extends FormIntegrationTestCase
 
         $this->assertTrue($form->isSynchronized());
         $this->assertNull($data->qty);
+    }
+
+    public function testPromotedReadonlyPropertyIsWrittenThroughTheConstructor()
+    {
+        $form = $this->factory->createBuilder(FormType::class, null, ['data_class' => ReadonlyPerson::class])
+            ->add('name')
+            ->getForm();
+
+        $this->assertSame('', $form->get('name')->getConfig()->getEmptyData());
+
+        $form->submit(['name' => '']);
+
+        $this->assertEquals(new ReadonlyPerson(''), $form->getData());
     }
 
     public function testAccessorIsNotAWriteTarget()

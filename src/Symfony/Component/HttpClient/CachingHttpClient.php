@@ -245,6 +245,8 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             return self::createGatewayTimeoutResponse($method, $url, $options);
         }
 
+        $requestTime = time();
+
         // consistent expiration time for all items
         $expiresAt = null === $this->maxTtl ? null : \DateTimeImmutable::createFromFormat('U', time() + $this->maxTtl);
 
@@ -263,6 +265,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             $hasClientConditionalValidator,
             $sentCacheValidator,
             $allowStaleFallback,
+            $requestTime,
         ): \Generator {
             static $attemptTag = null;
             static $firstChunkKey = null;
@@ -313,10 +316,6 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
                     }
 
                     $responseTime = time();
-                    $requestTime = (int) ($context->getInfo('start_time') ?? $responseTime);
-                    if ($requestTime <= $cachedData['stored_at']) {
-                        $requestTime = $responseTime;
-                    }
                     $correctedInitialAge = self::getCorrectedInitialAge($headers, $requestTime, $responseTime);
                     $updatedHeaders = self::filterStorableHeaders(array_merge($cachedData['headers'], $headers), self::getExcludedHeaders($headers));
                     $updatedCachedData = array_replace($cachedData, [
@@ -435,7 +434,6 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
                     ];
                 }, \INF);
 
-                $requestTime = (int) ($context->getInfo('start_time') ?? time());
                 $responseTime = time();
                 $correctedInitialAge = self::getCorrectedInitialAge($headers, $requestTime, $responseTime);
                 $maxAge = $this->determineMaxAge($headers, self::parseCacheControlHeader($headers['cache-control'] ?? []), $correctedInitialAge, $requestTime, $responseTime);

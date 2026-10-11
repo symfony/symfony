@@ -24,7 +24,9 @@ use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Clock\ClockInterface;
 use Psr\Log\AbstractLogger;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\DataKeyHandle;
@@ -350,6 +352,43 @@ class DataKeyStoreTest extends TestCase
         $this->assertSame(1, $this->rowCount());
     }
 
+    public function testTheClockDatesTheReference()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00');
+        $store = $this->store(clock: $clock);
+
+        $this->assertSame($clock->now()->getTimestamp(), Uuid::fromBinary($store->current('user.email')->reference)->getDateTime()->getTimestamp());
+    }
+
+    public function testTheClockTellsWhenAKeyRetires()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00');
+        $store = $this->store(maxAgeSeconds: 3600, clock: $clock);
+        $first = $store->current('user.email')->reference;
+
+        $clock->sleep(3599);
+        $this->assertSame($first, $store->current('user.email')->reference);
+
+        $clock->sleep(1);
+        $second = $store->current('user.email')->reference;
+        $this->assertNotSame($first, $second, 'the remembered key retires on the time of the clock.');
+
+        $clock->sleep(3600);
+        $store->forget();
+        $this->assertNotSame($second, $store->current('user.email')->reference, 'the stored key retires on the time of the clock.');
+        $this->assertSame(3, $this->rowCount());
+    }
+
+    public function testKeysMintedAtTheSameInstantKeepTheirOrder()
+    {
+        $store = $this->store(clock: new MockClock('2020-01-01 00:00:00'));
+        $references = [$store->current('user.email')->reference, $store->rotate('user.email')->reference, $store->rotate('user.email')->reference];
+        $store->forget();
+
+        $this->assertSame($references[2], $store->current('user.email')->reference);
+        $this->assertSame($references, array_map(static fn (StoredDataKey $row): string => $row->reference, iterator_to_array($store->all(), false)));
+    }
+
     public function testAnUnknownReferenceIsReportedAsSuch()
     {
         $store = $this->store();
@@ -545,14 +584,14 @@ class DataKeyStoreTest extends TestCase
     /**
      * @param array<string, object>|null $clients
      */
-    private function store(?array $clients = null, string $client = 'default', string $table = DataKeyStore::DEFAULT_TABLE, ?int $maxAgeSeconds = DataKeyStore::DEFAULT_MAX_AGE_SECONDS): DataKeyStore
+    private function store(?array $clients = null, string $client = 'default', string $table = DataKeyStore::DEFAULT_TABLE, ?int $maxAgeSeconds = DataKeyStore::DEFAULT_MAX_AGE_SECONDS, ?ClockInterface $clock = null): DataKeyStore
     {
         $factories = [];
         foreach ($clients ?? ['default' => new InMemoryKms()] as $name => $kms) {
             $factories[$name] = static fn (): object => $kms;
         }
 
-        $store = new DataKeyStore($this->connection, new ServiceLocator($factories), $client, 'app', $table, maxAgeSeconds: $maxAgeSeconds);
+        $store = new DataKeyStore($this->connection, new ServiceLocator($factories), $client, 'app', $table, 32, $maxAgeSeconds, $clock);
         $store->createTable();
 
         return $store;

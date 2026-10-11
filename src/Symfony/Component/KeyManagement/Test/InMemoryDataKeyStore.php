@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Test;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyHandle;
@@ -21,6 +22,7 @@ use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
 use Symfony\Component\KeyManagement\StoredDataKey;
 use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV7;
 
 /**
  * Array-backed {@see RewrappableDataKeyStoreInterface} for tests.
@@ -62,6 +64,7 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
         private readonly string $masterKeyId = 'app',
         private readonly int $keyBytes = 32,
         private readonly ?int $maxAgeSeconds = null,
+        private readonly ?ClockInterface $clock = null,
     ) {
         $this->clients = $clients ?: [$this->client => new InMemoryKms()];
     }
@@ -109,7 +112,7 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     public function rotate(string $scope): DataKeyHandle
     {
         $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes);
-        $reference = Uuid::v7()->toBinary();
+        $reference = (new UuidV7(UuidV7::generate($this->clock?->now())))->toBinary();
         $handle = new DataKeyHandle($reference, $dataKey);
         $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, $scope, $plaintext));
 
@@ -181,7 +184,7 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
         // A UUIDv7 minted while others share its millisecond carries an instant pushed forward to
         // keep the ordering, which can land ahead of the clock read here. Clamping the age at zero
         // keeps such a key from counting as not yet born, so a max age of zero still rotates.
-        return max(0, time() - $uid->getDateTime()->getTimestamp()) >= $this->maxAgeSeconds;
+        return max(0, ($this->clock?->now()->getTimestamp() ?? time()) - $uid->getDateTime()->getTimestamp()) >= $this->maxAgeSeconds;
     }
 
     private function clientFor(string $name): DataKeyGeneratorInterface

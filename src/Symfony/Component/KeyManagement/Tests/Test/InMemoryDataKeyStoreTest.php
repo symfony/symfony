@@ -13,6 +13,7 @@ namespace Symfony\Component\KeyManagement\Tests\Test;
 
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
@@ -102,6 +103,21 @@ class InMemoryDataKeyStoreTest extends TestCase
         $store = new InMemoryDataKeyStore(maxAgeSeconds: 3600);
 
         $this->assertSame($store->current('user.email')->reference, $store->current('user.email')->reference);
+    }
+
+    public function testTheClockDatesTheReferenceAndTellsWhenItRetires()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00');
+        $store = new InMemoryDataKeyStore([], 'default', 'app', 32, 3600, $clock);
+        $first = $store->current('user.email')->reference;
+
+        $this->assertSame($clock->now()->getTimestamp(), Uuid::fromBinary($first)->getDateTime()->getTimestamp());
+
+        $clock->sleep(3599);
+        $this->assertSame($first, $store->current('user.email')->reference);
+
+        $clock->sleep(1);
+        $this->assertNotSame($first, $store->current('user.email')->reference);
     }
 
     public function testAllListsInCreationOrder()

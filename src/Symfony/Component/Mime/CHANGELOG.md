@@ -13,6 +13,7 @@ CHANGELOG
  * Make `Email::ensureBodyValid()` protected
  * Make `FormDataPart` keep the encoding of parts created with an explicit `$encoding` instead of forcing `8bit`
  * Add argument `$encoding` to `DataPart::fromPath()`
+ * Use the global clock of symfony/clock, when installed, for the default `Date` header and for the timestamp of DKIM signatures
 
 8.0
 ---

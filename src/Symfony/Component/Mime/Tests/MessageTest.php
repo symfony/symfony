@@ -12,7 +12,12 @@
 namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
+use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Group;
@@ -34,6 +39,8 @@ use Symfony\Component\Serializer\Serializer;
 
 class MessageTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     public function testConstruct()
     {
         $m = new Message();
@@ -95,6 +102,33 @@ class MessageTest extends TestCase
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $message->getHeaders()->addMailboxListHeader('Bcc', ['fabien@symfony.com']);
         $this->assertNull($message->getPreparedHeaders()->get('Bcc'));
+    }
+
+    public function testGetPreparedHeadersDateFollowsTheClock()
+    {
+        $clock = self::mockTime('2005-10-15 12:34:56');
+
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
+
+        $this->assertEquals($clock->now(), $message->getPreparedHeaders()->get('Date')->getDateTime());
+    }
+
+    #[RunInSeparateProcess]
+    public function testGetPreparedHeadersDateFollowsClockMockWithoutTheClockComponent()
+    {
+        ClassExistsMock::register(Message::class);
+        ClassExistsMock::withMockedClasses([Clock::class => false]);
+        ClockMock::register(Message::class);
+        ClockMock::withClockMock(1129379696.25);
+        date_default_timezone_set('Europe/Paris');
+
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
+        $date = $message->getPreparedHeaders()->get('Date');
+
+        $this->assertSame('Sat, 15 Oct 2005 14:34:56 +0200', $date->getBodyAsString());
+        $this->assertSame('1129379696.250000', $date->getDateTime()->format('U.u'));
     }
 
     public function testGetPreparedHeadersWithNoFrom()

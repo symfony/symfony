@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime;
 
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
@@ -85,7 +86,7 @@ class Message extends RawMessage
         }
 
         if (!$headers->has('Date')) {
-            $headers->addDateHeader('Date', new \DateTimeImmutable());
+            $headers->addDateHeader('Date', class_exists(Clock::class) ? Clock::get()->now() : \DateTimeImmutable::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get())));
         }
 
         // determine the "real" sender

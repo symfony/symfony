@@ -12,19 +12,23 @@
 namespace Symfony\Component\Mime\Tests\Crypto;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 
 #[RequiresPhpExtension('openssl')]
-#[Group('time-sensitive')]
 class DkimSignerTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     private static string $pk = <<<EOF
         -----BEGIN RSA PRIVATE KEY-----
         MIICXAIBAAKBgQC6lQYNOMaboSOE/c2KNl8Rwk61zoMXrEmXC926an3/jHrtj9wB
@@ -46,7 +50,7 @@ class DkimSignerTest extends TestCase
     #[DataProvider('getSignData')]
     public function testSign(int $time, string $bodyCanon, string $headerCanon, string $header)
     {
-        ClockMock::withClockMock($time);
+        self::mockTime(new \DateTimeImmutable('@'.$time));
 
         $message = (new Email())
             ->from(new Address('fabien@testdkim.symfony.net', 'Fabién'))
@@ -88,6 +92,40 @@ class DkimSignerTest extends TestCase
             1591597612, DkimSigner::CANON_SIMPLE, DkimSigner::CANON_RELAXED,
             'v=1; q=dns/txt; a=rsa-sha256; bh=JC6qmm3afMaxL3Rm1YHxrzIpqiUuB7aAarWMcZfuca4=; d=testdkim.symfony.net; h=From: To: Subject: Date: MIME-Version; i=@testdkim.symfony.net; s=sf; t=1591597612; c=relaxed/simple; b=E+BszWWfYJfrWXk5uggwZJmLlh+4IeVScnJhqAj0G4h0dhqRZ0Qs1XNPSS0IZtPSTUgNxAeTi mc8jjVCnrROPnYnaomvgTdkxwRU5ZcA4felmGjcXODrdy9GUAokES6qjy4bVwBvaHxMgr00eP J3sJqBBwcg/HsO52ppJma/1HM=',
         ];
+    }
+
+    public function testSignatureExpirationFollowsTheClock()
+    {
+        self::mockTime(new \DateTimeImmutable('@1591597074'));
+
+        $message = (new Email())
+            ->from('fabien@testdkim.symfony.net')
+            ->to('fabien.potencier@gmail.com')
+            ->text('Some body');
+
+        $signer = new DkimSigner(self::$pk, 'testdkim.symfony.net', 'sf', ['signature_expiration_delay' => 3600]);
+        $signedMessage = $signer->sign($message);
+
+        $this->assertStringContainsString(' t=1591597074; c=relaxed/relaxed; x=1591600674; b=', $signedMessage->getHeaders()->get('DKIM-Signature')->getBody());
+    }
+
+    #[RunInSeparateProcess]
+    public function testSignatureTimeFollowsClockMockWithoutTheClockComponent()
+    {
+        ClassExistsMock::register(DkimSigner::class);
+        ClassExistsMock::withMockedClasses([Clock::class => false]);
+        ClockMock::register(DkimSigner::class);
+        ClockMock::withClockMock(1591597074);
+
+        $message = (new Email())
+            ->from('fabien@testdkim.symfony.net')
+            ->to('fabien.potencier@gmail.com')
+            ->text('Some body');
+
+        $signer = new DkimSigner(self::$pk, 'testdkim.symfony.net', 'sf', ['signature_expiration_delay' => 3600]);
+        $signedMessage = $signer->sign($message);
+
+        $this->assertStringContainsString(' t=1591597074; c=relaxed/relaxed; x=1591600674; b=', $signedMessage->getHeaders()->get('DKIM-Signature')->getBody());
     }
 
     public function testSignWithUnsupportedAlgorithm()

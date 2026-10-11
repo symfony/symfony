@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Crypto;
 
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
@@ -97,7 +98,7 @@ final class DkimSigner
             'h' => implode(': ', $signedHeaderNames),
             'i' => '@'.$this->domainName,
             's' => $this->selector,
-            't' => time(),
+            't' => class_exists(Clock::class) ? Clock::get()->now()->getTimestamp() : time(),
             'c' => $options['header_canon'].'/'.$options['body_canon'],
         ];
 

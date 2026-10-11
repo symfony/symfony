@@ -24,14 +24,21 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\InMemoryStore;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Message\RedispatchMessage;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Scheduler\Command\DebugCommand;
+use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Messenger\SchedulerTransport;
+use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\SchedulerBundle;
 use Symfony\Component\Scheduler\Tests\Fixtures\AttributeScheduleProvider;
 use Symfony\Component\Scheduler\Tests\Fixtures\AttributeTask;
+use Symfony\Component\Scheduler\Tests\Fixtures\AttributeTaskWithStamps;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\inline_service;
 
@@ -128,6 +135,30 @@ class SchedulerBundleTest extends TestCase
         $this->assertTrue($lock->acquire());
         $this->assertFalse($schedule->getLock()->acquire());
         $lock->release();
+    }
+
+    public function testTaskStampsAreDumpedWithTheContainer()
+    {
+        $kernel = new TestSchedulerKernel('test', true, $this->varDir);
+        $kernel->boot();
+
+        $messages = [];
+        foreach ($kernel->getContainer()->get('test.stamped_schedule')->getSchedule()->getRecurringMessages() as $recurringMessage) {
+            $context = new MessageContext('stamped', $recurringMessage->getId(), $recurringMessage->getTrigger(), new \DateTimeImmutable());
+            array_push($messages, ...$recurringMessage->getMessages($context));
+        }
+
+        [$envelope, $redispatchMessage] = $messages;
+
+        $this->assertInstanceOf(Envelope::class, $envelope);
+        $this->assertInstanceOf(ServiceCallMessage::class, $envelope->getMessage());
+        $this->assertInstanceOf(DispatchAfterCurrentBusStamp::class, $envelope->last(DispatchAfterCurrentBusStamp::class));
+        $this->assertSame(5000, $envelope->last(DelayStamp::class)->getDelay());
+
+        $this->assertInstanceOf(RedispatchMessage::class, $redispatchMessage);
+        $this->assertSame('async', $redispatchMessage->transportNames);
+        $this->assertInstanceOf(ServiceCallMessage::class, $redispatchMessage->envelope->getMessage());
+        $this->assertSame(7000, $redispatchMessage->envelope->last(DelayStamp::class)->getDelay());
     }
 
     public function testServicesAreDroppedWhenMessengerIsNotAvailable()
@@ -234,6 +265,7 @@ class TestSchedulerKernel extends AbstractKernel
             ->set('cache.app', ArrayAdapter::class)
             ->set(AttributeScheduleProvider::class)->autoconfigure()
             ->set(AttributeTask::class)->autoconfigure()
+            ->set(AttributeTaskWithStamps::class)->autoconfigure()
             ->alias('test.attributes_transport', 'messenger.transport.scheduler_attributes')->public()
             ->alias('test.default_transport', 'messenger.transport.scheduler_default')->public()
             ->alias('test.debug_command', 'console.command.scheduler_debug')->public()
@@ -241,6 +273,7 @@ class TestSchedulerKernel extends AbstractKernel
             ->alias('test.lock_factory', 'lock.factory')->public()
             ->alias('test.default_schedule', 'scheduler.provider.default')->public()
             ->alias('test.attributes_schedule', AttributeScheduleProvider::class)->public()
+            ->alias('test.stamped_schedule', 'scheduler.provider.stamped')->public()
         ;
     }
 }

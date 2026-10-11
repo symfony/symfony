@@ -9,6 +9,7 @@ CHANGELOG
  * Add `SchedulerBundle`, which provides the `scheduler` configuration and the services previously provided by `FrameworkBundle` under `framework.scheduler`
  * Add a "Next Run In" column to `debug:scheduler` showing the time until the next run
  * Add `env` option to `#[AsCronTask]` and `#[AsPeriodicTask]` to restrict a task to one or more environments
+ * Add `stamps` option to `#[AsCronTask]` and `#[AsPeriodicTask]` to add Messenger stamps to the message scheduling the task
  * Deprecate `Schedule::with()`, use `add()` on a new `Schedule` instead
  * Add the `scheduler.use_messenger_routing` option and the `$useMessengerRouting` argument of `SchedulerTransport` and `SchedulerTransportFactory`, to send scheduled messages through the Messenger senders configured for their class
  * Deprecate not setting the `scheduler.use_messenger_routing` option, it will default to `true` in 9.0

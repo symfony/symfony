@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpFoundation\UrlHelper;
+use Twig\Attribute\AsTwigFilter;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -53,6 +55,7 @@ final class HttpFoundationExtension extends AbstractExtension
      *
      * @see Request::getUriForPath()
      */
+    #[AsTwigFunction('absolute_url')]
     public function generateAbsoluteUrl(string $path): string
     {
         return $this->urlHelper->getAbsoluteUrl($path);
@@ -65,6 +68,7 @@ final class HttpFoundationExtension extends AbstractExtension
      *
      * @see Request::getRelativeUriForPath()
      */
+    #[AsTwigFunction('relative_path')]
     public function generateRelativePath(string $path): string
     {
         return $this->urlHelper->getRelativePath($path);
@@ -75,6 +79,7 @@ final class HttpFoundationExtension extends AbstractExtension
      *
      * @see UriSigner::sign()
      */
+    #[AsTwigFilter('sign_url')]
     public function signUrl(string $url, \DateTimeInterface|\DateInterval|int|null $expiration = null): string
     {
         if (null === $this->uriSigner) {

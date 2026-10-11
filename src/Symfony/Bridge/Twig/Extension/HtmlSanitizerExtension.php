@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Psr\Container\ContainerInterface;
+use Twig\Attribute\AsTwigFilter;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -33,6 +34,7 @@ final class HtmlSanitizerExtension extends AbstractExtension
         ];
     }
 
+    #[AsTwigFilter('sanitize_html', isSafe: ['html'])]
     public function sanitize(string $html, ?string $sanitizer = null): string
     {
         return $this->sanitizers->get($sanitizer ?? $this->defaultSanitizer)->sanitize($html);

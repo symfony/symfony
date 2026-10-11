@@ -14,11 +14,9 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Twig\Attribute\AsTwigFilter;
 use Twig\Attribute\AsTwigFunction;
 use Twig\Attribute\AsTwigTest;
-use Twig\Extension\AbstractExtension;
 use Twig\Extension\AttributeExtension;
 use Twig\Extension\ExtensionInterface;
 
@@ -36,15 +34,10 @@ final class AttributeExtensionPass implements CompilerPassInterface
 
     public static function autoconfigureFromAttribute(ChildDefinition $definition, AsTwigFilter|AsTwigFunction|AsTwigTest $attribute, \ReflectionMethod $reflector): void
     {
-        $class = $reflector->getDeclaringClass();
-        if ($class->implementsInterface(ExtensionInterface::class)) {
-            if ($class->isSubclassOf(AbstractExtension::class)) {
-                throw new LogicException(\sprintf('The class "%s" cannot extend "%s" and use the "#[%s]" attribute on method "%s()", choose one or the other.', $class->name, AbstractExtension::class, $attribute::class, $reflector->name));
-            }
-            throw new LogicException(\sprintf('The class "%s" cannot implement "%s" and use the "#[%s]" attribute on method "%s()", choose one or the other.', $class->name, ExtensionInterface::class, $attribute::class, $reflector->name));
+        // An extension gets the "twig.extension" tag from its interface, and LazyExtensionPass reads its attributes
+        if (!$reflector->getDeclaringClass()->implementsInterface(ExtensionInterface::class)) {
+            $definition->addTag(self::TAG);
         }
-
-        $definition->addTag(self::TAG);
 
         // The service must be tagged as a runtime to call non-static methods
         if (!$reflector->isStatic()) {

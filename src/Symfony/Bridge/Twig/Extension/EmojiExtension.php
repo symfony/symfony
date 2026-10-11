@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Emoji\EmojiTransliterator;
+use Twig\Attribute\AsTwigFilter;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -40,6 +41,7 @@ final class EmojiExtension extends AbstractExtension
     /**
      * Converts emoji short code (:wave:) to real emoji (👋).
      */
+    #[AsTwigFilter('emojify')]
     public function emojify(string $string, ?string $catalog = null): string
     {
         $catalog ??= $this->defaultCatalog;

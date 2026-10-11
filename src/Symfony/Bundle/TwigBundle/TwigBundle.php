@@ -39,7 +39,7 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new TwigEnvironmentPass());
         $container->addCompilerPass(new TwigLoaderPass());
         $container->addCompilerPass(new SafeClassPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new LazyExtensionPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 }

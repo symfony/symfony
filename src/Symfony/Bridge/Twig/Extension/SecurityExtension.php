@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterf
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -40,6 +41,7 @@ final class SecurityExtension extends AbstractExtension
     ) {
     }
 
+    #[AsTwigFunction('is_granted')]
     public function isGranted(mixed $role, mixed $object = null, ?string $field = null, ?AccessDecision $accessDecision = null): bool
     {
         if (null === $this->securityChecker) {
@@ -61,6 +63,7 @@ final class SecurityExtension extends AbstractExtension
         }
     }
 
+    #[AsTwigFunction('access_decision')]
     public function getAccessDecision(mixed $role, mixed $object = null, ?string $field = null): AccessDecision
     {
         if (!class_exists(AccessDecision::class)) {
@@ -73,6 +76,7 @@ final class SecurityExtension extends AbstractExtension
         return $accessDecision;
     }
 
+    #[AsTwigFunction('is_granted_for_user')]
     public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?string $field = null, ?AccessDecision $accessDecision = null): bool
     {
         if (null === $this->securityChecker) {
@@ -102,6 +106,7 @@ final class SecurityExtension extends AbstractExtension
         }
     }
 
+    #[AsTwigFunction('access_decision_for_user')]
     public function getAccessDecisionForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?string $field = null): AccessDecision
     {
         if (!class_exists(AccessDecision::class)) {
@@ -114,6 +119,7 @@ final class SecurityExtension extends AbstractExtension
         return $accessDecision;
     }
 
+    #[AsTwigFunction('impersonation_exit_url')]
     public function getImpersonateExitUrl(?string $exitTo = null): string
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -123,6 +129,7 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateExitUrl($exitTo);
     }
 
+    #[AsTwigFunction('impersonation_exit_path')]
     public function getImpersonateExitPath(?string $exitTo = null): string
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -132,6 +139,7 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateExitPath($exitTo);
     }
 
+    #[AsTwigFunction('impersonation_url')]
     public function getImpersonateUrl(string $identifier, ?string $targetUri = null): string
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -141,6 +149,7 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateImpersonationUrl($identifier, $targetUri);
     }
 
+    #[AsTwigFunction('impersonation_path')]
     public function getImpersonatePath(string $identifier, ?string $targetUri = null): string
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -155,6 +164,7 @@ final class SecurityExtension extends AbstractExtension
      *
      * @return array{action: string, fields: array<string, string>, csrf_field: string|null}
      */
+    #[AsTwigFunction('impersonation_form')]
     public function getImpersonateForm(string $identifier, ?string $targetUri = null): array
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -169,6 +179,7 @@ final class SecurityExtension extends AbstractExtension
      *
      * @return array{action: string, fields: array<string, string>, csrf_field: string|null}
      */
+    #[AsTwigFunction('impersonation_exit_form')]
     public function getImpersonateExitForm(?string $targetUri = null): array
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -185,6 +196,7 @@ final class SecurityExtension extends AbstractExtension
      * @param array<string, mixed> $attr     The HTML attributes of the button
      * @param array<string, mixed> $formAttr The HTML attributes of the form
      */
+    #[AsTwigFunction('impersonation_button', isSafe: ['html'])]
     public function renderImpersonateButton(Environment $env, string|\Stringable $label, string $identifier, ?string $targetUri = null, array $attr = [], array $formAttr = []): string
     {
         return PostFormRenderer::render($env, $this->getImpersonateForm($identifier, $targetUri), $label, $attr, $formAttr, $this->csrfFieldAttr);
@@ -197,6 +209,7 @@ final class SecurityExtension extends AbstractExtension
      * @param array<string, mixed> $attr     The HTML attributes of the button
      * @param array<string, mixed> $formAttr The HTML attributes of the form
      */
+    #[AsTwigFunction('impersonation_exit_button', isSafe: ['html'])]
     public function renderImpersonateExitButton(Environment $env, string|\Stringable $label = 'Exit impersonation', ?string $targetUri = null, array $attr = [], array $formAttr = []): string
     {
         return PostFormRenderer::render($env, $this->getImpersonateExitForm($targetUri), $label, $attr, $formAttr, $this->csrfFieldAttr);

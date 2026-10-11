@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
@@ -33,16 +34,18 @@ final class RoutingExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('url', $this->getUrl(...), ['is_safe_callback' => $this->isUrlGenerationSafe(...)]),
-            new TwigFunction('path', $this->getPath(...), ['is_safe_callback' => $this->isUrlGenerationSafe(...)]),
+            new TwigFunction('url', $this->getUrl(...), ['is_safe_callback' => self::isUrlGenerationSafe(...)]),
+            new TwigFunction('path', $this->getPath(...), ['is_safe_callback' => self::isUrlGenerationSafe(...)]),
         ];
     }
 
+    #[AsTwigFunction('path', isSafeCallback: [self::class, 'isUrlGenerationSafe'])]
     public function getPath(string $name, array $parameters = [], bool $relative = false): string
     {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
+    #[AsTwigFunction('url', isSafeCallback: [self::class, 'isUrlGenerationSafe'])]
     public function getUrl(string $name, array $parameters = [], bool $schemeRelative = false): string
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
@@ -70,7 +73,7 @@ final class RoutingExtension extends AbstractExtension
      *
      * @return array An array with the contexts the URL is safe
      */
-    public function isUrlGenerationSafe(Node $argsNode): array
+    public static function isUrlGenerationSafe(Node $argsNode): array
     {
         // support named arguments
         $paramsNode = $argsNode->hasNode('parameters') ? $argsNode->getNode('parameters') : (

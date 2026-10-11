@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -29,6 +30,7 @@ final class ExpressionExtension extends AbstractExtension
         ];
     }
 
+    #[AsTwigFunction('expression')]
     public function createExpression(string $expression): Expression
     {
         return new Expression($expression);

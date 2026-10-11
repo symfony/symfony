@@ -12,17 +12,21 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
+use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
-use Symfony\Bridge\Twig\Extension\YamlExtension;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\LazyExtensionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpFoundation\UrlHelper;
+use Symfony\Component\Translation\IdentityTranslator;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\AttributeExtension;
+use Twig\Extension\GlobalsInterface;
+use Twig\Loader\ArrayLoader;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
 
 class LazyExtensionPassTest extends TestCase
 {
@@ -35,13 +39,13 @@ class LazyExtensionPassTest extends TestCase
             ->addMethodCall('addExtension', [new Reference('inline_dependency')])
             ->addMethodCall('addExtension', [new Reference('setter_dependency')])
             ->addMethodCall('addGlobal', ['app', new Reference('app')]);
-        $container->register('extension', RoutingExtension::class)
-            ->addArgument(new Reference('router'));
-        $container->register('other_extension', RoutingExtension::class)
-            ->addArgument(new Reference('router'));
+        $container->register('extension', TranslationExtension::class)
+            ->addArgument(new Reference('translator'));
+        $container->register('other_extension', TranslationExtension::class)
+            ->addArgument(new Reference('translator'));
         $container->setAlias('aliased_extension', 'other_extension');
-        $container->register('inline_dependency', HttpFoundationExtension::class)
-            ->addArgument(new Definition(UrlHelper::class, [new Reference('request_stack')]));
+        $container->register('inline_dependency', TranslationExtension::class)
+            ->addArgument(new Definition(IdentityTranslator::class));
         $container->register('setter_dependency', ExtensionWithSetter::class)
             ->addMethodCall('setDependency', [new Reference('router')]);
         $container->register('app', \stdClass::class)
@@ -62,7 +66,7 @@ class LazyExtensionPassTest extends TestCase
         $container->register('twig', Environment::class)
             ->addMethodCall('addExtension', [new Reference('no_argument')])
             ->addMethodCall('addExtension', [new Reference('attribute')]);
-        $container->register('no_argument', YamlExtension::class);
+        $container->register('no_argument', CsrfExtension::class);
         $container->register('attribute', AttributeExtension::class)
             ->addArgument(\stdClass::class);
 
@@ -77,8 +81,8 @@ class LazyExtensionPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('twig', Environment::class)
             ->addMethodCall('addExtension', [new Reference('extension')]);
-        $container->register('extension', RoutingExtension::class)
-            ->addArgument(new Reference('router'))
+        $container->register('extension', TranslationExtension::class)
+            ->addArgument(new Reference('translator'))
             ->setLazy(false);
 
         (new LazyExtensionPass())->process($container);
@@ -93,9 +97,9 @@ class LazyExtensionPassTest extends TestCase
             ->addMethodCall('addExtension', [new Reference('factory')])
             ->addMethodCall('addExtension', [new Reference('internal_parent')])
             ->addMethodCall('addExtension', [new Reference('unknown_class')]);
-        $container->register('factory', RoutingExtension::class)
+        $container->register('factory', TranslationExtension::class)
             ->setFactory([new Reference('extension_factory'), 'create'])
-            ->addArgument(new Reference('router'));
+            ->addArgument(new Reference('translator'));
         $container->register('internal_parent', ExtensionWithInternalParent::class)
             ->addArgument(new Reference('router'));
         $container->register('unknown_class', 'Foo\Bar')
@@ -107,6 +111,87 @@ class LazyExtensionPassTest extends TestCase
         $this->assertFalse($container->getDefinition('internal_parent')->isLazy());
         $this->assertFalse($container->getDefinition('unknown_class')->isLazy());
     }
+
+    public function testExtensionsDeclaringOnlyAttributeCallablesAreRegisteredAsRuntimes()
+    {
+        if (!self::twigReturnsRuntimeExtensions()) {
+            $this->markTestSkipped('This version of Twig does not return the runtime of an extension registered through AttributeExtension.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register('twig', Environment::class)
+            ->addMethodCall('addExtension', [new Reference('extension')]);
+        $container->register('extension', RoutingExtension::class)
+            ->addArgument(new Reference('router'));
+
+        (new LazyExtensionPass())->process($container);
+
+        $this->assertEquals([['addExtension', [new Definition(AttributeExtension::class, [RoutingExtension::class])]]], $container->getDefinition('twig')->getMethodCalls());
+        $this->assertTrue($container->getDefinition('extension')->hasTag('twig.runtime'));
+        $this->assertFalse($container->getDefinition('extension')->isLazy());
+    }
+
+    public function testExtensionsDeclaringOnlyAttributeCallablesAreMadeLazyOnOlderTwigVersions()
+    {
+        if (self::twigReturnsRuntimeExtensions()) {
+            $this->markTestSkipped('This version of Twig returns the runtime of an extension registered through AttributeExtension.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register('twig', Environment::class)
+            ->addMethodCall('addExtension', [new Reference('extension')]);
+        $container->register('extension', RoutingExtension::class)
+            ->addArgument(new Reference('router'));
+
+        (new LazyExtensionPass())->process($container);
+
+        $this->assertEquals([['addExtension', [new Reference('extension')]]], $container->getDefinition('twig')->getMethodCalls());
+        $this->assertFalse($container->getDefinition('extension')->hasTag('twig.runtime'));
+        $this->assertTrue($container->getDefinition('extension')->isLazy());
+    }
+
+    public function testExtensionsDeclaringCallablesOnlyWithAttributesAreRegisteredAsRuntimesWithAnyTwigVersion()
+    {
+        $container = new ContainerBuilder();
+        $container->register('twig', Environment::class)
+            ->addMethodCall('addExtension', [new Reference('extension')]);
+        $container->register('extension', AttributeOnlyExtension::class)
+            ->addArgument(new Reference('router'));
+
+        (new LazyExtensionPass())->process($container);
+
+        $this->assertEquals([['addExtension', [new Definition(AttributeExtension::class, [AttributeOnlyExtension::class])]]], $container->getDefinition('twig')->getMethodCalls());
+        $this->assertTrue($container->getDefinition('extension')->hasTag('twig.runtime'));
+        $this->assertFalse($container->getDefinition('extension')->isLazy());
+    }
+
+    public function testExtensionsProvidingMoreThanAttributeCallablesAreMadeLazy()
+    {
+        $container = new ContainerBuilder();
+        $container->register('twig', Environment::class)
+            ->addMethodCall('addExtension', [new Reference('token_parsers')])
+            ->addMethodCall('addExtension', [new Reference('globals')]);
+        $container->register('token_parsers', AttributeExtensionWithTokenParsers::class)
+            ->addArgument(new Reference('router'));
+        $container->register('globals', AttributeExtensionWithGlobals::class)
+            ->addArgument(new Reference('router'));
+
+        (new LazyExtensionPass())->process($container);
+
+        $this->assertEquals([['addExtension', [new Reference('token_parsers')]], ['addExtension', [new Reference('globals')]]], $container->getDefinition('twig')->getMethodCalls());
+        $this->assertTrue($container->getDefinition('token_parsers')->isLazy());
+        $this->assertTrue($container->getDefinition('globals')->isLazy());
+    }
+
+    private static function twigReturnsRuntimeExtensions(): bool
+    {
+        $extension = new class extends AbstractExtension {};
+        $twig = new Environment(new ArrayLoader());
+        $twig->addExtension(new AttributeExtension($extension::class));
+        $twig->addRuntimeLoader(new FactoryRuntimeLoader([$extension::class => static fn () => $extension]));
+
+        return $extension === $twig->getExtension($extension::class);
+    }
 }
 
 class ExtensionWithInternalParent extends \ArrayObject
@@ -117,5 +202,54 @@ class ExtensionWithSetter extends AbstractExtension
 {
     public function setDependency(object $dependency): void
     {
+    }
+}
+
+class AttributeExtensionWithTokenParsers extends AbstractExtension
+{
+    public function __construct(object $dependency)
+    {
+    }
+
+    public function getTokenParsers(): array
+    {
+        return [];
+    }
+
+    #[AsTwigFunction('foo')]
+    public function foo(): string
+    {
+        return 'foo';
+    }
+}
+
+class AttributeExtensionWithGlobals extends AbstractExtension implements GlobalsInterface
+{
+    public function __construct(object $dependency)
+    {
+    }
+
+    public function getGlobals(): array
+    {
+        return [];
+    }
+
+    #[AsTwigFunction('bar')]
+    public function bar(): string
+    {
+        return 'bar';
+    }
+}
+
+class AttributeOnlyExtension extends AbstractExtension
+{
+    public function __construct(object $dependency)
+    {
+    }
+
+    #[AsTwigFunction('baz')]
+    public function baz(): string
+    {
+        return 'baz';
     }
 }

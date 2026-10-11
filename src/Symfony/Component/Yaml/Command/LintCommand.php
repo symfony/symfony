@@ -184,7 +184,8 @@ class LintCommand extends Command
         });
 
         try {
-            $data = $this->getParser()->parse($content, Yaml::PARSE_CONSTANT | $flags);
+            // Mappings are parsed as objects for the schema, so that an empty one is not mistaken for an empty sequence.
+            $data = $this->getParser()->parse($content, Yaml::PARSE_CONSTANT | $flags | ($this->checkSchema ? Yaml::PARSE_OBJECT_FOR_MAP : 0));
         } catch (ParseException $e) {
             return ['file' => $file, 'line' => $e->getParsedLine(), 'valid' => false, 'message' => $e->getMessage()];
         } finally {

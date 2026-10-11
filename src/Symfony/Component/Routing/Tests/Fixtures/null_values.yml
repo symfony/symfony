@@ -1,0 +1,34 @@
+route_with_null_values:
+    path: /foo
+    controller: ~
+    methods: ~
+    requirements: ~
+    defaults: ~
+    options: ~
+    host: ~
+    schemes: ~
+    condition: ~
+    locale: ~
+    format: ~
+    utf8: ~
+    stateless: ~
+
+import_with_null_values:
+    resource: validpattern.yml
+    type: ~
+    prefix: ~
+    name_prefix: ~
+    controller: ~
+    methods: ~
+    requirements: ~
+    defaults: ~
+    options: ~
+    host: ~
+    schemes: ~
+    condition: ~
+    trailing_slash_on_root: ~
+    locale: ~
+    format: ~
+    utf8: ~
+    exclude: ~
+    stateless: ~

@@ -1,0 +1,7 @@
+route:
+  path: /hello
+deprecated:
+  alias: route
+  deprecated:
+    package: "foo/bar"
+    version: 1.2

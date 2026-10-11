@@ -13,10 +13,13 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle\Security\UserChangingUserProvider;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Security\Http\RememberMe\PersistentRememberMeHandler;
 
 class RememberMeTest extends AbstractWebTestCase
 {
+    use ClockSensitiveTrait;
+
     protected function setUp(): void
     {
         UserChangingUserProvider::$changePassword = false;
@@ -133,6 +136,27 @@ class RememberMeTest extends AbstractWebTestCase
         $client->request('GET', '/logout');
         $this->assertSame(302, $client->getResponse()->getStatusCode(), 'Logout unsuccessful.');
         $this->assertNull($cookieJar->get('REMEMBERME'));
+    }
+
+    public function testRememberMeCookieExpiresWithTheClock()
+    {
+        self::mockTime('2100-01-01 00:00:00 UTC');
+        $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => ['config.yml', 'config_session.yml']]);
+        $client->request('POST', '/login', [
+            '_username' => 'johannes',
+            '_password' => 'test',
+        ]);
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+
+        $client->getCookieJar()->expire('MOCKSESSID');
+        $client->request('GET', '/profile');
+        $this->assertSame('johannes', $client->getResponse()->getContent());
+
+        self::mockTime('+1 year +1 day');
+
+        $client->getCookieJar()->expire('MOCKSESSID');
+        $client->request('GET', '/profile');
+        $this->assertRedirect($client->getResponse(), '/login');
     }
 
     public static function provideConfigs(): iterable

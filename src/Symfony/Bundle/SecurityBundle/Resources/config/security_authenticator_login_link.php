@@ -39,6 +39,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('user provider'),
                 abstract_arg('signature hasher'),
                 abstract_arg('options'),
+                service('clock')->nullOnInvalid(),
             ])
 
         ->set('security.authenticator.abstract_login_link_signature_hasher', SignatureHasher::class)
@@ -48,6 +49,7 @@ return static function (ContainerConfigurator $container) {
                 new Parameter('kernel.secret'),
                 abstract_arg('expired signature storage'),
                 abstract_arg('max signature uses'),
+                service('clock')->nullOnInvalid(),
             ])
 
         ->set('security.authenticator.expired_login_link_storage', ExpiredSignatureStorage::class)

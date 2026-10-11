@@ -16,7 +16,9 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -502,6 +504,26 @@ class LoginLinkHandlerTest extends TestCase
         $this->createLinker()->createLoginLink($user, null, null, ['ref' => new \stdClass()]);
     }
 
+    public function testLoginLinkExpiresWithTheClock()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00 UTC');
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->createUser($user);
+        $this->router = $this->createStub(UrlGeneratorInterface::class);
+        $this->router->method('generate')->willReturnCallback(static fn (string $name, array $parameters) => '/login/verify?'.http_build_query($parameters));
+        $linker = $this->createLinker([], ['emailProperty', 'passwordProperty'], $clock);
+
+        $loginLink = $linker->createLoginLink($user);
+
+        $this->assertEquals(new \DateTimeImmutable('2020-01-01 00:10:00 UTC'), $loginLink->getExpiresAt());
+        $this->assertEquals($user, $linker->consumeLoginLink(Request::create($loginLink->getUrl())));
+
+        $clock->sleep(601);
+
+        $this->expectException(ExpiredLoginLinkException::class);
+        $linker->consumeLoginLink(Request::create($loginLink->getUrl()));
+    }
+
     private function createSignatureHash(string $username, int $expires, array $extraFields = ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], array $parameters = []): string
     {
         $hasher = new SignatureHasher($this->propertyAccessor, array_keys($extraFields), 's3cret');
@@ -510,14 +532,14 @@ class LoginLinkHandlerTest extends TestCase
         return $hasher->computeSignatureHash($user, $expires, $parameters);
     }
 
-    private function createLinker(array $options = [], array $extraProperties = ['emailProperty', 'passwordProperty']): LoginLinkHandler
+    private function createLinker(array $options = [], array $extraProperties = ['emailProperty', 'passwordProperty'], ?ClockInterface $clock = null): LoginLinkHandler
     {
         $options = array_merge([
             'lifetime' => 600,
             'route_name' => 'app_check_login_link_route',
         ], $options);
 
-        return new LoginLinkHandler($this->router ?? $this->createStub(UrlGeneratorInterface::class), $this->userProvider, new SignatureHasher($this->propertyAccessor, $extraProperties, 's3cret', $this->expiredLinkStorage, $options['max_uses'] ?? null), $options);
+        return new LoginLinkHandler($this->router ?? $this->createStub(UrlGeneratorInterface::class), $this->userProvider, new SignatureHasher($this->propertyAccessor, $extraProperties, 's3cret', $this->expiredLinkStorage, $options['max_uses'] ?? null, $clock), $options, $clock);
     }
 }
 

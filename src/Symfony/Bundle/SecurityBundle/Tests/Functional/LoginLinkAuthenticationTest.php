@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -21,6 +22,8 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
  */
 class LoginLinkAuthenticationTest extends AbstractWebTestCase
 {
+    use ClockSensitiveTrait;
+
     public function testLoginLinkSuccess()
     {
         $client = $this->createClient(['test_case' => 'LoginLink', 'root_config' => 'config.yml', 'debug' => true]);
@@ -49,5 +52,22 @@ class LoginLinkAuthenticationTest extends AbstractWebTestCase
         $client->request('GET', $loginLink->getUrl());
         $response = $client->getResponse();
         $this->assertSame(302, $response->getStatusCode(), 'Should redirect with an error because max uses are only 2');
+    }
+
+    public function testLoginLinkExpiresWithTheClock()
+    {
+        self::mockTime('2100-01-01 00:00:00 UTC');
+        $client = $this->createClient(['test_case' => 'LoginLink', 'root_config' => 'config.yml']);
+
+        self::getContainer()->get(RequestStack::class)->push(Request::create('/get-login-link'));
+        $loginLink = self::getContainer()->get(LoginLinkHandlerInterface::class)->createLoginLink(new InMemoryUser('weaverryan', 'foo'));
+
+        $client->request('GET', $loginLink->getUrl());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        self::mockTime('+11 minutes');
+
+        $client->request('GET', $loginLink->getUrl());
+        $this->assertRedirect($client->getResponse(), '/login');
     }
 }

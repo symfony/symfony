@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\LoginLink;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -38,6 +39,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         private UserProviderInterface $userProvider,
         private SignatureHasher $signatureHasher,
         array $options,
+        private ?ClockInterface $clock = null,
     ) {
         $this->options = array_merge([
             'route_name' => null,
@@ -60,8 +62,8 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             }
         }
 
-        $expires = time() + ($lifetime ?: $this->options['lifetime']);
-        $expiresAt = new \DateTimeImmutable('@'.$expires);
+        $expires = ($this->clock?->now()->getTimestamp() ?? time()) + ($lifetime ?: $this->options['lifetime']);
+        $expiresAt = \DateTimeImmutable::createFromTimestamp($expires);
 
         if ($parameters) {
             ksort($parameters);

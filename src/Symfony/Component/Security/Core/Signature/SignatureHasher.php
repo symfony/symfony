@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Signature;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
@@ -39,6 +40,7 @@ class SignatureHasher
         #[\SensitiveParameter] string|array $secret,
         private ?ExpiredSignatureStorage $expiredSignaturesStorage = null,
         private ?int $maxUses = null,
+        private ?ClockInterface $clock = null,
     ) {
         $this->secrets = \is_array($secret) ? array_values($secret) : [$secret];
 
@@ -63,7 +65,7 @@ class SignatureHasher
     {
         $parameters = 3 < \func_num_args() ? func_get_arg(3) : [];
 
-        if ($expires < time()) {
+        if ($expires < ($this->clock?->now()->getTimestamp() ?? time())) {
             throw new ExpiredSignatureException('Signature has expired.');
         }
 
@@ -86,7 +88,7 @@ class SignatureHasher
     {
         $parameters = 3 < \func_num_args() ? func_get_arg(3) : [];
 
-        if ($expires < time()) {
+        if ($expires < ($this->clock?->now()->getTimestamp() ?? time())) {
             throw new ExpiredSignatureException('Signature has expired.');
         }
 

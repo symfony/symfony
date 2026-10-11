@@ -34,6 +34,7 @@ return static function (ContainerConfigurator $container) {
                 new Parameter('kernel.secret'),
                 null,
                 null,
+                service('clock')->nullOnInvalid(),
             ])
 
         ->set('security.authenticator.signature_remember_me_handler', SignatureRememberMeHandler::class)
@@ -45,6 +46,7 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 abstract_arg('options'),
                 service('logger')->nullOnInvalid(),
+                service('clock')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

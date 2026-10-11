@@ -20,6 +20,7 @@ CHANGELOG
  * Add `GuestAuthorizationCheckerInterface` and allow passing a null user to `AuthorizationChecker::isGrantedForUser()` to check guest permissions
  * Add a `current_user()` function to `ExpressionLanguageProvider` and optional authorization checker, token storage and request stack arguments to its constructor
  * Accept a list of secrets in `SignatureHasher::__construct()` to rotate them
+ * Add argument `$clock` to `SignatureHasher::__construct()`
 
 8.1
 ---

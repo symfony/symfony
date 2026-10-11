@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -101,5 +102,27 @@ class SignatureRememberMeHandlerTest extends TestCase
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('The cookie has expired.');
         $this->handler->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, $signature));
+    }
+
+    public function testRememberMeCookieExpiresWithTheClock()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00 UTC');
+        $handler = new SignatureRememberMeHandler(new SignatureHasher(PropertyAccess::createPropertyAccessor(), [], 's3cret', null, null, $clock), $this->userProvider, $this->requestStack, ['lifetime' => 3600], null, $clock);
+        $this->userProvider->createUser(new InMemoryUser('wouter', null));
+
+        $handler->createRememberMeCookie(new InMemoryUser('wouter', null));
+
+        /** @var Cookie $cookie */
+        $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
+        $this->assertSame(strtotime('2020-01-01 01:00:00 UTC'), $cookie->getExpiresTime());
+
+        $rememberMeDetails = RememberMeDetails::fromRawCookie($cookie->getValue());
+        $handler->consumeRememberMeCookie($rememberMeDetails);
+
+        $clock->sleep(3601);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The cookie has expired.');
+        $handler->consumeRememberMeCookie($rememberMeDetails);
     }
 }

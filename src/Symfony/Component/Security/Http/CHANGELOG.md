@@ -50,6 +50,7 @@ CHANGELOG
  * Allow keying the clients passed to `OidcTokenHandler::enableDiscovery()` by the issuer their discovery document must announce
  * Add the `$limiterName` argument to `LoginThrottlingListener`, which dispatches `RateLimitExceededEvent` when login throttling rejects an attempt
  * Add `#[FirewallListenerOrder]` to declare the firewall listeners a listener runs before or after
+ * Add argument `$clock` to `LoginLinkHandler::__construct()` and `SignatureRememberMeHandler::__construct()`, and make `LoginLinkNotification` use the global clock
 
 8.1
 ---

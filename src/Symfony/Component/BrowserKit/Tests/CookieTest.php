@@ -64,6 +64,125 @@ class CookieTest extends TestCase
         $this->assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
     }
 
+    public function testFromStringInBrowserCompatibleMode()
+    {
+        $before = time();
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; Max-Age=60; secure', 'http://example.com/foo/bar');
+
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHostOnly());
+        $this->assertSame(60, $cookie->getMaxAge());
+        $this->assertSame('/foo', $cookie->getPath());
+        $this->assertGreaterThanOrEqual($before + 60, (int) $cookie->getExpiresTime());
+        $this->assertLessThanOrEqual(time() + 60, (int) $cookie->getExpiresTime());
+        $this->assertSame('foo=bar; expires='.gmdate('D, d M Y H:i:s T', (int) $cookie->getExpiresTime()).'; max-age=60; path=/foo; secure', (string) $cookie);
+    }
+
+    public function testFromStringInBrowserCompatibleModeUsesDomainAndPathAttributes()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Domain=.Example.COM; Path=relative', 'https://www.example.com/foo/bar');
+
+        $this->assertFalse($cookie->isHostOnly());
+        $this->assertSame('example.com', $cookie->getDomain());
+        $this->assertSame('/foo', $cookie->getPath());
+        $this->assertSame('foo=bar; domain=example.com; path=/foo', (string) $cookie);
+    }
+
+    public function testFromStringInBrowserCompatibleModeTrimsAttributeNamesAndValues()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Domain = .Example.COM; Path = /account; Max-Age = 60', 'https://www.example.com/');
+
+        $this->assertSame('example.com', $cookie->getDomain());
+        $this->assertSame('/account', $cookie->getPath());
+        $this->assertSame(60, $cookie->getMaxAge());
+    }
+
+    public function testFromStringInBrowserCompatibleModeTrimsOnlyRfc6265Whitespace()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible("\tfoo\t=\t\x0Bbar\x0B\t; \tPath\t=\t/p\t", 'https://example.com/');
+
+        $this->assertSame('foo', $cookie->getName());
+        $this->assertSame("\x0Bbar\x0B", $cookie->getRawValue());
+        $this->assertSame('/p', $cookie->getPath());
+    }
+
+    public function testFromStringInBrowserCompatibleModeExpiresNonPositiveMaxAge()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; expires=Fri, 20 May 2099 15:25:52 GMT; Max-Age=0', 'https://example.com/');
+
+        $this->assertSame(0, $cookie->getMaxAge());
+        $this->assertTrue($cookie->isExpired());
+    }
+
+    public function testFromStringInBrowserCompatibleModeParsesLeadingZeroMaxAge()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Max-Age=00060', 'https://example.com/');
+
+        $this->assertSame(60, $cookie->getMaxAge());
+    }
+
+    public function testFromStringInBrowserCompatibleModeClampsMaxAgeOverflow()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Max-Age='.\PHP_INT_MAX, 'https://example.com/');
+
+        $this->assertSame((string) \PHP_INT_MAX, $cookie->getExpiresTime());
+    }
+
+    public function testFromStringInBrowserCompatibleModeIgnoresInvalidMaxAge()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Max-Age=60; Max-Age=1.5', 'https://example.com/');
+
+        $this->assertSame(60, $cookie->getMaxAge());
+    }
+
+    #[DataProvider('provideBrowserCompatibleNumericExpires')]
+    public function testFromStringInBrowserCompatibleModeParsesNumericExpires(string $expires, ?string $expected, bool $expired)
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Expires='.$expires, 'https://example.com/');
+
+        $this->assertSame($expected, $cookie->getExpiresTime());
+        $this->assertSame($expired, $cookie->isExpired());
+    }
+
+    public static function provideBrowserCompatibleNumericExpires(): iterable
+    {
+        yield ['0', '0', true];
+        yield ['-3', '-3', true];
+        yield ['1.5', '1', true];
+        yield ['1e999', null, false];
+        yield ['9223372036854775808.0', null, false];
+        yield ['999999999999999999999999', null, false];
+    }
+
+    public function testFromStringInBrowserCompatibleModeTreatsTheUnixEpochAsExpired()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Expires=Thu, 01 Jan 1970 00:00:00 GMT', 'https://example.com/');
+
+        $this->assertSame('0', $cookie->getExpiresTime());
+        $this->assertTrue($cookie->isExpired());
+    }
+
+    public function testFromStringInBrowserCompatibleModeDoesNotClearBooleanAttributes()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Secure; Secure=; HttpOnly; HttpOnly=0', 'https://example.com/');
+
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+    }
+
+    public function testFromStringInBrowserCompatibleModeAcceptsTruthyBooleanAttributeValues()
+    {
+        $cookie = Cookie::fromStringBrowserCompatible('foo=bar; Secure=1; HttpOnly=true', 'https://example.com/');
+
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+    }
+
+    public function testFromStringSignatureRemainsUnchanged()
+    {
+        $this->assertCount(2, (new \ReflectionMethod(Cookie::class, 'fromString'))->getParameters());
+    }
+
     #[DataProvider('getExpireCookieStrings')]
     public function testFromStringAcceptsSeveralExpiresDateFormats($cookie)
     {

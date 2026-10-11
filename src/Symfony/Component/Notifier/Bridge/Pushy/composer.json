@@ -25,6 +25,7 @@
         "symfony/notifier": "^8.2"
     },
     "require-dev": {
+        "symfony/clock": "^7.4|^8.0",
         "symfony/event-dispatcher": "^7.4|^8.0"
     },
     "autoload": {

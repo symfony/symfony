@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\PagerDuty;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
@@ -19,7 +21,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 final class PagerDutyOptions implements MessageOptionsInterface
 {
-    public function __construct(string $routingKey, string $eventAction, string $severity, private array $options = [])
+    public function __construct(string $routingKey, string $eventAction, string $severity, private array $options = [], ?ClockInterface $clock = null)
     {
         if (!\in_array($eventAction, ['trigger', 'acknowledge', 'resolve'], true)) {
             throw new InvalidArgumentException('Invalid "event_action" option given.');
@@ -35,7 +37,7 @@ final class PagerDutyOptions implements MessageOptionsInterface
                 throw new InvalidArgumentException('Timestamp date must be in "RFC3339_EXTENDED" format.');
             }
         } else {
-            $timestamp = new \DateTimeImmutable();
+            $timestamp = $clock?->now() ?? (class_exists(Clock::class) ? Clock::get()->now() : \DateTimeImmutable::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get())));
         }
 
         $this->options['routing_key'] = $routingKey;

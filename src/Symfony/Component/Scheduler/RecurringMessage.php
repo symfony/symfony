@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
@@ -59,11 +60,13 @@ final class RecurringMessage implements MessageProviderInterface
             return self::trigger(CronExpressionTrigger::fromSpec($expression, null, $timezone), $message);
         }
 
-        if (!$message instanceof \Stringable) {
+        $subject = self::unwrap($message);
+
+        if (!$subject instanceof \Stringable) {
             throw new InvalidArgumentException('A message must be stringable to use "hashed" cron expressions.');
         }
 
-        return self::trigger(CronExpressionTrigger::fromSpec($expression, (string) $message, $timezone), $message);
+        return self::trigger(CronExpressionTrigger::fromSpec($expression, (string) $subject, $timezone), $message);
     }
 
     /**
@@ -75,10 +78,11 @@ final class RecurringMessage implements MessageProviderInterface
             return new self($trigger, $message);
         }
 
-        $description = $message::class;
-        if ($message instanceof \Stringable) {
+        $subject = self::unwrap($message);
+        $description = $subject::class;
+        if ($subject instanceof \Stringable) {
             try {
-                $description .= " ($message)";
+                $description .= " ($subject)";
             } catch (\Exception) {
             }
         }
@@ -121,5 +125,10 @@ final class RecurringMessage implements MessageProviderInterface
     public function getTrigger(): TriggerInterface
     {
         return $this->trigger;
+    }
+
+    private static function unwrap(object $message): object
+    {
+        return $message instanceof Envelope ? $message->getMessage() : $message;
     }
 }

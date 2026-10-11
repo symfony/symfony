@@ -35,7 +35,7 @@ final class RateLimit
 
     /**
      * @param string                          $limiter       The configured limiter name
-     * @param string|Expression|\Closure|null $key           A literal string key, an Expression, or a Closure (defaults to client IP + method + path)
+     * @param string|Expression|\Closure|null $key           A string where {name} is replaced by the "name" request attribute, such as a route parameter, or an Expression or a Closure evaluating to a string; null means client IP + method + path
      * @param int                             $tokens        The number of tokens to consume
      * @param string[]|string                 $methods       HTTP methods to rate limit; empty means all methods
      * @param bool                            $exposeHeaders Whether this limiter's state may be exposed via the `X-RateLimit-*` response headers, opt-in

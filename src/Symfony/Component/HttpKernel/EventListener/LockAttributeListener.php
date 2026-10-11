@@ -108,7 +108,7 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         }
 
         if (\is_string($key = $attribute->key) && str_contains($key, '{')) {
-            $key = self::resolvePlaceholders($key, $event);
+            $key = KeyPlaceholderResolver::resolve($key, $event);
         } elseif (\is_string($key = $event->evaluate($key)) || \is_int($key) || $key instanceof \Stringable) {
             $key = (string) $key;
         } else {
@@ -281,32 +281,5 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         }
 
         return false;
-    }
-
-    /**
-     * @param ControllerAttributeEvent<Lock, ControllerEvent|ControllerArgumentsEvent> $event
-     */
-    private static function resolvePlaceholders(string $key, ControllerAttributeEvent $event): string
-    {
-        $attributes = $event->kernelEvent->getRequest()->attributes;
-
-        return preg_replace_callback('/\{([\w\x80-\xFF]++)\}/', static function (array $m) use ($attributes, $event): string {
-            if (!$attributes->has($m[1])) {
-                throw new \LogicException(\sprintf('Cannot resolve the "%s" placeholder in the key of the "#[Lock]" attribute of "%s()": the request has no "%s" attribute.', $m[0], self::getControllerName($event->kernelEvent->getController()), $m[1]));
-            }
-
-            if (!\is_string($value = $attributes->get($m[1])) && !\is_int($value) && !$value instanceof \Stringable) {
-                throw new \TypeError(\sprintf('Cannot resolve the "%s" placeholder in the key of the "#[Lock]" attribute of "%s()": the "%s" request attribute must be a string, an integer or a "Stringable" object, "%s" given.', $m[0], self::getControllerName($event->kernelEvent->getController()), $m[1], get_debug_type($value)));
-            }
-
-            return (string) $value;
-        }, $key);
-    }
-
-    private static function getControllerName(callable $controller): string
-    {
-        $r = new \ReflectionFunction($controller(...));
-
-        return !$r->isAnonymous() && ($class = $r->getClosureCalledClass()) ? $class->name.'::'.$r->name : $r->name;
     }
 }

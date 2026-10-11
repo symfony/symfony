@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\ArgumentResolver\ValueResolver\DateTimeValueResolver;
 use Symfony\Component\Console\Attribute\MapDateTime;
@@ -399,6 +400,93 @@ class DateTimeValueResolverTest extends TestCase
         $this->expectExceptionMessage('Invalid date given for parameter "$createdAt".');
 
         $resolver->resolve('createdAt', $input, $member);
+    }
+
+    public static function provideRelativeDates()
+    {
+        yield [\DateTimeImmutable::class, 'yesterday', '2022-02-19 00:00:00.000000'];
+        yield [\DateTime::class, '+1 hour', '2022-02-20 23:20:02.123456'];
+        yield [FooDateTime::class, 'noon', '2022-02-20 12:00:00.000000'];
+        yield [DatePoint::class, 'first day of next month', '2022-03-01 22:20:02.123456'];
+        yield [\DateTimeInterface::class, '2016-09-08', '2016-09-08 00:00:00.000000'];
+        yield [\DateTimeInterface::class, '2016-09-08 +1 hour', '2016-09-08 01:00:00.000000'];
+    }
+
+    #[DataProvider('provideRelativeDates')]
+    public function testRelativeDateWithClock(string $class, string $value, string $expected)
+    {
+        date_default_timezone_set('UTC');
+        $resolver = new DateTimeValueResolver(new MockClock('2022-02-20 22:20:02.123456', 'Pacific/Honolulu'));
+
+        $input = new ArrayInput(['--since' => $value], new InputDefinition([
+            new InputOption('since', null, InputOption::VALUE_REQUIRED),
+        ]));
+
+        $function = eval(\sprintf('return fn (%s $since) => null;', $class));
+        $member = new ReflectionMember((new \ReflectionFunction($function))->getParameters()[0]);
+
+        $results = $resolver->resolve('since', $input, $member);
+
+        $this->assertCount(1, $results);
+        $this->assertInstanceOf($class, $results[0]);
+        $this->assertSame('Pacific/Honolulu', $results[0]->getTimezone()->getName());
+        $this->assertSame($expected, $results[0]->format('Y-m-d H:i:s.u'));
+    }
+
+    public static function provideDatesAroundDstChanges()
+    {
+        yield ['2018-11-04 16:00:00', 'America/Sao_Paulo', 'Sep 8', '2018-09-08 00:00:00 -03:00'];
+        yield ['2018-11-04 16:00:00', 'America/Sao_Paulo', 'Sep 8 +1 hour', '2018-09-08 01:00:00 -03:00'];
+        yield ['2018-11-04 16:00:00', 'America/Sao_Paulo', '2016-09-08', '2016-09-08 00:00:00 -03:00'];
+        yield ['2026-07-01 12:00:00', 'Europe/Paris', '2025-10-26 02:30', '2025-10-26 02:30:00 +01:00'];
+    }
+
+    #[DataProvider('provideDatesAroundDstChanges')]
+    public function testDateWithClockAroundDstChanges(string $now, string $timezone, string $value, string $expected)
+    {
+        date_default_timezone_set('UTC');
+        $resolver = new DateTimeValueResolver(new MockClock($now, $timezone));
+
+        $input = new ArrayInput(['--since' => $value], new InputDefinition([
+            new InputOption('since', null, InputOption::VALUE_REQUIRED),
+        ]));
+
+        $function = static fn (\DateTimeImmutable $since) => null;
+        $member = new ReflectionMember((new \ReflectionFunction($function))->getParameters()[0]);
+
+        $results = $resolver->resolve('since', $input, $member);
+
+        $this->assertCount(1, $results);
+        $this->assertSame($expected, $results[0]->format('Y-m-d H:i:s P'));
+    }
+
+    public static function provideFormatsWithMissingFields()
+    {
+        yield [\DateTimeImmutable::class, 'H:i', '10:30', '2022-02-20 10:30:00.000000'];
+        yield [\DateTime::class, 'Y-m-d', '2016-09-08', '2016-09-08 22:20:02.000000'];
+        yield [FooDateTime::class, 'd', '05', '2022-02-05 22:20:02.000000'];
+        yield [\DateTimeInterface::class, 'Y-m-d|', '2016-09-08', '2016-09-08 00:00:00.000000'];
+    }
+
+    #[DataProvider('provideFormatsWithMissingFields')]
+    public function testWithFormatAndClock(string $class, string $format, string $value, string $expected)
+    {
+        date_default_timezone_set('UTC');
+        $resolver = new DateTimeValueResolver(new MockClock('2022-02-20 22:20:02.123456', 'Pacific/Honolulu'));
+
+        $input = new ArrayInput(['since' => $value], new InputDefinition([
+            new InputArgument('since'),
+        ]));
+
+        $function = eval(\sprintf('return fn (#[\\Symfony\\Component\\Console\\Attribute\\MapDateTime(format: "%s")] %s $since) => null;', $format, $class));
+        $member = new ReflectionMember((new \ReflectionFunction($function))->getParameters()[0]);
+
+        $results = $resolver->resolve('since', $input, $member);
+
+        $this->assertCount(1, $results);
+        $this->assertInstanceOf($class, $results[0]);
+        $this->assertSame('Pacific/Honolulu', $results[0]->getTimezone()->getName());
+        $this->assertSame($expected, $results[0]->format('Y-m-d H:i:s.u'));
     }
 }
 

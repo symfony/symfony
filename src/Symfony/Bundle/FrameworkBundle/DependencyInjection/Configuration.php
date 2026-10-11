@@ -367,7 +367,7 @@ class Configuration implements ConfigurationInterface
                                     $workflows = [];
                                 }
 
-                                if (1 === \count($workflows) && isset($workflows['workflows']) && !array_is_list($workflows['workflows']) && array_diff_key($workflows['workflows'], ['audit_trail' => 1, 'type' => 1, 'marking_store' => 1, 'supports' => 1, 'support_strategy' => 1, 'initial_marking' => 1, 'places' => 1, 'transitions' => 1])) {
+                                if (1 === \count($workflows) && isset($workflows['workflows']) && !array_is_list($workflows['workflows']) && array_diff_key($workflows['workflows'], ['audit_trail' => 1, 'type' => 1, 'marking_store' => 1, 'supports' => 1, 'support_strategy' => 1, 'initial_marking' => 1, 'events_to_dispatch' => 1, 'places' => 1, 'transitions' => 1, 'metadata' => 1])) {
                                     $workflows = $workflows['workflows'];
                                 }
 
@@ -376,7 +376,9 @@ class Configuration implements ConfigurationInterface
                                         throw new LogicException(\sprintf('Cannot disable a single workflow. Remove the configuration for the workflow "%s" instead.', $key));
                                     }
 
-                                    unset($workflows[$key]['enabled']);
+                                    if (\is_array($workflow)) {
+                                        unset($workflows[$key]['enabled']);
+                                    }
                                 }
 
                                 $v = [
@@ -592,16 +594,16 @@ class Configuration implements ConfigurationInterface
                                     ->thenInvalid('"supports" or "support_strategy" should be configured.')
                                 ->end()
                                 ->beforeNormalization()
-                                        ->always()
-                                        ->then(static function ($values) {
-                                            // Special case to deal with XML when the user wants an empty array
-                                            if (\array_key_exists('event_to_dispatch', $values) && null === $values['event_to_dispatch']) {
-                                                $values['events_to_dispatch'] = [];
-                                                unset($values['event_to_dispatch']);
-                                            }
+                                    ->ifArray()
+                                    ->then(static function ($values) {
+                                        // Special case to deal with XML when the user wants an empty array
+                                        if (\array_key_exists('event_to_dispatch', $values) && null === $values['event_to_dispatch']) {
+                                            $values['events_to_dispatch'] = [];
+                                            unset($values['event_to_dispatch']);
+                                        }
 
-                                            return $values;
-                                        })
+                                        return $values;
+                                    })
                                 ->end()
                             ->end()
                         ->end()

@@ -13,7 +13,9 @@ namespace Symfony\Component\Scheduler\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Random\Randomizer;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
+use Symfony\Component\Scheduler\Generator\MessageContext;
 use Symfony\Component\Scheduler\RecurringMessage;
 
 class RecurringMessageTest extends TestCase
@@ -36,6 +38,32 @@ class RecurringMessageTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         RecurringMessage::cron('#midnight', new \stdClass());
+    }
+
+    public function testHashedCronExpressionIsBuiltFromTheMessageInsideTheEnvelope()
+    {
+        $message = new DummyStringableMessage();
+
+        $this->assertSame(
+            (string) RecurringMessage::cron('#midnight', $message)->getTrigger(),
+            (string) RecurringMessage::cron('#midnight', new Envelope($message))->getTrigger(),
+        );
+    }
+
+    public function testTaskIsDescribedByTheMessageInsideTheEnvelope()
+    {
+        $message = RecurringMessage::cron('* * * * *', new Envelope(new DummyStringableMessage()));
+
+        $this->assertSame(DummyStringableMessage::class.' (my task)', (string) $message->getProvider());
+    }
+
+    public function testEnvelopeIsTheMessageThatGetsDispatched()
+    {
+        $envelope = new Envelope(new DummyStringableMessage());
+        $message = RecurringMessage::cron('* * * * *', $envelope);
+        $context = new MessageContext('dummy', $message->getId(), $message->getTrigger(), new \DateTimeImmutable());
+
+        $this->assertSame([$envelope], [...$message->getMessages($context)]);
     }
 
     public function testUniqueId()

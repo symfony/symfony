@@ -569,9 +569,10 @@ class ContextListenerTest extends TestCase
     #[TestWith([true])]
     #[TestWith([false])]
     #[TestWith([null])]
-    public function testNullOrHashedPasswordInSessionDoesntInvalidateTheToken(?bool $hashPassword)
+    #[TestWith([true, null])]
+    public function testNullOrHashedPasswordInSessionDoesntInvalidateTheToken(?bool $hashPassword, ?string $password = 'pass')
     {
-        $user = new CustomUser('user', ['ROLE_USER'], 'pass', $hashPassword);
+        $user = new CustomUser('user', ['ROLE_USER'], $password, $hashPassword);
 
         $userProvider = $this->createMock(UserProviderInterface::class);
         $userProvider->expects($this->once())
@@ -586,6 +587,30 @@ class ContextListenerTest extends TestCase
 
         $this->assertInstanceOf(UsernamePasswordToken::class, $tokenStorage->getToken());
         $this->assertSame($user, $tokenStorage->getToken()->getUser());
+    }
+
+    #[TestWith(['other'])]
+    #[TestWith([null])]
+    public function testHashedPasswordInSessionInvalidatesTheTokenWhenThePasswordChanged(?string $refreshedPassword)
+    {
+        $user = new CustomUser('user', ['ROLE_USER'], 'pass', true);
+
+        $userProvider = $this->createStub(UserProviderInterface::class);
+        $userProvider->method('supportsClass')->willReturn(true);
+        $userProvider->method('refreshUser')->willReturn(new CustomUser('user', ['ROLE_USER'], $refreshedPassword, true));
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, 'context_key', ['ROLE_USER'])));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $tokenStorage = new TokenStorage();
+        $listener = new ContextListener($tokenStorage, [$userProvider], 'context_key');
+        $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertNull($tokenStorage->getToken());
     }
 
     protected function runSessionOnKernelResponse($newToken, $original = null)

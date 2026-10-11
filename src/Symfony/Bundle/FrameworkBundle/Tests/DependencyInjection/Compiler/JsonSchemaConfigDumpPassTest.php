@@ -243,6 +243,37 @@ class JsonSchemaConfigDumpPassTest extends TestCase
 
     #[RequiresMethod(Validator::class, 'validate')]
     #[RequiresMethod(SchemaValidator::class, 'validate')]
+    public function testGeneratedSchemaAcceptsImportsParametersAndServicesInTheBlockOfAnEnvironment()
+    {
+        $schemaFile = $this->tempDir.'/when_schema.json';
+        $container = new ContainerBuilder();
+
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([JsonSchemaTestBundle::class => ['all' => true], JsonSchemaDevBundle::class => ['dev' => true]])))->process($container);
+
+        $config = Yaml::parse(<<<YAML
+            when@dev:
+                imports:
+                    - { resource: services_dev.yaml }
+                parameters:
+                    app.debug: true
+                services:
+                    App\Debug\Collector: ~
+                json_schema_dev:
+                    toolbar: true
+            YAML);
+
+        $this->assertSame([], (new SchemaValidator())->validate($config, $schemaFile));
+
+        $config = Yaml::parse(<<<YAML
+            when@dev:
+                unknown_extension: ~
+            YAML);
+
+        $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    #[RequiresMethod(SchemaValidator::class, 'validate')]
     public function testGeneratedSchemaAcceptsTheCollectionOfASectionGivenDirectlyUnderItsRoot()
     {
         $schemaFile = $this->tempDir.'/shorthand_schema.json';

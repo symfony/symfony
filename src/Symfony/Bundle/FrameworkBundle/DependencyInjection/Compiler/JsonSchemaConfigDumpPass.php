@@ -72,7 +72,8 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
         ksort($envAliases);
         $rootProperties = $allProperties;
         foreach ($envAliases as $env => $aliases) {
-            $whenProperties = $allProperties;
+            // Like the root of a file, the block of an environment accepts the sections of a service file
+            $whenProperties = $allProperties + ['imports' => true, 'parameters' => true, 'services' => true];
             foreach ($aliases as $alias) {
                 $whenProperties[$alias] = ['$ref' => '#/$defs/nodes/'.$alias];
             }

@@ -113,11 +113,16 @@ class WebhookBundle extends AbstractBundle
         $container->registerAliasForArgument('webhook.request_parser', RequestParserInterface::class, 'webhook.request_parser', 'webhook');
 
         $parsers = [];
+        $secrets = [];
         foreach ($config['routing'] as $type => $cfg) {
             $parsers[$type] = [
                 'parser' => new Reference($cfg['service']),
                 'secret' => $cfg['secret'],
             ];
+
+            if ('webhook.request_parser' === $cfg['service']) {
+                $secrets[$type] = $cfg['secret'];
+            }
         }
 
         $controller = $container->getDefinition('webhook.controller');
@@ -150,6 +155,15 @@ class WebhookBundle extends AbstractBundle
             ->replaceArgument(4, $config['timestamp_header_name'])
             ->replaceArgument(5, $signatureFormat)
             ->replaceArgument(6, $config['timestamp_tolerance']);
+
+        $container->getDefinition('webhook.test.request_factory')
+            ->replaceArgument(0, $secrets)
+            ->replaceArgument(1, $config['signing_algorithm'])
+            ->replaceArgument(2, $config['signature_header_name'])
+            ->replaceArgument(3, $config['event_header_name'])
+            ->replaceArgument(4, $config['id_header_name'])
+            ->replaceArgument(5, $config['timestamp_header_name'])
+            ->replaceArgument(6, $signatureFormat);
 
         $clientId = $config['http_client'];
 

@@ -18,12 +18,14 @@ use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -218,6 +220,39 @@ class KernelBrowser extends HttpKernelBrowser
         }
 
         return $httpRequest;
+    }
+
+    /**
+     * Posts a webhook to the application, signed as the "webhook.routing" entry of the given type expects it.
+     *
+     * Only the routing entries that use the generic request parser of the Webhook component are supported.
+     *
+     * @param string               $type    The key of the "webhook.routing" entry
+     * @param array<string, mixed> $payload The payload, sent as JSON
+     * @param string|null          $secret  A secret to sign the webhook with instead of the configured one, to check that it is rejected
+     */
+    public function sendWebhook(string $type, string $event, array $payload = [], #[\SensitiveParameter] ?string $secret = null): Crawler
+    {
+        $container = $this->getContainer();
+
+        if (!$container->has('webhook.test.request_factory')) {
+            throw new \LogicException(\sprintf('"%s" requires the Webhook component to be enabled. Try running "composer require symfony/webhook".', __METHOD__));
+        }
+
+        try {
+            $uri = $container->get('router')->generate('_webhook_controller', ['type' => $type]);
+        } catch (RouteNotFoundException $e) {
+            throw new \LogicException(\sprintf('"%s" requires the "_webhook_controller" route. Did you forget to import "@FrameworkBundle/Resources/config/routing/webhook.php" in your routes?', __METHOD__), 0, $e);
+        }
+
+        $request = $container->get('webhook.test.request_factory')->createRequest($uri, $type, $event, $payload, $secret);
+        $server = [];
+
+        foreach ($request->headers->all() as $name => $values) {
+            $server['content-type' === $name ? 'CONTENT_TYPE' : 'HTTP_'.strtoupper(strtr($name, '-', '_'))] = implode(', ', $values);
+        }
+
+        return $this->request('POST', $uri, [], [], $server, $request->getContent());
     }
 
     /**

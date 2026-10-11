@@ -39,6 +39,7 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
 
         if (!$container->has((string) $httpClient->getArgument(0))) {
             $container->removeDefinition('webhook.http_client');
+            $container->removeDefinition('webhook.transport.traceable');
             $transport
                 ->setArguments([])
                 ->addError('You cannot use the "webhook transport" service since the HttpClient component is not '

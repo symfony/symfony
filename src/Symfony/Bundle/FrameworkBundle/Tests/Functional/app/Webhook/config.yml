@@ -1,0 +1,17 @@
+imports:
+    - { resource: ../config/default.yml }
+    - { resource: services.yml }
+
+framework:
+    messenger:
+        transports:
+            async: 'in-memory://'
+        routing:
+            Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventMessage: async
+            Symfony\Component\Webhook\Messenger\SendWebhookMessage: async
+    webhook:
+        http_client: test.webhook_http_client
+        signature_format: standard
+        routing:
+            payments:
+                secret: 'whsec_dGhlLXNlY3JldA=='

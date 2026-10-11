@@ -149,6 +149,7 @@ FrameworkBundle
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
  * Deprecate passing the `$debug` argument to `DependencyInjection\Configuration::__construct()`, the config tree no longer depends on `kernel.debug`
  * BrowserKit assertions are no longer verbose by default. Failed response assertions no longer include the response body unless `setBrowserKitAssertionsAsVerbose(true)` is called or `verbose: true` is passed to the assertion.
+ * `MailerAssertionsTrait` and `NotificationAssertionsTrait` now see the emails and notifications sent during the previous requests of the test client. They used to see only the ones sent during the last request. A test that expects no email after a second request must now account for the emails sent before it
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use the `esi` or `inline` fragment renderer, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
  * Most of what this bundle configured now lives in a bundle shipped by the component itself: `asset`,
    `asset_mapper`, `cache`, `html_sanitizer`, `http_client`, `json_streamer`, `lock`, `mailer`, `messenger`,

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Make `MailerAssertionsTrait` and `NotificationAssertionsTrait` see the emails and notifications sent during the previous requests of the test client
  * Add the `kernel.test_state` tag to call a method of a service when a test ends, or to keep a copy of the service before each reset until the test ends
  * Pass the token of `KernelBrowser::loginUser()` with each request, so that stateless firewalls can read it
  * Inject the `clock` service into the session `MetadataBag`

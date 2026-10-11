@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
@@ -33,6 +34,18 @@ final class NotificationController
         $thirdNotification->content('Symfony is awesome!');
         $notifier->send($thirdNotification, new Recipient('', '112'));
 
+        return new Response();
+    }
+
+    public function sendAndRedirectAction(NotifierInterface $notifier, string $subject): Response
+    {
+        $notifier->send(new Notification($subject, ['chat/slack']));
+
+        return new RedirectResponse('/notification_sent');
+    }
+
+    public function sentAction(): Response
+    {
         return new Response();
     }
 }

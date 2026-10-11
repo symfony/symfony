@@ -104,4 +104,49 @@ class MailerTest extends AbstractWebTestCase
         $this->assertEmailAddressNotContains($email, 'To', 'helene@symfony.com');
         $this->assertEmailAddressNotContains($email, 'Reply-To', 'helene@symfony.com');
     }
+
+    public function testEmailsSentBeforeARebootAreKept()
+    {
+        $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
+        $client->request('GET', '/send_email/Foo');
+        $this->assertResponseRedirects('/email_sent');
+        $client->followRedirect();
+
+        $this->assertEmailCount(1);
+        $this->assertQueuedEmailCount(1);
+        $this->assertEmailSubjectContains($this->getMailerMessage(), 'Foo');
+    }
+
+    public function testEmailsSentBeforeARebootAreListedBeforeTheNewOnes()
+    {
+        $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
+        $client->request('GET', '/send_email/Foo');
+        $client->request('GET', '/send_email/Bar');
+
+        $this->assertEmailCount(2);
+        $this->assertSame(['Foo', 'Bar'], array_map(static fn (Email $email) => $email->getSubject(), $this->getMailerMessages()));
+    }
+
+    public function testEmailsAreKeptWhenRebootIsDisabled()
+    {
+        $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
+        $client->disableReboot();
+        $client->request('GET', '/send_email/Foo');
+        $client->followRedirect();
+        $client->request('GET', '/send_email/Bar');
+
+        $this->assertEmailCount(2);
+        $this->assertSame(['Foo', 'Bar'], array_map(static fn (Email $email) => $email->getSubject(), $this->getMailerMessages()));
+    }
+
+    public function testKeptEmailsDoNotOutliveTheKernel()
+    {
+        $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
+        $client->request('GET', '/send_email/Foo');
+        $client->followRedirect();
+        self::ensureKernelShutdown();
+        self::bootKernel(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $this->assertEmailCount(0);
+    }
 }

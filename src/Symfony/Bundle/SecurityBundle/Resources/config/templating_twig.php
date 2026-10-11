@@ -19,6 +19,7 @@ return static function (ContainerConfigurator $container) {
         ->set('twig.extension.logout_url', LogoutUrlExtension::class)
             ->args([
                 service('security.logout_url_generator'),
+                ['data-controller' => 'csrf-protection'],
             ])
             ->tag('twig.extension')
 
@@ -26,6 +27,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.authorization_checker')->ignoreOnInvalid(),
                 service('security.impersonate_url_generator')->ignoreOnInvalid(),
+                ['data-controller' => 'csrf-protection'],
             ])
             ->tag('twig.extension')
     ;

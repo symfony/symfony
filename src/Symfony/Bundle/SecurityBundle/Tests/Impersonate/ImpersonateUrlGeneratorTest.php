@@ -143,6 +143,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/profile?page=2',
             'fields' => ['_switch_user' => 'kuba'],
+            'csrf_field' => null,
         ], $generator->generateImpersonationForm('kuba'));
     }
 
@@ -153,6 +154,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/switch-user',
             'fields' => ['_switch_user' => 'kuba', '_target_path' => '/profile?page=2'],
+            'csrf_field' => null,
         ], $generator->generateImpersonationForm('kuba'));
     }
 
@@ -163,6 +165,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/switch-user',
             'fields' => ['_switch_user' => 'kuba', '_target_path' => '/profile?page=2'],
+            'csrf_field' => null,
         ], $generator->generateImpersonationForm('kuba'));
     }
 
@@ -178,6 +181,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/switch-user',
             'fields' => ['_switch_user' => 'kuba', '_token' => 'T0K3N', '_target_path' => '/profile?page=2'],
+            'csrf_field' => '_token',
         ], $generator->generateImpersonationForm('kuba'));
     }
 
@@ -188,6 +192,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/switch-user',
             'fields' => ['_switch_user' => 'kuba', '_target_path' => '/dashboard'],
+            'csrf_field' => null,
         ], $generator->generateImpersonationForm('kuba', '/dashboard'));
     }
 
@@ -198,6 +203,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/switch-user',
             'fields' => ['_switch_user' => '_exit', '_target_path' => '/dashboard'],
+            'csrf_field' => null,
         ], $generator->generateExitForm('/dashboard'));
     }
 
@@ -205,7 +211,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
     {
         $generator = $this->createGenerator(['parameter' => '_switch_user', 'path' => '/switch-user']);
 
-        $this->assertSame(['action' => '', 'fields' => []], $generator->generateExitForm());
+        $this->assertSame(['action' => '', 'fields' => [], 'csrf_field' => null], $generator->generateExitForm());
     }
 
     public function testParametersTheRouteTakesAsPlaceholdersStayOutOfTheFormFields()
@@ -215,8 +221,23 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/switch-user/kuba',
             'fields' => ['_target_path' => '/profile?page=2'],
+            'csrf_field' => null,
         ], $generator->generateImpersonationForm('kuba'));
         $this->assertSame('/switch-user/kuba?_target_path=%2Fprofile%3Fpage%3D2', $generator->generateImpersonationPath('kuba'));
+    }
+
+    public function testFormNamesNoCsrfFieldWhenTheRouteTakesTheTokenAsAPlaceholder()
+    {
+        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->method('getToken')->willReturn(new CsrfToken('impersonate', 'T0K3N'));
+
+        $generator = $this->createGenerator(self::CSRF_CONFIG + ['path' => 'app_switch_user_token'], false, $csrfTokenManager);
+
+        $this->assertSame([
+            'action' => '/switch-user/T0K3N',
+            'fields' => ['_switch_user' => 'kuba', '_target_path' => '/profile?page=2'],
+            'csrf_field' => null,
+        ], $generator->generateImpersonationForm('kuba'));
     }
 
     private function createGenerator(array $switchUser, bool $impersonating = false, ?CsrfTokenManagerInterface $csrfTokenManager = null): ImpersonateUrlGenerator
@@ -234,6 +255,7 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $routes = new RouteCollection();
         $routes->add('app_switch_user', new Route('/switch-user'));
         $routes->add('app_switch_user_restful', new Route('/switch-user/{_switch_user}'));
+        $routes->add('app_switch_user_token', new Route('/switch-user/{_token}'));
 
         return new ImpersonateUrlGenerator($requestStack, $firewallMap, $tokenStorage, new UrlGenerator($routes, new RequestContext()), $csrfTokenManager);
     }

@@ -22,6 +22,9 @@ use Symfony\Component\Security\Core\Authorization\GuestAuthorizationCheckerInter
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -39,8 +42,47 @@ class SecurityExtensionTest extends TestCase
     {
         $extension = new SecurityExtension();
 
-        $this->assertSame(['action' => '', 'fields' => []], $extension->getImpersonateForm('kuba'));
-        $this->assertSame(['action' => '', 'fields' => []], $extension->getImpersonateExitForm());
+        $this->assertSame(['action' => '', 'fields' => [], 'csrf_field' => null], $extension->getImpersonateForm('kuba'));
+        $this->assertSame(['action' => '', 'fields' => [], 'csrf_field' => null], $extension->getImpersonateExitForm());
+    }
+
+    public function testImpersonationButtonsAreEmptyWithoutAnImpersonateUrlGenerator()
+    {
+        $this->assertSame('', $this->render('{{ impersonation_button("Impersonate", "kuba") }}{{ impersonation_exit_button() }}', new SecurityExtension()));
+    }
+
+    public function testImpersonationButtonRendersTheImpersonationForm()
+    {
+        $generator = $this->createMock(ImpersonateUrlGenerator::class);
+        $generator->expects($this->once())
+            ->method('generateImpersonationForm')->with('kuba', '/dashboard')
+            ->willReturn(['action' => '/switch-user', 'fields' => ['_switch_user' => 'kuba', '_csrf_token' => 'T0K3N', '_target_path' => '/dashboard'], 'csrf_field' => '_csrf_token']);
+
+        $this->assertSame(
+            '<form method="post" action="/switch-user" class="inline"><input type="hidden" name="_switch_user" value="kuba"><input type="hidden" name="_csrf_token" value="T0K3N" data-controller="csrf-protection"><input type="hidden" name="_target_path" value="/dashboard"><button type="submit" class="link">Impersonate &lt;kuba&gt;</button></form>',
+            $this->render('{{ impersonation_button("Impersonate <kuba>", "kuba", target_uri: "/dashboard", attr: {class: "link"}, form_attr: {class: "inline"}) }}', new SecurityExtension(null, $generator, ['data-controller' => 'csrf-protection'])),
+        );
+    }
+
+    public function testImpersonationExitButtonRendersTheExitForm()
+    {
+        $generator = $this->createMock(ImpersonateUrlGenerator::class);
+        $generator->expects($this->once())
+            ->method('generateExitForm')->with('/admin/users')
+            ->willReturn(['action' => '/switch-user', 'fields' => ['_switch_user' => '_exit', '_target_path' => '/admin/users'], 'csrf_field' => null]);
+
+        $this->assertSame(
+            '<form method="post" action="/switch-user"><input type="hidden" name="_switch_user" value="_exit"><input type="hidden" name="_target_path" value="/admin/users"><button type="submit">Exit impersonation</button></form>',
+            $this->render('{{ impersonation_exit_button(target_uri: "/admin/users") }}', new SecurityExtension(null, $generator, ['data-controller' => 'csrf-protection'])),
+        );
+    }
+
+    public function testImpersonationExitButtonIsEmptyWhenNotImpersonating()
+    {
+        $generator = $this->createStub(ImpersonateUrlGenerator::class);
+        $generator->method('generateExitForm')->willReturn(['action' => '', 'fields' => [], 'csrf_field' => null]);
+
+        $this->assertSame('', $this->render('{{ impersonation_exit_button("Back") }}', new SecurityExtension(null, $generator)));
     }
 
     #[DataProvider('provideObjectFieldAclCases')]
@@ -298,6 +340,14 @@ class SecurityExtensionTest extends TestCase
 
         $this->assertContains('is_granted_for_user', $functions);
         $this->assertContains('access_decision_for_user', $functions);
+    }
+
+    private function render(string $template, SecurityExtension $extension): string
+    {
+        $twig = new Environment(new ArrayLoader(['template' => $template]), ['strict_variables' => true]);
+        $twig->addExtension($extension);
+
+        return $twig->render('template');
     }
 
     private function createMockAuthorizationChecker(): MockAuthorizationChecker

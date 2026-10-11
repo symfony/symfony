@@ -128,7 +128,7 @@ class LogoutUrlGeneratorTest extends TestCase
     {
         $this->generator->registerListener('secured_area', '/logout', null, null);
 
-        $this->assertSame(['action' => '/logout', 'fields' => []], $this->generator->getLogoutForm('secured_area'));
+        $this->assertSame(['action' => '/logout', 'fields' => [], 'csrf_field' => null], $this->generator->getLogoutForm('secured_area'));
     }
 
     public function testGetLogoutFormCarriesTheCsrfTokenUnderTheConfiguredParameter()
@@ -143,6 +143,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/logout',
             'fields' => ['_token' => 'T0K3N'],
+            'csrf_field' => '_token',
         ], $this->generator->getLogoutForm('secured_area'));
     }
 
@@ -164,6 +165,29 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame([
             'action' => '/logout',
             'fields' => ['_csrf_token' => 'T0K3N'],
+            'csrf_field' => '_csrf_token',
+        ], $generator->getLogoutForm('secured_area'));
+    }
+
+    public function testGetLogoutFormNamesNoCsrfFieldWhenTheRouteTakesTheTokenAsAPlaceholder()
+    {
+        $router = $this->createStub(UrlGeneratorInterface::class);
+        $router->method('generate')->willReturnCallback(
+            static fn (string $name, array $parameters) => '/logout/'.$parameters['_csrf_token']
+        );
+
+        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->method('getToken')->willReturn(new CsrfToken('logout', 'T0K3N'));
+
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
+        $generator = new LogoutUrlGenerator($requestStack, $router, $this->tokenStorage);
+        $generator->registerListener('secured_area', 'app_logout', 'logout', '_csrf_token', $csrfTokenManager);
+
+        $this->assertSame([
+            'action' => '/logout/T0K3N',
+            'fields' => [],
+            'csrf_field' => null,
         ], $generator->getLogoutForm('secured_area'));
     }
 

@@ -83,13 +83,15 @@ class LogoutUrlGenerator implements ResetInterface
      *         <button>Log out</button>
      *     </form>
      *
-     * @return array{action: string, fields: array<string, string>}
+     * The "csrf_field" key gives the name of the field that contains the CSRF token, or null. A template can use it to mark this field for client-side scripts.
+     *
+     * @return array{action: string, fields: array<string, string>, csrf_field: string|null}
      */
     public function getLogoutForm(?string $key = null): array
     {
-        [$action, $fields] = $this->buildParts($key, UrlGeneratorInterface::ABSOLUTE_PATH);
+        [$action, $fields, $csrfParameter] = $this->buildParts($key, UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        return ['action' => $action, 'fields' => $fields];
+        return ['action' => $action, 'fields' => $fields, 'csrf_field' => null !== $csrfParameter && \array_key_exists($csrfParameter, $fields) ? $csrfParameter : null];
     }
 
     public function setCurrentFirewall(?string $key, ?string $context = null): void
@@ -113,7 +115,7 @@ class LogoutUrlGenerator implements ResetInterface
     }
 
     /**
-     * @return array{0: string, 1: array<string, string>}
+     * @return array{0: string, 1: array<string, string>, 2: string|null}
      */
     private function buildParts(?string $key, int $referenceType): array
     {
@@ -131,7 +133,7 @@ class LogoutUrlGenerator implements ResetInterface
             }
 
             // the route may take the parameters as placeholders, only the others are left over
-            return self::splitQuery($this->router->generate($logoutPath, $parameters, $referenceType));
+            return [...self::splitQuery($this->router->generate($logoutPath, $parameters, $referenceType)), $csrfParameter];
         }
 
         if (!$this->requestStack) {
@@ -146,7 +148,7 @@ class LogoutUrlGenerator implements ResetInterface
 
         $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBaseUrl().$logoutPath;
 
-        return [$url, $parameters];
+        return [$url, $parameters, $csrfParameter];
     }
 
     /**

@@ -69,7 +69,7 @@ class ImpersonateUrlGenerator
      * ones the route of the path takes as placeholders. They render like the ones of
      * {@see \Symfony\Component\Security\Http\Logout\LogoutUrlGenerator::getLogoutForm()}.
      *
-     * @return array{action: string, fields: array<string, string>}
+     * @return array{action: string, fields: array<string, string>, csrf_field: string|null}
      */
     public function generateImpersonationForm(string $identifier, ?string $targetUri = null): array
     {
@@ -82,7 +82,7 @@ class ImpersonateUrlGenerator
      * The action is empty when the current user is not impersonating anyone, so that a
      * template can skip the form.
      *
-     * @return array{action: string, fields: array<string, string>}
+     * @return array{action: string, fields: array<string, string>, csrf_field: string|null}
      */
     public function generateExitForm(?string $targetUri = null): array
     {
@@ -106,26 +106,26 @@ class ImpersonateUrlGenerator
     }
 
     /**
-     * @return array{action: string, fields: array<string, string>}
+     * @return array{action: string, fields: array<string, string>, csrf_field: string|null}
      */
     private function buildForm(?string $targetUri = null, string $identifier = SwitchUserListener::EXIT_VALUE): array
     {
-        [$action, $fields] = $this->buildParts(UrlGeneratorInterface::ABSOLUTE_PATH, $targetUri, $identifier);
+        [$action, $fields, $csrfParameter] = $this->buildParts(UrlGeneratorInterface::ABSOLUTE_PATH, $targetUri, $identifier);
 
-        return ['action' => $action, 'fields' => $fields];
+        return ['action' => $action, 'fields' => $fields, 'csrf_field' => null !== $csrfParameter && \array_key_exists($csrfParameter, $fields) ? $csrfParameter : null];
     }
 
     /**
-     * @return array{0: string, 1: array<string, string>}
+     * @return array{0: string, 1: array<string, string>, 2: string|null}
      */
     private function buildParts(int $referenceType, ?string $targetUri, string $identifier): array
     {
         if (null === ($request = $this->requestStack->getCurrentRequest())) {
-            return ['', []];
+            return ['', [], null];
         }
 
         if (!$this->isImpersonatedUser() && SwitchUserListener::EXIT_VALUE == $identifier) {
-            return ['', []];
+            return ['', [], null];
         }
 
         if (null === $switchUserConfig = $this->firewallMap->getFirewallConfig($request)?->getSwitchUser()) {
@@ -133,6 +133,7 @@ class ImpersonateUrlGenerator
         }
 
         $parameters = [$switchUserConfig['parameter'] => $identifier];
+        $csrfParameter = null;
 
         if ($switchUserConfig['enable_csrf'] ?? false) {
             if (null === $this->csrfTokenManager) {
@@ -140,7 +141,8 @@ class ImpersonateUrlGenerator
             }
 
             // the token id is served by the manager the firewall configured for it
-            $parameters[$switchUserConfig['csrf_parameter']] = $this->csrfTokenManager->getToken($switchUserConfig['csrf_token_id'])->getValue();
+            $csrfParameter = $switchUserConfig['csrf_parameter'];
+            $parameters[$csrfParameter] = $this->csrfTokenManager->getToken($switchUserConfig['csrf_token_id'])->getValue();
         }
 
         if (null !== $path = $switchUserConfig['path'] ?? null) {
@@ -153,7 +155,7 @@ class ImpersonateUrlGenerator
                 }
 
                 // the route may take some of the parameters as placeholders, only the others are left over
-                return self::splitQuery($this->urlGenerator->generate($path, $parameters, $referenceType));
+                return [...self::splitQuery($this->urlGenerator->generate($path, $parameters, $referenceType)), $csrfParameter];
             }
 
             $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($path) : $request->getBaseUrl().$path;
@@ -165,7 +167,7 @@ class ImpersonateUrlGenerator
             }
         }
 
-        return [$url, $parameters];
+        return [$url, $parameters, $csrfParameter];
     }
 
     /**

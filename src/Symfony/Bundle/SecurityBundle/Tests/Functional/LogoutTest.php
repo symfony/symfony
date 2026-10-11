@@ -116,6 +116,18 @@ class LogoutTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/');
     }
 
+    public function testTheLogoutButtonPostsAFormTheListenerAccepts()
+    {
+        $client = $this->createAuthenticatedClient();
+
+        $crawler = $client->request('GET', '/logout-button');
+        $this->assertSame('csrf-protection', $crawler->filter('input[name="_csrf_token"]')->attr('data-controller'));
+
+        $client->submit($crawler->selectButton('Log out')->form());
+
+        $this->assertRedirect($client->getResponse(), '/');
+    }
+
     public function testLoggingOutWithoutTheTokenTheFormCarriesIsDenied()
     {
         $client = $this->createAuthenticatedClient();

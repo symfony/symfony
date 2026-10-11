@@ -54,6 +54,7 @@ class AmqpReceiver implements QueueReceiverInterface, KeepaliveReceiverInterface
     public function getFromQueues(array $queueNames/* , int $fetchSize = 1 */): iterable
     {
         $fetchSize = \func_num_args() > 1 ? max(1, func_get_arg(1)) : 1;
+        $queueNames = array_values(array_intersect($queueNames, $this->connection->getQueueNames()));
 
         if (0 < $this->connection->getPrefetchCount()) {
             yield from $this->consumeFromQueues($queueNames, $fetchSize);
@@ -62,7 +63,7 @@ class AmqpReceiver implements QueueReceiverInterface, KeepaliveReceiverInterface
         }
 
         $remaining = $fetchSize;
-        $activeQueues = array_values($queueNames);
+        $activeQueues = $queueNames;
         $firstRound = true;
 
         while ($activeQueues && ($remaining > 0 || $firstRound)) {

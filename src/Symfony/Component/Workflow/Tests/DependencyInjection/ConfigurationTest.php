@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Configuration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -114,6 +115,27 @@ class ConfigurationTest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    #[DataProvider('provideWorkflowsGivenUnderTheRoot')]
+    public function testWorkflowsGivenUnderTheRoot(array $config, array $expectedNames)
+    {
+        $this->assertSame($expectedNames, array_keys($this->process($config)['workflows']));
+    }
+
+    public static function provideWorkflowsGivenUnderTheRoot(): iterable
+    {
+        $workflow = [
+            'supports' => [self::class],
+            'places' => ['a', 'b'],
+            'transitions' => [['name' => 'go', 'from' => ['a'], 'to' => ['b']]],
+        ];
+
+        yield 'directly' => [['enabled' => true, 'blog' => $workflow], ['blog']];
+        yield 'under "workflows"' => [['enabled' => true, 'workflows' => ['blog' => $workflow]], ['blog']];
+        yield 'named "workflows"' => [['enabled' => true, 'workflows' => $workflow], ['workflows']];
+        yield 'as a list' => [[['name' => 'blog'] + $workflow], ['blog']];
+        yield 'as a list that only enables them' => [[['enabled' => true]], []];
     }
 
     private function process(array $config): array

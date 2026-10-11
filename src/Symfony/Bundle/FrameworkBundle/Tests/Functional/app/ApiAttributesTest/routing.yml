@@ -38,6 +38,18 @@ serialize_mapped_controller_results:
     path: /serialize-mapped-controller-results
     controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAndMapAttributeOnGeneratorController
 
+serialize_streamed_controller_result:
+    path: /serialize-streamed-controller-result
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAndStreamAttributesController::show
+
+serialize_streamed_controller_results:
+    path: /serialize-streamed-controller-results
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAndStreamAttributesController::list
+
+serialize_streamed_mapped_controller_results:
+    path: /serialize-streamed-mapped-controller-results
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAndStreamAttributesController::mapped
+
 map_request_payload_and_serialize_controller_result:
     path: /map-request-payload-and-serialize-controller-result
     controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadAndSerializeAttributesController

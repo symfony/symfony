@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\Serialize;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsMetadata;
@@ -22,13 +24,27 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\SerializeControllerResultAttributeListener;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class SerializeControllerResultListenerTest extends TestCase
 {
+    private string $streamWritersDir;
+
+    protected function setUp(): void
+    {
+        $this->streamWritersDir = \sprintf('%s/symfony_http_kernel_serialize_test/stream_writer', sys_get_temp_dir());
+
+        if (is_dir($this->streamWritersDir)) {
+            array_map('unlink', glob($this->streamWritersDir.'/*'));
+            rmdir($this->streamWritersDir);
+        }
+    }
+
     public function testSerializeAttribute()
     {
         $controllerResult = new ProductCreated(10);
@@ -225,11 +241,88 @@ class SerializeControllerResultListenerTest extends TestCase
         $listener->onView(new ControllerAttributeEvent(new Serialize(map: ProductView::class), $viewEvent));
     }
 
-    private function createViewEvent(mixed $controllerResult): ViewEvent
+    public function testStreamControllerResult()
+    {
+        $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'show']);
+
+        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir));
+        $listener->onView(new ControllerAttributeEvent(new Serialize(201, ['X-Test-Header' => 'abc'], stream: true), $viewEvent));
+
+        $response = $viewEvent->getResponse();
+
+        self::assertInstanceOf(StreamedResponse::class, $response);
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('application/json', $response->headers->get('Content-Type'));
+        self::assertSame('abc', $response->headers->get('X-Test-Header'));
+        self::assertSame('{"productId":10}', self::getStreamedContent($response));
+    }
+
+    public function testStreamControllerResultMappedToAClass()
+    {
+        $controllerResult = (static function () {
+            yield new ProductCreated(1);
+            yield new ProductCreated(2);
+        })();
+        $viewEvent = $this->createViewEvent($controllerResult, [new StreamApiController(), 'untyped']);
+
+        $listener = new SerializeControllerResultAttributeListener(null, new ObjectMapper(), JsonStreamWriter::create([], $this->streamWritersDir));
+        $listener->onView(new ControllerAttributeEvent(new Serialize(map: ProductView::class, stream: true), $viewEvent));
+
+        self::assertSame('[{"productId":1},{"productId":2}]', self::getStreamedContent($viewEvent->getResponse()));
+    }
+
+    public function testStreamNullControllerResultMappedToAClass()
+    {
+        $viewEvent = $this->createViewEvent(null, [new StreamApiController(), 'untyped']);
+
+        $listener = new SerializeControllerResultAttributeListener(null, new ObjectMapper(), JsonStreamWriter::create([], $this->streamWritersDir));
+        $listener->onView(new ControllerAttributeEvent(new Serialize(map: ProductView::class, stream: true), $viewEvent));
+
+        self::assertSame('null', self::getStreamedContent($viewEvent->getResponse()));
+    }
+
+    public function testStreamRequiresTheTypeOfTheControllerResult()
+    {
+        $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'untyped']);
+
+        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "stream" option of the "#[Symfony\Component\HttpKernel\Attribute\Serialize]" attribute requires the "map" option or a return type on the controller:');
+
+        $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+    }
+
+    public function testStreamRequiresTheJsonFormat()
+    {
+        $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'show']);
+        $viewEvent->getRequest()->setRequestFormat('xml');
+
+        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir));
+
+        $this->expectException(UnsupportedMediaTypeHttpException::class);
+        $this->expectExceptionMessage('Unsupported format "xml".');
+
+        $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+    }
+
+    public function testStreamRequiresTheJsonStreamer()
+    {
+        $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'show']);
+
+        $listener = new SerializeControllerResultAttributeListener($this->createStub(SerializerInterface::class));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "symfony/json-streamer" component is required to use the "stream" option of the "#[Symfony\Component\HttpKernel\Attribute\Serialize]" attribute.');
+
+        $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+    }
+
+    private function createViewEvent(mixed $controllerResult, ?callable $controller = null): ViewEvent
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $request = new Request();
-        $controller = new GetApiController();
+        $controller ??= new GetApiController();
         $requestType = HttpKernelInterface::MAIN_REQUEST;
 
         return new ViewEvent(
@@ -242,6 +335,24 @@ class SerializeControllerResultListenerTest extends TestCase
                 new ControllerArgumentsEvent($kernel, $controller, [], $request, $requestType),
             ),
         );
+    }
+
+    private static function getStreamedContent(Response $response): string
+    {
+        $content = '';
+        ob_start(static function (string $chunk) use (&$content) {
+            $content .= $chunk;
+
+            return '';
+        });
+
+        try {
+            $response->sendContent();
+        } finally {
+            ob_end_clean();
+        }
+
+        return $content;
     }
 }
 
@@ -263,6 +374,19 @@ class GetApiController
 {
     #[Serialize(201, ['X-Test-Header' => 'abc'], ['foo' => 'bar'])]
     public function __invoke(): ProductCreated
+    {
+        return new ProductCreated(10);
+    }
+}
+
+class StreamApiController
+{
+    public function show(): ProductCreated
+    {
+        return new ProductCreated(10);
+    }
+
+    public function untyped()
     {
         return new ProductCreated(10);
     }

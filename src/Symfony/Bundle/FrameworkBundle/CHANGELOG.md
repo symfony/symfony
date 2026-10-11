@@ -47,6 +47,7 @@ CHANGELOG
  * Add the `framework.request.serializer` and `framework.response.serializer` options
  * Add support for the `#[Lock]` attribute on controllers when the Lock component is enabled
  * Add support for the `map` option of the `#[Serialize]` attribute when the ObjectMapper component is installed
+ * Add support for the `stream` option of the `#[Serialize]` attribute when the JsonStreamer component is installed
 
 8.1
 ---

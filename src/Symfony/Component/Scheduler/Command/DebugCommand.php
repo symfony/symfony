@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Scheduler\Command;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,7 +35,7 @@ final class DebugCommand extends Command
 {
     private array $scheduleNames;
 
-    public function __construct(private ServiceProviderInterface $schedules)
+    public function __construct(private ServiceProviderInterface $schedules, private ?ClockInterface $clock = null)
     {
         $this->scheduleNames = array_keys($this->schedules->getProvidedServices());
 
@@ -87,7 +89,7 @@ final class DebugCommand extends Command
         }
 
         $dateOption = $input->getOption('date');
-        $date = new \DateTimeImmutable($dateOption);
+        $date = new DatePoint($dateOption, new \DateTimeZone(date_default_timezone_get()), $this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(microtime(true)));
         if ('now' !== $dateOption) {
             $io->comment(\sprintf('All next run dates computed from %s.', $date->format('r')));
         }

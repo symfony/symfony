@@ -12,8 +12,12 @@
 namespace Symfony\Component\Scheduler\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Scheduler\Command\DebugCommand;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -27,6 +31,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 class DebugCommandTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     public function testExecuteWithoutSchedules()
     {
         $schedules = $this->createMock(ServiceProviderInterface::class);
@@ -370,6 +376,49 @@ class DebugCommandTest extends TestCase
         $tester->execute(['--date' => '2026-08-15 12:00:00.25 UTC'], ['decorated' => false]);
 
         $this->assertMatchesRegularExpression('/Sat, 15 Aug 2026 13:00:00 \+0000\s+59 min, 59.75 s\s/', $tester->getDisplay(true));
+    }
+
+    #[DataProvider('provideDatesResolvedWithTheClock')]
+    #[Group('time-sensitive')]
+    public function testExecuteResolvesTheDateWithTheClock(array $input, string $nextRun)
+    {
+        ClockMock::withClockMock((new \DateTimeImmutable('2030-01-01 06:00:00'))->getTimestamp());
+
+        $schedule = new Schedule();
+        $schedule->add(RecurringMessage::every('1 hour', new \stdClass()));
+
+        $schedules = $this->createStub(ServiceProviderInterface::class);
+        $schedules->method('getProvidedServices')->willReturn(['schedule_name' => $schedule]);
+        $schedules->method('get')->willReturn($schedule);
+
+        $tester = new CommandTester(new DebugCommand($schedules));
+        $tester->execute($input, ['decorated' => false]);
+
+        $this->assertMatchesRegularExpression('/'.preg_quote((new \DateTimeImmutable($nextRun))->format('r'), '/').'\s+1 h\s/', $tester->getDisplay(true));
+    }
+
+    public static function provideDatesResolvedWithTheClock(): iterable
+    {
+        yield 'now' => [[], '2030-01-01 07:00:00'];
+        yield 'relative date' => [['--date' => '+1 day'], '2030-01-02 07:00:00'];
+    }
+
+    #[DataProvider('provideDatesResolvedWithTheClock')]
+    public function testExecuteResolvesTheDateWithTheGivenClock(array $input, string $nextRun)
+    {
+        self::mockTime('2020-01-01 00:00:00');
+
+        $schedule = new Schedule();
+        $schedule->add(RecurringMessage::every('1 hour', new \stdClass()));
+
+        $schedules = $this->createStub(ServiceProviderInterface::class);
+        $schedules->method('getProvidedServices')->willReturn(['schedule_name' => $schedule]);
+        $schedules->method('get')->willReturn($schedule);
+
+        $tester = new CommandTester(new DebugCommand($schedules, new MockClock('2030-01-01 06:00:00')));
+        $tester->execute($input, ['decorated' => false]);
+
+        $this->assertMatchesRegularExpression('/'.preg_quote((new \DateTimeImmutable($nextRun))->format('r'), '/').'\s+1 h\s/', $tester->getDisplay(true));
     }
 
     public function testExecuteWithStatefulScheduleWithoutCheckpointFallsBackToNow()

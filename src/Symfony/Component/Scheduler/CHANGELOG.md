@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Use the global clock to resolve relative dates in the `$from` and `$until` arguments of `PeriodicalTrigger`
+ * Add a `$clock` argument to `DebugCommand` to resolve relative dates in the `--date` option of `debug:scheduler`
  * Yield the message of a `RedispatchMessage` with a `RedispatchStamp`, and with a `TransportNamesStamp` when it names transports, instead of the `RedispatchMessage` itself
  * Register the listeners of `before()`, `after()` and `onFailure()` on the schedule itself, and deprecate the `$dispatcher` argument of `Schedule::__construct()`
  * Add `SchedulerBundle`, which provides the `scheduler` configuration and the services previously provided by `FrameworkBundle` under `framework.scheduler`

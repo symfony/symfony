@@ -23,6 +23,7 @@ use MongoDB\Driver\WriteConcern;
 use MongoDB\Model\BSONDocument;
 use MongoDB\Operation\FindOneAndUpdate;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 
@@ -46,12 +47,12 @@ class Connection
         private readonly Collection $collection,
         private readonly string $queueName = 'default',
         private readonly int $redeliverTimeout = 3600,
-        private readonly ?ClockInterface $clock = null,
+        private readonly ClockInterface $clock = new Clock(),
     ) {
         $this->uniqueId = 'consumer_'.bin2hex(random_bytes(16));
     }
 
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], ?Client $client = null, ?ClockInterface $clock = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], ?Client $client = null, ClockInterface $clock = new Clock()): self
     {
         [$configuration, $uri] = self::buildConfiguration($dsn, $options);
 
@@ -158,7 +159,7 @@ class Connection
         $updateStatement = [
             '$set' => [
                 'deliveredTo' => $this->uniqueId,
-                'deliveredAt' => new UTCDateTime($this->now()),
+                'deliveredAt' => new UTCDateTime($this->clock->now()),
             ],
         ];
 
@@ -191,7 +192,7 @@ class Connection
      */
     public function send(string $body, array $headers = [], int $delay = 0, ?Session $session = null, ?string $queueName = null): ObjectId
     {
-        $document = $this->createDocument($this->now(), $body, $headers, $delay, $queueName);
+        $document = $this->createDocument($this->clock->now(), $body, $headers, $delay, $queueName);
 
         try {
             $insertResult = $this->collection->insertOne($document, $this->getWriteOptions($session));
@@ -213,7 +214,7 @@ class Connection
      */
     public function sendBatch(array $messages): array
     {
-        $now = $this->now();
+        $now = $this->clock->now();
         $ids = $requests = $documents = [];
         $session = null;
 
@@ -380,7 +381,7 @@ class Connection
     {
         $queueNames ??= [$this->queueName];
 
-        $now = $this->now();
+        $now = $this->clock->now();
         $redeliverLimit = $now->modify(\sprintf('-%d seconds', $this->redeliverTimeout));
 
         return [
@@ -423,11 +424,6 @@ class Connection
         ];
 
         return $readOptions;
-    }
-
-    private function now(): \DateTimeImmutable
-    {
-        return $this->clock?->now() ?? new \DateTimeImmutable();
     }
 
     /**

@@ -12,6 +12,9 @@
 namespace Symfony\Component\KeyManagement;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\Embeddable;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\MappedSuperclass;
 use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Console\Application;
@@ -32,6 +35,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterEncryptedColumnsPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
 use Symfony\Component\KeyManagement\DependencyInjection\KeyManagementPass;
@@ -85,6 +89,10 @@ class KeyManagementBundle extends AbstractBundle
 
         if (class_exists(RegisterBlindIndexesPass::class)) {
             $container->addCompilerPass(new RegisterBlindIndexesPass());
+        }
+
+        if (class_exists(RegisterEncryptedColumnsPass::class)) {
+            $container->addCompilerPass(new RegisterEncryptedColumnsPass());
         }
     }
 
@@ -272,6 +280,12 @@ class KeyManagementBundle extends AbstractBundle
         $container->registerForAutoconfiguration(BlindIndexInterface::class)
             ->addTag('key_management.blind_index');
 
+        if (class_exists(RegisterEncryptedColumnsPass::class)) {
+            foreach ([Entity::class, Embeddable::class, MappedSuperclass::class] as $mapping) {
+                $container->registerAttributeForAutoconfiguration($mapping, RegisterEncryptedColumnsPass::autoconfigure(...));
+            }
+        }
+
         $clients = $config['clients'];
 
         $defaultName = $config['default_client'] ?? (1 === \count($clients) ? array_key_first($clients) : null);
@@ -323,9 +337,11 @@ class KeyManagementBundle extends AbstractBundle
             $this->registerStore($config['store'], array_keys($clients), $defaultName, $container);
         }
 
-        if ($config['doctrine_dbal']['types'] ?? []) {
-            $this->registerDoctrineDbalTypes($config['doctrine_dbal']['types'], isset($config['store']['key_id']), $defaultName, $container);
-        }
+        $this->registerDoctrineDbalTypes($config['doctrine_dbal']['types'] ?? [], match (true) {
+            isset($config['store']['key_id']) => 'key_management.stored_envelope_encrypter',
+            null !== $defaultName => 'key_management.envelope_encrypter.'.$defaultName,
+            default => null,
+        }, $container);
     }
 
     /**
@@ -442,23 +458,28 @@ class KeyManagementBundle extends AbstractBundle
      *
      * They encrypt with the encrypter the envelope interfaces resolve to: the store-backed one when a store is configured, the default client's otherwise.
      *
+     * With the Doctrine ORM bridge, they are registered even when none is configured.
+     * RegisterEncryptedColumnsPass then adds the types of the columns marked with #[Encrypted], and removes the service when there is none.
+     *
      * @param array<string, array{type: string, key: string}> $types
      */
-    private function registerDoctrineDbalTypes(array $types, bool $hasStore, ?string $defaultName, ContainerBuilder $container): void
+    private function registerDoctrineDbalTypes(array $types, ?string $encrypter, ContainerBuilder $container): void
     {
-        if (!ContainerBuilder::willBeAvailable('symfony/doctrine-dbal-key-management', EncryptedTypes::class, ['symfony/key-management'])) {
-            throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "symfony/doctrine-dbal-key-management" package. Try running "composer require symfony/doctrine-dbal-key-management".');
-        }
+        if ($types) {
+            if (!ContainerBuilder::willBeAvailable('symfony/doctrine-dbal-key-management', EncryptedTypes::class, ['symfony/key-management'])) {
+                throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "symfony/doctrine-dbal-key-management" package. Try running "composer require symfony/doctrine-dbal-key-management".');
+            }
 
-        if (!ContainerBuilder::willBeAvailable('doctrine/dbal', Type::class, ['symfony/doctrine-dbal-key-management', 'symfony/key-management'])) {
-            throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "doctrine/dbal" package. Try running "composer require doctrine/dbal".');
-        }
+            if (!ContainerBuilder::willBeAvailable('doctrine/dbal', Type::class, ['symfony/doctrine-dbal-key-management', 'symfony/key-management'])) {
+                throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "doctrine/dbal" package. Try running "composer require doctrine/dbal".');
+            }
 
-        $encrypter = match (true) {
-            $hasStore => 'key_management.stored_envelope_encrypter',
-            null !== $defaultName => 'key_management.envelope_encrypter.'.$defaultName,
-            default => throw new LogicException('The "key_management.doctrine_dbal.types" need an envelope encrypter: configure "key_management.store", or set "key_management.default_client".'),
-        };
+            if (null === $encrypter) {
+                throw new LogicException('The "key_management.doctrine_dbal.types" need an envelope encrypter: configure "key_management.store", or set "key_management.default_client".');
+            }
+        } elseif (null === $encrypter || !class_exists(RegisterEncryptedColumnsPass::class)) {
+            return;
+        }
 
         $container->register('key_management.doctrine_dbal.encrypted_types', EncryptedTypes::class)
             ->setArguments([new Reference($encrypter), $types])

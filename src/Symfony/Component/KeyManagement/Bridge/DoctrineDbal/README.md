@@ -80,6 +80,9 @@ When `key_management.store` is configured, this is the store-backed encrypter, a
 Otherwise, this is the encrypter of the default client, and `key` names a master key.
 The bundle declares the types when the kernel boots.
 
+With the Doctrine ORM, you don't need to declare these types.
+Mark the property with the `#[Encrypted]` attribute of `symfony/doctrine-orm-key-management` instead, and the bundle registers the type of the column for you.
+
 Booting is early enough for every entry point at once, the front controller,
 the console with its schema tool and its migrations, and the test kernel, and
 it costs nothing: a DBAL connection only reaches the database on its first

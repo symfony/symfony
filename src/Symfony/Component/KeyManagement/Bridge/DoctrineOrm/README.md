@@ -1,7 +1,8 @@
 Symfony Doctrine ORM Key Management Bridge
 ==========================================
 
-Connects `symfony/key-management` to the Doctrine ORM: a `#[BlindIndexed]` attribute
+Connects `symfony/key-management` to the Doctrine ORM: an `#[Encrypted]` attribute
+that encrypts the column of a property, a `#[BlindIndexed]` attribute
 whose listener fills the blind index of a property on every flush, and a schema
 listener declaring the table the data key store of
 `symfony/doctrine-dbal-key-management` needs.
@@ -10,6 +11,68 @@ listener declaring the table the data key store of
 [Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
 are not covered by Symfony's
 [Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
+
+Encrypted columns
+-----------------
+
+The `#[Encrypted]` attribute encrypts the column of a property at rest:
+
+```php
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
+
+#[ORM\Column(nullable: true)]
+#[Encrypted(key: 'speaker.contact')]
+public ?string $phone = null;
+```
+
+The column keeps the type of its mapping, `string` here.
+That type converts the value first, then the value is encrypted under the key.
+The column is stored as a binary one.
+When the encrypter uses a data key store, the key is the scope of the data key.
+
+`EncryptedColumnListener` gives each of these columns the encrypted type registered for its key and its type.
+It runs when the metadata of a class is loaded, so the metadata cache keeps that type.
+This is why the listener doesn't register the types.
+They must be registered before the first query.
+The listener gets the names of the types, by key and by the type they wrap:
+
+```php
+use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Events;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
+
+Type::getTypeRegistry()->register('app_speaker_contact', new EncryptedType(new StringType(), $encrypter, 'speaker.contact'));
+
+$eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnListener([
+    'speaker.contact' => ['string' => 'app_speaker_contact'],
+]));
+```
+
+Loading the metadata of a class fails when no encrypted type is registered for the key and the type of a column.
+It also fails when the attribute is on a property that is not a mapped column.
+
+In a Symfony application, the `KeyManagementBundle` registers the types when the kernel boots.
+When the container is compiled, the bundle finds the `#[Encrypted]` columns and registers one type per key and type.
+It looks for these columns in the entities, embeddables and mapped superclasses found in the `resource` directories of your services.
+With the default `App\:` resource, this covers `src/Entity/`.
+The types encrypt with the encrypter `EnvelopeEncrypterInterface` resolves to, like the ones of `key_management.doctrine_dbal.types`.
+A type declared there is used for the columns of its key and type, instead of registering another one.
+
+The type of a column is read from its `#[ORM\Column]` attribute, or guessed from the type of the property, as the ORM does by default.
+The container misses the columns of an entity that your services exclude, or that is mapped in XML.
+It can also guess another type than the ORM when you use a custom typed field mapper.
+Loading the metadata of such an entity fails, `cache:warmup` included.
+Declare its types in `key_management.doctrine_dbal.types`, and the attribute uses them:
+
+```yaml
+key_management:
+    doctrine_dbal:
+        types:
+            speaker_contact: { type: string, key: speaker.contact }
+```
 
 Blind indexes
 -------------

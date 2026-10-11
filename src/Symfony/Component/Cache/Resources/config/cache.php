@@ -227,6 +227,7 @@ return static function (ContainerConfigurator $container) {
                 0, // default lifetime
                 [], // options
                 service('cache.default_marshaller')->ignoreOnInvalid(),
+                service('clock')->nullOnInvalid(),
             ])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', [
@@ -244,6 +245,7 @@ return static function (ContainerConfigurator $container) {
                 0, // default lifetime
                 [], // options
                 service('cache.default_marshaller')->ignoreOnInvalid(),
+                service('clock')->nullOnInvalid(),
             ])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', [

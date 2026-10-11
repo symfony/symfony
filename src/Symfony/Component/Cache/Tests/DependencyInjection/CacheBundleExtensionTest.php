@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -21,8 +22,10 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 
 class CacheBundleExtensionTest extends TestCase
 {
@@ -71,6 +74,15 @@ class CacheBundleExtensionTest extends TestCase
         $bar = $container->getDefinition('cache.bar');
         $this->assertSame(TagAwareAdapter::class, $bar->getClass());
         $this->assertSame('.cache.bar.inner', (string) $bar->getArgument(0));
+    }
+
+    #[TestWith(['cache.adapter.mongodb'])]
+    #[TestWith(['cache.adapter.mongodb_tag_aware'])]
+    public function testTheMongoDbAdaptersUseTheClock(string $id)
+    {
+        $adapter = $this->createContainerFromFile('cache')->getDefinition($id);
+
+        $this->assertEquals(new Reference('clock', ContainerInterface::NULL_ON_INVALID_REFERENCE), $adapter->getArguments()[5] ?? null);
     }
 
     public function testTheDefaultProviderDeducesTheAdapterFromTheDsn()

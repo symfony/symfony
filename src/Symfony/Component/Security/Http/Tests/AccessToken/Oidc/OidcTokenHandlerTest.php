@@ -29,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -1143,6 +1144,28 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame(2, $requestCount);
         $this->assertSame('user-expires', $handler->getUserBadgeFrom($token)->getUserIdentifier());
         $this->assertSame(2, $requestCount);
+    }
+
+    public function testDiscoveryCachesJwksUntilTheirExpiresOnTheClock()
+    {
+        $httpClient = new MockHttpClient(static function (string $method, string $url): JsonMockResponse {
+            if (str_contains($url, 'openid-configuration')) {
+                return new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']);
+            }
+
+            return new JsonMockResponse(
+                ['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]],
+                ['response_headers' => ['Expires' => 'Sat, 01 Jan 2000 00:10:00 GMT']]
+            );
+        });
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com'], 'sub', null, new MockClock('2000-01-01 00:00:00 UTC'), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_ttl_clock');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->once())->method('expiresAfter')->with(600);
+
+        $handler->computeDiscoveryKeys($item);
     }
 
     public function testComputeDiscoveryKeysReturnsEmptyWhenNoClients()

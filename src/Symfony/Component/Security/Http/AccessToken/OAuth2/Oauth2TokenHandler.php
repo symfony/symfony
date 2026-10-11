@@ -339,7 +339,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
      */
     private function computeMetadataKeys(ItemInterface $item): array
     {
-        [$keys, $ttl] = OidcJwks::fromResponse($this->metadataClient->request('GET', $this->metadata->getConfiguration()['jwks_uri'], ['max_redirects' => 0]), true);
+        [$keys, $ttl] = OidcJwks::fromResponse($this->metadataClient->request('GET', $this->metadata->getConfiguration()['jwks_uri'], ['max_redirects' => 0]), true, $this->clock);
 
         if (0 < ($ttl ?? -1)) {
             $item->expiresAfter(min($ttl, OidcJwks::MAX_TTL));

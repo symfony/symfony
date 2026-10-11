@@ -274,7 +274,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
             }
 
             foreach ($jwkSetResponses as $issuer => $response) {
-                [$keys, $currentTtl] = OidcJwks::fromResponse($response, $this->enforceKeyUsageVerification);
+                [$keys, $currentTtl] = OidcJwks::fromResponse($response, $this->enforceKeyUsageVerification, $this->clock);
 
                 // Apply the lowest TTL found to ensure all keys in the set are still valid
                 if (null !== $currentTtl && (null === $minTtl || $currentTtl < $minTtl)) {

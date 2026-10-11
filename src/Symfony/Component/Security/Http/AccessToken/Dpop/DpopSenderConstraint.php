@@ -201,10 +201,10 @@ final class DpopSenderConstraint implements SenderConstraintInterface
         }
 
         $this->checkRequest($request, $payload);
-        $expiresAt = $this->checkIssuedAt($payload);
+        $lifetime = $this->checkIssuedAt($payload);
         $this->checkAccessTokenHash($payload, $accessToken);
 
-        $this->rememberProof($jkt, $payload, $expiresAt);
+        $this->rememberProof($jkt, $payload, $lifetime);
 
         return $jkt;
     }
@@ -234,7 +234,7 @@ final class DpopSenderConstraint implements SenderConstraintInterface
      *
      * @param array<string, mixed> $payload
      *
-     * @return int the moment the proof stops standing, as a timestamp
+     * @return int how long the proof still stands, in seconds
      *
      * @throws InvalidDpopProofException
      */
@@ -257,7 +257,7 @@ final class DpopSenderConstraint implements SenderConstraintInterface
         }
 
         // cast once the window bounds it: a float out of the integer range has no integer value
-        return (int) ceil($issuedAt) + $this->proofLifetime + $this->allowedTimeDrift;
+        return (int) ceil($issuedAt) + $this->proofLifetime + $this->allowedTimeDrift - $now;
     }
 
     /**
@@ -293,7 +293,7 @@ final class DpopSenderConstraint implements SenderConstraintInterface
      *
      * @throws InvalidDpopProofException
      */
-    private function rememberProof(string $jkt, array $payload, int $expiresAt): void
+    private function rememberProof(string $jkt, array $payload, int $lifetime): void
     {
         $identifier = $payload['jti'] ?? null;
         if (!\is_string($identifier) || '' === $identifier) {
@@ -305,7 +305,7 @@ final class DpopSenderConstraint implements SenderConstraintInterface
             throw new InvalidDpopProofException('The DPoP proof was presented before (RFC 9449, Section 11.1).');
         }
 
-        if (!$this->proofReplayCache->save($item->set(true)->expiresAt(new \DateTimeImmutable('@'.$expiresAt)))) {
+        if (!$this->proofReplayCache->save($item->set(true)->expiresAfter($lifetime))) {
             throw new InvalidDpopProofException('The DPoP proof could not be remembered, so a second presentation of it could not be told from this one (RFC 9449, Section 11.1).');
         }
     }

@@ -187,7 +187,7 @@ final class OidcSignatureVerifier
         // marker would collide with the other strictness of the same endpoint
         $cacheKey = 'oidc_jwks.'.($this->enforceKeyUsageVerification ? '' : 'lax.').hash('xxh128', $jwksUri);
         $compute = fn (ItemInterface $item): array => [
-            'keys' => OidcJwks::fetchKeys($this->httpClient, $jwksUri, $item, $this->jwksCacheTtl, $this->enforceKeyUsageVerification),
+            'keys' => OidcJwks::fetchKeys($this->httpClient, $jwksUri, $item, $this->jwksCacheTtl, $this->enforceKeyUsageVerification, $this->clock),
             // the JWKS is stored with the time it was fetched, so that the rotation
             // refetch below can be throttled without a second cache entry
             'fetched_at' => $this->clock->now()->getTimestamp(),

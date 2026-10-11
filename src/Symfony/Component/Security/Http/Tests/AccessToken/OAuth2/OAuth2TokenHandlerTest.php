@@ -512,6 +512,25 @@ class OAuth2TokenHandlerTest extends TestCase
         $this->assertContains($metadataUrl, $requested);
     }
 
+    #[RequiresPhpExtension('openssl')]
+    public function testCachesTheMetadataKeysUntilTheirExpiresOnTheClock()
+    {
+        $client = new MockHttpClient(static fn (string $method, string $url): MockResponse => match (true) {
+            str_contains($url, '/.well-known/') => new JsonMockResponse(['issuer' => self::ISSUER, 'jwks_uri' => 'https://as.example.com/jwks']),
+            str_contains($url, '/jwks') => new JsonMockResponse(['keys' => [self::publicJwk()->all() + ['use' => 'sig']]], ['response_headers' => ['Expires' => 'Fri, 21 Jun 2024 20:10:00 GMT']]),
+            default => self::jwtResponse(self::signedResponsePayload(self::activeClaims(['sub' => 'jdoe']))),
+        }, self::ENDPOINT);
+
+        $handler = self::createHandler($client, [self::AUDIENCE], self::ISSUER);
+        $handler->enableSignedResponse(new AlgorithmManager([new ES256()]), null);
+        $handler->enableSignedResponseDiscovery($cache = new ArrayAdapter(), $client, 'metadata.');
+
+        $this->assertSame('jdoe', $handler->getUserBadgeFrom('a-secret-token')->getUserIdentifier());
+
+        $item = $cache->getItem('metadata.');
+        $this->assertEqualsWithDelta(600, $item->getMetadata()[$item::METADATA_EXPIRY] - microtime(true), 2);
+    }
+
     /**
      * The options are asserted after the call: the handler turns every exception the response
      * factory raises into a BadCredentialsException, a failed assertion included.

@@ -74,12 +74,31 @@ class AmqpReceiverTest extends TestCase
 
         $amqpEnvelope = $this->createAMQPEnvelope();
         $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['queueName']);
         $connection->expects($this->exactly(2))->method('get')->with('queueName')->willReturnOnConsecutiveCalls($amqpEnvelope, null);
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $actualEnvelopes = iterator_to_array($receiver->getFromQueues(['queueName'], 7));
 
         $this->assertCount(1, $actualEnvelopes);
+    }
+
+    public function testItOnlyGetsMessagesFromConfiguredQueues()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+
+        $amqpEnvelope = $this->createAMQPEnvelope();
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['queue1', 'queue2']);
+        $connection->expects($this->once())->method('get')->with('queue1')->willReturn($amqpEnvelope);
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        $actualEnvelopes = iterator_to_array($receiver->getFromQueues(['queue1', 'unknown_queue']), false);
+
+        $this->assertCount(1, $actualEnvelopes);
+        $this->assertSame('queue1', $actualEnvelopes[0]->last(AmqpReceivedStamp::class)->getQueueName());
     }
 
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()

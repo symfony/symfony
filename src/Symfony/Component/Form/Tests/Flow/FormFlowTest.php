@@ -25,9 +25,11 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\Tests\Fixtures\Flow\Data\Order;
 use Symfony\Component\Form\Tests\Fixtures\Flow\Data\UserSignUp;
 use Symfony\Component\Form\Tests\Fixtures\Flow\Extension\UserSignUpTypeExtension;
 use Symfony\Component\Form\Tests\Fixtures\Flow\LastStepSkippedType;
+use Symfony\Component\Form\Tests\Fixtures\Flow\OrderType;
 use Symfony\Component\Form\Tests\Fixtures\Flow\UserSignUpType;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
@@ -772,6 +774,34 @@ class FormFlowTest extends TestCase
         self::assertTrue($button->isNextAction());
         self::assertSame($flow, $flow->getStepForm());
         self::assertSame('This value should not be blank.', $flow->getErrors(true)->current()->getMessage());
+    }
+
+    public function testInvalidStepData()
+    {
+        $flow = $this->factory->create(OrderType::class, new Order());
+
+        $flow->submit([
+            'buyer' => ['name' => ''],
+            'navigator' => ['next' => ''],
+        ]);
+
+        self::assertFalse($flow->isValid());
+        self::assertCount(1, $errors = $flow->get('buyer')->get('name')->getErrors());
+        self::assertSame('This value should not be blank.', $errors[0]->getMessage());
+        self::assertCount(1, $flow->getErrors(true));
+    }
+
+    public function testDataOfOtherStepsIsNotValidated()
+    {
+        $flow = $this->factory->create(OrderType::class, new Order());
+
+        $flow->submit([
+            'buyer' => ['name' => 'John'],
+            'navigator' => ['next' => ''],
+        ]);
+
+        self::assertTrue($flow->isValid());
+        self::assertSame('recipient', $flow->getStepForm()->getCursor()->getCurrentStep());
     }
 
     public function testCannotModifyStepConfigAfterFormBuilding()

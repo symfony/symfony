@@ -53,8 +53,9 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
     public function getFromQueues(array $queueNames/* , int $fetchSize = 1 */): iterable
     {
         $fetchSize = \func_num_args() > 1 ? max(1, func_get_arg(1)) : 1;
+        $queueNames = array_values(array_intersect($queueNames, $this->connection->getQueueNames()));
         $remaining = $fetchSize;
-        $activeQueues = array_values($queueNames);
+        $activeQueues = $queueNames;
         $firstRound = true;
 
         while ($activeQueues && ($remaining > 0 || $firstRound)) {

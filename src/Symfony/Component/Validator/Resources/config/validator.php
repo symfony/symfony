@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Constraints\NoSuspiciousCharactersValidator;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
 use Symfony\Component\Validator\Constraints\NotEqualToValidator;
 use Symfony\Component\Validator\Constraints\NotIdenticalToValidator;
+use Symfony\Component\Validator\Constraints\PathAvailableValidator;
 use Symfony\Component\Validator\Constraints\RangeValidator;
 use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
@@ -191,5 +192,12 @@ return static function (ContainerConfigurator $container) {
         ->set('validator.form.attribute_metadata', Form::class)
             ->tag('container.excluded')
             ->tag('validator.attribute_metadata')
+
+        ->set('validator.path_available', PathAvailableValidator::class)
+            ->args([
+                service('router'),
+            ])
+            ->tag('validator.constraint_validator')
+            ->tag('container.remove_if_missing', ['service' => 'router'])
     ;
 };

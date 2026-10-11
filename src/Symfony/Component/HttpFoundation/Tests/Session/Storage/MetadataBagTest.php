@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
 /**
@@ -142,5 +143,37 @@ class MetadataBagTest extends TestCase
         $bag->initialize($sessionMetadata);
 
         $this->assertSame(60, $bag->getLifetime());
+    }
+
+    public function testClock()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00 UTC');
+        $created = $clock->now()->getTimestamp();
+        $sessionMetadata = [];
+
+        $bag = new MetadataBag('_sf2_meta', 30, null, $clock);
+        $bag->initialize($sessionMetadata);
+
+        $this->assertSame($created, $bag->getCreated());
+        $this->assertSame($created, $bag->getLastUsed());
+
+        $clock->sleep(20);
+        $bag = new MetadataBag('_sf2_meta', 30, null, $clock);
+        $bag->initialize($sessionMetadata);
+
+        $this->assertSame($created, $bag->getLastUsed());
+        $this->assertSame($created, $sessionMetadata[MetadataBag::UPDATED]);
+
+        $clock->sleep(20);
+        $bag = new MetadataBag('_sf2_meta', 30, null, $clock);
+        $bag->initialize($sessionMetadata);
+
+        $this->assertSame($created, $bag->getLastUsed());
+        $this->assertSame($created + 40, $sessionMetadata[MetadataBag::UPDATED]);
+
+        $bag->stampNew();
+
+        $this->assertSame($created + 40, $bag->getCreated());
+        $this->assertSame($created + 40, $bag->getLastUsed());
     }
 }

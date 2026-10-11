@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle;
 
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\AttributeExtensionPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\LazyExtensionPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\SafeClassPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
@@ -39,5 +40,6 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new TwigLoaderPass());
         $container->addCompilerPass(new SafeClassPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new LazyExtensionPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 }

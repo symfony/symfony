@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Transport;
 
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
@@ -72,7 +73,7 @@ class RoundRobinTransport implements TransportInterface
             try {
                 return $transport->send($message);
             } catch (TransportExceptionInterface) {
-                $this->deadTransports[$transport] = microtime(true);
+                $this->deadTransports[$transport] = $this->now();
             }
         }
 
@@ -102,7 +103,7 @@ class RoundRobinTransport implements TransportInterface
                 break;
             }
 
-            if ((microtime(true) - $this->deadTransports[$transport]) > $this->retryPeriod) {
+            if (($this->now() - $this->deadTransports[$transport]) > $this->retryPeriod) {
                 unset($this->deadTransports[$transport]);
 
                 break;
@@ -138,6 +139,11 @@ class RoundRobinTransport implements TransportInterface
     private function moveCursor(int $cursor): int
     {
         return ++$cursor >= \count($this->transports) ? 0 : $cursor;
+    }
+
+    private function now(): float
+    {
+        return class_exists(Clock::class) ? (float) Clock::get()->now()->format('U.u') : microtime(true);
     }
 }
 

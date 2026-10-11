@@ -10,6 +10,7 @@ CHANGELOG
  * Deprecate declaring `getAdminRecipients()` without implementing `AdminRecipientsProviderInterface`
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0
  * Add `AbstractTransport::setSsl()`, `AbstractTransport::getHttpScheme()`, the `AbstractTransport::SSL` constant and `AbstractTransportFactory::getSsl()` to support the `ssl` DSN option of the bridges
+ * Use the global clock of symfony/clock, when installed, for the retry period of `RoundRobinTransport` and `FailoverTransport`
 
 8.0
 ---

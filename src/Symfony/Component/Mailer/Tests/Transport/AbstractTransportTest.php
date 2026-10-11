@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Envelope;
@@ -33,32 +33,35 @@ use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
-#[Group('time-sensitive')]
 class AbstractTransportTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     public function testThrottling()
     {
+        $clock = self::mockTime();
+
         $transport = new NullTransport();
         $transport->setMaxPerSecond(2 / 10);
         $message = new RawMessage('');
         $envelope = new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')]);
 
-        $start = time();
+        $start = $clock->now()->getTimestamp();
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(0, time() - $start, 1);
+        $this->assertEqualsWithDelta(0, $clock->now()->getTimestamp() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(5, time() - $start, 1);
+        $this->assertEqualsWithDelta(5, $clock->now()->getTimestamp() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(10, time() - $start, 1);
+        $this->assertEqualsWithDelta(10, $clock->now()->getTimestamp() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(15, time() - $start, 1);
+        $this->assertEqualsWithDelta(15, $clock->now()->getTimestamp() - $start, 1);
 
-        $start = time();
+        $start = $clock->now()->getTimestamp();
         $transport->setMaxPerSecond(-3);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(0, time() - $start, 1);
+        $this->assertEqualsWithDelta(0, $clock->now()->getTimestamp() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEqualsWithDelta(0, time() - $start, 1);
+        $this->assertEqualsWithDelta(0, $clock->now()->getTimestamp() - $start, 1);
     }
 
     public function testRateLimiting()

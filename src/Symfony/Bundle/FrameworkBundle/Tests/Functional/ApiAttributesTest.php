@@ -981,6 +981,36 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedResponse' => '',
             'expectedStatusCode' => 415,
         ];
+
+        yield 'map controller result before serializing it' => [
+            'uri' => '/serialize-mapped-controller-result',
+            'format' => 'json',
+            'expectedResponse' => <<<'JSON'
+                {
+                    "id": 101,
+                    "name": "Laptop"
+                }
+                JSON,
+            'expectedStatusCode' => 200,
+        ];
+
+        yield 'map each item of controller result before serializing it' => [
+            'uri' => '/serialize-mapped-controller-results',
+            'format' => 'json',
+            'expectedResponse' => <<<'JSON'
+                [
+                    {
+                        "id": 101,
+                        "name": "Laptop"
+                    },
+                    {
+                        "id": 102,
+                        "name": "Phone"
+                    }
+                ]
+                JSON,
+            'expectedStatusCode' => 200,
+        ];
     }
 
     #[RequiresMethod(ControllerAttributesListener::class, 'beforeController')]
@@ -1107,6 +1137,25 @@ class WithSerializeAttributeController
     }
 }
 
+class WithSerializeAndMapAttributeController
+{
+    #[Serialize(map: ProductSummary::class)]
+    public function __invoke(): Product
+    {
+        return new Product(101, 'Laptop', new \DateTimeImmutable('2021-12-31T12:34:56+00:00'));
+    }
+}
+
+class WithSerializeAndMapAttributeOnGeneratorController
+{
+    #[Serialize(map: ProductSummary::class)]
+    public function __invoke(): iterable
+    {
+        yield new Product(101, 'Laptop', new \DateTimeImmutable('2021-12-31T12:34:56+00:00'));
+        yield new Product(102, 'Phone', new \DateTimeImmutable('2022-01-31T12:34:56+00:00'));
+    }
+}
+
 class WithMapRequestPayloadAndSerializeAttributesController
 {
     #[Serialize]
@@ -1152,6 +1201,15 @@ class Product
         public readonly int $id,
         public readonly string $name,
         public readonly \DateTimeImmutable $createdAt,
+    ) {
+    }
+}
+
+class ProductSummary
+{
+    public function __construct(
+        public readonly int $id,
+        public readonly string $name,
     ) {
     }
 }

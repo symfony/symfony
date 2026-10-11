@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\SerializeControllerResultAttributeListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class SerializeControllerResultListenerTest extends TestCase
@@ -151,9 +152,107 @@ class SerializeControllerResultListenerTest extends TestCase
         self::assertSame(202, $response->getStatusCode());
         self::assertSame($responseBody, $response->getContent());
     }
+
+    public function testMapControllerResult()
+    {
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())
+            ->method('serialize')
+            ->with(new ProductView(10), 'json', [])
+            ->willReturn('{"productId": 10}');
+
+        $viewEvent = $this->createViewEvent(new ProductCreated(10));
+
+        $listener = new SerializeControllerResultAttributeListener($serializer, new ObjectMapper());
+        $listener->onView(new ControllerAttributeEvent(new Serialize(map: ProductView::class), $viewEvent));
+
+        self::assertSame('{"productId": 10}', $viewEvent->getResponse()->getContent());
+    }
+
+    public function testMapEachItemOfAnArrayControllerResult()
+    {
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())
+            ->method('serialize')
+            ->with(['a' => new ProductView(1), 'b' => null, 'c' => new ProductView(3)], 'json', [])
+            ->willReturn('{}');
+
+        $viewEvent = $this->createViewEvent(['a' => new ProductCreated(1), 'b' => null, 'c' => new ProductCreated(3)]);
+
+        $listener = new SerializeControllerResultAttributeListener($serializer, new ObjectMapper());
+        $listener->onView(new ControllerAttributeEvent(new Serialize(map: ProductView::class), $viewEvent));
+
+        self::assertSame('{}', $viewEvent->getResponse()->getContent());
+    }
+
+    public function testMapEachItemOfAGeneratorControllerResultLazily()
+    {
+        $started = false;
+        $controllerResult = (static function () use (&$started) {
+            $started = true;
+            yield 'a' => new ProductCreated(1);
+            yield 'b' => new ProductCreated(2);
+        })();
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())
+            ->method('serialize')
+            ->willReturnCallback(static function (mixed $data) use (&$started) {
+                self::assertFalse($started);
+                self::assertInstanceOf(\Generator::class, $data);
+                self::assertEquals(['a' => new ProductView(1), 'b' => new ProductView(2)], iterator_to_array($data));
+
+                return '{}';
+            });
+
+        $viewEvent = $this->createViewEvent($controllerResult);
+
+        $listener = new SerializeControllerResultAttributeListener($serializer, new ObjectMapper());
+        $listener->onView(new ControllerAttributeEvent(new Serialize(map: ProductView::class), $viewEvent));
+
+        self::assertSame('{}', $viewEvent->getResponse()->getContent());
+    }
+
+    public function testMapRequiresTheObjectMapper()
+    {
+        $viewEvent = $this->createViewEvent(new ProductCreated(10));
+
+        $listener = new SerializeControllerResultAttributeListener($this->createStub(SerializerInterface::class));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "symfony/object-mapper" component is required to use the "map" option of the "#[Symfony\Component\HttpKernel\Attribute\Serialize]" attribute.');
+
+        $listener->onView(new ControllerAttributeEvent(new Serialize(map: ProductView::class), $viewEvent));
+    }
+
+    private function createViewEvent(mixed $controllerResult): ViewEvent
+    {
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = new Request();
+        $controller = new GetApiController();
+        $requestType = HttpKernelInterface::MAIN_REQUEST;
+
+        return new ViewEvent(
+            $kernel,
+            $request,
+            $requestType,
+            $controllerResult,
+            new ControllerArgumentsMetadata(
+                new ControllerEvent($kernel, $controller, $request, $requestType),
+                new ControllerArgumentsEvent($kernel, $controller, [], $request, $requestType),
+            ),
+        );
+    }
 }
 
 class ProductCreated
+{
+    public function __construct(public readonly int $productId)
+    {
+    }
+}
+
+class ProductView
 {
     public function __construct(public readonly int $productId)
     {

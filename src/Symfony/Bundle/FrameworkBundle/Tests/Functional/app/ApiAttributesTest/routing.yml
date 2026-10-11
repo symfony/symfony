@@ -30,6 +30,14 @@ serialize_controller_result_with_format:
     path: /serialize-controller-result.{_format}
     controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAttributeController
 
+serialize_mapped_controller_result:
+    path: /serialize-mapped-controller-result
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAndMapAttributeController
+
+serialize_mapped_controller_results:
+    path: /serialize-mapped-controller-results
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAndMapAttributeOnGeneratorController
+
 map_request_payload_and_serialize_controller_result:
     path: /map-request-payload-and-serialize-controller-result
     controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestPayloadAndSerializeAttributesController

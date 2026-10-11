@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -27,8 +28,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class SerializeControllerResultAttributeListener implements EventSubscriberInterface
 {
-    public function __construct(private readonly ?SerializerInterface $serializer)
-    {
+    public function __construct(
+        private readonly ?SerializerInterface $serializer,
+        private readonly ?ObjectMapperInterface $objectMapper = null,
+    ) {
     }
 
     /**
@@ -49,6 +52,10 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
         $request = $kernelEvent->getRequest();
         $controllerResult = $kernelEvent->getControllerResult();
         $format = $request->getRequestFormat('json');
+
+        if (null !== $event->attribute->map) {
+            $controllerResult = $this->map($controllerResult, $event->attribute->map);
+        }
 
         try {
             $data = $this->serializer->serialize($controllerResult, $format, $event->attribute->context);
@@ -84,5 +91,26 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
         }
 
         return $headers;
+    }
+
+    private function map(mixed $value, string $class): mixed
+    {
+        if (!$this->objectMapper) {
+            throw new \LogicException(\sprintf('The "symfony/object-mapper" component is required to use the "map" option of the "#[%s]" attribute. Try running "composer require symfony/object-mapper".', Serialize::class));
+        }
+
+        if (\is_array($value)) {
+            return array_map(fn ($item) => \is_object($item) ? $this->objectMapper->map($item, $class) : $item, $value);
+        }
+
+        if ($value instanceof \Traversable) {
+            return (function () use ($value, $class) {
+                foreach ($value as $key => $item) {
+                    yield $key => \is_object($item) ? $this->objectMapper->map($item, $class) : $item;
+                }
+            })();
+        }
+
+        return \is_object($value) ? $this->objectMapper->map($value, $class) : $value;
     }
 }

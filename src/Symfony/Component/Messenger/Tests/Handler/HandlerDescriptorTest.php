@@ -67,14 +67,14 @@ class HandlerDescriptorTest extends TestCase
 
     public function testStampParameters()
     {
-        $descriptor = new HandlerDescriptor(static function (DummyMessage $message, Envelope $envelope, AnEnvelopeStamp $stamp, ?AnEnvelopeStamp $nullable, ?AnEnvelopeStamp $optional = null, AnEnvelopeStamp $withDefault = new AnEnvelopeStamp(), ?Acknowledger $ack = null, string $other = '') {});
+        $descriptor = new HandlerDescriptor(static function (DummyMessage $message, Envelope $envelope, AnEnvelopeStamp $stamp, ?AnEnvelopeStamp $nullable, ?AnEnvelopeStamp $optional = null, AnEnvelopeStamp $withDefault = new AnEnvelopeStamp(), ?Acknowledger $ack = null, string $other = '', AnEnvelopeStamp ...$variadic) {});
 
         $this->assertSame([
-            'envelope' => [Envelope::class, false, false],
-            'stamp' => [AnEnvelopeStamp::class, false, false],
-            'nullable' => [AnEnvelopeStamp::class, true, false],
-            'optional' => [AnEnvelopeStamp::class, true, true],
-            'withDefault' => [AnEnvelopeStamp::class, false, true],
+            'envelope' => [Envelope::class, false, false, 1],
+            'stamp' => [AnEnvelopeStamp::class, false, false, 2],
+            'nullable' => [AnEnvelopeStamp::class, true, false, 3],
+            'optional' => [AnEnvelopeStamp::class, true, true, 4],
+            'withDefault' => [AnEnvelopeStamp::class, false, true, 5],
         ], $descriptor->getStampParameters());
     }
 
@@ -82,14 +82,14 @@ class HandlerDescriptorTest extends TestCase
     {
         $descriptor = new HandlerDescriptor(new DummyHandlerWithStampArgument());
 
-        $this->assertSame(['stamp' => [AnEnvelopeStamp::class, false, false]], $descriptor->getStampParameters());
+        $this->assertSame(['stamp' => [AnEnvelopeStamp::class, false, false, 1]], $descriptor->getStampParameters());
     }
 
     public function testTheMessageParameterIsNotAStampParameter()
     {
         $descriptor = new HandlerDescriptor(static function (AnEnvelopeStamp $message, AnEnvelopeStamp $stamp) {});
 
-        $this->assertSame(['stamp' => [AnEnvelopeStamp::class, false, false]], $descriptor->getStampParameters());
+        $this->assertSame(['stamp' => [AnEnvelopeStamp::class, false, false, 1]], $descriptor->getStampParameters());
     }
 
     public function testHandlersWithoutStampParameters()

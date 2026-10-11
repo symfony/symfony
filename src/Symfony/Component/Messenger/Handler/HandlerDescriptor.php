@@ -26,7 +26,7 @@ final class HandlerDescriptor
     private ?BatchHandlerInterface $batchHandler = null;
 
     /**
-     * @var array<string, array{class-string<Envelope|StampInterface>, bool, bool}>
+     * @var array<string, array{class-string<Envelope|StampInterface>, bool, bool, int}>
      */
     private array $stampParameters = [];
 
@@ -57,13 +57,13 @@ final class HandlerDescriptor
         foreach (\array_slice($r->getParameters(), 1) as $parameter) {
             $type = $parameter->getType();
 
-            if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+            if (!$type instanceof \ReflectionNamedType || $type->isBuiltin() || $parameter->isVariadic()) {
                 continue;
             }
             $class = $type->getName();
 
             if (Envelope::class === $class || is_subclass_of($class, StampInterface::class)) {
-                $this->stampParameters[$parameter->name] = [$class, $type->allowsNull(), $parameter->isDefaultValueAvailable()];
+                $this->stampParameters[$parameter->name] = [$class, $type->allowsNull(), $parameter->isDefaultValueAvailable(), $parameter->getPosition()];
             }
         }
     }
@@ -103,12 +103,12 @@ final class HandlerDescriptor
     /**
      * Returns the parameters of the handler typed with Envelope or with a stamp class, keyed by name.
      *
-     * The first parameter, which receives the message, is never listed. Each entry holds
-     * the class, whether the parameter accepts null and whether it has a default value.
+     * The first parameter, which receives the message, is never listed, and neither are variadic parameters.
+     * Each entry contains the class, whether the parameter accepts null, whether it has a default value and its position.
      *
      * @internal
      *
-     * @return array<string, array{class-string<Envelope|StampInterface>, bool, bool}>
+     * @return array<string, array{class-string<Envelope|StampInterface>, bool, bool, int}>
      */
     public function getStampParameters(): array
     {

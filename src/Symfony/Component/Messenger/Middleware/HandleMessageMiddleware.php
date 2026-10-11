@@ -178,7 +178,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
         if (null !== $handlerArgumentsStamp = $envelope->last(HandlerArgumentsStamp::class)) {
             $arguments = [...$arguments, ...$handlerArgumentsStamp->getAdditionalArguments()];
         }
-        foreach ($handlerDescriptor->getStampParameters() as $name => [$class, $allowsNull, $hasDefault]) {
+        foreach ($handlerDescriptor->getStampParameters() as $name => [$class, $allowsNull, $hasDefault, $position]) {
+            if (\array_key_exists($position, $arguments) || \array_key_exists($name, $arguments)) {
+                continue;
+            }
             if (Envelope::class === $class) {
                 $arguments[$name] = $envelope;
             } elseif (null !== $stamp = $envelope->last($class)) {

@@ -583,6 +583,118 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertSame(['additional argument', $stamp], $received);
     }
 
+    #[DataProvider('provideStampArgumentsPassedByAHandlerArgumentsStamp')]
+    public function testHandlerArgumentsStampTakesPrecedenceOverStampArguments(\Closure $handler, array $stamps, array $expected)
+    {
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handler],
+        ]));
+
+        $envelope = $middleware->handle(new Envelope(new DummyMessage('Hey'), $stamps), $this->getStackMock());
+
+        $this->assertSame($expected, $envelope->last(HandledStamp::class)->getResult());
+    }
+
+    public static function provideStampArgumentsPassedByAHandlerArgumentsStamp(): iterable
+    {
+        $fromEnvelope = new AnEnvelopeStamp();
+        $fromArguments = new AnEnvelopeStamp();
+        $envelope = new Envelope(new DummyMessage('Bob'));
+
+        yield 'positional' => [
+            static fn (DummyMessage $message, ?AnEnvelopeStamp $stamp = null) => [$stamp],
+            [$fromEnvelope, new HandlerArgumentsStamp([$fromArguments])],
+            [$fromArguments],
+        ];
+        yield 'positional, nullable' => [
+            static fn (DummyMessage $message, ?AnEnvelopeStamp $stamp) => [$stamp],
+            [new HandlerArgumentsStamp([$fromArguments])],
+            [$fromArguments],
+        ];
+        yield 'positional, required' => [
+            static fn (DummyMessage $message, AnEnvelopeStamp $stamp) => [$stamp],
+            [new HandlerArgumentsStamp([$fromArguments])],
+            [$fromArguments],
+        ];
+        yield 'positional, envelope' => [
+            static fn (DummyMessage $message, Envelope $envelope) => [$envelope],
+            [new HandlerArgumentsStamp([$envelope])],
+            [$envelope],
+        ];
+        yield 'named' => [
+            static fn (DummyMessage $message, ?AnEnvelopeStamp $stamp = null) => [$stamp],
+            [$fromEnvelope, new HandlerArgumentsStamp(['stamp' => $fromArguments])],
+            [$fromArguments],
+        ];
+        yield 'named, nullable' => [
+            static fn (DummyMessage $message, ?AnEnvelopeStamp $stamp) => [$stamp],
+            [new HandlerArgumentsStamp(['stamp' => $fromArguments])],
+            [$fromArguments],
+        ];
+        yield 'fewer arguments than stamp parameters' => [
+            static fn (DummyMessage $message, ?AnEnvelopeStamp $first = null, ?AnEnvelopeStamp $second = null) => [$first, $second],
+            [$fromEnvelope, new HandlerArgumentsStamp([$fromArguments])],
+            [$fromArguments, $fromEnvelope],
+        ];
+        yield 'more arguments than stamp parameters' => [
+            static fn (DummyMessage $message, ?AnEnvelopeStamp $stamp = null, string ...$rest) => [$stamp, ...$rest],
+            [$fromEnvelope, new HandlerArgumentsStamp([$fromArguments, 'extra'])],
+            [$fromArguments, 'extra'],
+        ];
+        yield 'variadic' => [
+            static fn (DummyMessage $message, AnEnvelopeStamp ...$stamps) => $stamps,
+            [$fromEnvelope],
+            [],
+        ];
+        yield 'variadic, missing from the envelope' => [
+            static fn (DummyMessage $message, AnEnvelopeStamp ...$stamps) => $stamps,
+            [],
+            [],
+        ];
+        yield 'variadic, positional' => [
+            static fn (DummyMessage $message, AnEnvelopeStamp ...$stamps) => $stamps,
+            [$fromEnvelope, new HandlerArgumentsStamp([$fromArguments])],
+            [$fromArguments],
+        ];
+    }
+
+    public function testHandlerArgumentsStampTakesPrecedenceOverStampArgumentsOfABatchHandler()
+    {
+        $handler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public array $stamps = [];
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null, ?AnEnvelopeStamp $stamp = null)
+            {
+                $this->stamps[] = $stamp;
+
+                return $this->handle($message, $ack);
+            }
+
+            private function shouldFlush()
+            {
+                return true;
+            }
+
+            private function process(array $jobs): void
+            {
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]));
+
+        $stamp = new AnEnvelopeStamp();
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp(static function () {}), new AnEnvelopeStamp(), new HandlerArgumentsStamp([$stamp])]), new StackMiddleware());
+
+        $this->assertSame([$stamp], $handler->stamps);
+    }
+
     public function testDispatchHandlerEvents()
     {
         $message = new DummyMessage('Hey');

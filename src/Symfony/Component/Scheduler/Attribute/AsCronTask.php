@@ -31,6 +31,7 @@ class AsCronTask
      * @param string|null              $method     The method to run as the task when the attribute target is a class
      * @param string[]|string|null     $transports One or many transports through which the message scheduling the task will go
      * @param string[]|string          $env        One or many environments the task is scheduled in; all of them when empty
+     * @param array<mixed>|string      $stamps     One or many Messenger stamps to add to the message scheduling the task, as class names, each optionally mapped to the arguments its constructor takes
      */
     public function __construct(
         public readonly string $expression,
@@ -41,6 +42,7 @@ class AsCronTask
         public readonly ?string $method = null,
         public readonly array|string|null $transports = null,
         public readonly array|string $env = [],
+        public readonly array|string $stamps = [],
     ) {
     }
 }

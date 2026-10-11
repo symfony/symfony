@@ -21,8 +21,10 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -134,6 +136,10 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                     $message = new Definition(ServiceCallMessage::class, [$serviceId, $tagAttributes['method'] ?? '__invoke', (array) ($tagAttributes['arguments'] ?? [])]);
                 }
 
+                if ($stamps = (array) ($tagAttributes['stamps'] ?? [])) {
+                    $message = new Definition(Envelope::class, [$message, $this->createStampDefinitions($container, $stamps, $serviceId)]);
+                }
+
                 if ($tagAttributes['transports'] ?? null) {
                     $message = new Definition(RedispatchMessage::class, [$message, $tagAttributes['transports']]);
                 }
@@ -232,5 +238,41 @@ class AddScheduleMessengerPass implements CompilerPassInterface
             ;
             $container->setDefinition('messenger.transport.'.$transportName, $transportDefinition);
         }
+    }
+
+    /**
+     * The container holds classes, not objects, so a stamp is declared as a class name, on its own or mapped to the arguments its constructor takes.
+     *
+     * @param array<mixed> $stamps
+     *
+     * @return Definition[]
+     */
+    private function createStampDefinitions(ContainerBuilder $container, array $stamps, string $serviceId): array
+    {
+        $definitions = [];
+
+        foreach ($stamps as $class => $arguments) {
+            if (\is_int($class)) {
+                [$class, $arguments] = [$arguments, []];
+            }
+
+            if (\is_object($class)) {
+                throw new InvalidArgumentException(\sprintf('Option "stamps" of task "%s" must list stamp classes, not instances: pass "%s::class" instead, or "%s::class => [...$arguments]" when the stamp takes constructor arguments.', $serviceId, $class::class, $class::class));
+            }
+
+            $reflector = \is_string($class) ? $container->getReflectionClass($class) : null;
+
+            if (!$reflector?->implementsInterface(StampInterface::class) || !$reflector->isInstantiable()) {
+                throw new InvalidArgumentException(\sprintf('Option "stamps" of task "%s" must list instantiable classes implementing "%s", got "%s".', $serviceId, StampInterface::class, \is_string($class) ? $class : get_debug_type($class)));
+            }
+
+            $definition = new Definition($class);
+            foreach ((array) $arguments as $key => $value) {
+                $definition->setArgument(\is_string($key) && !str_starts_with($key, '$') ? '$'.$key : $key, $value);
+            }
+            $definitions[] = $definition;
+        }
+
+        return $definitions;
     }
 }

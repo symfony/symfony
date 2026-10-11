@@ -16,8 +16,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use Twig\Extension\AttributeExtension;
 use Twig\Loader\ArrayLoader;
 use Twig\Node\Expression\FilterExpression;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
 use Twig\Source;
 
 class RoutingExtensionTest extends TestCase
@@ -26,7 +28,11 @@ class RoutingExtensionTest extends TestCase
     public function testEscaping($template, $mustBeEscaped)
     {
         $twig = new Environment(new ArrayLoader(), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
-        $twig->addExtension(new RoutingExtension($this->createStub(UrlGeneratorInterface::class)));
+        $generator = $this->createStub(UrlGeneratorInterface::class);
+        $twig->addExtension(new AttributeExtension(RoutingExtension::class));
+        $twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            RoutingExtension::class => static fn () => new RoutingExtension($generator),
+        ]));
 
         $nodes = $twig->parse($twig->tokenize(new Source($template, '')));
 

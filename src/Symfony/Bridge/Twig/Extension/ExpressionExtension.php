@@ -12,7 +12,9 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\AttributeExtension;
 use Twig\TwigFunction;
 
 /**
@@ -22,13 +24,19 @@ use Twig\TwigFunction;
  */
 final class ExpressionExtension extends AbstractExtension
 {
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(ExpressionExtension::class)" instead
+     */
     public function getFunctions(): array
     {
+        trigger_deprecation('symfony/twig-bridge', '8.2', 'The "%s::getFunctions()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         return [
             new TwigFunction('expression', $this->createExpression(...)),
         ];
     }
 
+    #[AsTwigFunction('expression')]
     public function createExpression(string $expression): Expression
     {
         return new Expression($expression);

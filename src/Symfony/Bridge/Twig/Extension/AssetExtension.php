@@ -12,7 +12,9 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Asset\Packages;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\AttributeExtension;
 use Twig\TwigFunction;
 
 /**
@@ -27,8 +29,13 @@ final class AssetExtension extends AbstractExtension
     ) {
     }
 
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(AssetExtension::class)" instead
+     */
     public function getFunctions(): array
     {
+        trigger_deprecation('symfony/twig-bridge', '8.2', 'The "%s::getFunctions()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         return [
             new TwigFunction('asset', $this->getAssetUrl(...)),
             new TwigFunction('asset_version', $this->getAssetVersion(...)),
@@ -41,6 +48,7 @@ final class AssetExtension extends AbstractExtension
      * If the package used to generate the path is an instance of
      * UrlPackage, you will always get a URL and not a path.
      */
+    #[AsTwigFunction('asset')]
     public function getAssetUrl(string $path, ?string $packageName = null): string
     {
         return $this->packages->getUrl($path, $packageName);
@@ -49,6 +57,7 @@ final class AssetExtension extends AbstractExtension
     /**
      * Returns the version of an asset.
      */
+    #[AsTwigFunction('asset_version')]
     public function getAssetVersion(string $path, ?string $packageName = null): string
     {
         return $this->packages->getVersion($path, $packageName);

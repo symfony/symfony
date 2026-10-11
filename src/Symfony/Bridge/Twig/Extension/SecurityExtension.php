@@ -19,7 +19,9 @@ use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterf
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\AttributeExtension;
 use Twig\TwigFunction;
 
 /**
@@ -35,6 +37,7 @@ final class SecurityExtension extends AbstractExtension
     ) {
     }
 
+    #[AsTwigFunction('is_granted')]
     public function isGranted(mixed $role, mixed $object = null, ?string $field = null, ?AccessDecision $accessDecision = null): bool
     {
         if (null === $this->securityChecker) {
@@ -56,6 +59,7 @@ final class SecurityExtension extends AbstractExtension
         }
     }
 
+    #[AsTwigFunction('access_decision')]
     public function getAccessDecision(mixed $role, mixed $object = null, ?string $field = null): AccessDecision
     {
         if (!class_exists(AccessDecision::class)) {
@@ -68,6 +72,7 @@ final class SecurityExtension extends AbstractExtension
         return $accessDecision;
     }
 
+    #[AsTwigFunction('is_granted_for_user')]
     public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?string $field = null, ?AccessDecision $accessDecision = null): bool
     {
         if (null === $this->securityChecker) {
@@ -97,6 +102,7 @@ final class SecurityExtension extends AbstractExtension
         }
     }
 
+    #[AsTwigFunction('access_decision_for_user')]
     public function getAccessDecisionForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?string $field = null): AccessDecision
     {
         if (!class_exists(AccessDecision::class)) {
@@ -109,6 +115,7 @@ final class SecurityExtension extends AbstractExtension
         return $accessDecision;
     }
 
+    #[AsTwigFunction('impersonation_exit_url')]
     public function getImpersonateExitUrl(?string $exitTo = null): string
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -118,6 +125,7 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateExitUrl($exitTo);
     }
 
+    #[AsTwigFunction('impersonation_exit_path')]
     public function getImpersonateExitPath(?string $exitTo = null): string
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -127,6 +135,7 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateExitPath($exitTo);
     }
 
+    #[AsTwigFunction('impersonation_url')]
     public function getImpersonateUrl(string $identifier, ?string $targetUri = null): string
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -136,6 +145,7 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateImpersonationUrl($identifier, $targetUri);
     }
 
+    #[AsTwigFunction('impersonation_path')]
     public function getImpersonatePath(string $identifier, ?string $targetUri = null): string
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -150,6 +160,7 @@ final class SecurityExtension extends AbstractExtension
      *
      * @return array{action: string, fields: array<string, string>}
      */
+    #[AsTwigFunction('impersonation_form')]
     public function getImpersonateForm(string $identifier, ?string $targetUri = null): array
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -164,6 +175,7 @@ final class SecurityExtension extends AbstractExtension
      *
      * @return array{action: string, fields: array<string, string>}
      */
+    #[AsTwigFunction('impersonation_exit_form')]
     public function getImpersonateExitForm(?string $targetUri = null): array
     {
         if (null === $this->impersonateUrlGenerator) {
@@ -173,8 +185,13 @@ final class SecurityExtension extends AbstractExtension
         return $this->impersonateUrlGenerator->generateExitForm($targetUri);
     }
 
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(SecurityExtension::class)" instead
+     */
     public function getFunctions(): array
     {
+        trigger_deprecation('symfony/twig-bridge', '8.2', 'The "%s::getFunctions()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         $functions = [
             new TwigFunction('is_granted', $this->isGranted(...)),
             new TwigFunction('access_decision', $this->getAccessDecision(...)),

@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecate the `render_hinclude()` Twig function; use `render_esi()` or `render()`, or Symfony UX Turbo, instead
  * Add a `for _self` modifier to the `trans_default_domain` tag to apply the domain to the whole template
  * Add the `sign_url` filter to sign absolute URLs with `UriSigner`
+ * Deprecate the `getFunctions()` and `getFilters()` methods of Twig extensions that declare their functions and filters with the `#[AsTwigFunction]` and `#[AsTwigFilter]` attributes; register these extensions with `new AttributeExtension(MyExtension::class)` instead
 
 8.1
 ---

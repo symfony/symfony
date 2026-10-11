@@ -14,7 +14,10 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpFoundation\UrlHelper;
+use Twig\Attribute\AsTwigFilter;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\AttributeExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
@@ -31,16 +34,26 @@ final class HttpFoundationExtension extends AbstractExtension
     ) {
     }
 
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(HttpFoundationExtension::class)" instead
+     */
     public function getFunctions(): array
     {
+        trigger_deprecation('symfony/twig-bridge', '8.2', 'The "%s::getFunctions()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         return [
             new TwigFunction('absolute_url', $this->generateAbsoluteUrl(...)),
             new TwigFunction('relative_path', $this->generateRelativePath(...)),
         ];
     }
 
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(HttpFoundationExtension::class)" instead
+     */
     public function getFilters(): array
     {
+        trigger_deprecation('symfony/twig-bridge', '8.2', 'The "%s::getFilters()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         return [
             new TwigFilter('sign_url', $this->signUrl(...)),
         ];
@@ -53,6 +66,7 @@ final class HttpFoundationExtension extends AbstractExtension
      *
      * @see Request::getUriForPath()
      */
+    #[AsTwigFunction('absolute_url')]
     public function generateAbsoluteUrl(string $path): string
     {
         return $this->urlHelper->getAbsoluteUrl($path);
@@ -65,6 +79,7 @@ final class HttpFoundationExtension extends AbstractExtension
      *
      * @see Request::getRelativeUriForPath()
      */
+    #[AsTwigFunction('relative_path')]
     public function generateRelativePath(string $path): string
     {
         return $this->urlHelper->getRelativePath($path);
@@ -75,6 +90,7 @@ final class HttpFoundationExtension extends AbstractExtension
      *
      * @see UriSigner::sign()
      */
+    #[AsTwigFilter('sign_url')]
     public function signUrl(string $url, \DateTimeInterface|\DateInterval|int|null $expiration = null): string
     {
         if (null === $this->uriSigner) {

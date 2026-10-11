@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Authorization\GuestAuthorizationCheckerInter
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Twig\Extension\AttributeExtension;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -276,27 +277,13 @@ class SecurityExtensionTest extends TestCase
         $securityExtension->getAccessDecisionForUser(new InMemoryUser('john', 'password'), 'ROLE', 'object');
     }
 
-    public function testFunctionsForUserAreRegisteredWithAGuestChecker()
+    public function testFunctionsAreRegisteredWithAttributes()
     {
-        if (!interface_exists(GuestAuthorizationCheckerInterface::class)) {
-            $this->markTestSkipped('This test requires symfony/security-core 8.2 or superior.');
-        }
+        $functions = array_map(static fn ($function) => $function->getName(), (new AttributeExtension(SecurityExtension::class))->getFunctions());
 
-        $securityChecker = new class implements AuthorizationCheckerInterface, GuestAuthorizationCheckerInterface {
-            public function isGranted(mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
-            {
-                throw new \BadMethodCallException('This method should not be called.');
-            }
-
-            public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
-            {
-                throw new \BadMethodCallException('This method should not be called.');
-            }
-        };
-
-        $functions = array_map(static fn ($function) => $function->getName(), (new SecurityExtension($securityChecker))->getFunctions());
-
+        $this->assertContains('is_granted', $functions);
         $this->assertContains('is_granted_for_user', $functions);
+        $this->assertContains('access_decision', $functions);
         $this->assertContains('access_decision_for_user', $functions);
     }
 

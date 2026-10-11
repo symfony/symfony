@@ -20,7 +20,9 @@ use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\Routing\RequestContext;
 use Twig\Environment;
+use Twig\Extension\AttributeExtension;
 use Twig\Loader\ArrayLoader;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
 
 class HttpFoundationExtensionTest extends TestCase
 {
@@ -185,8 +187,13 @@ class HttpFoundationExtensionTest extends TestCase
         $stack = new RequestStack();
         $stack->push(Request::create('https://example.com/'));
 
+        $extension = new HttpFoundationExtension(new UrlHelper($stack), $signer);
+
         $twig = new Environment(new ArrayLoader(['template' => $template]));
-        $twig->addExtension(new HttpFoundationExtension(new UrlHelper($stack), $signer));
+        $twig->addExtension(new AttributeExtension(HttpFoundationExtension::class));
+        $twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            HttpFoundationExtension::class => static fn () => $extension,
+        ]));
 
         return $twig->render('template', $context);
     }

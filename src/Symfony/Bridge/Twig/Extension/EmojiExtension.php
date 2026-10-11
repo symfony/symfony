@@ -12,7 +12,9 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Emoji\EmojiTransliterator;
+use Twig\Attribute\AsTwigFilter;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\AttributeExtension;
 use Twig\TwigFilter;
 
 /**
@@ -30,8 +32,13 @@ final class EmojiExtension extends AbstractExtension
         }
     }
 
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(EmojiExtension::class)" instead
+     */
     public function getFilters(): array
     {
+        trigger_deprecation('symfony/twig-bridge', '8.2', 'The "%s::getFilters()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         return [
             new TwigFilter('emojify', $this->emojify(...)),
         ];
@@ -40,6 +47,7 @@ final class EmojiExtension extends AbstractExtension
     /**
      * Converts emoji short code (:wave:) to real emoji (👋).
      */
+    #[AsTwigFilter('emojify')]
     public function emojify(string $string, ?string $catalog = null): string
     {
         $catalog ??= $this->defaultCatalog;

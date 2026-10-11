@@ -15,6 +15,7 @@ use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Twig\Loader\FilesystemLoader;
 
@@ -50,11 +51,11 @@ class ExtensionPass implements CompilerPassInterface
         $templateIterator->replaceArgument(1, $templatePaths);
 
         if ($container->has('router')) {
-            $container->getDefinition('twig.extension.routing')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('twig.extension.routing'));
         }
 
         if ($container->has('html_sanitizer')) {
-            $container->getDefinition('twig.extension.htmlsanitizer')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('twig.extension.htmlsanitizer'));
         }
 
         if ($container->has('fragment.handler')) {
@@ -69,7 +70,7 @@ class ExtensionPass implements CompilerPassInterface
         }
 
         if ($container->has('request_stack')) {
-            $container->getDefinition('twig.extension.httpfoundation')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('twig.extension.httpfoundation'));
         }
 
         if ($container->getParameter('kernel.debug')) {
@@ -82,17 +83,17 @@ class ExtensionPass implements CompilerPassInterface
         }
 
         if ($container->has('web_link.add_link_header_listener')) {
-            $container->getDefinition('twig.extension.weblink')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('twig.extension.weblink'));
         }
 
         $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
 
         if ($container->has('assets.packages')) {
-            $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('twig.extension.assets'));
         }
 
         if ($container->hasDefinition('twig.extension.yaml')) {
-            $container->getDefinition('twig.extension.yaml')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('twig.extension.yaml'));
         }
 
         if (class_exists(Stopwatch::class)) {
@@ -100,20 +101,32 @@ class ExtensionPass implements CompilerPassInterface
         }
 
         if ($container->hasDefinition('twig.extension.expression')) {
-            $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('twig.extension.expression'));
         }
 
         if ($container->hasDefinition('twig.extension.emoji')) {
-            $container->getDefinition('twig.extension.emoji')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('twig.extension.emoji'));
         }
 
         if ($container->hasDefinition('workflow.twig_extension')) {
-            $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');
+            $this->tagAsAttributeExtension($container->getDefinition('workflow.twig_extension'));
         }
 
         if ($container->has('serializer')) {
             $container->getDefinition('twig.runtime.serializer')->addTag('twig.runtime');
             $container->getDefinition('twig.extension.serializer')->addTag('twig.extension');
         }
+    }
+
+    /**
+     * Registers a service declaring its Twig callables with attributes.
+     *
+     * Such services are lazy: they are only instantiated when one of their
+     * functions, filters, or tests is actually called from a template.
+     */
+    private function tagAsAttributeExtension(Definition $definition): void
+    {
+        $definition->addTag('twig.attribute_extension');
+        $definition->addTag('twig.runtime');
     }
 }

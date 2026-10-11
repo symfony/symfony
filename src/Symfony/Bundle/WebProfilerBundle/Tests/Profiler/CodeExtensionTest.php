@@ -16,7 +16,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Profiler\CodeExtension;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Twig\Environment;
+use Twig\Extension\AttributeExtension;
 use Twig\Loader\ArrayLoader;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
 
 class CodeExtensionTest extends TestCase
 {
@@ -252,11 +254,16 @@ class CodeExtensionTest extends TestCase
 
     private function render(string $template, array $context = [])
     {
+        $extension = $this->getExtension();
+
         $twig = new Environment(
             new ArrayLoader(['index' => $template]),
             ['debug' => true]
         );
-        $twig->addExtension($this->getExtension());
+        $twig->addExtension(new AttributeExtension(CodeExtension::class));
+        $twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            CodeExtension::class => static fn () => $extension,
+        ]));
 
         return $twig->render('index', $context);
     }

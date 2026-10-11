@@ -12,7 +12,9 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Yaml\Dumper as YamlDumper;
+use Twig\Attribute\AsTwigFilter;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\AttributeExtension;
 use Twig\TwigFilter;
 
 /**
@@ -22,14 +24,20 @@ use Twig\TwigFilter;
  */
 final class YamlExtension extends AbstractExtension
 {
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(YamlExtension::class)" instead
+     */
     public function getFilters(): array
     {
+        trigger_deprecation('symfony/twig-bridge', '8.2', 'The "%s::getFilters()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         return [
             new TwigFilter('yaml_encode', $this->encode(...)),
             new TwigFilter('yaml_dump', $this->dump(...)),
         ];
     }
 
+    #[AsTwigFilter('yaml_encode')]
     public function encode(mixed $input, int $inline = 0, int $dumpObjects = 0): string
     {
         static $dumper;
@@ -39,6 +47,7 @@ final class YamlExtension extends AbstractExtension
         return $dumper->dump($input, $inline, 0, $dumpObjects);
     }
 
+    #[AsTwigFilter('yaml_dump')]
     public function dump(mixed $value, int $inline = 0, int $dumpObjects = 0): string
     {
         if (\is_resource($value)) {

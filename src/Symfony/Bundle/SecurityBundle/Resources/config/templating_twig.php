@@ -20,13 +20,15 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.logout_url_generator'),
             ])
-            ->tag('twig.extension')
+            ->tag('twig.attribute_extension')
+            ->tag('twig.runtime')
 
         ->set('twig.extension.security', SecurityExtension::class)
             ->args([
                 service('security.authorization_checker')->ignoreOnInvalid(),
                 service('security.impersonate_url_generator')->ignoreOnInvalid(),
             ])
-            ->tag('twig.extension')
+            ->tag('twig.attribute_extension')
+            ->tag('twig.runtime')
     ;
 };

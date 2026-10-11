@@ -84,7 +84,8 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.extension.code', CodeExtension::class)
             ->args([service('debug.file_link_formatter'), param('kernel.project_dir'), param('kernel.charset')])
-            ->tag('twig.extension')
+            ->tag('twig.attribute_extension')
+            ->tag('twig.runtime')
 
         ->set('web_profiler.profiler_link_log_listener', ProfilerLinkLogListener::class)
             ->args([

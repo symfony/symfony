@@ -14,7 +14,9 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\ExpressionExtension;
 use Twig\Environment;
+use Twig\Extension\AttributeExtension;
 use Twig\Loader\ArrayLoader;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
 
 class ExpressionExtensionTest extends TestCase
 {
@@ -22,7 +24,10 @@ class ExpressionExtensionTest extends TestCase
     {
         $template = "{{ expression('1 == 1') }}";
         $twig = new Environment(new ArrayLoader(['template' => $template]), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
-        $twig->addExtension(new ExpressionExtension());
+        $twig->addExtension(new AttributeExtension(ExpressionExtension::class));
+        $twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            ExpressionExtension::class => static fn () => new ExpressionExtension(),
+        ]));
 
         $output = $twig->render('template');
         $this->assertEquals('1 == 1', $output);

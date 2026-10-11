@@ -12,7 +12,9 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\AttributeExtension;
 use Twig\TwigFunction;
 
 /**
@@ -27,8 +29,13 @@ final class LogoutUrlExtension extends AbstractExtension
     ) {
     }
 
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(LogoutUrlExtension::class)" instead
+     */
     public function getFunctions(): array
     {
+        trigger_deprecation('symfony/twig-bridge', '8.2', 'The "%s::getFunctions()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         return [
             new TwigFunction('logout_url', $this->getLogoutUrl(...)),
             new TwigFunction('logout_path', $this->getLogoutPath(...)),
@@ -41,6 +48,7 @@ final class LogoutUrlExtension extends AbstractExtension
      *
      * @param string|null $key The firewall key or null to use the current firewall key
      */
+    #[AsTwigFunction('logout_path')]
     public function getLogoutPath(?string $key = null): string
     {
         return $this->generator->getLogoutPath($key);
@@ -51,6 +59,7 @@ final class LogoutUrlExtension extends AbstractExtension
      *
      * @param string|null $key The firewall key or null to use the current firewall key
      */
+    #[AsTwigFunction('logout_url')]
     public function getLogoutUrl(?string $key = null): string
     {
         return $this->generator->getLogoutUrl($key);
@@ -63,6 +72,7 @@ final class LogoutUrlExtension extends AbstractExtension
      *
      * @return array{action: string, fields: array<string, string>}
      */
+    #[AsTwigFunction('logout_form')]
     public function getLogoutForm(?string $key = null): array
     {
         return $this->generator->getLogoutForm($key);

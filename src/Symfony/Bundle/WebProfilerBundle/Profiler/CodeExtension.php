@@ -12,7 +12,9 @@
 namespace Symfony\Bundle\WebProfilerBundle\Profiler;
 
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
+use Twig\Attribute\AsTwigFilter;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\AttributeExtension;
 use Twig\TwigFilter;
 
 /**
@@ -36,8 +38,13 @@ final class CodeExtension extends AbstractExtension
         $this->projectDir = str_replace('\\', '/', $projectDir).'/';
     }
 
+    /**
+     * @deprecated since Symfony 8.2, register this class with "new AttributeExtension(CodeExtension::class)" instead
+     */
     public function getFilters(): array
     {
+        trigger_deprecation('symfony/web-profiler-bundle', '8.2', 'The "%s::getFilters()" method is deprecated, register this class with "new %s(%s::class)" instead.', self::class, AttributeExtension::class, self::class);
+
         return [
             new TwigFilter('abbr_class', $this->abbrClass(...), ['is_safe' => ['html'], 'pre_escape' => 'html']),
             new TwigFilter('abbr_method', $this->abbrMethod(...), ['is_safe' => ['html'], 'pre_escape' => 'html']),
@@ -52,6 +59,7 @@ final class CodeExtension extends AbstractExtension
         ];
     }
 
+    #[AsTwigFilter('abbr_class', isSafe: ['html'], preEscape: 'html')]
     public function abbrClass(string $class): string
     {
         $parts = explode('\\', $class);
@@ -60,6 +68,7 @@ final class CodeExtension extends AbstractExtension
         return \sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
+    #[AsTwigFilter('abbr_method', isSafe: ['html'], preEscape: 'html')]
     public function abbrMethod(string $method): string
     {
         if (str_contains($method, '::')) {
@@ -77,6 +86,7 @@ final class CodeExtension extends AbstractExtension
     /**
      * Formats an array as a string.
      */
+    #[AsTwigFilter('format_args', isSafe: ['html'])]
     public function formatArgs(array $args): string
     {
         $result = [];
@@ -109,6 +119,7 @@ final class CodeExtension extends AbstractExtension
     /**
      * Formats an array as a string.
      */
+    #[AsTwigFilter('format_args_as_text')]
     public function formatArgsAsText(array $args): string
     {
         return strip_tags($this->formatArgs($args));
@@ -117,6 +128,7 @@ final class CodeExtension extends AbstractExtension
     /**
      * Returns an excerpt of a code file around the given line number.
      */
+    #[AsTwigFilter('file_excerpt', isSafe: ['html'])]
     public function fileExcerpt(string $file, int $line, int $srcContext = 3): ?string
     {
         if (!is_file($file) || !is_readable($file)) {
@@ -191,6 +203,7 @@ final class CodeExtension extends AbstractExtension
     /**
      * Formats a file path.
      */
+    #[AsTwigFilter('format_file', isSafe: ['html'])]
     public function formatFile(string $file, int $line, ?string $text = null): string
     {
         $file = trim($file);
@@ -217,6 +230,7 @@ final class CodeExtension extends AbstractExtension
         return $text;
     }
 
+    #[AsTwigFilter('file_link')]
     public function getFileLink(string $file, int $line): string|false
     {
         if ($fmt = $this->fileLinkFormat) {
@@ -226,6 +240,7 @@ final class CodeExtension extends AbstractExtension
         return false;
     }
 
+    #[AsTwigFilter('file_relative')]
     public function getFileRelative(string $file): ?string
     {
         $file = str_replace('\\', '/', $file);
@@ -237,6 +252,7 @@ final class CodeExtension extends AbstractExtension
         return null;
     }
 
+    #[AsTwigFilter('format_file_from_text', isSafe: ['html'])]
     public function formatFileFromText(string $text): string
     {
         return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', fn ($match) => 'in '.$this->formatFile($match[2], $match[3]), $text);
@@ -245,6 +261,7 @@ final class CodeExtension extends AbstractExtension
     /**
      * @internal
      */
+    #[AsTwigFilter('format_log_message', isSafe: ['html'])]
     public function formatLogMessage(string $message, array $context): string
     {
         if ($context && str_contains($message, '{')) {

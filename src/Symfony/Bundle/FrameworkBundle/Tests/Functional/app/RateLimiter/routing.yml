@@ -1,0 +1,7 @@
+tickets:
+    path: /tickets
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\RateLimiterController::tickets
+
+own_pool:
+    path: /own-pool
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\RateLimiterController::ownPool

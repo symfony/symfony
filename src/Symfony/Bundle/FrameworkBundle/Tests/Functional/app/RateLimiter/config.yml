@@ -1,0 +1,21 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    cache:
+        pools:
+            rate_limiter.own_pool: ~
+    rate_limiter:
+        tickets:
+            policy: fixed_window
+            limit: 5
+            interval: '1 hour'
+        own_pool:
+            policy: fixed_window
+            limit: 5
+            interval: '1 hour'
+            cache_pool: rate_limiter.own_pool
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\RateLimiterController:
+        public: true

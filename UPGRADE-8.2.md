@@ -354,6 +354,7 @@ RateLimiter
 
  * `CompoundLimiter::consume()` now stops consuming at the first limiter that rejects the request;
    list limiters from the most specific to the most global to spare shared quotas from rejected hits
+ * `KernelTestCase::ensureKernelShutdown()` now clears the `cache.rate_limiter` pool when `framework.test` is enabled, so that rate limiters start fresh in each test. A test that relied on the tokens consumed by a previous test, or before a kernel shutdown in the same test, should consume them itself
 
 Scheduler
 ---------

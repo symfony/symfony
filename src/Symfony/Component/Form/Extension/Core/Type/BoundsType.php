@@ -63,7 +63,8 @@ class BoundsType extends AbstractType
             ->add('from', $options['type'], array_merge($fromOptions, $options['options'], $options['from_options']))
             ->add('to', $options['type'], array_merge($toOptions, $options['options'], $options['to_options']))
             ->addEventListener(FormEvents::SUBMIT, static function (FormEvent $event): void {
-                if (null === $event->getData()) {
+                // an object is kept even when both bounds are empty, as FormType does
+                if (!\is_array($event->getData())) {
                     return;
                 }
 

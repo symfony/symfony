@@ -16,7 +16,9 @@ use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Messenger\Bridge\Doctrine\EventListener\PostgreSqlNotifyOnIdleListener;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
@@ -199,12 +201,15 @@ class PostgreSqlNotifyOnIdleListenerTest extends TestCase
         $driverConnection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
         $driverConnection->method('createQueryBuilder')->willReturn(new QueryBuilder($driverConnection));
 
-        // For getEarliestDelayedMessageTime query
-        $delayedResult = $this->createStub(DriverResult::class);
-        $delayedResult->method('fetchOne')->willReturn($delayedAvailableAt ?? false);
-
+        // For getEarliestDelayedMessageTime(), applies "available_at > ?" to the values sent to the database
         $driverConnection->method('executeQuery')
-            ->willReturn(new Result($delayedResult, $driverConnection));
+            ->willReturnCallback(function (string $sql, array $params, array $types) use ($driverConnection, $delayedAvailableAt) {
+                $now = Type::getType($types[1])->convertToDatabaseValue($params[1], new PostgreSQLPlatform());
+                $delayedResult = $this->createStub(DriverResult::class);
+                $delayedResult->method('fetchOne')->willReturn(null !== $delayedAvailableAt && $delayedAvailableAt > $now ? $delayedAvailableAt : false);
+
+                return new Result($delayedResult, $driverConnection);
+            });
 
         // Use ArrayObject so object identity survives array destructuring
         // (plain array references are lost when using [$a, $b] = ...)
@@ -266,6 +271,23 @@ class PostgreSqlNotifyOnIdleListenerTest extends TestCase
         $this->assertCount(1, $capturedTimeouts);
         $this->assertGreaterThan(0, $capturedTimeouts[0]);
         $this->assertLessThanOrEqual(4000, $capturedTimeouts[0]);
+    }
+
+    public function testTimeoutCappedByDelayedMessageWhenTheClockIsNotInUtc()
+    {
+        [$connection, $capturedTimeouts] = $this->createConnectionWithGetNotifyCapture(
+            ['get_notify_timeout' => 60000],
+            '2024-05-02 10:00:30',
+        );
+
+        $listener = new PostgreSqlNotifyOnIdleListener(null, new MockClock('2024-05-02 12:00:00', 'Europe/Paris'));
+        $listener->addConnection('async', $connection);
+
+        $worker = $this->createWorkerWithTransports(['async']);
+        $listener->onWorkerStarted(new WorkerStartedEvent($worker));
+        $listener->onWorkerRunning(new WorkerRunningEvent($worker, true));
+
+        $this->assertSame([30000], $capturedTimeouts->getArrayCopy());
     }
 
     public function testTimeoutUsesMinOfAllConstraints()

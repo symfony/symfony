@@ -37,7 +37,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 final class RateLimitAttributeListener implements EventSubscriberInterface
 {
-    private const RATE_LIMIT_ATTRIBUTE = '_rate_limit';
+    /** @internal */
+    public const RATE_LIMIT_ATTRIBUTE = '_rate_limit';
 
     /**
      * @var \WeakMap<Request, list<RateLimit>>
@@ -99,27 +100,19 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
 
         $rateLimit = $this->limiters->get($attribute->limiter)->create($key)->consume($attribute->tokens);
 
-        $candidate = $attribute->exposeHeaders && null !== $rateLimit->getResetAt()
-            ? new AppliedRateLimit($rateLimit, $attribute->tokens)
-            : null;
+        $candidate = new AppliedRateLimit($rateLimit, $attribute->tokens, $attribute->limiter, $attribute->exposeHeaders);
+
+        $applied = $request->attributes->get(self::RATE_LIMIT_ATTRIBUTE, []);
+        $applied = \is_array($applied) ? $applied : [];
+        $applied[] = $candidate;
+        $request->attributes->set(self::RATE_LIMIT_ATTRIBUTE, $applied);
 
         if (!$rateLimit->isAccepted()) {
-            $request->attributes->set(self::RATE_LIMIT_ATTRIBUTE, $candidate);
-
             if ($dispatcher && class_exists(RateLimitExceededEvent::class)) {
                 $dispatcher->dispatch(new RateLimitExceededEvent($rateLimit, $attribute->limiter, $key));
             }
 
             throw new TooManyRequestsHttpException(max(0, $rateLimit->getRetryAfter()->getTimestamp() - time()));
-        }
-
-        if ($candidate) {
-            /** @var AppliedRateLimit|null $applied */
-            $applied = $request->attributes->get(self::RATE_LIMIT_ATTRIBUTE);
-
-            if (!$applied instanceof AppliedRateLimit || $candidate->getRemainingCalls() < $applied->getRemainingCalls()) {
-                $request->attributes->set(self::RATE_LIMIT_ATTRIBUTE, $candidate);
-            }
         }
     }
 
@@ -128,9 +121,9 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        $applied = $event->getRequest()->attributes->get(self::RATE_LIMIT_ATTRIBUTE);
+        $applied = $event->getRequest()->attributes->get(self::RATE_LIMIT_ATTRIBUTE, []);
 
-        if (!$event->isMainRequest() || !$applied instanceof AppliedRateLimit) {
+        if (!$event->isMainRequest() || !\is_array($applied) || !($applied = $this->getMostRestrictiveExposedRateLimit($applied))) {
             return;
         }
 
@@ -174,5 +167,30 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param list<AppliedRateLimit> $applied
+     */
+    private function getMostRestrictiveExposedRateLimit(array $applied): ?AppliedRateLimit
+    {
+        // Rejection stops attribute processing, so the rejecting result is last and takes precedence.
+        $last = end($applied);
+        if ($last instanceof AppliedRateLimit && !$last->rateLimit->isAccepted()) {
+            return $last->exposeHeaders && null !== $last->rateLimit->getResetAt() ? $last : null;
+        }
+
+        $selected = null;
+        foreach ($applied as $candidate) {
+            if (!$candidate instanceof AppliedRateLimit || !$candidate->exposeHeaders || null === $candidate->rateLimit->getResetAt()) {
+                continue;
+            }
+
+            if (!$selected || $candidate->getRemainingCalls() < $selected->getRemainingCalls()) {
+                $selected = $candidate;
+            }
+        }
+
+        return $selected;
     }
 }

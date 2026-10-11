@@ -76,6 +76,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\LockValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\MapRateLimitValueResolver;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
@@ -1831,6 +1832,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('rate_limiter.attribute_listener'));
         $definition = $container->getDefinition('rate_limiter.attribute_listener');
         $this->assertSame(RateLimitAttributeListener::class, $definition->getClass());
+        $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
+    }
+
+    public function testMapRateLimitValueResolver()
+    {
+        $container = $this->createContainerFromFile('http_client_rate_limiter');
+
+        $definition = $container->getDefinition('argument_resolver.map_rate_limit');
+        $this->assertSame(MapRateLimitValueResolver::class, $definition->getClass());
+        $this->assertTrue($definition->hasTag('controller.argument_value_resolver'));
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
     }
 

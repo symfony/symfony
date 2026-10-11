@@ -199,8 +199,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                     $currentTtl = null;
                 }
 
+                // Default to 1 hour when the provider advertises no TTL
+                $currentTtl = $currentTtl ?: 3600;
+
                 // Apply the lowest TTL found to ensure all keys in the set are still valid
-                if (null !== $currentTtl && (null === $minTtl || $currentTtl < $minTtl)) {
+                if (null === $minTtl || $currentTtl < $minTtl) {
                     $minTtl = $currentTtl;
                 }
 
@@ -211,10 +214,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                 }
             }
 
-            if (0 < ($minTtl ?? -1)) {
-                // Cap the TTL to 30 days to avoid keeping JWKS indefinitely
-                $item->expiresAfter(min($minTtl, 30 * 24 * 60 * 60));
-            }
+            // Cap the TTL to 30 days to avoid keeping JWKS indefinitely
+            $item->expiresAfter(min($minTtl, 30 * 24 * 60 * 60));
 
             return $bindKeysToIssuers ? $keys : $keys[''] ?? [];
         } catch (\Exception $e) {

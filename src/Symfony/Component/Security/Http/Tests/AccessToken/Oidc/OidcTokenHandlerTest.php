@@ -555,6 +555,59 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame(2, $requestCount);
     }
 
+    #[DataProvider('provideJwksCacheHeaders')]
+    public function testDiscoveryBoundsTheLifetimeOfTheCachedJwks(array $headers, int $expectedTtl)
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]], ['response_headers' => $headers]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com']);
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_config');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->once())->method('expiresAfter')->with($expectedTtl);
+
+        $this->assertCount(1, $handler->computeDiscoveryKeys($item));
+    }
+
+    public static function provideJwksCacheHeaders(): iterable
+    {
+        yield 'no cache headers' => [[], 3600];
+        yield 'max-age=0' => [['Cache-Control' => 'max-age=0'], 3600];
+        yield 'no-store' => [['Cache-Control' => 'no-store'], 3600];
+        yield 'Expires in the past' => [['Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() - 60)], 3600];
+        yield 'max-age beyond 30 days' => [['Cache-Control' => 'max-age=99999999'], 30 * 24 * 60 * 60];
+    }
+
+    #[DataProvider('provideJwksCacheHeadersOfTwoProviders')]
+    public function testDiscoveryCachesTheJwksOfSeveralProvidersForTheLowestLifetime(array $headers1, array $headers2, int $expectedTtl)
+    {
+        $httpClient1 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider1.example.com', 'jwks_uri' => 'https://provider1.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]], ['response_headers' => $headers1]),
+        ]);
+        $httpClient2 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider2.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]], ['response_headers' => $headers2]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://provider1.example.com', 'https://provider2.example.com']);
+        $handler->enableDiscovery(new ArrayAdapter(), [$httpClient1, $httpClient2], 'oidc_config');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->once())->method('expiresAfter')->with($expectedTtl);
+
+        $this->assertCount(2, $handler->computeDiscoveryKeys($item));
+    }
+
+    public static function provideJwksCacheHeadersOfTwoProviders(): iterable
+    {
+        yield 'max-age=0 and max-age=120' => [['Cache-Control' => 'max-age=0'], ['Cache-Control' => 'max-age=120'], 120];
+        yield 'no cache headers and max-age=7200' => [[], ['Cache-Control' => 'max-age=7200'], 3600];
+    }
+
     public function testComputeDiscoveryKeysReturnsEmptyWhenNoClients()
     {
         $cache = new ArrayAdapter();
@@ -685,8 +738,7 @@ class OidcTokenHandlerTest extends TestCase
         );
         $handler->enableDiscovery($cache, $httpClient, 'oidc_http_issuer');
 
-        $item = $this->createMock(ItemInterface::class);
-        $item->expects($this->never())->method('expiresAfter');
+        $item = $this->createStub(ItemInterface::class);
 
         $this->assertCount(1, $handler->computeDiscoveryKeys($item));
     }
@@ -742,8 +794,7 @@ class OidcTokenHandlerTest extends TestCase
         );
         $handler->enableDiscovery($cache, $httpClient, 'oidc_non_sig_keys');
 
-        $item = $this->createMock(ItemInterface::class);
-        $item->expects($this->never())->method('expiresAfter');
+        $item = $this->createStub(ItemInterface::class);
         $this->assertSame([], $handler->computeDiscoveryKeys($item));
     }
 }

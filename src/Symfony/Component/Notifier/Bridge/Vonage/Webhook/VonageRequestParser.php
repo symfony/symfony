@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Vonage\Webhook;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
@@ -24,6 +25,11 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 final class VonageRequestParser extends AbstractRequestParser
 {
     private const TIMESTAMP_TOLERANCE = 300;
+
+    public function __construct(
+        private readonly ?ClockInterface $clock = null,
+    ) {
+    }
 
     protected function getRequestMatcher(): RequestMatcherInterface
     {
@@ -99,7 +105,7 @@ final class VonageRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Signature is wrong.');
         }
 
-        if (abs(time() - (int) ($claims['iat'] ?? 0)) > self::TIMESTAMP_TOLERANCE) {
+        if (abs(($this->clock?->now()->getTimestamp() ?? time()) - (int) ($claims['iat'] ?? 0)) > self::TIMESTAMP_TOLERANCE) {
             throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
 

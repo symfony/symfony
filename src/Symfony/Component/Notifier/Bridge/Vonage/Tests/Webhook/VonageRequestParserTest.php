@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Vonage\Tests\Webhook;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Notifier\Bridge\Vonage\Webhook\VonageRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
@@ -54,6 +55,17 @@ class VonageRequestParserTest extends AbstractRequestParserTestCase
         ClockMock::withClockMock(self::getIssuedAt($request) + $offset);
 
         $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
+    public function testTheTimestampIsCheckedAgainstTheGivenClock()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $issuedAt = self::getIssuedAt($request);
+        ClockMock::withClockMock($issuedAt + 86400);
+
+        $parser = new VonageRequestParser(new MockClock('@'.$issuedAt));
+
+        $this->assertNotNull($parser->parse($request, $this->getSecret()));
     }
 
     public function testMissingAuthorizationTokenThrows()

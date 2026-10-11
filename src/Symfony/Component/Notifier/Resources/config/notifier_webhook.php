@@ -26,12 +26,14 @@ return static function (ContainerConfigurator $container) {
         ->alias(SmsboxRequestParser::class, 'notifier.webhook.request_parser.smsbox')
 
         ->set('notifier.webhook.request_parser.sweego', SweegoRequestParser::class)
+            ->args([service('clock')->nullOnInvalid()])
         ->alias(SweegoRequestParser::class, 'notifier.webhook.request_parser.sweego')
 
         ->set('notifier.webhook.request_parser.twilio', TwilioRequestParser::class)
         ->alias(TwilioRequestParser::class, 'notifier.webhook.request_parser.twilio')
 
         ->set('notifier.webhook.request_parser.vonage', VonageRequestParser::class)
+            ->args([service('clock')->nullOnInvalid()])
         ->alias(VonageRequestParser::class, 'notifier.webhook.request_parser.vonage')
     ;
 };

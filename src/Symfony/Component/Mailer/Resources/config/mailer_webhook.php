@@ -61,7 +61,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('mailer.payload_converter.mailgun', MailgunPayloadConverter::class)
         ->set('mailer.webhook.request_parser.mailgun', MailgunRequestParser::class)
-            ->args([service('mailer.payload_converter.mailgun')])
+            ->args([service('mailer.payload_converter.mailgun'), service('clock')->nullOnInvalid()])
         ->alias(MailgunRequestParser::class, 'mailer.webhook.request_parser.mailgun')
 
         ->set('mailer.payload_converter.mailjet', MailjetPayloadConverter::class)
@@ -71,7 +71,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('mailer.payload_converter.mailomat', MailomatPayloadConverter::class)
         ->set('mailer.webhook.request_parser.mailomat', MailomatRequestParser::class)
-            ->args([service('mailer.payload_converter.mailomat')])
+            ->args([service('mailer.payload_converter.mailomat'), 43200, service('clock')->nullOnInvalid()])
         ->alias(MailomatRequestParser::class, 'mailer.webhook.request_parser.mailomat')
 
         ->set('mailer.payload_converter.postmark', PostmarkPayloadConverter::class)
@@ -86,7 +86,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('mailer.payload_converter.resend', ResendPayloadConverter::class)
         ->set('mailer.webhook.request_parser.resend', ResendRequestParser::class)
-            ->args([service('mailer.payload_converter.resend')])
+            ->args([service('mailer.payload_converter.resend'), service('clock')->nullOnInvalid()])
         ->alias(ResendRequestParser::class, 'mailer.webhook.request_parser.resend')
 
         ->set('mailer.payload_converter.scaleway', ScalewayPayloadConverter::class)
@@ -95,22 +95,23 @@ return static function (ContainerConfigurator $container) {
                 service('mailer.payload_converter.scaleway'),
                 service('http_client')->nullOnInvalid(),
                 service('cache.app')->nullOnInvalid(),
+                '$clock' => service('clock')->nullOnInvalid(),
             ])
         ->alias(ScalewayRequestParser::class, 'mailer.webhook.request_parser.scaleway')
 
         ->set('mailer.payload_converter.sendgrid', SendgridPayloadConverter::class)
         ->set('mailer.webhook.request_parser.sendgrid', SendgridRequestParser::class)
-            ->args([service('mailer.payload_converter.sendgrid')])
+            ->args([service('mailer.payload_converter.sendgrid'), service('clock')->nullOnInvalid()])
         ->alias(SendgridRequestParser::class, 'mailer.webhook.request_parser.sendgrid')
 
         ->set('mailer.payload_converter.sweego', SweegoPayloadConverter::class)
         ->set('mailer.webhook.request_parser.sweego', SweegoRequestParser::class)
-            ->args([service('mailer.payload_converter.sweego')])
+            ->args([service('mailer.payload_converter.sweego'), service('clock')->nullOnInvalid()])
         ->alias(SweegoRequestParser::class, 'mailer.webhook.request_parser.sweego')
 
         ->set('mailer.payload_converter.ahasend', AhaSendPayloadConverter::class)
         ->set('mailer.webhook.request_parser.ahasend', AhaSendRequestParser::class)
-            ->args([service('mailer.payload_converter.ahasend')])
+            ->args([service('mailer.payload_converter.ahasend'), service('clock')->nullOnInvalid()])
         ->alias(AhaSendRequestParser::class, 'mailer.webhook.request_parser.ahasend')
 
         ->set('mailer.payload_converter.mailchimp', MailchimpPayloadConverter::class)

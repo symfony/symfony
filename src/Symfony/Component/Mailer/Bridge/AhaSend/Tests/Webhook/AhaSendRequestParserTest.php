@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\AhaSend\Tests\Webhook;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\AhaSend\RemoteEvent\AhaSendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\AhaSend\Webhook\AhaSendRequestParser;
@@ -58,6 +59,17 @@ class AhaSendRequestParserTest extends AbstractRequestParserTestCase
         ClockMock::withClockMock((int) $request->headers->get('webhook-timestamp') + $offset);
 
         $this->assertNotNull($this->createRequestParser()->parse($request, self::SECRET));
+    }
+
+    public function testTheTimestampIsCheckedAgainstTheGivenClock()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $timestamp = (int) $request->headers->get('webhook-timestamp');
+        ClockMock::withClockMock($timestamp + 86400);
+
+        $parser = new AhaSendRequestParser(new AhaSendPayloadConverter(), new MockClock('@'.$timestamp));
+
+        $this->assertNotNull($parser->parse($request, self::SECRET));
     }
 
     public function testRequestSignedWithAnEmptySecretIsRejected()

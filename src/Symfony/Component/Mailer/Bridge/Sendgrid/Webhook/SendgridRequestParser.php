@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Webhook;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
@@ -32,6 +33,7 @@ final class SendgridRequestParser extends AbstractRequestParser
 
     public function __construct(
         private readonly SendgridPayloadConverter $converter,
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
@@ -55,7 +57,7 @@ final class SendgridRequestParser extends AbstractRequestParser
                 throw new RejectWebhookException(406, 'Signature is required.');
             }
 
-            if (abs(time() - (int) $request->headers->get('X-Twilio-Email-Event-Webhook-Timestamp')) > self::TIMESTAMP_TOLERANCE) {
+            if (abs(($this->clock?->now()->getTimestamp() ?? time()) - (int) $request->headers->get('X-Twilio-Email-Event-Webhook-Timestamp')) > self::TIMESTAMP_TOLERANCE) {
                 throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
             }
 

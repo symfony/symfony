@@ -271,6 +271,16 @@ class MailerBundleTest extends TestCase
         $this->assertTrue($container->getAlias(MailgunRequestParser::class)->isDeprecated());
     }
 
+    public function testTheWebhookRequestParsersAreGivenTheClock()
+    {
+        $container = $this->load([]);
+        $clock = new Reference('clock', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+
+        foreach (['ahasend' => 1, 'mailgun' => 1, 'mailomat' => 2, 'resend' => 1, 'scaleway' => '$clock', 'sendgrid' => 1, 'sweego' => 1] as $provider => $argument) {
+            $this->assertEquals($clock, $container->getDefinition('mailer.webhook.request_parser.'.$provider)->getArgument($argument), $provider);
+        }
+    }
+
     public function testTheDataCollectorIsRegisteredInDebugModeOnly()
     {
         $this->assertFalse($this->load([])->hasDefinition('mailer.data_collector'));

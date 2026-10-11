@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
@@ -63,6 +64,17 @@ class SendgridSignedRequestParserTest extends AbstractRequestParserTestCase
         $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
     }
 
+    public function testTheTimestampIsCheckedAgainstTheGivenClock()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/webhook.json'));
+        $timestamp = (int) $request->headers->get('X-Twilio-Email-Event-Webhook-Timestamp');
+        ClockMock::withClockMock($timestamp + 86400);
+
+        $parser = new SendgridRequestParser(new SendgridPayloadConverter(), new MockClock('@'.$timestamp));
+
+        $this->assertNotNull($parser->parse($request, $this->getSecret()));
+    }
+
     public function testRejectUnsignedRequestBeforeParsingThePayload()
     {
         $request = $this->createRequest('{"not":"an event"}');
@@ -88,7 +100,7 @@ class SendgridSignedRequestParserTest extends AbstractRequestParserTestCase
 
     protected function createRequestParser(): RequestParserInterface
     {
-        return new SendgridRequestParser(new SendgridPayloadConverter(), true);
+        return new SendgridRequestParser(new SendgridPayloadConverter());
     }
 
     /**

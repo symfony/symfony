@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for CC and BCC recipients
+ * Add a `$clock` argument to `SweegoRequestParser`
 
 7.3
 ---

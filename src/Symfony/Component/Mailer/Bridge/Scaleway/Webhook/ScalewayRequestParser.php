@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Scaleway\Webhook;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,6 +59,7 @@ final class ScalewayRequestParser extends AbstractRequestParser
         private ?HttpClientInterface $httpClient = null,
         private readonly ?CacheInterface $cache = null,
         private readonly string $trustChain = __DIR__.'/../Resources/sns-trust-chain.pem',
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
@@ -92,7 +94,7 @@ final class ScalewayRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
 
-        if (abs(time() - $timestamp->getTimestamp()) > self::TIMESTAMP_TOLERANCE) {
+        if (abs(($this->clock?->now()->getTimestamp() ?? time()) - $timestamp->getTimestamp()) > self::TIMESTAMP_TOLERANCE) {
             throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
 

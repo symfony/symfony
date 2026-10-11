@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sweego\Webhook;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\HeaderRequestMatcher;
@@ -30,6 +31,11 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 final class SweegoRequestParser extends AbstractRequestParser
 {
     private const TIMESTAMP_TOLERANCE = 300;
+
+    public function __construct(
+        private readonly ?ClockInterface $clock = null,
+    ) {
+    }
 
     protected function getRequestMatcher(): RequestMatcherInterface
     {
@@ -71,7 +77,7 @@ final class SweegoRequestParser extends AbstractRequestParser
     {
         $timestamp = $request->headers->get('webhook-timestamp');
 
-        if (abs(time() - (int) $timestamp) > self::TIMESTAMP_TOLERANCE) {
+        if (abs(($this->clock?->now()->getTimestamp() ?? time()) - (int) $timestamp) > self::TIMESTAMP_TOLERANCE) {
             throw new RejectWebhookException(403, 'Timestamp is outside the allowed time window.');
         }
 

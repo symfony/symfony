@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer\Bridge\Mailomat\Tests\Webhook;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Mailomat\RemoteEvent\MailomatPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailomat\Webhook\MailomatRequestParser;
@@ -63,6 +64,16 @@ class MailomatRequestParserTest extends AbstractRequestParserTestCase
         $request = self::buildSignedRequest($body, self::EVENT_ID, self::EVENT, '1718004211', 'sha256', self::SECRET);
 
         $parser = new MailomatRequestParser(new MailomatPayloadConverter(), 0);
+        $this->assertNotNull($parser->parse($request, self::SECRET));
+    }
+
+    public function testTheTimestampIsCheckedAgainstTheGivenClock()
+    {
+        $payload = str_replace("\n", "\r\n", file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $request = self::buildSignedRequest($payload, self::EVENT_ID, self::EVENT, '1718004211', 'sha256', self::SECRET);
+
+        $parser = new MailomatRequestParser(new MailomatPayloadConverter(), 43200, new MockClock('@1718004211'));
+
         $this->assertNotNull($parser->parse($request, self::SECRET));
     }
 

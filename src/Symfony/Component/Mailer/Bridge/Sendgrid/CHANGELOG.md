@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for `RemoteTemplateEmail` to `SendgridApiTransport`
+ * Add a `$clock` argument to `SendgridRequestParser`
 
 8.1
 ---

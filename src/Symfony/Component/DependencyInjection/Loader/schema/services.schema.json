@@ -68,7 +68,7 @@
           ],
           "$comment": "FQCN service ids: short array syntax is allowed here."
         },
-        "^(?!_).+$": {
+        "^(?!_)(?!(?:[A-Za-z_\\x7f-\\xff][A-Za-z0-9_\\x7f-\\xff]*\\\\)+[A-Za-z_\\x7f-\\xff][A-Za-z0-9_\\x7f-\\xff]*$).+$": {
           "oneOf": [
             { "$ref": "#/$defs/serviceConcrete" },
             { "$ref": "#/$defs/serviceAliasObject" },
@@ -111,8 +111,8 @@
     },
     "fqcn": {
       "type": "string",
-      "pattern": "^(?:\\\\)?(?:[A-Za-z_\\\\x7f-\\\\xff][A-Za-z0-9_\\\\x7f-\\\\xff]*\\\\)+[A-Za-z_\\\\x7f-\\\\xff][A-Za-z0-9_\\\\x7f-\\\\xff]*$",
-      "$comment": "Fully-qualified class name, optional leading backslash; requires at least one namespace separator."
+      "pattern": "^(?:\\\\)?(?:[A-Za-z_\\x7f-\\xff][A-Za-z0-9_\\x7f-\\xff]*\\\\)*[A-Za-z_\\x7f-\\xff][A-Za-z0-9_\\x7f-\\xff]*$",
+      "$comment": "Fully-qualified class name, optional leading backslash."
     },
     "arguments": {
       "$comment": "Arguments can be an array (positional) or a map (named).",
@@ -123,7 +123,7 @@
     },
     "tags": {
       "$comment": "YAML examples:\n- ['kernel.event_subscriber', { name: 'kernel.event_listener', event: 'kernel.request' }, { my_tag: { attr: 1 } }].",
-      "type": "array",
+      "type": ["array", "null"],
       "items": {
         "oneOf": [
           { "type": "string" },
@@ -147,7 +147,7 @@
     },
     "calls": {
       "$comment": "YAML examples:\n- ['setFoo', ['@bar'], true]\n- { method: 'setFoo', arguments: ['@bar'], returns_clone: true }\n- { setFoo: ['@bar'] }\n- { setFoo: !returns_clone ['@bar'] } (special YAML tag)",
-      "type": "array",
+      "type": ["array", "null"],
       "items": {
         "oneOf": [
           {
@@ -169,7 +169,7 @@
             "type": "object",
             "properties": {
               "method": { "type": "string" },
-              "arguments": { "$ref": "#/$defs/arguments" },
+              "arguments": { "oneOf": [ { "$ref": "#/$defs/arguments" }, { "type": "null" } ] },
               "returns_clone": { "type": "boolean" }
             },
             "required": ["method"],
@@ -189,7 +189,7 @@
       "type": "object",
       "properties": {
         "package": { "type": "string" },
-        "version": { "type": "string" },
+        "version": { "type": ["string", "number"] },
         "message": { "type": "string" }
       },
       "required": ["package", "version"],
@@ -198,29 +198,36 @@
     "callable": {
       "$comment": "Either 'Class::method' or ['Class', 'method'].",
       "oneOf": [
-        { "type": "string" },
+        { "type": ["string", "null"] },
         {
           "type": "array",
           "minItems": 2,
           "maxItems": 2,
-          "items": [ { "type": "string" }, { "type": "string" } ]
+          "items": [ { "type": ["string", "object"] }, { "type": "string" } ]
         }
       ]
     },
     "serviceShortSyntax": {
-      "$comment": "Short syntax: service defined as arguments array. YAML example: App\\SomeService: ['@dependency', 'literal', 123]",
-      "type": "array",
-      "items": { "$ref": "#/$defs/parameterValue" }
+      "$comment": "Short syntax: service defined by its arguments, positional, named or typed. YAML examples: App\\SomeService: ['@dependency', 'literal', 123] or App\\SomeService: { $apiKey: '%env(API_KEY)%' }",
+      "oneOf": [
+        { "type": "array", "items": { "$ref": "#/$defs/parameterValue" } },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^(?:-?[0-9]+|\\$.*|.*\\\\.*)$" },
+          "additionalProperties": { "$ref": "#/$defs/parameterValue" }
+        }
+      ]
     },
     "factoryCallable": {
       "$comment": "Either '@service', 'Class::method', or [classOrService, method]. For ['null', method] the class is resolved from the service class when using 'constructor'.",
       "oneOf": [
-        { "type": "string" },
+        { "type": ["string", "null"] },
         {
           "type": "array",
           "minItems": 2,
           "maxItems": 2,
-          "items": [ { "type": ["string", "null"] }, { "type": "string" } ]
+          "items": [ { "type": ["string", "object", "null"] }, { "type": "string" } ]
         }
       ]
     },
@@ -229,7 +236,7 @@
       "type": "object",
       "properties": {
         "alias": { "type": "string" },
-        "public": { "type": "boolean" },
+        "public": { "type": ["boolean", "null"] },
         "deprecated": { "$ref": "#/$defs/deprecation" }
       },
       "required": ["alias"],
@@ -239,30 +246,30 @@
       "$comment": "'constructor' cannot be used together with 'factory'. If 'from_callable' is used, many other keys are not allowed (see YamlFileLoader).",
       "type": "object",
       "properties": {
-        "class": { "type": "string" },
-        "file": { "type": "string" },
-        "parent": { "type": "string" },
-        "shared": { "type": "boolean" },
-        "synthetic": { "type": "boolean" },
-        "lazy": { "oneOf": [ { "type": "boolean" }, { "$ref": "#/$defs/fqcn" } ] },
-        "public": { "type": "boolean" },
-        "abstract": { "type": "boolean" },
-        "deprecated": { "$ref": "#/$defs/deprecation" },
+        "class": { "type": ["string", "null"] },
+        "file": { "type": ["string", "null"] },
+        "parent": { "type": ["string", "null"] },
+        "shared": { "type": ["boolean", "null"] },
+        "synthetic": { "type": ["boolean", "null"] },
+        "lazy": { "oneOf": [ { "type": ["boolean", "null"] }, { "$ref": "#/$defs/fqcn" } ] },
+        "public": { "type": ["boolean", "null"] },
+        "abstract": { "type": ["boolean", "null"] },
+        "deprecated": { "oneOf": [ { "$ref": "#/$defs/deprecation" }, { "type": "null" } ] },
         "factory": { "$ref": "#/$defs/factoryCallable" },
         "configurator": { "$ref": "#/$defs/callable" },
-        "arguments": { "$ref": "#/$defs/arguments" },
-        "properties": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "arguments": { "oneOf": [ { "$ref": "#/$defs/arguments" }, { "type": "null" } ] },
+        "properties": { "type": ["object", "null"], "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
         "calls": { "$ref": "#/$defs/calls" },
         "tags": { "$ref": "#/$defs/tags" },
         "resource_tags": { "$ref": "#/$defs/tags" },
-        "decorates": { "type": "string" },
-        "decoration_inner_name": { "type": "string" },
-        "decoration_priority": { "type": "integer" },
+        "decorates": { "type": ["string", "null"] },
+        "decoration_inner_name": { "type": ["string", "null"] },
+        "decoration_priority": { "type": ["integer", "null"] },
         "decoration_on_invalid": { "oneOf": [ { "enum": ["exception", "ignore"] }, { "type": "null" } ], "$comment": "Use null (without quotes) for NULL_ON_INVALID_REFERENCE." },
-        "autowire": { "type": "boolean" },
-        "autoconfigure": { "type": "boolean" },
-        "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
-        "constructor": { "type": "string" },
+        "autowire": { "type": ["boolean", "null"] },
+        "autoconfigure": { "type": ["boolean", "null"] },
+        "bind": { "type": ["object", "null"], "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "constructor": { "type": ["string", "null"] },
         "from_callable": { "$ref": "#/$defs/parameterValue", "$comment": "Will be wrapped by factory ['Closure','fromCallable'] and sets lazy=true unless class is 'Closure'." }
       },
       "additionalProperties": false
@@ -272,30 +279,30 @@
       "type": "object",
       "properties": {
         "resource": { "type": "string" },
-        "namespace": { "type": "string" },
+        "namespace": { "type": ["string", "null"] },
         "exclude": {
           "oneOf": [
-            { "type": "string" },
+            { "type": ["string", "null"] },
             { "type": "array", "items": { "type": "string" } }
           ]
         },
-        "parent": { "type": "string" },
-        "shared": { "type": "boolean" },
-        "lazy": { "oneOf": [ { "type": "boolean" }, { "$ref": "#/$defs/fqcn" } ] },
-        "public": { "type": "boolean" },
-        "abstract": { "type": "boolean" },
-        "deprecated": { "$ref": "#/$defs/deprecation" },
+        "parent": { "type": ["string", "null"] },
+        "shared": { "type": ["boolean", "null"] },
+        "lazy": { "oneOf": [ { "type": ["boolean", "null"] }, { "$ref": "#/$defs/fqcn" } ] },
+        "public": { "type": ["boolean", "null"] },
+        "abstract": { "type": ["boolean", "null"] },
+        "deprecated": { "oneOf": [ { "$ref": "#/$defs/deprecation" }, { "type": "null" } ] },
         "factory": { "$ref": "#/$defs/factoryCallable" },
-        "arguments": { "$ref": "#/$defs/arguments" },
-        "properties": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "arguments": { "oneOf": [ { "$ref": "#/$defs/arguments" }, { "type": "null" } ] },
+        "properties": { "type": ["object", "null"], "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
         "configurator": { "$ref": "#/$defs/callable" },
         "calls": { "$ref": "#/$defs/calls" },
         "tags": { "$ref": "#/$defs/tags" },
         "resource_tags": { "$ref": "#/$defs/tags" },
-        "autowire": { "type": "boolean" },
-        "autoconfigure": { "type": "boolean" },
-        "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
-        "constructor": { "type": "string" }
+        "autowire": { "type": ["boolean", "null"] },
+        "autoconfigure": { "type": ["boolean", "null"] },
+        "bind": { "type": ["object", "null"], "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "constructor": { "type": ["string", "null"] }
       },
       "required": ["resource"],
       "allOf": [
@@ -310,15 +317,23 @@
         "stack": {
           "type": "array",
           "items": {
-            "oneOf": [
+            "anyOf": [
               { "$ref": "#/$defs/serviceConcrete" },
               { "$ref": "#/$defs/serviceAliasObject" },
-              { "$ref": "#/$defs/servicePrototype" }
+              { "$ref": "#/$defs/servicePrototype" },
+              { "type": "string", "pattern": "^@.+" },
+              {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 1,
+                "additionalProperties": { "oneOf": [ { "$ref": "#/$defs/arguments" }, { "type": "null" } ] },
+                "$comment": "A class with its arguments. YAML example: - App\\Decorator: ['@.inner']"
+              }
             ]
           }
         },
-        "public": { "type": "boolean" },
-        "deprecated": { "$ref": "#/$defs/deprecation" }
+        "public": { "type": ["boolean", "null"] },
+        "deprecated": { "oneOf": [ { "$ref": "#/$defs/deprecation" }, { "type": "null" } ] }
       },
       "required": ["stack"],
       "additionalProperties": false
@@ -327,13 +342,13 @@
       "$comment": "Defaults applied to services declared in the current file.",
       "type": "object",
       "properties": {
-        "public": { "type": "boolean" },
+        "public": { "type": ["boolean", "null"] },
         "tags": { "$ref": "#/$defs/tags" },
         "resource_tags": { "$ref": "#/$defs/tags" },
-        "autowire": { "type": "boolean" },
-        "autoconfigure": { "type": "boolean" },
+        "autowire": { "type": ["boolean", "null"] },
+        "autoconfigure": { "type": ["boolean", "null"] },
         "bind": {
-          "type": "object",
+          "type": ["object", "null"],
           "additionalProperties": { "$ref": "#/$defs/parameterValue" }
         }
       },
@@ -343,17 +358,17 @@
       "$comment": "Applied to services declared in the current file whose class matches the key (interface or parent class).",
       "type": "object",
       "properties": {
-        "shared": { "type": "boolean" },
-        "lazy": { "oneOf": [ { "type": "boolean" }, { "$ref": "#/$defs/fqcn" } ] },
-        "public": { "type": "boolean" },
-        "properties": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "shared": { "type": ["boolean", "null"] },
+        "lazy": { "oneOf": [ { "type": ["boolean", "null"] }, { "$ref": "#/$defs/fqcn" } ] },
+        "public": { "type": ["boolean", "null"] },
+        "properties": { "type": ["object", "null"], "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
         "configurator": { "$ref": "#/$defs/callable" },
         "calls": { "$ref": "#/$defs/calls" },
         "tags": { "$ref": "#/$defs/tags" },
         "resource_tags": { "$ref": "#/$defs/tags" },
-        "autowire": { "type": "boolean" },
-        "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
-        "constructor": { "type": "string" }
+        "autowire": { "type": ["boolean", "null"] },
+        "bind": { "type": ["object", "null"], "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
+        "constructor": { "type": ["string", "null"] }
       },
       "additionalProperties": false
     }

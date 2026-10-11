@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use Opis\JsonSchema\Errors\ErrorFormatter;
+use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
@@ -46,6 +49,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
 
 class YamlFileLoaderTest extends TestCase
@@ -1246,6 +1250,56 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals((new Definition('stdClass'))->setFactory([null, 'create']), $definition);
     }
 
+    #[RequiresMethod(Validator::class, 'validate')]
+    public function testSchemaAcceptsTheFilesTheLoaderAccepts()
+    {
+        $validator = new Validator(null, 100, false);
+        $schema = json_decode(file_get_contents(\dirname(self::$fixturesPath, 2).'/Loader/schema/services.schema.json'));
+        // A service without a class cannot be compiled, so the schema rejects the short syntax for ids that are not class names.
+        $ignored = ['services_short_syntax.yml'];
+        $failures = [];
+
+        foreach (array_merge(glob(self::$fixturesPath.'/yaml/*.yml'), glob(self::$fixturesPath.'/yaml/*.yaml')) as $file) {
+            if (\in_array(basename($file), $ignored, true)) {
+                continue;
+            }
+
+            set_error_handler(static fn (int $type, string $message) => throw new \ErrorException($message, 0, $type));
+            try {
+                (new YamlFileLoader(new ContainerBuilder(), new FileLocator(\dirname($file)), 'dev'))->load(basename($file));
+            } catch (\Exception) {
+                continue;
+            } finally {
+                restore_error_handler();
+            }
+
+            if (null === $data = Yaml::parseFile($file, Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_OBJECT_FOR_MAP)) {
+                continue;
+            }
+
+            $result = $validator->validate(self::toJsonData($data), $schema);
+
+            if (!$result->isValid()) {
+                $failures[basename($file)] = (new ErrorFormatter())->format($result->error(), false);
+            }
+        }
+
+        $this->assertSame([], $failures);
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    public function testSchemaRejectsTagsGivenAsAMap()
+    {
+        $schema = json_decode(file_get_contents(\dirname(self::$fixturesPath, 2).'/Loader/schema/services.schema.json'));
+        $data = Yaml::parse(<<<YAML
+            services:
+                App\\Processor:
+                    tags: { name: monolog.processor, handler: main }
+            YAML, Yaml::PARSE_OBJECT_FOR_MAP);
+
+        $this->assertFalse((new Validator())->validate(self::toJsonData($data), $schema)->isValid());
+    }
+
     #[IgnoreDeprecations]
     #[Group('legacy')]
     public function testDeprecatedTagged()
@@ -1256,5 +1310,16 @@ class YamlFileLoaderTest extends TestCase
         $this->expectUserDeprecationMessage(\sprintf('Since symfony/dependency-injection 7.2: Using "!tagged" is deprecated, use "!tagged_iterator" instead in "%s/yaml%stagged_deprecated.yml".', self::$fixturesPath, \DIRECTORY_SEPARATOR));
 
         $loader->load('tagged_deprecated.yml');
+    }
+
+    private static function toJsonData(mixed $value): mixed
+    {
+        return match (true) {
+            $value instanceof TaggedValue => self::toJsonData($value->getValue()),
+            $value instanceof \UnitEnum => $value->name,
+            $value instanceof \stdClass => (object) array_map(self::toJsonData(...), (array) $value),
+            \is_array($value) => array_map(self::toJsonData(...), $value),
+            default => $value,
+        };
     }
 }

@@ -43,6 +43,8 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 
     public function getFromQueues(array $queueNames): iterable
     {
+        $queueNames = array_intersect($queueNames, $this->connection->getQueueNames());
+
         foreach ($queueNames as $queueName) {
             yield from $this->getEnvelope($queueName);
         }

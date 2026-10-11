@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-11T12:21:55Z
+
+Thanks @KalimeroMK. I squashed and pushed one change to the code. Named constructor arguments now work without the `$` prefix, as in `TenantStamp::class => ['tenant' => 'acme']`. Before, they failed with `did you forget to add the "$" prefix to argument "tenant"?` on `scheduler.provider.default`, a service users never declare.
+
+We'll merge this once #66781 is merged up to 8.2.

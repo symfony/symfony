@@ -137,6 +137,10 @@ final class JsonSchemaDumper
                 if ($node->getMinNumberOfElements()) {
                     $schema['minItems'] = $node->getMinNumberOfElements();
                 }
+
+                if (null !== $node->getAttribute('wraps_arrays_into')) {
+                    $schema = ['anyOf' => [$schema, $this->dumpWrappedMap($node)]];
+                }
             }
         } elseif ($node instanceof ArrayNode) {
             $schema = ['$ref' => $node->isNullable() ? '#/$defs/types/object_null' : '#/$defs/types/object'];
@@ -330,6 +334,33 @@ final class JsonSchemaDumper
         }
 
         return $schemas;
+    }
+
+    /**
+     * Describes the map whose keys normalization puts into the items of the list.
+     *
+     * @return array<string, mixed>
+     */
+    private function dumpWrappedMap(PrototypedArrayNode $node): array
+    {
+        $inListItem = $this->inListItem;
+        // the items of a map are merged by key, so another file can provide their children
+        $this->inListItem = false;
+
+        try {
+            $schema = [
+                '$ref' => $node->isNullable() ? '#/$defs/types/object_null' : '#/$defs/types/object',
+                'additionalProperties' => $this->dumpNode($node->getPrototype()),
+            ];
+        } finally {
+            $this->inListItem = $inListItem;
+        }
+
+        if ($node->getMinNumberOfElements()) {
+            $schema['minProperties'] = $node->getMinNumberOfElements();
+        }
+
+        return $schema;
     }
 
     /** @return array<string, mixed> */

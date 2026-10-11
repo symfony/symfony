@@ -492,16 +492,69 @@ class ArrayNodeDefinitionTest extends TestCase
             ->getNode();
     }
 
-    public function testAcceptAndWrapArraysIsNotApplicableToPrototypeNodes()
+    #[DataProvider('provideMapsWrappedIntoTheItemsOfAList')]
+    public function testAcceptAndWrapMapsIntoTheItemsOfAList(array $config, array $expected)
+    {
+        $node = (new ArrayNodeDefinition('root'))
+            ->acceptAndWrap(['array'], 'name')
+            ->arrayPrototype()
+                ->children()
+                    ->scalarNode('name')->isRequired()->end()
+                    ->scalarNode('label')->end()
+                ->end()
+            ->end()
+        ;
+
+        $this->assertEquals($expected, (new Processor())->process($node->getNode(), [$config]));
+    }
+
+    public static function provideMapsWrappedIntoTheItemsOfAList(): iterable
+    {
+        yield 'the keys of a map go into the items' => [['foo' => ['label' => 'Foo'], 'bar' => []], ['foo' => ['name' => 'foo', 'label' => 'Foo'], 'bar' => ['name' => 'bar']]];
+        yield 'an item setting the child keeps it' => [['foo' => ['name' => 'bar']], ['foo' => ['name' => 'bar']]];
+        yield 'a list is not changed' => [[['name' => 'foo'], ['name' => 'foo', 'label' => 'Foo']], [['name' => 'foo'], ['name' => 'foo', 'label' => 'Foo']]];
+    }
+
+    public function testAcceptAndWrapArraysIntoAMissingChildOfTheItemsOfAList()
     {
         $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('->acceptAndWrap() cannot wrap arrays into a prototype node at path "root".');
+        $this->expectExceptionMessage('->acceptAndWrap() cannot wrap arrays into "name" as it is not a child of the items of the node at path "root".');
+
+        (new ArrayNodeDefinition('root'))
+            ->acceptAndWrap(['array'], 'name')
+            ->arrayPrototype()
+                ->children()
+                    ->scalarNode('label')->end()
+                ->end()
+            ->end()
+            ->getNode();
+    }
+
+    public function testAcceptAndWrapArraysIsNotApplicableToMaps()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('->acceptAndWrap() cannot wrap arrays into a prototype node that uses ->useAttributeAsKey() at path "root".');
 
         (new ArrayNodeDefinition('root'))
             ->acceptAndWrap(['array'], 'items')
             ->useAttributeAsKey('name')
             ->scalarPrototype()->end()
             ->getNode();
+    }
+
+    public function testAcceptAndWrapArraysKeepsTheTypesDeclaredByTheClosures()
+    {
+        $node = (new ArrayNodeDefinition('root'))
+            ->acceptAndWrap(['array'], 'name')
+            ->beforeNormalization()->ifString()->then(static fn ($v) => [['name' => $v]])->end()
+            ->arrayPrototype()
+                ->children()
+                    ->scalarNode('name')->end()
+                ->end()
+            ->end()
+        ;
+
+        $this->assertSame(['string', 'array'], $node->getNode()->getNormalizedTypes());
     }
 
     public function testAcceptAndWrapDoesNotHideTheClosuresThatAcceptAnyValue()

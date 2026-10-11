@@ -275,6 +275,77 @@ class JsonSchemaConfigDumpPassTest extends TestCase
 
     #[RequiresMethod(Validator::class, 'validate')]
     #[RequiresMethod(SchemaValidator::class, 'validate')]
+    public function testGeneratedSchemaAcceptsTheDocumentedPlacesAndTransitionsOfWorkflows()
+    {
+        $schemaFile = $this->tempDir.'/workflow_schema.json';
+        $container = new ContainerBuilder();
+
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([WorkflowBundle::class => ['all' => true]])))->process($container);
+
+        $config = Yaml::parse(<<<YAML
+            workflow:
+                workflows:
+                    blog_publishing:
+                        type: workflow
+                        initial_marking: draft
+                        places: [draft, reviewed, published]
+                        transitions:
+                            to_review:
+                                from: draft
+                                to: reviewed
+                            publish:
+                                from: [draft, reviewed]
+                                to: published
+                    pull_request:
+                        places:
+                            start: ~
+                            review:
+                                metadata:
+                                    description: Human review
+                        transitions:
+                            - name: submit
+                              from: start
+                              to: [review, { place: start, weight: 2 }]
+            YAML);
+
+        $this->assertSame([], (new SchemaValidator())->validate($config, $schemaFile));
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    #[RequiresMethod(SchemaValidator::class, 'validate')]
+    public function testGeneratedSchemaRejectsUnknownKeysInPlacesAndTransitionsGivenAsMaps()
+    {
+        $schemaFile = $this->tempDir.'/workflow_schema.json';
+        $container = new ContainerBuilder();
+
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([WorkflowBundle::class => ['all' => true]])))->process($container);
+
+        $config = Yaml::parse(<<<YAML
+            workflow:
+                workflows:
+                    blog_publishing:
+                        places:
+                            draft:
+                                metdata: { description: Draft }
+            YAML);
+
+        $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));
+
+        $config = Yaml::parse(<<<YAML
+            workflow:
+                workflows:
+                    blog_publishing:
+                        transitions:
+                            publish:
+                                form: draft
+                                to: published
+            YAML);
+
+        $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    #[RequiresMethod(SchemaValidator::class, 'validate')]
     public function testGeneratedSchemaAcceptsTheCollectionOfASectionGivenDirectlyUnderItsRoot()
     {
         $schemaFile = $this->tempDir.'/shorthand_schema.json';

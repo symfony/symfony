@@ -58,6 +58,29 @@ class ConfigurationTest extends TestCase
         $this->assertSame([['place' => 'c', 'weight' => 1]], $transitions[1]['to']);
     }
 
+    public function testWorkflowPlacesAndTransitionsGivenAsMaps()
+    {
+        $config = $this->process([
+            'workflows' => [
+                'blog' => [
+                    'supports' => [self::class],
+                    'places' => [
+                        'draft' => null,
+                        'review' => ['metadata' => ['description' => 'Human review']],
+                    ],
+                    'transitions' => [
+                        'to_review' => ['from' => 'draft', 'to' => 'review'],
+                        'reopen' => ['from' => 'review', 'to' => 'draft'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([['name' => 'draft', 'metadata' => []], ['name' => 'review', 'metadata' => ['description' => 'Human review']]], $config['workflows']['blog']['places']);
+        $this->assertSame(['to_review', 'reopen'], array_keys($config['workflows']['blog']['transitions']));
+        $this->assertSame(['to_review', 'reopen'], array_column($config['workflows']['blog']['transitions'], 'name'));
+    }
+
     public function testWorkflowEventsToDispatchRejectsMixedAllowListAndBlockList()
     {
         $this->expectException(InvalidConfigurationException::class);

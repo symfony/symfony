@@ -209,6 +209,15 @@ class PrototypedArrayNode extends ArrayNode
         $value = $this->remapXml($value);
 
         $isList = array_is_list($value);
+
+        if (!$isList && null !== $wrapKey = $this->getAttribute('wraps_arrays_into')) {
+            foreach ($value as $k => $v) {
+                if (\is_array($v)) {
+                    $value[$k][$wrapKey] ??= $k;
+                }
+            }
+        }
+
         $normalized = [];
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {

@@ -203,6 +203,26 @@ bar';
         $this->assertStringContainsString('ERROR', $tester->getDisplay());
     }
 
+    public function testLintValidatesMappingsAsObjectsAndSequencesAsArrays()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'map' => ['type' => 'object'],
+                'list' => ['type' => 'array'],
+            ],
+        ]));
+
+        $tester = $this->createCommandTester();
+
+        $this->assertSame(0, $tester->execute(['filename' => $this->createFile("map: {}\nlist: []"), '--check-schema' => $schema], ['decorated' => false]), 'An empty mapping is an object and an empty sequence is an array');
+        $this->assertSame(0, $tester->execute(['filename' => $this->createFile("map: {0: a, 1: b}\nlist: [a, b]"), '--check-schema' => $schema], ['decorated' => false]), 'A mapping with integer keys is an object');
+        $this->assertSame(1, $tester->execute(['filename' => $this->createFile('list: {}'), '--check-schema' => $schema], ['decorated' => false]), 'An empty mapping is not an array');
+        $this->assertSame(1, $tester->execute(['filename' => $this->createFile('map: []'), '--check-schema' => $schema], ['decorated' => false]), 'An empty sequence is not an object');
+    }
+
     public function testLintReportsAllSchemaViolations()
     {
         $this->skipIfJsonSchemaMissing();

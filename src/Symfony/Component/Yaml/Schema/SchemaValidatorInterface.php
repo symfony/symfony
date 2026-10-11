@@ -27,7 +27,7 @@ interface SchemaValidatorInterface
     public function isSupported(): bool;
 
     /**
-     * @param mixed       $data    The data to validate, typically the result of Yaml::parse()
+     * @param mixed       $data    The data to validate, typically the result of Yaml::parse() with the Yaml::PARSE_OBJECT_FOR_MAP flag, so that empty mappings are objects
      * @param string      $schema  The schema location, as returned by a SchemaResolverInterface
      * @param string|null $content The raw YAML content, used to locate the errors in the document
      *

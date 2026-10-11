@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\TestBrowserToken;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
+use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +36,11 @@ class KernelBrowser extends HttpKernelBrowser
     private bool $profiler = false;
     private bool $reboot = true;
     private ?\Closure $containerConfigurator = null;
+
+    /**
+     * @var array<string, TestBrowserToken>
+     */
+    private array $tokens = [];
 
     public function __construct(KernelInterface $kernel, array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
@@ -152,6 +158,13 @@ class KernelBrowser extends HttpKernelBrowser
         parent::insulate($insulated);
     }
 
+    public function restart(): void
+    {
+        parent::restart();
+
+        $this->tokens = [];
+    }
+
     /**
      * @param UserInterface        $user
      * @param array<string, mixed> $tokenAttributes
@@ -170,6 +183,9 @@ class KernelBrowser extends HttpKernelBrowser
 
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
         $token->setAttributes($tokenAttributes);
+
+        // stateless firewalls don't read the session, so the token is also sent with each request
+        $this->tokens[$firewallContext] = $token;
 
         $container = $this->getContainer();
         $container->get('security.untracked_token_storage')->setToken($token);
@@ -190,6 +206,17 @@ class KernelBrowser extends HttpKernelBrowser
         $session->save();
 
         return $this;
+    }
+
+    protected function filterRequest(DomRequest $request): Request
+    {
+        $httpRequest = parent::filterRequest($request);
+
+        if ($this->tokens) {
+            $httpRequest->attributes->set('_security_test_tokens', $this->tokens);
+        }
+
+        return $httpRequest;
     }
 
     /**

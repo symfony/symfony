@@ -27,6 +27,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
 
 class AccessTokenTest extends AbstractWebTestCase
 {
@@ -676,6 +678,77 @@ class AccessTokenTest extends AbstractWebTestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($response->getContent(), true));
+    }
+
+    public function testLoginUserOnAStatelessFirewallSurvivesKernelReboots()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_login_user.yml']);
+        $client->loginUser(new InMemoryUser('dunglas', null, ['ROLE_USER']), 'api');
+
+        $client->request('GET', '/foo');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($client->getResponse()->getContent(), true));
+
+        $client->request('GET', '/foo');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($client->getResponse()->getContent(), true));
+    }
+
+    public function testLoginUserOnAStatelessFirewallGivesTheTokenAttributes()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_login_user.yml']);
+
+        $client->loginUser(new InMemoryUser('dunglas', null, ['ROLE_USER']), 'api', [AccessTokenAuthenticator::SCOPE_ATTRIBUTE => ['profile:write']]);
+        $client->request('GET', '/scoped');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(['message' => 'Welcome @dunglas!'], json_decode($client->getResponse()->getContent(), true));
+
+        $client->loginUser(new InMemoryUser('dunglas', null, ['ROLE_USER']), 'api', [AccessTokenAuthenticator::SCOPE_ATTRIBUTE => ['profile:read']]);
+        $client->request('GET', '/scoped');
+
+        $this->assertSame(403, $client->getResponse()->getStatusCode());
+        $this->assertSame('Bearer realm="My API",error="insufficient_scope",error_description="The request requires higher privileges than provided by the access token.",scope="profile:write"', $client->getResponse()->headers->get('WWW-Authenticate'));
+    }
+
+    public function testLoginUserOnAStatelessFirewallLoadsTheUserFromItsUserProvider()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_login_user.yml']);
+        $client->loginUser(new InMemoryUser('unknown', null, ['ROLE_USER']), 'api');
+
+        $client->request('GET', '/foo');
+
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $client->getResponse()->headers->get('WWW-Authenticate'));
+    }
+
+    public function testAnAccessTokenSentWithTheRequestPrevailsOverLoginUser()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_login_user.yml']);
+        $client->loginUser(new InMemoryUser('dunglas', null, ['ROLE_USER']), 'api');
+
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN']);
+
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $client->getResponse()->headers->get('WWW-Authenticate'));
+    }
+
+    public function testRestartLogsOutOfAStatelessFirewall()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_login_user.yml']);
+        $client->loginUser(new InMemoryUser('dunglas', null, ['ROLE_USER']), 'api');
+
+        $client->request('GET', '/foo');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        $client->restart();
+        $client->request('GET', '/foo');
+
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('Bearer realm="My API"', $client->getResponse()->headers->get('WWW-Authenticate'));
     }
 
     public static function validAccessTokens(): array

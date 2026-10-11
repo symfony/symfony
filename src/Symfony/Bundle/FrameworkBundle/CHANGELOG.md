@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Pass the token of `KernelBrowser::loginUser()` with each request, so that stateless firewalls can read it
  * Assert each constraint of the DomCrawler and BrowserKit assertions on its own, so that their failure messages describe the failed check instead of dumping the crawler, the response or the client
  * Add the `expression_language.compiled` tag to decorate an expression language with `CompiledExpressionLanguage`
  * Register the `lint:expressions` command

@@ -18,6 +18,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\Authentic
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\Routing\OidcLoginRouteLoader;
+use Symfony\Bundle\SecurityBundle\Security\TestBrowserAccessTokenAuthenticator;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\CustomProviderFactory;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\DummyProviderFactory;
@@ -1330,6 +1331,57 @@ class SecurityExtensionTest extends TestCase
         yield 'next to form_login' => [['form_login' => true], 'security.authenticator.form_login.main'];
         // and it can still be asked for explicitly
         yield 'explicitly configured' => [['http_basic' => true, 'entry_point' => 'access_token'], 'security.authenticator.access_token.main'];
+    }
+
+    public function testStatelessAccessTokenFirewallReadsTheUserOfTheTestClientInTestMode()
+    {
+        $container = $this->getRawContainer();
+        $container->register('test.client', \stdClass::class);
+        $container->register('token_handler', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'main' => ['stateless' => true, 'access_token' => ['token_handler' => 'token_handler']],
+            ],
+        ]);
+
+        $container->compile();
+
+        $definition = $container->getDefinition('security.authenticator.access_token.test_browser.main');
+        $this->assertSame(TestBrowserAccessTokenAuthenticator::class, $definition->getClass());
+        $this->assertSame(['security.authenticator.access_token.main', null, 0], $definition->getDecoratedService());
+        $this->assertEquals([new Reference('security.authenticator.access_token.test_browser.main.inner'), 'main', new Reference('foo')], $definition->getArguments());
+    }
+
+    #[DataProvider('provideFirewallsNotReadingTheUserOfTheTestClient')]
+    public function testFirewallDoesNotReadTheUserOfTheTestClient(bool $stateless, bool $testMode)
+    {
+        $container = $this->getRawContainer();
+        if ($testMode) {
+            $container->register('test.client', \stdClass::class);
+        }
+        $container->register('token_handler', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'main' => ['stateless' => $stateless, 'access_token' => ['token_handler' => 'token_handler']],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.access_token.test_browser.main'));
+    }
+
+    public static function provideFirewallsNotReadingTheUserOfTheTestClient(): iterable
+    {
+        yield 'stateless outside test mode' => [true, false];
+        // the test client stores its token in the session of a stateful firewall
+        yield 'stateful in test mode' => [false, true];
     }
 
     public static function provideEntryPointFirewalls(): iterable

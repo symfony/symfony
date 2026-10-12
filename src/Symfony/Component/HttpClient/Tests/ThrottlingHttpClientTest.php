@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -53,5 +54,24 @@ class ThrottlingHttpClientTest extends TestCase
         $client->request('GET', 'http://example.com/baz');
         $client->request('GET', 'http://example.com/qux');
         $client->request('GET', 'http://example.com/corge');
+    }
+
+    #[Group('time-sensitive')]
+    public function testThrottlingWithoutPauseHandler()
+    {
+        $rateLimiterFactory = new RateLimiterFactory([
+            'id' => 'token_bucket',
+            'policy' => 'token_bucket',
+            'limit' => 1,
+            'rate' => ['interval' => '5 seconds'],
+        ], new InMemoryStorage());
+
+        $client = new ThrottlingHttpClient(new MockHttpClient(), $rateLimiterFactory->create());
+
+        $start = microtime(true);
+        $client->request('GET', 'http://example.com/foo');
+        $client->request('GET', 'http://example.com/bar');
+
+        $this->assertEqualsWithDelta(5, microtime(true) - $start, 1);
     }
 }

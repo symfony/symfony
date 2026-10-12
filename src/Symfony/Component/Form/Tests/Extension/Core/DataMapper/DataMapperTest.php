@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\ReadonlyPerson;
 use Symfony\Component\Form\Tests\Fixtures\TypehintedPropertiesCar;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -420,6 +421,21 @@ class DataMapperTest extends TestCase
         ]);
 
         $this->assertSame('bar', $person->myName());
+    }
+
+    public function testMapFormsToDataAcceptsFormsThatCanBeIteratedOnlyOnce()
+    {
+        $form = (new FormFactoryBuilder())
+            ->getFormFactory()
+            ->createBuilder(FormType::class, new ReadonlyPerson('Bernhard'), ['data_class' => ReadonlyPerson::class])
+            ->add('name', TextType::class)
+            ->getForm();
+        $form->submit(['name' => 'Fabien']);
+        $person = new ReadonlyPerson('Bernhard');
+
+        $this->mapper->mapFormsToData((static fn () => yield from $form)(), $person);
+
+        self::assertEquals(new ReadonlyPerson('Fabien'), $person);
     }
 }
 

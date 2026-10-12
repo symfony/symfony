@@ -64,6 +64,10 @@ class DataMapper implements DataMapperInterface
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
+        if (\is_object($data)) {
+            $forms = ConstructorMapper::mapFormsToObject($forms, $data);
+        }
+
         foreach ($forms as $form) {
             $config = $form->getConfig();
 

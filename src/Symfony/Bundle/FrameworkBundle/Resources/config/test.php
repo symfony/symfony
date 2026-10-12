@@ -49,6 +49,10 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('kernel'),
                 'test.private_services_locator',
+                [],
+                [],
+                abstract_arg('the services to keep a copy of before each reset'),
+                abstract_arg('the methods to call at the end of each test'),
             ])
             ->public()
 

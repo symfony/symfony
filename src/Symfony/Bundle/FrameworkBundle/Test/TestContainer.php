@@ -29,11 +29,22 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class TestContainer extends Container
 {
+    /**
+     * @var array<string, list<object>>
+     */
+    private array $keptState = [];
+
+    /**
+     * @param iterable<string, object>    $keptServices The services tagged "kernel.test_state" with "keep", when they are instantiated
+     * @param array<string, list<string>> $stateMethods The methods given by the "kernel.test_state" tag, by service id
+     */
     public function __construct(
         private KernelInterface $kernel,
         private string $privateServicesLocatorId,
         private array $renamedIds = [],
         private array $nonSharedServices = [],
+        private iterable $keptServices = [],
+        private array $stateMethods = [],
     ) {
     }
 
@@ -118,6 +129,58 @@ class TestContainer extends Container
     public function getRemovedIds(): array
     {
         return $this->getPublicContainer()->getRemovedIds();
+    }
+
+    /**
+     * Keeps a copy of the services tagged "kernel.test_state" with "keep", before the kernel resets them.
+     *
+     * @return array<string, list<object>> The copies kept so far, by service id
+     */
+    public function keepState(): array
+    {
+        foreach ($this->keptServices as $id => $service) {
+            $this->keptState[$id][] = clone $service;
+        }
+
+        return $this->keptState;
+    }
+
+    /**
+     * Receives the copies kept by the container that the kernel used before it rebooted.
+     *
+     * @param array<string, list<object>> $state
+     */
+    public function setKeptState(array $state): void
+    {
+        $this->keptState = $state;
+    }
+
+    /**
+     * Returns the copies of a service kept before the kernel reset it, the oldest first.
+     *
+     * @return list<object>
+     */
+    public function getKeptState(string $id): array
+    {
+        return $this->keptState[$id] ?? [];
+    }
+
+    /**
+     * Calls the methods given by the "kernel.test_state" tag, so that the next test starts from a clean state.
+     */
+    public function resetState(): void
+    {
+        foreach ($this->stateMethods as $id => $methods) {
+            if (!$this->has($id)) {
+                continue;
+            }
+
+            $service = $this->get($id);
+
+            foreach ($methods as $method) {
+                $service->$method();
+            }
+        }
     }
 
     private function getPublicContainer(): Container

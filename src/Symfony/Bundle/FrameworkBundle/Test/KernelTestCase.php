@@ -152,6 +152,10 @@ abstract class KernelTestCase extends TestCase
                 $httpCacheDir = static::$kernel->getShareDir().'/http_cache';
             }
 
+            if ($container->has('test.service_container')) {
+                $container->get('test.service_container')->resetState();
+            }
+
             if ($container->has('services_resetter')) {
                 // Instantiate the service because Container::reset() only resets services that have been used
                 $container->get('services_resetter');

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `kernel.test_state` tag to call a method of a service when a test ends, or to keep a copy of the service before each reset until the test ends
  * Pass the token of `KernelBrowser::loginUser()` with each request, so that stateless firewalls can read it
  * Inject the `clock` service into the session `MetadataBag`
  * Assert each constraint of the DomCrawler and BrowserKit assertions on its own, so that their failure messages describe the failed check instead of dumping the crawler, the response or the client

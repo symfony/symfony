@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\EventListener;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
@@ -204,7 +205,8 @@ class PostgreSqlNotifyOnIdleListenerTest extends TestCase
         // For getEarliestDelayedMessageTime(), applies "available_at > ?" to the values sent to the database
         $driverConnection->method('executeQuery')
             ->willReturnCallback(function (string $sql, array $params, array $types) use ($driverConnection, $delayedAvailableAt) {
-                $now = Type::getType($types[1])->convertToDatabaseValue($params[1], new PostgreSQLPlatform());
+                $type = method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider()->get($types[1]) : Type::getType($types[1]);
+                $now = $type->convertToDatabaseValue($params[1], new PostgreSQLPlatform());
                 $delayedResult = $this->createStub(DriverResult::class);
                 $delayedResult->method('fetchOne')->willReturn(null !== $delayedAvailableAt && $delayedAvailableAt > $now ? $delayedAvailableAt : false);
 

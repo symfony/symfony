@@ -329,6 +329,29 @@ class Store implements StoreInterface
     }
 
     /**
+     * Removes all the entries of the store and releases the locks it holds.
+     */
+    public function clear(): void
+    {
+        $this->cleanup();
+        $this->keyCache = new \SplObjectStorage();
+
+        if (!is_dir($this->root)) {
+            return;
+        }
+
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->root, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+
+        foreach ($files as $file) {
+            if ($file->isDir()) {
+                @rmdir($file->getPathname());
+            } else {
+                @unlink($file->getPathname());
+            }
+        }
+    }
+
+    /**
      * Purges data for the given URL.
      */
     private function doPurge(string $url): bool

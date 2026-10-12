@@ -77,6 +77,57 @@ class StoreTest extends TestCase
         $this->assertFalse($this->store->purge('/bar'));
     }
 
+    public function testClearRemovesAllEntries()
+    {
+        $request1 = Request::create('/foo');
+        $request2 = Request::create('https://example.com/bar');
+        $this->store->write($request1, new Response('foo'));
+        $this->store->write($request2, new Response('bar'));
+
+        $this->store->clear();
+
+        $this->assertNull($this->store->lookup($request1));
+        $this->assertNull($this->store->lookup($request2));
+        $this->assertSame(['.', '..'], scandir(sys_get_temp_dir().'/http_cache'));
+    }
+
+    public function testStoreIsUsableAfterClear()
+    {
+        $this->storeSimpleEntry();
+
+        $this->store->clear();
+
+        $this->assertNull($this->store->lookup($this->request));
+
+        $this->storeSimpleEntry();
+
+        $this->assertStringEqualsFile($this->store->lookup($this->request)->headers->get('X-Body-File'), 'test');
+    }
+
+    public function testClearReleasesLocks()
+    {
+        $this->storeSimpleEntry();
+        $this->assertTrue($this->store->lock($this->request));
+
+        $this->store->clear();
+
+        $this->assertFalse($this->store->isLocked($this->request));
+        $this->assertFalse($this->store->unlock($this->request));
+        $this->assertTrue((new Store(sys_get_temp_dir().'/http_cache'))->lock($this->request));
+    }
+
+    public function testClearWhenTheRootDirectoryIsMissing()
+    {
+        HttpCacheTestCase::clearDirectory(sys_get_temp_dir().'/http_cache');
+        rmdir(sys_get_temp_dir().'/http_cache');
+
+        $this->store->clear();
+
+        $this->storeSimpleEntry();
+
+        $this->assertStringEqualsFile($this->store->lookup($this->request)->headers->get('X-Body-File'), 'test');
+    }
+
     public function testStoresACacheEntry()
     {
         $cacheKey = $this->storeSimpleEntry();

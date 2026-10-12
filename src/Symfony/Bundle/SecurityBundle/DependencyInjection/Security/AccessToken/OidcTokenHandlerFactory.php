@@ -92,6 +92,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         if (!$container->hasDefinition('security.access_token_handler.oidc.command.generate')) {
             $container
                 ->register('security.access_token_handler.oidc.command.generate', OidcTokenGenerateCommand::class)
+                ->setArguments([new Reference('clock')])
                 ->addTag('console.command')
             ;
         }

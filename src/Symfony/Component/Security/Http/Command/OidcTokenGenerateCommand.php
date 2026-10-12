@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Command;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -31,6 +32,12 @@ final class OidcTokenGenerateCommand extends Command
     private array $algorithms;
     /** @var array<string, list<string>> */
     private array $issuers;
+
+    public function __construct(
+        private readonly ?ClockInterface $clock = null,
+    ) {
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -69,7 +76,7 @@ final class OidcTokenGenerateCommand extends Command
             $input->getOption('algorithm'),
             $input->getOption('issuer'),
             $input->getOption('ttl'),
-            ($nbf = $input->getOption('not-before')) ? new \DateTimeImmutable($nbf) : null,
+            ($nbf = $input->getOption('not-before')) ? $this->createNotBefore($nbf) : null,
         );
 
         $output->writeln($token);
@@ -111,5 +118,14 @@ final class OidcTokenGenerateCommand extends Command
                 $suggestions->suggestValue(new Suggestion($issuer, \sprintf('Available firewalls: "%s".', implode('", "', $firewalls))));
             }
         }
+    }
+
+    private function createNotBefore(string $notBefore): \DateTimeImmutable
+    {
+        if (false === $timestamp = strtotime($notBefore, $this->clock?->now()->getTimestamp() ?? time())) {
+            throw new \InvalidArgumentException(\sprintf('The "--not-before" option must be a valid date, "%s" given.', $notBefore));
+        }
+
+        return new \DateTimeImmutable('@'.$timestamp);
     }
 }

@@ -29,6 +29,7 @@
     "require-dev": {
         "symfony/cache": "^6.4|^7.0|^8.0",
         "symfony/clock": "^6.4|^7.0|^8.0",
+        "symfony/console": "^6.4|^7.0|^8.0",
         "symfony/expression-language": "^6.4|^7.0|^8.0",
         "symfony/http-client": "^6.4|^7.0|^8.0",
         "symfony/http-client-contracts": "^3.0",

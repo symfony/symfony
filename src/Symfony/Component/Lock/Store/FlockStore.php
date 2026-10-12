@@ -98,7 +98,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 
         while (true) {
             if (!$handle) {
-                $handle = $this->openFile($fileName);
+                $handle = $this->openFile($fileName, $blocking);
             }
 
             // On Windows, even if PHP doc says the contrary, LOCK_NB works, see
@@ -175,7 +175,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     /**
      * @return resource
      */
-    private function openFile(string $fileName)
+    private function openFile(string $fileName, bool $blocking)
     {
         $error = 'Unable to open the lock file.';
 
@@ -188,6 +188,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         try {
             // When files are removed on release, other processes may remove and create the file between the attempts below.
             // On Windows, a removed file also stays in the way until all the processes that opened it close it.
+            // A blocking acquisition waits longer for it, as its caller waits for the lock anyway.
             for ($retry = 0;; ++$retry) {
                 if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
                     if ($handle = fopen($fileName, 'x')) {
@@ -198,7 +199,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
                     }
                 }
 
-                if ($handle || !$this->removeOnRelease || 10 <= $retry) {
+                if ($handle || !$this->removeOnRelease || ($blocking ? 50 : 10) <= $retry) {
                     break;
                 }
 

@@ -106,6 +106,30 @@ class FlockStoreRemoveOnReleaseTest extends AbstractStoreTestCase
         $this->assertWaiterAcquiresTheLock($waiter, $store, $key);
     }
 
+    public function testWaitingProcessWaitsForTheLockFileToBeOpenable()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows does not deny reading a file through its permissions.');
+        }
+        if (\function_exists('posix_geteuid') && 0 === posix_geteuid()) {
+            $this->markTestSkipped('The permissions of a file do not apply to root.');
+        }
+
+        $key = new Key(__METHOD__);
+        $store = new FlockStore($this->lockPath);
+        $store->save($key);
+        $store->delete($key);
+        [$file] = glob($this->lockPath.'/*.lock');
+
+        // Stands for a removed file that another process still holds open on Windows, which cannot be opened either
+        chmod($file, 0);
+        [$waiter] = $this->startWaiters($key, 1);
+        usleep(500000);
+        chmod($file, 0o666);
+
+        $this->assertWaiterAcquiresTheLock($waiter, new FlockStore($this->lockPath, true), $key);
+    }
+
     public function testWaitingProcessesLockTheNewFilesInTurnWhenTheLockFileIsRemoved()
     {
         $store = new FlockStore($this->lockPath, true);

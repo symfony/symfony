@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
 use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
@@ -232,6 +233,40 @@ class SignatureHasherTest extends TestCase
 
         $this->expectException(InvalidSignatureException::class);
         $hasher->acceptSignatureHash('john', $expires, 'invalid-hash');
+    }
+
+    public function testAcceptSignatureHashExpiresWithTheClock()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00 UTC');
+        $user = new TestSignatureUser('john', 'my-password');
+        $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['password'], 'secret', null, null, $clock);
+
+        $expires = $clock->now()->getTimestamp() + 3600;
+        $hash = $hasher->computeSignatureHash($user, $expires);
+
+        $hasher->acceptSignatureHash('john', $expires, $hash);
+
+        $clock->sleep(3601);
+
+        $this->expectException(ExpiredSignatureException::class);
+        $hasher->acceptSignatureHash('john', $expires, $hash);
+    }
+
+    public function testVerifySignatureHashExpiresWithTheClock()
+    {
+        $clock = new MockClock('2020-01-01 00:00:00 UTC');
+        $user = new TestSignatureUser('john', 'my-password');
+        $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['password'], 'secret', null, null, $clock);
+
+        $expires = $clock->now()->getTimestamp() + 3600;
+        $hash = $hasher->computeSignatureHash($user, $expires);
+
+        $hasher->verifySignatureHash($user, $expires, $hash);
+
+        $clock->sleep(3601);
+
+        $this->expectException(ExpiredSignatureException::class);
+        $hasher->verifySignatureHash($user, $expires, $hash);
     }
 
     public function testConstructorThrowsOnEmptySecret()

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\LoginLink;
 
 use Symfony\Bridge\Twig\Mime\NotificationEmail;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Notifier\Message\EmailMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\EmailNotificationInterface;
@@ -59,7 +60,7 @@ class LoginLinkNotification extends Notification implements EmailNotificationInt
 
     private function getDefaultContent(string $target): string
     {
-        $duration = $this->loginLinkDetails->getExpiresAt()->getTimestamp() - time();
+        $duration = $this->loginLinkDetails->getExpiresAt()->getTimestamp() - (class_exists(Clock::class) ? Clock::get()->now()->getTimestamp() : time());
         $durationString = floor($duration / 60).' minute'.($duration > 60 ? 's' : '');
         if (($hours = $duration / 3600) >= 1) {
             $durationString = floor($hours).' hour'.($hours >= 2 ? 's' : '');

@@ -32,6 +32,7 @@
         "symfony/expression-language": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/http-client-contracts": "^3.0",
+        "symfony/notifier": "^7.4|^8.0",
         "symfony/rate-limiter": "^7.4|^8.0",
         "symfony/routing": "^7.4|^8.0",
         "symfony/security-csrf": "^7.4|^8.0",

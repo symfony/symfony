@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\RememberMe;
 
+use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -38,13 +39,14 @@ final class SignatureRememberMeHandler extends AbstractRememberMeHandler
         RequestStack $requestStack,
         array $options,
         ?LoggerInterface $logger = null,
+        private ?ClockInterface $clock = null,
     ) {
         parent::__construct($userProvider, $requestStack, $options, $logger);
     }
 
     public function createRememberMeCookie(UserInterface $user): void
     {
-        $expires = time() + $this->options['lifetime'];
+        $expires = ($this->clock?->now()->getTimestamp() ?? time()) + $this->options['lifetime'];
         $value = $this->signatureHasher->computeSignatureHash($user, $expires);
 
         $details = new RememberMeDetails($user->getUserIdentifier(), $expires, $value);

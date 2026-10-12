@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T09:22:08Z
+
+Thanks for the PR. I pushed two fixes to your code.
+
+A run a few microseconds after `$until` made `getNextRunDate()` return null. `PeriodicalTrigger` runs have microseconds when no `from` is given, so `every('1 minute')` with a 01:00-04:00 window could stop for good. Both ends are now compared to the microsecond, like in `ExcludeTimeTrigger`.
+
+On the days the clocks change, jumping to `$until` skipped runs after the window. With 01:00-02:30 in Paris, the 03:00 run of 2026-03-29 was lost. The window now ends when the local time reaches `$until`, or just before the clocks change if that comes first.

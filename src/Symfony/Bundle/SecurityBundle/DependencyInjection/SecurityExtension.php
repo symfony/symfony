@@ -18,6 +18,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\Authentic
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
+use Symfony\Bundle\SecurityBundle\Security\TestBrowserAccessTokenAuthenticator;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
@@ -683,6 +684,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 }
 
                 $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
+
+                // a stateless firewall doesn't read the session, so the test client sends its token with each request instead
+                // this decorator is removed when there is no test client, that is outside test mode
+                if ('access_token' === $key && $firewall['stateless']) {
+                    $container->register($testBrowserId = 'security.authenticator.access_token.test_browser.'.$id, TestBrowserAccessTokenAuthenticator::class)
+                        ->setDecoratedService($authenticators)
+                        ->setArguments([new Reference($testBrowserId.'.inner'), $id, $userProvider ? new Reference($userProvider) : null])
+                        ->addTag('container.remove_if_missing', ['service' => 'test.client'])
+                    ;
+                }
+
                 if (\is_array($authenticators)) {
                     foreach ($authenticators as $authenticator) {
                         $authenticationProviders[$authenticator] = $authenticator;

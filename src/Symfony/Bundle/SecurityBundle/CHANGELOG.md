@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Make `KernelBrowser::loginUser()` work on the stateless firewalls that use the `access_token` authenticator
  * Compile the expressions of `access_control` rules and of `#[IsGranted]` and `#[IsCsrfTokenValid]` attributes when warming up the cache
  * Deprecate the `ExpressionCacheWarmer` class
  * Add the `dpop` option to the `access_token` authenticator, to accept only the access tokens bound to a key the request proves it holds (RFC 9449)

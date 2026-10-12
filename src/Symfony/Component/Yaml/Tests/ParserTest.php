@@ -3135,6 +3135,14 @@ class ParserTest extends TestCase
         $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
+    public function testKeyStartingWithNulByteThrowsParseExceptionWhenMappingsAreParsedAsObjects()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Mapping keys starting with a NUL byte are not supported with the "Yaml::PARSE_OBJECT_FOR_MAP" flag at line 2 (near ""\0": 1").');
+
+        $this->parser->parse("foo: 1\n\"\\0\": 1\n", Yaml::PARSE_OBJECT_FOR_MAP);
+    }
+
     public function testFilenamesAreParsedAsStringsWithoutFlag()
     {
         $file = __DIR__.'/Fixtures/index.yml';

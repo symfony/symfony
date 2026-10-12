@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add `TraceableTransport` to record the webhooks sent through a transport
+ * Add `Test\RequestFactory` to create the requests that the generic request parser accepts
  * Deprecate the `RequestParser` autowiring alias, use the `webhook.request_parser` service or `#[Target('webhook')]` with `RequestParserInterface` instead
  * Add `WebhookBundle`, which provides the `webhook` configuration and the services previously provided by `FrameworkBundle` under `framework.webhook`
  * Add the `webhook.no_private_network` and `webhook.http_client` options

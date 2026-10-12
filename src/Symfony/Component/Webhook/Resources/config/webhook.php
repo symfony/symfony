@@ -20,7 +20,9 @@ use Symfony\Component\Webhook\Server\HeaderSignatureConfigurator;
 use Symfony\Component\Webhook\Server\JsonBodyConfigurator;
 use Symfony\Component\Webhook\Server\NativeJsonPayloadSerializer;
 use Symfony\Component\Webhook\Server\SerializerPayloadSerializer;
+use Symfony\Component\Webhook\Server\TraceableTransport;
 use Symfony\Component\Webhook\Server\Transport;
+use Symfony\Component\Webhook\Test\RequestFactory;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -89,5 +91,26 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('user defined parsers'),
                 abstract_arg('message bus'),
             ])
+
+        ->set('webhook.transport.traceable', TraceableTransport::class)
+            ->decorate('webhook.transport')
+            ->args([service('.inner')])
+            ->tag('kernel.reset', ['method' => 'reset'])
+            ->tag('kernel.test_state', ['keep' => true])
+            ->tag('container.remove_if_missing', ['service' => 'test.service_container'])
+
+        ->set('webhook.test.request_factory', RequestFactory::class)
+            ->public()
+            ->args([
+                abstract_arg('secrets'),
+                abstract_arg('signing algorithm'),
+                abstract_arg('signature header name'),
+                abstract_arg('event header name'),
+                abstract_arg('id header name'),
+                abstract_arg('timestamp header name'),
+                abstract_arg('signature format'),
+                service('clock')->nullOnInvalid(),
+            ])
+            ->tag('container.remove_if_missing', ['service' => 'test.service_container'])
     ;
 };

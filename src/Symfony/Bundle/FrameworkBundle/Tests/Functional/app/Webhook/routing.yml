@@ -1,0 +1,15 @@
+webhook:
+    resource: '@FrameworkBundle/Resources/config/routing/webhook.php'
+    prefix: /webhook
+
+webhook_sender_send:
+    path:     /webhook-sender/send/{event}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\WebhookSenderController::send }
+
+webhook_sender_dispatch:
+    path:     /webhook-sender/dispatch/{event}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\WebhookSenderController::dispatch }
+
+webhook_sender_sent:
+    path:     /webhook-sender/sent
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\WebhookSenderController::sent }

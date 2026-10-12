@@ -14,6 +14,7 @@ namespace Symfony\Component\Webhook\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
@@ -27,6 +28,8 @@ use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
+use Symfony\Component\Webhook\Exception\InvalidArgumentException;
+use Symfony\Component\Webhook\Messenger\SendWebhookMessage;
 use Symfony\Component\Webhook\Subscriber;
 use Symfony\Component\Webhook\Tests\Fixtures\TestConsumer;
 use Symfony\Component\Webhook\Tests\Fixtures\TestRequestParser;
@@ -108,6 +111,54 @@ class WebhookBundleTest extends TestCase
         $this->assertEquals(['payments' => ['parser' => new Reference('webhook.request_parser'), 'secret' => 'the-secret']], $container->getDefinition('webhook.controller')->getArgument(0));
     }
 
+    public function testTestsCanSignIncomingWebhooks()
+    {
+        $kernel = new TestWebhookKernel('test_services', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $request = $container->get('webhook.test.request_factory')->createRequest('/webhook/test', 'test', 'order.paid', ['order' => 42]);
+        $response = $container->get('webhook.controller')->handle('test', $request);
+
+        $this->assertSame(202, $response->getStatusCode());
+
+        $events = $container->get('test.consumer')->events;
+        $this->assertCount(1, $events);
+        $this->assertSame('order.paid', $events[0]->getName());
+        $this->assertSame(['order' => 42], $events[0]->getPayload());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot sign webhooks of type "custom": only the routing entries that use the generic request parser of the Webhook component can be signed ("test"). Create the requests of the other entries by hand.');
+
+        $container->get('webhook.test.request_factory')->createRequest('/webhook/custom', 'custom', 'order.paid');
+    }
+
+    public function testTestsCanSeeTheSentWebhooks()
+    {
+        $kernel = new TestWebhookKernel('test_services', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $subscriber = new Subscriber('https://example.com/hook', 'the-secret');
+        $event = new RemoteEvent('the-event', 'the-id', ['foo' => 'bar']);
+
+        $container->get('test.webhook.transport')->send($subscriber, $event);
+
+        $this->assertEquals([new SendWebhookMessage($subscriber, $event)], $container->get('test.webhook.traceable_transport')->getSentWebhooks());
+        $this->assertSame('{"foo":"bar"}', $container->get('test.mock_response')->getRequestOptions()['body']);
+    }
+
+    public function testTheTestServicesAreRemovedOutsideOfTests()
+    {
+        $container = new ContainerBuilder();
+        new WebhookBundle()->getContainerExtension()->load([[]], $container);
+
+        new RemoveMissingDependenciesPass()->process($container);
+
+        $this->assertTrue($container->hasDefinition('webhook.transport'));
+        $this->assertFalse($container->hasDefinition('webhook.transport.traceable'));
+        $this->assertFalse($container->hasDefinition('webhook.test.request_factory'));
+    }
+
     public function testTheRequestParserIsAutowiredByTarget()
     {
         $container = new ContainerBuilder();
@@ -142,11 +193,25 @@ class TestWebhookKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
-        $container->extension('webhook', [
-            'routing' => [
-                'test' => ['service' => 'test.request_parser', 'secret' => 'the-secret'],
-            ],
-        ]);
+        if ('test_services' === $this->environment) {
+            $container->extension('webhook', [
+                'routing' => [
+                    'test' => ['secret' => 'the-secret'],
+                    'custom' => ['service' => 'test.request_parser', 'secret' => 'the-secret'],
+                ],
+            ]);
+
+            $container->services()
+                ->set('test.service_container', \stdClass::class)
+                ->alias('test.webhook.traceable_transport', 'webhook.transport.traceable')->public()
+            ;
+        } else {
+            $container->extension('webhook', [
+                'routing' => [
+                    'test' => ['service' => 'test.request_parser', 'secret' => 'the-secret'],
+                ],
+            ]);
+        }
 
         $container->services()
             ->set('test.request_parser', TestRequestParser::class)

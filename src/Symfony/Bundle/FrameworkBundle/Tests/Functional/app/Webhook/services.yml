@@ -1,0 +1,7 @@
+services:
+    test.webhook_http_client:
+        class: Symfony\Component\HttpClient\MockHttpClient
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\WebhookSenderController:
+        public: true
+        arguments: ['@webhook.transport', '@messenger.default_bus']

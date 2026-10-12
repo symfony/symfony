@@ -68,6 +68,30 @@ class RemoveMissingDependenciesPassTest extends TestCase
         $this->assertSame([[]], $transport->getTag('container.error'));
     }
 
+    public function testTheTraceableTransportIsKeptInTestsWhenTheHttpClientExists()
+    {
+        $container = $this->createContainer();
+        $container->register('http_client');
+        $container->register('test.service_container');
+
+        new ContainerRemoveMissingDependenciesPass()->process($container);
+        new RemoveMissingDependenciesPass()->process($container);
+
+        $this->assertTrue($container->hasDefinition('webhook.transport.traceable'));
+    }
+
+    public function testTheTraceableTransportIsDroppedWhenTheHttpClientIsMissing()
+    {
+        $container = $this->createContainer();
+        $container->register('test.service_container');
+
+        new ContainerRemoveMissingDependenciesPass()->process($container);
+        new RemoveMissingDependenciesPass()->process($container);
+
+        $this->assertFalse($container->hasDefinition('webhook.transport.traceable'));
+        $this->assertTrue($container->getDefinition('webhook.transport')->hasErrors());
+    }
+
     public function testTheWrappingHttpClientIsDroppedWhenTheClientItWrapsIsMissing()
     {
         $container = $this->createContainer(['no_private_network' => true]);

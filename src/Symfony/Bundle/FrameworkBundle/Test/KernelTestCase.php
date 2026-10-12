@@ -31,6 +31,7 @@ abstract class KernelTestCase extends TestCase
     use MailerAssertionsTrait;
     use MessengerAssertionsTrait;
     use NotificationAssertionsTrait;
+    use WebhookAssertionsTrait;
 
     protected static ?string $class = null;
     protected static ?KernelInterface $kernel = null;

@@ -247,6 +247,87 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertEquals('2016-09-08 12:34:56', $results[0]->format('Y-m-d H:i:s'));
     }
 
+    public static function provideRelativeDates()
+    {
+        yield [\DateTimeInterface::class, 'yesterday', '2022-02-19 00:00:00.000000'];
+        yield [\DateTime::class, '+1 hour', '2022-02-20 23:20:02.123456'];
+        yield [FooDateTime::class, 'noon', '2022-02-20 12:00:00.000000'];
+        yield [\DateTimeInterface::class, 'first day of next month', '2022-03-01 22:20:02.123456'];
+        yield [\DateTimeInterface::class, '2016-09-08', '2016-09-08 00:00:00.000000'];
+        yield [\DateTimeInterface::class, '2016-09-08 +1 hour', '2016-09-08 01:00:00.000000'];
+    }
+
+    /**
+     * @dataProvider provideRelativeDates
+     */
+    public function testRelativeDateWithClock(string $class, string $value, string $expected)
+    {
+        date_default_timezone_set('UTC');
+        $resolver = new DateTimeValueResolver(new MockClock('2022-02-20 22:20:02.123456', 'Pacific/Honolulu'));
+
+        $argument = new ArgumentMetadata('dummy', $class, false, false, null);
+        $request = self::requestWithAttributes(['dummy' => $value]);
+
+        $results = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $results);
+        $this->assertInstanceOf($class, $results[0]);
+        $this->assertSame('Pacific/Honolulu', $results[0]->getTimezone()->getName());
+        $this->assertSame($expected, $results[0]->format('Y-m-d H:i:s.u'));
+    }
+
+    public static function provideDatesAroundDstChanges()
+    {
+        yield ['2018-11-04 16:00:00', 'America/Sao_Paulo', 'Sep 8', '2018-09-08 00:00:00 -03:00'];
+        yield ['2018-11-04 16:00:00', 'America/Sao_Paulo', 'Sep 8 +1 hour', '2018-09-08 01:00:00 -03:00'];
+        yield ['2018-11-04 16:00:00', 'America/Sao_Paulo', '2016-09-08', '2016-09-08 00:00:00 -03:00'];
+        yield ['2026-07-01 12:00:00', 'Europe/Paris', '2025-10-26 02:30', '2025-10-26 02:30:00 +01:00'];
+    }
+
+    /**
+     * @dataProvider provideDatesAroundDstChanges
+     */
+    public function testDateWithClockAroundDstChanges(string $now, string $timezone, string $value, string $expected)
+    {
+        date_default_timezone_set('UTC');
+        $resolver = new DateTimeValueResolver(new MockClock($now, $timezone));
+
+        $argument = new ArgumentMetadata('dummy', \DateTimeImmutable::class, false, false, null);
+        $request = self::requestWithAttributes(['dummy' => $value]);
+
+        $results = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $results);
+        $this->assertSame($expected, $results[0]->format('Y-m-d H:i:s P'));
+    }
+
+    public static function provideFormatsWithMissingFields()
+    {
+        yield [\DateTimeInterface::class, 'H:i', '10:30', '2022-02-20 10:30:00.000000'];
+        yield [\DateTime::class, 'Y-m-d', '2016-09-08', '2016-09-08 22:20:02.000000'];
+        yield [FooDateTime::class, 'd', '05', '2022-02-05 22:20:02.000000'];
+        yield [\DateTimeInterface::class, 'Y-m-d|', '2016-09-08', '2016-09-08 00:00:00.000000'];
+    }
+
+    /**
+     * @dataProvider provideFormatsWithMissingFields
+     */
+    public function testWithFormatAndClock(string $class, string $format, string $value, string $expected)
+    {
+        date_default_timezone_set('UTC');
+        $resolver = new DateTimeValueResolver(new MockClock('2022-02-20 22:20:02.123456', 'Pacific/Honolulu'));
+
+        $argument = new ArgumentMetadata('dummy', $class, false, false, null, false, [new MapDateTime(format: $format)]);
+        $request = self::requestWithAttributes(['dummy' => $value]);
+
+        $results = $resolver->resolve($request, $argument);
+
+        $this->assertCount(1, $results);
+        $this->assertInstanceOf($class, $results[0]);
+        $this->assertSame('Pacific/Honolulu', $results[0]->getTimezone()->getName());
+        $this->assertSame($expected, $results[0]->format('Y-m-d H:i:s.u'));
+    }
+
     public static function provideInvalidDates()
     {
         return [

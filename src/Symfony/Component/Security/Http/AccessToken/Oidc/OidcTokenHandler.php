@@ -27,7 +27,6 @@ use Jose\Component\Signature\Serializer\CompactSerializer as JwsCompactSerialize
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
@@ -63,7 +62,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private array $issuers,
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
-        private ClockInterface $clock = new Clock(),
+        private ?ClockInterface $clock = null,
     ) {
         if ($signatureAlgorithm instanceof Algorithm) {
             trigger_deprecation('symfony/security-http', '7.1', 'First argument must be instance of %s, %s given.', AlgorithmManager::class, Algorithm::class);
@@ -269,10 +268,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     private function verifyClaims(array $claims): array
     {
         // Verify the claims
+        $clock = $this->getClock();
         $checkers = [
-            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0),
-            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0),
-            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0),
+            new Checker\IssuedAtChecker(clock: $clock, allowedTimeDrift: 0),
+            new Checker\NotBeforeChecker(clock: $clock, allowedTimeDrift: 0),
+            new Checker\ExpirationTimeChecker(clock: $clock, allowedTimeDrift: 0),
             new Checker\AudienceChecker($this->audience),
             new Checker\IssuerChecker($this->issuers),
         ];
@@ -290,14 +290,15 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             return $accessToken;
         }
 
+        $clock = $this->getClock();
         $jweHeaderChecker = new Checker\HeaderCheckerManager(
             [
                 new Checker\AlgorithmChecker($this->decryptionAlgorithms->list()),
                 new Checker\CallableChecker('enc', fn ($value) => \in_array($value, $this->decryptionAlgorithms->list())),
                 new Checker\CallableChecker('cty', static fn ($value) => 'JWT' === $value),
-                new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-                new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-                new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\IssuedAtChecker(clock: $clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\NotBeforeChecker(clock: $clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\ExpirationTimeChecker(clock: $clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
             ],
             [new JWETokenSupport()]
         );
@@ -335,5 +336,15 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
             return $accessToken;
         }
+    }
+
+    private function getClock(): ClockInterface
+    {
+        return $this->clock ?? new class implements ClockInterface {
+            public function now(): \DateTimeImmutable
+            {
+                return new \DateTimeImmutable('@'.time());
+            }
+        };
     }
 }

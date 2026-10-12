@@ -35,15 +35,15 @@ final class PagerDutyOptions implements MessageOptionsInterface
                 throw new InvalidArgumentException('Timestamp date must be in "RFC3339_EXTENDED" format.');
             }
         } else {
-            $timestamp = (new \DateTimeImmutable())->format(\DateTimeInterface::RFC3339_EXTENDED);
+            $timestamp = new \DateTimeImmutable();
         }
 
         $this->options['routing_key'] = $routingKey;
         $this->options['event_action'] = $eventAction;
         $this->options['payload'] = [
             'severity' => $severity,
-            'timestamp' => $timestamp,
-        ];
+            'timestamp' => $timestamp->format(\DateTimeInterface::RFC3339_EXTENDED),
+        ] + ($this->options['payload'] ?? []);
 
         if ($dedupKey = $options['dedup_key'] ?? null) {
             $this->options['dedup_key'] = $dedupKey;
@@ -96,7 +96,7 @@ final class PagerDutyOptions implements MessageOptionsInterface
      */
     public function attachCustomDetails(array $customDetails): static
     {
-        $this->options['payload']['custom_details'] += $customDetails;
+        $this->options['payload']['custom_details'] = ($this->options['payload']['custom_details'] ?? []) + $customDetails;
 
         return $this;
     }

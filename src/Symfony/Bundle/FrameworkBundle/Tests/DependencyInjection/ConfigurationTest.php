@@ -568,6 +568,45 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testWorkflowNamedWorkflowsCanSetAnyOption()
+    {
+        $config = (new Processor())->processConfiguration(new Configuration(true), [
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'workflows' => [
+                    'workflows' => [
+                        'type' => 'workflow',
+                        'supports' => [self::class],
+                        'places' => ['draft', 'published'],
+                        'transitions' => [['name' => 'publish', 'from' => 'draft', 'to' => 'published']],
+                        'events_to_dispatch' => [],
+                        'metadata' => ['title' => 'Workflows'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(['workflows'], array_keys($config['workflows']['workflows']));
+        $this->assertSame(['title' => 'Workflows'], $config['workflows']['workflows']['workflows']['metadata']);
+    }
+
+    public function testWorkflowMustBeAnArray()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid type for path "framework.workflows.workflows.blog". Expected "array", but got "string"');
+
+        (new Processor())->processConfiguration(new Configuration(true), [
+            [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'workflows' => ['blog' => 'foo'],
+            ],
+        ]);
+    }
+
     public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured()
     {
         $processor = new Processor();

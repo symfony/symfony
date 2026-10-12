@@ -19,8 +19,10 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -189,6 +191,29 @@ class OidcTokenHandlerTest extends TestCase
             'email',
             $loggerMock,
         ))->getUserBadgeFrom($token);
+    }
+
+    #[RunInSeparateProcess]
+    public function testChecksTheDatesAgainstTheSystemTimeWithoutAClock()
+    {
+        $time = strtotime('2020-01-01 00:00:00 UTC');
+        ClockMock::register(OidcTokenHandler::class);
+        ClockMock::withClockMock($time);
+
+        $claims = [
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+        ];
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), self::getJWKSet(), self::AUDIENCE, ['https://www.example.com']);
+
+        $this->assertSame($claims['sub'], $handler->getUserBadgeFrom(self::buildJWS(json_encode($claims)))->getUserIdentifier());
+
+        $this->expectException(BadCredentialsException::class);
+        $handler->getUserBadgeFrom(self::buildJWS(json_encode(['exp' => $time - 1] + $claims)));
     }
 
     private static function buildJWS(string $payload): string

@@ -631,6 +631,12 @@ class InlineTest extends TestCase
         $this->assertSame($timezone, $date->format('O'));
     }
 
+    public function testParseTimestampBeforeUnixEpochAsUnixTimestamp()
+    {
+        $this->assertSame(-1.5, Inline::parse('1969-12-31T23:59:58.5Z'));
+        $this->assertSame(-2, Inline::parse('1969-12-31T23:59:58Z'));
+    }
+
     public static function getTimestampTests(): array
     {
         return [
@@ -1280,5 +1286,13 @@ class InlineTest extends TestCase
         $this->expectExceptionMessage('Merge items must be arrays');
 
         Inline::parse('{ <<: [foo] }');
+    }
+
+    public function testParseKeyStartingWithNulByteWithMapObjectsThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Mapping keys starting with a NUL byte are not supported with the "Yaml::PARSE_OBJECT_FOR_MAP" flag');
+
+        Inline::parse('{ foo: 1, "\0": 1 }', Yaml::PARSE_OBJECT_FOR_MAP);
     }
 }

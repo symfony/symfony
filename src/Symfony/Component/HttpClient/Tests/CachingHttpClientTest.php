@@ -1857,12 +1857,9 @@ class CachingHttpClientTest extends TestCase
                 'http_code' => 200,
                 'response_headers' => ['ETag' => '"abc123"', 'Cache-Control' => 'max-age=60'],
             ]);
-            // MockResponse reads the start time from the real clock otherwise: once the real
-            // clock crosses a second, the request seems to have taken the whole max-age
             yield new MockResponse('', [
                 'http_code' => 304,
                 'response_headers' => ['ETag' => '"abc123"'],
-                'start_time' => microtime(true),
             ]);
             yield new MockResponse('should not be served');
         })());
@@ -2004,6 +2001,27 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('foo', $response->getContent());
         $this->assertSame('3', $response->getHeaders()['age'][0]);
+    }
+
+    public function testStartTimeInfoDoesNotAgeTheStoredResponse()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('foo', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300'],
+                // replayed responses report the start time of the recording
+                'start_time' => time() - 86400 * 90,
+            ]),
+            new MockResponse('should not be served'),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $this->assertSame('foo', $client->request('GET', 'http://example.com/replayed')->getContent());
+
+        $response = $client->request('GET', 'http://example.com/replayed');
+        $this->assertSame('foo', $response->getContent());
+        $this->assertSame('0', $response->getHeaders()['age'][0]);
     }
 
     public function testOldDateWithShortMaxAgeIsImmediatelyStale()

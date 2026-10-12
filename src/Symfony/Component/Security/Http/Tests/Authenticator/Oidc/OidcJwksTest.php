@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator\Oidc;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -128,6 +129,77 @@ class OidcJwksTest extends TestCase
         [$keys, $ttl] = OidcJwks::fromResponse($response);
 
         $this->assertSame([], $keys);
+        $this->assertNull($ttl);
+    }
+
+    public function testFromResponseReadsTheLifetimeOfExpiresFromDate()
+    {
+        $response = (new MockHttpClient(new JsonMockResponse(['keys' => []], ['response_headers' => [
+            'date' => 'Sat, 01 Jan 2000 00:00:00 GMT',
+            'expires' => 'Sat, 01 Jan 2000 00:10:00 GMT',
+        ]])))->request('GET', 'https://provider.example.com/jwks');
+
+        [, $ttl] = OidcJwks::fromResponse($response, true, new MockClock('2000-01-01 00:02:00 UTC'));
+
+        $this->assertSame(480, $ttl);
+    }
+
+    public function testFromResponseSubtractsTheAgeOfTheResponse()
+    {
+        $response = (new MockHttpClient(new JsonMockResponse(['keys' => []], ['response_headers' => [
+            'cache-control' => 'max-age=600',
+            'age' => '200',
+        ]])))->request('GET', 'https://provider.example.com/jwks');
+
+        [, $ttl] = OidcJwks::fromResponse($response, true, new MockClock('2000-01-01 00:00:00 UTC'));
+
+        $this->assertSame(400, $ttl);
+    }
+
+    public function testFromResponseReadsTheAgeOfTheResponseFromItsDate()
+    {
+        $response = (new MockHttpClient(new JsonMockResponse(['keys' => []], ['response_headers' => [
+            'date' => 'Sat, 01 Jan 2000 00:00:00 GMT',
+            'cache-control' => 'max-age=600',
+            'age' => '60',
+        ]])))->request('GET', 'https://provider.example.com/jwks');
+
+        [, $ttl] = OidcJwks::fromResponse($response, true, new MockClock('2000-01-01 00:05:00 UTC'));
+
+        $this->assertSame(300, $ttl);
+    }
+
+    public function testFromResponseReturnsNullTtlWhenTheResponseIsStale()
+    {
+        $response = (new MockHttpClient(new JsonMockResponse(['keys' => []], ['response_headers' => [
+            'date' => 'Sat, 01 Jan 2000 00:00:00 GMT',
+            'expires' => 'Sat, 01 Jan 2000 00:10:00 GMT',
+        ]])))->request('GET', 'https://provider.example.com/jwks');
+
+        [, $ttl] = OidcJwks::fromResponse($response, true, new MockClock('2030-01-01 00:00:00 UTC'));
+
+        $this->assertNull($ttl);
+    }
+
+    public function testFromResponseReadsExpiresOnTheClockWithoutDate()
+    {
+        $response = (new MockHttpClient(new JsonMockResponse(['keys' => []], ['response_headers' => ['expires' => 'Sat, 01 Jan 2000 00:10:00 GMT']])))
+            ->request('GET', 'https://provider.example.com/jwks');
+
+        [, $ttl] = OidcJwks::fromResponse($response, true, new MockClock('2000-01-01 00:00:00 UTC'));
+
+        $this->assertSame(600, $ttl);
+    }
+
+    public function testFromResponseReturnsNullTtlWhenExpiresIsNotAfterDate()
+    {
+        $response = (new MockHttpClient(new JsonMockResponse(['keys' => []], ['response_headers' => [
+            'date' => 'Sat, 01 Jan 2000 00:10:00 GMT',
+            'expires' => 'Sat, 01 Jan 2000 00:10:00 GMT',
+        ]])))->request('GET', 'https://provider.example.com/jwks');
+
+        [, $ttl] = OidcJwks::fromResponse($response, true, new MockClock('2000-01-01 00:00:00 UTC'));
+
         $this->assertNull($ttl);
     }
 

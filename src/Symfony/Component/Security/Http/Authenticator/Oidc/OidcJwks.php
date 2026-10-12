@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Authenticator\Oidc;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientExceptionInterface;
@@ -47,8 +48,11 @@ final class OidcJwks
     /**
      * Extracts the signing keys from a JWKS endpoint response, together with their TTL.
      *
-     * The TTL, in seconds, is the one the provider advertises through "Cache-Control: max-age"
-     * or "Expires", and is null when it advertises none.
+     * The TTL, in seconds, is what remains of the freshness lifetime the provider advertises through
+     * "Cache-Control: max-age" or "Expires", once the current age of the response is subtracted
+     * (RFC 9111, Section 4.2). It is null when the provider advertises none or the response is stale.
+     *
+     * With "Expires", the lifetime is counted from the "Date" of the response, or from the clock without "Date".
      *
      * @param bool $enforceKeyUsageVerification When true (default, strict), only JWKs whose `use` is "sig" or whose
      *                                          `key_ops` contains "sign"/"verify" are kept. When false (lax), JWKs
@@ -59,7 +63,7 @@ final class OidcJwks
      *
      * @throws AuthenticationException If the JWKS cannot be fetched or decoded
      */
-    public static function fromResponse(ResponseInterface $response, bool $enforceKeyUsageVerification = true): array
+    public static function fromResponse(ResponseInterface $response, bool $enforceKeyUsageVerification = true, ?ClockInterface $clock = null): array
     {
         try {
             $headers = $response->getHeaders();
@@ -81,11 +85,19 @@ final class OidcJwks
         // a "keys" member that is not a list of JWK objects yields no usable key
         $keys = \is_array($keys['keys'] ?? null) ? array_values(array_filter($keys['keys'], is_array(...))) : [];
 
+        $now = $clock?->now()->getTimestamp() ?? time();
+        $date = strtotime($headers['date'][0] ?? '');
         $ttl = null;
+
         if (preg_match('/max-age=(\d+)/', $headers['cache-control'][0] ?? '', $m)) {
             $ttl = (int) $m[1];
-        } elseif (0 < $expires = strtotime($headers['expires'][0] ?? '@0') - time()) {
-            $ttl = $expires;
+        } elseif (isset($headers['expires'][0])) {
+            $ttl = (int) strtotime($headers['expires'][0]) - ($date ?: $now);
+        }
+
+        // what remains of the freshness lifetime once the current age of the response is subtracted, see RFC 9111, section 4.2.3
+        if (null !== $ttl && 0 >= $ttl -= max(false === $date ? 0 : $now - $date, (int) ($headers['age'][0] ?? 0))) {
+            $ttl = null;
         }
 
         return [self::filterSignatureKeys($keys, $enforceKeyUsageVerification), $ttl];
@@ -98,9 +110,9 @@ final class OidcJwks
      *
      * @return list<array<string, mixed>>
      */
-    public static function fetchKeys(HttpClientInterface $httpClient, string $jwksUri, ItemInterface $item, int $defaultTtl = 3600, bool $enforceKeyUsageVerification = true): array
+    public static function fetchKeys(HttpClientInterface $httpClient, string $jwksUri, ItemInterface $item, int $defaultTtl = 3600, bool $enforceKeyUsageVerification = true, ?ClockInterface $clock = null): array
     {
-        [$keys, $ttl] = self::fromResponse($httpClient->request('GET', $jwksUri, ['max_redirects' => 0]), $enforceKeyUsageVerification);
+        [$keys, $ttl] = self::fromResponse($httpClient->request('GET', $jwksUri, ['max_redirects' => 0]), $enforceKeyUsageVerification, $clock);
 
         $item->expiresAfter(null === $ttl ? $defaultTtl : min($ttl, self::MAX_TTL));
 

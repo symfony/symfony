@@ -27,6 +27,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[RequiresPhpExtension('openssl')]
@@ -281,6 +282,18 @@ class OidcSignatureVerifierTest extends TestCase
         $verifier->verify($token);
 
         $this->assertSame(1, $requests);
+    }
+
+    public function testVerifyCachesTheProviderKeysUntilTheirExpiresOnTheClock()
+    {
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->once())->method('expiresAfter')->with(600);
+        $cache = $this->createStub(CacheInterface::class);
+        $cache->method('get')->willReturnCallback(static fn (string $key, callable $callback) => $callback($item));
+        $httpClient = new MockHttpClient(new JsonMockResponse(['keys' => [self::PUBLIC_JWK]], ['response_headers' => ['Expires' => 'Sat, 01 Jan 2000 00:10:00 GMT']]));
+        $verifier = $this->createVerifier(httpClient: $httpClient, clock: new MockClock('2000-01-01 00:00:00 UTC'), jwksCache: $cache);
+
+        $this->assertSame(['sub' => 'user-42'], $verifier->verify($this->buildJws(json_encode(['sub' => 'user-42']))));
     }
 
     public function testVerifyRefetchesTheKeysWhenTheTokenAnnouncesAnUnknownKid()

@@ -20,6 +20,7 @@ use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\CacheItem;
@@ -62,8 +63,8 @@ class DpopSenderConstraintTest extends TestCase
     protected function setUp(): void
     {
         $this->clock = new MockClock('2026-09-22 10:00:00');
-        // the pool is handed the same clock, so that a proof stops being remembered when it stops standing
-        $this->cache = new ArrayAdapter(0, true, 0, 0, $this->clock);
+        // the pool reads the real time and not the clock, as the pools of the framework do
+        $this->cache = new ArrayAdapter();
     }
 
     public function testItAcceptsAProofMadeForTheRequestThatCarriesIt()
@@ -320,18 +321,19 @@ class DpopSenderConstraintTest extends TestCase
         $constraint->check($this->createRequest($this->createProof()), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
     }
 
-    public function testItAcceptsTheSameIdentifierOnceTheProofStoppedStanding()
+    public function testItRemembersAProofForAsLongAsItStands()
     {
-        $proof = $this->createProof(['jti' => 'reused']);
-        $constraint = $this->createConstraint();
+        $item = $this->createMock(CacheItemInterface::class);
+        $item->method('set')->willReturnSelf();
+        $item->expects($this->once())->method('expiresAfter')->with(35)->willReturnSelf();
+        $cache = $this->createStub(CacheItemPoolInterface::class);
+        $cache->method('getItem')->willReturn($item);
+        $cache->method('save')->willReturn(true);
+
+        $constraint = new DpopSenderConstraint(new AlgorithmManager([new ES256()]), $cache, $this->clock);
+        $proof = $this->createProof(['iat' => $this->clock->now()->getTimestamp() - 30]);
+
         $constraint->check($this->createRequest($proof), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
-
-        $this->clock->sleep(120);
-        $refreshed = $this->createProof(['jti' => 'reused']);
-
-        $constraint->check($this->createRequest($refreshed), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
-
-        $this->expectNotToPerformAssertions();
     }
 
     public function testItRefusesATokenBoundToNothing()

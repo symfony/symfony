@@ -338,6 +338,25 @@ final class BlueskyTransportTest extends TransportTestCase
         $this->assertSame($recordCid, $message->getInfo('cid'));
     }
 
+    public function testCreatedAtIsSentInUtc()
+    {
+        $client = new MockHttpClient((function () {
+            yield static fn () => new JsonMockResponse(['accessJwt' => 'foo']);
+
+            yield function (string $method, string $url, array $options) {
+                $this->assertSame('https://bsky.social/xrpc/com.atproto.repo.createRecord', $url);
+                $this->assertSame('2024-01-01T11:00:00.000000Z', json_decode($options['body'], true)['record']['createdAt']);
+
+                return new JsonMockResponse(['uri' => 'at://foo', 'cid' => 'bar']);
+            };
+        })());
+
+        $transport = new BlueskyTransport('username', 'password', new NullLogger(), $client, null, new MockClock('2024-01-01 12:00:00', 'Europe/Paris'));
+        $transport->setHost('bsky.social');
+
+        $this->assertSame('at://foo', $transport->send(new ChatMessage('Hello!'))->getMessageId());
+    }
+
     public static function sendMessageWithEmbedDataProvider(): iterable
     {
         yield 'With media' => [

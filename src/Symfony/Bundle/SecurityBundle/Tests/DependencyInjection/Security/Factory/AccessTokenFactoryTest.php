@@ -421,6 +421,30 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertSame(['method' => 'reset'], $tags['kernel.reset'][0]);
     }
 
+    public function testOidcTokenHandlerDiscoveryCachesInTheDiscoveryPoolByDefault()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'enforce_at_jwt_type' => false,
+                    'discovery' => [
+                        'base_uri' => 'https://www.example.com/realms/demo/',
+                    ],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $factory->createAuthenticator($container, 'firewall1', $this->processConfig($config, $factory), 'userprovider');
+
+        [[$method, $arguments]] = $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls();
+        $this->assertSame('enableDiscovery', $method);
+        $this->assertEquals(new Reference('cache.security.discovery'), $arguments[0]);
+    }
+
     #[DataProvider('provideEnforceKeyUsageVerification')]
     public function testOidcTokenHandlerEnableDiscoveryArgsMatchMethodSignature(bool $enforceKeyUsageVerification)
     {
@@ -725,6 +749,32 @@ class AccessTokenFactoryTest extends TestCase
         $tags = $container->getDefinition('security.access_token_handler.firewall1')->getTags();
         $this->assertArrayHasKey('kernel.reset', $tags);
         $this->assertSame(['method' => 'reset'], $tags['kernel.reset'][0]);
+    }
+
+    public function testOidcUserInfoTokenHandlerDiscoveryCachesInTheDiscoveryPoolByDefault()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc_user_info' => [
+                    'discovery' => [],
+                    'base_uri' => 'https://www.example.com/realms/demo/',
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $factory->createAuthenticator($container, 'firewall1', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertEquals([
+            [
+                'enableDiscovery',
+                [
+                    new Reference('cache.security.discovery'),
+                    'security.access_token_handler.firewall1.oidc_configuration',
+                ],
+            ],
+        ], $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
     }
 
     public function testMultipleTokenHandlersSet()

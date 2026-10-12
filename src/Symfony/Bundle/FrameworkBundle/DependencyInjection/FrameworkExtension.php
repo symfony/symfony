@@ -283,6 +283,7 @@ class FrameworkExtension extends Extension
             }
         } else {
             $container->removeDefinition('console.command.form_debug');
+            $container->removeDefinition('console.command.debug.section.form');
         }
 
         // profiler depends on form, validation, translation and serializer being registered

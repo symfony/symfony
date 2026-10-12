@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DebugSectionNamesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DebugValidatorClassCandidatesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultCachePoolsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
@@ -231,6 +233,8 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, RoutingControllerPass::class);
         $container->addCompilerPass(new ProfilerPass());
         $this->addCompilerPassIfExists($container, ControllerAttributesListenerPass::class, PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new DebugValidatorClassCandidatesPass());
+        $container->addCompilerPass(new DebugSectionNamesPass());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new FragmentRendererPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());

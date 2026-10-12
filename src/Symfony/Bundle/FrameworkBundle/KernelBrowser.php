@@ -39,6 +39,7 @@ class KernelBrowser extends HttpKernelBrowser
     private bool $profiler = false;
     private bool $reboot = true;
     private ?\Closure $containerConfigurator = null;
+    private ?\WeakReference $configuredContainer = null;
 
     /**
      * @var array<string, TestBrowserToken>
@@ -149,6 +150,7 @@ class KernelBrowser extends HttpKernelBrowser
         }
 
         $this->containerConfigurator = $configurator;
+        $this->configuredContainer = \WeakReference::create($this->kernel->getContainer());
         $configurator($this->getContainer());
     }
 
@@ -270,21 +272,26 @@ class KernelBrowser extends HttpKernelBrowser
                 $this->kernel->boot();
                 $this->kernel->shutdown();
 
-                if ($this->containerConfigurator || $keptState) {
+                if ($keptState) {
                     $this->kernel->boot();
                     $container = $this->getContainer();
 
-                    if ($keptState && $container instanceof TestContainer) {
+                    if ($container instanceof TestContainer) {
                         $container->setKeptState($keptState);
-                    }
-
-                    if ($this->containerConfigurator) {
-                        ($this->containerConfigurator)($container);
                     }
                 }
             }
         } else {
             $this->hasPerformedRequest = true;
+        }
+
+        if ($this->containerConfigurator) {
+            $this->kernel->boot();
+
+            if ($this->configuredContainer?->get() !== $container = $this->kernel->getContainer()) {
+                $this->configuredContainer = \WeakReference::create($container);
+                ($this->containerConfigurator)($this->getContainer());
+            }
         }
 
         if ($this->profiler) {

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-12T13:03:11Z
+
+Thanks for the review, both points are addressed.
+
+The generated normalization is removed. The method is descriptive again, and the rewriting stays
+in the `beforeNormalization()` closure of the bundle, which is the one that knows how to name the
+element. The definition now fails fast when the parent node has no such closure.
+
+The keys that stay in the parent are no longer a list to maintain. The key that names the
+elements, the one of `useAttributeAsKey()`, is left out of the shape given at the parent level.
+A key declared by both the parent and the elements is rejected at definition time, so the schema
+and the closure cannot drift apart on the keys that the parent keeps.
+
+For `doctrine.dbal`, the flat branch is the 3 keys of the section plus the 46 options of a
+connection, and `name` is not one of them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T13:49:33Z
+
+Thanks for the update @GromNaN. I pushed a few changes on top:
+- two children of the same node can't both declare `acceptElementsAtParentLevel()` anymore, since the dumped schema was broken in that case
+- same when the node also wraps arrays with `acceptAndWrap()`
+- the prototype must be an array with children
+- `validateElementsAtParentLevel()` moved to the end of the class
+- docblocks are not wrapped at a column anymore
+- the changelog line names only the new method

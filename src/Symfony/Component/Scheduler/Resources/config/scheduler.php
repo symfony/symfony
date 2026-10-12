@@ -49,6 +49,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.scheduler_debug', SchedulerDebugCommand::class)
             ->args([
                 tagged_locator('scheduler.schedule_provider', 'name'),
+                service('clock'),
             ])
             ->tag('console.command')
 

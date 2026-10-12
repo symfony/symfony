@@ -200,6 +200,14 @@ class SchedulerBundleTest extends TestCase
         $this->assertSame([['sign' => true]], $container->getDefinition('scheduler.messenger.service_call_message_handler')->getTag('messenger.message_handler'));
     }
 
+    public function testDebugCommandUsesTheClockService()
+    {
+        $container = new ContainerBuilder();
+        new SchedulerBundle()->getContainerExtension()->load([['enabled' => true]], $container);
+
+        $this->assertEquals(new Reference('clock'), $container->getDefinition('console.command.scheduler_debug')->getArgument(1));
+    }
+
     public function testUseMessengerRoutingNotSetKeepsTheParameterNull()
     {
         // no deprecation is expected here: it is only triggered lazily by SchedulerTransport,

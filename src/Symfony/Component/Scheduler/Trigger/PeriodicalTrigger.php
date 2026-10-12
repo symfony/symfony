@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Trigger;
 
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Scheduler\Exception\InvalidArgumentException;
 
 class PeriodicalTrigger implements StatefulTriggerInterface
@@ -27,8 +28,9 @@ class PeriodicalTrigger implements StatefulTriggerInterface
         string|\DateTimeImmutable|null $from = null,
         string|\DateTimeImmutable $until = new \DateTimeImmutable('3000-01-01'),
     ) {
-        $this->from = \is_string($from) ? new \DateTimeImmutable($from) : $from;
-        $this->until = \is_string($until) ? new \DateTimeImmutable($until) : $until;
+        $timezone = new \DateTimeZone(date_default_timezone_get());
+        $this->from = \is_string($from) ? new DatePoint($from, $timezone) : $from;
+        $this->until = \is_string($until) ? new DatePoint($until, $timezone) : $until;
 
         if (\is_int($interval) || \is_float($interval) || \is_string($interval) && ctype_digit($interval)) {
             if (0 >= (int) $interval) {

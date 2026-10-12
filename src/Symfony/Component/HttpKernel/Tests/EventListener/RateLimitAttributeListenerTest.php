@@ -345,7 +345,7 @@ class RateLimitAttributeListenerTest extends TestCase
     {
         $listener = $this->makeListener();
         $request = Request::create('/');
-        $request->attributes->set('_rate_limit', 'a route default');
+        $request->attributes->set(RateLimitAttributeListener::RATE_LIMIT_ATTRIBUTE, 'a route default');
 
         $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api', exposeHeaders: true), $request));
 

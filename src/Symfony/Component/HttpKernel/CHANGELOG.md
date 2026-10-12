@@ -33,6 +33,7 @@ CHANGELOG
  * Allow `{name}` placeholders in the key of `#[RateLimit]` to read request attributes
  * Add the `$map` argument to `#[Serialize]` and the `$objectMapper` argument to `SerializeControllerResultAttributeListener` to map controller results with the object mapper before serializing them
  * Add the `$stream` argument to `#[Serialize]` and the `$streamWriter` and `$typeResolver` arguments to `SerializeControllerResultAttributeListener` to stream controller results as JSON with the stream writer
+ * Add `RateLimitValueResolver` to inject the rate limit consumed by `#[RateLimit]` into the `RateLimit` controller arguments
 
 8.1
 ---

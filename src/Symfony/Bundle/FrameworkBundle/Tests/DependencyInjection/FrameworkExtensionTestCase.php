@@ -76,6 +76,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\LockValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RateLimitValueResolver;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\EventListener\LockAttributeListener;
@@ -1834,11 +1835,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
     }
 
+    public function testRateLimitValueResolver()
+    {
+        $container = $this->createContainerFromFile('http_client_rate_limiter');
+
+        $definition = $container->getDefinition('argument_resolver.rate_limit');
+        $this->assertSame(RateLimitValueResolver::class, $definition->getClass());
+        $this->assertSame([['priority' => 100, 'name' => RateLimitValueResolver::class]], $definition->getTag('controller.argument_value_resolver'));
+        $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
+    }
+
     public function testRateLimiterAttributeListenerIsRemovedWhenRateLimiterIsDisabled()
     {
         $container = $this->createContainerFromFile('rate_limiter_disabled');
 
         $this->assertFalse($container->hasDefinition('rate_limiter.attribute_listener'));
+        $this->assertFalse($container->hasDefinition('argument_resolver.rate_limit'));
     }
 
     public function testControllerExpressionLanguageRegistersTheSecurityProvider()

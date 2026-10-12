@@ -88,6 +88,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * Allows alternative types and wraps them into arrays.
      *
      * An array is wrapped into the child named by the key when it does not set this child, except for its keys that name other children.
+     * For a list of arrays, a map is accepted too: each of its keys goes into the child named by the key of its item, unless the item sets this child.
      *
      * @param list<ExprBuilder::TYPE_INT|ExprBuilder::TYPE_STRING|ExprBuilder::TYPE_BOOL|ExprBuilder::TYPE_NULL|ExprBuilder::TYPE_BACKED_ENUM|ExprBuilder::TYPE_ARRAY> $allowedTypes
      * @param string|null                                                                                                                                              $key          The key to wrap the value in
@@ -96,7 +97,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      */
     public function acceptAndWrap(array $allowedTypes, ?string $key = null): static
     {
-        $this->allowedTypes = $allowedTypes;
+        // arrays are accepted anyway, so they do not replace the types declared by the normalization closures
+        $this->allowedTypes = array_values(array_diff($allowedTypes, [ExprBuilder::TYPE_ARRAY]));
 
         foreach ($allowedTypes as $type) {
             if (ExprBuilder::TYPE_ARRAY === $type) {
@@ -620,7 +622,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         }
 
         if (isset($this->attributes['wraps_arrays_into'])) {
-            throw new InvalidDefinitionException(\sprintf('->acceptAndWrap() cannot wrap arrays into a prototype node at path "%s".', $path));
+            if (null !== $this->key) {
+                throw new InvalidDefinitionException(\sprintf('->acceptAndWrap() cannot wrap arrays into a prototype node that uses ->useAttributeAsKey() at path "%s".', $path));
+            }
+
+            if (!$this->prototype instanceof self || !isset($this->prototype->children[$this->attributes['wraps_arrays_into']])) {
+                throw new InvalidDefinitionException(\sprintf('->acceptAndWrap() cannot wrap arrays into "%s" as it is not a child of the items of the node at path "%s".', $this->attributes['wraps_arrays_into'], $path));
+            }
         }
 
         if (false !== $this->addDefaultChildren) {

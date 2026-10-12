@@ -274,6 +274,40 @@ class JsonSchemaDumperTest extends TestCase
             ],
         ]];
 
+        $keyedList = (new ArrayNodeDefinition('node'))
+            ->acceptAndWrap(['array'], 'name')
+            ->requiresAtLeastOneElement()
+            ->arrayPrototype()
+                ->children()
+                    ->scalarNode('name')->isRequired()->end()
+                ->end()
+            ->end()
+            ->getNode();
+        $item = [
+            '$ref' => '#/$defs/types/object_null',
+            'properties' => ['name' => ['$ref' => '#/$defs/types/scalar']],
+            'additionalProperties' => false,
+        ];
+        yield 'a map given to a list declared by acceptAndWrap() puts its keys into the items' => [$keyedList, [
+            'anyOf' => [
+                [
+                    '$ref' => '#/$defs/types/array_null',
+                    'items' => [
+                        '$ref' => '#/$defs/types/object_null',
+                        'properties' => ['name' => ['$ref' => '#/$defs/types/scalar']],
+                        'required' => ['name'],
+                        'additionalProperties' => false,
+                    ],
+                    'minItems' => 1,
+                ],
+                [
+                    '$ref' => '#/$defs/types/object_null',
+                    'additionalProperties' => $item,
+                    'minProperties' => 1,
+                ],
+            ],
+        ]];
+
         $child = new BooleanNode('node');
         $child->setDeprecated('vendor/package', '1.0', 'The "%path%" option is deprecated.');
         $child->setDefaultValue(true);

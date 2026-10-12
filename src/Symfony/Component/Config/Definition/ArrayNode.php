@@ -66,7 +66,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             $value = $normalized;
         }
 
-        if (null === $key = $this->getAttribute('wraps_arrays_into')) {
+        if (null === ($key = $this->getAttribute('wraps_arrays_into')) || !isset($this->children[$key])) {
             return $value;
         }
 

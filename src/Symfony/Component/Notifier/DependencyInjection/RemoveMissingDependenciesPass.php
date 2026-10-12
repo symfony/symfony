@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\DependencyInjection;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -49,6 +50,15 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
         if ($container->hasDefinition('notifier.channel.email')) {
             if ($container->hasDefinition('mailer.envelope_listener')) {
                 $sender = $container->getDefinition('mailer.envelope_listener')->getArgument(0);
+
+                if (null === $sender && $container->hasDefinition('mailer.message_listener') && ($headers = $container->getDefinition('mailer.message_listener')->getArgument(0)) instanceof Definition) {
+                    foreach ($headers->getMethodCalls() as [$method, $arguments]) {
+                        if ('addHeader' === $method && 'from' === strtolower($arguments[0]) && 1 === \count($from = (array) $arguments[1])) {
+                            $sender = reset($from);
+                        }
+                    }
+                }
+
                 $container->getDefinition('notifier.channel.email')->setArgument(2, $sender);
             } else {
                 $container->removeDefinition('notifier.channel.email');

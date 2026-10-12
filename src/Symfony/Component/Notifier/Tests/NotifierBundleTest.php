@@ -18,8 +18,10 @@ use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Notifier\AdminRecipientsProviderInterface;
 use Symfony\Component\Notifier\Bridge\Twilio\Webhook\TwilioRequestParser;
 use Symfony\Component\Notifier\ChatterInterface;
@@ -58,6 +60,36 @@ class NotifierBundleTest extends TestCase
         $container = $this->load(self::TRANSPORTS, ['mailer', 'messenger']);
 
         $this->assertSame('sender@example.org', $container->getDefinition('notifier.channel.email')->getArgument(2));
+    }
+
+    #[DataProvider('provideEmailChannelSender')]
+    public function testTheEmailChannelFallsBackToTheFromHeaderOfTheMailer(?string $envelopeSender, array $headers, ?string $expectedSender)
+    {
+        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false, 'kernel.bundles' => []]));
+        new NotifierBundle()->getContainerExtension()->load([self::TRANSPORTS], $container);
+        $container->register('mailer.envelope_listener')->setArguments([$envelopeSender]);
+
+        if ($headers) {
+            $definition = new Definition(Headers::class);
+            foreach ($headers as $name => $value) {
+                $definition->addMethodCall('addHeader', [$name, $value]);
+            }
+            $container->register('mailer.message_listener')->setArguments([$definition]);
+        }
+
+        new RemoveMissingDependenciesPass()->process($container);
+
+        $this->assertSame($expectedSender, $container->getDefinition('notifier.channel.email')->getArgument(2));
+    }
+
+    public static function provideEmailChannelSender(): iterable
+    {
+        yield 'From header' => [null, ['From' => ['Conferences <noreply@conferences.example>']], 'Conferences <noreply@conferences.example>'];
+        yield 'header name is case-insensitive' => [null, ['X-Foo' => 'bar', 'from' => ['noreply@conferences.example']], 'noreply@conferences.example'];
+        yield 'envelope sender wins' => ['sender@example.org', ['From' => ['noreply@conferences.example']], 'sender@example.org'];
+        yield 'several From addresses' => [null, ['From' => ['a@conferences.example', 'b@conferences.example']], null];
+        yield 'no From header' => [null, ['X-Foo' => 'bar'], null];
+        yield 'no headers' => [null, [], null];
     }
 
     public function testTheEmailChannelIsDroppedWithoutAMailer()

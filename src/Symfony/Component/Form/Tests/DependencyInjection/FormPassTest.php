@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,8 +31,13 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension;
 use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\AddressTrait;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\AdminData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\CarData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\ContactData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\KeynoteSpeakerData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\PersonData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\SpeakerData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\UserData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\VehicleData;
 
@@ -138,6 +144,54 @@ class FormPassTest extends TestCase
         $this->assertSame(VehicleData::class, $container->getDefinition('.form.data_class_type.'.CarData::class)->getArgument(1));
     }
 
+    public function testDataClassTypesReadTheFieldsOfParentClassesWithoutAsFormType()
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->setDefinition('form.extension', $this->createExtensionDefinition());
+        $container->register(SpeakerData::class, SpeakerData::class)->addResourceTag('form.data_class');
+        $container->register(KeynoteSpeakerData::class, KeynoteSpeakerData::class)->addResourceTag('form.data_class');
+
+        $container->compile();
+
+        $this->assertSame([
+            SpeakerData::class,
+            FormType::class,
+            'speaker_data',
+            [
+                'email' => [null, []],
+                'phoneNumber' => [null, ['property_path' => 'phone']],
+                'city' => [null, []],
+                'name' => [null, []],
+                'company' => [null, ['label' => 'Organization']],
+                'bio' => [null, []],
+            ],
+            [],
+        ], $container->getDefinition('.form.data_class_type.'.SpeakerData::class)->getArguments());
+
+        $this->assertSame([
+            KeynoteSpeakerData::class,
+            SpeakerData::class,
+            'keynote_speaker_data',
+            ['talk' => [null, []]],
+            [],
+        ], $container->getDefinition('.form.data_class_type.'.KeynoteSpeakerData::class)->getArguments());
+    }
+
+    public function testDataClassTypesTrackTheFilesOfTheClassesAndTraitsTheyRead()
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->setDefinition('form.extension', $this->createExtensionDefinition());
+        $container->register(SpeakerData::class, SpeakerData::class)->addResourceTag('form.data_class');
+
+        $container->compile();
+
+        foreach ([SpeakerData::class, PersonData::class, ContactData::class, AddressTrait::class] as $class) {
+            $this->assertContainsEquals(new FileResource((new \ReflectionClass($class))->getFileName()), $container->getResources());
+        }
+    }
+
     public function testDataClassTypesAreAddedToTheDebugCommand()
     {
         $container = $this->createContainerBuilder();
@@ -199,6 +253,11 @@ class FormPassTest extends TestCase
         yield 'duplicate field name' => [
             FormPassTest_DuplicateField::class,
             'Duplicate field "email" declared on the #[FormField] attribute of property "'.FormPassTest_DuplicateField::class.'::$contact".',
+        ];
+
+        yield 'duplicate field name in parent classes' => [
+            FormPassTest_DuplicateParentField::class,
+            'Duplicate field "email" declared on the #[FormField] attribute of property "'.FormPassTest_ParentWithPublicField::class.'::$email".',
         ];
 
         yield 'object option value' => [
@@ -546,3 +605,19 @@ class FormPassTest_ObjectOption
     public ?string $name = null;
 }
 
+abstract class FormPassTest_ParentWithPrivateField
+{
+    #[FormField]
+    private ?string $email = null;
+}
+
+abstract class FormPassTest_ParentWithPublicField extends FormPassTest_ParentWithPrivateField
+{
+    #[FormField]
+    public ?string $email = null;
+}
+
+#[AsFormType]
+class FormPassTest_DuplicateParentField extends FormPassTest_ParentWithPublicField
+{
+}

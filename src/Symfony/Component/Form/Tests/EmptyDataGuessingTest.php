@@ -22,6 +22,7 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\PrivateReadonlyChild;
 use Symfony\Component\Form\Tests\Fixtures\ConstructorMapping\ReadonlyPerson;
 use Symfony\Component\Form\Tests\Fixtures\TypedProperties;
 use Symfony\Component\Form\Tests\Fixtures\WriteTargetTypedProperties;
@@ -219,6 +220,19 @@ class EmptyDataGuessingTest extends FormIntegrationTestCase
         $form->submit(['name' => '']);
 
         $this->assertEquals(new ReadonlyPerson(''), $form->getData());
+    }
+
+    public function testPrivatePromotedReadonlyPropertyOfAParentClassIsWrittenThroughTheConstructor()
+    {
+        $form = $this->factory->createBuilder(FormType::class, null, ['data_class' => PrivateReadonlyChild::class])
+            ->add('code')
+            ->getForm();
+
+        $this->assertSame('', $form->get('code')->getConfig()->getEmptyData());
+
+        $form->submit(['code' => '']);
+
+        $this->assertEquals(new PrivateReadonlyChild(''), $form->getData());
     }
 
     public function testAccessorIsNotAWriteTarget()

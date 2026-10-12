@@ -108,7 +108,12 @@ final class EmptyDataGuesser
     private function getPromotedReadonlyPropertyType(string $class, string $property): ?\ReflectionType
     {
         try {
-            $property = new \ReflectionProperty($class, $property);
+            $reflector = new \ReflectionClass($class);
+            // a child class does not list the private properties of its parent classes
+            while (!$reflector->hasProperty($property) && $reflector->getParentClass()) {
+                $reflector = $reflector->getParentClass();
+            }
+            $property = $reflector->getProperty($property);
         } catch (\ReflectionException) {
             return null;
         }

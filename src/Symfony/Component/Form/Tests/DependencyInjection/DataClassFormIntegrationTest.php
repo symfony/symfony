@@ -30,6 +30,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\AdminData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\CarData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\KeynoteSpeakerData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\SpeakerData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\UserData;
 use Symfony\Component\Form\Tests\Fixtures\AsFormType\VehicleData;
 use Symfony\Component\Form\TypeInfoFormTypeGuesser;
@@ -89,6 +91,38 @@ class DataClassFormIntegrationTest extends TestCase
         $blockPrefixes = $form->createView()->vars['block_prefixes'];
         $this->assertContains('car_data', $blockPrefixes);
         $this->assertContains('vehicle_data', $blockPrefixes);
+    }
+
+    public function testFieldsAreReadFromParentClassesWithoutAsFormType()
+    {
+        $factory = $this->createFormFactory(static function (ContainerBuilder $container) {
+            $container->register(SpeakerData::class, SpeakerData::class)->addResourceTag('form.data_class');
+            $container->register(KeynoteSpeakerData::class, KeynoteSpeakerData::class)->addResourceTag('form.data_class');
+        });
+
+        $speaker = new KeynoteSpeakerData();
+        $form = $factory->create(KeynoteSpeakerData::class, $speaker);
+
+        $this->assertSame(['email', 'phoneNumber', 'city', 'name', 'company', 'bio', 'talk'], array_keys($form->all()));
+        $this->assertSame('Organization', $form->get('company')->getConfig()->getOption('label'));
+
+        $form->submit([
+            'email' => 'ada@example.com',
+            'phoneNumber' => '555',
+            'city' => 'London',
+            'name' => 'Ada',
+            'company' => 'Analytical',
+            'bio' => 'Hi',
+            'talk' => 'Engines',
+        ]);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame('ada@example.com', $speaker->email);
+        $this->assertSame('555', $speaker->getPhone());
+        $this->assertSame('London', $speaker->city);
+        $this->assertSame('Ada', $speaker->name);
+        $this->assertSame('Analytical', $speaker->company);
+        $this->assertSame('Engines', $speaker->talk);
     }
 
     public function testTypeExtensionsApplyToDataClassTypes()

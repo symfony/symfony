@@ -4,7 +4,7 @@
   "description": "Defines the application's URL routes, including imports and environment-specific conditionals.",
   "type": "object",
   "patternProperties": {
-    "^[a-zA-Z0-9_.-]+$": {
+    "^(?!when@)": {
       "oneOf": [
         { "$ref": "#/$defs/routeDefinition" },
         { "$ref": "#/$defs/routeImport" },
@@ -29,40 +29,40 @@
           "description": "The URL path or a map of locale=>path for localized routes."
         },
         "controller": {
-          "type": "string",
+          "type": ["string", "null"],
           "description": "The controller that handles the request, e.g., 'App\\Controller\\BlogController::show'."
         },
         "methods": {
           "description": "The HTTP method(s) this route matches.",
           "oneOf": [
-            { "type": "string" },
+            { "type": ["string", "null"] },
             { "type": "array", "items": { "type": "string" } }
           ]
         },
         "requirements": {
-          "type": "object",
+          "type": ["object", "null"],
           "description": "Regular expression constraints for path parameters.",
           "additionalProperties": { "type": "string" }
         },
-        "defaults": { "type": "object" },
-        "options": { "type": "object" },
+        "defaults": { "type": ["object", "null"] },
+        "options": { "type": ["object", "null"] },
         "host": {
           "oneOf": [
-            { "type": "string" },
+            { "type": ["string", "null"] },
             { "type": "object", "patternProperties": { "^.+$": { "type": "string" } }, "additionalProperties": false }
           ]
         },
         "schemes": {
           "oneOf": [
-            { "type": "string" },
+            { "type": ["string", "null"] },
             { "type": "array", "items": { "type": "string" } }
           ]
         },
-        "condition": { "type": "string" },
-        "locale": { "type": "string" },
-        "format": { "type": "string" },
-        "utf8": { "type": "boolean" },
-        "stateless": { "type": "boolean" },
+        "condition": { "type": ["string", "null"] },
+        "locale": { "type": ["string", "null"] },
+        "format": { "type": ["string", "null"] },
+        "utf8": { "type": ["boolean", "null"] },
+        "stateless": { "type": ["boolean", "null"] },
         "deprecated": {
           "type": "object",
           "properties": {
@@ -97,44 +97,44 @@
           ]
         },
         "type": {
-          "type": "string",
+          "type": ["string", "null"],
           "description": "The type of the resource (e.g., 'attribute', 'annotation', 'yaml')."
         },
         "prefix": {
           "oneOf": [
-            { "type": "string" },
+            { "type": ["string", "null"] },
             { "type": "object", "patternProperties": { "^.+$": { "type": "string" } }, "additionalProperties": false }
           ],
           "description": "A URL prefix to apply to all routes from the imported resource."
         },
         "name_prefix": {
-          "type": "string",
+          "type": ["string", "null"],
           "description": "A name prefix to apply to all routes from the imported resource."
         },
-        "requirements": { "type": "object", "additionalProperties": { "type": "string" } },
-        "defaults": { "type": "object" },
-        "options": { "type": "object" },
+        "requirements": { "type": ["object", "null"], "additionalProperties": { "type": "string" } },
+        "defaults": { "type": ["object", "null"] },
+        "options": { "type": ["object", "null"] },
         "host": {
           "oneOf": [
-            { "type": "string" },
+            { "type": ["string", "null"] },
             { "type": "object", "patternProperties": { "^.+$": { "type": "string" } }, "additionalProperties": false }
           ]
         },
         "schemes": {
           "oneOf": [
-            { "type": "string" },
+            { "type": ["string", "null"] },
             { "type": "array", "items": { "type": "string" } }
           ]
         },
-        "condition": { "type": "string" },
-        "trailing_slash_on_root": { "type": "boolean" },
-        "methods": { "oneOf": [ { "type": "string" }, { "type": "array", "items": { "type": "string" } } ] },
-        "locale": { "type": "string" },
-        "format": { "type": "string" },
-        "utf8": { "type": "boolean" },
-        "exclude": { "oneOf": [ { "type": "string" }, { "type": "array", "items": { "type": "string" } } ] },
-        "stateless": { "type": "boolean" },
-        "controller": { "type": "string" }
+        "condition": { "type": ["string", "null"] },
+        "trailing_slash_on_root": { "type": ["boolean", "null"] },
+        "methods": { "oneOf": [ { "type": ["string", "null"] }, { "type": "array", "items": { "type": "string" } } ] },
+        "locale": { "type": ["string", "null"] },
+        "format": { "type": ["string", "null"] },
+        "utf8": { "type": ["boolean", "null"] },
+        "exclude": { "oneOf": [ { "type": ["string", "null"] }, { "type": "array", "items": { "type": "string" } } ] },
+        "stateless": { "type": ["boolean", "null"] },
+        "controller": { "type": ["string", "null"] }
       },
       "required": ["resource"],
       "additionalProperties": false
@@ -147,7 +147,7 @@
           "type": "object",
           "properties": {
             "package": { "type": "string" },
-            "version": { "type": "string" },
+            "version": { "type": ["string", "number"] },
             "message": { "type": "string" }
           },
           "required": ["package", "version"],

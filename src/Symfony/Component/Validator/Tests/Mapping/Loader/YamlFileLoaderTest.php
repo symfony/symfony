@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
+use Opis\JsonSchema\Errors\ErrorFormatter;
+use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -36,6 +39,8 @@ use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments;
 use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments;
+use Symfony\Component\Yaml\Tag\TaggedValue;
+use Symfony\Component\Yaml\Yaml;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -186,5 +191,51 @@ class YamlFileLoaderTest extends TestCase
         $expected->setGroupSequenceProvider(true);
 
         $this->assertEquals($expected, $metadata);
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    public function testSchemaAcceptsTheFilesTheLoaderAccepts()
+    {
+        $validator = new Validator(null, 100, false);
+        $schema = json_decode(file_get_contents(\dirname(__DIR__, 3).'/Mapping/Loader/schema/validation.schema.json'));
+        $failures = [];
+
+        foreach (glob(__DIR__.'/*.yml') as $file) {
+            set_error_handler(static fn (int $type, string $message) => throw new \ErrorException($message, 0, $type));
+            try {
+                $loader = new YamlFileLoader($file);
+
+                foreach ($loader->getMappedClasses() as $class) {
+                    $loader->loadClassMetadata(new ClassMetadata($class));
+                }
+            } catch (\Exception) {
+                continue;
+            } finally {
+                restore_error_handler();
+            }
+
+            if (null === $data = Yaml::parseFile($file, Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_OBJECT_FOR_MAP)) {
+                continue;
+            }
+
+            $result = $validator->validate(self::toJsonData($data), $schema);
+
+            if (!$result->isValid()) {
+                $failures[basename($file)] = (new ErrorFormatter())->format($result->error(), false);
+            }
+        }
+
+        $this->assertSame([], $failures);
+    }
+
+    private static function toJsonData(mixed $value): mixed
+    {
+        return match (true) {
+            $value instanceof TaggedValue => self::toJsonData($value->getValue()),
+            $value instanceof \UnitEnum => $value->name,
+            $value instanceof \stdClass => (object) array_map(self::toJsonData(...), (array) $value),
+            \is_array($value) => array_map(self::toJsonData(...), $value),
+            default => $value,
+        };
     }
 }

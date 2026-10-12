@@ -524,8 +524,21 @@ class UuidTest extends TestCase
         $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814001-1dd2-11b2-a456-426655440000'))->getDateTime());
         $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814000-1dd2-11b2-a456-426655440000'))->getDateTime());
         $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13813fff-1dd2-11b2-a456-426655440000'))->getDateTime());
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), (new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('1969-12-31 23:59:59.999999 UTC'), (new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('1969-12-31 23:59:59.999999 UTC'), (new UuidV1('13813ff5-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('1969-12-31 23:59:58.500000 UTC'), (new UuidV1('129c5e40-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('1582-10-15 00:00:00.500000 UTC'), (new UuidV1('004c4b40-0000-1000-a456-426655440000'))->getDateTime());
         $this->assertEquals(new \DateTimeImmutable('@-12219292800'), (new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime());
+    }
+
+    public function testGenerateBeforeUnixEpoch()
+    {
+        $node = new UuidV1('00000000-0000-1000-a456-426655440000');
+
+        $this->assertSame('13813ff6-1dd2-11b2-a456-426655440000', UuidV1::generate(new \DateTimeImmutable('1969-12-31 23:59:59.999999 UTC'), $node));
+        $this->assertSame('129c5e40-1dd2-11b2-a456-426655440000', UuidV1::generate(new \DateTimeImmutable('1969-12-31 23:59:58.500000 UTC'), $node));
+        $this->assertSame('004c4b40-0000-1000-a456-426655440000', UuidV1::generate(new \DateTimeImmutable('1582-10-15 00:00:00.500000 UTC'), $node));
+        $this->assertSame('1b21dd21-29c5-6e40-a456-426655440000', UuidV6::generate(new \DateTimeImmutable('1969-12-31 23:59:58.500000 UTC'), $node));
     }
 
     public function testFromStringBase58Padding()

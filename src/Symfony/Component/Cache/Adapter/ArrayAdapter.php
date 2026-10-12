@@ -60,11 +60,12 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
         }
 
         self::$createCacheItem ??= \Closure::bind(
-            static function ($key, $value, $isHit, $tags, $expiry = null) {
+            static function ($key, $value, $isHit, $tags, $expiry = null, $clock = null) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
                 $item->isHit = $isHit;
+                $item->clock = $clock;
                 if (null !== $tags) {
                     $item->metadata[CacheItem::METADATA_TAGS] = $tags;
                 }
@@ -134,7 +135,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
             $value = $this->deepClone ? $this->unfreeze($key, $isHit) : $this->values[$key];
         }
 
-        return (self::$createCacheItem)($key, $value, $isHit, $this->tags[$key] ?? null, $this->explicitExpiries[$key] ?? null);
+        return (self::$createCacheItem)($key, $value, $isHit, $this->tags[$key] ?? null, $this->explicitExpiries[$key] ?? null, $this->clock);
     }
 
     public function getItems(array $keys = []): iterable
@@ -359,7 +360,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
             }
             unset($keys[$i]);
 
-            yield $key => $f($key, $value, $isHit, $this->tags[$key] ?? null, $this->explicitExpiries[$key] ?? null);
+            yield $key => $f($key, $value, $isHit, $this->tags[$key] ?? null, $this->explicitExpiries[$key] ?? null, $this->clock);
         }
 
         foreach ($keys as $key) {

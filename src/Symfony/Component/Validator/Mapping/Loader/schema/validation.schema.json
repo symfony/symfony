@@ -6,7 +6,7 @@
   "additionalProperties": false,
   "properties": {
     "namespaces": {
-      "type": "object",
+      "type": ["object", "null"],
       "description": "Namespace aliases for constraint classes",
       "additionalProperties": {
         "type": "string",
@@ -15,22 +15,21 @@
     }
   },
   "patternProperties": {
-    "^[A-Za-z0-9\\\\_]+$": {
-      "type": "object",
+    "^(?!namespaces$)[A-Za-z0-9\\\\_]+$": {
+      "type": ["object", "null"],
       "description": "Class metadata configuration",
       "additionalProperties": false,
       "properties": {
         "group_sequence": {
           "oneOf": [
             {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "Array of validation group names"
+              "$ref": "#/definitions/groupSequence"
             },
             {
               "type": "boolean"
+            },
+            {
+              "type": "null"
             }
           ],
           "description": "Validation group sequence or group sequence provider flag"
@@ -44,21 +43,24 @@
             {
               "type": "string",
               "description": "Class name of the group sequence provider"
+            },
+            {
+              "type": "null"
             }
           ]
         },
         "constraints": {
-          "$ref": "#/definitions/constraintArray"
+          "$ref": "#/definitions/constraintArrayOrNull"
         },
         "properties": {
-          "type": "object",
+          "type": ["object", "null"],
           "description": "Property-level constraints",
           "additionalProperties": {
             "$ref": "#/definitions/constraintArrayOrNull"
           }
         },
         "getters": {
-          "type": "object",
+          "type": ["object", "null"],
           "description": "Getter method constraints",
           "additionalProperties": {
             "$ref": "#/definitions/constraintArrayOrNull"
@@ -68,6 +70,24 @@
     }
   },
   "definitions": {
+    "groupSequence": {
+      "type": "array",
+      "description": "Array of validation group names",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "description": "Validation group names validated in the same step",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "constraintArray": {
       "type": "array",
       "description": "Array of constraints",

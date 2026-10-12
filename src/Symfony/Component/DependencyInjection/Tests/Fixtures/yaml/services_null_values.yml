@@ -1,0 +1,36 @@
+services:
+    _defaults:
+        autowire: true
+        bind: ~
+        tags: ~
+
+    _instanceof:
+        Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface:
+            autowire: ~
+            calls: ~
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\:
+        resource: ../Prototype
+        exclude: ~
+        bind: ~
+
+    with_null_values:
+        class: stdClass
+        public: ~
+        autowire: ~
+        lazy: ~
+        deprecated: ~
+        arguments: ~
+        properties: ~
+        calls: ~
+        tags: ~
+        bind: ~
+
+    alias_with_null_values:
+        alias: with_null_values
+        public: ~
+
+    stack_with_null_values:
+        public: ~
+        stack:
+            - class: stdClass

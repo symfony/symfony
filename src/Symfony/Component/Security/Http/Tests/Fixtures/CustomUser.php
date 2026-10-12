@@ -50,7 +50,7 @@ final class CustomUser implements UserInterface, PasswordAuthenticatedUserInterf
         $passwordKey = \sprintf("\0%s\0password", self::class);
 
         if ($this->hashPassword) {
-            $data[$passwordKey] = hash('crc32c', $this->password);
+            $data[$passwordKey] = hash('crc32c', $this->password ?? '');
         } elseif (null !== $this->hashPassword) {
             unset($data[$passwordKey]);
         }

@@ -1,0 +1,12 @@
+namespaces: ~
+
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+  group_sequence: ~
+  constraints: ~
+  properties: ~
+  getters: ~
+
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity:
+  group_sequence_provider: ~
+
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent: ~

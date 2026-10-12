@@ -154,7 +154,14 @@ class BinaryUtil
      */
     public static function hexToDateTime(string $time): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('U.u?', substr_replace(self::hexToNumericString($time), '.', -7, 0));
+        $time = self::hexToNumericString($time);
+
+        // "U.u" reads "-1.5" as -1 + 0.5 seconds, so -1.5 seconds must be written "-2.5"
+        if ('-' === $time[0] && '000000' !== $us = substr($time, -7, 6)) {
+            $time = \sprintf('-%.0F%06d', substr($time, 1, -7) + 1, 1000000 - $us).substr($time, -1);
+        }
+
+        return \DateTimeImmutable::createFromFormat('U.u?', substr_replace($time, '.', -7, 0));
     }
 
     /**
@@ -162,15 +169,24 @@ class BinaryUtil
      */
     public static function dateTimeToHex(\DateTimeInterface $time): string
     {
+        $seconds = $time->format('U');
+        $microseconds = $time->format('u');
+
+        // "U" and "u" give -1.5 seconds as -2 and 500000
+        if ('-' === $seconds[0] && '000000' !== $microseconds) {
+            $seconds = \sprintf('-%.0F', substr($seconds, 1) - 1);
+            $microseconds = str_pad(1000000 - $microseconds, 6, '0', \STR_PAD_LEFT);
+        }
+
         if (\PHP_INT_SIZE >= 8) {
-            if (-self::TIME_OFFSET_INT > $time = (int) $time->format('Uu0')) {
+            if (-self::TIME_OFFSET_INT > $time = (int) ($seconds.$microseconds.'0')) {
                 throw new InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');
             }
 
             return str_pad(dechex(self::TIME_OFFSET_INT + $time), 16, '0', \STR_PAD_LEFT);
         }
 
-        $time = $time->format('Uu0');
+        $time = $seconds.$microseconds.'0';
         $negative = '-' === $time[0];
         if ($negative && self::TIME_OFFSET_INT < $time = substr($time, 1)) {
             throw new InvalidArgumentException('The given UUID date cannot be earlier than 1582-10-15.');

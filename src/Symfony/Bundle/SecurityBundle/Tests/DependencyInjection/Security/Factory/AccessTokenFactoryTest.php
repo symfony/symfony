@@ -656,6 +656,7 @@ class AccessTokenFactoryTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('security.access_token_handler.oidc.command.generate'));
         $this->assertTrue($container->getDefinition('security.access_token_handler.oidc.command.generate')->hasMethodCall('addGenerator'));
+        $this->assertEquals([new Reference('clock')], $container->getDefinition('security.access_token_handler.oidc.command.generate')->getArguments());
     }
 
     public function testOidcTokenGeneratorCommandWithNoTokenHandler()

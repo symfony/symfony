@@ -19,8 +19,10 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -189,6 +191,29 @@ class OidcTokenHandlerTest extends TestCase
             'email',
             $loggerMock,
         ))->getUserBadgeFrom($token);
+    }
+
+    #[RunInSeparateProcess]
+    public function testChecksTheDatesAgainstTheSystemTimeWithoutAClock()
+    {
+        $time = strtotime('2020-01-01 00:00:00 UTC');
+        ClockMock::register(OidcTokenHandler::class);
+        ClockMock::withClockMock($time);
+
+        $claims = [
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+        ];
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), self::getJWKSet(), self::AUDIENCE, ['https://www.example.com']);
+
+        $this->assertSame($claims['sub'], $handler->getUserBadgeFrom(self::buildJWS(json_encode($claims)))->getUserIdentifier());
+
+        $this->expectException(BadCredentialsException::class);
+        $handler->getUserBadgeFrom(self::buildJWS(json_encode(['exp' => $time - 1] + $claims)));
     }
 
     private static function buildJWS(string $payload): string
@@ -555,6 +580,59 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame(2, $requestCount);
     }
 
+    #[DataProvider('provideJwksCacheHeaders')]
+    public function testDiscoveryBoundsTheLifetimeOfTheCachedJwks(array $headers, int $expectedTtl)
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]], ['response_headers' => $headers]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com']);
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_config');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->once())->method('expiresAfter')->with($expectedTtl);
+
+        $this->assertCount(1, $handler->computeDiscoveryKeys($item));
+    }
+
+    public static function provideJwksCacheHeaders(): iterable
+    {
+        yield 'no cache headers' => [[], 3600];
+        yield 'max-age=0' => [['Cache-Control' => 'max-age=0'], 3600];
+        yield 'no-store' => [['Cache-Control' => 'no-store'], 3600];
+        yield 'Expires in the past' => [['Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() - 60)], 3600];
+        yield 'max-age beyond 30 days' => [['Cache-Control' => 'max-age=99999999'], 30 * 24 * 60 * 60];
+    }
+
+    #[DataProvider('provideJwksCacheHeadersOfTwoProviders')]
+    public function testDiscoveryCachesTheJwksOfSeveralProvidersForTheLowestLifetime(array $headers1, array $headers2, int $expectedTtl)
+    {
+        $httpClient1 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider1.example.com', 'jwks_uri' => 'https://provider1.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]], ['response_headers' => $headers1]),
+        ]);
+        $httpClient2 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider2.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]], ['response_headers' => $headers2]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://provider1.example.com', 'https://provider2.example.com']);
+        $handler->enableDiscovery(new ArrayAdapter(), [$httpClient1, $httpClient2], 'oidc_config');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->once())->method('expiresAfter')->with($expectedTtl);
+
+        $this->assertCount(2, $handler->computeDiscoveryKeys($item));
+    }
+
+    public static function provideJwksCacheHeadersOfTwoProviders(): iterable
+    {
+        yield 'max-age=0 and max-age=120' => [['Cache-Control' => 'max-age=0'], ['Cache-Control' => 'max-age=120'], 120];
+        yield 'no cache headers and max-age=7200' => [[], ['Cache-Control' => 'max-age=7200'], 3600];
+    }
+
     public function testComputeDiscoveryKeysReturnsEmptyWhenNoClients()
     {
         $cache = new ArrayAdapter();
@@ -685,8 +763,7 @@ class OidcTokenHandlerTest extends TestCase
         );
         $handler->enableDiscovery($cache, $httpClient, 'oidc_http_issuer');
 
-        $item = $this->createMock(ItemInterface::class);
-        $item->expects($this->never())->method('expiresAfter');
+        $item = $this->createStub(ItemInterface::class);
 
         $this->assertCount(1, $handler->computeDiscoveryKeys($item));
     }
@@ -742,8 +819,7 @@ class OidcTokenHandlerTest extends TestCase
         );
         $handler->enableDiscovery($cache, $httpClient, 'oidc_non_sig_keys', enforceKeyUsageVerification: false);
 
-        $item = $this->createMock(ItemInterface::class);
-        $item->expects($this->never())->method('expiresAfter');
+        $item = $this->createStub(ItemInterface::class);
         $keys = $handler->computeDiscoveryKeys($item);
         $this->assertCount(1, $keys);
         $this->assertSame('sig', $keys[0]['use']);
@@ -833,8 +909,7 @@ class OidcTokenHandlerTest extends TestCase
         );
         $handler->enableDiscovery($cache, $httpClient, 'oidc_enforced', enforceKeyUsageVerification: true);
 
-        $item = $this->createMock(ItemInterface::class);
-        $item->expects($this->never())->method('expiresAfter');
+        $item = $this->createStub(ItemInterface::class);
         $this->assertSame([], $handler->computeDiscoveryKeys($item));
     }
 

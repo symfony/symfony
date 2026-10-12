@@ -25,7 +25,6 @@ use Jose\Component\Signature\Serializer\CompactSerializer as JwsCompactSerialize
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
@@ -62,7 +61,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private array $issuers,
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
-        private ClockInterface $clock = new Clock(),
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -194,8 +193,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                     $currentTtl = null;
                 }
 
+                // Default to 1 hour when the provider advertises no TTL
+                $currentTtl = $currentTtl ?: 3600;
+
                 // Apply the lowest TTL found to ensure all keys in the set are still valid
-                if (null !== $currentTtl && (null === $minTtl || $currentTtl < $minTtl)) {
+                if (null === $minTtl || $currentTtl < $minTtl) {
                     $minTtl = $currentTtl;
                 }
 
@@ -205,10 +207,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                 }
             }
 
-            if (0 < ($minTtl ?? -1)) {
-                // Cap the TTL to 30 days to avoid keeping JWKS indefinitely
-                $item->expiresAfter(min($minTtl, 30 * 24 * 60 * 60));
-            }
+            // Cap the TTL to 30 days to avoid keeping JWKS indefinitely
+            $item->expiresAfter(min($minTtl, 30 * 24 * 60 * 60));
 
             return $bindKeysToIssuers ? $discoveredKeys : $discoveredKeys[''] ?? [];
         } catch (\Exception $e) {
@@ -293,10 +293,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     private function verifyClaims(array $claims): array
     {
         // Verify the claims
+        $clock = $this->getClock();
         $checkers = [
-            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0),
-            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0),
-            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0),
+            new Checker\IssuedAtChecker(clock: $clock, allowedTimeDrift: 0),
+            new Checker\NotBeforeChecker(clock: $clock, allowedTimeDrift: 0),
+            new Checker\ExpirationTimeChecker(clock: $clock, allowedTimeDrift: 0),
             new Checker\AudienceChecker($this->audience),
             new Checker\IssuerChecker($this->issuers),
         ];
@@ -314,14 +315,15 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             return $accessToken;
         }
 
+        $clock = $this->getClock();
         $jweHeaderChecker = new Checker\HeaderCheckerManager(
             [
                 new Checker\AlgorithmChecker($this->decryptionAlgorithms->list()),
                 new Checker\CallableChecker('enc', fn ($value) => \in_array($value, $this->decryptionAlgorithms->list())),
                 new Checker\CallableChecker('cty', static fn ($value) => 'JWT' === $value),
-                new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-                new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-                new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\IssuedAtChecker(clock: $clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\NotBeforeChecker(clock: $clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\ExpirationTimeChecker(clock: $clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
             ],
             [new JWETokenSupport()]
         );
@@ -359,5 +361,15 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
             return $accessToken;
         }
+    }
+
+    private function getClock(): ClockInterface
+    {
+        return $this->clock ?? new class implements ClockInterface {
+            public function now(): \DateTimeImmutable
+            {
+                return new \DateTimeImmutable('@'.time());
+            }
+        };
     }
 }

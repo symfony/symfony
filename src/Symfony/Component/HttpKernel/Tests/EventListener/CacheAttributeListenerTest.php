@@ -612,6 +612,77 @@ class CacheAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
     }
 
+    public function testTargetedAttributeSetsTargetedCacheControl()
+    {
+        $request = $this->createRequest(
+            new Cache(maxage: 300, public: true),
+            new Cache(maxage: '1 hour', public: true, mustRevalidate: true, staleWhileRevalidate: 60, staleIfError: '1 day', target: 'CDN'),
+        );
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $this->response));
+
+        $this->assertSame('max-age=300, public', $this->response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=3600, must-revalidate, public, stale-if-error=86400, stale-while-revalidate=60', $this->response->headers->get('CDN-Cache-Control'));
+    }
+
+    public function testTargetedAttributeEventSetsTargetedCacheControl()
+    {
+        $response = new Response();
+
+        $this->listener->onKernelControllerAttribute(new ControllerAttributeEvent(new Cache(maxage: 3600, public: false, noStore: true, target: 'CDN'), $this->createEventMock(new Request(), $response)));
+
+        $this->assertSame('max-age=3600, no-store, private', $response->headers->get('CDN-Cache-Control'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('max-age'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('no-store'));
+    }
+
+    public function testTargetedAttributeDoesNotOverrideDirectivesAlreadySet()
+    {
+        $request = $this->createRequest(
+            new Cache(maxage: 3600, public: true, staleWhileRevalidate: 60, staleIfError: 60, target: 'CDN'),
+            new Cache(staleWhileRevalidate: 30, target: 'CDN'),
+        );
+        $this->response->cacheControl('CDN')->setMaxAge(600)->setPrivate();
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $this->response));
+
+        $this->assertSame('max-age=600, private, stale-if-error=60, stale-while-revalidate=30', $this->response->headers->get('CDN-Cache-Control'));
+    }
+
+    public function testTargetedAttributeSetsEachTarget()
+    {
+        $request = $this->createRequest(new Cache(maxage: 3600, staleIfError: 60, target: ['CDN', 'Fastly']));
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $this->response));
+
+        $this->assertFalse($this->response->headers->hasCacheControlDirective('max-age'));
+        $this->assertSame('max-age=3600, stale-if-error=60', $this->response->headers->get('CDN-Cache-Control'));
+        $this->assertSame('max-age=3600, stale-if-error=60', $this->response->headers->get('Fastly-Cache-Control'));
+    }
+
+    public function testTargetedAttributeDoesNotOverrideDirectivesAlreadySetPerTarget()
+    {
+        $request = $this->createRequest(
+            new Cache(maxage: 3600, staleIfError: 60, target: ['CDN', 'Fastly']),
+            new Cache(maxage: 60, target: 'Fastly'),
+        );
+        $this->response->cacheControl('CDN')->setMaxAge(600);
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $this->response));
+
+        $this->assertSame('max-age=600, stale-if-error=60', $this->response->headers->get('CDN-Cache-Control'));
+        $this->assertSame('max-age=60, stale-if-error=60', $this->response->headers->get('Fastly-Cache-Control'));
+    }
+
+    public function testTargetedAttributeIsIgnoredWhenIfIsFalse()
+    {
+        $request = $this->createRequest(new Cache(maxage: 3600, if: false, target: 'CDN'));
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $this->response));
+
+        $this->assertFalse($this->response->headers->has('CDN-Cache-Control'));
+    }
+
     private function createRequest(Cache ...$cache): Request
     {
         return new Request([], [], ['_cache' => $cache]);

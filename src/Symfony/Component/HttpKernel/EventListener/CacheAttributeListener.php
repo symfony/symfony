@@ -18,6 +18,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\TargetedCacheControl;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
@@ -173,6 +174,14 @@ class CacheAttributeListener implements EventSubscriberInterface
             return;
         }
 
+        if ($cache->target) {
+            foreach ((array) $cache->target as $target) {
+                $this->processTargetedAttributeAfterController($cache, $response->cacheControl($target));
+            }
+
+            return;
+        }
+
         // Check if the response has a Vary header that should be considered, ignoring cases where
         // it's only 'Accept-Language' and the request has the '_vary_by_language' attribute
         $hasVary ??= ['Accept-Language'] === $response->getVary() ? !$request->attributes->get('_vary_by_language') : $response->hasVary();
@@ -244,6 +253,33 @@ class CacheAttributeListener implements EventSubscriberInterface
 
         if (false === $cache->noStore) {
             $response->headers->removeCacheControlDirective('no-store');
+        }
+    }
+
+    private function processTargetedAttributeAfterController(Cache $cache, TargetedCacheControl $cacheControl): void
+    {
+        if ($cache->mustRevalidate) {
+            $cacheControl->set('must-revalidate');
+        }
+
+        if (null !== $cache->maxage && !$cacheControl->has('max-age')) {
+            $cacheControl->setMaxAge($this->toSeconds($cache->maxage));
+        }
+
+        if (null !== $cache->staleWhileRevalidate && !$cacheControl->has('stale-while-revalidate')) {
+            $cacheControl->setStaleWhileRevalidate($this->toSeconds($cache->staleWhileRevalidate));
+        }
+
+        if (null !== $cache->staleIfError && !$cacheControl->has('stale-if-error')) {
+            $cacheControl->setStaleIfError($this->toSeconds($cache->staleIfError));
+        }
+
+        if (\is_bool($cache->public) && !$cacheControl->has('public') && !$cacheControl->has('private')) {
+            $cache->public ? $cacheControl->setPublic() : $cacheControl->setPrivate();
+        }
+
+        if (null !== $cache->noStore) {
+            $cacheControl->setNoStore($cache->noStore);
         }
     }
 

@@ -138,6 +138,35 @@ final class Cache
          * @var bool|string|Expression|\Closure(array<string, mixed>, Request, ?object):bool
          */
         public bool|string|Expression|\Closure $if = true,
+
+        /**
+         * The caches the directives are for, as defined by RFC 9213.
+         *
+         * For example, "CDN" sets the "CDN-Cache-Control" header instead of "Cache-Control", and ["CDN", "Fastly"] sets both "CDN-Cache-Control" and "Fastly-Cache-Control".
+         * Only $maxage, $public, $mustRevalidate, $staleWhileRevalidate, $staleIfError and $noStore apply to a targeted cache.
+         *
+         * @see https://www.rfc-editor.org/rfc/rfc9213.html
+         *
+         * @var string|list<string>
+         */
+        public string|array $target = [],
     ) {
+        $targets = [];
+        foreach ((array) $target as $t) {
+            if (!\is_string($t) || '' === $t) {
+                throw new \InvalidArgumentException(\sprintf('The "$target" argument of "%s" must be a non-empty string or a list of non-empty strings.', self::class));
+            }
+            $targets[strtolower($t)] ??= $t;
+        }
+
+        if (!$this->target = array_values($targets)) {
+            return;
+        }
+
+        foreach (['expires' => $expires, 'smaxage' => $smaxage, 'vary' => $vary ?: null, 'lastModified' => $lastModified, 'etag' => $etag, 'maxStale' => $maxStale] as $name => $value) {
+            if (null !== $value) {
+                throw new \InvalidArgumentException(\sprintf('The "$%s" argument of "%s" cannot be used with "$target". Only "$maxage", "$public", "$mustRevalidate", "$staleWhileRevalidate", "$staleIfError" and "$noStore" apply to a targeted cache.', $name, self::class));
+            }
+        }
     }
 }

@@ -14,9 +14,12 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 
 class SessionTest extends AbstractWebTestCase
 {
+    use ClockSensitiveTrait;
+
     /**
      * Tests session attributes persist.
      */
@@ -198,6 +201,33 @@ class SessionTest extends AbstractWebTestCase
         $session->save();
 
         $this->assertSame('baz', $client->getSession()->get('obj')->foo);
+    }
+
+    public function testMetadataBagFollowsTheClock()
+    {
+        $clock = self::mockTime('2020-01-01 00:00:00 UTC');
+        $created = $clock->now()->getTimestamp();
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => 'config.yml']);
+
+        $client->request('GET', '/session/drak');
+        $metadataBag = $client->getRequest()->getSession()->getMetadataBag();
+
+        $this->assertSame($created, $metadataBag->getCreated());
+        $this->assertSame($created, $metadataBag->getLastUsed());
+
+        $clock->sleep(3600);
+        $client->request('GET', '/session');
+        $metadataBag = $client->getRequest()->getSession()->getMetadataBag();
+
+        $this->assertSame($created, $metadataBag->getCreated());
+        $this->assertSame($created, $metadataBag->getLastUsed());
+
+        $clock->sleep(60);
+        $client->request('GET', '/session');
+        $metadataBag = $client->getRequest()->getSession()->getMetadataBag();
+
+        $this->assertSame($created, $metadataBag->getCreated());
+        $this->assertSame($created + 3600, $metadataBag->getLastUsed());
     }
 
     public static function getConfigs()

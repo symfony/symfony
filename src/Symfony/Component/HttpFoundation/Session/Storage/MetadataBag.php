@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 
 /**
@@ -40,6 +41,7 @@ class MetadataBag implements SessionBagInterface
         private string $storageKey = '_sf2_meta',
         private int $updateThreshold = 0,
         private ?int $cookieLifetime = null,
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -50,7 +52,7 @@ class MetadataBag implements SessionBagInterface
         if (isset($array[self::CREATED])) {
             $this->lastUsed = $this->meta[self::UPDATED];
 
-            $timeStamp = time();
+            $timeStamp = $this->clock?->now()->getTimestamp() ?? time();
             if ($timeStamp - $array[self::UPDATED] >= $this->updateThreshold) {
                 $this->meta[self::UPDATED] = $timeStamp;
             }
@@ -126,7 +128,7 @@ class MetadataBag implements SessionBagInterface
 
     private function stampCreated(?int $lifetime = null): void
     {
-        $timeStamp = time();
+        $timeStamp = $this->clock?->now()->getTimestamp() ?? time();
         $this->meta[self::CREATED] = $this->meta[self::UPDATED] = $this->lastUsed = $timeStamp;
         $this->meta[self::LIFETIME] = $lifetime ?? $this->cookieLifetime ?? (int) \ini_get('session.cookie_lifetime');
     }

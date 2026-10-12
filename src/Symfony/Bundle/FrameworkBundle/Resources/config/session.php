@@ -55,6 +55,7 @@ return static function (ContainerConfigurator $container) {
                         param('session.metadata.storage_key'),
                         param('session.metadata.update_threshold'),
                         param('session.metadata.cookie_lifetime'),
+                        service('clock')->nullOnInvalid(),
                     ]),
                 false,
             ])
@@ -66,6 +67,7 @@ return static function (ContainerConfigurator $container) {
                         param('session.metadata.storage_key'),
                         param('session.metadata.update_threshold'),
                         param('session.metadata.cookie_lifetime'),
+                        service('clock')->nullOnInvalid(),
                     ]),
                 false,
             ])
@@ -78,6 +80,7 @@ return static function (ContainerConfigurator $container) {
                         param('session.metadata.storage_key'),
                         param('session.metadata.update_threshold'),
                         param('session.metadata.cookie_lifetime'),
+                        service('clock')->nullOnInvalid(),
                     ]),
             ])
 

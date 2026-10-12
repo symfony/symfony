@@ -21,6 +21,7 @@ CHANGELOG
  * Deprecate saving changes made to session attributes without calling `set()` afterwards
  * Accept the 308 status code in `Response::isCacheable()`
  * Stop adding a default `Cache-Control: no-cache, private` header to 308 `RedirectResponse` instances
+ * Add argument `$clock` to `MetadataBag::__construct()`
 
 8.1
 ---

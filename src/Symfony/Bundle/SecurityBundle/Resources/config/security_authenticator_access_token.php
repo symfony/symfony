@@ -261,7 +261,7 @@ return static function (ContainerConfigurator $container) {
         ->set('security.access_token_handler.oidc.encryption.A256GCM', A256GCM::class)
             ->tag('security.access_token_handler.oidc.encryption_algorithm')
 
-        // the discovery documents and the keys of the providers, read by the "oauth2" token handler and by "oidc_login"
+        // the discovery documents and the keys of the providers, read by the "oidc", "oidc_user_info" and "oauth2" token handlers and by "oidc_login"
         ->set('cache.security.discovery')
             ->parent('cache.app')
             ->private()

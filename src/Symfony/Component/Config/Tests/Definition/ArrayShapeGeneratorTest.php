@@ -331,6 +331,102 @@ class ArrayShapeGeneratorTest extends TestCase
             CODE, $shape);
     }
 
+    public function testElementsAtParentLevelAddsTheShapeOfTheElements()
+    {
+        $stores = (new ArrayNodeDefinition('stores'))
+            ->useAttributeAsKey('name')
+            ->acceptElementsAtParentLevel()
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('host')->end()
+                ->end()
+            ->end();
+
+        $root = (new ArrayNodeDefinition('root'))
+            ->beforeNormalization()
+                ->ifTrue(static fn ($v) => \is_array($v) && !isset($v['stores']))
+                ->then(static fn ($v) => ['stores' => [$v]])
+            ->end()
+            ->children()
+                ->scalarNode('name')->end()
+            ->end()
+            ->append($stores);
+
+        $shape = ArrayShapeGenerator::generate($root->getNode());
+
+        $this->assertStringContainsString(<<<'CODE'
+            array{
+             *     name?: scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null,
+             *     stores?: array<string, array{ // Default: []
+             *         host?: scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null,
+             *     }>,
+             * }|array{
+             *     name?: scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null,
+             *     host?: scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null,
+             * }
+            CODE, $shape);
+        $this->assertStringNotContainsString('...<string, mixed>', $shape);
+    }
+
+    public function testElementsAtParentLevelKeepsTheExtraKeysAcceptedByTheElements()
+    {
+        $stores = (new ArrayNodeDefinition('stores'))
+            ->useAttributeAsKey('name')
+            ->acceptElementsAtParentLevel()
+            ->prototype('array')
+                ->ignoreExtraKeys()
+                ->children()
+                    ->scalarNode('host')->end()
+                ->end()
+            ->end();
+
+        $root = (new ArrayNodeDefinition('root'))
+            ->beforeNormalization()->ifTrue(static fn ($v) => \is_array($v))->then(static fn ($v) => $v)->end()
+            ->children()
+                ->scalarNode('name')->end()
+            ->end()
+            ->append($stores);
+
+        $shape = ArrayShapeGenerator::generate($root->getNode());
+
+        $this->assertStringContainsString(<<<'CODE'
+            }|array{
+             *     name?: scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null,
+             *     host?: scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null,
+             *     ...<string, mixed>
+             * }
+            CODE, $shape);
+    }
+
+    public function testElementsAtParentLevelLeavesTheKeyAttributeToTheChild()
+    {
+        $stores = (new ArrayNodeDefinition('stores'))
+            ->useAttributeAsKey('name')
+            ->acceptElementsAtParentLevel()
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('name')->end()
+                    ->scalarNode('host')->end()
+                ->end()
+            ->end();
+
+        $root = (new ArrayNodeDefinition('root'))
+            ->beforeNormalization()
+                ->ifTrue(static fn ($v) => \is_array($v) && !isset($v['stores']))
+                ->then(static fn ($v) => ['stores' => [$v]])
+            ->end()
+            ->append($stores);
+
+        $shape = ArrayShapeGenerator::generate($root->getNode());
+
+        // the "name" of the elements names them, so the flat shape does not provide it
+        $this->assertStringContainsString(<<<'CODE'
+            }|array{
+             *     host?: scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null,
+             * }
+            CODE, $shape);
+    }
+
     #[DataProvider('provideQuotedNodes')]
     public function testPhpdocQuoteNodeName(NodeInterface $node, string $expected)
     {

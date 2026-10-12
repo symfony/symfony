@@ -569,6 +569,145 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertSame(['string', 'any', 'array'], $node->getNode()->getNormalizedTypes());
     }
 
+    public function testAcceptElementsAtParentLevel()
+    {
+        $node = (new ArrayNodeDefinition('root'))
+            ->beforeNormalization()->ifArray()->then(static fn ($v) => $v)->end()
+            ->children()
+                ->scalarNode('name')->end()
+            ->end()
+            ->append(self::createElementsAtParentLevelNode())
+        ;
+
+        $stores = $node->getNode()->getChildren()['stores'];
+
+        $this->assertInstanceOf(PrototypedArrayNode::class, $stores);
+        $this->assertTrue($stores->getAttribute('elements_at_parent_level'));
+    }
+
+    public function testAcceptElementsAtParentLevelRequiresANormalizationClosureOnTheParent()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The node "root" accepts the elements of "stores" at its level but has no beforeNormalization() closure to rewrite them.');
+
+        (new ArrayNodeDefinition('root'))
+            ->children()
+                ->scalarNode('name')->end()
+            ->end()
+            ->append(self::createElementsAtParentLevelNode())
+            ->getNode();
+    }
+
+    public function testAcceptElementsAtParentLevelRejectsAKeyDeclaredByTheParentAndTheElements()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The node "root" and the elements of "stores" both declare the key(s) "host", so they cannot be told apart when they are given at the level of the node.');
+
+        (new ArrayNodeDefinition('root'))
+            ->beforeNormalization()->ifArray()->then(static fn ($v) => $v)->end()
+            ->children()
+                ->scalarNode('host')->end()
+            ->end()
+            ->append(self::createElementsAtParentLevelNode())
+            ->getNode();
+    }
+
+    public function testAcceptElementsAtParentLevelRejectsAKeyDeclaredByTheParentAndTheSingularOfTheElements()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The node "root" and the elements of "stores" both declare the key(s) "address", so they cannot be told apart when they are given at the level of the node.');
+
+        $stores = new ArrayNodeDefinition('stores');
+        $stores
+            ->useAttributeAsKey('name')
+            ->acceptElementsAtParentLevel()
+            ->prototype('array')
+                ->fixXmlConfig('address')
+                ->children()
+                    ->scalarNode('addresses')->end()
+                ->end()
+            ->end()
+        ;
+
+        (new ArrayNodeDefinition('root'))
+            ->beforeNormalization()->ifArray()->then(static fn ($v) => $v)->end()
+            ->children()
+                ->scalarNode('address')->end()
+            ->end()
+            ->append($stores)
+            ->getNode();
+    }
+
+    public function testAcceptElementsAtParentLevelIsNotApplicableToConcreteNodes()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('->acceptElementsAtParentLevel() is not applicable to concrete nodes at path "root".');
+
+        (new ArrayNodeDefinition('root'))
+            ->acceptElementsAtParentLevel()
+            ->children()
+                ->scalarNode('name')->end()
+            ->end()
+            ->getNode();
+    }
+
+    #[DataProvider('provideNodesWithoutAnArrayPrototypeWithChildren')]
+    public function testAcceptElementsAtParentLevelRequiresAnArrayPrototypeWithChildren(ArrayNodeDefinition $node)
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('->acceptElementsAtParentLevel() requires the prototype of the node at path "root" to be an array with children.');
+
+        $node->getNode();
+    }
+
+    public static function provideNodesWithoutAnArrayPrototypeWithChildren(): iterable
+    {
+        yield 'a scalar prototype' => [(new ArrayNodeDefinition('root'))->acceptElementsAtParentLevel()->useAttributeAsKey('name')->scalarPrototype()->end()];
+        yield 'a prototyped array prototype' => [(new ArrayNodeDefinition('root'))->acceptElementsAtParentLevel()->useAttributeAsKey('name')->arrayPrototype()->scalarPrototype()->end()->end()];
+        yield 'an array prototype without children' => [(new ArrayNodeDefinition('root'))->acceptElementsAtParentLevel()->useAttributeAsKey('name')->arrayPrototype()->end()];
+    }
+
+    public function testAcceptElementsAtParentLevelRejectsSeveralChildrenOfTheSameNode()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('Only one child of the node "root" can declare ->acceptElementsAtParentLevel(), found "stores", "caches".');
+
+        $caches = new ArrayNodeDefinition('caches');
+        $caches
+            ->acceptElementsAtParentLevel()
+            ->arrayPrototype()
+                ->children()
+                    ->integerNode('ttl')->end()
+                ->end()
+            ->end()
+        ;
+
+        (new ArrayNodeDefinition('root'))
+            ->beforeNormalization()->ifArray()->then(static fn ($v) => $v)->end()
+            ->append(self::createElementsAtParentLevelNode())
+            ->append($caches)
+            ->getNode();
+    }
+
+    public function testAcceptElementsAtParentLevelCannotBeCombinedWithWrappingArrays()
+    {
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('The node "root" cannot both wrap arrays into "options" with ->acceptAndWrap() and accept the elements of "stores" at its level.');
+
+        (new ArrayNodeDefinition('root'))
+            ->beforeNormalization()->ifArray()->then(static fn ($v) => $v)->end()
+            ->acceptAndWrap(['array'], 'options')
+            ->children()
+                ->arrayNode('options')
+                    ->children()
+                        ->scalarNode('timeout')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->append(self::createElementsAtParentLevelNode())
+            ->getNode();
+    }
+
     public function testFindShouldThrowExceptionIfNodeDoesNotExistInRootNode()
     {
         $this->expectException(\RuntimeException::class);
@@ -653,5 +792,21 @@ class ArrayNodeDefinitionTest extends TestCase
         $reflection = new \ReflectionProperty($object, $field);
 
         return $reflection->getValue($object);
+    }
+
+    private static function createElementsAtParentLevelNode(): ArrayNodeDefinition
+    {
+        $node = new ArrayNodeDefinition('stores');
+        $node
+            ->useAttributeAsKey('name')
+            ->acceptElementsAtParentLevel()
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('host')->end()
+                ->end()
+            ->end()
+        ;
+
+        return $node;
     }
 }

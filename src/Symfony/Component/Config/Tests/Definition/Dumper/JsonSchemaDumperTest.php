@@ -198,6 +198,102 @@ class JsonSchemaDumperTest extends TestCase
             ->getNode();
         yield 'a node normalized from any value accepts any value' => [$shortcut, ['$ref' => '#/$defs/types/variable']];
 
+        $connections = (new ArrayNodeDefinition('connections'))
+            ->useAttributeAsKey('name')
+            ->acceptElementsAtParentLevel()
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('driver')->end()
+                ->end()
+            ->end();
+        $elementsAtParentLevel = (new ArrayNodeDefinition('node'))
+            ->beforeNormalization()
+                ->ifTrue(static fn ($v) => \is_array($v) && !isset($v['connections']))
+                ->then(static fn ($v) => ['connections' => [$v]])
+            ->end()
+            ->children()
+                ->scalarNode('default_connection')->end()
+            ->end()
+            ->append($connections)
+            ->getNode();
+        yield 'the elements of a child declared as accepted at the parent level are described' => [$elementsAtParentLevel, [
+            'anyOf' => [
+                [
+                    '$ref' => '#/$defs/types/object_null',
+                    'properties' => [
+                        'default_connection' => ['$ref' => '#/$defs/types/scalar'],
+                        'connections' => [
+                            '$ref' => '#/$defs/types/object_null',
+                            'additionalProperties' => [
+                                '$ref' => '#/$defs/types/object_null',
+                                'properties' => ['driver' => ['$ref' => '#/$defs/types/scalar']],
+                                'additionalProperties' => false,
+                            ],
+                        ],
+                    ],
+                    'additionalProperties' => false,
+                ],
+                [
+                    '$ref' => '#/$defs/types/object_null',
+                    'properties' => [
+                        'default_connection' => ['$ref' => '#/$defs/types/scalar'],
+                        'driver' => ['$ref' => '#/$defs/types/scalar'],
+                    ],
+                    'additionalProperties' => false,
+                ],
+            ],
+        ]];
+
+        $connectionsWithKeyAttribute = (new ArrayNodeDefinition('connections'))
+            ->useAttributeAsKey('name')
+            ->acceptElementsAtParentLevel()
+            ->prototype('array')
+                ->children()
+                    ->scalarNode('name')->end()
+                    ->scalarNode('host')->end()
+                ->end()
+            ->end();
+        $keyAttributeAtParentLevel = (new ArrayNodeDefinition('node'))
+            ->beforeNormalization()
+                ->ifTrue(static fn ($v) => \is_array($v) && !isset($v['connections']))
+                ->then(static fn ($v) => ['connections' => [$v]])
+            ->end()
+            ->children()
+                ->scalarNode('default_connection')->end()
+            ->end()
+            ->append($connectionsWithKeyAttribute)
+            ->getNode();
+        yield 'the key attribute of the elements is not provided at the parent level' => [$keyAttributeAtParentLevel, [
+            'anyOf' => [
+                [
+                    '$ref' => '#/$defs/types/object_null',
+                    'properties' => [
+                        'default_connection' => ['$ref' => '#/$defs/types/scalar'],
+                        'connections' => [
+                            '$ref' => '#/$defs/types/object_null',
+                            'additionalProperties' => [
+                                '$ref' => '#/$defs/types/object_null',
+                                'properties' => [
+                                    'name' => ['$ref' => '#/$defs/types/scalar'],
+                                    'host' => ['$ref' => '#/$defs/types/scalar'],
+                                ],
+                                'additionalProperties' => false,
+                            ],
+                        ],
+                    ],
+                    'additionalProperties' => false,
+                ],
+                [
+                    '$ref' => '#/$defs/types/object_null',
+                    'properties' => [
+                        'default_connection' => ['$ref' => '#/$defs/types/scalar'],
+                        'host' => ['$ref' => '#/$defs/types/scalar'],
+                    ],
+                    'additionalProperties' => false,
+                ],
+            ],
+        ]];
+
         $castToArray = (new ArrayNodeDefinition('node'))->beforeNormalization()->castToArray()->end()->scalarPrototype()->end()->getNode();
         yield 'a list cast from any value accepts any value' => [$castToArray, ['$ref' => '#/$defs/types/variable']];
 

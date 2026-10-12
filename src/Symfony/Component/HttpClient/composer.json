@@ -29,8 +29,10 @@
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
+        "amphp/dns": "^2.1.2",
         "amphp/http-client": "^5.3.2",
         "amphp/http-tunnel": "^2.0",
+        "amphp/socket": "^2.3.1",
         "guzzlehttp/guzzle": "^7.10|^8.0",
         "nyholm/psr7": "^1.0",
         "php-http/httplug": "^1.0|^2.0",

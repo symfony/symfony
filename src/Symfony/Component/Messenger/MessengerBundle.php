@@ -594,6 +594,15 @@ class MessengerBundle extends AbstractBundle
                 ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($transportSerializerId)])
                 ->addTag('messenger.receiver', $tags)
             ;
+
+            $usedEnvs = [];
+            $container->resolveEnvPlaceholders($transport['dsn'], null, $usedEnvs);
+
+            // the test environment can also use an env var to select an in-memory transport
+            if ($usedEnvs || str_starts_with($transport['dsn'], 'in-memory://')) {
+                $transportDefinition->addTag('kernel.test_state', ['keep' => true]);
+            }
+
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
 

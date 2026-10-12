@@ -563,6 +563,24 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertEquals($expectedRateLimitersByRateLimitedTransports, $rateLimitedTransports);
     }
 
+    public function testMessengerTransportsThatCanBeInMemoryKeepTheirStateUntilTheEndOfATest()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'memory' => 'in-memory://',
+                    'env' => '%env(MESSENGER_TRANSPORT_DSN)%',
+                    'amqp' => 'amqp://localhost/%2f/messages',
+                    'sync' => 'sync://',
+                ],
+            ]);
+        });
+
+        foreach (['memory' => true, 'env' => true, 'amqp' => false, 'sync' => false] as $name => $kept) {
+            $this->assertSame($kept ? [['keep' => true]] : [], $container->getDefinition('messenger.transport.'.$name)->getTag('kernel.test_state'), $name);
+        }
+    }
+
     public function testMessengerClaimCheckSerializer()
     {
         $container = $this->createContainerFromFile('messenger_claim_check');

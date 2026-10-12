@@ -20,12 +20,16 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnIdleListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 
 /**
  * Assertions and helpers for the messages queued on in-memory Messenger transports.
+ *
+ * The kernel empties in-memory transports before each request of the test client.
+ * These helpers still see the messages queued during the previous requests, until the kernel is shut down at the end of the test.
  */
 trait MessengerAssertionsTrait
 {
@@ -56,7 +60,13 @@ trait MessengerAssertionsTrait
      */
     public static function getQueuedMessages(string $transport): array
     {
-        return self::getMessengerTransport($transport)->all();
+        $envelopes = [];
+
+        foreach (self::getInMemoryTransports($transport) as $inMemoryTransport) {
+            $envelopes[] = $inMemoryTransport->all();
+        }
+
+        return array_merge(...$envelopes);
     }
 
     /**
@@ -84,10 +94,10 @@ trait MessengerAssertionsTrait
         $receivers = [];
 
         if (null !== $transport) {
-            $receivers[$transport] = self::createRetryAwareReceiver(self::getMessengerTransport($transport));
+            $receivers[$transport] = self::createRetryAwareReceiver(self::getInMemoryTransports($transport));
         } else {
-            foreach (self::getInMemoryMessengerTransports() as $name => $inMemoryTransport) {
-                $receivers[$name] = self::createRetryAwareReceiver($inMemoryTransport, true);
+            foreach (array_keys(self::getInMemoryMessengerTransports()) as $name) {
+                $receivers[$name] = self::createRetryAwareReceiver(self::getInMemoryTransports($name), true);
             }
         }
 
@@ -182,17 +192,40 @@ trait MessengerAssertionsTrait
     }
 
     /**
+     * Returns the copies of an in-memory transport kept when the client reset the kernel, then the transport itself.
+     *
+     * @return non-empty-list<InMemoryTransport>
+     */
+    private static function getInMemoryTransports(string $transport): array
+    {
+        $inMemoryTransport = self::getMessengerTransport($transport);
+        $container = static::getContainer();
+
+        return [...($container instanceof TestContainer ? $container->getKeptState('messenger.transport.'.$transport) : []), $inMemoryTransport];
+    }
+
+    /**
      * Reads the messages sent for retry without waiting for their delay, so that a test does not have to.
      *
-     * @param bool $skipFailedMessages Leaves the messages sent to a failure transport where they are
+     * @param non-empty-list<InMemoryTransport> $transports         The live transport comes last
+     * @param bool                              $skipFailedMessages Leaves the messages sent to a failure transport where they are
      */
-    private static function createRetryAwareReceiver(InMemoryTransport $transport, bool $skipFailedMessages = false): ReceiverInterface
+    private static function createRetryAwareReceiver(array $transports, bool $skipFailedMessages = false): ReceiverInterface
     {
-        return new class($transport, $skipFailedMessages) implements ReceiverInterface {
+        return new class($transports, $skipFailedMessages) implements ReceiverInterface {
+            /**
+             * @var \WeakMap<TransportMessageIdStamp, InMemoryTransport>
+             */
+            private \WeakMap $origins;
+
+            /**
+             * @param non-empty-list<InMemoryTransport> $transports
+             */
             public function __construct(
-                private InMemoryTransport $transport,
+                private array $transports,
                 private bool $skipFailedMessages,
             ) {
+                $this->origins = new \WeakMap();
             }
 
             /**
@@ -201,47 +234,80 @@ trait MessengerAssertionsTrait
             public function get(): iterable
             {
                 $fetchSize = \func_num_args() > 0 ? max(1, func_get_arg(0)) : 1;
-                $envelopes = [];
 
-                foreach ($this->transport->get(\PHP_INT_MAX) as $envelope) {
-                    if ($this->skipFailedMessages && $envelope->last(SentToFailureTransportStamp::class)) {
-                        continue;
+                foreach ($this->transports as $transport) {
+                    $envelopes = [];
+
+                    foreach ($transport->get(\PHP_INT_MAX) as $envelope) {
+                        if ($this->skipFailedMessages && $envelope->last(SentToFailureTransportStamp::class)) {
+                            continue;
+                        }
+
+                        $envelopes[] = $envelope;
+
+                        if (\count($envelopes) >= $fetchSize) {
+                            break;
+                        }
                     }
 
-                    $envelopes[] = $envelope;
-
-                    if (\count($envelopes) >= $fetchSize) {
-                        break;
+                    if ($envelopes) {
+                        return $this->track($transport, $envelopes);
                     }
                 }
 
-                if ($envelopes) {
-                    return $envelopes;
+                foreach ($this->transports as $transport) {
+                    $envelopes = [];
+
+                    foreach ($transport->all() as $envelope) {
+                        if (!$envelope->last(RedeliveryStamp::class) || $this->skipFailedMessages && $envelope->last(SentToFailureTransportStamp::class)) {
+                            continue;
+                        }
+
+                        $envelopes[] = $envelope;
+
+                        if (\count($envelopes) >= $fetchSize) {
+                            break;
+                        }
+                    }
+
+                    if ($envelopes) {
+                        return $this->track($transport, $envelopes);
+                    }
                 }
 
-                foreach ($this->transport->all() as $envelope) {
-                    if (!$envelope->last(RedeliveryStamp::class) || $this->skipFailedMessages && $envelope->last(SentToFailureTransportStamp::class)) {
-                        continue;
-                    }
+                return [];
+            }
 
-                    $envelopes[] = $envelope;
+            public function ack(Envelope $envelope): void
+            {
+                $this->getOrigin($envelope)->ack($envelope);
+            }
 
-                    if (\count($envelopes) >= $fetchSize) {
-                        break;
-                    }
+            public function reject(Envelope $envelope): void
+            {
+                $this->getOrigin($envelope)->reject($envelope);
+            }
+
+            /**
+             * @param list<Envelope> $envelopes
+             *
+             * @return list<Envelope>
+             */
+            private function track(InMemoryTransport $transport, array $envelopes): array
+            {
+                foreach ($envelopes as $envelope) {
+                    // ids restart at 1 when the kernel reboots, so the instance of the stamp tells where an envelope comes from
+                    $this->origins[$envelope->last(TransportMessageIdStamp::class)] = $transport;
                 }
 
                 return $envelopes;
             }
 
-            public function ack(Envelope $envelope): void
+            private function getOrigin(Envelope $envelope): InMemoryTransport
             {
-                $this->transport->ack($envelope);
-            }
+                $stamp = $envelope->last(TransportMessageIdStamp::class);
 
-            public function reject(Envelope $envelope): void
-            {
-                $this->transport->reject($envelope);
+                return null !== $stamp && isset($this->origins[$stamp]) ? $this->origins[$stamp] : $this->transports[array_key_last($this->transports)];
             }
         };
     }

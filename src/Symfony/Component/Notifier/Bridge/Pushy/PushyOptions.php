@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\Pushy;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Notifier\Bridge\Pushy\Enum\InterruptionLevel;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
@@ -25,6 +27,7 @@ final class PushyOptions implements MessageOptionsInterface
 {
     public function __construct(
         private array $options = [],
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -114,11 +117,9 @@ final class PushyOptions implements MessageOptionsInterface
      */
     public function schedule(int $seconds): static
     {
-        if (false === \DateTime::createFromFormat('U', $seconds)) {
-            throw new InvalidArgumentException('Pushy notification schedule time must be correct Unix timestamp.');
-        }
+        $now = $this->clock?->now() ?? (class_exists(Clock::class) ? Clock::get()->now() : \DateTimeImmutable::createFromTimestamp(time()));
 
-        if (\DateTime::createFromFormat('U', $seconds) >= new \DateTime('+1 year')) {
+        if (\DateTime::createFromTimestamp($seconds) >= $now->modify('+1 year')) {
             throw new InvalidArgumentException('Pushy notification schedule time cannot exceed 1 year.');
         }
 

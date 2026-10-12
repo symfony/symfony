@@ -93,6 +93,14 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
             ])
 
+        // the DPoP proofs already seen and the provider sessions that ended, which every server must share
+        ->set('cache.security')
+            ->parent('cache.app')
+            ->private()
+            ->tag('cache.pool')
+            ->tag('kernel.test_state', ['method' => 'clear'])
+            ->tag('container.remove_if_missing', ['service' => 'cache.app'])
+
         ->set('security.authenticator.access_token.protected_resource_metadata_controller', ProtectedResourceMetadataController::class)
             ->public()
             ->args([
@@ -252,6 +260,14 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.access_token_handler.oidc.encryption.A256GCM', A256GCM::class)
             ->tag('security.access_token_handler.oidc.encryption_algorithm')
+
+        // the discovery documents and the keys of the providers, read by the "oauth2" token handler and by "oidc_login"
+        ->set('cache.security.discovery')
+            ->parent('cache.app')
+            ->private()
+            ->tag('cache.pool')
+            ->tag('kernel.test_state', ['method' => 'clear'])
+            ->tag('container.remove_if_missing', ['service' => 'cache.app'])
 
         // OAuth2 Introspection (RFC 7662)
         ->set('security.access_token_handler.oauth2', Oauth2TokenHandler::class)

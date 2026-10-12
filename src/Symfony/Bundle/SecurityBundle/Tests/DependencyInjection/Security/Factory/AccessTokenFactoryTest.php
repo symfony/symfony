@@ -854,6 +854,31 @@ class AccessTokenFactoryTest extends TestCase
         ], $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
     }
 
+    public function testOAuth2TokenHandlerConfigurationWithASignedResponseDiscovery()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oauth2' => [
+                    'audience' => 'https://api.example.com',
+                    'issuer' => 'https://www.example.com',
+                    'response_signature' => [
+                        'discovery' => true,
+                    ],
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        [, [$method, $arguments]] = $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls();
+        $this->assertSame('enableSignedResponseDiscovery', $method);
+        $this->assertEquals(new Reference('cache.security.discovery'), $arguments[0]);
+    }
+
     public function testOAuth2TokenHandlerConfigurationWithASignedResponseDisabled()
     {
         $container = new ContainerBuilder();
@@ -1013,7 +1038,7 @@ class AccessTokenFactoryTest extends TestCase
 
         $senderConstraint = $container->getDefinition($senderConstraintId);
         $this->assertSame(['ES256', 'PS256', 'RS256'], $senderConstraint->getArgument(0)->getArgument(0));
-        $this->assertSame('cache.app', (string) $senderConstraint->getArgument(1));
+        $this->assertSame('cache.security', (string) $senderConstraint->getArgument(1));
         $this->assertSame(60, $senderConstraint->getArgument(3));
         $this->assertSame(5, $senderConstraint->getArgument(4));
 

@@ -62,7 +62,7 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('OIDC discovery'),
-                service('cache.app'),
+                service('cache.security.discovery'),
                 service('http_client'),
                 abstract_arg('signature algorithms'),
                 abstract_arg('default JWKS cache TTL'),
@@ -81,7 +81,7 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 service('http_client'),
-                service('cache.app'),
+                service('cache.security.discovery'),
                 // relative to the issuer below, which OidcDiscovery normalizes at runtime
                 '.well-known/openid-configuration',
                 abstract_arg('issuer'),

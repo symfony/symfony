@@ -181,7 +181,7 @@ class OAuth2TokenHandlerFactory implements TokenHandlerFactoryInterface
                                         ->children()
                                             ->scalarNode('id')
                                                 ->info('Cache service id the metadata document and the keys it points at are stored in.')
-                                                ->defaultValue('cache.app')
+                                                ->defaultValue('cache.security.discovery')
                                                 ->cannotBeEmpty()
                                             ->end()
                                         ->end()

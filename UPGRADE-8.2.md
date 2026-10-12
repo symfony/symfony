@@ -188,6 +188,7 @@ HttpClient
 
  * [BC BREAK] Widen the type of the `$buffer` argument of `HttpOptions::buffer()` from `bool` to `mixed`, so that the stream and closure forms the option accepts can be passed; a class extending `HttpOptions` and overriding that method must widen it too
  * [BC BREAK] An explicit `http_version` of `2.0` makes `CurlHttpClient` and `AmpHttpClient` require HTTP/2: they use prior knowledge on `http://` URLs instead of offering an upgrade, and offer only `h2` during the TLS handshake on `https://` URLs (with curl 8.10 or higher); servers that speak only HTTP/1.1 are not reachable that way anymore, unset the option for them
+ * `KernelTestCase::ensureKernelShutdown()` now clears the responses cached in the `cache.http_client` pool when `framework.test` is enabled, so that each test starts with no cached response. A test that relied on a response cached by a previous test, or before a kernel shutdown in the same test, should request it itself
 
 HttpFoundation
 --------------
@@ -397,6 +398,7 @@ Scheduler
  * `MessageContext::$trigger` is a `SerializedTrigger` once its message has crossed a transport. Triggers can hold
    closures or any other non-serializable state, so only their description travels, and `getNextRunDate()` throws
    on the receiving side
+ * `KernelTestCase::ensureKernelShutdown()` now clears the `cache.scheduler` pool when `framework.test` is enabled, so that stateful schedules start fresh in each test. A test that relied on the runs recorded by a previous test, or before a kernel shutdown in the same test, should run the schedule itself
 
 Security
 --------
@@ -469,6 +471,7 @@ SecurityBundle
  * Deprecate the `Symfony\Component\Security\Http\Firewall` autowiring alias, the firewall listens to kernel events and is not meant to be injected
  * Deprecate the `ExpressionCacheWarmer` class, as the expressions of `access_control` rules are compiled when warming up the cache
  * The `security.expression_language` service is decorated by a `CompiledExpressionLanguage`; inject it as a `Symfony\Component\ExpressionLanguage\ExpressionLanguage`, not as a `Symfony\Component\Security\Core\Authorization\ExpressionLanguage`
+ * `KernelTestCase::ensureKernelShutdown()` now clears the `security.authenticator.cache.expired_links` pool when `framework.test` is enabled, so that the `max_uses` option of login links counts the uses of each test only. A test that relied on a login link used by a previous test, or before a kernel shutdown in the same test, should use the link itself
 
 Serializer
 ----------

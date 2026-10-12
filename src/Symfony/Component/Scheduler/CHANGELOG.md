@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Tag the `cache.scheduler` pool with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
  * Use the global clock to resolve relative dates in the `$from` and `$until` arguments of `PeriodicalTrigger`
  * Add a `$clock` argument to `DebugCommand` to resolve relative dates in the `--date` option of `debug:scheduler`
  * Yield the message of a `RedispatchMessage` with a `RedispatchStamp`, and with a `TransportNamesStamp` when it names transports, instead of the `RedispatchMessage` itself

@@ -30,6 +30,7 @@ return static function (ContainerConfigurator $container) {
         ->set('cache.http_client.pool')
             ->parent('cache.app')
             ->tag('cache.pool')
+            ->tag('kernel.test_state', ['method' => 'clear'])
             ->tag('container.remove_if_missing', ['service' => 'cache.app'])
 
         ->set('cache.http_client', TagAwareAdapter::class)

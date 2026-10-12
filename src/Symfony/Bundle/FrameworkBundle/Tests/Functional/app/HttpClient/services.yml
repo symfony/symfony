@@ -16,7 +16,11 @@ services:
         decorates: http_client.transport
         arguments: ['@.inner']
 
-    # keeps the otherwise unreferenced opted-out client alive for the tests
+    # keep the otherwise unreferenced clients alive for the tests
     test.not_mocked.http_client:
         alias: not_mocked.http_client
+        public: true
+
+    test.cached.http_client:
+        alias: cached.http_client
         public: true

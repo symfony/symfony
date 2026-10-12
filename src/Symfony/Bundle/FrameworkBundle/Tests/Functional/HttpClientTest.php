@@ -162,4 +162,24 @@ class HttpClientTest extends AbstractWebTestCase
             'GET https://b.example.com/posts/1 X-Scoped: yes',
         ], TransportDecorator::$requests);
     }
+
+    public function testCachedResponsesAreClearedWhenTheKernelIsShutDown()
+    {
+        static::bootKernel(['test_case' => 'HttpClient', 'root_config' => 'config.yml']);
+        $this->assertSame('first', $this->requestCachedResource('first'));
+        $this->assertSame('first', $this->requestCachedResource('second'));
+
+        self::ensureKernelShutdown();
+
+        static::bootKernel(['test_case' => 'HttpClient', 'root_config' => 'config.yml']);
+        $this->assertSame('second', $this->requestCachedResource('second'));
+    }
+
+    private function requestCachedResource(string $mockedContent): string
+    {
+        $container = static::getContainer();
+        $container->get('http_client.mock_transport')->setResponseFactory(new MockResponse($mockedContent, ['response_headers' => ['cache-control' => 'max-age=300']]));
+
+        return $container->get('test.cached.http_client')->request('GET', '/')->getContent();
+    }
 }

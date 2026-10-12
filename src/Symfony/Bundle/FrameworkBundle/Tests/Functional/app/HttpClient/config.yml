@@ -12,3 +12,7 @@ framework:
             not_mocked.http_client:
                 base_uri: 'https://symfony.com'
                 mock_response_factory: false
+            cached.http_client:
+                base_uri: 'https://symfony.com'
+                mock_response_factory: true
+                caching: true

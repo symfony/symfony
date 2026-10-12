@@ -56,7 +56,8 @@ class NativeClockTest extends TestCase
 
         $before = microtime(true);
         $clock->sleep(1.5);
-        $now = (float) $clock->now()->format('U.u');
+        $date = $clock->now();
+        $now = $date->getTimestamp() + $date->getMicrosecond() / 1e6;
         usleep(10);
         $after = microtime(true);
 

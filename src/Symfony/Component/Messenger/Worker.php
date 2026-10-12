@@ -95,7 +95,7 @@ class Worker
             'time_limit' => null,
         ], $options);
         $queueNames = $options['queues'] ?? null;
-        $endTime = null !== $options['time_limit'] ? $this->clock->now()->format('U.u') + $options['time_limit'] : null;
+        $endTime = null !== $options['time_limit'] ? $this->now() + $options['time_limit'] : null;
         $bufferedEnvelopes = [];
 
         $this->metadata->set(['queueNames' => $queueNames]);
@@ -112,13 +112,13 @@ class Worker
         }
 
         while (!$this->shouldStop) {
-            if (null !== $endTime && $this->clock->now()->format('U.u') >= $endTime) {
+            if (null !== $endTime && $this->now() >= $endTime) {
                 $this->logger?->info('Worker stopped due to time limit of {timeLimit}s exceeded', ['timeLimit' => $options['time_limit']]);
                 break;
             }
 
             $envelopeHandled = false;
-            $envelopeHandledStart = $this->clock->now();
+            $envelopeHandledStart = $this->now();
             $fetchSize = max(1, $options['fetch_size'] ?? 1);
 
             if ($this->messageExecutionStrategy->shouldPauseConsumption()
@@ -195,17 +195,17 @@ class Worker
                     continue;
                 }
 
-                if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->clock->now()->format('U.u') - $envelopeHandledStart->format('U.u')))) {
+                if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->now() - $envelopeHandledStart))) {
                     if (null !== $endTime) {
-                        $sleep = min($sleep, (int) (1e6 * ($endTime - $this->clock->now()->format('U.u'))));
+                        $sleep = min($sleep, (int) (1e6 * ($endTime - $this->now())));
                     }
 
                     if (0 < $sleep) {
-                        $sleepStart = $this->clock->now()->format('U.u');
+                        $sleepStart = $this->now();
 
                         // messages in flight are acknowledged as soon as they are handled, instead of after the sleep
                         if (!$this->messageExecutionStrategy->wait($this->preAck(...), $sleep / 1e6)) {
-                            $sleep -= (int) (1e6 * ($this->clock->now()->format('U.u') - $sleepStart));
+                            $sleep -= (int) (1e6 * ($this->now() - $sleepStart));
 
                             if (0 < $sleep) {
                                 $this->clock->sleep($sleep / 1e6);
@@ -254,7 +254,7 @@ class Worker
             $this->acks[] = [$transportName, $envelope, $e];
         } elseif ($noAutoAckStamp) {
             $this->unacks ??= new DeferredBatchMessageQueue();
-            $this->unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $transportName, $envelope->withoutAll(AckStamp::class), $acked, (float) $this->clock->now()->format('U.u'));
+            $this->unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $transportName, $envelope->withoutAll(AckStamp::class), $acked, $this->now());
         }
 
         $this->ack();
@@ -349,7 +349,7 @@ class Worker
             return $flushed;
         }
 
-        $unacks = $this->unacks->popFlushable($force, (float) $this->clock->now()->format('U.u'));
+        $unacks = $this->unacks->popFlushable($force, $this->now());
 
         if (!$unacks->count()) {
             return $flushed;
@@ -382,7 +382,7 @@ class Worker
                 $this->acks[] = [$transportName, $envelope, $e];
             } elseif ($noAutoAckStamp) {
                 $this->unacks ??= new DeferredBatchMessageQueue();
-                $this->unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $transportName, $envelope->withoutAll(AckStamp::class), $deferredMessage->acked, (float) $this->clock->now()->format('U.u'));
+                $this->unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $transportName, $envelope->withoutAll(AckStamp::class), $deferredMessage->acked, $this->now());
             }
         }
 
@@ -426,5 +426,12 @@ class Worker
     public function getMetadata(): WorkerMetadata
     {
         return $this->metadata;
+    }
+
+    private function now(): float
+    {
+        $now = $this->clock->now();
+
+        return \PHP_INT_SIZE >= 8 ? $now->getTimestamp() + $now->getMicrosecond() / 1e6 : (float) $now->format('U.u');
     }
 }

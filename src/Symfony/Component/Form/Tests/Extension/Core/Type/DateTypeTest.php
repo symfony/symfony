@@ -230,7 +230,7 @@ class DateTypeTest extends BaseTypeTestCase
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $form->getData());
+        $this->assertEquals($dateTime->getTimestamp(), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
@@ -407,7 +407,7 @@ class DateTypeTest extends BaseTypeTestCase
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $form->getData());
+        $this->assertEquals($dateTime->getTimestamp(), $form->getData());
         $this->assertEquals('06*2010*02', $form->getViewData());
     }
 

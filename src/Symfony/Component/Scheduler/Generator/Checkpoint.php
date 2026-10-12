@@ -114,9 +114,14 @@ final class Checkpoint implements CheckpointInterface
             $this->lock->release();
         } elseif ($remaining = $this->lock->getRemainingLifetime()) {
             // the lock might have expired during a long run; stores reject negative TTLs and some reject TTLs below one second
-            if (1 <= $ttl = (float) $nextTime->format('U.u') - (float) $now->format('U.u') + $remaining) {
+            if (1 <= $ttl = self::toTimestamp($nextTime) - self::toTimestamp($now) + $remaining) {
                 $this->lock->refresh($ttl);
             }
         }
+    }
+
+    private static function toTimestamp(\DateTimeInterface $date): float
+    {
+        return \PHP_INT_SIZE >= 8 ? $date->getTimestamp() + $date->getMicrosecond() / 1e6 : (float) $date->format('U.u');
     }
 }

@@ -572,7 +572,7 @@ class Connection implements ResetInterface
     {
         $availableAt = $now->modify(\sprintf('%+d milliseconds', $delay));
 
-        if (0 < $delay && '000000' !== $availableAt->format('u')) {
+        if (0 < $delay && 0 !== $availableAt->getMicrosecond()) {
             // "available_at" is stored with second precision, so a truncated instant would make
             // the message available before the delay elapsed
             $availableAt = $availableAt->modify('+1 second');

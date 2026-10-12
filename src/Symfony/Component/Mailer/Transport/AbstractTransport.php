@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Psr\Clock\ClockInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -161,7 +162,7 @@ abstract class AbstractTransport implements TransportInterface
         }
 
         $clock = class_exists(Clock::class) ? Clock::get() : null;
-        $sleep = (1 / $this->rate) - (($clock ? (float) $clock->now()->format('U.u') : microtime(true)) - $this->lastSent);
+        $sleep = (1 / $this->rate) - (self::now($clock) - $this->lastSent);
         if (0 < $sleep) {
             $this->logger->debug(\sprintf('Email transport "%s" sleeps for %.2f seconds', __CLASS__, $sleep));
             if ($clock) {
@@ -170,6 +171,17 @@ abstract class AbstractTransport implements TransportInterface
                 usleep((int) ($sleep * 1000000));
             }
         }
-        $this->lastSent = $clock ? (float) $clock->now()->format('U.u') : microtime(true);
+        $this->lastSent = self::now($clock);
+    }
+
+    private static function now(?ClockInterface $clock): float
+    {
+        if (null === $clock) {
+            return microtime(true);
+        }
+
+        $now = $clock->now();
+
+        return \PHP_INT_SIZE >= 8 ? $now->getTimestamp() + $now->getMicrosecond() / 1e6 : (float) $now->format('U.u');
     }
 }

@@ -717,7 +717,9 @@ class Response
             return (int) $age;
         }
 
-        return max(time() - (int) $this->getDate()->format('U'), 0);
+        $date = $this->getDate();
+
+        return max(time() - (\PHP_INT_SIZE >= 8 ? $date->getTimestamp() : (int) $date->format('U')), 0);
     }
 
     /**
@@ -794,7 +796,8 @@ class Response
         }
 
         if (null !== $expires = $this->getExpires()) {
-            $maxAge = (int) $expires->format('U') - (int) $this->getDate()->format('U');
+            $date = $this->getDate();
+            $maxAge = \PHP_INT_SIZE >= 8 ? $expires->getTimestamp() - $date->getTimestamp() : (int) $expires->format('U') - (int) $date->format('U');
 
             return max($maxAge, 0);
         }

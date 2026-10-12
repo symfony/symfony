@@ -163,7 +163,7 @@ class Cookie
     {
         // convert expiration time to a Unix timestamp
         if ($expire instanceof \DateTimeInterface) {
-            $expire = $expire->format('U');
+            $expire = \PHP_INT_SIZE >= 8 ? $expire->getTimestamp() : $expire->format('U');
         } elseif (!is_numeric($expire)) {
             $expire = strtotime($expire);
 

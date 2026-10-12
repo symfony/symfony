@@ -434,11 +434,13 @@ class WorkerTest extends TestCase
         });
 
         $worker = new Worker(['transport' => new DummyReceiver([])], new MessageBus(), $dispatcher, clock: $clock, messageExecutionStrategy: $strategy);
-        $start = (float) $clock->now()->format('U.u');
+        $now = $clock->now();
+        $start = $now->getTimestamp() + $now->getMicrosecond() / 1e6;
         $worker->run(['sleep' => 1000000]);
+        $now = $clock->now();
 
         $this->assertSame([1.0], $strategy->timeouts);
-        $this->assertEqualsWithDelta($expectedElapsed, (float) $clock->now()->format('U.u') - $start, 0.001);
+        $this->assertEqualsWithDelta($expectedElapsed, $now->getTimestamp() + $now->getMicrosecond() / 1e6 - $start, 0.001);
     }
 
     public static function provideIdleWaits(): iterable

@@ -441,7 +441,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         return $this->clock ?? new class implements ClockInterface {
             public function now(): \DateTimeImmutable
             {
-                return new \DateTimeImmutable('@'.time());
+                return \DateTimeImmutable::createFromTimestamp(time());
             }
         };
     }

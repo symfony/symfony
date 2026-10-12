@@ -174,7 +174,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
 
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $form->getData());
+        $this->assertEquals($dateTime->getTimestamp(), $form->getData());
     }
 
     public function testSubmitWithoutMinutes()

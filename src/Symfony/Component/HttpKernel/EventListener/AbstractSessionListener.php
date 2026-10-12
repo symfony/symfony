@@ -211,6 +211,15 @@ abstract class AbstractSessionListener implements EventSubscriberInterface, Rese
                 ->setPrivate()
                 ->setMaxAge($maxAge)
                 ->headers->addCacheControlDirective('must-revalidate');
+
+            // Fields like CDN-Cache-Control replace Cache-Control for the caches they target (RFC 9213).
+            // We overwrite these fields instead of removing them, so that a 304 also updates the copy a CDN may have stored before.
+            $cacheControl = $response->headers->get('Cache-Control');
+            foreach (array_keys($response->headers->allPreserveCase()) as $name) {
+                if (str_ends_with(strtolower($name), '-cache-control')) {
+                    $response->headers->set($name, $cacheControl);
+                }
+            }
         }
 
         if (!$event->getRequest()->attributes->get('_stateless', false)) {

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-10-12T04:02:57Z
+
+The "Unit Tests (8.4, high-deps)" failure is not caused by this change: Composer got an empty zip for symfony/dependency-injection while it installed the FrameworkBundle dependencies, so the tests did not run.

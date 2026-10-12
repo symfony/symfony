@@ -77,7 +77,7 @@ final class UuidFactoryTest extends TestCase
         $this->assertInstanceOf(UuidV1::class, $uuid3);
 
         // Test negative timestamp and round
-        $uuid4 = $uuidFactory->timeBased()->create(\DateTimeImmutable::createFromTimestamp(-12219292800));
+        $uuid4 = $uuidFactory->timeBased()->create(new \DateTimeImmutable('@-12219292800'));
         $this->assertSame('-12219292800.000000', $uuid4->getDateTime()->format('U.u'));
     }
 

@@ -113,8 +113,8 @@ class UlidTest extends TestCase
 
         $this->assertEquals(\DateTimeImmutable::createFromTimestamp(0), (new Ulid('000000000079KA1307SR9X4MV3'))->getDateTime());
         $this->assertEquals(\DateTimeImmutable::createFromTimestamp(0.001), (new Ulid('000000000179KA1307SR9X4MV3'))->getDateTime());
-        $this->assertEquals(\DateTimeImmutable::createFromTimestamp(281474976710)->setMicrosecond(654000), (new Ulid('7ZZZZZZZZY79KA1307SR9X4MV3'))->getDateTime());
-        $this->assertEquals(\DateTimeImmutable::createFromTimestamp(281474976710)->setMicrosecond(655000), (new Ulid('7ZZZZZZZZZ79KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.654'), (new Ulid('7ZZZZZZZZY79KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.655'), (new Ulid('7ZZZZZZZZZ79KA1307SR9X4MV3'))->getDateTime());
     }
 
     public function testIsValid()
@@ -386,7 +386,7 @@ class UlidTest extends TestCase
 
     public function testCreateBoundariesLeavesTheGeneratorClockAlone()
     {
-        Ulid::createBoundaries(\DateTimeImmutable::createFromTimestamp(4102444800));
+        Ulid::createBoundaries(new \DateTimeImmutable('@4102444800'));
 
         $this->assertLessThan(new \DateTimeImmutable('+1 day'), new Ulid()->getDateTime());
     }

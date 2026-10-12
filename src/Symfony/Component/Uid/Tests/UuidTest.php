@@ -152,7 +152,7 @@ class UuidTest extends TestCase
 
         $uuid = new UuidV6(substr_replace(self::A_UUID_V1, '6', 14, 1));
 
-        $this->assertEquals(\DateTimeImmutable::createFromTimestamp(85916308548)->setMicrosecond(278321), $uuid->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '85916308548.278321'), $uuid->getDateTime());
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
@@ -703,7 +703,7 @@ class UuidTest extends TestCase
 
     public function testCreateBoundariesLeavesTheGeneratorClockAlone()
     {
-        UuidV7::createBoundaries(\DateTimeImmutable::createFromTimestamp(4102444800));
+        UuidV7::createBoundaries(new \DateTimeImmutable('@4102444800'));
 
         $this->assertLessThan(new \DateTimeImmutable('+1 day'), new UuidV7()->getDateTime());
     }

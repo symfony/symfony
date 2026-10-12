@@ -50,7 +50,7 @@ class DkimSignerTest extends TestCase
     #[DataProvider('getSignData')]
     public function testSign(int $time, string $bodyCanon, string $headerCanon, string $header)
     {
-        self::mockTime(new \DateTimeImmutable('@'.$time));
+        self::mockTime(\DateTimeImmutable::createFromTimestamp($time));
 
         $message = (new Email())
             ->from(new Address('fabien@testdkim.symfony.net', 'Fabién'))
@@ -96,7 +96,7 @@ class DkimSignerTest extends TestCase
 
     public function testSignatureExpirationFollowsTheClock()
     {
-        self::mockTime(new \DateTimeImmutable('@1591597074'));
+        self::mockTime(\DateTimeImmutable::createFromTimestamp(1591597074));
 
         $message = (new Email())
             ->from('fabien@testdkim.symfony.net')

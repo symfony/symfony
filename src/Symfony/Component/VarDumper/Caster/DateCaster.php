@@ -100,10 +100,10 @@ class DateCaster
                 }
 
                 $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-                $numberOfSeconds = (float) $now->add($p->getDateInterval())->format('U.u') - (float) $now->format('U.u');
+                $numberOfSeconds = self::toTimestamp($now->add($p->getDateInterval())) - self::toTimestamp($now);
 
                 if (0 < $numberOfSeconds) {
-                    $dates[] = \sprintf('%s more', ceil(($end->format('U.u') - $d->format('U.u')) / $numberOfSeconds));
+                    $dates[] = \sprintf('%s more', ceil((self::toTimestamp($end) - self::toTimestamp($d)) / $numberOfSeconds));
                 }
 
                 break;
@@ -132,5 +132,10 @@ class DateCaster
     private static function formatSeconds(string $s, string $us): string
     {
         return \sprintf('%02d.%s', $s, 0 === ($len = \strlen($t = rtrim($us, '0'))) ? '0' : ($len <= 3 ? str_pad($t, 3, '0') : $us));
+    }
+
+    private static function toTimestamp(\DateTimeInterface $date): float
+    {
+        return \PHP_INT_SIZE >= 8 ? $date->getTimestamp() + $date->getMicrosecond() / 1e6 : (float) $date->format('U.u');
     }
 }

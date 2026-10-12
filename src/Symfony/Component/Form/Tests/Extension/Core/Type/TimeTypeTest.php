@@ -146,7 +146,7 @@ class TimeTypeTest extends BaseTypeTestCase
 
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
-        $this->assertEquals($dateTime->format('U'), $form->getData());
+        $this->assertEquals($dateTime->getTimestamp(), $form->getData());
         $this->assertEquals($input, $form->getViewData());
     }
 

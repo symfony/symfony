@@ -48,7 +48,7 @@ class DatePointTest extends TestCase
         $date = new DatePoint($datetime, $timezone);
 
         $this->assertSame($expected->getTimezone()->getName(), $date->getTimezone()->getName());
-        $this->assertSame('000000' === $expected->format('u'), '000000' === $date->format('u'));
+        $this->assertSame(0 === $expected->getMicrosecond(), 0 === $date->getMicrosecond());
         $this->assertEqualsWithDelta($expected->getTimestamp(), $date->getTimestamp(), 1);
     }
 

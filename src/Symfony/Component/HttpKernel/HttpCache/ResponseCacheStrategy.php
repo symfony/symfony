@@ -81,8 +81,10 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
 
         $maxAge = $response->headers->hasCacheControlDirective('max-age') ? (int) $response->headers->getCacheControlDirective('max-age') : null;
         $sharedMaxAge = $response->headers->hasCacheControlDirective('s-maxage') ? (int) $response->headers->getCacheControlDirective('s-maxage') : $maxAge;
-        $expires = $response->getExpires();
-        $expires = null !== $expires ? (int) $expires->format('U') - (int) $response->getDate()->format('U') : null;
+        if (null !== $expires = $response->getExpires()) {
+            $date = $response->getDate();
+            $expires = \PHP_INT_SIZE >= 8 ? $expires->getTimestamp() - $date->getTimestamp() : (int) $expires->format('U') - (int) $date->format('U');
+        }
 
         // See https://datatracker.ietf.org/doc/html/rfc7234#section-4.2.2
         // If a response is "public" but does not have maximum lifetime, heuristics might be applied.

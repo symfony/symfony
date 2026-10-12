@@ -52,8 +52,8 @@ final class MockClock implements ClockInterface
             return;
         }
 
-        $s = (float) $this->now->format('U') + floor($seconds);
-        $us = (int) $this->now->format('u') + (int) round(fmod($seconds, 1) * 1e6);
+        $s = (\PHP_INT_SIZE >= 8 ? $this->now->getTimestamp() : (float) $this->now->format('U')) + floor($seconds);
+        $us = $this->now->getMicrosecond() + (int) round(fmod($seconds, 1) * 1e6);
 
         if (1000000 <= $us) {
             ++$s;

@@ -63,7 +63,7 @@ final class Scheduler
         $options += ['sleep' => 1e6];
 
         while (!$this->shouldStop) {
-            $start = $this->clock->now();
+            $start = $this->now();
 
             $ran = false;
             foreach ($this->generators as $generator) {
@@ -99,7 +99,7 @@ final class Scheduler
             }
 
             if (!$ran) {
-                if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->clock->now()->format('U.u') - $start->format('U.u')))) {
+                if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->now() - $start))) {
                     $this->clock->sleep($sleep / 1e6);
                 }
             }
@@ -109,5 +109,12 @@ final class Scheduler
     public function stop(): void
     {
         $this->shouldStop = true;
+    }
+
+    private function now(): float
+    {
+        $now = $this->clock->now();
+
+        return \PHP_INT_SIZE >= 8 ? $now->getTimestamp() + $now->getMicrosecond() / 1e6 : (float) $now->format('U.u');
     }
 }

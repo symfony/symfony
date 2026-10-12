@@ -98,7 +98,7 @@ class PostgreSqlNotifyOnIdleListener implements EventSubscriberInterface
             return;
         }
 
-        $now = $this->clock?->now()->format('U.u') ?? microtime(true);
+        $now = null !== $this->clock ? self::toTimestamp($this->clock->now()) : microtime(true);
 
         // Cap by worker deadline (--time-limit) — checked first to avoid a SQL query
         // in getEarliestDelayedMessageTime() when the worker is already past its deadline.
@@ -111,7 +111,7 @@ class PostgreSqlNotifyOnIdleListener implements EventSubscriberInterface
 
         // Cap by earliest delayed message across all PG queues: wake up in time to process it
         if (null !== $earliest = $this->getEarliestDelayedMessageTime()) {
-            $msUntilEarliest = ($earliest->format('U.u') - $now) * 1000;
+            $msUntilEarliest = (self::toTimestamp($earliest) - $now) * 1000;
             if (0 >= $timeout = min($timeout, $msUntilEarliest)) {
                 return;
             }
@@ -187,5 +187,10 @@ class PostgreSqlNotifyOnIdleListener implements EventSubscriberInterface
         }
 
         return new \DateTimeImmutable($result, new \DateTimeZone('UTC'));
+    }
+
+    private static function toTimestamp(\DateTimeInterface $date): float
+    {
+        return \PHP_INT_SIZE >= 8 ? $date->getTimestamp() + $date->getMicrosecond() / 1e6 : (float) $date->format('U.u');
     }
 }

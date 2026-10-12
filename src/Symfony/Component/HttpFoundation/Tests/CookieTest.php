@@ -331,11 +331,11 @@ class CookieTest extends TestCase
         $expire = new \DateTime();
         $cookie = Cookie::create('foo', 'bar', $expire);
 
-        $this->assertEquals($expire->format('U'), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
+        $this->assertEquals($expire->getTimestamp(), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
 
         $cookie = Cookie::create('foo')->withExpires($expire);
 
-        $this->assertEquals($expire->format('U'), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
+        $this->assertEquals($expire->getTimestamp(), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
     }
 
     public function testConstructorWithDateTimeImmutable()
@@ -343,11 +343,11 @@ class CookieTest extends TestCase
         $expire = new \DateTimeImmutable();
         $cookie = Cookie::create('foo', 'bar', $expire);
 
-        $this->assertEquals($expire->format('U'), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
+        $this->assertEquals($expire->getTimestamp(), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
 
         $cookie = Cookie::create('foo')->withValue('bar')->withExpires($expire);
 
-        $this->assertEquals($expire->format('U'), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
+        $this->assertEquals($expire->getTimestamp(), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
     }
 
     public function testGetExpiresTimeWithStringValue()

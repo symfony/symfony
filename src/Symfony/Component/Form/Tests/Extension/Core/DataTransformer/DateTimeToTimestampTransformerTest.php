@@ -22,7 +22,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $transformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
 
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
-        $output = $input->format('U');
+        $output = $input->getTimestamp();
 
         $this->assertEquals($output, $transformer->transform($input));
     }
@@ -39,7 +39,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
-        $output = $input->format('U');
+        $output = $input->getTimestamp();
         $input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
         $this->assertEquals($output, $transformer->transform($input));
@@ -53,7 +53,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
 
         $dateTime = clone $input;
         $dateTime->setTimezone(new \DateTimeZone('UTC'));
-        $output = $dateTime->format('U');
+        $output = $dateTime->getTimestamp();
 
         $this->assertEquals($output, $transformer->transform($input));
     }
@@ -63,7 +63,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
         $input = new \DateTimeImmutable('2010-02-03 04:05:06 America/New_York');
-        $output = $input->format('U');
+        $output = $input->getTimestamp();
         $input = $input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
         $this->assertEquals($output, $transformer->transform($input));
@@ -83,7 +83,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $reverseTransformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
-        $input = $output->format('U');
+        $input = $output->getTimestamp();
 
         $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
@@ -100,7 +100,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $reverseTransformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
         $output = new \DateTime('2010-02-03 04:05:06 America/New_York');
-        $input = $output->format('U');
+        $input = $output->getTimestamp();
         $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
         $this->assertEquals($output, $reverseTransformer->reverseTransform($input));

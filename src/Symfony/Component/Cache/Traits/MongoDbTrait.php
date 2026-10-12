@@ -303,7 +303,9 @@ trait MongoDbTrait
     private function now(): float
     {
         if (null !== $this->clock) {
-            return (float) $this->clock->now()->format('U.u');
+            $now = $this->clock->now();
+
+            return \PHP_INT_SIZE >= 8 ? $now->getTimestamp() + $now->getMicrosecond() / 1e6 : (float) $now->format('U.u');
         }
 
         return microtime(true);

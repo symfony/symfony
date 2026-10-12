@@ -36,12 +36,13 @@ class MonotonicClockTest extends TestCase
         $clock = new MonotonicClock();
         $before = microtime(true);
         usleep(10);
-        $now = $clock->now();
+        $date = $clock->now();
         usleep(10);
         $after = microtime(true);
 
-        $this->assertGreaterThan($before, (float) $now->format('U.u'));
-        $this->assertLessThan($after, (float) $now->format('U.u'));
+        $now = $date->getTimestamp() + $date->getMicrosecond() / 1e6;
+        $this->assertGreaterThan($before, $now);
+        $this->assertLessThan($after, $now);
     }
 
     public function testSleep()
@@ -51,11 +52,12 @@ class MonotonicClockTest extends TestCase
 
         $before = microtime(true);
         $clock->sleep(1.5);
-        $now = (float) $clock->now()->format('U.u');
+        $date = $clock->now();
+        $now = $date->getTimestamp() + $date->getMicrosecond() / 1e6;
         usleep(10);
         $after = microtime(true);
 
-        // $now is truncated to the microsecond by format('U.u') while $before is not,
+        // $now is truncated to the microsecond while $before is not,
         // and a double holds barely more precision than that at current timestamps,
         // so the bound has to sit a little further below the 1.5s that was slept
         $this->assertGreaterThanOrEqual($before + 1.4999, $now);

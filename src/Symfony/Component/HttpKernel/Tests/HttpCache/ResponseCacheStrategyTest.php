@@ -412,7 +412,7 @@ class ResponseCacheStrategyTest extends TestCase
 
         foreach ($expects as $key => $value) {
             if ('expires' === $key) {
-                $this->assertSame($value, $response->getExpires()->format('U') - $response->getDate()->format('U'));
+                $this->assertSame($value, $response->getExpires()->getTimestamp() - $response->getDate()->getTimestamp());
             } elseif ('age' === $key) {
                 $this->assertSame($value, $response->getAge());
             } elseif (true === $value) {

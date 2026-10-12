@@ -99,8 +99,8 @@ class PeriodicalTrigger implements StatefulTriggerInterface
             }
 
             $fromDate = $this->from;
-            $from = (float) $fromDate->format('U.u');
-            $delta = $run->format('U.u') - $from;
+            $from = self::toTimestamp($fromDate);
+            $delta = self::toTimestamp($run) - $from;
             $recurrencesPassed = floor($delta / $this->intervalInSeconds);
             $nextRunTimestamp = ($recurrencesPassed + 1) * $this->intervalInSeconds + $from;
             $nextRun = (\PHP_INT_SIZE >= 8 ? \DateTimeImmutable::createFromTimestamp($nextRunTimestamp) : \DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $nextRunTimestamp)))->setTimezone($fromDate->getTimezone());
@@ -142,12 +142,17 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
     private function calcInterval(\DateInterval $interval): float
     {
-        $seconds = (float) \DateTimeImmutable::createFromTimestamp(0)->add($interval)->format('U.u');
+        $seconds = self::toTimestamp(\DateTimeImmutable::createFromTimestamp(0)->add($interval));
 
         if (0.0 >= $seconds) {
             throw new InvalidArgumentException('The "$interval" argument must be greater than zero.');
         }
 
         return $seconds;
+    }
+
+    private static function toTimestamp(\DateTimeInterface $date): float
+    {
+        return \PHP_INT_SIZE >= 8 ? $date->getTimestamp() + $date->getMicrosecond() / 1e6 : (float) $date->format('U.u');
     }
 }

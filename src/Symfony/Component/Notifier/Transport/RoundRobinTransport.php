@@ -143,7 +143,13 @@ class RoundRobinTransport implements TransportInterface
 
     private function now(): float
     {
-        return class_exists(Clock::class) ? (float) Clock::get()->now()->format('U.u') : microtime(true);
+        if (!class_exists(Clock::class)) {
+            return microtime(true);
+        }
+
+        $now = Clock::get()->now();
+
+        return \PHP_INT_SIZE >= 8 ? $now->getTimestamp() + $now->getMicrosecond() / 1e6 : (float) $now->format('U.u');
     }
 }
 

@@ -607,7 +607,7 @@ class DataKeyStoreTest extends TestCase
     private function age(DataKeyStore $store, string $scope, int $seconds): string
     {
         $handle = $store->current($scope);
-        $backdated = Uuid::fromString(UuidV7::generate(new \DateTimeImmutable(\sprintf('@%d', time() - $seconds))))->toBinary();
+        $backdated = Uuid::fromString(UuidV7::generate(\DateTimeImmutable::createFromTimestamp(time() - $seconds)))->toBinary();
         $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($backdated, $scope, $plaintext));
 
         $this->connection->executeStatement(

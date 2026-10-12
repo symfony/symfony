@@ -65,7 +65,7 @@ class OidcTokenGenerator
 
         $jwsBuilder = new JWSBuilder($this->algorithmManager);
 
-        $now = $this->clock?->now() ?? new \DateTimeImmutable('@'.time());
+        $now = $this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(time());
         $payload = [
             $this->claim => $userIdentifier,
             'iat' => $now->getTimestamp(), // https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6

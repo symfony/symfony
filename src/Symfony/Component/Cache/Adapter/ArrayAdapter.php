@@ -403,6 +403,12 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     private function getCurrentTime(): float
     {
-        return $this->clock?->now()->format('U.u') ?? microtime(true);
+        if (null === $this->clock) {
+            return microtime(true);
+        }
+
+        $now = $this->clock->now();
+
+        return \PHP_INT_SIZE >= 8 ? $now->getTimestamp() + $now->getMicrosecond() / 1e6 : (float) $now->format('U.u');
     }
 }

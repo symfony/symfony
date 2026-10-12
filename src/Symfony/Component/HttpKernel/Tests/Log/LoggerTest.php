@@ -227,8 +227,9 @@ class LoggerTest extends TestCase
         $this->assertSame($timestamp, $recorded->getTimestamp());
 
         // the recorded time is truncated to the millisecond, so it can sit just below $before
-        $this->assertGreaterThan($before - 0.001, (float) $recorded->format('U.v'));
-        $this->assertLessThanOrEqual($after, (float) $recorded->format('U.v'));
+        $recordedTime = $recorded->getTimestamp() + $recorded->getMicrosecond() / 1e6;
+        $this->assertGreaterThan($before - 0.001, $recordedTime);
+        $this->assertLessThanOrEqual($after, $recordedTime);
     }
 }
 

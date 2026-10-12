@@ -45,7 +45,8 @@ trait BatchHandlerTrait
     private function handle(object $message, ?Acknowledger $ack): mixed
     {
         $this->batchClock ??= $ack?->clock ?? Clock::get();
-        $this->lastMessageAt = (int) $this->batchClock->now()->format('U');
+        $now = $this->batchClock->now();
+        $this->lastMessageAt = \PHP_INT_SIZE >= 8 ? $now->getTimestamp() : (int) $now->format('U');
 
         if (null === $ack) {
             $ack = new Acknowledger(get_debug_type($this), null, $this->batchClock);
@@ -77,7 +78,9 @@ trait BatchHandlerTrait
 
         $idleTimeout = $this->getIdleTimeout();
         if (null !== $idleTimeout && null !== $this->lastMessageAt) {
-            return ((int) ($this->batchClock ?? Clock::get())->now()->format('U') - $this->lastMessageAt) >= $idleTimeout;
+            $now = ($this->batchClock ?? Clock::get())->now();
+
+            return ((\PHP_INT_SIZE >= 8 ? $now->getTimestamp() : (int) $now->format('U')) - $this->lastMessageAt) >= $idleTimeout;
         }
 
         return false;

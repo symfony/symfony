@@ -33,6 +33,7 @@ use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\RateLimiter\RateLimiterBundle;
 use Symfony\Component\Semaphore\SemaphoreBundle;
 use Symfony\Component\Serializer\SerializerBundle;
+use Symfony\Component\Workflow\WorkflowBundle;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
 use Symfony\Component\Yaml\Yaml;
 
@@ -279,7 +280,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $schemaFile = $this->tempDir.'/shorthand_schema.json';
         $container = new ContainerBuilder();
 
-        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([RateLimiterBundle::class => ['all' => true], LockBundle::class => ['all' => true], SemaphoreBundle::class => ['all' => true]])))->process($container);
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([RateLimiterBundle::class => ['all' => true], LockBundle::class => ['all' => true], SemaphoreBundle::class => ['all' => true], WorkflowBundle::class => ['all' => true]])))->process($container);
 
         $config = Yaml::parse(<<<YAML
             rate_limiter:
@@ -295,6 +296,13 @@ class JsonSchemaConfigDumpPassTest extends TestCase
             semaphore:
                 enabled: true
                 invoice: 'redis://r2.docker'
+            workflow:
+                blog_publishing:
+                    type: workflow
+                    marking_store:
+                        type: method
+                        property: currentPlace
+                    initial_marking: draft
             when@test:
                 lock:
                     invoice: ['semaphore', 'redis://r2.docker']
@@ -311,7 +319,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         $schemaFile = $this->tempDir.'/shorthand_schema.json';
         $container = new ContainerBuilder();
 
-        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([RateLimiterBundle::class => ['all' => true], LockBundle::class => ['all' => true]])))->process($container);
+        (new JsonSchemaConfigDumpPass($schemaFile, new ExtensionConfigTrees([RateLimiterBundle::class => ['all' => true], LockBundle::class => ['all' => true], WorkflowBundle::class => ['all' => true]])))->process($container);
 
         $config = Yaml::parse(<<<YAML
             rate_limiter:
@@ -329,6 +337,17 @@ class JsonSchemaConfigDumpPassTest extends TestCase
                 resources:
                     invoice: semaphore
                 report: semaphore
+            YAML);
+
+        $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));
+
+        $config = Yaml::parse(<<<YAML
+            workflow:
+                workflows:
+                    blog_publishing:
+                        initial_marking: draft
+                unknown:
+                    initial_marking: draft
             YAML);
 
         $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));

@@ -69,6 +69,7 @@ class WorkflowBundle extends AbstractBundle
     {
         $definition->rootNode()
             ->canBeDisabled()
+            ->acceptAndWrap(['array'], 'workflows')
             ->beforeNormalization()
                 ->ifArray()
                 ->then(static function ($v) {
@@ -78,12 +79,13 @@ class WorkflowBundle extends AbstractBundle
                         $workflows = $v;
                         unset($workflows['enabled']);
 
-                        if (1 === \count($workflows) && isset($workflows[0]['enabled']) && 1 === \count($workflows[0])) {
-                            $workflows = [];
+                        // a map of workflow options is a workflow named "workflows"
+                        if (1 === \count($workflows) && \is_array($workflows['workflows'] ?? null) && (array_is_list($workflows['workflows']) || array_diff_key($workflows['workflows'], ['audit_trail' => 1, 'type' => 1, 'marking_store' => 1, 'supports' => 1, 'support_strategy' => 1, 'initial_marking' => 1, 'places' => 1, 'transitions' => 1]))) {
+                            $workflows = $workflows['workflows'];
                         }
 
-                        if (1 === \count($workflows) && isset($workflows['workflows']) && !array_is_list($workflows['workflows']) && array_diff_key($workflows['workflows'], ['audit_trail' => 1, 'type' => 1, 'marking_store' => 1, 'supports' => 1, 'support_strategy' => 1, 'initial_marking' => 1, 'places' => 1, 'transitions' => 1])) {
-                            $workflows = $workflows['workflows'];
+                        if (1 === \count($workflows) && isset($workflows[0]['enabled']) && 1 === \count($workflows[0])) {
+                            $workflows = [];
                         }
 
                         foreach ($workflows as $key => $workflow) {

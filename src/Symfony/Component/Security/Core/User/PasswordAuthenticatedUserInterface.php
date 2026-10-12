@@ -22,8 +22,7 @@ namespace Symfony\Component\Security\Core\User;
  * In order to invalidate the user sessions while not storing the password hash
  * in the session, it's also possible to hash the password hash before
  * serializing it; crc32c is the only algorithm supported. A user without a
- * password must keep null, which hash() would turn into the CRC of an empty
- * string, a password that the refreshed user does not have.
+ * password should keep null, since PHP deprecates passing null to hash().
  * For example:
  *
  *     public function __serialize(): array

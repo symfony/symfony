@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -190,5 +191,24 @@ class ArrayAdapterTest extends AdapterTestCase
         $clock->modify('+11 seconds');
 
         $this->assertFalse($cache->hasItem('foo'));
+    }
+
+    #[TestWith(['2000-01-01 00:00:00'])]
+    #[TestWith(['2100-01-01 00:00:00'])]
+    public function testExpiresAfterFollowsTheClock(string $now)
+    {
+        $clock = new MockClock($now);
+        $cache = new ArrayAdapter(0, false, 0, 0, $clock);
+
+        $cache->save($cache->getItem('foo')->expiresAfter(10));
+        $cache->save(iterator_to_array($cache->getItems(['bar']))['bar']->expiresAfter(new \DateInterval('PT10S')));
+
+        $this->assertTrue($cache->hasItem('foo'));
+        $this->assertTrue($cache->hasItem('bar'));
+
+        $clock->sleep(11);
+
+        $this->assertFalse($cache->hasItem('foo'));
+        $this->assertFalse($cache->hasItem('bar'));
     }
 }

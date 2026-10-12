@@ -16,9 +16,12 @@ use Jose\Component\Core\JWK;
 use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\Algorithm\ES512;
+use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenGenerator;
@@ -130,6 +133,24 @@ class OidcTokenGeneratorTest extends TestCase
         yield 'No issuers' => ['ES256', null, null, null, 'Please choose an issuer. Available issuers: "https://www.example1.com", "https://www.example2.com"'];
         yield 'Invalid issuer' => ['ES256', 'https://www.invalid.com', null, null, '"https://www.invalid.com" is not a valid issuer. Available issuers: "https://www.example1.com", "https://www.example2.com"'];
         yield 'Invalid TTL' => ['ES256', 'https://www.example1.com', -1, null, 'Time to live must be a positive integer.'];
+    }
+
+    #[RunInSeparateProcess]
+    public function testDatesTheTokenWithTheSystemTimeWithoutAClock()
+    {
+        ClockMock::register(OidcTokenGenerator::class);
+        ClockMock::withClockMock(900276300);
+
+        $generator = new OidcTokenGenerator(new AlgorithmManager([new ES256()]), self::getJWKSet(), 'Symfony OIDC', ['https://www.example.com']);
+        $claims = self::decodePayload($generator->generate('john_doe', null, null, 3600));
+
+        $this->assertSame(900276300, $claims['iat']);
+        $this->assertSame(900276300 + 3600, $claims['exp']);
+    }
+
+    private static function decodePayload(string $token): array
+    {
+        return json_decode((new CompactSerializer())->unserialize($token)->getPayload(), true);
     }
 
     private static function getJWKSet(): JWKSet

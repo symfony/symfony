@@ -538,6 +538,10 @@ class Inline
                     $key = self::evaluateScalar($state, $key, $flags);
                 }
 
+                if (self::$objectForMap && \is_string($key) && str_starts_with($key, "\0")) {
+                    throw new ParseException('Mapping keys starting with a NUL byte are not supported with the "Yaml::PARSE_OBJECT_FOR_MAP" flag.', self::$parsedLineNumber + 1, $mapping);
+                }
+
                 if (false === $i = strpos($mapping, ':', $i)) {
                     break;
                 }
@@ -905,7 +909,7 @@ class Inline
                         }
 
                         if ('' !== rtrim($time->format('u'), '0')) {
-                            return (float) $time->format('U.u');
+                            return $time->format('U') + $time->format('u') / 1e6;
                         }
 
                         try {

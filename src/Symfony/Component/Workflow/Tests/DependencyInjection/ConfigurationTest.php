@@ -140,6 +140,31 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testWorkflowNamedWorkflowsCanSetAnyOption()
+    {
+        $config = $this->process([
+            'workflows' => [
+                'type' => 'workflow',
+                'supports' => [self::class],
+                'places' => ['draft', 'published'],
+                'transitions' => [['name' => 'publish', 'from' => 'draft', 'to' => 'published']],
+                'events_to_dispatch' => [],
+                'metadata' => ['title' => 'Workflows'],
+            ],
+        ]);
+
+        $this->assertSame(['workflows'], array_keys($config['workflows']));
+        $this->assertSame(['title' => 'Workflows'], $config['workflows']['workflows']['metadata']);
+    }
+
+    public function testWorkflowMustBeAnArray()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid type for path "workflow.workflows.blog". Expected "array", but got "string"');
+
+        $this->process(['blog' => 'foo']);
+    }
+
     #[DataProvider('provideWorkflowsGivenUnderTheRoot')]
     public function testWorkflowsGivenUnderTheRoot(array $config, array $expectedNames)
     {

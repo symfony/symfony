@@ -340,9 +340,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
     {
         [$keys, $ttl] = OidcJwks::fromResponse($this->metadataClient->request('GET', $this->metadata->getConfiguration()['jwks_uri'], ['max_redirects' => 0]), true, $this->getClock());
 
-        if (0 < ($ttl ?? -1)) {
-            $item->expiresAfter(min($ttl, OidcJwks::MAX_TTL));
-        }
+        $item->expiresAfter(min($ttl ?: 3600, OidcJwks::MAX_TTL));
 
         return $keys;
     }

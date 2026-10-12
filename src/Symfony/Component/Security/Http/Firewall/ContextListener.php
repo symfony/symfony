@@ -326,7 +326,7 @@ class ContextListener extends AbstractListener
 
             if (null !== $originalPassword
                 && $refreshedPassword !== $originalPassword
-                && (8 !== \strlen($originalPassword) || hash('crc32c', $refreshedPassword ?? $originalPassword) !== $originalPassword)
+                && (8 !== \strlen($originalPassword) || hash('crc32c', $refreshedPassword ?? '') !== $originalPassword)
             ) {
                 return true;
             }

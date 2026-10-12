@@ -73,7 +73,7 @@ final class BlueskyTransport extends AbstractTransport
         $post = [
             '$type' => 'app.bsky.feed.post',
             'text' => $message->getSubject(),
-            'createdAt' => $this->clock->now()->format('Y-m-d\\TH:i:s.u\\Z'),
+            'createdAt' => $this->clock->now()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d\\TH:i:s.u\\Z'),
         ];
         if ($facets = $this->parseFacets($post['text'])) {
             $post['facets'] = $facets;

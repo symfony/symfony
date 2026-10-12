@@ -236,6 +236,8 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             return self::createGatewayTimeoutResponse($method, $url, $options);
         }
 
+        $requestTime = time();
+
         // consistent expiration time for all items
         $expiresAt = \DateTimeImmutable::createFromTimestamp(time() + ($this->maxTtl ?? 86400));
 
@@ -255,6 +257,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             $hasClientConditionalValidator,
             $sentCacheValidator,
             $allowStaleFallback,
+            $requestTime,
         ): \Generator {
             static $attemptTag = null;
             static $firstChunkKey = null;
@@ -315,10 +318,6 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                     }
 
                     $responseTime = time();
-                    $requestTime = (int) ($context->getInfo('start_time') ?? $responseTime);
-                    if ($requestTime <= $cachedData['stored_at']) {
-                        $requestTime = $responseTime;
-                    }
                     $correctedInitialAge = self::getCorrectedInitialAge($headers, $requestTime, $responseTime);
                     $updatedHeaders = self::filterStorableHeaders(array_merge($cachedData['headers'], $headers), self::getExcludedHeaders($headers));
                     // The entry is shared between requests, so the tags it already carries must
@@ -500,7 +499,6 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                     ];
                 }, \INF);
 
-                $requestTime = (int) ($context->getInfo('start_time') ?? time());
                 $responseTime = time();
                 $correctedInitialAge = self::getCorrectedInitialAge($headers, $requestTime, $responseTime);
                 $maxAge = $cachePolicy?->getTtl() ?? $this->determineMaxAge($headers, self::parseCacheControlHeader($headers['cache-control'] ?? []), $correctedInitialAge, $requestTime, $responseTime);

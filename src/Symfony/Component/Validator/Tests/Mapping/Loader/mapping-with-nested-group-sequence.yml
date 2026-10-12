@@ -1,0 +1,4 @@
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+  group_sequence:
+    - [Foo, Bar]
+    - Entity

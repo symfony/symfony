@@ -55,11 +55,18 @@ final class DatePoint extends \DateTimeImmutable
                 $timezone = $builtInDate->getTimezone();
             }
 
-            $now = $now->setTimezone($timezone)->modify($datetime);
+            $parsed = date_parse($datetime);
+            $now = $now->setTimezone($timezone);
 
-            if ('00:00:00.000000' === $builtInDate->format('H:i:s.u')) {
-                $now = $now->setTime(0, 0);
+            // the native constructor starts from midnight when $datetime has a date but no time, modify() does not
+            if (false === $parsed['hour'] && (false !== $parsed['month'] || false !== $parsed['day'])) {
+                $datetime = 'midnight '.$datetime;
+            } elseif (false === $parsed['fraction'] && (false !== $parsed['year'] || false !== $parsed['hour'])) {
+                // it also resets the microseconds when $datetime sets a field without a fraction
+                $now = $now->setTimestamp($now->getTimestamp());
             }
+
+            $now = $now->modify($datetime);
         } elseif (null !== $timezone) {
             $now = $now->setTimezone($timezone);
         }

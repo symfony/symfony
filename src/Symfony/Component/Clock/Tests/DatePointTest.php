@@ -89,4 +89,25 @@ class DatePointTest extends TestCase
         $date = new DatePoint($datetime);
         $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
     }
+
+    /**
+     * @testWith ["2016-09-08 01:00:00.000000", "2016-09-08 +1 hour"]
+     *           ["2016-09-07 23:00:00.000000", "2016-09-08 -1 hour"]
+     *           ["2016-09-09 12:00:00.000000", "2016-09-08 +36 hours"]
+     *           ["2016-09-08 01:00:00.000000", "+1 hour 2016-09-08"]
+     *           ["2016-09-01 01:00:00.000000", "2016-09 +1 hour"]
+     *           ["2018-11-04 01:00:00.000000", "2018-11-04", "America/Sao_Paulo"]
+     *           ["2016-09-08 10:30:00.000000", "2016-09-08T1030"]
+     *           ["2016-09-09 10:30:00.000000", "2016-09-08 t1030 +1 day"]
+     */
+    public function testTimeDefaultsToMidnightWithReference(string $expected, string $datetime, string $timezone = 'UTC')
+    {
+        $timezone = new \DateTimeZone($timezone);
+
+        $date = new \DateTimeImmutable($datetime, $timezone);
+        $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
+
+        $date = new DatePoint($datetime, $timezone, new \DateTimeImmutable('2024-01-10 22:20:02.654321', $timezone));
+        $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
+    }
 }

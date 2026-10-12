@@ -415,7 +415,7 @@ class DebugCommandTest extends TestCase
         $schedules->method('getProvidedServices')->willReturn(['schedule_name' => $schedule]);
         $schedules->method('get')->willReturn($schedule);
 
-        $tester = new CommandTester(new DebugCommand($schedules, new MockClock('2030-01-01 06:00:00')));
+        $tester = new CommandTester(new DebugCommand($schedules, new MockClock('2030-01-01 06:00:00', date_default_timezone_get())));
         $tester->execute($input, ['decorated' => false]);
 
         $this->assertMatchesRegularExpression('/'.preg_quote((new \DateTimeImmutable($nextRun))->format('r'), '/').'\s+1 h\s/', $tester->getDisplay(true));

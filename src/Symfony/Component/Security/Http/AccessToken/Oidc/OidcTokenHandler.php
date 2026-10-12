@@ -22,7 +22,6 @@ use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
@@ -110,15 +109,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
     private function getClock(): ClockInterface
     {
-        if ($this->clock) {
-            return $this->clock;
-        }
-
-        if (class_exists(Clock::class)) {
-            return new Clock();
-        }
-
-        return new class implements ClockInterface {
+        return $this->clock ?? new class implements ClockInterface {
             public function now(): \DateTimeImmutable
             {
                 return new \DateTimeImmutable('@'.time());

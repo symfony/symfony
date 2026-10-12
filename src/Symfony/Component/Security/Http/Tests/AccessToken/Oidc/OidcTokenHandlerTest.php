@@ -19,10 +19,7 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Bridge\PhpUnit\ClockMock;
-use Symfony\Component\Clock\Clock;
-use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
@@ -34,8 +31,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
  */
 class OidcTokenHandlerTest extends TestCase
 {
-    use ClockSensitiveTrait;
-
     private const AUDIENCE = 'Symfony OIDC';
 
     /**
@@ -198,41 +193,15 @@ class OidcTokenHandlerTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testChecksTheDatesAgainstTheSystemTimeWithoutTheClockComponent()
+    public function testChecksTheDatesAgainstTheSystemTimeWithoutAClock()
     {
         if (3 > (new \ReflectionMethod(IssuedAtChecker::class, '__construct'))->getNumberOfParameters()) {
             $this->markTestSkipped('web-token/jwt-checker < 3.2 does not take a clock.');
         }
 
         $time = strtotime('2020-01-01 00:00:00 UTC');
-        ClassExistsMock::register(OidcTokenHandler::class);
-        ClassExistsMock::withMockedClasses([Clock::class => false]);
         ClockMock::register(OidcTokenHandler::class);
         ClockMock::withClockMock($time);
-
-        $claims = [
-            'iat' => $time,
-            'nbf' => $time,
-            'exp' => $time + 3600,
-            'iss' => 'https://www.example.com',
-            'aud' => self::AUDIENCE,
-            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
-        ];
-        $handler = new OidcTokenHandler(new ES256(), self::getJWK(), self::AUDIENCE, ['https://www.example.com']);
-
-        $this->assertSame($claims['sub'], $handler->getUserBadgeFrom(self::buildJWS(json_encode($claims)))->getUserIdentifier());
-
-        $this->expectException(BadCredentialsException::class);
-        $handler->getUserBadgeFrom(self::buildJWS(json_encode(['exp' => $time - 1] + $claims)));
-    }
-
-    public function testChecksTheDatesAgainstTheGlobalClockWithoutAClock()
-    {
-        if (3 > (new \ReflectionMethod(IssuedAtChecker::class, '__construct'))->getNumberOfParameters()) {
-            $this->markTestSkipped('web-token/jwt-checker < 3.2 does not take a clock.');
-        }
-
-        $time = self::mockTime('2020-01-01 00:00:00 UTC')->now()->getTimestamp();
 
         $claims = [
             'iat' => $time,

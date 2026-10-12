@@ -39,7 +39,7 @@ The bridge verifies the signature with the certificate referenced by the
 `SigningCertURL` field of the message, after checking that the Scaleway
 certificate authority bundled with the bridge issued it. Fetching the
 certificate requires the [HttpClient component][http-client]. In Symfony
-applications, the certificate is cached in the `cache.app` pool.
+applications, the certificate is cached in the `cache.mailer.webhook` pool.
 
 The first time Scaleway calls the endpoint, it sends a subscription confirmation
 message and the bridge confirms it automatically. That message contains no

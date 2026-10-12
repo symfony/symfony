@@ -281,6 +281,21 @@ class MailerBundleTest extends TestCase
         }
     }
 
+    public function testTheScalewayRequestParserCachesTheCertificatesInTheWebhookPool()
+    {
+        $container = $this->load([]);
+
+        $this->assertEquals(new Reference('cache.mailer.webhook', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.webhook.request_parser.scaleway')->getArgument(2));
+
+        $pool = $container->getDefinition('cache.mailer.webhook');
+        $this->assertSame('cache.app', $pool->getParent());
+        $this->assertSame([
+            'cache.pool' => [[]],
+            'kernel.test_state' => [['method' => 'clear']],
+            'container.remove_if_missing' => [['service' => 'cache.app']],
+        ], $pool->getTags());
+    }
+
     public function testTheDataCollectorIsRegisteredInDebugModeOnly()
     {
         $this->assertFalse($this->load([])->hasDefinition('mailer.data_collector'));

@@ -290,6 +290,22 @@ class TranslationBundleTest extends TestCase
         $this->assertSame(['foo' => 'bar', '' => '*'], $config['providers']['loco']['domains']);
     }
 
+    public function testThePhraseProviderCachesItsResponsesInTheProvidersPool()
+    {
+        $container = $this->load([], merge: false);
+        new MergeExtensionConfigurationPass()->process($container);
+
+        $this->assertEquals(new Reference('cache.translation.providers'), $container->getDefinition('translation.provider_factory.phrase')->getArgument(4));
+
+        $pool = $container->getDefinition('cache.translation.providers');
+        $this->assertSame('cache.app', $pool->getParent());
+        $this->assertSame([
+            'cache.pool' => [[]],
+            'kernel.test_state' => [['method' => 'clear']],
+            'container.remove_if_missing' => [['service' => 'cache.app']],
+        ], $pool->getTags());
+    }
+
     public function testDataCollectorFollowsTheProfilerInDebugMode()
     {
         $container = $this->load([], debug: true, profiler: true);

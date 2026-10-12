@@ -25,10 +25,11 @@ CHANGELOG
  * Add `PaymentRequiredHttpException`, `RequestTimeoutHttpException`, `ContentTooLargeHttpException`, `RangeNotSatisfiableHttpException`, `ExpectationFailedHttpException`, `FailedDependencyHttpException`, `TooEarlyHttpException`, `UnavailableForLegalReasonsHttpException` and `NotImplementedHttpException`
  * Make `HttpClientKernel` forward the responses that carry the RFC 10036 `Incremental: ?1` header without buffering them
  * Consume the tokens of `#[RateLimit]` before resolving the controller arguments when its key does not read them
- * Add the `#[Lock]` attribute and `ConcurrentRequestHttpException` to reject or delay concurrent requests to a controller
+ * Add the `#[Lock]` attribute and `ConcurrentRequestHttpException` to reject or delay concurrent requests to a controller, with `{name}` placeholders in the key to read request attributes
  * Apply the `#[Cache]` attribute to 308 responses
  * Treat 308 responses like 301 ones in `ResponseCacheStrategy`
  * Add `LockValueResolver` to inject the lock acquired by `#[Lock]` into the `LockInterface` and `SharedLockInterface` controller arguments
+ * Allow `{name}` placeholders in the key of `#[RateLimit]` to read request attributes
 
 8.1
 ---

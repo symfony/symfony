@@ -771,6 +771,65 @@ class LockAttributeListenerTest extends TestCase
         $this->makeListener()->onKernelControllerAttribute($this->makeEvent(new Lock(static fn () => 4.2), Request::create('/')));
     }
 
+    #[DataProvider('provideKeysWithPlaceholders')]
+    public function testKeyPlaceholdersAreReplacedByRequestAttributes(string $key, string $expectedKey)
+    {
+        $listener = $this->makeListener();
+        $request = Request::create('/');
+        $request->attributes->add([
+            'conference' => 'symfonycon',
+            'year' => 2026,
+            'city' => new class implements \Stringable {
+                public function __toString(): string
+                {
+                    return 'amsterdam';
+                }
+            },
+        ]);
+
+        $listener->onKernelControllerAttribute($this->makeControllerEvent(new Lock($key), $request));
+
+        $this->assertTrue($this->isLocked($expectedKey));
+    }
+
+    public static function provideKeysWithPlaceholders(): iterable
+    {
+        yield 'string attribute' => ['ticket-sale-{conference}', 'ticket-sale-symfonycon'];
+        yield 'integer attribute' => ['ticket-sale-{year}', 'ticket-sale-2026'];
+        yield 'stringable attribute' => ['ticket-sale-{city}', 'ticket-sale-amsterdam'];
+        yield 'several placeholders' => ['{conference}-{year}', 'symfonycon-2026'];
+        yield 'braces around no name' => ['ticket-sale-{}-{ conference }-{conference', 'ticket-sale-{}-{ conference }-{conference'];
+    }
+
+    public function testMissingRequestAttributeThrows()
+    {
+        $event = new ControllerAttributeEvent(new Lock('ticket-sale-{conference}'), new ControllerEvent($this->createStub(HttpKernelInterface::class), [new TicketController(), 'buy'], Request::create('/'), null));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageIs('Cannot resolve the "{conference}" placeholder in the key of the "#[Lock]" attribute of "Symfony\\Component\\HttpKernel\\Tests\\EventListener\\TicketController::buy()": the request has no "conference" attribute.');
+
+        $this->makeListener()->onKernelControllerAttribute($event);
+    }
+
+    #[DataProvider('provideInvalidRequestAttributes')]
+    public function testInvalidRequestAttributeThrows(mixed $value, string $type)
+    {
+        $request = Request::create('/');
+        $request->attributes->set('conference', $value);
+        $event = new ControllerAttributeEvent(new Lock('ticket-sale-{conference}'), new ControllerEvent($this->createStub(HttpKernelInterface::class), [new TicketController(), 'buy'], $request, null));
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageIs(\sprintf('Cannot resolve the "{conference}" placeholder in the key of the "#[Lock]" attribute of "Symfony\\Component\\HttpKernel\\Tests\\EventListener\\TicketController::buy()": the "conference" request attribute must be a string, an integer or a "Stringable" object, "%s" given.', $type));
+
+        $this->makeListener()->onKernelControllerAttribute($event);
+    }
+
+    public static function provideInvalidRequestAttributes(): iterable
+    {
+        yield 'null' => [null, 'null'];
+        yield 'array' => [['slug' => 'symfonycon'], 'array'];
+    }
+
     #[DataProvider('provideKeysNotReadingArguments')]
     public function testKeyNotReadingArgumentsIsAcquiredBeforeTheArgumentsAreResolved(string|Expression $key, string $expectedKey)
     {
@@ -902,5 +961,12 @@ class LockAttributeListenerTest extends TestCase
         $factory->expects($this->never())->method('createLock');
 
         $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock('foo', methods: ['POST']), Request::create('/', 'GET')));
+    }
+}
+
+class TicketController
+{
+    public function buy(): void
+    {
     }
 }

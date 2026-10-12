@@ -692,6 +692,65 @@ class RateLimitAttributeListenerTest extends TestCase
         ));
     }
 
+    #[DataProvider('provideKeysWithPlaceholders')]
+    public function testKeyPlaceholdersAreReplacedByRequestAttributes(string $key, string $expectedKey)
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+        $request = Request::create('/');
+        $request->attributes->add([
+            'conference' => 'symfonycon',
+            'year' => 2026,
+            'city' => new class implements \Stringable {
+                public function __toString(): string
+                {
+                    return 'amsterdam';
+                }
+            },
+        ]);
+
+        $listener->onKernelControllerAttribute($this->makeControllerEvent(new RateLimit('api', key: $key), $request));
+
+        $this->assertSame($expectedKey, $usedKey);
+    }
+
+    public static function provideKeysWithPlaceholders(): iterable
+    {
+        yield 'string attribute' => ['ticket-sale-{conference}', 'ticket-sale-symfonycon'];
+        yield 'integer attribute' => ['ticket-sale-{year}', 'ticket-sale-2026'];
+        yield 'stringable attribute' => ['ticket-sale-{city}', 'ticket-sale-amsterdam'];
+        yield 'several placeholders' => ['{conference}-{year}', 'symfonycon-2026'];
+        yield 'braces around no name' => ['ticket-sale-{}-{ conference }-{conference', 'ticket-sale-{}-{ conference }-{conference'];
+    }
+
+    public function testMissingRequestAttributeThrows()
+    {
+        $event = new ControllerAttributeEvent(new RateLimit('api', key: 'ticket-sale-{conference}'), new ControllerEvent($this->createStub(HttpKernelInterface::class), new RateLimitedController(), Request::create('/'), null));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageIs('Cannot resolve the "{conference}" placeholder in the key of the "#[RateLimit]" attribute of "Symfony\\Component\\HttpKernel\\Tests\\EventListener\\RateLimitedController::__invoke()": the request has no "conference" attribute.');
+
+        $this->makeListener()->onKernelControllerAttribute($event);
+    }
+
+    #[DataProvider('provideInvalidRequestAttributes')]
+    public function testInvalidRequestAttributeThrows(mixed $value, string $type)
+    {
+        $request = Request::create('/');
+        $request->attributes->set('conference', $value);
+        $event = new ControllerAttributeEvent(new RateLimit('api', key: 'ticket-sale-{conference}'), new ControllerEvent($this->createStub(HttpKernelInterface::class), new RateLimitedController(), $request, null));
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageIs(\sprintf('Cannot resolve the "{conference}" placeholder in the key of the "#[RateLimit]" attribute of "Symfony\\Component\\HttpKernel\\Tests\\EventListener\\RateLimitedController::__invoke()": the "conference" request attribute must be a string, an integer or a "Stringable" object, "%s" given.', $type));
+
+        $this->makeListener()->onKernelControllerAttribute($event);
+    }
+
+    public static function provideInvalidRequestAttributes(): iterable
+    {
+        yield 'null' => [null, 'null'];
+        yield 'array' => [['slug' => 'symfonycon'], 'array'];
+    }
+
     public function testRejectedDispatchesRateLimitExceededEvent()
     {
         if (!class_exists(RateLimitExceededEvent::class)) {
@@ -764,6 +823,7 @@ class RateLimitAttributeListenerTest extends TestCase
     {
         $listener = $this->makeListenerCapturingKey($usedKey);
         $request = Request::create('/', 'GET', [], [], [], ['REMOTE_ADDR' => '1.2.3.4']);
+        $request->attributes->set('id', '42');
         $attribute = new RateLimit('api', key: $key);
 
         $listener->onKernelControllerAttribute($this->makeControllerEvent($attribute, $request, new ExpressionLanguage()));
@@ -778,6 +838,7 @@ class RateLimitAttributeListenerTest extends TestCase
     {
         yield 'default key' => [null, '1.2.3.4~GET~/'];
         yield 'literal key' => ['shared', 'shared'];
+        yield 'key with placeholders' => ['user-{id}', 'user-42'];
         yield 'expression not reading args' => [new Expression('request.getClientIp()'), '1.2.3.4'];
     }
 

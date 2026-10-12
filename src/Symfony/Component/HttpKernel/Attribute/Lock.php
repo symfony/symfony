@@ -30,7 +30,7 @@ final class Lock
     public readonly array $methods;
 
     /**
-     * @param string|Expression|\Closure $key      The requests sharing the same key contend for the lock: a literal string, or an Expression or a Closure evaluating to a string, an integer or a \Stringable object
+     * @param string|Expression|\Closure $key      The requests sharing the same key contend for the lock: a string where {name} is replaced by the "name" request attribute, such as a route parameter, or an Expression or a Closure evaluating to a string, an integer or a \Stringable object
      * @param string                     $factory  The name of the lock factory to use, as configured under the "lock" resources
      * @param float|null                 $ttl      The maximum expected duration of the request in seconds, after which the lock expires; null means never
      * @param bool                       $blocking Whether to wait for the lock to be released instead of rejecting the request with a "409 Conflict" response

@@ -38,6 +38,7 @@
         "symfony/http-client": "^7.4|^8.0",
         "symfony/http-client-contracts": "^2.5|^3",
         "symfony/lock": "^7.4|^8.0",
+        "symfony/object-mapper": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
         "symfony/rate-limiter": "^7.4|^8.0",

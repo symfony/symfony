@@ -30,6 +30,7 @@ CHANGELOG
  * Treat 308 responses like 301 ones in `ResponseCacheStrategy`
  * Add `LockValueResolver` to inject the lock acquired by `#[Lock]` into the `LockInterface` and `SharedLockInterface` controller arguments
  * Allow `{name}` placeholders in the key of `#[RateLimit]` to read request attributes
+ * Add the `$map` argument to `#[Serialize]` and the `$objectMapper` argument to `SerializeControllerResultAttributeListener` to map controller results with the object mapper before serializing them
 
 8.1
 ---

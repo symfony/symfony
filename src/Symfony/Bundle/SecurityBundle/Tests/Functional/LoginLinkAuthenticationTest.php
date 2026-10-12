@@ -56,7 +56,7 @@ class LoginLinkAuthenticationTest extends AbstractWebTestCase
 
     public function testLoginLinkExpiresWithTheClock()
     {
-        self::mockTime('2100-01-01 00:00:00 UTC');
+        self::mockTime('2037-01-01 00:00:00 UTC');
         $client = $this->createClient(['test_case' => 'LoginLink', 'root_config' => 'config.yml']);
 
         self::getContainer()->get(RequestStack::class)->push(Request::create('/get-login-link'));
@@ -73,7 +73,7 @@ class LoginLinkAuthenticationTest extends AbstractWebTestCase
 
     public function testUsedLoginLinksAreForgottenWhenTheKernelIsShutDown()
     {
-        self::mockTime('2100-01-01 00:00:00 UTC');
+        self::mockTime('2037-01-01 00:00:00 UTC');
         $client = $this->createClient(['test_case' => 'LoginLink', 'root_config' => 'config.yml']);
         $loginLinkUrl = $this->createLoginLinkUrl();
 

@@ -140,7 +140,7 @@ class RememberMeTest extends AbstractWebTestCase
 
     public function testRememberMeCookieExpiresWithTheClock()
     {
-        self::mockTime('2100-01-01 00:00:00 UTC');
+        self::mockTime('2037-01-01 00:00:00 UTC');
         $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => ['config.yml', 'config_session.yml']]);
         $client->request('POST', '/login', [
             '_username' => 'johannes',

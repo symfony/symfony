@@ -94,10 +94,17 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('mailer.payload_converter.scaleway'),
                 service('http_client')->nullOnInvalid(),
-                service('cache.app')->nullOnInvalid(),
+                service('cache.mailer.webhook')->nullOnInvalid(),
                 '$clock' => service('clock')->nullOnInvalid(),
             ])
         ->alias(ScalewayRequestParser::class, 'mailer.webhook.request_parser.scaleway')
+
+        ->set('cache.mailer.webhook')
+            ->parent('cache.app')
+            ->private()
+            ->tag('cache.pool')
+            ->tag('kernel.test_state', ['method' => 'clear'])
+            ->tag('container.remove_if_missing', ['service' => 'cache.app'])
 
         ->set('mailer.payload_converter.sendgrid', SendgridPayloadConverter::class)
         ->set('mailer.webhook.request_parser.sendgrid', SendgridRequestParser::class)

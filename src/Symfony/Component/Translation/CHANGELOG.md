@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `cache.translation.providers` cache pool, which the Phrase provider uses instead of `cache.app`
  * Add `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\TranslationLintCommandPass`, `DependencyInjection\TranslationUpdateCommandPass` and `DependencyInjection\Translator`, which `FrameworkBundle` used to provide
  * Add `TranslationBundle`, which provides the `translation` configuration and the services previously provided by `FrameworkBundle` under `framework.translator`
  * Preserve the XLIFF `<source>` element when loading and dumping a file, instead of overwriting it with the message key

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `cache.mailer.webhook` cache pool, which the Scaleway webhook request parser uses instead of `cache.app`
  * Deprecate the autowiring aliases named after the webhook request parsers, use `#[Target('mailer.<provider>')]` with `RequestParserInterface` instead
  * Add `MailerBundle`, which provides the `mailer` configuration and the services previously provided by `FrameworkBundle` under `framework.mailer`
  * Add a `rate_limiter` option to mailer transports

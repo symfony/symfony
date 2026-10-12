@@ -99,11 +99,18 @@ return static function (ContainerConfigurator $container) {
                 service('logger'),
                 service('translation.loader.xliff'),
                 service('translation.dumper.xliff'),
-                service('cache.app'),
+                service('cache.translation.providers'),
                 param('kernel.default_locale'),
             ])
             ->tag('translation.provider_factory')
             ->tag('container.remove_if_missing', ['service' => 'http_client'])
+
+        ->set('cache.translation.providers')
+            ->parent('cache.app')
+            ->private()
+            ->tag('cache.pool')
+            ->tag('kernel.test_state', ['method' => 'clear'])
+            ->tag('container.remove_if_missing', ['service' => 'cache.app'])
 
         ->set('translation.provider_factory.poeditor', PoEditorProviderFactory::class)
             ->args([

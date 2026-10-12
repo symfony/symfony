@@ -61,6 +61,11 @@ class LoginController implements ServiceSubscriberInterface
         return new Response($this->container->get('twig')->render('@FormLogin/Login/logout_form.html.twig'));
     }
 
+    public function logoutButtonAction()
+    {
+        return new Response($this->container->get('twig')->render('@FormLogin/Login/logout_button.html.twig'));
+    }
+
     public function impersonationFormAction()
     {
         $csrfToken = $this->container->get('csrf')->getToken('switch_user')->getValue();
@@ -76,6 +81,11 @@ class LoginController implements ServiceSubscriberInterface
     public function impersonationFormHelperAction()
     {
         return new Response($this->container->get('twig')->render('@FormLogin/Login/impersonation_form.html.twig'));
+    }
+
+    public function impersonationButtonAction()
+    {
+        return new Response($this->container->get('twig')->render('@FormLogin/Login/impersonation_button.html.twig'));
     }
 
     public function secureAction()

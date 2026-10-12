@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
@@ -32,6 +33,7 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
     {
         $this->registerCsrfProtectionListener($container);
         $this->registerLogoutHandler($container);
+        $this->configureCsrfFieldAttr($container);
     }
 
     private function registerCsrfProtectionListener(ContainerBuilder $container): void
@@ -66,5 +68,21 @@ class RegisterCsrfFeaturesPass implements CompilerPassInterface
         $container->register('security.logout.listener.csrf_token_clearing', CsrfTokenClearingLogoutListener::class)
             ->addArgument(new Reference('security.csrf.token_storage'))
             ->addTag('kernel.event_subscriber');
+    }
+
+    private function configureCsrfFieldAttr(ContainerBuilder $container): void
+    {
+        if (!$container->hasParameter('form.type_extension.csrf.field_attr')) {
+            return;
+        }
+
+        // the logout and impersonation buttons render their CSRF field with the same attributes as forms
+        if ($container->hasDefinition('twig.extension.logout_url')) {
+            $container->getDefinition('twig.extension.logout_url')->replaceArgument(1, new Parameter('form.type_extension.csrf.field_attr'));
+        }
+
+        if ($container->hasDefinition('twig.extension.security')) {
+            $container->getDefinition('twig.extension.security')->replaceArgument(2, new Parameter('form.type_extension.csrf.field_attr'));
+        }
     }
 }

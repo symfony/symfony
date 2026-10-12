@@ -168,6 +168,22 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
     }
 
+    public function testTheImpersonationButtonsPostFormsTheListenerAccepts()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_csrf_custom_manager.yml']);
+
+        $crawler = $client->request('GET', '/impersonation-button');
+        $this->assertCount(0, $crawler->selectButton('Exit impersonation'));
+        $this->assertSame('csrf-protection', $crawler->filter('input[name="_csrf_token"]')->attr('data-controller'));
+
+        $crawler = $client->submit($crawler->selectButton('Impersonate')->form());
+        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+
+        $client->submit($crawler->selectButton('Exit impersonation')->form());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
+    }
+
     public function testSwitchUserStateless()
     {
         $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'switchuser_stateless.yml']);

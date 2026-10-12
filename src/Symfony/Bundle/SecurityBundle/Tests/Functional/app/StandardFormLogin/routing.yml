@@ -8,6 +8,10 @@ logout_form:
     path:     /logout-form
     defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::logoutFormAction }
 
+logout_button:
+    path:     /logout-button
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::logoutButtonAction }
+
 app_logout:
     path:     /logout
     methods:  [POST]
@@ -28,3 +32,7 @@ impersonation_link:
 impersonation_form_helper:
     path:     /impersonation-form-helper
     defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::impersonationFormHelperAction }
+
+impersonation_button:
+    path:     /impersonation-button
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::impersonationButtonAction }

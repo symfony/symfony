@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterf
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
+use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -29,9 +30,13 @@ use Twig\TwigFunction;
  */
 final class SecurityExtension extends AbstractExtension
 {
+    /**
+     * @param array<string, mixed> $csrfFieldAttr The HTML attributes of the hidden field that contains the CSRF token
+     */
     public function __construct(
         private ?AuthorizationCheckerInterface $securityChecker = null,
         private ?ImpersonateUrlGenerator $impersonateUrlGenerator = null,
+        private array $csrfFieldAttr = [],
     ) {
     }
 
@@ -148,12 +153,12 @@ final class SecurityExtension extends AbstractExtension
     /**
      * Returns the action and the hidden fields of a form triggering the impersonation.
      *
-     * @return array{action: string, fields: array<string, string>}
+     * @return array{action: string, fields: array<string, string>, csrf_field: string|null}
      */
     public function getImpersonateForm(string $identifier, ?string $targetUri = null): array
     {
         if (null === $this->impersonateUrlGenerator) {
-            return ['action' => '', 'fields' => []];
+            return ['action' => '', 'fields' => [], 'csrf_field' => null];
         }
 
         return $this->impersonateUrlGenerator->generateImpersonationForm($identifier, $targetUri);
@@ -162,15 +167,39 @@ final class SecurityExtension extends AbstractExtension
     /**
      * Returns the action and the hidden fields of a form exiting the impersonation, the action being empty when the user is not impersonating anyone.
      *
-     * @return array{action: string, fields: array<string, string>}
+     * @return array{action: string, fields: array<string, string>, csrf_field: string|null}
      */
     public function getImpersonateExitForm(?string $targetUri = null): array
     {
         if (null === $this->impersonateUrlGenerator) {
-            return ['action' => '', 'fields' => []];
+            return ['action' => '', 'fields' => [], 'csrf_field' => null];
         }
 
         return $this->impersonateUrlGenerator->generateExitForm($targetUri);
+    }
+
+    /**
+     * Renders a form that triggers the impersonation with a POST, or nothing when no form can be built.
+     *
+     * @param string|\Stringable   $label    The label of the button, escaped unless it is a Twig Markup
+     * @param array<string, mixed> $attr     The HTML attributes of the button
+     * @param array<string, mixed> $formAttr The HTML attributes of the form
+     */
+    public function renderImpersonateButton(Environment $env, string|\Stringable $label, string $identifier, ?string $targetUri = null, array $attr = [], array $formAttr = []): string
+    {
+        return PostFormRenderer::render($env, $this->getImpersonateForm($identifier, $targetUri), $label, $attr, $formAttr, $this->csrfFieldAttr);
+    }
+
+    /**
+     * Renders a form that exits the impersonation with a POST, or nothing when the user is not impersonating anyone.
+     *
+     * @param string|\Stringable   $label    The label of the button, escaped unless it is a Twig Markup
+     * @param array<string, mixed> $attr     The HTML attributes of the button
+     * @param array<string, mixed> $formAttr The HTML attributes of the form
+     */
+    public function renderImpersonateExitButton(Environment $env, string|\Stringable $label = 'Exit impersonation', ?string $targetUri = null, array $attr = [], array $formAttr = []): string
+    {
+        return PostFormRenderer::render($env, $this->getImpersonateExitForm($targetUri), $label, $attr, $formAttr, $this->csrfFieldAttr);
     }
 
     public function getFunctions(): array
@@ -184,6 +213,8 @@ final class SecurityExtension extends AbstractExtension
             new TwigFunction('impersonation_path', $this->getImpersonatePath(...)),
             new TwigFunction('impersonation_form', $this->getImpersonateForm(...)),
             new TwigFunction('impersonation_exit_form', $this->getImpersonateExitForm(...)),
+            new TwigFunction('impersonation_button', $this->renderImpersonateButton(...), ['needs_environment' => true, 'is_safe' => ['html']]),
+            new TwigFunction('impersonation_exit_button', $this->renderImpersonateExitButton(...), ['needs_environment' => true, 'is_safe' => ['html']]),
         ];
 
         if ($this->securityChecker instanceof UserAuthorizationCheckerInterface) {

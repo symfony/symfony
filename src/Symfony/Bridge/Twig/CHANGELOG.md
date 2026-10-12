@@ -7,6 +7,7 @@ CHANGELOG
  * Add the `logout_form()` function to build a form that logs the user out with a POST
  * Add the `normalize` filter to normalize values with the Serializer component
  * Add the `impersonation_form()` and `impersonation_exit_form()` functions to build a form that switches the user with a POST
+ * Add the `logout_button()`, `impersonation_button()` and `impersonation_exit_button()` functions to render a form that logs the user out or switches the user with a POST
  * Render an `id` attribute on the `<form>` element when a child uses `form_attr`
  * Render the `name` attribute of the `<form>` element through `attr`, so that it can be overridden or disabled
  * Render `<optgroup>` labels from `ChoiceGroupView::$label`, which allows translatable choice group labels

@@ -176,7 +176,7 @@ class PostgreSqlNotifyOnIdleListener implements EventSubscriberInterface
         $sql = \sprintf('SELECT MIN(available_at) FROM %s WHERE queue_name IN (?) AND available_at > ? AND delivered_at IS NULL', $config['table_name']);
         $result = $dbal->executeQuery($sql, [
             $this->queueNames,
-            $this->clock?->now() ?? new \DateTimeImmutable(),
+            ($this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(microtime(true)))->setTimezone(new \DateTimeZone('UTC')),
         ], [
             ArrayParameterType::STRING,
             Types::DATETIME_IMMUTABLE,

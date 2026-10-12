@@ -79,7 +79,8 @@ class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheIn
         self::$setInnerItem ??= \Closure::bind(
             static function (CacheItemInterface $innerItem, CacheItem $item, $expiry = null) {
                 $innerItem->set($item->pack());
-                $innerItem->expiresAt(($expiry ?? $item->expiry) ? \DateTimeImmutable::createFromTimestamp($expiry ?? $item->expiry) : null);
+                $expiry ??= $item->expiry;
+                $innerItem->expiresAt($expiry ? (\PHP_INT_SIZE >= 8 ? \DateTimeImmutable::createFromTimestamp($expiry) : \DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $expiry))) : null);
             },
             null,
             CacheItem::class

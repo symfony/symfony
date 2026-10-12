@@ -91,7 +91,7 @@ class Cookie
         $cookie = \sprintf('%s=%s', $this->name, $this->rawValue);
 
         if (null !== $this->expires) {
-            $dateTime = \DateTimeImmutable::createFromTimestamp((int) $this->expires);
+            $dateTime = \PHP_INT_SIZE >= 8 ? \DateTimeImmutable::createFromTimestamp((int) $this->expires) : \DateTimeImmutable::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
             $cookie .= '; expires='.str_replace('+0000', '', $dateTime->format(self::DATE_FORMATS[0]));
         }
 

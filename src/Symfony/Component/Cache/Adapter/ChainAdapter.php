@@ -79,7 +79,8 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
                 $item->metadata = $item->newMetadata = $sourceItem->metadata = $sourceMetadata;
 
                 if (isset($item->metadata[CacheItem::METADATA_EXPIRY])) {
-                    $item->expiresAt(\DateTimeImmutable::createFromTimestamp($item->metadata[CacheItem::METADATA_EXPIRY]));
+                    $expiry = $item->metadata[CacheItem::METADATA_EXPIRY];
+                    $item->expiresAt(\PHP_INT_SIZE >= 8 ? \DateTimeImmutable::createFromTimestamp($expiry) : \DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $expiry)));
                 } elseif (0 < $defaultLifetime) {
                     $item->expiresAfter($defaultLifetime);
                     $item->newMetadata[CacheItem::METADATA_EXPIRY] = $item->expiry;

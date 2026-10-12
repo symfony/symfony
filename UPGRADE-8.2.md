@@ -538,3 +538,4 @@ Yaml
 ----
 
  * A custom tag on a block scalar requires the `Yaml::PARSE_CUSTOM_TAGS` flag, as on any other value; linting such files, Ansible `!vault |` values for example, needs the `--parse-tags` option of `lint:yaml`
+ * When the `opis/json-schema` package is installed, `lint:yaml` also validates each file against its JSON Schema; use the `--no-check-schema` option to only check the syntax

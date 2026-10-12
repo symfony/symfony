@@ -106,7 +106,7 @@ bar';
         $tester = $this->createCommandTester();
         $filename = $this->createFile('version: not-an-integer');
 
-        $tester->execute(['filename' => $filename, '--check-schema' => $schema], ['decorated' => false]);
+        $tester->execute(['filename' => $filename, '--schema' => $schema], ['decorated' => false]);
 
         $this->assertSame(1, $tester->getStatusCode(), 'lint:yaml validates against the schema given with --check-schema');
     }
@@ -125,7 +125,8 @@ bar';
         $this->assertSame(1, $tester->getStatusCode(), 'lint:yaml validates against the in-file schema header');
     }
 
-    public function testLintValidatesPackageConfigAgainstDefaultConfigSchema()
+    #[DataProvider('provideSchemaOptions')]
+    public function testLintValidatesPackageConfigAgainstDefaultConfigSchema(array $options)
     {
         $this->skipIfJsonSchemaMissing();
 
@@ -143,7 +144,7 @@ bar';
         try {
             $tester = $this->createFrameworkCommandTester($projectDir);
 
-            $tester->execute(['filename' => $file, '--check-schema' => null], ['decorated' => false]);
+            $tester->execute(['filename' => $file] + $options, ['decorated' => false]);
 
             $this->assertSame(1, $tester->getStatusCode(), 'config/packages files are validated against config/schema.json by default');
         } finally {
@@ -152,6 +153,68 @@ bar';
             @rmdir($projectDir.'/config/packages');
             @rmdir($projectDir.'/config');
         }
+    }
+
+    public static function provideSchemaOptions(): iterable
+    {
+        yield 'without option' => [[]];
+        yield 'with --check-schema' => [['--check-schema' => null]];
+    }
+
+    public function testLintDoesNotValidatePackageConfigWithNoCheckSchemaOption()
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $projectDir = sys_get_temp_dir().'/yml-lint-test';
+        @mkdir($projectDir.'/config/packages', 0o777, true);
+        file_put_contents($projectDir.'/config/schema.json', json_encode([
+            'type' => 'object',
+            'properties' => ['version' => ['type' => 'integer']],
+        ]));
+        $file = $projectDir.'/config/packages/framework.yaml';
+        file_put_contents($file, 'version: not-an-integer');
+
+        try {
+            $tester = $this->createFrameworkCommandTester($projectDir);
+
+            $tester->execute(['filename' => $file, '--no-check-schema' => true], ['decorated' => false]);
+
+            $tester->assertCommandIsSuccessful('lint:yaml only checks the syntax with --no-check-schema');
+        } finally {
+            @unlink($file);
+            @unlink($projectDir.'/config/schema.json');
+            @rmdir($projectDir.'/config/packages');
+            @rmdir($projectDir.'/config');
+        }
+    }
+
+    #[DataProvider('provideMissingGeneratedSchemaOptions')]
+    public function testLintHandlesTheGeneratedSchemaDeclaredByAHeaderBeforeItExists(array $options, int $expectedStatusCode)
+    {
+        $this->skipIfJsonSchemaMissing();
+
+        $projectDir = sys_get_temp_dir().'/yml-lint-test';
+        @mkdir($projectDir.'/config/packages', 0o777, true);
+        $file = $projectDir.'/config/packages/framework.yaml';
+        file_put_contents($file, "# yaml-language-server: \$schema=../schema.json\nversion: 8");
+
+        try {
+            $tester = $this->createFrameworkCommandTester($projectDir);
+
+            $tester->execute(['filename' => $file] + $options, ['decorated' => false]);
+
+            $this->assertSame($expectedStatusCode, $tester->getStatusCode());
+        } finally {
+            @unlink($file);
+            @rmdir($projectDir.'/config/packages');
+            @rmdir($projectDir.'/config');
+        }
+    }
+
+    public static function provideMissingGeneratedSchemaOptions(): iterable
+    {
+        yield 'skipped without option' => [[], 0];
+        yield 'reported with --check-schema' => [['--check-schema' => null], 1];
     }
 
     #[DataProvider('provideComponentSchemaFiles')]
@@ -193,7 +256,8 @@ bar';
         yield 'validator' => ['config/validator/app.yaml', 'validation.schema.json', \Symfony\Component\Validator\Validation::class];
     }
 
-    public function testLintDoesNotApplyGeneratedSchemaOutsideConfigPackages()
+    #[DataProvider('provideSchemaOptions')]
+    public function testLintDoesNotApplyGeneratedSchemaOutsideConfigPackages(array $options)
     {
         $this->skipIfJsonSchemaMissing();
 
@@ -201,16 +265,19 @@ bar';
         @mkdir($projectDir.'/config', 0o777, true);
         file_put_contents($projectDir.'/config/schema.json', json_encode(['type' => 'object']));
         $this->files[] = $projectDir.'/config/schema.json';
-        // A file outside config/packages, which config/schema.json does not describe.
+        // Files outside config/packages, which config/schema.json does not describe.
         $file = $this->createFile('- invalid');
+        $configFile = $projectDir.'/config/app.yaml';
+        file_put_contents($configFile, '- invalid');
 
         try {
             $tester = $this->createFrameworkCommandTester($projectDir);
 
-            $tester->execute(['filename' => $file, '--check-schema' => null], ['decorated' => false]);
+            $tester->execute(['filename' => [$file, $configFile]] + $options, ['decorated' => false]);
 
             $this->assertSame(0, $tester->getStatusCode(), 'config/schema.json is not applied outside config/packages');
         } finally {
+            @unlink($configFile);
             @unlink($projectDir.'/config/schema.json');
             @rmdir($projectDir.'/config');
         }
@@ -230,7 +297,7 @@ bar';
             $filename = $this->createFile('foo: bar');
 
             $tester->execute(
-                ['filename' => $filename, '--check-schema' => $schema],
+                ['filename' => $filename, '--schema' => $schema],
                 ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
             );
 

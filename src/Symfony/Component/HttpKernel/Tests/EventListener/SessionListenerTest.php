@@ -502,6 +502,7 @@ class SessionListenerTest extends TestCase
 
         $response = new Response();
         $response->setSharedMaxAge(60);
+        $response->cacheControl('CDN')->setMaxAge(3600);
         $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
 
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
@@ -511,6 +512,7 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('private'));
         $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
+        $this->assertSame('max-age=3600', $response->headers->get('CDN-Cache-Control'));
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
@@ -664,6 +666,29 @@ class SessionListenerTest extends TestCase
         $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertLessThanOrEqual(new \DateTimeImmutable('now', new \DateTimeZone('UTC')), new \DateTimeImmutable($response->headers->get('Expires')));
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+    }
+
+    public function testTargetedCacheControlIsPrivateIfSessionStarted()
+    {
+        $session = $this->createMock(Session::class);
+        $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
+
+        $listener = new SessionListener(new Container());
+        $kernel = $this->createStub(HttpKernelInterface::class);
+
+        $request = new Request();
+        $request->setSession($session);
+
+        $response = new Response();
+        $response->setPublic()->setMaxAge(300);
+        $response->cacheControl('CDN')->setMaxAge(3600)->setStaleIfError(86400);
+        $response->headers->set('Cloudflare-CDN-Cache-Control', 'max-age=7200');
+
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $this->assertSame('max-age=0, must-revalidate, private', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=0, must-revalidate, private', $response->headers->get('CDN-Cache-Control'));
+        $this->assertSame(['max-age=0, must-revalidate, private'], $response->headers->allPreserveCase()['Cloudflare-CDN-Cache-Control'] ?? null);
     }
 
     public function testSurrogateMainRequestIsPublic()

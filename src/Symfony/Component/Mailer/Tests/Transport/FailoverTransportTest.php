@@ -11,17 +11,18 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-#[Group('time-sensitive')]
 class FailoverTransportTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     public function testSendNoTransports()
     {
         $this->expectException(TransportException::class);
@@ -87,6 +88,8 @@ class FailoverTransportTest extends TestCase
 
     public function testSendOneDeadAndRecoveryWithinRetryPeriod()
     {
+        $clock = self::mockTime();
+
         $t1 = $this->createStub(TransportInterface::class);
 
         $t1
@@ -117,22 +120,24 @@ class FailoverTransportTest extends TestCase
         $t = new FailoverTransport([$t1, $t2], 6);
         $t->send(new RawMessage('')); // t1>fail - t2>sent
         $this->assertTransports($t, 0, [$t1]);
-        sleep(4);
+        $clock->sleep(4);
         $t->send(new RawMessage('')); // t2>sent
         $this->assertTransports($t, 0, [$t1]);
-        sleep(4);
+        $clock->sleep(4);
         $t->send(new RawMessage('')); // t2>sent
         $this->assertTransports($t, 0, [$t1]);
-        sleep(4);
+        $clock->sleep(4);
         $t->send(new RawMessage('')); // t2>fail - t1>sent
         $this->assertTransports($t, 1, [$t2]);
-        sleep(4);
+        $clock->sleep(4);
         $t->send(new RawMessage('')); // t1>sent
         $this->assertTransports($t, 1, [$t2]);
     }
 
     public function testSendAllDeadWithinRetryPeriod()
     {
+        $clock = self::mockTime();
+
         $t1 = $this->createMock(TransportInterface::class);
         $t1->method('send')->willThrowException(new TransportException());
         $t1->expects($this->once())->method('send');
@@ -150,9 +155,9 @@ class FailoverTransportTest extends TestCase
             });
         $t = new FailoverTransport([$t1, $t2], 40);
         $t->send(new RawMessage(''));
-        sleep(4);
+        $clock->sleep(4);
         $t->send(new RawMessage(''));
-        sleep(4);
+        $clock->sleep(4);
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('All transports failed.');
         $t->send(new RawMessage(''));
@@ -160,6 +165,8 @@ class FailoverTransportTest extends TestCase
 
     public function testSendOneDeadButRecover()
     {
+        $clock = self::mockTime();
+
         $t1 = $this->createStub(TransportInterface::class);
         $t1->method('send')->willReturnCallback(static function () {
             static $call = 0;
@@ -185,9 +192,9 @@ class FailoverTransportTest extends TestCase
             });
         $t = new FailoverTransport([$t1, $t2], 1);
         $t->send(new RawMessage(''));
-        sleep(1);
+        $clock->sleep(1);
         $t->send(new RawMessage(''));
-        sleep(1);
+        $clock->sleep(1);
         $t->send(new RawMessage(''));
     }
 

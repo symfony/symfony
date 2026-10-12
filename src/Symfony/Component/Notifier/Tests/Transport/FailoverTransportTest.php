@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Notifier\Tests\Transport;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
@@ -20,9 +20,10 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\FailoverTransport;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
-#[Group('time-sensitive')]
 class FailoverTransportTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     public function testSendNoTransports()
     {
         $this->expectException(LogicException::class);
@@ -122,6 +123,8 @@ class FailoverTransportTest extends TestCase
 
     public function testSendAllDeadWithinRetryPeriod()
     {
+        $clock = self::mockTime();
+
         $message = new DummyMessage();
 
         $t1 = $this->createMock(TransportInterface::class);
@@ -148,9 +151,9 @@ class FailoverTransportTest extends TestCase
             });
         $t = new FailoverTransport([$t1, $t2], 40);
         $t->send($message);
-        sleep(4);
+        $clock->sleep(4);
         $t->send($message);
-        sleep(4);
+        $clock->sleep(4);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('All transports failed.');
@@ -160,6 +163,8 @@ class FailoverTransportTest extends TestCase
 
     public function testSendOneDeadButRecover()
     {
+        $clock = self::mockTime();
+
         $message = new DummyMessage();
 
         $t1 = $this->createMock(TransportInterface::class);
@@ -195,7 +200,7 @@ class FailoverTransportTest extends TestCase
         $t = new FailoverTransport([$t1, $t2], 1);
 
         $t->send($message);
-        sleep(2);
+        $clock->sleep(2);
         $t->send($message);
     }
 }

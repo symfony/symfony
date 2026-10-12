@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
@@ -22,9 +22,10 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
-#[Group('time-sensitive')]
 class RoundRobinTransportTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     public function testSendNoTransports()
     {
         $this->expectException(TransportException::class);
@@ -117,6 +118,8 @@ class RoundRobinTransportTest extends TestCase
 
     public function testSendOneDeadAndRecoveryWithinRetryPeriod()
     {
+        $clock = self::mockTime();
+
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->exactly(3))->method('send');
 
@@ -139,7 +142,7 @@ class RoundRobinTransportTest extends TestCase
         $this->assertTransports($t, 1, []);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 1, [$t2]);
-        sleep(5);
+        $clock->sleep(5);
         $t->send(new RawMessage(''));
         $this->assertTransports($t, 0, []);
         $t->send(new RawMessage(''));

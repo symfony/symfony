@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Transport;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -58,7 +59,7 @@ class RoundRobinTransport implements TransportInterface
                 $exception ??= new TransportException('All transports failed.');
                 $exception->appendDebug(\sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
                 $this->logger->error(\sprintf('Transport "%s" failed.', $transport), ['exception' => $e]);
-                $this->deadTransports[$transport] = microtime(true);
+                $this->deadTransports[$transport] = $this->now();
             }
         }
 
@@ -87,7 +88,7 @@ class RoundRobinTransport implements TransportInterface
                 break;
             }
 
-            if ((microtime(true) - $this->deadTransports[$transport]) > $this->retryPeriod) {
+            if (($this->now() - $this->deadTransports[$transport]) > $this->retryPeriod) {
                 unset($this->deadTransports[$transport]);
 
                 break;
@@ -123,5 +124,10 @@ class RoundRobinTransport implements TransportInterface
     private function moveCursor(int $cursor): int
     {
         return ++$cursor >= \count($this->transports) ? 0 : $cursor;
+    }
+
+    private function now(): float
+    {
+        return class_exists(Clock::class) ? (float) Clock::get()->now()->format('U.u') : microtime(true);
     }
 }

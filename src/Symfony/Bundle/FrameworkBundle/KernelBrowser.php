@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\Test\TestBrowserToken;
+use Symfony\Bundle\FrameworkBundle\Test\TestContainer;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
@@ -226,13 +227,26 @@ class KernelBrowser extends HttpKernelBrowser
     {
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
-        if ($this->hasPerformedRequest && $this->reboot) {
-            $this->kernel->boot();
-            $this->kernel->shutdown();
+        if ($this->hasPerformedRequest) {
+            // the kernel resets its services before handling the next request, with or without a reboot
+            $keptState = $this->keepState();
 
-            if ($this->containerConfigurator) {
+            if ($this->reboot) {
                 $this->kernel->boot();
-                ($this->containerConfigurator)($this->getContainer());
+                $this->kernel->shutdown();
+
+                if ($this->containerConfigurator || $keptState) {
+                    $this->kernel->boot();
+                    $container = $this->getContainer();
+
+                    if ($keptState && $container instanceof TestContainer) {
+                        $container->setKeptState($keptState);
+                    }
+
+                    if ($this->containerConfigurator) {
+                        ($this->containerConfigurator)($container);
+                    }
+                }
             }
         } else {
             $this->hasPerformedRequest = true;
@@ -317,5 +331,20 @@ class KernelBrowser extends HttpKernelBrowser
             EOF;
 
         return $code.$this->getHandleScript();
+    }
+
+    /**
+     * @return array<string, list<object>>
+     */
+    private function keepState(): array
+    {
+        try {
+            $container = $this->getContainer();
+        } catch (\LogicException) {
+            // the kernel was shut down, its state is gone already
+            return [];
+        }
+
+        return $container instanceof TestContainer ? $container->keepState() : [];
     }
 }

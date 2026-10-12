@@ -1,0 +1,3 @@
+test_state_record:
+    path:     /test_state/{record}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\TestStateController }

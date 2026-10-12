@@ -38,3 +38,27 @@ services:
         public: true
         tags:
             - kernel.reset: { method: 'myCustomName' }
+
+    test_state.kept:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\TestStateService
+        public: true
+        tags:
+            - kernel.reset: { method: 'reset' }
+            - kernel.test_state: { keep: true }
+
+    test_state.kept_but_unused:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\TestStateService
+        public: true
+        tags:
+            - kernel.reset: { method: 'reset' }
+            - kernel.test_state: { keep: true }
+
+    test_state.cleared:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\TestStateService
+        public: true
+        tags:
+            - kernel.test_state: { method: 'clear' }
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\TestStateController:
+        public: true
+        arguments: ['@test_state.kept']

@@ -92,7 +92,21 @@ trait NotificationAssertionsTrait
     {
         $container = static::getContainer();
         if ($container->has('notifier.notification_logger_listener')) {
-            return $container->get('notifier.notification_logger_listener')->getEvents();
+            $listener = $container->get('notifier.notification_logger_listener');
+
+            if (!$container instanceof TestContainer || !$keptListeners = $container->getKeptState('notifier.notification_logger_listener')) {
+                return $listener->getEvents();
+            }
+
+            $events = new NotificationEvents();
+
+            foreach ([...$keptListeners, $listener] as $someListener) {
+                foreach ($someListener->getEvents()->getEvents() as $event) {
+                    $events->add($event);
+                }
+            }
+
+            return $events;
         }
 
         static::fail('A client must have Notifier enabled to make notifications assertions. Did you forget to require symfony/notifier?');

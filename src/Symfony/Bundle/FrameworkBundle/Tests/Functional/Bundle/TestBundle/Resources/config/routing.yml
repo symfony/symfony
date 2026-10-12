@@ -61,6 +61,14 @@ send_email:
     path:     /send_email
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::indexAction }
 
+send_email_and_redirect:
+    path:     /send_email/{subject}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::sendAndRedirectAction }
+
+email_sent:
+    path:     /email_sent
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::sentAction }
+
 http_client_call:
     path:     /http_client_call
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\HttpClientController::index }
@@ -76,3 +84,11 @@ uid:
 send_notification:
     path:     /send_notification
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\NotificationController::indexAction }
+
+send_notification_and_redirect:
+    path:     /send_notification/{subject}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\NotificationController::sendAndRedirectAction }
+
+notification_sent:
+    path:     /notification_sent
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\NotificationController::sentAction }

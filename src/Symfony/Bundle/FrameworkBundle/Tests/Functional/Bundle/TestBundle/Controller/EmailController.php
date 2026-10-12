@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
@@ -37,6 +38,18 @@ class EmailController
             ->addPart(new DataPart(file_get_contents(__FILE__), 'foobar.php'))
         );
 
+        return new Response();
+    }
+
+    public function sendAndRedirectAction(MailerInterface $mailer, string $subject): Response
+    {
+        $mailer->send((new Email())->to('fabien@symfony.com')->from('fabien@symfony.com')->subject($subject)->text('Bar!'));
+
+        return new RedirectResponse('/email_sent');
+    }
+
+    public function sentAction(): Response
+    {
         return new Response();
     }
 }

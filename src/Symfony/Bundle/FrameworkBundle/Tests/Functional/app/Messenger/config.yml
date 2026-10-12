@@ -3,16 +3,23 @@ imports:
 
 framework:
     messenger:
+        failure_transport: failed
         transports:
             async:
                 dsn: 'in-memory://'
                 retry_strategy:
                     delay: 10000
+            events: 'in-memory://'
+            failed: 'in-memory://'
             sync: 'sync://'
         routing:
             Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage: async
             Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage: async
+            Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\ChainedMessage: events
 
 services:
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\RecordingMessageHandler:
         autoconfigure: true
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\ChainedMessageHandler:
+        autoconfigure: true
+        autowire: true

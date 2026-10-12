@@ -94,7 +94,8 @@ final class JsonSchemaDumper
 
     public function dumpNode(NodeInterface $node): array
     {
-        $acceptsAnyValue = $node instanceof BaseNode && \in_array(ExprBuilder::TYPE_ANY, $node->getNormalizedTypes(), true);
+        $elementsAtParentLevel = $node instanceof ArrayNode ? $this->getChildrenWithElementsAtParentLevel($node) : [];
+        $acceptsAnyValue = !$elementsAtParentLevel && $node instanceof BaseNode && \in_array(ExprBuilder::TYPE_ANY, $node->getNormalizedTypes(), true);
 
         if ($node instanceof BaseNode && null !== ($alias = $node->getAttribute('alias_of')) && null !== $ref = $this->resolveAlias?->__invoke($alias)) {
             $schema = ['$ref' => $ref];
@@ -144,34 +145,14 @@ final class JsonSchemaDumper
             }
         } elseif ($node instanceof ArrayNode) {
             $schema = ['$ref' => $node->isNullable() ? '#/$defs/types/object_null' : '#/$defs/types/object'];
-            $children = $node->getChildren();
-            foreach ($children as $child) {
-                $schema['properties'] ??= [];
-                $schema['properties'][$child->getName()] = $this->dumpNode($child);
-                // another file can provide the child, except in the items of a list, which are never merged
-                if ($this->inListItem && $child->isRequired()) {
-                    $schema['required'] ??= [];
-                    $schema['required'][] = $child->getName();
-                }
-            }
-
-            foreach ($node->getXmlRemappings() as [$singular, $plural]) {
-                if (!isset($children[$plural]) || isset($children[$singular])) {
-                    continue;
-                }
-
-                // a pattern accepts the singular key without proposing it to completion
-                $schema['patternProperties']['^'.preg_quote($singular).'$'] = $children[$plural] instanceof PrototypedArrayNode && !$children[$plural]->getKeyAttribute()
-                    ? ['anyOf' => [$this->dumpPrototype($children[$plural]), $schema['properties'][$plural]]]
-                    : ['$ref' => '#/$defs/types/variable'];
-            }
-
-            if (isset($schema['properties'])) {
-                $schema['additionalProperties'] = $node->shouldIgnoreExtraKeys();
-            }
+            $schema = [...$schema, ...$this->dumpArrayNodeProperties($node)];
 
             if (null !== $key = $node->getAttribute('wraps_arrays_into')) {
                 $schema = ['anyOf' => [$schema, ...$this->dumpWrappedArrays($node, $key, $schema)]];
+            }
+
+            foreach ($elementsAtParentLevel as $child) {
+                $schema = ['anyOf' => [$schema, ...$this->dumpElementsAtParentLevel($node, $child, $schema)]];
             }
         } elseif ($node instanceof BooleanNode) {
             $schema = ['$ref' => $node->isNullable() ? '#/$defs/types/boolean_null' : '#/$defs/types/boolean'];
@@ -289,6 +270,124 @@ final class JsonSchemaDumper
         } finally {
             $this->inListItem = $inListItem;
         }
+    }
+
+    /**
+     * Describes the keys declared by the children of an array node.
+     *
+     * @return array<string, mixed>
+     */
+    private function dumpArrayNodeProperties(ArrayNode $node): array
+    {
+        $schema = [];
+        $children = $node->getChildren();
+
+        foreach ($children as $child) {
+            $schema['properties'] ??= [];
+            $schema['properties'][$child->getName()] = $this->dumpNode($child);
+            // another file can provide the child, except in the items of a list, which are never merged
+            if ($this->inListItem && $child->isRequired()) {
+                $schema['required'] ??= [];
+                $schema['required'][] = $child->getName();
+            }
+        }
+
+        foreach ($node->getXmlRemappings() as [$singular, $plural]) {
+            if (!isset($children[$plural]) || isset($children[$singular])) {
+                continue;
+            }
+
+            // a pattern accepts the singular key without proposing it to completion
+            $schema['patternProperties']['^'.preg_quote($singular).'$'] = $children[$plural] instanceof PrototypedArrayNode && !$children[$plural]->getKeyAttribute()
+                ? ['anyOf' => [$this->dumpPrototype($children[$plural]), $schema['properties'][$plural]]]
+                : ['$ref' => '#/$defs/types/variable'];
+        }
+
+        if (isset($schema['properties'])) {
+            $schema['additionalProperties'] = $node->shouldIgnoreExtraKeys();
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Returns the children whose elements can be given in this node instead of in the child.
+     *
+     * @return list<PrototypedArrayNode>
+     */
+    private function getChildrenWithElementsAtParentLevel(ArrayNode $node): array
+    {
+        return array_values(array_filter(
+            $node->getChildren(),
+            static fn (NodeInterface $child) => $child instanceof PrototypedArrayNode && null !== $child->getAttribute('elements_at_parent_level'),
+        ));
+    }
+
+    /**
+     * Describes the elements of the given child as the parent node accepts them.
+     *
+     * The keys of the elements are given next to the keys of the parent node, which a normalization closure rewrites into the elements of the child.
+     *
+     * @param array<string, mixed> $schema the schema of the parent node
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function dumpElementsAtParentLevel(ArrayNode $node, PrototypedArrayNode $child, array $schema): array
+    {
+        $element = $child->getPrototype();
+        // the key that names the elements is consumed by the child, so the elements cannot provide it
+        $keyAttribute = $child->getKeyAttribute();
+        $consumedKeys = null === $keyAttribute ? [] : [$keyAttribute];
+        $prototypeSchema = $this->dumpPrototype($child);
+
+        $schemas = [];
+        foreach ($prototypeSchema['anyOf'] ?? [$prototypeSchema] as $elementSchema) {
+            if (!isset($elementSchema['properties'])) {
+                if ('#/$defs/types/variable' !== ($elementSchema['$ref'] ?? null) || !$element instanceof ArrayNode) {
+                    // the elements have no key that can be given in the parent node
+                    continue;
+                }
+
+                // the elements accept any value, but the node still declares the keys of the shape
+                $elementSchema = $this->dumpArrayNodeProperties($element);
+            }
+
+            $flatSchema = $schema;
+            unset($flatSchema['properties'][$child->getName()]);
+
+            foreach ($node->getXmlRemappings() as [$singular, $plural]) {
+                if ($plural === $child->getName()) {
+                    unset($flatSchema['patternProperties']['^'.preg_quote($singular).'$']);
+                }
+            }
+
+            foreach (['properties', 'patternProperties'] as $key) {
+                $elementProperties = $elementSchema[$key] ?? [];
+
+                if ('properties' === $key) {
+                    // the keys that name the elements are consumed by the child
+                    $elementProperties = array_diff_key($elementProperties, array_flip($consumedKeys));
+                }
+
+                foreach ($elementProperties as $name => $propertySchema) {
+                    $flatSchema[$key][$name] = $propertySchema;
+                }
+            }
+
+            if (isset($flatSchema['properties']) && !$flatSchema['properties']) {
+                unset($flatSchema['properties']);
+            }
+
+            if ($required = array_diff($elementSchema['required'] ?? [], $consumedKeys)) {
+                $flatSchema['required'] = [...$flatSchema['required'] ?? [], ...$required];
+            }
+
+            $flatSchema['additionalProperties'] = $elementSchema['additionalProperties'] ?? false;
+
+            $schemas[] = $flatSchema;
+        }
+
+        return $schemas;
     }
 
     /**

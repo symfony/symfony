@@ -67,23 +67,57 @@ final class ArrayShapeGenerator
             return $node->hasDefaultValue() && null === $node->getDefaultValue() ? 'array<mixed>|null' : 'array<mixed>';
         }
 
+        $elementsAtParentLevel = array_filter($children, static fn (NodeInterface $child) => $child instanceof PrototypedArrayNode && null !== $child->getAttribute('elements_at_parent_level'));
+
         $arrayShape = \sprintf("array{%s\n", self::generateInlinePhpDocForNode($node));
+        $arrayShape .= self::generateArrayShapeChildren($node, $children, $nestingLevel, $resolveAlias);
+
+        if ($node->shouldIgnoreExtraKeys() || (!$elementsAtParentLevel && \in_array(ExprBuilder::TYPE_ANY, $node->getNormalizedTypes(), true))) {
+            $arrayShape .= str_repeat('    ', $nestingLevel)."...<string, mixed>\n";
+        }
+
+        $arrayShape = $arrayShape.str_repeat('    ', $nestingLevel - 1).'}';
+
+        foreach ($elementsAtParentLevel as $child) {
+            $element = $child->getPrototype();
+
+            if (!$element instanceof ArrayNode) {
+                continue;
+            }
+
+            // the keys of the elements of the child are given in this node instead of in the child
+            $siblings = array_filter($children, static fn (NodeInterface $sibling) => $sibling !== $child);
+            // the key that names the elements is consumed by the child, so the elements cannot provide it
+            $keyAttribute = $child->getKeyAttribute();
+            $elementChildren = null === $keyAttribute ? $element->getChildren() : array_diff_key($element->getChildren(), [$keyAttribute => true]);
+
+            $arrayShape .= \sprintf("|array{\n%s%s%s%s}",
+                self::generateArrayShapeChildren($node, $siblings, $nestingLevel, $resolveAlias),
+                self::generateArrayShapeChildren($element, $elementChildren, $nestingLevel, $resolveAlias),
+                $element->shouldIgnoreExtraKeys() ? str_repeat('    ', $nestingLevel)."...<string, mixed>\n" : '',
+                str_repeat('    ', $nestingLevel - 1),
+            );
+        }
+
+        return implode('|', [...self::getNormalizedTypes($node, ['array', 'any']), $arrayShape]);
+    }
+
+    /**
+     * @param array<string, NodeInterface> $children
+     */
+    private static function generateArrayShapeChildren(ArrayNode $parent, array $children, int $nestingLevel, ?\Closure $resolveAlias): string
+    {
+        $arrayShape = '';
 
         foreach ($children as $child) {
-            $arrayShape .= str_repeat('    ', $nestingLevel).self::dumpNodeKey($child, $node).': ';
+            $arrayShape .= str_repeat('    ', $nestingLevel).self::dumpNodeKey($child, $parent).': ';
 
             $arrayShape .= self::doGeneratePhpDoc($child, 1 + $nestingLevel, $resolveAlias);
 
             $arrayShape .= \sprintf(",%s\n", !$child instanceof ArrayNode ? self::generateInlinePhpDocForNode($child) : '');
         }
 
-        if ($node->shouldIgnoreExtraKeys() || \in_array(ExprBuilder::TYPE_ANY, $node->getNormalizedTypes(), true)) {
-            $arrayShape .= str_repeat('    ', $nestingLevel)."...<string, mixed>\n";
-        }
-
-        $arrayShape = $arrayShape.str_repeat('    ', $nestingLevel - 1).'}';
-
-        return implode('|', [...self::getNormalizedTypes($node, ['array', 'any']), $arrayShape]);
+        return $arrayShape;
     }
 
     private static function dumpNodeKey(NodeInterface $node, ?ArrayNode $parent = null): string

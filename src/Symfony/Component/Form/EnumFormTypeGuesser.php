@@ -58,7 +58,12 @@ final class EnumFormTypeGuesser implements FormTypeGuesserInterface
         }
 
         try {
-            $propertyReflection = new \ReflectionProperty($class, $property);
+            $reflector = new \ReflectionClass($class);
+            // a child class does not list the private properties of its parent classes
+            while (!$reflector->hasProperty($property) && $reflector->getParentClass()) {
+                $reflector = $reflector->getParentClass();
+            }
+            $propertyReflection = $reflector->getProperty($property);
         } catch (\ReflectionException) {
             return $this->cache[$class][$property] = false;
         }

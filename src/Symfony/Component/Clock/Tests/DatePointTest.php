@@ -50,6 +50,27 @@ class DatePointTest extends TestCase
         $this->assertSame('UTC', (new DatePoint('now', new \DateTimeZone('UTC')))->getTimezone()->getName());
     }
 
+    /**
+     * @testWith ["2016-10-30 02:30:00+02:00", "now", "2016-10-30 00:30:00 UTC"]
+     *           ["2016-10-30 02:30:01+02:00", "+1 second", "2016-10-30 00:30:00 UTC"]
+     *           ["2016-10-30 02:30:00+01:00", "now", "2016-10-30 01:30:00 UTC"]
+     *           ["2016-10-30 02:30:01+01:00", "+1 second", "2016-10-30 01:30:00 UTC"]
+     *           ["2016-10-30 02:30:00+01:00", "2016-10-30 02:30", "2016-07-14 12:00:00 UTC"]
+     *           ["2016-10-30 02:30:00+02:00", "2016-10-30 02:30 Europe/Paris", "2016-01-14 12:00:00 UTC"]
+     */
+    public function testFallBackHourWithReference(string $expected, string $datetime, string $reference)
+    {
+        $timezone = new \DateTimeZone('Europe/Paris');
+
+        $date = new DatePoint($datetime, $timezone, new \DateTimeImmutable($reference));
+        $this->assertSame($expected, $date->format('Y-m-d H:i:sP'));
+
+        self::mockTime(new \DateTimeImmutable($reference));
+
+        $date = new DatePoint($datetime, $timezone);
+        $this->assertSame($expected, $date->format('Y-m-d H:i:sP'));
+    }
+
     public function testCreateFromFormat()
     {
         $date = DatePoint::createFromFormat('Y-m-d H:i:s', '2010-01-28 15:00:00');

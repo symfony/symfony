@@ -56,32 +56,46 @@ final class DatePoint extends \DateTimeImmutable
             }
 
             $parsed = date_parse($datetime);
-            $now = $now->setTimezone($timezone);
 
-            // the native constructor starts from midnight when $datetime has a date but no time, modify() does not
-            if (false === $parsed['hour'] && (false !== $parsed['month'] || false !== $parsed['day'])) {
-                $datetime = 'midnight '.$datetime;
-            } elseif (false === $parsed['fraction'] && (false !== $parsed['year'] || false !== $parsed['hour'])) {
-                // it also resets the microseconds when $datetime sets a field without a fraction
-                $now = $now->setTimestamp($now->getTimestamp());
+            if (false !== $parsed['year'] && false !== $parsed['month'] && false !== $parsed['day']) {
+                // the native result does not depend on the current time when $datetime has a full date
+                $now = $builtInDate;
+            } else {
+                $now = $now->setTimezone($timezone);
+
+                // the native constructor starts from midnight when $datetime has a date but no time, modify() does not
+                if (false === $parsed['hour'] && (false !== $parsed['month'] || false !== $parsed['day'])) {
+                    $datetime = 'midnight '.$datetime;
+                } elseif (false === $parsed['fraction'] && (false !== $parsed['year'] || false !== $parsed['hour'])) {
+                    // it also resets the microseconds when $datetime sets a field without a fraction
+                    $now = $now->setTimestamp($now->getTimestamp());
+                }
+
+                $now = $now->modify($datetime);
             }
-
-            $now = $now->modify($datetime);
         } elseif (null !== $timezone) {
             $now = $now->setTimezone($timezone);
         }
 
         if (\PHP_VERSION_ID < 80200) {
-            $now = (array) $now;
-            $this->date = $now['date'];
-            $this->timezone_type = $now['timezone_type'];
-            $this->timezone = $now['timezone'];
+            $copy = (array) $now;
+            $this->date = $copy['date'];
+            $this->timezone_type = $copy['timezone_type'];
+            $this->timezone = $copy['timezone'];
             $this->__wakeup();
-
-            return;
+        } else {
+            $this->__unserialize((array) $now);
         }
 
-        $this->__unserialize((array) $now);
+        // copying $now goes through its local time, which is ambiguous during the DST fall-back hour
+        if ($this->getTimestamp() !== $now->getTimestamp()) {
+            // PHP picks the DST occurrence when the timezone is part of the string
+            $date = $now->format('Y-m-d H:i:s.u e');
+
+            if ($now->getTimestamp() === (new parent($date))->getTimestamp()) {
+                parent::__construct($date);
+            }
+        }
     }
 
     /**

@@ -110,6 +110,9 @@ final class AttributeMetadataPass implements CompilerPassInterface
                 continue;
             }
 
+            // the resource registered by getReflectionClass() ignores private members
+            $container->addObjectResource($class->name);
+
             foreach ($class->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE) as $member) {
                 if (!$member->isStatic() && $this->hasAttribute($member, $attributes)) {
                     $definition->addTag('serializer.attribute_metadata');

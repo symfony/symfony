@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Tests\Fixtures\TraitWithPrivateProperty;
 
 class AttributeMetadataPassTest extends TestCase
 {
@@ -163,6 +164,20 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertSame([true, []], $container->getDefinition('serializer.mapping.attribute_loader')->getArguments());
     }
 
+    public function testProcessTracksTheFilesOfInspectedClassesAndOfTheirTraits()
+    {
+        $container = $this->createContainerWithAutoconfiguredAttributes();
+        $container->register('dto', _AttrMeta_PrivatePropertyFromTrait::class)->setAutoconfigured(true);
+
+        $this->processPasses($container);
+
+        $this->assertSame([], $container->getDefinition('serializer.mapping.attribute_loader')->getArgument(1));
+
+        $resources = array_map('strval', $container->getResources());
+        $this->assertContains(__FILE__, $resources);
+        $this->assertContains(\dirname(__DIR__).'/Fixtures/TraitWithPrivateProperty.php', $resources);
+    }
+
     private function createContainerWithAutoconfiguredAttributes(): ContainerBuilder
     {
         if (!method_exists(ContainerBuilder::class, 'getAttributeAutoconfigurators')) {
@@ -259,4 +274,9 @@ class _AttrMeta_IgnoredAttributes
 {
     #[Groups(['read'])]
     private string $name;
+}
+
+class _AttrMeta_PrivatePropertyFromTrait
+{
+    use TraitWithPrivateProperty;
 }

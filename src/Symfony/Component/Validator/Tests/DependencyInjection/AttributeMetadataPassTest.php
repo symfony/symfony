@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Validator\Exception\MappingException;
+use Symfony\Component\Validator\Tests\Fixtures\TraitWithPrivateProperty;
 use Symfony\Component\Validator\Validation;
 
 class AttributeMetadataPassTest extends TestCase
@@ -189,6 +190,20 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertSame([], $container->getDefinition('validator.builder')->getMethodCalls());
     }
 
+    public function testProcessTracksTheFilesOfInspectedClassesAndOfTheirTraits()
+    {
+        $container = $this->createContainerWithAutoconfiguredConstraints();
+        $container->register('dto', _AttrMeta_PrivatePropertyFromTrait::class)->setAutoconfigured(true);
+
+        $this->processPasses($container);
+
+        $this->assertSame([], $container->getDefinition('validator.builder')->getMethodCalls());
+
+        $resources = array_map('strval', $container->getResources());
+        $this->assertContains(__FILE__, $resources);
+        $this->assertContains((new \ReflectionClass(TraitWithPrivateProperty::class))->getFileName(), $resources);
+    }
+
     private function createContainerWithAutoconfiguredConstraints(): ContainerBuilder
     {
         $container = new ContainerBuilder();
@@ -275,4 +290,9 @@ class _AttrMeta_IgnoredAttributes
 {
     #[Assert\NotBlank]
     private string $name = '';
+}
+
+class _AttrMeta_PrivatePropertyFromTrait
+{
+    use TraitWithPrivateProperty;
 }

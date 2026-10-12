@@ -24,6 +24,7 @@ use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
+use Symfony\Component\Serializer\Tests\Fixtures\TraitWithPrivateProperty;
 
 class AttributeMetadataPassTest extends TestCase
 {
@@ -292,6 +293,20 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertSame([true, [], []], $container->getDefinition('serializer.mapping.attribute_loader')->getArguments());
     }
 
+    public function testProcessTracksTheFilesOfInspectedClassesAndOfTheirTraits()
+    {
+        $container = $this->createContainerWithAutoconfiguredAttributes();
+        $container->register('dto', _AttrMeta_PrivatePropertyFromTrait::class)->setAutoconfigured(true);
+
+        $this->processPasses($container);
+
+        $this->assertSame([], $container->getDefinition('serializer.mapping.attribute_loader')->getArgument(1));
+
+        $resources = array_map('strval', $container->getResources());
+        $this->assertContains(__FILE__, $resources);
+        $this->assertContains((new \ReflectionClass(TraitWithPrivateProperty::class))->getFileName(), $resources);
+    }
+
     private function createContainerWithAutoconfiguredAttributes(): ContainerBuilder
     {
         $container = new ContainerBuilder();
@@ -406,4 +421,9 @@ class _AttrMeta_DiscriminatorChildWithPrivateProperty extends _AttrMeta_Discrimi
 {
     #[Groups(['read'])]
     private string $name;
+}
+
+class _AttrMeta_PrivatePropertyFromTrait
+{
+    use TraitWithPrivateProperty;
 }

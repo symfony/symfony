@@ -517,6 +517,33 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertStringContainsString('usage1', $command->getUsages()[0]);
     }
 
+    public function testProcessInvokableCommandReadsHelpAndUsagesFromItsAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->register('invokable_command', InvokableCommandWithUsages::class)
+            ->addTag('console.command', ['command' => 'invokable-usages', 'description' => 'Just testing']);
+
+        $container->compile();
+        $command = $container->get('console.command_loader')->get('invokable-usages');
+
+        self::assertSame('The %command.name% help content.', $command->getHelp());
+        self::assertSame(['invokable-usages usage1', 'invokable-usages usage2'], $command->getUsages());
+    }
+
+    public function testProcessCommandSubclassAddsTheUsagesOfItsAttributeOnce()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->register('command_with_usages', CommandWithUsages::class)
+            ->addTag('console.command', ['command' => 'with-usages', 'description' => 'Just testing']);
+
+        $container->compile();
+        $command = $container->get('console.command_loader')->get('with-usages');
+
+        self::assertSame(['with-usages usage1'], $command->getUsages());
+    }
+
     public function testProcessCommandWithDescriptionWithpercentageSigns()
     {
         $container = new ContainerBuilder();
@@ -588,6 +615,19 @@ class DescribedCommand extends Command
 
 #[AsCommand(name: 'invokable', description: 'Just testing', help: 'The %command.name% help content.')]
 class InvokableCommand
+{
+    public function __invoke(): void
+    {
+    }
+}
+
+#[AsCommand(name: 'with-usages', description: 'Just testing', usages: ['usage1'])]
+class CommandWithUsages extends Command
+{
+}
+
+#[AsCommand(name: 'invokable-usages', description: 'Just testing', help: 'The %command.name% help content.', usages: ['usage1', 'usage2'])]
+class InvokableCommandWithUsages
 {
     public function __invoke(): void
     {

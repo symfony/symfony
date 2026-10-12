@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -148,11 +147,6 @@ abstract class KernelTestCase extends TestCase
             static::$kernel->boot();
             $container = static::$kernel->getContainer();
 
-            $httpCacheDir = null;
-            if ($container->has('http_cache')) {
-                $httpCacheDir = static::$kernel->getShareDir().'/http_cache';
-            }
-
             if ($container->has('test.service_container')) {
                 $container->get('test.service_container')->resetState();
             }
@@ -181,10 +175,6 @@ abstract class KernelTestCase extends TestCase
 
             if ($container instanceof ResetInterface) {
                 $container->reset();
-            }
-
-            if (null !== $httpCacheDir && is_dir($httpCacheDir)) {
-                (new Filesystem())->remove($httpCacheDir);
             }
         }
     }

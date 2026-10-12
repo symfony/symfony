@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `KernelBrowser::sendWebhook()` to post a webhook signed as its `webhook.routing` entry expects
  * Add `WebhookAssertionsTrait` to `KernelTestCase` to assert on the webhooks sent with the `webhook.transport` service
+ * Tag the `http_cache.store` service with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
  * Make `MailerAssertionsTrait` and `NotificationAssertionsTrait` see the emails and notifications sent during the previous requests of the test client
  * Add the `kernel.test_state` tag to call a method of a service when a test ends, or to keep a copy of the service before each reset until the test ends
  * Pass the token of `KernelBrowser::loginUser()` with each request, so that stateless firewalls can read it

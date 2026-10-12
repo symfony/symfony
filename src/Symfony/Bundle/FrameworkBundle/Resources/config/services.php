@@ -76,6 +76,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 param('kernel.share_dir').'/http_cache',
             ])
+            ->tag('kernel.test_state', ['method' => 'clear'])
         ->alias(StoreInterface::class, 'http_cache.store')
 
         ->set('url_helper', UrlHelper::class)

@@ -102,7 +102,8 @@ class PeriodicalTrigger implements StatefulTriggerInterface
             $from = (float) $fromDate->format('U.u');
             $delta = $run->format('U.u') - $from;
             $recurrencesPassed = floor($delta / $this->intervalInSeconds);
-            $nextRun = \DateTimeImmutable::createFromTimestamp(($recurrencesPassed + 1) * $this->intervalInSeconds + $from)->setTimezone($fromDate->getTimezone());
+            $nextRunTimestamp = ($recurrencesPassed + 1) * $this->intervalInSeconds + $from;
+            $nextRun = (\PHP_INT_SIZE >= 8 ? \DateTimeImmutable::createFromTimestamp($nextRunTimestamp) : \DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $nextRunTimestamp)))->setTimezone($fromDate->getTimezone());
 
             if ($this->from > $nextRun) {
                 return $this->from;

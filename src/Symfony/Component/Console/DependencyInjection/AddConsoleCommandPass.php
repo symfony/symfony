@@ -194,7 +194,11 @@ class AddConsoleCommandPass implements CompilerPassInterface
             $definition->addMethodCall('setHelp', [str_replace('%', '%%', $help)]);
         }
 
-        if ($usages ??= $attribute?->usages) {
+        if ($reflection instanceof \ReflectionMethod) {
+            $usages ??= $attribute?->usages;
+        }
+
+        if ($usages) {
             foreach ($usages as $usage) {
                 $definition->addMethodCall('addUsage', [$usage]);
             }

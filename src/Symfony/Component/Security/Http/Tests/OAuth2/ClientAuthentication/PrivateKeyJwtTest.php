@@ -13,8 +13,10 @@ namespace Symfony\Component\Security\Http\Tests\OAuth2\ClientAuthentication;
 
 use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -109,6 +111,17 @@ class PrivateKeyJwtTest extends TestCase
         $clientAuthentication = new PrivateKeyJwt(new JWK(self::PRIVATE_JWK), 'ES256', 30, new MockClock('2026-09-08 10:00:00'));
 
         $claims = self::decodePayload($clientAuthentication->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []])['body']['client_assertion']);
+
+        $this->assertSame(strtotime('2026-09-08 10:00:00 UTC'), $claims['iat']);
+        $this->assertSame(strtotime('2026-09-08 10:00:30 UTC'), $claims['exp']);
+    }
+
+    #[Group('time-sensitive')]
+    public function testDatesTheAssertionWithTheCurrentTimeWithoutAClock()
+    {
+        ClockMock::withClockMock(strtotime('2026-09-08 10:00:00 UTC'));
+
+        $claims = self::decodePayload((new PrivateKeyJwt(new JWK(self::PRIVATE_JWK), 'ES256', 30))->authenticate('test-client-id', 'https://provider.example.com/token', ['body' => []])['body']['client_assertion']);
 
         $this->assertSame(strtotime('2026-09-08 10:00:00 UTC'), $claims['iat']);
         $this->assertSame(strtotime('2026-09-08 10:00:30 UTC'), $claims['exp']);

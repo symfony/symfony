@@ -210,7 +210,7 @@ final class HarFile
     public static function createEntry(string $method, string $url, ?string $requestBody, array $requestHeaders, int $status, array $responseHeaders, string $content): array
     {
         return [
-            'startedDateTime' => (class_exists(Clock::class) ? Clock::get()->now() : new \DateTimeImmutable())->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d\TH:i:s.v\Z'),
+            'startedDateTime' => (class_exists(Clock::class) ? Clock::get()->now() : \DateTimeImmutable::createFromTimestamp(microtime(true)))->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d\TH:i:s.v\Z'),
             'time' => 0,
             'request' => [
                 'method' => $method,

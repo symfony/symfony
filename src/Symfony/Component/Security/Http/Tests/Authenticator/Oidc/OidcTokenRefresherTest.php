@@ -16,7 +16,9 @@ use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -93,6 +95,18 @@ class OidcTokenRefresherTest extends TestCase
 
         $this->assertTrue($refresher->refreshIfNeeded($token));
         $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
+        $this->assertSame($this->clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
+    }
+
+    #[Group('time-sensitive')]
+    public function testRefreshIfNeededReadsTheTimeWithoutAClock()
+    {
+        ClockMock::withClockMock($this->clock->now()->getTimestamp());
+
+        $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456', 'expires_in' => 300]), withClock: false);
+        $token = $this->createToken(['oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() + 29]);
+
+        $this->assertTrue($refresher->refreshIfNeeded($token));
         $this->assertSame($this->clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
     }
 
@@ -289,7 +303,7 @@ class OidcTokenRefresherTest extends TestCase
         $refresher->refresh($token);
     }
 
-    private function createRefresher(MockResponse $tokenEndpointResponse, ?OidcSignatureVerifier $signatureVerifier = null, int $leeway = 30): OidcTokenRefresher
+    private function createRefresher(MockResponse $tokenEndpointResponse, ?OidcSignatureVerifier $signatureVerifier = null, int $leeway = 30, bool $withClock = true): OidcTokenRefresher
     {
         return new OidcTokenRefresher(
             new OidcClient(new MockHttpClient($tokenEndpointResponse), $this->discovery, 'test-client-id', new ClientSecretPost('test-client-secret')),
@@ -298,7 +312,7 @@ class OidcTokenRefresherTest extends TestCase
             'test-client-id',
             $signatureVerifier,
             $leeway,
-            $this->clock,
+            $withClock ? $this->clock : null,
         );
     }
 

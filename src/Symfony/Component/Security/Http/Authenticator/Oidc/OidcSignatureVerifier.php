@@ -20,7 +20,6 @@ use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\OAuth2\JwsAlgorithms;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
@@ -46,8 +45,6 @@ final class OidcSignatureVerifier
      */
     private const ROTATION_COOLDOWN = 60;
 
-    private readonly ClockInterface $clock;
-
     /**
      * @param list<string> $algorithms                  The signature algorithms accepted to verify the ID token (e.g. ["RS256"])
      * @param int          $jwksCacheTtl                The JWKS cache lifetime used when the provider advertises none
@@ -61,13 +58,8 @@ final class OidcSignatureVerifier
         private readonly array $algorithms = ['RS256'],
         private readonly int $jwksCacheTtl = 3600,
         private readonly bool $enforceKeyUsageVerification = true,
-        ?ClockInterface $clock = null,
+        private readonly ?ClockInterface $clock = null,
     ) {
-        if (null === $clock && !class_exists(Clock::class)) {
-            throw new \LogicException(\sprintf('The "symfony/clock" component is required to build "%s" without a clock. Try running "composer require symfony/clock", or pass any PSR-20 clock to the constructor.', self::class));
-        }
-
-        $this->clock = $clock ?? new Clock();
     }
 
     /**
@@ -190,7 +182,7 @@ final class OidcSignatureVerifier
             'keys' => OidcJwks::fetchKeys($this->httpClient, $jwksUri, $item, $this->jwksCacheTtl, $this->enforceKeyUsageVerification, $this->clock),
             // the JWKS is stored with the time it was fetched, so that the rotation
             // refetch below can be throttled without a second cache entry
-            'fetched_at' => $this->clock->now()->getTimestamp(),
+            'fetched_at' => $this->clock?->now()->getTimestamp() ?? time(),
         ];
 
         /** @var array{keys: list<array<string, mixed>>, fetched_at: int} $jwks */
@@ -198,7 +190,7 @@ final class OidcSignatureVerifier
 
         if (null !== $kid
             && !$this->hasKey($jwks['keys'], $kid)
-            && ($jwks['fetched_at'] ?? 0) <= $this->clock->now()->getTimestamp() - self::ROTATION_COOLDOWN
+            && ($jwks['fetched_at'] ?? 0) <= ($this->clock?->now()->getTimestamp() ?? time()) - self::ROTATION_COOLDOWN
         ) {
             $jwks = $this->jwksCache->get($cacheKey, $compute, \INF);
         }

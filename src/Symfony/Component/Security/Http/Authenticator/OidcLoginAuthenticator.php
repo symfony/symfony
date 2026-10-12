@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Authenticator;
 
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,7 +55,6 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     private const MANAGED_PARAMS = ['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'max_age', 'dpop_jkt'];
 
     private array $options;
-    private readonly ClockInterface $clock;
 
     /**
      * Refuses a public client that turns PKCE or the ID token signature check off.
@@ -75,7 +73,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
      *                                                           as the token endpoint request verifies TLS
      * @param ClockInterface|null           $clock               Turns the "expires_in" of the token endpoint response into
      *                                                           the absolute expiry the security token carries, or null to
-     *                                                           use the clock of the "symfony/clock" component
+     *                                                           use the system time
      * @param EventDispatcherInterface|null $eventDispatcher     Dispatches OidcAuthorizationRequestEvent before the user is
      *                                                           redirected to the provider, or null to always send the
      *                                                           authorization request $authorizationParams describes
@@ -92,16 +90,10 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         array $options,
         private readonly array $authorizationParams = [],
         private readonly ?OidcSignatureVerifier $signatureVerifier = null,
-        ?ClockInterface $clock = null,
+        private readonly ?ClockInterface $clock = null,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
         private readonly ?DpopProofFactory $dpopProofFactory = null,
     ) {
-        if (null === $clock && !class_exists(Clock::class)) {
-            throw new \LogicException(\sprintf('The "symfony/clock" component is required to build "%s" without a clock. Try running "composer require symfony/clock", or pass any PSR-20 clock to the constructor.', self::class));
-        }
-
-        $this->clock = $clock ?? new Clock();
-
         $this->options = array_merge([
             'check_path' => '/oidc/callback',
             'firewall_name' => 'main',
@@ -410,7 +402,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             // it renews; both are null unless the provider issued them, as it only issues
             // a refresh token when it was asked for one, and "expires_in" is optional
             $token->setAttribute('oidc_refresh_token', $tokenData['refresh_token'] ?? null);
-            $token->setAttribute('oidc_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? $this->clock->now()->getTimestamp() + (int) $tokenData['expires_in'] : null);
+            $token->setAttribute('oidc_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? ($this->clock?->now()->getTimestamp() ?? time()) + (int) $tokenData['expires_in'] : null);
         }
 
         $token->setAttribute('oidc_acr', $passport->getAttribute('oidc_acr'));
@@ -419,7 +411,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
 
         $methods = $passport->getAttribute('oidc_amr');
         $methods = \is_array($methods) && $methods ? $methods : [AuthenticationMethod::UNSPECIFIED];
-        $now = $this->clock->now()->getTimestamp();
+        $now = $this->clock?->now()->getTimestamp() ?? time();
 
         // a provider whose clock runs ahead would otherwise extend the window that
         // IS_AUTHENTICATED_RECENTLY grants, so the claim never dates from the future

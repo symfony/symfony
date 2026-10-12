@@ -18,10 +18,12 @@ use Jose\Component\Signature\Algorithm\RS256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Clock\MockClock;
@@ -213,6 +215,17 @@ class DpopSenderConstraintTest extends TestCase
         yield 'a fragment' => ['https://api.example.com/me#here'];
         yield 'the port the scheme implies' => ['https://api.example.com:443/me'];
         yield 'an upper-case host' => ['https://API.example.com/me'];
+    }
+
+    #[Group('time-sensitive')]
+    public function testItReadsTheTimeWithoutAClock()
+    {
+        ClockMock::withClockMock($this->clock->now()->getTimestamp());
+
+        $constraint = new DpopSenderConstraint(new AlgorithmManager([new ES256()]), $this->cache);
+        $constraint->check($this->createRequest($this->createProof()), self::ACCESS_TOKEN, $this->claimsBoundTo(self::PRIVATE_JWK));
+
+        $this->expectNotToPerformAssertions();
     }
 
     public function testItRefusesAProofMadeLaterThanTheRequest()

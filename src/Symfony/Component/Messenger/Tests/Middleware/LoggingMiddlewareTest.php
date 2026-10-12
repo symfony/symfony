@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\MockClock;
@@ -53,6 +54,31 @@ class LoggingMiddlewareTest extends MiddlewareTestCase
             new DummyMessage('Hello')),
             new StackMiddleware(new \ArrayIterator([null, ...$nextMiddlewares($clock)]))
         );
+    }
+
+    #[Group('time-sensitive')]
+    public function testHandleMeasuresTheDurationWithoutAClock()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('info')
+            ->with('"{class}" message successfully handled.', [
+                'class' => DummyMessage::class,
+                'duration_ms' => 2000,
+                'memory_usage' => 0,
+            ])
+        ;
+
+        $nextMiddleware = new class implements MiddlewareInterface {
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                sleep(2);
+
+                return $stack->next()->handle($envelope, $stack);
+            }
+        };
+
+        (new LoggingMiddleware($logger, null, $this->createMemoryResolver(0)))->handle(new Envelope(new DummyMessage('Hello')), new StackMiddleware(new \ArrayIterator([null, $nextMiddleware])));
     }
 
     public static function provideDurationAndMemoryUsageByStack(): iterable

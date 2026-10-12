@@ -12,9 +12,8 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Composer\Semver\VersionParser;
+use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\Clock;
-use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -41,7 +40,6 @@ class ImportMapUpdateChecker
     private const RELEASE_AGE_MODIFIER_FORMAT = '-%d seconds';
 
     private readonly HttpClientInterface $httpClient;
-    private readonly ClockInterface $clock;
 
     /**
      * @param int $minimumReleaseAge Minimum age, in seconds, a package version must have to be
@@ -50,12 +48,11 @@ class ImportMapUpdateChecker
     public function __construct(
         private readonly ImportMapConfigReader $importMapConfigReader,
         ?HttpClientInterface $httpClient = null,
-        ?ClockInterface $clock = null,
+        private readonly ?ClockInterface $clock = null,
         private readonly int $minimumReleaseAge = 0,
         private readonly ?LoggerInterface $logger = null,
     ) {
         $this->httpClient = new BatchHttpClient($httpClient ?? HttpClient::create());
-        $this->clock = $clock ?? Clock::get();
     }
 
     public function getMinimumReleaseAge(): int
@@ -142,7 +139,7 @@ class ImportMapUpdateChecker
             return null;
         }
 
-        $boundary = $this->clock->now()->modify(\sprintf(self::RELEASE_AGE_MODIFIER_FORMAT, $this->minimumReleaseAge));
+        $boundary = ($this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(time()))->modify(\sprintf(self::RELEASE_AGE_MODIFIER_FORMAT, $this->minimumReleaseAge));
 
         // `time` records a publish timestamp for every version plus the `created`/`modified`
         // meta keys, and also keeps unpublished versions that are absent from `versions`.

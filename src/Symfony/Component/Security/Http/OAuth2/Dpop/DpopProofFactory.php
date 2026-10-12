@@ -17,7 +17,6 @@ use Jose\Component\Core\JWK;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Http\OAuth2\JwsAlgorithms;
 
 /**
@@ -45,7 +44,6 @@ final class DpopProofFactory
      */
     private const TYPE = 'dpop+jwt';
 
-    private readonly ClockInterface $clock;
     private readonly Algorithm $algorithm;
     private readonly JWK $publicKey;
 
@@ -58,7 +56,7 @@ final class DpopProofFactory
     public function __construct(
         private readonly JWK $signingKey,
         string $algorithm = 'ES256',
-        ?ClockInterface $clock = null,
+        private readonly ?ClockInterface $clock = null,
     ) {
         if (!class_exists(JWSBuilder::class)) {
             throw new \LogicException('You cannot sign DPoP proofs since the "web-token/jwt-library" package is not installed. Try running "composer require web-token/jwt-library".');
@@ -78,11 +76,6 @@ final class DpopProofFactory
             throw new \InvalidArgumentException('A DPoP proof must be signed with the private key of the client, and the given JWK has no "d" parameter: it is the public key.');
         }
 
-        if (null === $clock && !class_exists(Clock::class)) {
-            throw new \LogicException(\sprintf('The "symfony/clock" component is required to build "%s" without a clock. Try running "composer require symfony/clock", or pass any PSR-20 clock to the constructor.', self::class));
-        }
-
-        $this->clock = $clock ?? new Clock();
         // the header of every proof carries the members RFC 7638 names a public key by and nothing else,
         // since any other member may be private, such as the "oth" of a multi-prime RSA key
         $this->publicKey = new JWK(array_intersect_key($signingKey->all(), array_flip(['kty', 'crv', 'x', 'y', 'n', 'e'])));
@@ -114,7 +107,7 @@ final class DpopProofFactory
      */
     public function createProof(string $method, string $url, #[\SensitiveParameter] ?string $accessToken = null, ?string $nonce = null): string
     {
-        $now = $this->clock->now()->getTimestamp();
+        $now = $this->clock?->now()->getTimestamp() ?? time();
 
         $claims = [
             'jti' => bin2hex(random_bytes(16)),

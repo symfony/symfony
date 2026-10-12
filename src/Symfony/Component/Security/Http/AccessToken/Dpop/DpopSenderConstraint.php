@@ -20,7 +20,6 @@ use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -85,7 +84,7 @@ final class DpopSenderConstraint implements SenderConstraintInterface
     public function __construct(
         private readonly AlgorithmManager $algorithms,
         private readonly CacheItemPoolInterface $proofReplayCache,
-        private readonly ClockInterface $clock = new Clock(),
+        private readonly ?ClockInterface $clock = null,
         private readonly int $proofLifetime = 60,
         private readonly int $allowedTimeDrift = 5,
         private readonly ?LoggerInterface $logger = null,
@@ -247,7 +246,7 @@ final class DpopSenderConstraint implements SenderConstraintInterface
             throw new InvalidDpopProofException('The DPoP proof carries no "iat" (RFC 9449, Section 4.2).');
         }
 
-        $now = $this->clock->now()->getTimestamp();
+        $now = $this->clock?->now()->getTimestamp() ?? time();
         if ($issuedAt > $now + $this->allowedTimeDrift) {
             throw new InvalidDpopProofException('The DPoP proof was made later than the request that carries it (RFC 9449, Section 4.3).');
         }

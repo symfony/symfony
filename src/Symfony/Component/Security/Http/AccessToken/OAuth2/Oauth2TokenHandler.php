@@ -21,7 +21,6 @@ use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OAuth2User;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
@@ -114,7 +113,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
         string|array $audiences = [],
         private readonly ?string $issuer = null,
         private readonly ?string $claim = null,
-        private readonly ClockInterface $clock = new Clock(),
+        private readonly ?ClockInterface $clock = null,
         private readonly int $allowedTimeDrift = 0,
     ) {
         $this->audiences = \is_array($audiences) ? array_values($audiences) : [$audiences];
@@ -259,7 +258,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
 
             $ttl = $this->cacheTtl;
             if (is_numeric($response['claims']['exp'] ?? null)) {
-                $ttl = min($ttl, (int) $response['claims']['exp'] - $this->clock->now()->getTimestamp());
+                $ttl = min($ttl, (int) $response['claims']['exp'] - $this->getClock()->now()->getTimestamp());
             }
 
             $save = 0 < $ttl && true === ($response['claims']['active'] ?? false);
@@ -339,7 +338,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
      */
     private function computeMetadataKeys(ItemInterface $item): array
     {
-        [$keys, $ttl] = OidcJwks::fromResponse($this->metadataClient->request('GET', $this->metadata->getConfiguration()['jwks_uri'], ['max_redirects' => 0]), true, $this->clock);
+        [$keys, $ttl] = OidcJwks::fromResponse($this->metadataClient->request('GET', $this->metadata->getConfiguration()['jwks_uri'], ['max_redirects' => 0]), true, $this->getClock());
 
         if (0 < ($ttl ?? -1)) {
             $item->expiresAfter(min($ttl, OidcJwks::MAX_TTL));
@@ -399,7 +398,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
             throw new BadCredentialsException('The payload of the introspection response is not a JSON object.');
         }
 
-        $checkers = [new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: $this->allowedTimeDrift)];
+        $checkers = [new Checker\IssuedAtChecker(clock: $this->getClock(), allowedTimeDrift: $this->allowedTimeDrift)];
         if (null !== $this->issuer) {
             $checkers[] = new Checker\IssuerChecker([$this->issuer]);
         }
@@ -432,7 +431,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
      */
     private function verifyClaims(array $claims, bool $signed): void
     {
-        $now = $this->clock->now()->getTimestamp();
+        $now = $this->getClock()->now()->getTimestamp();
 
         if (null !== ($exp = $this->readTimestamp($claims, 'exp')) && $exp <= $now - $this->allowedTimeDrift) {
             throw new BadCredentialsException('The token reported by the authorization server has expired.');
@@ -550,5 +549,15 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
         }
 
         return new OAuth2User(...$claims);
+    }
+
+    private function getClock(): ClockInterface
+    {
+        return $this->clock ?? new class implements ClockInterface {
+            public function now(): \DateTimeImmutable
+            {
+                return \DateTimeImmutable::createFromTimestamp(time());
+            }
+        };
     }
 }

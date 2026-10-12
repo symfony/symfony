@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Command;
 
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -60,7 +59,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
         private ?LoggerInterface $logger = null,
         ?PhpSerializer $phpSerializer = null,
         private ?array $signals = null,
-        ClockInterface $clock = new Clock(),
+        ?ClockInterface $clock = null,
     ) {
         parent::__construct($globalReceiverName, $failureTransports, $phpSerializer, $clock);
     }

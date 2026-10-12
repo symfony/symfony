@@ -84,7 +84,7 @@ final class UuidFactoryTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The given UUID date cannot be earlier than 1582-10-15.');
 
-        (new UuidFactory())->timeBased()->create(new \DateTimeImmutable('@-12219292800.001000'));
+        (new UuidFactory())->timeBased()->create(new \DateTimeImmutable('1582-10-14 23:59:59.999 UTC'));
     }
 
     public function testCreateRandom()

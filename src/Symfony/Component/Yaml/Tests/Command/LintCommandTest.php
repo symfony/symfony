@@ -458,7 +458,7 @@ bar';
         $this->assertSame(0, $ret, 'lint:yaml skips a schema that does not exist when --check-schema is not used');
         $this->assertStringContainsString('All 1 YAML files contain valid syntax.', $tester->getDisplay());
         // Strip the wrap prefix and every whitespace so the wrapped absolute schema path stays searchable.
-        $this->assertStringContainsString('/packages/../schema.jsonnotavailable)', preg_replace('/\s+/', '', preg_replace('~\n\s*// ~', '', $tester->getDisplay())));
+        $this->assertStringContainsString('/packages/../schema.jsonnotavailable)', str_replace('\\', '/', preg_replace('/\s+/', '', preg_replace('~\n\s*// ~', '', $tester->getDisplay()))));
     }
 
     public function testLintReportsMissingSchemaWithOption()

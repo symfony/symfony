@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T11:12:26Z
+
+PR updated: a property promoted by a parent constructor now prevents creating the object again (it was silently reset to the default of the argument), a disabled or unsubmitted field provides its data to a required argument, and `DataMapper::mapFormsToData()` accepts forms that can be iterated only once.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T12:11:16Z
+
+PR updated: the empty field of a required argument now carries the error itself, instead of a generic one on the parent form. With the validator, the constraints of its property are validated against its data, so `NotBlank` or `NotNull` show up on the field.

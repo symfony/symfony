@@ -7,6 +7,6 @@ $wh->setRecipientEmail('receiver@example.com');
 $wh->setTags(['Password reset']);
 $wh->setMetadata(['variable_a' => 'value', 'variable_b' => 'value2']);
 $wh->setReason('[CS01] Message rejected due to local policy');
-$wh->setDate(\DateTimeImmutable::createFromFormat('U', 1726358034));
+$wh->setDate(\DateTimeImmutable::createFromTimestamp(1726358034));
 
 return [$wh];

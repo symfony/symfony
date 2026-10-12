@@ -197,7 +197,7 @@ class UriSigner
 
     private function now(): \DateTimeImmutable
     {
-        return $this->clock?->now() ?? \DateTimeImmutable::createFromFormat('U', time());
+        return $this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(time());
     }
 
     /**

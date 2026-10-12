@@ -23,7 +23,7 @@ class Lox24OptionsTest extends TestCase
 {
     public function testDeliveryAtWithNotNull()
     {
-        $options = (new Lox24Options())->deliveryAt((new \DateTimeImmutable())->setTimestamp(123));
+        $options = (new Lox24Options())->deliveryAt(\DateTimeImmutable::createFromTimestamp(123));
         $this->assertSame(123, $options->toArray()['delivery_at']);
     }
 

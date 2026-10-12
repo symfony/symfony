@@ -100,8 +100,7 @@ class PeriodicalTrigger implements StatefulTriggerInterface
             $from = (float) $fromDate->format('U.u');
             $delta = $run->format('U.u') - $from;
             $recurrencesPassed = floor($delta / $this->intervalInSeconds);
-            $nextRunTimestamp = \sprintf('%.6F', ($recurrencesPassed + 1) * $this->intervalInSeconds + $from);
-            $nextRun = \DateTimeImmutable::createFromFormat('U.u', $nextRunTimestamp)->setTimezone($fromDate->getTimezone());
+            $nextRun = \DateTimeImmutable::createFromTimestamp(($recurrencesPassed + 1) * $this->intervalInSeconds + $from)->setTimezone($fromDate->getTimezone());
 
             if ($this->from > $nextRun) {
                 return $this->from;
@@ -140,7 +139,7 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
     private function calcInterval(\DateInterval $interval): float
     {
-        $seconds = (float) (new \DateTimeImmutable('@0'))->add($interval)->format('U.u');
+        $seconds = (float) \DateTimeImmutable::createFromTimestamp(0)->add($interval)->format('U.u');
 
         if (0.0 >= $seconds) {
             throw new InvalidArgumentException('The "$interval" argument must be greater than zero.');

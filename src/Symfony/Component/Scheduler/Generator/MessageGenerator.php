@@ -32,7 +32,7 @@ final class MessageGenerator implements MessageGeneratorInterface
         private readonly ClockInterface $clock = new Clock(),
         private ?CheckpointInterface $checkpoint = null,
     ) {
-        $this->waitUntil = new \DateTimeImmutable('@0');
+        $this->waitUntil = \DateTimeImmutable::createFromTimestamp(0);
     }
 
     /**
@@ -44,7 +44,7 @@ final class MessageGenerator implements MessageGeneratorInterface
 
         if ($this->schedule?->shouldRestart()) {
             unset($this->triggerHeap);
-            $this->waitUntil = new \DateTimeImmutable('@0');
+            $this->waitUntil = \DateTimeImmutable::createFromTimestamp(0);
             $this->schedule->setRestart(false);
         }
 

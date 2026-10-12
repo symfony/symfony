@@ -60,7 +60,7 @@ final class MockClock implements ClockInterface
             $us -= 1000000;
         }
 
-        $this->now = DatePoint::createFromFormat('U.u', \sprintf('%.0F.%06d', $s, $us))->setTimezone($this->now->getTimezone());
+        $this->now = DatePoint::createFromTimestamp($s)->setMicrosecond($us)->setTimezone($this->now->getTimezone());
     }
 
     /**

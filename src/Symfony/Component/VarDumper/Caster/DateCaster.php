@@ -51,7 +51,7 @@ class DateCaster
 
     public static function castInterval(\DateInterval $interval, array $a, Stub $stub, bool $isNested, int $filter): array
     {
-        $now = new \DateTimeImmutable('@0', new \DateTimeZone('UTC'));
+        $now = \DateTimeImmutable::createFromTimestamp(0);
         $numberOfSeconds = $now->add($interval)->getTimestamp() - $now->getTimestamp();
         $title = number_format($numberOfSeconds, 0, '.', ' ').'s';
 
@@ -65,7 +65,7 @@ class DateCaster
         $format = '%R ';
 
         if (0 === $i->y && 0 === $i->m && ($i->h >= 24 || $i->i >= 60 || $i->s >= 60)) {
-            $d = new \DateTimeImmutable('@0', new \DateTimeZone('UTC'));
+            $d = \DateTimeImmutable::createFromTimestamp(0);
             $i = $d->diff($d->add($i)); // recalculate carry over points
             $format .= 0 < $i->days ? '%ad ' : '';
         } else {

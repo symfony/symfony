@@ -4,6 +4,6 @@ use Symfony\Component\RemoteEvent\Event\Mailer\MailerEngagementEvent;
 
 $wh = new MailerEngagementEvent(MailerEngagementEvent::CLICK, '5520611177', json_decode(file_get_contents(str_replace('.php', '.json', __FILE__)), true));
 $wh->setRecipientEmail('reader@world.com');
-$wh->setDate(DateTimeImmutable::createFromFormat('U', 1576709779));
+$wh->setDate(DateTimeImmutable::createFromTimestamp(1576709779));
 
 return $wh;

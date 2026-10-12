@@ -138,7 +138,7 @@ class BinaryFileResponse extends Response
      */
     public function setAutoLastModified(): static
     {
-        $this->setLastModified(\DateTimeImmutable::createFromFormat('U', $this->tempFileObject ? time() : $this->file->getMTime()));
+        $this->setLastModified(\DateTimeImmutable::createFromTimestamp($this->tempFileObject ? time() : $this->file->getMTime()));
 
         return $this;
     }

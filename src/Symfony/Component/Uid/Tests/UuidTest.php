@@ -108,7 +108,7 @@ class UuidTest extends TestCase
 
         $uuid = new UuidV1(self::A_UUID_V1);
 
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '1583245966.746458'), $uuid->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromTimestamp(1583245966.746458), $uuid->getDateTime());
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
@@ -152,7 +152,7 @@ class UuidTest extends TestCase
 
         $uuid = new UuidV6(substr_replace(self::A_UUID_V1, '6', 14, 1));
 
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '85916308548.278321'), $uuid->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromTimestamp(85916308548)->setMicrosecond(278321), $uuid->getDateTime());
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
@@ -654,7 +654,7 @@ class UuidTest extends TestCase
     #[TestWith(['1645557742.999999'])]
     public function testV7MicrosecondPrecision(string $time)
     {
-        $uuid = UuidV7::fromString(UuidV7::generate(\DateTimeImmutable::createFromFormat('U.u', $time)));
+        $uuid = UuidV7::fromString(UuidV7::generate(\DateTimeImmutable::createFromTimestamp((float) $time)));
 
         $this->assertSame($time, $uuid->getDateTime()->format('U.u'));
     }
@@ -662,7 +662,7 @@ class UuidTest extends TestCase
     public function testUuidV7Boundaries()
     {
         // 0x017F22E279B0 is the RFC 9562 example timestamp for UUIDv7
-        $time = \DateTimeImmutable::createFromFormat('U.v', '1645557742.000');
+        $time = \DateTimeImmutable::createFromTimestamp(1645557742);
         [$min, $max] = UuidV7::createBoundaries($time);
 
         $this->assertSame('017f22e2-79b0-7000-8000-000000000000', (string) $min);
@@ -690,7 +690,7 @@ class UuidTest extends TestCase
 
     public function testCreateBoundariesLeavesTheGeneratorClockAlone()
     {
-        UuidV7::createBoundaries(new \DateTimeImmutable('@4102444800'));
+        UuidV7::createBoundaries(\DateTimeImmutable::createFromTimestamp(4102444800));
 
         $this->assertLessThan(new \DateTimeImmutable('+1 day'), new UuidV7()->getDateTime());
     }

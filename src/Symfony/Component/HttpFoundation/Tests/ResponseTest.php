@@ -1079,16 +1079,12 @@ class ResponseTest extends ResponseTestCase
 
     protected function createDateTimeNow()
     {
-        $date = new \DateTime();
-
-        return $date->setTimestamp(time());
+        return \DateTime::createFromTimestamp(time());
     }
 
     protected function createDateTimeImmutableNow()
     {
-        $date = new \DateTimeImmutable();
-
-        return $date->setTimestamp(time());
+        return \DateTimeImmutable::createFromTimestamp(time());
     }
 
     protected function provideResponse()

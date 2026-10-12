@@ -168,7 +168,7 @@ class Lox24TransportTest extends TransportTestCase
         ], [], 201, ['uuid' => '123456']);
         $transport = new Lox24Transport('user', 'token', 'testFrom', [], $client);
 
-        $options = (new Lox24Options())->deliveryAt((new \DateTimeImmutable())->setTimestamp(1000000000));
+        $options = (new Lox24Options())->deliveryAt(\DateTimeImmutable::createFromTimestamp(1000000000));
         $message = new SmsMessage('+1411111111', 'test text');
         $message->options($options);
 

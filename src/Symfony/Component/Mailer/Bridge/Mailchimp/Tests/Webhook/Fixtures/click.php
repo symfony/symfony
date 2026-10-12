@@ -6,6 +6,6 @@ $wh = new MailerEngagementEvent(MailerEngagementEvent::CLICK, '7761630', json_de
 $wh->setRecipientEmail('foo@example.com');
 $wh->setTags(['my_tag_1', 'my_tag_2']);
 $wh->setMetadata(['mandrill-var-1' => 'foo', 'mandrill-var-2' => 'bar']);
-$wh->setDate(\DateTimeImmutable::createFromFormat('U', 1365109999));
+$wh->setDate(\DateTimeImmutable::createFromTimestamp(1365109999));
 
 return [$wh];

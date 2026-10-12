@@ -7,6 +7,6 @@ $wh->setRecipientEmail('receiver@example.com');
 $wh->setTags(['Password reset']);
 $wh->setMetadata(['variable_a' => 'value', 'variable_b' => 'value2']);
 $wh->setReason('4.7.1 Temporary error, please retry');
-$wh->setDate(\DateTimeImmutable::createFromFormat('U', 1726358034));
+$wh->setDate(\DateTimeImmutable::createFromTimestamp(1726358034));
 
 return [$wh];

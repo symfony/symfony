@@ -524,8 +524,8 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         yield 'different seconds' => [new \DateTimeImmutable('2026-05-04 10:00:00 UTC'), new \DateTimeImmutable('2026-05-04 10:00:01 UTC')];
         yield 'different microseconds' => [new \DateTimeImmutable('2026-05-04 10:00:00 UTC'), new \DateTimeImmutable('2026-05-04 10:00:00.000001 UTC')];
         yield 'same wall time in different timezones' => [new \DateTimeImmutable('2026-05-04 10:00:00', new \DateTimeZone('UTC')), new \DateTimeImmutable('2026-05-04 10:00:00', new \DateTimeZone('Europe/Paris'))];
-        yield 'date and integer' => [new \DateTimeImmutable('@1'), 1];
-        yield 'integer and date' => [1, new \DateTimeImmutable('@1')];
+        yield 'date and integer' => [\DateTimeImmutable::createFromTimestamp(1), 1];
+        yield 'integer and date' => [1, \DateTimeImmutable::createFromTimestamp(1)];
     }
 
     public function testFieldsBesideEqualDateTimesAreComparedStrictly()

@@ -70,7 +70,7 @@ final class SlidingWindowLimiter implements LimiterInterface
             $availableTokens = $this->getAvailableTokens($hitCount);
             if (0 === $tokens) {
                 $resetDuration = $window->calculateTimeForTokens($this->limit, $window->getHitCount());
-                $resetTime = \DateTimeImmutable::createFromFormat('U', $availableTokens ? floor($now) : floor($now + $resetDuration));
+                $resetTime = \DateTimeImmutable::createFromTimestamp($availableTokens ? floor($now) : floor($now + $resetDuration));
 
                 return new Reservation($now, new RateLimit($availableTokens, $resetTime, true, $this->limit, $this->resetAt($window, $now)));
             }

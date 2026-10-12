@@ -17,7 +17,6 @@ use Jose\Component\Core\JWKSet;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Clock\Clock;
 
 class OidcTokenGenerator
 {
@@ -27,7 +26,7 @@ class OidcTokenGenerator
         private readonly string $audience,
         private readonly array $issuers,
         private readonly string $claim = 'sub',
-        private readonly ClockInterface $clock = new Clock(),
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
@@ -41,7 +40,7 @@ class OidcTokenGenerator
 
         $jwsBuilder = new JWSBuilder($this->algorithmManager);
 
-        $now = $this->clock->now();
+        $now = $this->clock?->now() ?? new \DateTimeImmutable('@'.time());
         $payload = [
             $this->claim => $userIdentifier,
             'iat' => $now->getTimestamp(), // https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6

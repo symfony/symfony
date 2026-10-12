@@ -14,8 +14,10 @@ namespace Symfony\Component\Security\Http\Tests\OAuth2\Dpop;
 use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Security\Http\OAuth2\Dpop\DpopProofFactory;
 
@@ -44,6 +46,16 @@ class DpopProofFactoryTest extends TestCase
         $this->assertSame('https://provider.example.com/token', $claims['htu']);
         $this->assertSame(strtotime('2026-09-23 10:00:00 UTC'), $claims['iat']);
         $this->assertNotEmpty($claims['jti']);
+    }
+
+    #[Group('time-sensitive')]
+    public function testDatesTheProofWithTheCurrentTimeWithoutAClock()
+    {
+        ClockMock::withClockMock(strtotime('2026-09-23 10:00:00 UTC'));
+
+        $proof = (new DpopProofFactory(new JWK(self::PRIVATE_JWK)))->createProof('POST', 'https://provider.example.com/token');
+
+        $this->assertSame(strtotime('2026-09-23 10:00:00 UTC'), self::decodePayload($proof)['iat']);
     }
 
     /**

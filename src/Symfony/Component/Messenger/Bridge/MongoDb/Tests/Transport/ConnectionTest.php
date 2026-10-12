@@ -31,17 +31,16 @@ use MongoDB\InsertOneResult;
 use MongoDB\Model\BSONDocument;
 use MongoDB\Operation\FindOneAndUpdate;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\Connection;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 class ConnectionTest extends TestCase
 {
-    use ClockSensitiveTrait;
-
     public function testFromDsn()
     {
         $collection = $this->createStub(Collection::class);
@@ -337,9 +336,10 @@ class ConnectionTest extends TestCase
         $this->assertSame($objectId, $connection->send('serializedEnvelope', ['type' => 'foo']));
     }
 
-    public function testSendFollowsTheGlobalClockByDefault()
+    #[Group('time-sensitive')]
+    public function testSendReadsTheTimeWithoutAClock()
     {
-        self::mockTime('2024-05-02 12:00:00');
+        ClockMock::withClockMock((new \DateTimeImmutable('2024-05-02 12:00:00'))->getTimestamp());
 
         $insertOneResult = $this->createStub(InsertOneResult::class);
         $insertOneResult->method('getInsertedId')->willReturn(new ObjectId());

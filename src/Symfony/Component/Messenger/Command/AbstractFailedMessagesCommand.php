@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Command;
 
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -58,7 +57,7 @@ abstract class AbstractFailedMessagesCommand extends Command
          */
         protected ServiceProviderInterface $failureTransports,
         protected ?PhpSerializer $phpSerializer = null,
-        private ClockInterface $clock = new Clock(),
+        private ?ClockInterface $clock = null,
     ) {
         parent::__construct();
 
@@ -165,7 +164,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
 
         try {
-            return new DatePoint($value, null, $this->clock->now());
+            return new DatePoint($value, null, $this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get())));
         } catch (\DateMalformedStringException $e) {
             throw new InvalidArgumentException(\sprintf('The value of the "--%s" option is not a valid date: "%s".', $option, $value), previous: $e);
         }

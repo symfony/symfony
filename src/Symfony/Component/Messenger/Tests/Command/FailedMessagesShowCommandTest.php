@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -541,6 +542,32 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('Displaying only messages that failed after 2024-05-02 00:00:00', $display);
         $this->assertStringContainsString('Displaying only messages that failed before 2024-05-02 23:59:59', $display);
         $this->assertStringContainsString('Showing 1 message(s).', $display);
+    }
+
+    public function testListMessagesFilteredByRelativeFailureTimeWithoutAClock()
+    {
+        ClockMock::withClockMock((new \DateTimeImmutable('2024-05-02 12:00:00 UTC'))->getTimestamp());
+
+        $receiver = $this->createStub(ListableReceiverInterface::class);
+        $receiver->method('all')->willReturn([
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00 UTC', 'Older failure'),
+            $this->createFailedEnvelope(20, '2024-05-02 11:30:00 UTC', 'Recent failure'),
+        ]);
+
+        $tester = new CommandTester(new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver])));
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('Europe/Paris');
+
+        try {
+            $tester->execute(['--failed-after' => '-1 hour']);
+        } finally {
+            date_default_timezone_set($timezone);
+        }
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('Displaying only messages that failed after 2024-05-02 13:00:00', $display);
+        $this->assertStringContainsString('Recent failure', $display);
+        $this->assertStringNotContainsString('Older failure', $display);
     }
 
     public function testListMessagesFilteredByClassAndFailureTime()

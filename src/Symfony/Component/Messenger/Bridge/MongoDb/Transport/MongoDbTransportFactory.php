@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Bridge\MongoDb\Transport;
 
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 
@@ -24,7 +23,7 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 class MongoDbTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
-        private readonly ClockInterface $clock = new Clock(),
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 

@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 
@@ -38,7 +37,7 @@ class LoggingMiddleware implements MiddlewareInterface
      */
     public function __construct(
         private LoggerInterface $logger,
-        private ClockInterface $clock = new Clock(),
+        private ?ClockInterface $clock = null,
         ?callable $memoryResolver = null,
     ) {
         $memoryResolver ??= static fn (): int => memory_get_usage();
@@ -53,7 +52,7 @@ class LoggingMiddleware implements MiddlewareInterface
 
         $memoryResolver = $this->memoryResolver;
 
-        $startTime = (float) $this->clock->now()->format('U.u');
+        $startTime = $this->now();
         $startMemory = $memoryResolver();
 
         $success = false;
@@ -69,7 +68,7 @@ class LoggingMiddleware implements MiddlewareInterface
 
             throw $exception;
         } finally {
-            $endTime = (float) $this->clock->now()->format('U.u');
+            $endTime = $this->now();
 
             $context = [
                 ...$context,
@@ -85,5 +84,16 @@ class LoggingMiddleware implements MiddlewareInterface
                 $this->logger->info('"{class}" message successfully handled.', $context);
             }
         }
+    }
+
+    private function now(): float
+    {
+        if (null === $this->clock) {
+            return microtime(true);
+        }
+
+        $now = $this->clock->now();
+
+        return $now->getTimestamp() + $now->getMicrosecond() / 1e6;
     }
 }

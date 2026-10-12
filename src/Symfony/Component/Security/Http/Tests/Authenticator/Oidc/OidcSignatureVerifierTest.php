@@ -16,6 +16,7 @@ use Jose\Component\Core\JWK;
 use Jose\Component\Signature\Algorithm\ES256;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -311,6 +312,21 @@ class OidcSignatureVerifierTest extends TestCase
         $this->assertSame(['sub' => 'user-42'], $claims);
     }
 
+    #[Group('time-sensitive')]
+    public function testVerifyRefetchesTheKeysAfterTheCooldownWithoutAClock()
+    {
+        $verifier = $this->createVerifier(jwks: [
+            ['keys' => [self::FOREIGN_JWK]],
+            ['keys' => [['kid' => 'rotated-key'] + self::PUBLIC_JWK]],
+        ]);
+        $this->warmTheJwksCache($verifier);
+
+        sleep(120);
+        $claims = $verifier->verify($this->buildJws(json_encode(['sub' => 'user-42']), 'rotated-key'));
+
+        $this->assertSame(['sub' => 'user-42'], $claims);
+    }
+
     public function testVerifyThrottlesTheRefetchOfTheProviderKeys()
     {
         $verifier = $this->createVerifier(jwks: [
@@ -366,7 +382,7 @@ class OidcSignatureVerifierTest extends TestCase
             $algorithms,
             3600,
             $enforceKeyUsageVerification,
-            clock: $clock ?? new MockClock(),
+            clock: $clock,
         );
     }
 

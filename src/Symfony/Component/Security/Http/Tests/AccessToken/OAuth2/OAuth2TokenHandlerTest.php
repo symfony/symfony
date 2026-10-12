@@ -21,7 +21,9 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -733,6 +735,24 @@ class OAuth2TokenHandlerTest extends TestCase
         $client = new MockHttpClient([self::jwtResponse(self::signedResponsePayload(self::activeClaims(['sub' => 'jdoe'])))], self::ENDPOINT);
 
         $this->assertBadCredentials('The authorization server returned a JWT introspection response, which this resource server is not configured to verify.', self::createHandler($client));
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    #[RunInSeparateProcess]
+    public function testChecksTheDatesAgainstTheSystemTimeWithoutAClock()
+    {
+        ClockMock::register(Oauth2TokenHandler::class);
+        ClockMock::withClockMock(1719000000);
+
+        $client = new MockHttpClient([
+            self::jwtResponse(self::signedResponsePayload(self::activeClaims(['sub' => 'jdoe', 'exp' => 1719000000 + 10]))),
+            self::jwtResponse(['iat' => 1719000001] + self::signedResponsePayload(self::activeClaims(['sub' => 'jdoe']))),
+        ], self::ENDPOINT);
+        $handler = new Oauth2TokenHandler($client, null, [self::AUDIENCE], self::ISSUER);
+        $handler->enableSignedResponse(new AlgorithmManager([new ES256()]), new JWKSet([self::publicJwk()]));
+
+        $this->assertSame('jdoe', $handler->getUserBadgeFrom('a-secret-token')->getUserIdentifier());
+        $this->assertBadCredentials('The JWT is issued in the future.', $handler);
     }
 
     private function assertBadCredentials(string $message, Oauth2TokenHandler $handler): void

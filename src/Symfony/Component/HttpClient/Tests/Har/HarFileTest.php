@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\HttpClient\Tests\Har;
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Clock\NativeClock;
@@ -43,6 +46,19 @@ class HarFileTest extends TestCase
         $har->addEntry(HarFile::createEntry('GET', 'https://example.com/', null, [], 200, [], ''));
 
         $this->assertSame('2026-01-01T11:00:00.123Z', $har->toArray()['log']['entries'][0]['startedDateTime']);
+    }
+
+    #[RunInSeparateProcess]
+    public function testStartedDateTimeWithoutTheClockComponent()
+    {
+        ClassExistsMock::register(HarFile::class);
+        ClassExistsMock::withMockedClasses([Clock::class => false]);
+        ClockMock::register(HarFile::class);
+        ClockMock::withClockMock(1767268800.123);
+
+        $entry = HarFile::createEntry('GET', 'https://example.com/', null, [], 200, [], '');
+
+        $this->assertSame('2026-01-01T12:00:00.123Z', $entry['startedDateTime']);
     }
 
     public function testUpdateAppendsAndReturnsTheIndex()

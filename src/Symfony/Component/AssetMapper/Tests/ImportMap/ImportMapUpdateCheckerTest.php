@@ -12,8 +12,11 @@
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
@@ -115,8 +118,13 @@ class ImportMapUpdateCheckerTest extends TestCase
         ], $updates);
     }
 
-    public function testGetAvailableUpdatesHonorsMinimumReleaseAge()
+    #[TestWith([true])]
+    #[TestWith([false])]
+    #[Group('time-sensitive')]
+    public function testGetAvailableUpdatesHonorsMinimumReleaseAge(bool $withClock)
     {
+        ClockMock::withClockMock((new \DateTimeImmutable(self::NOW))->getTimestamp());
+
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
             'bootstrap' => self::createRemoteEntry(
                 importName: 'bootstrap',
@@ -140,7 +148,7 @@ class ImportMapUpdateCheckerTest extends TestCase
                 ],
             ]),
         ]);
-        $updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient, new MockClock(self::NOW), self::SEVEN_DAYS_IN_SECONDS);
+        $updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient, $withClock ? new MockClock(self::NOW) : null, self::SEVEN_DAYS_IN_SECONDS);
 
         $this->assertEquals([
             'bootstrap' => new PackageUpdateInfo(

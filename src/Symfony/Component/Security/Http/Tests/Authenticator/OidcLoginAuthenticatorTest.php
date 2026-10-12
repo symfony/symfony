@@ -18,6 +18,7 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -1454,6 +1455,28 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertSame($clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
     }
 
+    #[Group('time-sensitive')]
+    public function testCreateTokenReadsTheTimeWithoutAClock()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildIdToken(['nonce' => $nonce]),
+            'expires_in' => 300,
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        sleep(60);
+        $token = $authenticator->createToken($passport, 'main');
+
+        $this->assertSame(time() + 300, $token->getAttribute('oidc_access_token_expires_at'));
+    }
+
     public function testCreateTokenStampsTheAuthenticationTimeFromTheAuthTimeClaim()
     {
         $nonce = bin2hex(random_bytes(16));
@@ -2152,7 +2175,7 @@ class OidcLoginAuthenticatorTest extends TestCase
             $options,
             $authorizationParams,
             $signatureVerifier,
-            $clock ?? new Clock(),
+            $clock,
             $eventDispatcher,
             $dpopProofFactory,
         );

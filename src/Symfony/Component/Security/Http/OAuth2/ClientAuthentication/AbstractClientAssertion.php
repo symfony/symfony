@@ -17,7 +17,6 @@ use Jose\Component\Core\JWK;
 use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Clock\Clock;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 /**
@@ -60,8 +59,6 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
      */
     public const EXPLICIT_TYPE = 'client-authentication+jwt';
 
-    private readonly ClockInterface $clock;
-
     /**
      * @param JWK            $signingKey The key the assertion is signed with
      * @param Algorithm      $algorithm  The algorithm it is signed with, which the subclass picked from
@@ -74,18 +71,12 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
         private readonly JWK $signingKey,
         private readonly Algorithm $algorithm,
         private readonly int $lifetime,
-        ?ClockInterface $clock,
+        private readonly ?ClockInterface $clock,
         private readonly ?OidcDiscovery $discovery = null,
     ) {
         if (0 >= $lifetime) {
             throw new \InvalidArgumentException(\sprintf('The lifetime of an OAuth2 client assertion must be a positive number of seconds, got %d.', $lifetime));
         }
-
-        if (null === $clock && !class_exists(Clock::class)) {
-            throw new \LogicException(\sprintf('The "symfony/clock" component is required to build "%s" without a clock. Try running "composer require symfony/clock", or pass any PSR-20 clock to the constructor.', static::class));
-        }
-
-        $this->clock = $clock ?? new Clock();
     }
 
     /**
@@ -149,7 +140,7 @@ abstract class AbstractClientAssertion implements ClientAuthenticationInterface
      */
     private function createAssertion(string $clientId, string $tokenEndpoint): string
     {
-        $now = $this->clock->now()->getTimestamp();
+        $now = $this->clock?->now()->getTimestamp() ?? time();
 
         $claims = [
             'iss' => $clientId,

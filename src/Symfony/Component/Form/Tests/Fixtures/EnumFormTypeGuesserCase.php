@@ -21,6 +21,17 @@ class EnumFormTypeGuesserCase
     public ?BackedEnumFormTypeGuesserCaseEnum $nullableBackedEnum;
     public EnumFormTypeGuesserCaseEnum|BackedEnumFormTypeGuesserCaseEnum $enumUnion;
     public EnumFormTypeGuesserCaseEnum&BackedEnumFormTypeGuesserCaseEnum $enumIntersection;
+    private EnumFormTypeGuesserCaseEnum $privateEnum;
+
+    public function getPrivateEnum(): EnumFormTypeGuesserCaseEnum
+    {
+        return $this->privateEnum;
+    }
+
+    public function setPrivateEnum(EnumFormTypeGuesserCaseEnum $privateEnum): void
+    {
+        $this->privateEnum = $privateEnum;
+    }
 }
 
 enum EnumFormTypeGuesserCaseEnum

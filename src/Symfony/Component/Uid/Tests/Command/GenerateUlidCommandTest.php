@@ -33,7 +33,7 @@ final class GenerateUlidCommandTest extends TestCase
         $this->assertSame(0, $commandTester->execute([]));
 
         $ulid = Ulid::fromBase32(trim($commandTester->getDisplay()));
-        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', $time), $ulid->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromTimestamp((float) $time), $ulid->getDateTime());
     }
 
     public function testUnparsableTimestamp()

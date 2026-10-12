@@ -184,8 +184,8 @@ class VarExporterTest extends TestCase
         yield ['simple-array', [123, ['abc']], true];
         yield ['partially-indexed-array', [5 => true, 1 => true, 2 => true, 6 => true], true];
         yield ['datetime', [
-            \DateTime::createFromFormat('U', 0),
-            \DateTimeImmutable::createFromFormat('U', 0),
+            \DateTime::createFromTimestamp(0),
+            \DateTimeImmutable::createFromTimestamp(0),
             $tz = new \DateTimeZone('Europe/Paris'),
             $interval = ($start = new \DateTimeImmutable('2009-10-11', $tz))->diff(new \DateTimeImmutable('2009-10-18', $tz)),
             new \DatePeriod($start, $interval, 4),

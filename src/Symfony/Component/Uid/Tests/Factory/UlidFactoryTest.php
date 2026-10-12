@@ -23,15 +23,15 @@ final class UlidFactoryTest extends TestCase
 
         $ulidFactory->create();
 
-        $ulid1 = $ulidFactory->create(new \DateTimeImmutable('@999999.123000'));
+        $ulid1 = $ulidFactory->create(\DateTimeImmutable::createFromTimestamp(999999.123));
         $this->assertSame('999999.123000', $ulid1->getDateTime()->format('U.u'));
-        $ulid2 = $ulidFactory->create(new \DateTimeImmutable('@999999.123000'));
+        $ulid2 = $ulidFactory->create(\DateTimeImmutable::createFromTimestamp(999999.123));
         $this->assertSame('999999.123000', $ulid2->getDateTime()->format('U.u'));
 
         $this->assertFalse($ulid1->equals($ulid2));
         $this->assertSame(-1, $ulid1->compare($ulid2));
 
-        $ulid3 = $ulidFactory->create(new \DateTimeImmutable('@1234.162524'));
+        $ulid3 = $ulidFactory->create(\DateTimeImmutable::createFromTimestamp(1234.162524));
         $this->assertSame('1234.162000', $ulid3->getDateTime()->format('U.u'));
     }
 
@@ -40,6 +40,6 @@ final class UlidFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The timestamp must be positive.');
 
-        (new UlidFactory())->create(new \DateTimeImmutable('@-1000'));
+        (new UlidFactory())->create(\DateTimeImmutable::createFromTimestamp(-1000));
     }
 }

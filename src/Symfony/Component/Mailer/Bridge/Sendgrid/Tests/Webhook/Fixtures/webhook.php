@@ -7,6 +7,6 @@ $wh->setRecipientEmail('hello@world.com');
 $wh->setTags([]);
 $wh->setMetadata([]);
 $wh->setReason('Bounced Address');
-$wh->setDate(\DateTimeImmutable::createFromFormat('U', 1600112492));
+$wh->setDate(\DateTimeImmutable::createFromTimestamp(1600112492));
 
 return [$wh];

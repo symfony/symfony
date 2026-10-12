@@ -123,7 +123,7 @@ class OidcBackChannelLogoutTest extends TestCase
 
     private function createBackChannelLogout(OidcEndedSessions $endedSessions, ?LoggerInterface $logger = null): OidcBackChannelLogout
     {
-        $clock = new MockClock((new \DateTimeImmutable())->setTimestamp(self::NOW + 10));
+        $clock = new MockClock(\DateTimeImmutable::createFromTimestamp(self::NOW + 10));
         $discovery = new OidcDiscovery(
             new MockHttpClient(new JsonMockResponse(['issuer' => self::ISSUER, 'jwks_uri' => self::ISSUER.'/jwks'])),
             new ArrayAdapter(),

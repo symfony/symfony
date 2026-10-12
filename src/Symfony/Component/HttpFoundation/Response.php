@@ -746,7 +746,7 @@ class Response
             return $this->headers->getDate('Expires');
         } catch (\RuntimeException) {
             // according to RFC 2616 invalid date formats (e.g. "0" and "-1") must be treated as in the past
-            return \DateTimeImmutable::createFromFormat('U', time() - 172800);
+            return \DateTimeImmutable::createFromTimestamp(time() - 172800);
         }
     }
 

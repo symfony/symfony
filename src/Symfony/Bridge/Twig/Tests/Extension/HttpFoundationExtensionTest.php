@@ -138,7 +138,7 @@ class HttpFoundationExtensionTest extends TestCase
     {
         yield 'timestamp' => ["{{ 'https://example.com/ticket/42?lang=en'|sign_url(2000000000) }}", []];
         yield 'date() function' => ["{{ 'https://example.com/ticket/42?lang=en'|sign_url(date('@2000000000')) }}", []];
-        yield 'DateTimeInterface' => ['{{ url|sign_url(expiration) }}', ['url' => 'https://example.com/ticket/42?lang=en', 'expiration' => new \DateTimeImmutable('@2000000000')]];
+        yield 'DateTimeInterface' => ['{{ url|sign_url(expiration) }}', ['url' => 'https://example.com/ticket/42?lang=en', 'expiration' => \DateTimeImmutable::createFromTimestamp(2000000000)]];
         yield 'absolute_url() function' => ["{{ absolute_url('/ticket/42?lang=en')|sign_url(2000000000) }}", []];
     }
 

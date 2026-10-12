@@ -7,6 +7,6 @@ $wh->setRecipientEmail('receiver@example.com');
 $wh->setTags(['Password reset']);
 $wh->setMetadata(['variable_a' => 'value', 'variable_b' => 'value2']);
 $wh->setReason('Your account has reached its daily sending limit.');
-$wh->setDate(\DateTimeImmutable::createFromFormat('U', 1726358034));
+$wh->setDate(\DateTimeImmutable::createFromTimestamp(1726358034));
 
 return [$wh];

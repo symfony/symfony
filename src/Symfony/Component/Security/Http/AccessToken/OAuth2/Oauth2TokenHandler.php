@@ -538,7 +538,7 @@ final class Oauth2TokenHandler implements AccessTokenHandlerInterface
         }
 
         if ('' !== ($claims['updatedAt'] ?? '')) {
-            $claims['updatedAt'] = (new \DateTimeImmutable())->setTimestamp($claims['updatedAt']);
+            $claims['updatedAt'] = \DateTimeImmutable::createFromTimestamp($claims['updatedAt']);
         }
 
         // a string "false" would cast to true, so only a recognizable boolean is kept,

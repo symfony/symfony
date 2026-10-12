@@ -126,7 +126,7 @@ class OidcLogoutTokenTest extends TestCase
             'sid' => 'session-42',
         ], static fn (mixed $value): bool => null !== $value);
 
-        $logoutToken = new OidcLogoutToken(new MockClock((new \DateTimeImmutable())->setTimestamp(1758350010)));
+        $logoutToken = new OidcLogoutToken(new MockClock(\DateTimeImmutable::createFromTimestamp(1758350010)));
 
         return $logoutToken->validateClaims($claims, self::ISSUER, self::AUDIENCE);
     }

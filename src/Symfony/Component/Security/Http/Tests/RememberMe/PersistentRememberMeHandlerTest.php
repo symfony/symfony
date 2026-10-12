@@ -227,9 +227,9 @@ class PersistentRememberMeHandlerTest extends TestCase
     public function testConsumeRememberMeCookieExpired()
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
-            $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('@'.(time() - (31536000 + 1))), false);
+            $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', \DateTimeImmutable::createFromTimestamp(time() - (31536000 + 1)), false);
         } else {
-            $persistentToken = new PersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('@'.(time() - (31536000 + 1))));
+            $persistentToken = new PersistentToken('wouter', 'series1', 'tokenvalue', \DateTimeImmutable::createFromTimestamp(time() - (31536000 + 1)));
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);

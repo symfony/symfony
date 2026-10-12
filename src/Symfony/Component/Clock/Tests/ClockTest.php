@@ -77,7 +77,7 @@ class ClockTest extends TestCase
         $psrClock = new class implements ClockInterface {
             public function now(): \DateTimeImmutable
             {
-                return new \DateTimeImmutable('@1234567');
+                return \DateTimeImmutable::createFromTimestamp(1234567);
             }
         };
 

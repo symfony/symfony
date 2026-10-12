@@ -242,12 +242,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         }
 
         // Note: Unlike the XML files, the date pair is already in UTC.
-        $datetime = \DateTimeImmutable::createFromFormat('U', (string) $seconds, new \DateTimeZone('Etc/UTC'));
-
-        if (false === $datetime) {
-            throw new \RuntimeException('Unable to parse ICU milliseconds pair.');
-        }
-
-        return $datetime->format('Y-m-d\TH:i:s');
+        return \DateTimeImmutable::createFromTimestamp($seconds)->format('Y-m-d\TH:i:s');
     }
 }

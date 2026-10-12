@@ -107,7 +107,7 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertSame(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertEquals(
-            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
+            \DateTimeImmutable::createFromTimestamp(floor(microtime(true) + 12)),
             $rateLimit->getRetryAfter()
         );
     }
@@ -136,7 +136,7 @@ class SlidingWindowLimiterTest extends TestCase
             $this->assertTrue($rateLimit->isAccepted());
             $this->assertSame(10, $rateLimit->getLimit());
             $this->assertEquals(
-                \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true))),
+                \DateTimeImmutable::createFromTimestamp(floor(microtime(true))),
                 $rateLimit->getRetryAfter()
             );
         }
@@ -147,7 +147,7 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertEquals(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertEquals(
-            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
+            \DateTimeImmutable::createFromTimestamp(floor(microtime(true) + 12)),
             $rateLimit->getRetryAfter()
         );
     }

@@ -137,7 +137,7 @@ namespace MongoDB\BSON {
 
             public function toDateTime(): \DateTime
             {
-                return \DateTime::createFromFormat('U.v', \sprintf('%d.%03d', intdiv((int) $this->milliseconds, 1000), (int) $this->milliseconds % 1000));
+                return \DateTime::createFromTimestamp((int) $this->milliseconds / 1000);
             }
 
             public function __toString(): string

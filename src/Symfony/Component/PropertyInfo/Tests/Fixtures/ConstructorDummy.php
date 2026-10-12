@@ -34,7 +34,7 @@ class ConstructorDummy
     public function __construct(\DateTimeZone $timezone, $date, $dateObject, \DateTimeImmutable $dateTime, $mixed)
     {
         $this->timezone = $timezone->getName();
-        $this->date = \DateTimeImmutable::createFromFormat('U', $date);
+        $this->date = \DateTimeImmutable::createFromTimestamp($date);
         $this->dateTime = $dateTime->getTimestamp();
     }
 }

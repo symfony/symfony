@@ -54,7 +54,7 @@ class UriSignerTest extends TestCase
 
         // "0" is a real expiration date, not the absence of one
         $this->assertFalse($signer->check($signer->sign('http://example.com/foo', 0)));
-        $this->assertFalse($signer->check($signer->sign('http://example.com/foo', new \DateTimeImmutable('@0'))));
+        $this->assertFalse($signer->check($signer->sign('http://example.com/foo', \DateTimeImmutable::createFromTimestamp(0))));
     }
 
     public function testCheck()

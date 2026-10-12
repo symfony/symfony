@@ -41,7 +41,7 @@ class OidcUserTest extends TestCase
         $this->assertSame('john.doe', $user->getPreferredUsername());
         $this->assertSame('john.doe@example.com', $user->getEmail());
         $this->assertTrue($user->getEmailVerified());
-        $this->assertEquals((new \DateTimeImmutable())->setTimestamp(1669628917), $user->getUpdatedAt());
+        $this->assertEquals(\DateTimeImmutable::createFromTimestamp(1669628917), $user->getUpdatedAt());
         $this->assertNull($user->getNickname());
         $this->assertSame(['customId' => 12345], $user->getAdditionalClaims());
         $this->assertSame(['ROLE_USER'], $user->getRoles());
@@ -145,7 +145,7 @@ class OidcUserTest extends TestCase
                 'postal_code' => '75000',
                 'country' => 'France',
             ],
-            (new \DateTimeImmutable())->setTimestamp(1669628917),
+            \DateTimeImmutable::createFromTimestamp(1669628917),
             ...[
                 'impersonator' => [
                     'username' => 'jane.doe@example.com',
@@ -181,7 +181,7 @@ class OidcUserTest extends TestCase
                 'postal_code' => '75000',
                 'country' => 'France',
             ],
-            'updatedAt' => (new \DateTimeImmutable())->setTimestamp(1669628917),
+            'updatedAt' => \DateTimeImmutable::createFromTimestamp(1669628917),
             'impersonator' => [
                 'username' => 'jane.doe@example.com',
             ],
@@ -220,7 +220,7 @@ class OidcUserTest extends TestCase
                 'postal_code' => '75000',
                 'country' => 'France',
             ],
-            (new \DateTimeImmutable())->setTimestamp(1669628917),
+            \DateTimeImmutable::createFromTimestamp(1669628917),
             [
                 'username' => 'jane.doe@example.com',
             ],
@@ -254,7 +254,7 @@ class OidcUserTest extends TestCase
                 'postal_code' => '75000',
                 'country' => 'France',
             ],
-            (new \DateTimeImmutable())->setTimestamp(1669628917),
+            \DateTimeImmutable::createFromTimestamp(1669628917),
             [
                 'username' => 'jane.doe@example.com',
             ],

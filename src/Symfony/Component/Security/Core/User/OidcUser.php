@@ -98,7 +98,7 @@ class OidcUser implements UserInterface
         }
 
         if (isset($claims['updatedAt'])) {
-            $claims['updatedAt'] = (new \DateTimeImmutable())->setTimestamp((int) $claims['updatedAt']);
+            $claims['updatedAt'] = \DateTimeImmutable::createFromTimestamp((int) $claims['updatedAt']);
         }
 
         // a string "false" would cast to true, so only a recognizable boolean is kept,

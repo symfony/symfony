@@ -33,7 +33,7 @@ final class BlueskyTransportTest extends TransportTestCase
 
     protected function setUp(): void
     {
-        self::$clock = new MockClock(new \DateTimeImmutable('@1714293617'));
+        self::$clock = new MockClock(\DateTimeImmutable::createFromTimestamp(1714293617));
     }
 
     public static function createTransport(?HttpClientInterface $client = null): BlueskyTransport

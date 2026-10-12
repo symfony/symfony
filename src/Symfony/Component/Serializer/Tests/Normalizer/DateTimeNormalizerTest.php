@@ -173,42 +173,42 @@ class DateTimeNormalizerTest extends TestCase
     public static function provideNormalizeUsingCastCases(): iterable
     {
         yield [
-            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            \DateTimeImmutable::createFromTimestamp(1703071202),
             'Y',
             null,
             '2023',
         ];
 
         yield [
-            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            \DateTimeImmutable::createFromTimestamp(1703071202),
             'Y',
             'int',
             2023,
         ];
 
         yield [
-            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            \DateTimeImmutable::createFromTimestamp(1703071202),
             'Ymd',
             'int',
             20231220,
         ];
 
         yield [
-            \DateTimeImmutable::createFromFormat('U', '1703071202'),
+            \DateTimeImmutable::createFromTimestamp(1703071202),
             'Y',
             'int',
             2023,
         ];
 
         yield [
-            \DateTimeImmutable::createFromFormat('U.v', '1703071202.388'),
+            \DateTimeImmutable::createFromTimestamp(1703071202.388),
             'U.v',
             'float',
             1703071202.388,
         ];
 
         yield [
-            \DateTimeImmutable::createFromFormat('U.u', '1703071202.388811'),
+            \DateTimeImmutable::createFromTimestamp(1703071202.388811),
             'U.u',
             'float',
             1703071202.388811,

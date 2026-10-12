@@ -237,7 +237,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
         }
 
         // consistent expiration time for all items
-        $expiresAt = \DateTimeImmutable::createFromFormat('U', time() + ($this->maxTtl ?? 86400));
+        $expiresAt = \DateTimeImmutable::createFromTimestamp(time() + ($this->maxTtl ?? 86400));
 
         $passthru = function (ChunkInterface $chunk, AsyncContext $context) use (
             $expiresAt,

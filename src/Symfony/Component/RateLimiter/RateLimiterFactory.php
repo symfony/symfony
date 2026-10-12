@@ -65,7 +65,7 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
 
             // Create DateTimeImmutable from unix timestamp, so the default timezone is ignored and we don't need to
             // deal with quirks happening when modifying dates using a timezone with DST.
-            $now = \DateTimeImmutable::createFromFormat('U', (string) time());
+            $now = \DateTimeImmutable::createFromTimestamp(time());
 
             try {
                 $nowPlusInterval = @$now->modify('+'.$interval);

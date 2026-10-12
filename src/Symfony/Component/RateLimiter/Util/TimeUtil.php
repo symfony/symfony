@@ -20,7 +20,7 @@ final class TimeUtil
 {
     public static function dateIntervalToSeconds(\DateInterval $interval): int
     {
-        $now = \DateTimeImmutable::createFromFormat('U', time());
+        $now = \DateTimeImmutable::createFromTimestamp(time());
 
         return $now->add($interval)->getTimestamp() - $now->getTimestamp();
     }

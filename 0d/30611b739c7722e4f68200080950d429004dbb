@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-11T12:25:02Z
+
+Thank you @ayyoub-afwallah, I updated the PR. The resolver is now `RateLimitValueResolver`, like `LockValueResolver`, and it throws a `LogicException` when no `#[RateLimit]` applies. It's also removed when rate limiting is disabled.
+
+I dropped `#[MapRateLimit]` for now. `exposed` filters on a header setting, which a controller shouldn't care about. And with `#[RateLimit('daily', key: 'a')]` and `#[RateLimit('daily', key: 'b')]`, `#[MapRateLimit('daily')]` always gets the most restrictive of the two, so `limiter` can't select one attribute. We can add an attribute later without breaking BC, once a use case needs it.
+
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-10-11T18:42:50Z
+
+@nicolas-grekas Makes sense, thanks for the update!
+
+My motivation behind `#[MapRateLimit]` was that `RateLimit` could be used to provide feedback to the user (e.g., `You have 5 messages left`), so I wanted a way to avoid using global/class-level limiters or to only operate on explicitly exposed ones.
+
+But as u said, this can always be added later if needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T14:15:06Z
+
+Thank you @ayyoub-afwallah.

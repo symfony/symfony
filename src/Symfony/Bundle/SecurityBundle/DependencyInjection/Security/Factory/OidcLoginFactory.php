@@ -331,7 +331,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                     ->end()
                     ->scalarNode('cache')
                         ->cannotBeEmpty()
-                        ->defaultValue('cache.app')
+                        ->defaultValue('cache.security')
                         ->info('Id of the cache pool remembering the ended provider sessions, shared by every server of the application.')
                     ->end()
                     ->integerNode('lifetime')

@@ -186,7 +186,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                     ->end()
                     ->scalarNode('cache')
                         ->info('The cache pool proofs are remembered in to refuse a replay, shared by all the instances of the application.')
-                        ->defaultValue('cache.app')
+                        ->defaultValue('cache.security')
                         ->cannotBeEmpty()
                     ->end()
                     ->integerNode('proof_lifetime')

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Tag the `security.authenticator.cache.expired_links` pool with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
+ * Add the `cache.security.discovery` and `cache.security` cache pools, which `oidc_login`, the `dpop` option and the `oauth2` token handler use instead of `cache.app`
  * Make `KernelBrowser::loginUser()` work on the stateless firewalls that use the `access_token` authenticator
  * Compile the expressions of `access_control` rules and of `#[IsGranted]` and `#[IsCsrfTokenValid]` attributes when warming up the cache
  * Deprecate the `ExpressionCacheWarmer` class

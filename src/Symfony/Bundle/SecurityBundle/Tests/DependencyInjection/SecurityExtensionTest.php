@@ -2225,6 +2225,55 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('http_client', (string) $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
     }
 
+    public function testOidcLoginCachesTheDocumentsOfTheProviderInTheDiscoveryPool()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['client_secret_post' => 'my-client-secret'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertSame('cache.security.discovery', (string) $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(1));
+        $this->assertSame('cache.security.discovery', (string) $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(1));
+    }
+
+    public function testTheCachePoolsDeriveFromTheAppPoolAndAreClearedBetweenTests()
+    {
+        $container = $this->getRawContainer();
+        $container->getExtension('security')->load([[
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_authentication' => ['client_secret_post' => 'my-client-secret'],
+                    ],
+                ],
+            ],
+        ]], $container);
+
+        foreach (['cache.security.discovery', 'cache.security'] as $id) {
+            $pool = $container->getDefinition($id);
+            $this->assertSame('cache.app', $pool->getParent(), $id);
+            $this->assertSame([
+                'cache.pool' => [[]],
+                'kernel.test_state' => [['method' => 'clear']],
+                'container.remove_if_missing' => [['service' => 'cache.app']],
+            ], $pool->getTags(), $id);
+        }
+    }
+
     public function testOidcLoginCallsTheProviderWithTheConfiguredHttpClient()
     {
         $container = $this->getRawContainer();
@@ -2329,7 +2378,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('security.authenticator.oidc_login.ended_sessions.main', (string) $backChannelLogout->getArgument(4));
 
         $endedSessions = $container->getDefinition('security.authenticator.oidc_login.ended_sessions.main');
-        $this->assertSame('cache.app', (string) $endedSessions->getArgument(0));
+        $this->assertSame('cache.security', (string) $endedSessions->getArgument(0));
         $this->assertSame('main', $endedSessions->getArgument(1));
         $this->assertSame(86400, $endedSessions->getArgument(2));
 

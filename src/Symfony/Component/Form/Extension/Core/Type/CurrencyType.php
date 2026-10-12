@@ -72,7 +72,7 @@ class CurrencyType extends AbstractType
                             };
 
                             foreach (Currencies::getCurrencyCodes() as $code) {
-                                if (!Currencies::isValidInAnyCountry($code, $legalTender, $active, $activeAt ?? $notActiveAt, $includeUndated)) {
+                                if (!Currencies::isValidInAnyCountry($code, $legalTender, $active, $activeAt ?? $notActiveAt ?? new \DateTimeImmutable(), $includeUndated)) {
                                     continue;
                                 }
 

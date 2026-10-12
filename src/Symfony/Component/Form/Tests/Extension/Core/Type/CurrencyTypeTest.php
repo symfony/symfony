@@ -139,6 +139,37 @@ class CurrencyTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals($sit, $notActiveChoices);
     }
 
+    public function testNullActiveAtListsLegalTenderCurrenciesWhateverTheirDates()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'active_at' => null,
+            ])
+            ->createView()->vars['choices'];
+
+        $values = array_map(static fn (ChoiceView $choice) => $choice->value, $choices);
+
+        $this->assertContains('EUR', $values);
+        $this->assertContains('SIT', $values);
+        $this->assertNotContains('USN', $values);
+    }
+
+    public function testNullActiveAtListsNonLegalTenderCurrenciesWhateverTheirDates()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'active_at' => null,
+                'legal_tender' => false,
+            ])
+            ->createView()->vars['choices'];
+
+        $values = array_map(static fn (ChoiceView $choice) => $choice->value, $choices);
+
+        $this->assertContains('USN', $values);
+        $this->assertNotContains('EUR', $values);
+        $this->assertNotContains('SIT', $values);
+    }
+
     public function testAnExceptionShouldBeThrownWhenTheActiveAtAndNotActiveAtOptionsAreBothSet()
     {
         $this->expectException(InvalidOptionsException::class);

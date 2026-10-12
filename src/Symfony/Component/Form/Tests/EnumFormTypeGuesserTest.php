@@ -21,6 +21,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Tests\Fixtures\BackedEnumFormTypeGuesserCaseEnum;
 use Symfony\Component\Form\Tests\Fixtures\EnumFormTypeGuesserCase;
 use Symfony\Component\Form\Tests\Fixtures\EnumFormTypeGuesserCaseEnum;
+use Symfony\Component\Form\Tests\Fixtures\EnumFormTypeGuesserChildCase;
 
 class EnumFormTypeGuesserTest extends TestCase
 {
@@ -55,6 +56,12 @@ class EnumFormTypeGuesserTest extends TestCase
         yield 'Undefined property' => [
             null,
             EnumFormTypeGuesserCase::class,
+            'undefinedProperty',
+        ];
+
+        yield 'Undefined property of a child class' => [
+            null,
+            EnumFormTypeGuesserChildCase::class,
             'undefinedProperty',
         ];
 
@@ -116,6 +123,30 @@ class EnumFormTypeGuesserTest extends TestCase
             ),
             EnumFormTypeGuesserCase::class,
             'nullableBackedEnum',
+        ];
+
+        yield 'Private enum property' => [
+            new TypeGuess(
+                FormEnumType::class,
+                [
+                    'class' => EnumFormTypeGuesserCaseEnum::class,
+                ],
+                Guess::HIGH_CONFIDENCE,
+            ),
+            EnumFormTypeGuesserCase::class,
+            'privateEnum',
+        ];
+
+        yield 'Private enum property of a parent class' => [
+            new TypeGuess(
+                FormEnumType::class,
+                [
+                    'class' => EnumFormTypeGuesserCaseEnum::class,
+                ],
+                Guess::HIGH_CONFIDENCE,
+            ),
+            EnumFormTypeGuesserChildCase::class,
+            'privateEnum',
         ];
 
         yield 'Enum union property' => [
@@ -191,6 +222,24 @@ class EnumFormTypeGuesserTest extends TestCase
             ),
             EnumFormTypeGuesserCase::class,
             'nullableBackedEnum',
+        ];
+
+        yield 'Private enum property' => [
+            new ValueGuess(
+                true,
+                Guess::HIGH_CONFIDENCE,
+            ),
+            EnumFormTypeGuesserCase::class,
+            'privateEnum',
+        ];
+
+        yield 'Private enum property of a parent class' => [
+            new ValueGuess(
+                true,
+                Guess::HIGH_CONFIDENCE,
+            ),
+            EnumFormTypeGuesserChildCase::class,
+            'privateEnum',
         ];
 
         yield 'Enum union property' => [

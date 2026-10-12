@@ -68,6 +68,38 @@ class ConfigureContainerTest extends AbstractWebTestCase
         $this->assertSame(1, $calls);
     }
 
+    public function testTheServiceIsReplacedAfterTheKernelIsShutDown()
+    {
+        $calls = 0;
+        $client = $this->createClient(['test_case' => 'ConfigureContainer', 'configure_container' => self::greeterConfigurator('fake', $calls)]);
+        self::ensureKernelShutdown();
+
+        $greetings = [
+            $client->request('GET', '/configure_container')->filter('p')->text(),
+            $client->request('GET', '/configure_container')->filter('p')->text(),
+            $client->request('GET', '/configure_container')->filter('p')->text(),
+        ];
+
+        $this->assertSame(['fake', 'fake', 'fake'], $greetings);
+        $this->assertSame(4, $calls);
+    }
+
+    public function testTheServiceIsReplacedAfterTheKernelIsShutDownWhenRebootIsDisabled()
+    {
+        $calls = 0;
+        $client = $this->createClient(['test_case' => 'ConfigureContainer', 'configure_container' => self::greeterConfigurator('fake', $calls)]);
+        $client->disableReboot();
+        self::ensureKernelShutdown();
+
+        $greetings = [
+            $client->request('GET', '/configure_container')->filter('p')->text(),
+            $client->request('GET', '/configure_container')->filter('p')->text(),
+        ];
+
+        $this->assertSame(['fake', 'fake'], $greetings);
+        $this->assertSame(2, $calls);
+    }
+
     public function testTheOptionIsNotForwardedToCreateKernel()
     {
         $calls = 0;

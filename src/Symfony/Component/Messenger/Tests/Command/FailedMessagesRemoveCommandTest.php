@@ -12,6 +12,9 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -432,6 +435,19 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
+    public function testRemoveMessagesFilteredByRelativeFailureTimeFollowsTheClock()
+    {
+        $envelopes = [
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00 UTC'),
+            $this->createFailedEnvelope(20, '2024-05-02 11:30:00 UTC'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [20], new MockClock('2024-05-02 12:00:00 UTC'));
+        $tester->execute(['--failed-after' => '-1 hour', '--force' => true]);
+
+        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+    }
+
     public function testRemoveMessagesFilteredByClassAndFailureTime()
     {
         $anotherClass = new class extends \stdClass {};
@@ -561,7 +577,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
      * @param Envelope[] $envelopes   the messages listed by the failure transport
      * @param int[]      $expectedIds the ids expected to be removed, in order
      */
-    private function createCommandTester(array $envelopes, array $expectedIds): CommandTester
+    private function createCommandTester(array $envelopes, array $expectedIds, ClockInterface $clock = new Clock()): CommandTester
     {
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('all')->willReturn($envelopes);
@@ -580,7 +596,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         ;
         $receiver->expects($this->exactly(\count($expectedIds)))->method('reject');
 
-        $command = new FailedMessagesRemoveCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+        $command = new FailedMessagesRemoveCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]), null, $clock);
 
         return new CommandTester($command);
     }

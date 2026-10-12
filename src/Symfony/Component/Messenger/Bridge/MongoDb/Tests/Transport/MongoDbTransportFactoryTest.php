@@ -14,6 +14,8 @@ namespace Symfony\Component\Messenger\Bridge\MongoDb\Tests\Transport;
 require_once __DIR__.'/../Stubs/mongodb.php';
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Messenger\Bridge\MongoDb\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransport;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -36,5 +38,15 @@ class MongoDbTransportFactoryTest extends TestCase
         $transport = $factory->createTransport('mongodb://localhost:27017/db', ['transport_name' => 'mongo'], $this->createStub(SerializerInterface::class));
 
         $this->assertInstanceOf(MongoDbTransport::class, $transport);
+    }
+
+    public function testCreateTransportPassesTheClockToTheConnection()
+    {
+        $clock = new MockClock();
+        $transport = (new MongoDbTransportFactory($clock))->createTransport('mongodb://localhost:27017/db', [], $this->createStub(SerializerInterface::class));
+
+        $connection = (new \ReflectionProperty(MongoDbTransport::class, 'connection'))->getValue($transport);
+
+        $this->assertSame($clock, (new \ReflectionProperty(Connection::class, 'clock'))->getValue($connection));
     }
 }

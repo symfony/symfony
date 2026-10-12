@@ -256,6 +256,9 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.transport.beanstalkd.factory', BeanstalkdTransportFactory::class)
 
         ->set('messenger.transport.mongodb.factory', MongoDbTransportFactory::class)
+            ->args([
+                service('clock'),
+            ])
 
         // retry
         ->set('messenger.retry_strategy_locator', ServiceLocator::class)

@@ -13,6 +13,9 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -503,6 +506,19 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
+    public function testRetryMessagesFilteredByRelativeFailureTimeFollowsTheClock()
+    {
+        $envelopes = [
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00 UTC'),
+            $this->createFailedEnvelope(20, '2024-05-02 11:30:00 UTC'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [20], new MockClock('2024-05-02 12:00:00 UTC'));
+        $tester->execute(['--failed-after' => '-1 hour', '--force' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
     public function testRetryMessagesFilteredByClassAndFailureTime()
     {
         $anotherClass = new class extends \stdClass {};
@@ -741,7 +757,7 @@ class FailedMessagesRetryCommandTest extends TestCase
      * @param Envelope[] $envelopes   the messages listed by the failure transport
      * @param int[]      $expectedIds the ids expected to be retried, in order
      */
-    private function createCommandTester(array $envelopes, array $expectedIds): CommandTester
+    private function createCommandTester(array $envelopes, array $expectedIds, ClockInterface $clock = new Clock()): CommandTester
     {
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('all')->willReturn($envelopes);
@@ -767,7 +783,11 @@ class FailedMessagesRetryCommandTest extends TestCase
             'failure_receiver',
             new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
             $bus,
-            new EventDispatcher()
+            new EventDispatcher(),
+            null,
+            null,
+            null,
+            $clock,
         );
 
         return new CommandTester($command);

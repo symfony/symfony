@@ -33,12 +33,15 @@ use MongoDB\Operation\FindOneAndUpdate;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\Connection;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 class ConnectionTest extends TestCase
 {
+    use ClockSensitiveTrait;
+
     public function testFromDsn()
     {
         $collection = $this->createStub(Collection::class);
@@ -332,6 +335,29 @@ class ConnectionTest extends TestCase
         $connection = new Connection($collection, 'foobar', 3_600, $clock);
 
         $this->assertSame($objectId, $connection->send('serializedEnvelope', ['type' => 'foo']));
+    }
+
+    public function testSendFollowsTheGlobalClockByDefault()
+    {
+        self::mockTime('2024-05-02 12:00:00');
+
+        $insertOneResult = $this->createStub(InsertOneResult::class);
+        $insertOneResult->method('getInsertedId')->willReturn(new ObjectId());
+
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->once())
+            ->method('insertOne')
+            ->with(
+                $this->callback(static function ($document): bool {
+                    self::assertEquals(new UTCDateTime(new \DateTimeImmutable('2024-05-02 12:00:00')), $document->createdAt);
+
+                    return true;
+                }),
+                $this->anything(),
+            )
+            ->willReturn($insertOneResult);
+
+        (new Connection($collection, 'foobar'))->send('serializedEnvelope');
     }
 
     public function testSendWithDelay()

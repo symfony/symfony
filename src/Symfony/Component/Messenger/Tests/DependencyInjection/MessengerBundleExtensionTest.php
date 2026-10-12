@@ -139,6 +139,8 @@ class MessengerBundleExtensionTest extends TestCase
         $syncFactoryArguments = $container->getDefinition('messenger.transport.sync.factory')->getArguments();
         $this->assertEquals(new Reference('messenger.retry_strategy_locator'), $syncFactoryArguments[1]);
         $this->assertSame([], $container->getDefinition((string) $syncFactoryArguments[2])->getArgument(0));
+
+        $this->assertEquals(new Reference('clock'), $container->getDefinition('messenger.transport.mongodb.factory')->getArgument(0));
     }
 
     public function testMessengerAsMessageAttributeIsForwardedToTheTag()
@@ -386,6 +388,15 @@ class MessengerBundleExtensionTest extends TestCase
             ['failure_transport_global', 'failure_transport_1', 'failure_transport_3'],
             array_keys($locator->getArgument(0))
         );
+    }
+
+    public function testFailedMessagesCommandsGetTheClock()
+    {
+        $container = $this->createContainerFromFile('messenger_multiple_failure_transports_global');
+
+        $this->assertEquals(new Reference('clock'), $container->getDefinition('console.command.messenger_failed_messages_retry')->getArgument(7));
+        $this->assertEquals(new Reference('clock'), $container->getDefinition('console.command.messenger_failed_messages_show')->getArgument(3));
+        $this->assertEquals(new Reference('clock'), $container->getDefinition('console.command.messenger_failed_messages_remove')->getArgument(3));
     }
 
     public function testTheFailedMessageRepositoryIsRemovedWithoutAnyFailureTransport()

@@ -33,8 +33,7 @@ final class WorkerStartedEvent
     }
 
     /**
-     * Returns the absolute time (as a microtime(true) float) at which the
-     * worker must stop, or null if no --time-limit was set.
+     * Returns the Unix timestamp at which the worker must stop, according to the clock of the worker, or null if no --time-limit was set.
      */
     public function getDeadline(): ?float
     {

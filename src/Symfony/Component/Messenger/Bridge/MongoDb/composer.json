@@ -19,11 +19,7 @@
         "php": ">=8.4.1",
         "ext-mongodb": "^1.21|^2.0",
         "mongodb/mongodb": "^1.21|^2.0",
-        "psr/clock": "^1.0",
         "symfony/messenger": "^8.2"
-    },
-    "require-dev": {
-        "symfony/clock": "^7.4|^8.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\MongoDb\\": "" },

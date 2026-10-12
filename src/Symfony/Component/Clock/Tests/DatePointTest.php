@@ -180,4 +180,18 @@ class DatePointTest extends TestCase
         $date = new DatePoint($datetime, $timezone, new \DateTimeImmutable('2024-01-10 22:20:02.654321', $timezone));
         $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
     }
+
+    #[TestWith(['3000-01-01 00:00:00.000000', '3000-01-01'])]
+    #[TestWith(['1800-01-01 00:00:00.000000', '1800-01-01'])]
+    #[TestWith(['3000-01-01 10:00:00.000000', '10:00', '3000-01-01 05:06:07.123456'])]
+    #[TestWith(['3000-01-01 10:30:00.000000', 't1030', '3000-01-01 05:06:07.123456'])]
+    #[TestWith(['1800-01-01 10:30:00.000000', 't1030', '1800-01-01 05:06:07.123456'])]
+    #[TestWith(['3000-01-02 05:06:07.123456', '+1 day', '3000-01-01 05:06:07.123456'])]
+    public function testDatesOutsideThe32BitTimestampRange(string $expected, string $datetime, ?string $reference = null)
+    {
+        $timezone = new \DateTimeZone('UTC');
+        $date = new DatePoint($datetime, $timezone, null !== $reference ? new \DateTimeImmutable($reference, $timezone) : null);
+
+        $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));
+    }
 }

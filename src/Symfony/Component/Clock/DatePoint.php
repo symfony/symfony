@@ -68,7 +68,7 @@ final class DatePoint extends \DateTimeImmutable
                     $datetime = 'midnight '.$datetime;
                 } elseif (false === $parsed['fraction'] && (false !== $parsed['year'] || false !== $parsed['hour'])) {
                     // it also resets the microseconds when $datetime sets a field without a fraction
-                    $now = $now->setTimestamp($now->getTimestamp());
+                    $now = \PHP_INT_SIZE >= 8 ? $now->setTimestamp($now->getTimestamp()) : static::createFromFormat('U', $now->format('U'))->setTimezone($timezone);
                 }
 
                 $now = $now->modify($datetime);
@@ -80,11 +80,11 @@ final class DatePoint extends \DateTimeImmutable
         $this->__unserialize((array) $now);
 
         // copying $now goes through its local time, which is ambiguous during the DST fall-back hour
-        if ($this->getTimestamp() !== $now->getTimestamp()) {
+        if ($this != $now) {
             // PHP picks the DST occurrence when the timezone is part of the string
             $date = $now->format('Y-m-d H:i:s.u e');
 
-            if ($now->getTimestamp() === (new parent($date))->getTimestamp()) {
+            if ($now == new parent($date)) {
                 parent::__construct($date);
             }
         }

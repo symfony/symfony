@@ -44,7 +44,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private array $issuers,
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
-        private ClockInterface $clock = new Clock(),
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -76,10 +76,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $headerCheckerManager->check($jws, 0);
 
             // Verify the claims
+            $clock = $this->getClock();
             $checkers = [
-                new Checker\IssuedAtChecker(0, false, $this->clock),
-                new Checker\NotBeforeChecker(0, false, $this->clock),
-                new Checker\ExpirationTimeChecker(0, false, $this->clock),
+                new Checker\IssuedAtChecker(0, false, $clock),
+                new Checker\NotBeforeChecker(0, false, $clock),
+                new Checker\ExpirationTimeChecker(0, false, $clock),
                 new Checker\AudienceChecker($this->audience),
                 new Checker\IssuerChecker($this->issuers),
             ];
@@ -105,5 +106,23 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
             throw new BadCredentialsException('Invalid credentials.', $e->getCode(), $e);
         }
+    }
+
+    private function getClock(): ClockInterface
+    {
+        if ($this->clock) {
+            return $this->clock;
+        }
+
+        if (class_exists(Clock::class)) {
+            return new Clock();
+        }
+
+        return new class implements ClockInterface {
+            public function now(): \DateTimeImmutable
+            {
+                return new \DateTimeImmutable('@'.time());
+            }
+        };
     }
 }

@@ -31,6 +31,7 @@ CHANGELOG
  * Add `LockValueResolver` to inject the lock acquired by `#[Lock]` into the `LockInterface` and `SharedLockInterface` controller arguments
  * Allow `{name}` placeholders in the key of `#[RateLimit]` to read request attributes
  * Add the `$map` argument to `#[Serialize]` and the `$objectMapper` argument to `SerializeControllerResultAttributeListener` to map controller results with the object mapper before serializing them
+ * Add the `$stream` argument to `#[Serialize]` and the `$streamWriter` and `$typeResolver` arguments to `SerializeControllerResultAttributeListener` to stream controller results as JSON with the stream writer
 
 8.1
 ---

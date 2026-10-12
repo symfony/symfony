@@ -14,14 +14,20 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\Serialize;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\TypeInfo\Exception\UnsupportedException;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
@@ -31,6 +37,8 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
     public function __construct(
         private readonly ?SerializerInterface $serializer,
         private readonly ?ObjectMapperInterface $objectMapper = null,
+        private readonly ?StreamWriterInterface $streamWriter = null,
+        private ?TypeResolverInterface $typeResolver = null,
     ) {
     }
 
@@ -45,7 +53,11 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
             return;
         }
 
-        if (!$this->serializer) {
+        if ($event->attribute->stream) {
+            if (!$this->streamWriter) {
+                throw new \LogicException(\sprintf('The "symfony/json-streamer" component is required to use the "stream" option of the "#[%s]" attribute. Try running "composer require symfony/json-streamer".', Serialize::class));
+            }
+        } elseif (!$this->serializer) {
             throw new \LogicException(\sprintf('The "symfony/serializer" component is required to use the "#[%s]" attribute. Try running "composer require symfony/serializer".', Serialize::class));
         }
 
@@ -53,8 +65,21 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
         $controllerResult = $kernelEvent->getControllerResult();
         $format = $request->getRequestFormat('json');
 
+        if ($event->attribute->stream && 'json' !== $format) {
+            throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format "%s".', $format));
+        }
+
         if (null !== $event->attribute->map) {
             $controllerResult = $this->map($controllerResult, $event->attribute->map);
+        }
+
+        if ($event->attribute->stream) {
+            $type = $this->resolveType($controllerResult, $event->attribute->map, $kernelEvent);
+            $data = $this->streamWriter->write($controllerResult, $type, $event->attribute->context);
+            $headers = $this->mergeHeaders($event->attribute, $request, $format);
+            $kernelEvent->setResponse(new StreamedResponse($data, $event->attribute->code, $headers));
+
+            return;
         }
 
         try {
@@ -112,5 +137,22 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
         }
 
         return \is_object($value) ? $this->objectMapper->map($value, $class) : $value;
+    }
+
+    private function resolveType(mixed $controllerResult, ?string $map, ViewEvent $event): Type
+    {
+        if (null !== $map) {
+            return match (true) {
+                is_iterable($controllerResult) => Type::list(Type::object($map)),
+                null === $controllerResult => Type::null(),
+                default => Type::object($map),
+            };
+        }
+
+        try {
+            return ($this->typeResolver ??= TypeResolver::create())->resolve($event->controllerMetadata?->getReflector());
+        } catch (UnsupportedException $e) {
+            throw new \LogicException(\sprintf('The "stream" option of the "#[%s]" attribute requires the "map" option or a return type on the controller: %s', Serialize::class, $e->getMessage()), 0, $e);
+        }
     }
 }

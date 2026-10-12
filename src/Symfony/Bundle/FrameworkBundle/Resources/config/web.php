@@ -235,6 +235,8 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('serializer')->nullOnInvalid(),
             service('object_mapper')->nullOnInvalid(),
+            service('json_streamer.stream_writer')->nullOnInvalid(),
+            service('type_info.resolver')->nullOnInvalid(),
         ])
         ->tag('kernel.event_subscriber')
 

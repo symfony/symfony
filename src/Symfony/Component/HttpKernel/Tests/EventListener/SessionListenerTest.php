@@ -12,9 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -642,6 +644,29 @@ class SessionListenerTest extends TestCase
         $this->assertTrue($response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+    }
+
+    #[Group('time-sensitive')]
+    public function testResponseExpiresIsComputedFromNowIfSessionStarted()
+    {
+        ClockMock::withClockMock(1234567890.5);
+
+        $session = $this->createStub(Session::class);
+        $session->method('getUsageIndex')->willReturn(1);
+
+        $listener = new SessionListener(new Container());
+        $kernel = $this->createStub(HttpKernelInterface::class);
+
+        $request = new Request();
+        $request->setSession($session);
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $response = new Response();
+        $response->setPrivate();
+        $response->setMaxAge(600);
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        $this->assertSame('Fri, 13 Feb 2009 23:41:30 GMT', $response->headers->get('Expires'));
     }
 
     public function testPrivateResponseMaxAgeIsRespectedIfSessionStarted()

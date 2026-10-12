@@ -12,7 +12,9 @@
 namespace Symfony\Component\Mailer\Bridge\Azure\Tests\Transport;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureApiTransport;
@@ -101,6 +103,27 @@ class AzureApiTransportTest extends TestCase
         $message = $transport->send($mail);
 
         $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    #[Group('time-sensitive')]
+    public function testRequestIsSignedWithTheCurrentDate()
+    {
+        ClockMock::withClockMock(1234567890.5);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $this->assertSame(['x-ms-date: Fri, 13 Feb 2009 23:31:30 GMT'], $options['normalized_headers']['x-ms-date']);
+            $this->assertSame(['repeatability-first-sent: Fri, 13 Feb 2009 23:31:30 GMT'], $options['normalized_headers']['repeatability-first-sent']);
+
+            return new JsonMockResponse(['id' => 'foobar'], ['http_code' => 202]);
+        });
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        (new AzureApiTransport('KEY', 'my-acs-resource', true, '2023-03-31', $client))->send($mail);
     }
 
     public function testInlineAttachment()

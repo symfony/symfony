@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Uid\Exception\InvalidArgumentException;
 use Symfony\Component\Uid\MaxUuid;
 use Symfony\Component\Uid\NilUuid;
@@ -699,6 +700,17 @@ class UuidTest extends TestCase
         $this->assertLessThan(0, $min->compare($inside));
         $this->assertGreaterThan(0, $max->compare($inside));
         $this->assertSame($time->format('Uv'), $min->getDateTime()->format('Uv'));
+    }
+
+    #[Group('time-sensitive')]
+    public function testUuidV6BoundariesDefaultToNow()
+    {
+        ClockMock::withClockMock(1776072600.123456);
+
+        [$min, $max] = UuidV6::createBoundaries();
+
+        $this->assertSame('1f1371b5-7c2f-6280-8000-000000000000', (string) $min);
+        $this->assertSame('1f1371b5-7c2f-6280-bfff-ffffffffffff', (string) $max);
     }
 
     public function testCreateBoundariesLeavesTheGeneratorClockAlone()

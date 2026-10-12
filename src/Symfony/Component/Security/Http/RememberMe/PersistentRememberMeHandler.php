@@ -74,10 +74,11 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         if (null !== $digest = $this->hashSignatureProperties($user)) {
             $tokenValue .= self::DIGEST_SEPARATOR.$digest;
         }
+        $lastUsed = \DateTimeImmutable::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get()));
         if (method_exists(PersistentToken::class, 'getClass')) {
-            $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, new \DateTimeImmutable(), false);
+            $token = new PersistentToken($user::class, $user->getUserIdentifier(), $series, $tokenValue, $lastUsed, false);
         } else {
-            $token = new PersistentToken($user->getUserIdentifier(), $series, $tokenValue, new \DateTimeImmutable());
+            $token = new PersistentToken($user->getUserIdentifier(), $series, $tokenValue, $lastUsed);
         }
 
         $this->tokenProvider->createNewToken($token);
@@ -147,7 +148,7 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         if (null !== $digest) {
             $tokenValue .= self::DIGEST_SEPARATOR.$digest;
         }
-        $tokenLastUsed = new \DateTime();
+        $tokenLastUsed = \DateTime::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get()));
         $this->tokenVerifier?->updateExistingToken($token, $tokenValue, $tokenLastUsed);
         $this->tokenProvider->updateToken($series, $tokenValue, $tokenLastUsed);
 

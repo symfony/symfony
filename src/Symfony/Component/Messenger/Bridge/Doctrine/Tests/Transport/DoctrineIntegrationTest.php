@@ -16,9 +16,11 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 
@@ -74,6 +76,29 @@ class DoctrineIntegrationTest extends TestCase
         $this->driverConnection->commit();
 
         $this->assertNotSame('2000-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded[0]['id']]));
+    }
+
+    #[Group('time-sensitive')]
+    public function testDatesAreComputedFromNow()
+    {
+        ClockMock::withClockMock(1000000000.5);
+
+        $id = $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class], 2000);
+        $this->connection->sendBatch([['{"message": "Hi again"}', ['type' => DummyMessage::class], 2000]]);
+
+        $this->assertSame([
+            ['2001-09-09 01:46:40', '2001-09-09 01:46:43'],
+            ['2001-09-09 01:46:40', '2001-09-09 01:46:43'],
+        ], $this->driverConnection->fetchAllNumeric('SELECT created_at, available_at FROM messenger_messages ORDER BY id'));
+        $this->assertNull($this->connection->get());
+
+        sleep(3);
+        $this->assertEquals($id, $this->connection->get()[0]['id']);
+        $this->assertSame('2001-09-09 01:46:43', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$id]));
+
+        sleep(10);
+        $this->connection->keepalive($id);
+        $this->assertSame('2001-09-09 01:46:53', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$id]));
     }
 
     public function testSendWithDelay()

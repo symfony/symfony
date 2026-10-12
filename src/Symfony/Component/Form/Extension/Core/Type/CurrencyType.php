@@ -87,7 +87,7 @@ class CurrencyType extends AbstractType
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
-            'active_at' => new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')),
+            'active_at' => new \DateTimeImmutable(gmdate('Y-m-d'), new \DateTimeZone('Etc/UTC')),
             'not_active_at' => null,
             'include_undated' => true,
             'legal_tender' => true,

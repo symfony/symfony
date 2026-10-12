@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\InMemory;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -117,6 +119,19 @@ class InMemoryTransportTest extends TestCase
 
         $clock->sleep(0.5);
         $this->assertSame([$envelope], $transport->get());
+    }
+
+    #[Group('time-sensitive')]
+    public function testQueueWithSubSecondDelayWithoutAClock()
+    {
+        ClockMock::withClockMock(1577836800);
+        $envelope = $this->transport->send((new Envelope(new \stdClass()))->with(new DelayStamp(500)));
+
+        usleep(100000);
+        $this->assertSame([], $this->transport->get());
+
+        usleep(500000);
+        $this->assertSame([$envelope], $this->transport->get());
     }
 
     public function testQueueWithDelayAcrossDstTransition()

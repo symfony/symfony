@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Policy;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Policy\NoLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Reservation;
@@ -28,5 +30,25 @@ class NoLimiterTest extends TestCase
     {
         $limiter = new NoLimiter();
         $this->assertInstanceOf(Reservation::class, $limiter->reserve());
+    }
+
+    #[Group('time-sensitive')]
+    public function testRetryAfterIsNowInTheDefaultTimezone()
+    {
+        ClockMock::withClockMock(1234567890.5);
+        $originalTimezone = date_default_timezone_get();
+
+        try {
+            date_default_timezone_set('Europe/Paris');
+            $limiter = new NoLimiter();
+
+            $this->assertSame('2009-02-14 00:31:30.500000 Europe/Paris', $limiter->consume()->getRetryAfter()->format('Y-m-d H:i:s.u e'));
+
+            $reservation = $limiter->reserve();
+            $this->assertSame(1234567890.5, $reservation->getTimeToAct());
+            $this->assertSame('2009-02-14 00:31:30.500000 Europe/Paris', $reservation->getRateLimit()->getRetryAfter()->format('Y-m-d H:i:s.u e'));
+        } finally {
+            date_default_timezone_set($originalTimezone);
+        }
     }
 }

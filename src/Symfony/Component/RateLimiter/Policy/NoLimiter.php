@@ -27,12 +27,14 @@ final class NoLimiter implements LimiterInterface
 {
     public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
-        return new Reservation(microtime(true), new RateLimit(\PHP_INT_MAX, new \DateTimeImmutable(), true, \PHP_INT_MAX));
+        $now = microtime(true);
+
+        return new Reservation($now, new RateLimit(\PHP_INT_MAX, \DateTimeImmutable::createFromTimestamp($now)->setTimezone(new \DateTimeZone(date_default_timezone_get())), true, \PHP_INT_MAX));
     }
 
     public function consume(int $tokens = 1): RateLimit
     {
-        return new RateLimit(\PHP_INT_MAX, new \DateTimeImmutable(), true, \PHP_INT_MAX);
+        return new RateLimit(\PHP_INT_MAX, \DateTimeImmutable::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get())), true, \PHP_INT_MAX);
     }
 
     public function reset(): void

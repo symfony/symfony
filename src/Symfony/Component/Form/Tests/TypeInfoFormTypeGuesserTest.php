@@ -22,6 +22,7 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Tests\Fixtures\TypeInfoFormTypeGuesserCase;
+use Symfony\Component\Form\Tests\Fixtures\TypeInfoFormTypeGuesserChildCase;
 use Symfony\Component\Form\TypeInfoFormTypeGuesser;
 
 class TypeInfoFormTypeGuesserTest extends TestCase
@@ -47,6 +48,7 @@ class TypeInfoFormTypeGuesserTest extends TestCase
         yield 'int' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'int'];
         yield 'nullable int' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'nullableInt'];
         yield 'private int' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'privateInt'];
+        yield 'private int of a parent class' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserChildCase::class, 'privateInt'];
         yield 'float' => [new TypeGuess(NumberType::class, [], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'float'];
         yield 'bool' => [new TypeGuess(CheckboxType::class, [], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'bool'];
         yield 'nullable bool' => [new TypeGuess(CheckboxType::class, [], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'nullableBool'];
@@ -75,6 +77,7 @@ class TypeInfoFormTypeGuesserTest extends TestCase
 
         yield 'nullable string' => [new ValueGuess(false, Guess::LOW_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'nullableString'];
         yield 'nullable int' => [new ValueGuess(false, Guess::LOW_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'nullableInt'];
+        yield 'private nullable int of a parent class' => [new ValueGuess(false, Guess::LOW_CONFIDENCE), TypeInfoFormTypeGuesserChildCase::class, 'privateInt'];
         yield 'nullable DateTimeImmutable' => [new ValueGuess(false, Guess::LOW_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'dateTimeImmutable'];
         yield 'bool' => [new ValueGuess(false, Guess::LOW_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'bool'];
         yield 'nullable bool' => [new ValueGuess(false, Guess::LOW_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'nullableBool'];

@@ -108,7 +108,12 @@ final class TypeInfoFormTypeGuesser implements FormTypeGuesserInterface
         }
 
         try {
-            $type = ($this->typeResolver ??= TypeResolver::create())->resolve(new \ReflectionProperty($class, $property));
+            $reflector = new \ReflectionClass($class);
+            // a child class does not list the private properties of its parent classes
+            while (!$reflector->hasProperty($property) && $reflector->getParentClass()) {
+                $reflector = $reflector->getParentClass();
+            }
+            $type = ($this->typeResolver ??= TypeResolver::create())->resolve($reflector->getProperty($property));
         } catch (\ReflectionException|ExceptionInterface) {
             return $this->cache[$class][$property] = false;
         }

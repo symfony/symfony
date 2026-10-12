@@ -177,7 +177,7 @@ class AttributeMetadataPassTest extends TestCase
 
         $resources = array_map('strval', $container->getResources());
         $this->assertContains(__FILE__, $resources);
-        $this->assertContains(\dirname(__DIR__).'/Fixtures/TraitWithPrivateProperty.php', $resources);
+        $this->assertContains((new \ReflectionClass(TraitWithPrivateProperty::class))->getFileName(), $resources);
     }
 
     private function createContainerWithAutoconfiguredConstraints(): ContainerBuilder

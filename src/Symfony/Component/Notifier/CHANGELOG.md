@@ -11,6 +11,7 @@ CHANGELOG
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0
  * Add `AbstractTransport::setSsl()`, `AbstractTransport::getHttpScheme()`, the `AbstractTransport::SSL` constant and `AbstractTransportFactory::getSsl()` to support the `ssl` DSN option of the bridges
  * Use the global clock of symfony/clock, when installed, for the retry period of `RoundRobinTransport` and `FailoverTransport`
+ * Use the global `From` header of the mailer as the sender of the email channel when no envelope sender is configured
 
 8.0
 ---

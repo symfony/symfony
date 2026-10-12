@@ -1317,4 +1317,12 @@ class InlineTest extends TestCase
 
         Inline::parse('{ <<: [foo] }');
     }
+
+    public function testParseKeyStartingWithNulByteWithMapObjectsThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Mapping keys starting with a NUL byte are not supported with the "Yaml::PARSE_OBJECT_FOR_MAP" flag');
+
+        Inline::parse('{ foo: 1, "\0": 1 }', Yaml::PARSE_OBJECT_FOR_MAP);
+    }
 }

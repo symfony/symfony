@@ -23,6 +23,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.app')
             ->private()
             ->tag('cache.pool')
+            ->tag('kernel.test_state', ['method' => 'clear'])
 
         ->set('scheduler.messenger.service_call_message_handler', ServiceCallMessageHandler::class)
             ->args([
@@ -52,10 +53,5 @@ return static function (ContainerConfigurator $container) {
                 service('clock'),
             ])
             ->tag('console.command')
-
-        ->set('cache.scheduler')
-            ->parent('cache.app')
-            ->private()
-            ->tag('cache.pool')
     ;
 };

@@ -121,8 +121,29 @@ class SchedulerTest extends AbstractWebTestCase
         $this->assertSame($container->get('scheduler_custom_receiver'), $container->get('receivers')->get('scheduler_custom_receiver'));
     }
 
+    public function testStatefulScheduleStateIsResetWhenTheKernelIsShutDown()
+    {
+        $this->assertCount(1, $this->runStatefulSchedule());
+
+        self::ensureKernelShutdown();
+
+        $this->assertCount(1, $this->runStatefulSchedule());
+    }
+
     protected static function createKernel(array $options = []): KernelInterface
     {
         return parent::createKernel(['test_case' => 'Scheduler'] + $options);
+    }
+
+    private function runStatefulSchedule(): array
+    {
+        $container = self::getContainer();
+        $container->set('clock', $clock = new MockClock('2023-10-26T08:59:59Z'));
+        $cron = $container->get('receivers')->get('scheduler_stateful');
+
+        $this->assertSame([], iterator_to_array($cron->get()));
+        $clock->sleep(1);
+
+        return iterator_to_array($cron->get(), false);
     }
 }

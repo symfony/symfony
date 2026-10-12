@@ -5,6 +5,9 @@ framework:
     lock: ~
     scheduler:
         use_messenger_routing: false
+        schedules:
+            stateful:
+                stateful: true
     messenger: ~
 
 services:
@@ -18,6 +21,9 @@ services:
         autoconfigure: true
 
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyCommand:
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\StatefulTask:
         autoconfigure: true
 
     clock:

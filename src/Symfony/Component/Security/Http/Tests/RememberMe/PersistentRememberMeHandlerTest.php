@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -494,6 +496,29 @@ class PersistentRememberMeHandlerTest extends TestCase
         $user = $handler->consumeRememberMeCookie($rememberMeDetails);
 
         $this->assertSame('wouter', $user->getUserIdentifier());
+    }
+
+    #[Group('time-sensitive')]
+    public function testLastUsedIsNowInTheDefaultTimezone()
+    {
+        ClockMock::withClockMock(1234567890.5);
+        $originalTimezone = date_default_timezone_get();
+
+        try {
+            date_default_timezone_set('Europe/Paris');
+            $handler = $this->createHandler(null, $this->userProvider);
+            $handler->createRememberMeCookie(new InMemoryUser('wouter', null));
+
+            [$series, $tokenValue] = $this->readCookieValue();
+            $this->assertSame('2009-02-14 00:31:30.500000 Europe/Paris', $this->tokenProvider->loadTokenBySeries($series)->getLastUsed()->format('Y-m-d H:i:s.u e'));
+
+            sleep(3600);
+            $handler->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, $series.':'.$tokenValue));
+
+            $this->assertSame('2009-02-14 01:31:30.500000 Europe/Paris', $this->tokenProvider->loadTokenBySeries($series)->getLastUsed()->format('Y-m-d H:i:s.u e'));
+        } finally {
+            date_default_timezone_set($originalTimezone);
+        }
     }
 
     private function createSignedHandler(?TokenVerifierInterface $tokenVerifier = null): PersistentRememberMeHandler

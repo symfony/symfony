@@ -67,7 +67,7 @@ class InMemoryTransport implements TransportInterface, ListableReceiverInterface
     {
         $fetchSize = \func_num_args() > 0 ? max(1, func_get_arg(0)) : 1;
         $envelopes = [];
-        $now = $this->clock?->now() ?? new \DateTimeImmutable();
+        $now = $this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(microtime(true));
         foreach ($this->decodeQueue($this->queue) as $id => $envelope) {
             if (!isset($this->availableAt[$id]) || $now > $this->availableAt[$id]) {
                 $envelopes[] = $envelope;
@@ -142,7 +142,7 @@ class InMemoryTransport implements TransportInterface, ListableReceiverInterface
 
         /** @var DelayStamp|null $delayStamp */
         if ($delayStamp = $envelope->last(DelayStamp::class)) {
-            $now = $this->clock?->now() ?? new \DateTimeImmutable();
+            $now = $this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(microtime(true));
             $this->availableAt[$id] = $now->setTimezone(new \DateTimeZone('UTC'))->modify(\sprintf('+%d milliseconds', $delayStamp->getDelay()));
         }
 

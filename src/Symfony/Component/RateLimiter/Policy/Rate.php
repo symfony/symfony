@@ -89,7 +89,7 @@ final class Rate
      */
     public function calculateNextTokenAvailability(): \DateTimeImmutable
     {
-        return (new \DateTimeImmutable())->add($this->refillTime);
+        return \DateTimeImmutable::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get()))->add($this->refillTime);
     }
 
     /**

@@ -80,7 +80,7 @@ class UuidV6 extends Uuid implements TimeOrderedUidInterface
      */
     public static function createBoundaries(?\DateTimeInterface $time = null): array
     {
-        $time = BinaryUtil::dateTimeToHex($time ?? new \DateTimeImmutable());
+        $time = BinaryUtil::dateTimeToHex($time ?? \DateTimeImmutable::createFromTimestamp(microtime(true)));
         $time = substr($time, 1, 8).'-'.substr($time, 9, 4).'-6'.substr($time, 13, 3);
 
         return [static::fromString($time.'-8000-000000000000'), static::fromString($time.'-bfff-ffffffffffff')];

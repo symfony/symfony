@@ -138,7 +138,7 @@ class Connection implements ResetInterface
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
-        $parameters = $this->getInsertParameters(new \DateTimeImmutable('UTC'), $body, $headers, $delay);
+        $parameters = $this->getInsertParameters(\DateTimeImmutable::createFromTimestamp(microtime(true)), $body, $headers, $delay);
 
         return $this->executeInsert(fn () => $this->insert($this->getInsertSql(1), $parameters, self::INSERT_TYPES));
     }
@@ -154,7 +154,7 @@ class Connection implements ResetInterface
      */
     public function sendBatch(array $messages): array
     {
-        $now = new \DateTimeImmutable('UTC');
+        $now = \DateTimeImmutable::createFromTimestamp(microtime(true));
         $platform = $this->driverConnection->getDatabasePlatform();
 
         if (!$platform instanceof AbstractMySQLPlatform && !$platform instanceof PostgreSQLPlatform && !$platform instanceof SQLitePlatform && !$platform instanceof SQLServerPlatform) {
@@ -247,7 +247,7 @@ class Connection implements ResetInterface
 
             $doctrineEnvelopes = array_map($this->decodeEnvelopeHeaders(...), $doctrineEnvelopes);
 
-            $now = new \DateTimeImmutable('UTC');
+            $now = \DateTimeImmutable::createFromTimestamp(microtime(true));
 
             if (1 === \count($doctrineEnvelopes)) {
                 $queryBuilder = $this->driverConnection->createQueryBuilder()
@@ -328,7 +328,7 @@ class Connection implements ResetInterface
                 ->set('delivered_at', '?')
                 ->where('id = ?');
             $this->executeStatement($queryBuilder->getSQL(), [
-                new \DateTimeImmutable('UTC'),
+                \DateTimeImmutable::createFromTimestamp(microtime(true)),
                 $id,
             ], [
                 Types::DATETIME_IMMUTABLE,
@@ -417,7 +417,7 @@ class Connection implements ResetInterface
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
-        $now = new \DateTimeImmutable('UTC');
+        $now = \DateTimeImmutable::createFromTimestamp(microtime(true));
         $redeliverLimit = $now->modify(\sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->createQueryBuilder()

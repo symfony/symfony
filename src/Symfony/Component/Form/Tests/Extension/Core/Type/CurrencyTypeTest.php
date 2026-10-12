@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -73,6 +75,17 @@ class CurrencyTypeTest extends BaseTypeTestCase
             ->createView()->vars['choices'];
 
         $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'tolar slovène'), $choices);
+    }
+
+    #[Group('time-sensitive')]
+    public function testActiveAtDefaultsToToday()
+    {
+        ClockMock::withClockMock(1136116800);
+
+        $choices = $this->factory->create(static::TESTED_TYPE)
+            ->createView()->vars['choices'];
+
+        $this->assertContains('SIT', array_column($choices, 'value'));
     }
 
     #[RequiresPhpExtension('intl')]

@@ -196,8 +196,7 @@ final class AzureApiTransport extends AbstractApiTransport
         $verb = 'POST';
 
         // Request time
-        $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
-        $utcNow = $datetime->format('D, d M Y H:i:s \G\M\T');
+        $utcNow = gmdate('D, d M Y H:i:s \G\M\T');
 
         // Content hash signature
         $contentHash = $this->generateContentHash(json_encode($payload));

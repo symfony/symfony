@@ -402,6 +402,7 @@ class KeyManagementBundle extends AbstractBundle
                 $config['table'],
                 32,
                 $config['max_age'],
+                new Reference('clock', ContainerInterface::NULL_ON_INVALID_REFERENCE),
             ])
             ->addTag('kernel.reset', ['method' => 'forget']);
 

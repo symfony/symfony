@@ -20,6 +20,7 @@ use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Psr\Clock\ClockInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
@@ -32,6 +33,7 @@ use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
 use Symfony\Component\KeyManagement\StoredDataKey;
 use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV7;
 
 /**
  * Keeps wrapped data keys in a Doctrine DBAL table.
@@ -119,6 +121,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
         private readonly string $table = self::DEFAULT_TABLE,
         private readonly int $keyBytes = 32,
         private readonly ?int $maxAgeSeconds = self::DEFAULT_MAX_AGE_SECONDS,
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
@@ -230,7 +233,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
         $this->checkScope($scope);
 
         $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes);
-        $reference = Uuid::v7()->toBinary();
+        $reference = (new UuidV7(UuidV7::generate($this->clock?->now())))->toBinary();
         $handle = new DataKeyHandle($reference, $dataKey);
 
         $this->connection->insert($this->table, [
@@ -473,7 +476,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             return false;
         }
 
-        return time() >= ($this->retiresAt[$reference] ??= $this->retirementOf($reference));
+        return ($this->clock?->now()->getTimestamp() ?? time()) >= ($this->retiresAt[$reference] ??= $this->retirementOf($reference));
     }
 
     /**

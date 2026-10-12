@@ -247,6 +247,8 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame('alias/app-key', $arguments[3]);
         $this->assertSame('deks', $arguments[4]);
         $this->assertSame(3600, $arguments[6]);
+        $this->assertSame('clock', (string) $arguments[7]);
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $arguments[7]->getInvalidBehavior());
         $this->assertSame([['method' => 'forget']], $container->getDefinition('key_management.store')->getTag('kernel.reset'), 'the retained plaintexts must not survive a unit of work in a long-running process.');
 
         $encrypter = $container->getDefinition('key_management.stored_envelope_encrypter')->getArguments();

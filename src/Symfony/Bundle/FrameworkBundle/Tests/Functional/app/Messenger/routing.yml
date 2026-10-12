@@ -1,0 +1,7 @@
+messenger_dispatch:
+    path:     /messenger/dispatch/{message}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\MessengerController::dispatch }
+
+messenger_idle:
+    path:     /messenger
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\MessengerController::idle }

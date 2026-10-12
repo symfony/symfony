@@ -182,6 +182,120 @@ class MessengerTest extends AbstractWebTestCase
         $this->consumeQueuedMessages($transport);
     }
 
+    public function testMessagesQueuedBeforeARebootAreKept()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/messenger/dispatch/foo');
+        $this->assertResponseRedirects('/messenger');
+        $client->followRedirect();
+
+        $this->assertQueuedMessageCount(1, 'async', FooMessage::class);
+        $this->assertSame(1, $this->consumeQueuedMessages('async'));
+        $this->assertCount(1, RecordingMessageHandler::$handled);
+        $this->assertQueuedMessageCount(0, 'async');
+    }
+
+    public function testMessagesQueuedBeforeARebootAreConsumedInOrderWithTheNewOnes()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/messenger/dispatch/foo');
+        $client->request('GET', '/messenger/dispatch/bar');
+        $client->request('GET', '/messenger/dispatch/foo');
+
+        $this->assertSame([FooMessage::class, BarMessage::class, FooMessage::class], array_map(static fn (Envelope $envelope) => $envelope->getMessage()::class, $this->getQueuedMessages('async')));
+        $this->assertSame(3, $this->consumeQueuedMessages('async'));
+        $this->assertSame([FooMessage::class, BarMessage::class, FooMessage::class], array_map(static fn (object $message) => $message::class, RecordingMessageHandler::$handled));
+        $this->assertQueuedMessageCount(0, 'async');
+    }
+
+    public function testMessagesQueuedBeforeARebootAreConsumedWithAllInMemoryTransports()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/messenger/dispatch/foo');
+        $client->request('GET', '/messenger/dispatch/bar');
+
+        $this->assertSame(2, $this->consumeQueuedMessages());
+        $this->assertSame([FooMessage::class, BarMessage::class], array_map(static fn (object $message) => $message::class, RecordingMessageHandler::$handled));
+        $this->assertQueuedMessageCount(0, 'async');
+    }
+
+    public function testAKeptMessageIsConsumedOnce()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/messenger/dispatch/foo');
+        $client->followRedirect();
+
+        $this->assertSame(1, $this->consumeQueuedMessages('async'));
+
+        $client->request('GET', '/messenger');
+
+        $this->assertQueuedMessageCount(0, 'async');
+        $this->assertSame(0, $this->consumeQueuedMessages('async'));
+        $this->assertCount(1, RecordingMessageHandler::$handled);
+    }
+
+    public function testAKeptMessageThatFailsIsRetriedOnce()
+    {
+        RecordingMessageHandler::$failures = 1;
+        $client = $this->createClient();
+        $client->request('GET', '/messenger/dispatch/foo');
+        $client->followRedirect();
+
+        $this->assertSame(1, $this->consumeQueuedMessages('async'));
+        $this->assertSame(2, RecordingMessageHandler::$attempts);
+        $this->assertQueuedMessageCount(0, 'async');
+
+        $client->request('GET', '/messenger');
+
+        $this->assertQueuedMessageCount(0, 'async');
+        $this->assertCount(1, RecordingMessageHandler::$handled);
+    }
+
+    public function testAKeptMessageDelayedByTheApplicationIsLeftUntilDue()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/messenger/dispatch/foo?delay=3600000');
+        $client->followRedirect();
+
+        $this->assertSame(0, $this->consumeQueuedMessages('async'));
+        $this->assertQueuedMessageCount(1, 'async');
+        $this->assertSame(0, RecordingMessageHandler::$attempts);
+    }
+
+    public function testMessagesAreKeptWhenRebootIsDisabled()
+    {
+        $client = $this->createClient();
+        $client->disableReboot();
+        $client->request('GET', '/messenger/dispatch/foo');
+        $client->request('GET', '/messenger/dispatch/bar');
+
+        $this->assertQueuedMessageCount(2, 'async');
+        $this->assertSame(2, $this->consumeQueuedMessages('async'));
+        $this->assertSame([FooMessage::class, BarMessage::class], array_map(static fn (object $message) => $message::class, RecordingMessageHandler::$handled));
+    }
+
+    public function testKeptMessagesAreNotPutBackOnTheTransport()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/messenger/dispatch/foo');
+        $client->request('GET', '/messenger/dispatch/bar');
+
+        $transport = $client->getContainer()->get('messenger.transport.async');
+        $this->assertSame([BarMessage::class], array_map(static fn (Envelope $envelope) => $envelope->getMessage()::class, $transport->getSent()));
+        $this->assertSame(1, $transport->getMessageCount());
+        $this->assertQueuedMessageCount(2, 'async');
+    }
+
+    public function testKeptMessagesDoNotOutliveTheKernel()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/messenger/dispatch/foo');
+        $client->followRedirect();
+        self::ensureKernelShutdown();
+
+        $this->assertQueuedMessageCount(0, 'async');
+    }
+
     public function testAssertQueuedMessageCountRejectsAnUnknownMessageClass()
     {
         $this->expectException(\InvalidArgumentException::class);

@@ -23,3 +23,7 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\ChainedMessageHandler:
         autoconfigure: true
         autowire: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\MessengerController:
+        public: true
+        arguments: ['@messenger.default_bus']

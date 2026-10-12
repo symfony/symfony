@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\AhaSend\Webhook;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
@@ -29,6 +30,7 @@ final class AhaSendRequestParser extends AbstractRequestParser
 
     public function __construct(
         private readonly AhaSendPayloadConverter $converter,
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
@@ -55,7 +57,7 @@ final class AhaSendRequestParser extends AbstractRequestParser
         if (!is_numeric($timestamp) || \is_float($timestamp + 0) || (int) $timestamp != $timestamp || (int) $timestamp <= 0) {
             throw new RejectWebhookException(406, 'Invalid timestamp.');
         }
-        if (abs(time() - (int) $timestamp) > self::TIMESTAMP_TOLERANCE) {
+        if (abs(($this->clock?->now()->getTimestamp() ?? time()) - (int) $timestamp) > self::TIMESTAMP_TOLERANCE) {
             throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
         $expectedSignature = $this->sign($eventID, $timestamp, $request->getContent(), $secret);

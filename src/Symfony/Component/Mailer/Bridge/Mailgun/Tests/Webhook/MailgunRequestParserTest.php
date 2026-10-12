@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Webhook;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Mailgun\RemoteEvent\MailgunPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailgun\Webhook\MailgunRequestParser;
@@ -55,6 +56,17 @@ class MailgunRequestParserTest extends AbstractRequestParserTestCase
         ClockMock::withClockMock($request->toArray()['signature']['timestamp'] + $offset);
 
         $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
+    public function testTheTimestampIsCheckedAgainstTheGivenClock()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered_messages.json'));
+        $timestamp = (int) $request->toArray()['signature']['timestamp'];
+        ClockMock::withClockMock($timestamp + 86400);
+
+        $parser = new MailgunRequestParser(new MailgunPayloadConverter(), new MockClock('@'.$timestamp));
+
+        $this->assertNotNull($parser->parse($request, $this->getSecret()));
     }
 
     protected function createRequestParser(): RequestParserInterface

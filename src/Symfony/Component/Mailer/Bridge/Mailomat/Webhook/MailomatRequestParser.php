@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailomat\Webhook;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +36,7 @@ final class MailomatRequestParser extends AbstractRequestParser
     public function __construct(
         private readonly MailomatPayloadConverter $converter,
         private readonly int $timestampTolerance = 43200,
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
@@ -90,7 +92,7 @@ final class MailomatRequestParser extends AbstractRequestParser
         [$algo, $signature] = explode('=', $signatureHeader, 2);
 
         $timestamp = $headers->get(self::HEADER_TIMESTAMP);
-        if ($this->timestampTolerance > 0 && (!ctype_digit((string) $timestamp) || abs(time() - (int) $timestamp) > $this->timestampTolerance)) {
+        if ($this->timestampTolerance > 0 && (!ctype_digit((string) $timestamp) || abs(($this->clock?->now()->getTimestamp() ?? time()) - (int) $timestamp) > $this->timestampTolerance)) {
             throw new RejectWebhookException(406, 'Timestamp is outside the tolerance window.');
         }
 

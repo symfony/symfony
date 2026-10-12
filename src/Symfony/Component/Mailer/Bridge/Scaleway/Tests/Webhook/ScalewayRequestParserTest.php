@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Scaleway\Tests\Webhook;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,6 +60,22 @@ class ScalewayRequestParserTest extends AbstractRequestParserTestCase
         ClockMock::withClockMock(1768473001 + $offset);
 
         $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
+    public function testTheTimestampIsCheckedAgainstTheGivenClock()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/email_delivered.json'));
+        ClockMock::withClockMock(1768473001 + 86400);
+
+        $parser = new ScalewayRequestParser(
+            new ScalewayPayloadConverter(),
+            new MockHttpClient(static fn () => new MockResponse(file_get_contents(__DIR__.'/Fixtures/signing.crt'))),
+            null,
+            __DIR__.'/Fixtures/trust-chain.pem',
+            new MockClock('@1768473001'),
+        );
+
+        $this->assertNotNull($parser->parse($request, $this->getSecret()));
     }
 
     protected function createRequestParser(): RequestParserInterface

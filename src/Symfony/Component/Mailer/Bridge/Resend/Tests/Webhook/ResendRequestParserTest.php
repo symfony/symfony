@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Resend\Tests\Webhook;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Resend\RemoteEvent\ResendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Resend\Webhook\ResendRequestParser;
@@ -55,6 +56,17 @@ class ResendRequestParserTest extends AbstractRequestParserTestCase
         ClockMock::withClockMock((int) $request->headers->get('svix-timestamp') + $offset);
 
         $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
+    public function testTheTimestampIsCheckedAgainstTheGivenClock()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/sent.json'));
+        $timestamp = (int) $request->headers->get('svix-timestamp');
+        ClockMock::withClockMock($timestamp + 86400);
+
+        $parser = new ResendRequestParser(new ResendPayloadConverter(), new MockClock('@'.$timestamp));
+
+        $this->assertNotNull($parser->parse($request, $this->getSecret()));
     }
 
     protected function createRequestParser(): RequestParserInterface

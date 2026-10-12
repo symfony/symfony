@@ -190,6 +190,16 @@ class NotifierBundleTest extends TestCase
         $this->assertTrue($container->getAlias(TwilioRequestParser::class)->isDeprecated());
     }
 
+    public function testTheWebhookRequestParsersAreGivenTheClock()
+    {
+        $container = $this->load();
+        $clock = new Reference('clock', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+
+        foreach (['sweego', 'vonage'] as $provider) {
+            $this->assertEquals($clock, $container->getDefinition('notifier.webhook.request_parser.'.$provider)->getArgument(0), $provider);
+        }
+    }
+
     public function testTheAdminRecipientsProviderIsAutowiredToTheNotifier()
     {
         $container = $this->load(self::TRANSPORTS);

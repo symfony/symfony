@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add support for `RemoteTemplateEmail` to `MailgunApiTransport`
  * Deprecate the "template" email header, use a `RemoteTemplateEmail` instead
+ * Add a `$clock` argument to `MailgunRequestParser`
 
 6.1
 ---

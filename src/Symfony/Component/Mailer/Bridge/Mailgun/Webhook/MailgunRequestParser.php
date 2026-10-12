@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Webhook;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
@@ -29,6 +30,7 @@ final class MailgunRequestParser extends AbstractRequestParser
 
     public function __construct(
         private readonly MailgunPayloadConverter $converter,
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
@@ -56,7 +58,7 @@ final class MailgunRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
 
-        if (abs(time() - (int) $content['signature']['timestamp']) > self::TIMESTAMP_TOLERANCE) {
+        if (abs(($this->clock?->now()->getTimestamp() ?? time()) - (int) $content['signature']['timestamp']) > self::TIMESTAMP_TOLERANCE) {
             throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
 

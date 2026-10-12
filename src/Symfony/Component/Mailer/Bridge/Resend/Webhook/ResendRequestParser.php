@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Resend\Webhook;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\ChainRequestMatcher;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +32,7 @@ final class ResendRequestParser extends AbstractRequestParser
 
     public function __construct(
         private readonly ResendPayloadConverter $converter,
+        private readonly ?ClockInterface $clock = null,
     ) {
     }
 
@@ -84,7 +86,7 @@ final class ResendRequestParser extends AbstractRequestParser
         $messageTimestamp = (int) $headers->get('svix-timestamp');
         $messageSignature = $headers->get('svix-signature');
 
-        if (abs(time() - $messageTimestamp) > self::TIMESTAMP_TOLERANCE) {
+        if (abs(($this->clock?->now()->getTimestamp() ?? time()) - $messageTimestamp) > self::TIMESTAMP_TOLERANCE) {
             throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
 

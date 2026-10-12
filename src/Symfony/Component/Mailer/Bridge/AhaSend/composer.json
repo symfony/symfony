@@ -22,6 +22,7 @@
         "symfony/mailer": "^8.2"
     },
     "require-dev": {
+        "symfony/clock": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/webhook": "^7.4|^8.0"
     },

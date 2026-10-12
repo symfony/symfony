@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Sweego\Tests\Webhook;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Notifier\Bridge\Sweego\Webhook\SweegoRequestParser;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -59,6 +60,16 @@ class SweegoRequestParserTest extends AbstractRequestParserTestCase
         ClockMock::withClockMock((int) $request->headers->get('webhook-timestamp') + $offset);
 
         $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
+    public function testTheTimestampIsCheckedAgainstTheGivenClock()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/sent.json'));
+        ClockMock::withClockMock((int) self::WEBHOOK_TIMESTAMP + 86400);
+
+        $parser = new SweegoRequestParser(new MockClock('@'.self::WEBHOOK_TIMESTAMP));
+
+        $this->assertNotNull($parser->parse($request, $this->getSecret()));
     }
 
     public function testRequestSignedWithAnEmptySecretIsRejected()

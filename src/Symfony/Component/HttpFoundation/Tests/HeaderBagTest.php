@@ -42,6 +42,40 @@ class HeaderBagTest extends TestCase
         $this->assertEquals('foo', $keys[0]);
     }
 
+    public function testSensitiveNames()
+    {
+        $bag = new HeaderBag(['Authorization' => 'secret']);
+
+        $this->assertSame([], $bag->getSensitiveNames());
+
+        $bag->markSensitive('Authorization');
+        $bag->markSensitive('X-Api-Key');
+        $bag->markSensitive('AUTHORIZATION');
+
+        $this->assertSame(['authorization', 'x-api-key'], $bag->getSensitiveNames());
+        $this->assertSame('secret', $bag->get('authorization'));
+        $this->assertSame(['authorization' => ['secret']], $bag->all());
+        $this->assertCount(1, $bag);
+        $this->assertSame(['authorization' => ['secret']], iterator_to_array($bag));
+        $this->assertSame("Authorization: secret\r\n", (string) $bag);
+
+        $bag->markSensitive('Not-Yet-Added');
+        $this->assertFalse($bag->has('not-yet-added'));
+        $this->assertCount(1, $bag);
+        $this->assertSame(['authorization', 'x-api-key', 'not-yet-added'], $bag->getSensitiveNames());
+
+        $bag->remove('Authorization');
+        $this->assertSame(['authorization', 'x-api-key', 'not-yet-added'], $bag->getSensitiveNames());
+
+        $bag->set('Authorization', 'new-secret');
+        $this->assertSame('new-secret', $bag->get('authorization'));
+        $this->assertSame(['authorization', 'x-api-key', 'not-yet-added'], $bag->getSensitiveNames());
+
+        $bag->replace(['X-Api-Key' => 'new-api-key']);
+        $this->assertSame(['x-api-key' => ['new-api-key']], $bag->all());
+        $this->assertSame(['authorization', 'x-api-key', 'not-yet-added'], $bag->getSensitiveNames());
+    }
+
     public function testGetDate()
     {
         $bag = new HeaderBag(['foo' => 'Tue, 4 Sep 2012 20:00:00 +0200']);

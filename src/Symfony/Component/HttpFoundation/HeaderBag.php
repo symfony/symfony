@@ -28,6 +28,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
      */
     protected array $headers = [];
     protected array $cacheControl = [];
+    protected array $sensitiveNames = [];
 
     public function __construct(array $headers = [])
     {
@@ -82,6 +83,24 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     public function keys(): array
     {
         return array_map(strval(...), array_keys($this->all()));
+    }
+
+    /**
+     * Marks a header as sensitive.
+     */
+    public function markSensitive(string $name): void
+    {
+        $this->sensitiveNames[strtr($name, self::UPPER, self::LOWER)] = true;
+    }
+
+    /**
+     * Returns the names of sensitive headers.
+     *
+     * @return string[]
+     */
+    public function getSensitiveNames(): array
+    {
+        return array_map(strval(...), array_keys($this->sensitiveNames));
     }
 
     /**

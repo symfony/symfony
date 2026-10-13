@@ -12,6 +12,7 @@ CHANGELOG
  * Allow defining default query parameters with the `_query` route default
  * Add `RequestContext::runWith()` to generate and match URLs for another host, scheme or base URL without leaking the change
  * Add `Route::addCondition()`, `RouteCollection::addCondition()` and the `add_condition` import key to combine a condition with the existing ones
+ * Make the `router.strict_requirements` option default to `true` in debug mode and to `null` otherwise
 
 8.1
 ---

@@ -25,17 +25,29 @@ use Symfony\Component\Workflow\Arc;
 #[\Attribute(\Attribute::TARGET_CLASS_CONSTANT | \Attribute::IS_REPEATABLE)]
 class Transition
 {
+    use BuildMetadataTrait;
+
     /**
-     * @param \BackedEnum|Arc|string|non-empty-list<\BackedEnum|Arc|string> $from     The input place(s) of the transition, using an Arc to set a weight
-     * @param \BackedEnum|Arc|string|non-empty-list<\BackedEnum|Arc|string> $to       The output place(s) of the transition, using an Arc to set a weight
-     * @param string|null                                                   $guard    An expression that must be true to enable the transition
-     * @param array<string, mixed>                                          $metadata The metadata of the transition
+     * The metadata of the transition, including its description.
+     *
+     * @var array<string, mixed>
+     */
+    public readonly array $metadata;
+
+    /**
+     * @param \BackedEnum|Arc|string|non-empty-list<\BackedEnum|Arc|string> $from        The input place(s) of the transition, using an Arc to set a weight
+     * @param \BackedEnum|Arc|string|non-empty-list<\BackedEnum|Arc|string> $to          The output place(s) of the transition, using an Arc to set a weight
+     * @param string|null                                                   $guard       An expression that must be true to enable the transition
+     * @param string|null                                                   $description The description of the transition, stored under the "description" key of its metadata
+     * @param array<string, mixed>                                          $metadata    The metadata of the transition
      */
     public function __construct(
         public readonly \BackedEnum|Arc|string|array $from,
         public readonly \BackedEnum|Arc|string|array $to,
         public readonly ?string $guard = null,
-        public readonly array $metadata = [],
+        ?string $description = null,
+        array $metadata = [],
     ) {
+        $this->metadata = self::buildMetadata($metadata, $description);
     }
 }

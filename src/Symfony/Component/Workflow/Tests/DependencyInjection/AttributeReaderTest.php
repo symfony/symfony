@@ -157,6 +157,22 @@ class AttributeReaderTest extends TestCase
         ], $workflow['transitions']);
     }
 
+    public function testDescriptions()
+    {
+        $workflow = $this->read(ArticleWorkflow::class)['article'];
+
+        $this->assertSame(['title' => 'Articles', 'description' => 'Manages the articles'], $workflow['metadata']);
+        $this->assertSame([
+            ['name' => 'draft', 'metadata' => ['description' => 'Being written']],
+            ['name' => 'published', 'metadata' => ['label' => 'Published', 'description' => 'Visible by everyone']],
+            ['name' => 'archived', 'metadata' => []],
+        ], $workflow['places']);
+        $this->assertSame([
+            ['name' => 'publish', 'from' => [['place' => 'draft']], 'to' => [['place' => 'published']], 'metadata' => ['description' => 'Makes the article public'], 'guard' => 'true'],
+            ['name' => 'archive', 'from' => [['place' => 'published']], 'to' => [['place' => 'archived']], 'metadata' => []],
+        ], $workflow['transitions']);
+    }
+
     #[DataProvider('provideInvalidDefinitions')]
     public function testInvalidDefinition(string $class, string $expectedMessage)
     {
@@ -322,6 +338,25 @@ class PlaceConstantsWorkflow
     public const PUBLISH = 'publish';
 }
 
+enum ArticleStep: string
+{
+    #[Place('Visible by everyone', ['label' => 'Published'])]
+    case Published = 'published';
+}
+
+#[AsWorkflow(supports: \stdClass::class, description: 'Manages the articles', metadata: ['title' => 'Articles'])]
+class ArticleWorkflow
+{
+    #[Place('Being written', initial: true)]
+    public const DRAFT = 'draft';
+
+    #[Transition(from: self::DRAFT, to: ArticleStep::Published, guard: 'true', description: 'Makes the article public')]
+    public const PUBLISH = 'publish';
+
+    #[Transition(from: ArticleStep::Published, to: 'archived')]
+    public const ARCHIVE = 'archive';
+}
+
 #[AsWorkflow(supports: \stdClass::class)]
 class IntConstantWorkflow
 {
@@ -454,7 +489,7 @@ class ColoredPlace extends Place
         array $metadata = [],
         bool $initial = false,
     ) {
-        parent::__construct(array_filter(['label' => $label, 'bg_color' => $bgColor]) + $metadata, $initial);
+        parent::__construct(metadata: array_filter(['label' => $label, 'bg_color' => $bgColor]) + $metadata, initial: $initial);
     }
 }
 

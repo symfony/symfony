@@ -14,8 +14,8 @@ namespace Symfony\Component\Workflow\Attribute;
 /**
  * Defines a place of a workflow defined with the AsWorkflow attribute.
  *
- * Use it on the constants of the class, whose values are the names of the places, to define places without transitions or to attach metadata to places.
- * Use it on the cases of the string-backed enums used as places to attach metadata to them.
+ * Use it on the constants of the class, whose values are the names of the places, to define places without transitions or to attach a description or metadata to places.
+ * Use it on the cases of the string-backed enums used as places to attach a description or metadata to them.
  * Set "initial" to make the place part of the initial marking of the workflows that use it, unless they define their "initialMarking" explicitly.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -23,13 +23,25 @@ namespace Symfony\Component\Workflow\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS_CONSTANT)]
 class Place
 {
+    use BuildMetadataTrait;
+
     /**
-     * @param array<string, mixed> $metadata The metadata of the place
-     * @param bool                 $initial  Whether the place is part of the initial marking
+     * The metadata of the place, including its description.
+     *
+     * @var array<string, mixed>
+     */
+    public readonly array $metadata;
+
+    /**
+     * @param string|null          $description The description of the place, stored under the "description" key of its metadata
+     * @param array<string, mixed> $metadata    The metadata of the place
+     * @param bool                 $initial     Whether the place is part of the initial marking
      */
     public function __construct(
-        public readonly array $metadata = [],
+        ?string $description = null,
+        array $metadata = [],
         public readonly bool $initial = false,
     ) {
+        $this->metadata = self::buildMetadata($metadata, $description);
     }
 }

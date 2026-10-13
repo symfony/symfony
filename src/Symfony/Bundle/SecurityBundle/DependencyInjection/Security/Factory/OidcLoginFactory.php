@@ -223,7 +223,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->scalarNode('check_path')
                 ->cannotBeEmpty()
                 ->defaultValue('/oidc/callback')
-                ->info('The firewall path where the OIDC provider redirects after authentication. Must match a redirect URI registered with the provider. A route is declared for this path by the "security.authenticator.oidc_login.route_loader" service, which the application must import (see the OIDC login documentation), as it does for the logout routes. A route name is accepted too, in which case no route is declared for it.')
+                ->info('The firewall path where the OIDC provider redirects after authentication. Must match a redirect URI registered with the provider. A route is declared for this path by the "security.route_loader" service, which the application must import. A route name is accepted too, in which case no route is declared for it.')
             ->end()
             ->scalarNode('start_path')
                 ->cannotBeEmpty()

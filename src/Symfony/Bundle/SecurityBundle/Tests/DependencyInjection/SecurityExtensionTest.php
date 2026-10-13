@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
-use Symfony\Bundle\SecurityBundle\Routing\OidcLoginRouteLoader;
+use Symfony\Bundle\SecurityBundle\Routing\SecurityRouteLoader;
 use Symfony\Bundle\SecurityBundle\Security\TestBrowserAccessTokenAuthenticator;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\CustomProviderFactory;
@@ -2171,10 +2171,10 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame(['local_cert' => '/certs/client.pem', 'local_pk' => null, 'passphrase' => null], $client->getArgument(4), 'the certificate rides on the requests whatever the client authenticates with');
     }
 
-    public function testOidcLoginCallbackRouteLoaderIsAlwaysRegistered()
+    public function testRouteLoaderIsAlwaysRegistered()
     {
         // the "security.yaml" routing recipe imports this loader unconditionally, so it
-        // must exist even in an application no firewall of which uses the OIDC authenticator
+        // must exist even when no firewall declares a route
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
             'providers' => ['default' => ['memory' => null]],
@@ -2183,23 +2183,9 @@ class SecurityExtensionTest extends TestCase
 
         $container->compile();
 
-        $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.route_loader'));
-        $this->assertSame([], $container->getParameter('security.oidc_login.callback_uris'));
-        $this->assertSame([], $container->getParameter('security.oidc_login.start_paths'));
-        $this->assertSame([], $container->getParameter('security.oidc_login.backchannel_logout_paths'));
-
-        $loader = $container->getDefinition('security.authenticator.oidc_login.route_loader');
-        $this->assertSame(OidcLoginRouteLoader::class, $loader->getClass());
+        $loader = $container->getDefinition('security.route_loader');
+        $this->assertSame(SecurityRouteLoader::class, $loader->getClass());
         $this->assertArrayHasKey('routing.route_loader', $loader->getTags());
-        // it declares no route as long as no firewall configures the OIDC authenticator
-        $this->assertCount(0, (new OidcLoginRouteLoader(
-            $container->getParameter('security.oidc_login.callback_uris'),
-            'security.oidc_login.callback_uris',
-            $container->getParameter('security.oidc_login.start_paths'),
-            'security.oidc_login.start_paths',
-            $container->getParameter('security.oidc_login.backchannel_logout_paths'),
-            'security.oidc_login.backchannel_logout_paths',
-        ))());
     }
 
     public function testOidcLoginCallsTheProviderWithTheDefaultHttpClient()

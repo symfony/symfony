@@ -23,6 +23,8 @@ use Symfony\Component\Routing\RouteCollection;
  * back-channel logout path, where the provider pushes its logout tokens.
  *
  * @author Mathieu Santostefano <msantostefano@proton.me>
+ *
+ * @internal
  */
 final class OidcLoginRouteLoader
 {

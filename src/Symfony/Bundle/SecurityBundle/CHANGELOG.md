@@ -45,6 +45,8 @@ CHANGELOG
  * Accept a list of secrets in the `secret` option of the `remember_me` and `login_link` authenticators to rotate them
  * Sort firewall listeners with the `before` and `after` constraints of `#[FirewallListenerOrder]`
  * Make login links and signed remember-me cookies expire according to the `clock` service
+ * Add the `security.route_loader` service to load the routes of all firewalls with a single import
+ * Deprecate the `security.route_loader.logout` service, use `security.route_loader` instead
 
 8.1
 ---

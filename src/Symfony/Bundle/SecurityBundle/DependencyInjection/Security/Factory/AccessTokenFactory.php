@@ -106,7 +106,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 ->end()
             ->end()
             ->arrayNode('resource_metadata')
-                ->info('Declaring this node serves the RFC 9728 protected resource metadata document of the firewall at "/.well-known/oauth-protected-resource" and advertises its URL in the "resource_metadata" parameter of the "WWW-Authenticate" header, which is how a client discovers where to get a token this firewall accepts. The route is declared by the "security.authenticator.access_token.route_loader" service, which the application must import as it does for the logout routes; make sure it is reachable without a token.')
+                ->info('Declaring this node serves the RFC 9728 protected resource metadata document of the firewall at "/.well-known/oauth-protected-resource" and advertises its URL in the "resource_metadata" parameter of the "WWW-Authenticate" header, which is how a client discovers where to get a token this firewall accepts. The route is declared by the "security.route_loader" service, which the application must import. Make sure the route is reachable without a token.')
                 ->treatNullLike([])
                 ->children()
                     ->scalarNode('resource')

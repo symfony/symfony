@@ -84,12 +84,24 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     /** @var AuthenticatorFactoryInterface[] */
     private array $sortedFactories = [];
     private array $userProviderFactories = [];
+    private bool $frameworkTest = false;
 
     public function prepend(ContainerBuilder $container): void
     {
         foreach ($this->getSortedFactories() as $factory) {
             if ($factory instanceof PrependExtensionInterface) {
                 $factory->prepend($container);
+            }
+        }
+
+        $this->frameworkTest = false;
+
+        if ($container->hasExtension('framework')) {
+            foreach ($container->getExtensionConfig('framework') as $config) {
+                if (\array_key_exists('test', $config)) {
+                    // "test: ~" enables the option, like "test: true"
+                    $this->frameworkTest = true === $container->getParameterBag()->resolveValue($config['test'] ?? true);
+                }
             }
         }
     }
@@ -774,6 +786,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         $hasherMap = [];
         foreach ($hashers as $class => $hasher) {
+            if ($this->frameworkTest) {
+                // the lowest values that bcrypt and argon2 accept
+                $hasher['cost'] ??= 4;
+                $hasher['time_cost'] ??= 3;
+                $hasher['memory_cost'] ??= 10;
+            }
+
             $hasherMap[$class] = $this->createHasher($hasher);
             // The key is not a class, so we register an alias for argument to
             // ease getting the hasher

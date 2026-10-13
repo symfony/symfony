@@ -32,7 +32,7 @@ final class Lock
     /**
      * @param string|Expression|\Closure $key      The requests sharing the same key contend for the lock: a string where {name} is replaced by the "name" request attribute, such as a route parameter, or an Expression or a Closure evaluating to a string, an integer or a \Stringable object
      * @param string                     $factory  The name of the lock factory to use, as configured under the "lock" resources
-     * @param float|null                 $ttl      The maximum expected duration of the request in seconds, after which the lock expires; null means never
+     * @param float|null                 $ttl      The maximum expected duration of the request in seconds, after which the lock expires; null falls back to the TTL of the store, 300 seconds by default for the stores that expire locks
      * @param bool                       $blocking Whether to wait for the lock to be released instead of rejecting the request with a "409 Conflict" response
      * @param string[]|string            $methods  HTTP methods to lock; empty means all methods
      * @param bool                       $read     Whether to acquire a read lock, shared with the other read locks of the same key; falls back to a write lock when the store does not support read locks

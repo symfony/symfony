@@ -14,6 +14,12 @@ AssetMapper
  * Add argument `$useEsm` to `ImportMapConfigReader::createRemoteEntry()`
  * The `asset_mapper.missing_import_mode` option now defaults to `strict` in debug mode. A missing import then throws an exception instead of logging a warning. Set the option to `warn` to keep the previous behavior
 
+BrowserKit
+----------
+
+ * [BC BREAK] `CookieJar::updateFromSetCookie()` and `updateFromResponse()` ignore a cookie whose `Domain` attribute does not match the host of the response, as browsers do
+ * [BC BREAK] `CookieJar` sends a cookie set without a `Domain` attribute only to the host that set it, not to its subdomains, as browsers do
+
 Config
 ------
 

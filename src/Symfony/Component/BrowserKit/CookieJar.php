@@ -55,6 +55,9 @@ class CookieJar
                 if (!self::pathMatches($cookiePath, $path) || !isset($namedCookies[$name])) {
                     continue;
                 }
+                if ($domain && $namedCookies[$name]->isHostOnly() && ltrim($domain, '.') !== $namedCookies[$name]->getDomain()) {
+                    continue;
+                }
                 if (null === $match || self::isMoreSpecific($namedCookies[$name], $match)) {
                     $match = $namedCookies[$name];
                 }
@@ -123,11 +126,18 @@ class CookieJar
             }
         }
 
+        $host = null !== $uri ? parse_url($uri, \PHP_URL_HOST) : null;
+
         foreach ($cookies as $cookie) {
             try {
-                $this->set(Cookie::fromString($cookie, $uri));
+                $cookie = Cookie::fromString($cookie, $uri);
             } catch (InvalidArgumentException) {
                 // invalid cookies are just ignored
+                continue;
+            }
+
+            if (null === $host || self::domainMatches($host, $cookie->getDomain())) {
+                $this->set($cookie);
             }
         }
     }
@@ -188,6 +198,10 @@ class CookieJar
                         continue;
                     }
 
+                    if ($cookie->isHostOnly() && $parts['host'] !== $cookie->getDomain()) {
+                        continue;
+                    }
+
                     $name = $cookie->getName();
 
                     if (!isset($cookies[$name]) || self::isMoreSpecific($cookie, $cookies[$name])) {
@@ -234,6 +248,14 @@ class CookieJar
         }
 
         return \strlen(ltrim($cookie->getDomain(), '.')) > \strlen(ltrim($other->getDomain(), '.'));
+    }
+
+    private static function domainMatches(string $host, string $cookieDomain): bool
+    {
+        $host = strtolower($host);
+        $cookieDomain = strtolower(ltrim($cookieDomain, '.'));
+
+        return $host === $cookieDomain || (str_ends_with($host, '.'.$cookieDomain) && false === filter_var($host, \FILTER_VALIDATE_IP));
     }
 
     private static function pathMatches(string $cookiePath, string $requestPath): bool

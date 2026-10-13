@@ -245,6 +245,15 @@ class CookieTest extends TestCase
         $this->assertEquals('foo.com', $cookie->getDomain(), '->getDomain() returns the cookie domain');
     }
 
+    public function testIsHostOnly()
+    {
+        $this->assertTrue(Cookie::fromString('foo=bar', 'http://example.com/')->isHostOnly());
+        $this->assertTrue(Cookie::fromString('foo=bar; Domain=', 'http://example.com/')->isHostOnly());
+        $this->assertFalse(Cookie::fromString('foo=bar; Domain=example.com', 'http://example.com/')->isHostOnly());
+        $this->assertFalse(Cookie::fromString('foo=bar')->isHostOnly());
+        $this->assertFalse((new Cookie('foo', 'bar', null, '/', 'example.com'))->isHostOnly());
+    }
+
     public function testIsSecure()
     {
         $cookie = new Cookie('foo', 'bar');

@@ -327,4 +327,31 @@ class CookieJarTest extends TestCase
         $this->assertSame('bar', $cookieJar->get('foo', '/foo/bar')->getValue());
         $this->assertNull($cookieJar->get('foo', '/foobar'));
     }
+
+    public function testUpdateFromSetCookieIgnoresCookiesForAnotherDomain()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie([
+            'foreign=value; Domain=bank.example',
+            'sibling=value; Domain=other.example.com',
+            'suffix=value; Domain=ample.com',
+            'parent=value; Domain=.Example.com',
+            'self=value; Domain=www.example.com',
+        ], 'http://www.example.com/');
+        $cookieJar->updateFromSetCookie(['ip=value; Domain=127.0.0.1', 'ipsuffix=value; Domain=0.0.1'], 'http://127.0.0.1/');
+
+        $this->assertSame(['parent', 'self', 'ip'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->all()));
+        $this->assertSame([], $cookieJar->allValues('http://bank.example/'));
+    }
+
+    public function testHostOnlyCookiesAreNotSentToSubdomains()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['host=value', 'domain=value; Domain=example.com'], 'http://example.com/');
+
+        $this->assertSame(['host' => 'value', 'domain' => 'value'], $cookieJar->allValues('http://example.com/'));
+        $this->assertSame(['domain' => 'value'], $cookieJar->allValues('http://sub.example.com/'));
+        $this->assertSame('value', $cookieJar->get('host', '/', 'example.com')->getValue());
+        $this->assertNull($cookieJar->get('host', '/', 'sub.example.com'));
+    }
 }

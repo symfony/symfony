@@ -38,7 +38,7 @@ trait LocalAead
     {
         self::checkKeyLength($format, $dataKey);
         $tag = '';
-        $ciphertext = openssl_encrypt($plaintext, $format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $iv, $tag, $aad, $format->tagBytes());
+        $ciphertext = openssl_encrypt($plaintext, $format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $iv, $tag, self::bind($format, $aad), $format->tagBytes());
 
         if (false === $ciphertext) {
             throw new RuntimeException('Local AEAD encryption failed: '.(openssl_error_string() ?: 'unknown error'));
@@ -54,13 +54,25 @@ trait LocalAead
     private static function open(Envelope $envelope, #[\SensitiveParameter] string $dataKey, string $aad): string
     {
         self::checkKeyLength($envelope->format, $dataKey);
-        $plaintext = openssl_decrypt($envelope->ciphertext, $envelope->format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $envelope->iv, $envelope->tag, $aad);
+        $plaintext = openssl_decrypt($envelope->ciphertext, $envelope->format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $envelope->iv, $envelope->tag, self::bind($envelope->format, $aad));
 
         if (false === $plaintext) {
             throw new DecryptionFailedException();
         }
 
         return $plaintext;
+    }
+
+    /**
+     * The AAD the local cipher is given: the id of the format, then the caller's own bytes.
+     *
+     * Both shipped formats seal under AES-256-GCM with the same lengths, so the iv, the tag and the ciphertext of a frame in one of them fit the layout of the other.
+     * Committing to the id makes a frame reassembled in the other format fail its tag check, whatever `$aad` the caller passes.
+     * The id is one byte wide, so the caller's bytes start at a fixed offset and the two cannot be shifted into one another.
+     */
+    private static function bind(EnvelopeFormat $format, string $aad): string
+    {
+        return \chr($format->id()).$aad;
     }
 
     /**

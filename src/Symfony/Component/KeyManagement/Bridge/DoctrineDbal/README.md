@@ -167,13 +167,18 @@ Type::getTypeRegistry()->register('app_user_email', new EncryptedType(
 
 Rows of that column then share one data key and carry a 16-byte reference to
 it. To migrate a column that already holds self-contained envelopes, give the
-store-backed encrypter a fallback and keep the same registered name: rows
-written before are still read through the KMS, and rows written afterwards refer
-to the stored key.
+store-backed encrypter a fallback, `read_self_contained: true` in the bundle, and
+keep the same registered name: rows written before are still read through the KMS,
+and rows written afterwards refer to the stored key.
 
 ```php
 $encrypter = new StoredEnvelopeEncrypter($store, new EnvelopeEncrypter($kms));
 ```
+
+Turn it off once the migration is over. Such a payload carries its own wrapped
+data key, so it resolves no row: the store, the scope it states and the binding it
+carries have nothing to say about it, and the only thing standing between it and a
+reader is the master key.
 
 The table holds exactly what the store needs and nothing else:
 
@@ -212,9 +217,10 @@ table with `createTable()` or with your own migration.
 
 In a Symfony application, `key_management.store` wires all of this: the
 store is what `DataKeyStoreInterface` resolves to, and the store-backed encrypter
-becomes what `EnvelopeEncrypterInterface` injects, with the default client's
-encrypter behind it so the payloads written before the store keep being read. The
-per-client encrypters stay available through `#[Target('<name>')]`.
+becomes what `EnvelopeEncrypterInterface` injects. With `read_self_contained: true`,
+the default client's encrypter is put behind it so the payloads written before the
+store keep being read. The per-client encrypters stay available through
+`#[Target('<name>')]`.
 
 A scope, or a reference read back from a payload, is resolved once and then held, unwrapped, for as long as the store lives, which is what spares the round trips.
 A key created inside a transaction is the one exception: its row is looked up again on every use until the transaction is seen committed, so that a rollback taking the row away is noticed rather than encrypted with.

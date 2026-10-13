@@ -38,6 +38,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[RequiredBundle(ServicesBundle::class)]
 class HttpClientBundle extends AbstractBundle
 {
+    private bool $frameworkTest = false;
+
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
@@ -94,8 +96,16 @@ class HttpClientBundle extends AbstractBundle
                 ->end()
                 ->arrayNode('recorder')
                     ->info('Record HTTP exchanges into HAR files and replay them in tests (see RecorderHttpClient).')
-                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
+                    ->treatNullLike(['enabled' => true])
                     ->children()
+                        ->booleanNode('enabled')
+                            ->info('Defaults to true when "framework.test" is enabled, to false otherwise.')
+                            ->defaultNull()
+                            ->resolvesAtCompileTime()
+                        ->end()
                         ->scalarNode('redactor')
                             ->info('Service id of a RedactorInterface; when set, "redact" and "redact_except" are ignored.')
                             ->defaultNull()
@@ -184,6 +194,20 @@ class HttpClientBundle extends AbstractBundle
                 ->end()
             ->end()
         ;
+    }
+
+    public function prependExtension(ContainerConfigurator $configurator, ContainerBuilder $container): void
+    {
+        $this->frameworkTest = false;
+
+        if ($container->hasExtension('framework')) {
+            foreach ($container->getExtensionConfig('framework') as $config) {
+                if (\array_key_exists('test', $config)) {
+                    // "test: ~" enables the option, like "test: true"
+                    $this->frameworkTest = true === $container->getParameterBag()->resolveValue($config['test'] ?? true);
+                }
+            }
+        }
     }
 
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
@@ -380,7 +404,7 @@ class HttpClientBundle extends AbstractBundle
 
         $recorder = $config['recorder'];
 
-        if ($recorder['enabled']) {
+        if ($recorder['enabled'] ?? $this->frameworkTest) {
             $configurator->import('Resources/config/http_client_recorder.php');
 
             $container->getDefinition('http_client.recorder')

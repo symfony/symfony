@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Default the `http_client.recorder.enabled` option to `true` when `framework.test` is enabled
  * Tag the `cache.http_client.pool` cache pool with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
  * Add `HttpClientBundle`, which provides the `http_client` configuration and the services previously provided by `FrameworkBundle` under `framework.http_client`
  * Add the `max_connect_duration` option to the `http_client` configuration

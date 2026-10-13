@@ -17,7 +17,7 @@ security:
                 check_path: login
             logout:
                 delete_cookies:
-                    flavor: { path: null, domain: somedomain }
+                    flavor: { path: null, domain: localhost }
             stateless: true
 
     access_control:

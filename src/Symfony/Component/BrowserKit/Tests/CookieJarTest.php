@@ -327,4 +327,20 @@ class CookieJarTest extends TestCase
         $this->assertSame('bar', $cookieJar->get('foo', '/foo/bar')->getValue());
         $this->assertNull($cookieJar->get('foo', '/foobar'));
     }
+
+    public function testUpdateFromSetCookieIgnoresCookiesForAnotherDomain()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie([
+            'foreign=value; Domain=bank.example',
+            'sibling=value; Domain=other.example.com',
+            'suffix=value; Domain=ample.com',
+            'parent=value; Domain=.Example.com',
+            'self=value; Domain=www.example.com',
+        ], 'http://www.example.com/');
+        $cookieJar->updateFromSetCookie(['ip=value; Domain=127.0.0.1', 'ipsuffix=value; Domain=0.0.1'], 'http://127.0.0.1/');
+
+        $this->assertSame(['parent', 'self', 'ip'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->all()));
+        $this->assertSame([], $cookieJar->allValues('http://bank.example/'));
+    }
 }

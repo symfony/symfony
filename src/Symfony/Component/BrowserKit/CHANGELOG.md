@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Make `CookieJar` ignore a cookie whose `Domain` attribute does not match the host of the response
+
 8.0
 ---
 

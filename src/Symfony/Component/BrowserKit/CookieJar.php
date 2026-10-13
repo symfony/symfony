@@ -123,11 +123,18 @@ class CookieJar
             }
         }
 
+        $host = null !== $uri ? parse_url($uri, \PHP_URL_HOST) : null;
+
         foreach ($cookies as $cookie) {
             try {
-                $this->set(Cookie::fromString($cookie, $uri));
+                $cookie = Cookie::fromString($cookie, $uri);
             } catch (InvalidArgumentException) {
                 // invalid cookies are just ignored
+                continue;
+            }
+
+            if (null === $host || self::domainMatches($host, $cookie->getDomain())) {
+                $this->set($cookie);
             }
         }
     }
@@ -234,6 +241,14 @@ class CookieJar
         }
 
         return \strlen(ltrim($cookie->getDomain(), '.')) > \strlen(ltrim($other->getDomain(), '.'));
+    }
+
+    private static function domainMatches(string $host, string $cookieDomain): bool
+    {
+        $host = strtolower($host);
+        $cookieDomain = strtolower(ltrim($cookieDomain, '.'));
+
+        return $host === $cookieDomain || (str_ends_with($host, '.'.$cookieDomain) && false === filter_var($host, \FILTER_VALIDATE_IP));
     }
 
     private static function pathMatches(string $cookiePath, string $requestPath): bool

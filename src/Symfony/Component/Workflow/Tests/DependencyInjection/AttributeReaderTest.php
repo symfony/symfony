@@ -350,7 +350,7 @@ class ArticleWorkflow
     #[Place('Being written', initial: true)]
     public const DRAFT = 'draft';
 
-    #[Transition(from: self::DRAFT, to: ArticleStep::Published, guard: 'true', description: 'Makes the article public')]
+    #[Transition(from: self::DRAFT, to: ArticleStep::Published, description: 'Makes the article public', guard: 'true')]
     public const PUBLISH = 'publish';
 
     #[Transition(from: ArticleStep::Published, to: 'archived')]

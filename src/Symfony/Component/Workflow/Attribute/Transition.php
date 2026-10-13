@@ -37,15 +37,15 @@ class Transition
     /**
      * @param \BackedEnum|Arc|string|non-empty-list<\BackedEnum|Arc|string> $from        The input place(s) of the transition, using an Arc to set a weight
      * @param \BackedEnum|Arc|string|non-empty-list<\BackedEnum|Arc|string> $to          The output place(s) of the transition, using an Arc to set a weight
-     * @param string|null                                                   $guard       An expression that must be true to enable the transition
      * @param string|null                                                   $description The description of the transition, stored under the "description" key of its metadata
+     * @param string|null                                                   $guard       An expression that must be true to enable the transition
      * @param array<string, mixed>                                          $metadata    The metadata of the transition
      */
     public function __construct(
         public readonly \BackedEnum|Arc|string|array $from,
         public readonly \BackedEnum|Arc|string|array $to,
-        public readonly ?string $guard = null,
         ?string $description = null,
+        public readonly ?string $guard = null,
         array $metadata = [],
     ) {
         $this->metadata = self::buildMetadata($metadata, $description);

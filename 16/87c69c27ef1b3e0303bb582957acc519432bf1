@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-07T15:48:33Z
+
+Could the logic be worth a dedicated service, so that not only twig can do this?
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-10-07T17:06:36Z
+
+> Could the logic be worth a dedicated service, so that not only twig can do this?
+
+Do you mean on a `TranslatorInterface` implementation? Mmmh, I think it can makes sense yes.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-10-07T21:55:38Z
+
+@nicolas-grekas I just put the `transHtml()` method in `TranslatorInterface` and `TranslatorTrait` (and a new `HtmlTranslatorTrait` trait). It requires more code than the previous solution, but I think that's the way to go.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-10-09T20:21:16Z
+
+I went for `TranslatorInterface` following https://github.com/symfony/symfony/pull/66690#issuecomment-6042802915, and yep it was not ideal.
+
+Thanks for the comments and hints, I will do some modifications
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-10-10T09:59:44Z
+
+PR updated
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-11T12:22:38Z
+
+I updated the PR on top of my comments: `HtmlTranslator` isn't final anymore and takes the charset as second constructor argument (`kernel.charset` for the `translator.html` service), and the Twig extension now gets that service injected, using the charset of the Twig environment only when it builds its own.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-10-11T21:03:17Z
+
+Thanks! I didn't had time to do it today
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T06:41:29Z
+
+I made the Markup placeholders cheaper: a secret prefix drawn once per process plus a counter, instead of `random_bytes()` and 8 `mb_chr()` per parameter. That is about 8x faster per placeholder, and a placeholder still can't be forged or replayed from another render.

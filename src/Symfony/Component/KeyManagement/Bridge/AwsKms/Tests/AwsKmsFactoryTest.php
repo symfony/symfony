@@ -12,9 +12,14 @@
 namespace Symfony\Component\KeyManagement\Bridge\AwsKms\Tests;
 
 use AsyncAws\Core\AbstractApi;
+use AsyncAws\Core\HttpClient\AwsRetryStrategy;
 use AsyncAws\Kms\KmsClient;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKms;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory;
 use Symfony\Component\KeyManagement\Dsn;
@@ -125,13 +130,111 @@ class AwsKmsFactoryTest extends TestCase
 
     public function testTheGivenHttpClientIsHandedToTheAwsClient()
     {
-        $client = new MockHttpClient();
+        $urls = [];
+        $client = new MockHttpClient(static function (string $method, string $url) use (&$urls): MockResponse {
+            $urls[] = $url;
 
-        $kms = (new AwsKmsFactory($client))->create(Dsn::fromString('aws-kms://default?region=eu-west-1'));
+            return new MockResponse(json_encode(['CiphertextBlob' => base64_encode('blob'), 'KeyId' => 'arn:aws:kms:eu-west-1:111:key/abc']));
+        });
 
-        $httpClient = (new \ReflectionClass(AbstractApi::class))->getProperty('httpClient');
+        $kms = (new AwsKmsFactory($client))->create(Dsn::fromString('aws-kms://AKIA:SECRET@default?region=eu-west-1'));
+        $kms->encrypt('alias/app', 'hello');
 
-        $this->assertSame($client, $httpClient->getValue(self::getKmsClient($kms)));
+        $this->assertSame(['https://kms.eu-west-1.amazonaws.com/'], $urls);
+    }
+
+    public function testTheGivenHttpClientKeepsItsOwnTimeoutsButDoesNotFollowRedirects()
+    {
+        $options = [];
+        $client = (new MockHttpClient(static function (string $method, string $url, array $requestOptions) use (&$options): MockResponse {
+            $options[] = [$requestOptions['timeout'], $requestOptions['max_duration'], $requestOptions['max_redirects']];
+
+            return new MockResponse(json_encode(['CiphertextBlob' => base64_encode('blob'), 'KeyId' => 'arn:aws:kms:eu-west-1:111:key/abc']));
+        }))->withOptions(['timeout' => 42.0, 'max_duration' => 120.0, 'max_redirects' => 5]);
+
+        $kms = (new AwsKmsFactory($client))->create(Dsn::fromString('aws-kms://AKIA:SECRET@default?region=eu-west-1&session_token=ST'));
+        $kms->encrypt('alias/app', 'hello');
+
+        $this->assertSame([[42.0, 120.0, 0]], $options);
+    }
+
+    public function testTimeoutOptionsAreAppliedToTheGivenHttpClient()
+    {
+        $timeouts = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$timeouts): MockResponse {
+            $timeouts[] = [$options['timeout'], $options['max_duration'], $options['max_redirects']];
+
+            return new MockResponse(json_encode(['CiphertextBlob' => base64_encode('blob'), 'KeyId' => 'arn:aws:kms:eu-west-1:111:key/abc']));
+        });
+
+        $kms = (new AwsKmsFactory($client))->create(Dsn::fromString('aws-kms://AKIA:SECRET@default?region=eu-west-1&timeout=2.5&max_duration=7'));
+        $kms->encrypt('alias/app', 'hello');
+
+        $this->assertSame([[2.5, 7.0, 0]], $timeouts);
+    }
+
+    public function testTheGivenHttpClientKeepsRetryingWhenTimeoutOptionsAreApplied()
+    {
+        $timeouts = [];
+        $client = new RetryableHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$timeouts): MockResponse {
+            $timeouts[] = $options['timeout'];
+
+            if (1 === \count($timeouts)) {
+                return new MockResponse('', ['http_code' => 503]);
+            }
+
+            return new MockResponse(json_encode(['CiphertextBlob' => base64_encode('blob'), 'KeyId' => 'arn:aws:kms:eu-west-1:111:key/abc']));
+        }), new GenericRetryStrategy([503], 0));
+
+        $kms = (new AwsKmsFactory($client))->create(Dsn::fromString('aws-kms://AKIA:SECRET@default?region=eu-west-1&timeout=2.5&max_duration=7'));
+
+        $this->assertSame('blob', $kms->encrypt('alias/app', 'hello')->blob);
+        $this->assertSame([2.5, 2.5], $timeouts);
+    }
+
+    public function testTheClientBuiltByTheFactoryHasDefaultTimeoutsAndTheAwsRetryStrategy()
+    {
+        $kms = (new AwsKmsFactory())->create(Dsn::fromString('aws-kms://default?region=eu-west-1'));
+
+        $client = (new \ReflectionProperty(AbstractApi::class, 'httpClient'))->getValue(self::getKmsClient($kms));
+        $this->assertInstanceOf(RetryableHttpClient::class, $client);
+        $this->assertInstanceOf(AwsRetryStrategy::class, (new \ReflectionProperty(RetryableHttpClient::class, 'strategy'))->getValue($client));
+
+        $options = self::getDefaultOptions($client);
+        $this->assertSame(5.0, $options['timeout']);
+        $this->assertSame(10.0, $options['max_duration']);
+        $this->assertSame(0, $options['max_redirects']);
+    }
+
+    public function testTimeoutOptionsOverrideTheDefaultsOfTheClientBuiltByTheFactory()
+    {
+        $kms = (new AwsKmsFactory())->create(Dsn::fromString('aws-kms://default?region=eu-west-1&timeout=3&max_duration=60'));
+
+        $client = (new \ReflectionProperty(AbstractApi::class, 'httpClient'))->getValue(self::getKmsClient($kms));
+        $this->assertInstanceOf(AwsRetryStrategy::class, (new \ReflectionProperty(RetryableHttpClient::class, 'strategy'))->getValue($client));
+
+        $options = self::getDefaultOptions($client);
+        $this->assertSame(3.0, $options['timeout']);
+        $this->assertSame(60.0, $options['max_duration']);
+        $this->assertSame(0, $options['max_redirects']);
+    }
+
+    #[DataProvider('provideInvalidTimeoutOptions')]
+    public function testInvalidTimeoutOptionIsRejected(string $query, string $option)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s" option of the "aws-kms://" DSN must be positive.', $option));
+        (new AwsKmsFactory())->create(Dsn::fromString('aws-kms://default?region=eu-west-1&'.$query));
+    }
+
+    public static function provideInvalidTimeoutOptions(): iterable
+    {
+        yield ['timeout=0', 'timeout'];
+        yield ['timeout=-1', 'timeout'];
+        yield ['timeout=abc', 'timeout'];
+        yield ['timeout=1e999', 'timeout'];
+        yield ['max_duration=0', 'max_duration'];
+        yield ['max_duration=-5', 'max_duration'];
     }
 
     private static function getKmsClient(AwsKms $kms): KmsClient
@@ -139,5 +242,12 @@ class AwsKmsFactoryTest extends TestCase
         $clientProperty = (new \ReflectionClass(AwsKms::class))->getProperty('client');
 
         return $clientProperty->getValue($kms);
+    }
+
+    private static function getDefaultOptions(RetryableHttpClient $client): array
+    {
+        $client = (new \ReflectionProperty(RetryableHttpClient::class, 'client'))->getValue($client);
+
+        return (new \ReflectionProperty($client, 'defaultOptions'))->getValue($client);
     }
 }

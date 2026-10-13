@@ -42,6 +42,7 @@ CHANGELOG
  * Add `CorrelationStamp`, `MessageIdStamp` and `CausationStamp`, added by `FlowContextMiddleware` when the `messenger.identity_stamps` option is enabled
  * Add the `sign` transport option, `'*'` as a message type of `SigningSerializer` and its `$acceptUnverified` argument, to sign every message of a transport and refuse the unverified ones before reading their type
  * Make `SigningSerializer` sign the messages it did not verify as unverified, and refuse such a message when its type requires a signature
+ * Make `SigningSerializer` sign every header written by the serializer it decorates, except `Content-Type`, and pass only the signed headers to that serializer
  * Add `TrustStamp`, for transports that yield messages created in the same process to have `SigningSerializer` sign them as verified and `SendMessageMiddleware` honor their `RedispatchStamp`
  * Add argument `$timeout` to `MessageExecutionStrategyInterface::wait()`
  * Make `HandleMessageMiddleware` refuse to call the handlers that require a signature for an envelope marked untrusted

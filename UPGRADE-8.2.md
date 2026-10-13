@@ -326,6 +326,10 @@ Messenger
  * [BC BREAK] Messages are signed by a serializer created for each transport, instead of by decorators of the serializer services.
    Encoding a message with `messenger.default_serializer`, or with another serializer service, does not sign it anymore, and decoding with it does not check the signature.
    Send and receive the messages through their transport instead
+ * `SigningSerializer` signs every header written by the serializer it decorates, except `Content-Type`.
+   When it verifies a signature, the serializer it decorates only gets the signed headers and `Content-Type`.
+   A message with headers other than `type`, `Content-Type` and the `X-Message-Stamp-*` ones gets a `Sign-Headers` header, and earlier versions refuse it.
+   When your serializer writes such headers, upgrade the applications that consume a signing transport before the ones that send to it
  * Add argument `$timeout` to `MessageExecutionStrategyInterface::wait()`
  * `AsMessageHandler::$priority` is now `?int` and defaults to `null`, which means "no priority declared";
    the `messenger.message_handler` tags it produces carry `null` too. Code that read the property as an

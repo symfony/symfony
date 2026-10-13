@@ -34,6 +34,15 @@ final class SigningSerializer implements SerializerInterface
     // Marks a message that is signed although nothing verified it: the signature covers this header, so that adding or removing it breaks the signature.
     private const UNVERIFIED_HEADER = 'Sign-Trust';
 
+    // Lists the headers the signature covers, in addition to the headers that describe the message.
+    // The headers that describe the message are "type", "Sign-Trust" and the stamps, and they are signed whenever present.
+    // Transports add headers of their own, so the other headers that are not listed are dropped instead of breaking the signature.
+    // Without other headers to sign, the list is left out, so that the message is signed as before the list existed.
+    private const SIGNED_HEADERS = 'Sign-Headers';
+
+    // Never signed: AmqpSender moves it to a property of the AMQP message, and the serializers read the format from their configuration instead.
+    private const CONTENT_TYPE_HEADER = 'Content-Type';
+
     private array $signingKeys;
     private bool $signAll;
 
@@ -68,7 +77,7 @@ final class SigningSerializer implements SerializerInterface
 
         if (($message = $envelope->getMessage()) instanceof MessageDecodingFailedException) {
             // the inner serializer can send the failed envelope again as it is: it must have been signed with one of the keys, and not as unverified
-            unset($encoded['headers']['Body-Sign'], $encoded['headers']['Sign-Algo'], $encoded['headers'][self::UNVERIFIED_HEADER]);
+            unset($encoded['headers']['Body-Sign'], $encoded['headers']['Sign-Algo'], $encoded['headers'][self::UNVERIFIED_HEADER], $encoded['headers'][self::SIGNED_HEADERS]);
             $trusted = $trusted && $this->hasValidSignature($message->encodedEnvelope, false) && !isset($message->encodedEnvelope['headers'][self::UNVERIFIED_HEADER]);
 
             // a message refused for its signature stays refused: signing its failure, even as unverified, would let a failure transport accept it
@@ -82,6 +91,19 @@ final class SigningSerializer implements SerializerInterface
                 unset($encoded['headers'][self::UNVERIFIED_HEADER]);
             } else {
                 $encoded['headers'][self::UNVERIFIED_HEADER] = 'unverified';
+            }
+
+            unset($encoded['headers'][self::SIGNED_HEADERS]);
+            $names = [];
+
+            foreach ($encoded['headers'] ?? [] as $name => $value) {
+                if (self::CONTENT_TYPE_HEADER !== $name && !self::describesTheMessage($name)) {
+                    $names[] = (string) $name;
+                }
+            }
+
+            if ($names) {
+                $encoded['headers'][self::SIGNED_HEADERS] = json_encode($names, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
             }
 
             $encoded['headers']['Body-Sign'] = self::SIGNATURE_MARKER.hash_hmac($this->algorithm, self::getSignedPayload($encoded), $this->getSigningKey($this->signingKeys[0], false));
@@ -104,9 +126,14 @@ final class SigningSerializer implements SerializerInterface
 
         try {
             if ($signed = $this->hasValidSignature($encodedEnvelope, !$this->signAll)) {
+                if (str_starts_with($sign, self::SIGNATURE_MARKER)) {
+                    // the inner serializer only gets the signed headers, and so does a decode failure, as a failure transport signs it again
+                    $encodedEnvelope['headers'] = $headers = array_intersect_key($headers, self::getSignedHeaders($encodedEnvelope) + ['Body-Sign' => true, 'Sign-Algo' => true, self::CONTENT_TYPE_HEADER => true]);
+                }
+
                 // The algorithm is implied by the HMAC itself, so the "Sign-Algo" header isn't consulted here.
                 $signedEnvelope = $encodedEnvelope;
-                unset($signedEnvelope['headers']['Body-Sign'], $signedEnvelope['headers']['Sign-Algo'], $signedEnvelope['headers'][self::UNVERIFIED_HEADER]);
+                unset($signedEnvelope['headers']['Body-Sign'], $signedEnvelope['headers']['Sign-Algo'], $signedEnvelope['headers'][self::UNVERIFIED_HEADER], $signedEnvelope['headers'][self::SIGNED_HEADERS]);
             }
 
             if ($signed && !isset($headers[self::UNVERIFIED_HEADER])) {
@@ -210,7 +237,9 @@ final class SigningSerializer implements SerializerInterface
             return false;
         }
 
-        $payload = $bodyOnly ? $body : self::getSignedPayload($encodedEnvelope);
+        if (null === $payload = $bodyOnly ? $body : self::getSignedPayload($encodedEnvelope)) {
+            return false;
+        }
 
         return array_any($this->signingKeys, fn ($key) => hash_equals(($bodyOnly ? '' : self::SIGNATURE_MARKER).hash_hmac($this->algorithm, $payload, $this->getSigningKey($key, $bodyOnly)), $sign));
     }
@@ -221,18 +250,12 @@ final class SigningSerializer implements SerializerInterface
     }
 
     /**
-     * Returns the payload the signature covers: the body, plus the headers that
-     * decide how the body is turned into an envelope and whether it is verified. Transports add headers of
-     * their own, so signing every header would break as soon as one of them does.
+     * Returns the body and the signed headers as the payload the signature covers, or null when a signed header is missing.
      */
-    private static function getSignedPayload(array $encodedEnvelope): string
+    private static function getSignedPayload(array $encodedEnvelope): ?string
     {
-        $headers = [];
-
-        foreach ($encodedEnvelope['headers'] ?? [] as $name => $value) {
-            if ('type' === $name || self::UNVERIFIED_HEADER === $name || str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
-                $headers[$name] = $value;
-            }
+        if (null === $headers = self::getSignedHeaders($encodedEnvelope)) {
+            return null;
         }
 
         // transports are free to reorder headers, so the order must not matter
@@ -240,5 +263,42 @@ final class SigningSerializer implements SerializerInterface
 
         // serialize() gives an unambiguous encoding of the pair; it is never read back
         return serialize([$encodedEnvelope['body'] ?? '', $headers]);
+    }
+
+    /**
+     * Returns the headers that a signature covering the headers covers, or null when a listed header is missing.
+     *
+     * The headers that describe the message are signed whenever present. Adding such a header breaks the signature, as before the list existed.
+     * The list itself is signed, so that a signature with a list never matches a signature without a list.
+     */
+    private static function getSignedHeaders(array $encodedEnvelope): ?array
+    {
+        $headers = \is_array($encodedEnvelope['headers'] ?? null) ? $encodedEnvelope['headers'] : [];
+        $signed = array_filter($headers, self::describesTheMessage(...), \ARRAY_FILTER_USE_KEY);
+
+        if (!\array_key_exists(self::SIGNED_HEADERS, $headers)) {
+            return $signed;
+        }
+
+        if (!\is_string($list = $headers[self::SIGNED_HEADERS]) || !\is_array($names = json_decode($list, true, 2)) || !array_is_list($names)) {
+            return null;
+        }
+
+        $signed[self::SIGNED_HEADERS] = $list;
+
+        foreach ($names as $name) {
+            if (!\is_string($name) || !\array_key_exists($name, $headers)) {
+                return null;
+            }
+
+            $signed[$name] = $headers[$name];
+        }
+
+        return $signed;
+    }
+
+    private static function describesTheMessage(string $name): bool
+    {
+        return 'type' === $name || self::UNVERIFIED_HEADER === $name || str_starts_with($name, self::STAMP_HEADER_PREFIX);
     }
 }

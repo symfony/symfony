@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T16:46:21Z
+
+(I'm giving my own proposal a try, stay tuned)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T16:56:16Z
+
+I pushed a second commit that checks for a non-lazy manager before resetting it, with the trial call from my review. `resetManager()` now throws like on PHP < 8.4, and the manager and the container stay as they were. With the first commit, the stale object threw on every access and rebuilt the service each time. I updated the description accordingly.
+
+Note for the DoctrineBundle side: `Registry::reset()` calls `resetManager()` on every closed manager, so it will now throw for a closed non-lazy one.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-13T17:14:27Z
+
+@nicolas-grekas Thanks. I avoided building a manager just to decide whether to throw, it felt like too much to pay.
+
+Looking at yours though, I realize it is better. It throws when `resetService()` is called, while mine ghosts the manager first and only notices once the object is already empty, leaving the caller stuck with it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T17:23:15Z
+
+I replaced my second commit. A non-lazy manager is now reset instead of rejected. The instance that the trial call builds becomes the new manager, and the old object turns into a lazy proxy to it. Throwing broke DoctrineBundle's `Registry::reset()`, which resets every closed manager on `kernel.reset`. This also answers your concern about the cost, since nothing is thrown away for a non-lazy manager. I updated the description accordingly.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-13T17:36:32Z
+
+Replacing an originally non-lazy manager with a lazy proxy that returns the new instance. What an awesome solution :smile:

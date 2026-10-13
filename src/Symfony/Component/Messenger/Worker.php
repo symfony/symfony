@@ -86,6 +86,7 @@ class Worker
      * Valid options are:
      *  * sleep (default: 1000000): Time in microseconds to sleep after no messages are found
      *  * time_limit: The time limit in seconds the worker can handle new messages
+     *  * stop_when_empty (default: false): Whether to stop once the receivers have no message left, after handling the messages in flight and the pending batches
      *  * queues: The queue names to consume from, instead of consuming from all queues. When this is used, all receivers must implement the QueueReceiverInterface
      */
     public function run(array $options = []): void
@@ -93,6 +94,7 @@ class Worker
         $options = array_merge([
             'sleep' => 1000000,
             'time_limit' => null,
+            'stop_when_empty' => false,
         ], $options);
         $queueNames = $options['queues'] ?? null;
         $endTime = null !== $options['time_limit'] ? $this->now() + $options['time_limit'] : null;
@@ -141,6 +143,11 @@ class Worker
                     // advance past the last handled envelope now that the worker is ready
                     // again; lazy receivers fetch from the broker only at this point
                     $envelopes->next();
+
+                    // the buffer is drained: poll the receivers again, in their order of priority
+                    if (!$envelopes->valid()) {
+                        continue 2;
+                    }
                 } else {
                     if ($queueNames) {
                         /** @var QueueReceiverInterface $receiver */
@@ -189,6 +196,16 @@ class Worker
             }
 
             if (!$this->flush(30.0) && !$envelopeHandled) {
+                if ($options['stop_when_empty']) {
+                    // the messages in flight and the pending batches can dispatch new messages
+                    if ($this->flush(true)) {
+                        continue;
+                    }
+
+                    $this->logger?->info('Worker stopped because no message was available');
+                    break;
+                }
+
                 $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, true));
 
                 if ($this->shouldStop) {

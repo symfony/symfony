@@ -31,6 +31,7 @@ use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnIdleListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
@@ -382,6 +383,73 @@ class WorkerTest extends TestCase
         }
 
         $this->assertSame(['second' => 2, 'third' => 2], $handledBatches);
+    }
+
+    public function testWorkerFetchesAgainWhenTheBufferedEnvelopesAreDrained()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('first')), new Envelope(new DummyMessage('second'))],
+            [new Envelope(new DummyMessage('third')), new Envelope(new DummyMessage('fourth'))],
+            [],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnIdleListener());
+
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), new PausingExecutionStrategy());
+        $worker->run(['fetch_size' => 2]);
+
+        $this->assertSame(4, $receiver->getAcknowledgeCount());
+    }
+
+    public function testDrainedBufferedEnvelopesDoNotDelayHigherPriorityReceivers()
+    {
+        $highPriorityReceiver = new DummyReceiver([
+            [],
+            [new Envelope(new DummyMessage('high'))],
+        ]);
+        $lowPriorityReceiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('low1')), new Envelope(new DummyMessage('low2'))],
+            [new Envelope(new DummyMessage('low3')), new Envelope(new DummyMessage('low4'))],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnIdleListener());
+
+        $strategy = new PausingExecutionStrategy();
+        $worker = new Worker(['high' => $highPriorityReceiver, 'low' => $lowPriorityReceiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $strategy);
+        $worker->run(['fetch_size' => 2]);
+
+        $this->assertSame(['low1', 'low2', 'high', 'low3', 'low4'], $strategy->executed);
+    }
+
+    public function testStopWhenEmptyHandlesTheMessagesDispatchedByPendingBatches()
+    {
+        $receiver = new AppendableReceiver([new Envelope(new DummyMessage('first'))]);
+        $handler = new FollowUpBatchHandler($receiver);
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [new HandlerDescriptor($handler)]]))]);
+
+        $worker = new Worker(['transport' => $receiver], $bus, null, null, null, new MockClock());
+        $worker->run(['stop_when_empty' => true, 'time_limit' => 10]);
+
+        $this->assertSame(['first', 'follow-up'], $receiver->acked);
+        $this->assertSame([], $receiver->queue);
+    }
+
+    public function testStopWhenEmptyHandlesTheMessagesDispatchedByTheMessagesInFlight()
+    {
+        $receiver = new AppendableReceiver([new Envelope(new DummyMessage('first'))]);
+        $strategy = new DeferringExecutionStrategy(static function (Envelope $envelope) use ($receiver) {
+            if ('first' === $envelope->getMessage()->getMessage()) {
+                $receiver->queue[] = new Envelope(new DummyMessage('follow-up'));
+            }
+        });
+
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), null, null, null, new MockClock(), $strategy);
+        $worker->run(['stop_when_empty' => true, 'time_limit' => 10]);
+
+        $this->assertSame(['first', 'follow-up'], $receiver->acked);
+        $this->assertSame([], $receiver->queue);
     }
 
     #[DataProvider('provideIdleWaits')]
@@ -1701,6 +1769,146 @@ class WorkerTest extends TestCase
             pcntl_async_signals($previousAsync);
             pcntl_signal(\SIGALRM, $previousHandler);
         }
+    }
+}
+
+class PausingExecutionStrategy implements MessageExecutionStrategyInterface
+{
+    public array $executed = [];
+    private array $inFlight = [];
+
+    public function execute(Envelope $envelope, string $transportName, callable $onHandled): void
+    {
+        $this->executed[] = $envelope->getMessage()->getMessage();
+        $this->inFlight[] = [$envelope, $transportName];
+    }
+
+    public function shouldPauseConsumption(): bool
+    {
+        return (bool) $this->inFlight;
+    }
+
+    public function wait(callable $onHandled, ?float $timeout = null): bool
+    {
+        return $this->flush($onHandled);
+    }
+
+    public function flush(callable $onHandled, bool|float $force = false): bool
+    {
+        if (!$this->inFlight) {
+            return false;
+        }
+
+        foreach ($this->inFlight as [$envelope, $transportName]) {
+            $acked = false;
+            $onHandled($envelope, $transportName, $acked, null);
+        }
+        $this->inFlight = [];
+
+        return true;
+    }
+
+    public function shutdown(): void
+    {
+    }
+}
+
+class AppendableReceiver implements ReceiverInterface
+{
+    public array $acked = [];
+
+    public function __construct(
+        public array $queue = [],
+    ) {
+    }
+
+    public function get(/* int $fetchSize = 1 */): iterable
+    {
+        return array_splice($this->queue, 0, \func_num_args() > 0 ? func_get_arg(0) : 1);
+    }
+
+    public function ack(Envelope $envelope): void
+    {
+        $this->acked[] = $envelope->getMessage()->getMessage();
+    }
+
+    public function reject(Envelope $envelope): void
+    {
+    }
+}
+
+class FollowUpBatchHandler implements BatchHandlerInterface
+{
+    use BatchHandlerTrait;
+
+    public function __construct(
+        private AppendableReceiver $receiver,
+    ) {
+    }
+
+    public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+    {
+        return $this->handle($message, $ack);
+    }
+
+    private function getIdleTimeout(): ?int
+    {
+        return null;
+    }
+
+    private function process(array $jobs): void
+    {
+        foreach ($jobs as [$job, $ack]) {
+            if ('first' === $job->getMessage()) {
+                $this->receiver->queue[] = new Envelope(new DummyMessage('follow-up'));
+            }
+
+            $ack->ack();
+        }
+    }
+}
+
+class DeferringExecutionStrategy implements MessageExecutionStrategyInterface
+{
+    private array $inFlight = [];
+
+    public function __construct(
+        private \Closure $handler,
+    ) {
+    }
+
+    public function execute(Envelope $envelope, string $transportName, callable $onHandled): void
+    {
+        $this->inFlight[] = [$envelope, $transportName];
+    }
+
+    public function shouldPauseConsumption(): bool
+    {
+        return false;
+    }
+
+    public function wait(callable $onHandled, ?float $timeout = null): bool
+    {
+        return false;
+    }
+
+    public function flush(callable $onHandled, bool|float $force = false): bool
+    {
+        if (true !== $force || !$this->inFlight) {
+            return false;
+        }
+
+        foreach (array_splice($this->inFlight, 0) as [$envelope, $transportName]) {
+            ($this->handler)($envelope);
+            $acked = false;
+            $onHandled($envelope, $transportName, $acked, null);
+        }
+
+        return true;
+    }
+
+    public function shutdown(): void
+    {
     }
 }
 

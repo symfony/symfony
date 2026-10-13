@@ -93,6 +93,16 @@ class CookieJarTest extends TestCase
         $this->assertNull($cookieJar->get('foo'));
     }
 
+    public function testUpdateFromSetCookieIgnoresAnEmptyDomainAttribute()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar; Domain='], 'http://example.com/');
+
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://example.com/'));
+        $this->assertSame([], $cookieJar->allValues('http://other.example/'));
+        $this->assertSame('example.com', $cookieJar->get('foo')->getDomain());
+    }
+
     public function testUpdateFromEmptySetCookie()
     {
         $cookieJar = new CookieJar();

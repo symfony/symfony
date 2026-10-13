@@ -191,6 +191,8 @@ class Cookie
                     continue;
                 } elseif ('path' === $attribute && !str_starts_with($attributeValue, '/')) {
                     continue;
+                } elseif ('domain' === $attribute && '' === $attributeValue) {
+                    continue;
                 } elseif (!\in_array($attribute, ['domain', 'path', 'samesite'], true)) {
                     continue;
                 }

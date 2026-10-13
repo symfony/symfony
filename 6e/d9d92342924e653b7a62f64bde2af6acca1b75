@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T06:40:17Z
+
+Two things on the migration. `--unbound` can't be resumed: on a second run, the rows already moved fail and the command exits 1, asking to run it again (3 moved, then 2 more written: "2 moved, 3 left behind", then "0 moved, 5 left behind"). Counting a row that opens under the store's own context as already moved would fix that. And the rewrap check doesn't close a hole: on 8.2 a forged row is re-wrapped but `get()` still refuses it, since the binding is keyed by the data key. The check makes that a reported failure, which is fine, but the description, the docblock and the test name say more. The `--unbound` success path also needs a test through the command, and the docs should say that turning the option on is a flag day with no way back.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T09:20:22Z
+
+I rebased on 8.2 and squashed the fixes from my previous comment into your commit. `--unbound` can now be run again after an interruption. The rows that a previous run already moved are opened under the store's context. The README also says that turning the option on takes effect at once, with no way back.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T14:07:58Z
+
+Thanks @GromNaN, I squashed the changes below into the commit and rebased after #66639.
+
+`--unbound` is now `--accept-unbound`. The help also says that every key is re-wrapped under the context of the store, never under none.
+
+I kept the wide catch. `DecrypterInterface` allows a `RuntimeException` for an AAD mismatch that the backend can't identify. `KmipKms` does that with PyKMIP, so a narrower catch would break the second run there. Instead, when both attempts fail, the command now reports the failure that isn't the expected `DecryptionFailedException`. A throttled request is then reported as such.
+
+The backend note is in the docblock of `StoredDataKey::wrappingContextFor()`, and in the description for the docs. None of the shipped clients ignores the AAD. Vault refuses a key that isn't derived, and the sealed box and Azure with RSA refuse any AAD. So the risk is a custom client, and the `binding` HMAC stays the check for every backend.

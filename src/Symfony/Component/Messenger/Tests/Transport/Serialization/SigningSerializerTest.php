@@ -218,6 +218,7 @@ class SigningSerializerTest extends TestCase
         $envelope = (new SigningSerializer($inner, 'secret-key', [DummyMessage::class]))->decode(['body' => 'irrelevant', 'headers' => []]);
 
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
         $this->assertSame(\sprintf('Message "%s" requires a signature but none was found.', DummyMessage::class), $envelope->getMessage()->getPrevious()->getMessage());
     }
 
@@ -544,6 +545,7 @@ class SigningSerializerTest extends TestCase
         $envelope = $this->createSerializer([DummyMessage::class])->decode(['body' => addslashes($body), 'headers' => []]);
 
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
         $this->assertSame(\sprintf('Message "%s" requires a signature but none was found.', DummyMessage::class), $envelope->getMessage()->getPrevious()->getMessage());
     }
 

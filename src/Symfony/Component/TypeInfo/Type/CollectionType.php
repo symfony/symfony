@@ -156,32 +156,28 @@ class CollectionType extends Type implements WrappingTypeInterface
 
     public function getCollectionKeyType(): Type
     {
-        $defaultCollectionKeyType = self::arrayKey();
-
         if ($this->type instanceof GenericType) {
             return match (\count($this->type->getVariableTypes())) {
                 2 => $this->type->getVariableTypes()[0],
                 1 => self::int(),
-                default => $defaultCollectionKeyType,
+                default => self::arrayKey(),
             };
         }
 
-        return $defaultCollectionKeyType;
+        return self::arrayKey();
     }
 
     public function getCollectionValueType(): Type
     {
-        $defaultCollectionValueType = self::mixed();
-
         if ($this->type instanceof GenericType) {
             return match (\count($this->type->getVariableTypes())) {
                 2 => $this->type->getVariableTypes()[1],
                 1 => $this->type->getVariableTypes()[0],
-                default => $defaultCollectionValueType,
+                default => self::mixed(),
             };
         }
 
-        return $defaultCollectionValueType;
+        return self::mixed();
     }
 
     /**

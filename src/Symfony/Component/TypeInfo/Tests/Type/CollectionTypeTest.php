@@ -54,6 +54,9 @@ class CollectionTypeTest extends TestCase
 
         $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()));
         $this->assertEquals(Type::string(), $type->getCollectionKeyType());
+
+        $type = new CollectionType(new GenericType(Type::builtin(TypeIdentifier::ITERABLE)));
+        $this->assertEquals(Type::arrayKey(), $type->getCollectionKeyType());
     }
 
     public function testGetCollectionValueType()
@@ -66,6 +69,9 @@ class CollectionTypeTest extends TestCase
 
         $type = new CollectionType(new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()));
         $this->assertEquals(Type::bool(), $type->getCollectionValueType());
+
+        $type = new CollectionType(new GenericType(Type::builtin(TypeIdentifier::ITERABLE)));
+        $this->assertEquals(Type::mixed(), $type->getCollectionValueType());
     }
 
     public function testWrappedTypeIsSatisfiedBy()

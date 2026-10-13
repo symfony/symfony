@@ -178,17 +178,20 @@ class Cookie
             }
 
             if (2 === \count($elements = explode('=', $part, 2))) {
-                if ('expires' === strtolower($elements[0])) {
-                    $elements[1] = self::parseDate($elements[1]);
-                } elseif ('max-age' === strtolower($elements[0])) {
-                    if (preg_match('/^-?\d+$/D', $elements[1])) {
-                        $maxAge = (int) $elements[1];
+                $attribute = strtolower(trim($elements[0]));
+                $attributeValue = trim($elements[1]);
+
+                if ('expires' === $attribute) {
+                    $attributeValue = self::parseDate($attributeValue);
+                } elseif ('max-age' === $attribute) {
+                    if (preg_match('/^-?\d+$/D', $attributeValue)) {
+                        $maxAge = (int) $attributeValue;
                     }
 
                     continue;
                 }
 
-                $values[strtolower($elements[0])] = $elements[1];
+                $values[$attribute] = $attributeValue;
             }
         }
 

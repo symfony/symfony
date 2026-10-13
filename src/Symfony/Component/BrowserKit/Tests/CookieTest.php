@@ -104,6 +104,18 @@ class CookieTest extends TestCase
         $this->assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::fromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
+    public function testFromStringTrimsAttributeNamesAndValues()
+    {
+        $cookie = Cookie::fromString('foo=bar; Domain = .example.com; Path = /account; Expires = Fri, 20 May 2011 15:25:52 GMT; SameSite = Lax', 'http://www.example.com/');
+
+        $this->assertSame('.example.com', $cookie->getDomain());
+        $this->assertSame('/account', $cookie->getPath());
+        $this->assertSame('1305905152', $cookie->getExpiresTime());
+        $this->assertSame('Lax', $cookie->getSameSite());
+
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age = 0')->isExpired());
+    }
+
     public function testFromStringWithMaxAge()
     {
         $before = time();

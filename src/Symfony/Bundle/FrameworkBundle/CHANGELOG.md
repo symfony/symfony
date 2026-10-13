@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Default `framework.session.storage_factory_id` to `session.storage.factory.mock_file` when `framework.test` is `true`
  * Add `KernelBrowser::sendWebhook()` to post a webhook signed as its `webhook.routing` entry expects
  * Add `WebhookAssertionsTrait` to `KernelTestCase` to assert on the webhooks sent with the `webhook.transport` service
  * Tag the `http_cache.store` service with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test

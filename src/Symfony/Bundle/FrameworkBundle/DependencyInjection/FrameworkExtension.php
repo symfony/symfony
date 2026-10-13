@@ -28,6 +28,7 @@ use Symfony\Component\Console\Attribute\AsTargetedValueResolver as AsTargetedCon
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -217,7 +218,7 @@ class FrameworkExtension extends Extension
 
         if (null !== $config['response']['serializer'] && $container->hasDefinition('serialize_controller_result_listener')) {
             $container->getDefinition('serialize_controller_result_listener')
-                ->replaceArgument(0, new Reference($config['response']['serializer']));
+                ->replaceArgument(0, new ServiceClosureArgument(new Reference($config['response']['serializer'])));
         }
 
         $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override'], $config['allowed_http_method_override']);

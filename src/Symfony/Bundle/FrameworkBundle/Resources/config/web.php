@@ -234,10 +234,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('serialize_controller_result_listener', SerializeControllerResultAttributeListener::class)
         ->args([
-            service('serializer')->nullOnInvalid(),
-            service('object_mapper')->nullOnInvalid(),
-            service('json_streamer.stream_writer')->nullOnInvalid(),
-            service('type_info.resolver')->nullOnInvalid(),
+            service_closure('serializer')->nullOnInvalid(),
+            service_closure('object_mapper')->nullOnInvalid(),
+            service_closure('json_streamer.stream_writer')->nullOnInvalid(),
+            service_closure('type_info.resolver')->nullOnInvalid(),
         ])
         ->tag('kernel.event_subscriber')
 

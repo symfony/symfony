@@ -11,13 +11,16 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -157,10 +160,78 @@ class HttpClientBundleTest extends TestCase
         $this->assertFalse($this->loadExtension([])->hasDefinition('http_client.recorder'));
     }
 
-    private function loadExtension(array $config): ContainerBuilder
+    #[DataProvider('provideFrameworkConfigsEnablingTest')]
+    public function testTheRecorderIsEnabledWhenFrameworkTestIsEnabled(array $frameworkConfigs)
     {
-        $container = new ContainerBuilder(new ParameterBag(['kernel.debug' => false]));
-        new HttpClientBundle()->getContainerExtension()->load([$config], $container);
+        $this->assertTrue($this->loadExtension([], $frameworkConfigs)->hasDefinition('http_client.recorder'));
+        $this->assertTrue($this->loadExtension(['recorder' => ['redact' => ['pin']]], $frameworkConfigs)->hasDefinition('http_client.recorder'));
+    }
+
+    public static function provideFrameworkConfigsEnablingTest(): iterable
+    {
+        yield 'true' => [[['test' => true]]];
+        yield 'null' => [[['test' => null]]];
+        yield 'parameter' => [[['test' => '%app.test%']]];
+        yield 'last one wins' => [[['test' => false], ['test' => true], ['secret' => 's3cr3t']]];
+    }
+
+    #[DataProvider('provideFrameworkConfigsNotEnablingTest')]
+    public function testTheRecorderIsDisabledWhenFrameworkTestIsNotEnabled(array $frameworkConfigs)
+    {
+        $this->assertFalse($this->loadExtension([], $frameworkConfigs)->hasDefinition('http_client.recorder'));
+        $this->assertFalse($this->loadExtension(['recorder' => ['redact' => ['pin']]], $frameworkConfigs)->hasDefinition('http_client.recorder'));
+    }
+
+    public static function provideFrameworkConfigsNotEnablingTest(): iterable
+    {
+        yield 'unset' => [[['secret' => 's3cr3t']]];
+        yield 'false' => [[['test' => false]]];
+        yield 'last one wins' => [[['test' => true], ['test' => false]]];
+        yield 'env var' => [[['test' => '%env(bool:APP_TEST)%']]];
+    }
+
+    #[DataProvider('provideExplicitRecorderConfigs')]
+    public function testAnExplicitRecorderConfigWinsOverFrameworkTest(mixed $recorder, bool $enabled)
+    {
+        $this->assertSame($enabled, $this->loadExtension(['recorder' => $recorder], [['test' => true]])->hasDefinition('http_client.recorder'));
+        $this->assertSame($enabled, $this->loadExtension(['recorder' => $recorder], [['test' => false]])->hasDefinition('http_client.recorder'));
+    }
+
+    public static function provideExplicitRecorderConfigs(): iterable
+    {
+        yield 'true' => [true, true];
+        yield 'null' => [null, true];
+        yield 'enabled' => [['enabled' => true], true];
+        yield 'false' => [false, false];
+        yield 'disabled' => [['enabled' => false, 'redact' => ['pin']], false];
+    }
+
+    private function loadExtension(array $config, array $frameworkConfigs = []): ContainerBuilder
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('app.test', true);
+        $container->registerExtension(new HttpClientBundle()->getContainerExtension());
+        $container->loadFromExtension('http_client', $config);
+
+        if ($frameworkConfigs) {
+            $container->registerExtension(new class extends Extension {
+                public function load(array $configs, ContainerBuilder $container): void
+                {
+                }
+
+                public function getAlias(): string
+                {
+                    return 'framework';
+                }
+            });
+
+            foreach ($frameworkConfigs as $frameworkConfig) {
+                $container->loadFromExtension('framework', $frameworkConfig);
+            }
+        }
+
+        new MergeExtensionConfigurationPass()->process($container);
 
         return $container;
     }

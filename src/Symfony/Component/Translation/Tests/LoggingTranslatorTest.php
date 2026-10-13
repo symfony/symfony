@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Translator;
 
@@ -29,5 +30,13 @@ class LoggingTranslatorTest extends TestCase
         $translator = new Translator('ar');
         $loggableTranslator = new LoggingTranslator($translator, $logger);
         $loggableTranslator->trans('bar');
+    }
+
+    public function testGetGlobalParametersIsVisibleToOuterDecorators()
+    {
+        $translator = new Translator('en');
+        $translator->addGlobalParameter('%site%', 'Symfony');
+
+        $this->assertSame(['%site%' => 'Symfony'], (new DataCollectorTranslator(new LoggingTranslator($translator, $this->createStub(LoggerInterface::class))))->getGlobalParameters());
     }
 }

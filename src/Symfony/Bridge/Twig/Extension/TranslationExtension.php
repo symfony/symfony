@@ -16,11 +16,13 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
+use Symfony\Component\Translation\HtmlTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
+use Twig\Markup;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
@@ -35,9 +37,13 @@ class_exists(TranslatorTrait::class);
  */
 final class TranslationExtension extends AbstractExtension
 {
+    private static ?string $placeholderPrefix = null;
+    private static int $placeholderCount = 0;
+
     public function __construct(
         private ?TranslatorInterface $translator = null,
         private ?TranslationNodeVisitor $translationNodeVisitor = null,
+        private ?HtmlTranslator $htmlTranslator = null,
         private readonly TransDefaultDomainRegistry $transDefaultDomainRegistry = new TransDefaultDomainRegistry(),
     ) {
     }
@@ -68,6 +74,7 @@ final class TranslationExtension extends AbstractExtension
     {
         return [
             new TwigFilter('trans', $this->trans(...)),
+            new TwigFilter('trans_html', $this->transHtml(...), ['needs_charset' => true, 'is_safe' => ['html']]),
         ];
     }
 
@@ -124,6 +131,56 @@ final class TranslationExtension extends AbstractExtension
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
     }
 
+    /**
+     * @param array|string $arguments Can be the locale as a string when $message is a TranslatableInterface
+     *
+     * @internal
+     */
+    public function transHtml(string $charset, string|\Stringable|TranslatableInterface|null $message, array $tags, array|string $arguments = [], ?string $domain = null, ?string $locale = null, ?int $count = null): string
+    {
+        if ($message instanceof TranslatableInterface) {
+            if (!\is_string($arguments) && [] !== $arguments) {
+                throw new \TypeError(\sprintf('The arguments of the "trans_html" filter must be a locale passed as a string when the message is a "%s", "%s" given.', TranslatableInterface::class, get_debug_type($arguments)));
+            }
+
+            $locale ??= \is_string($arguments) ? $arguments : null;
+
+            if (!$message instanceof TranslatableMessage) {
+                if ($tags) {
+                    throw new \LogicException(\sprintf('The "trans_html" filter cannot render the tags of a "%s": only strings and "%s" messages are supported.', get_debug_type($message), TranslatableMessage::class));
+                }
+
+                return htmlspecialchars($message->trans($this->getTranslator(), $locale), \ENT_QUOTES | \ENT_SUBSTITUTE, $charset);
+            }
+
+            [$message, $arguments, $domain] = [$message->getMessage(), $message->getParameters(), $message->getDomain()];
+        } elseif (!\is_array($arguments)) {
+            throw new \TypeError(\sprintf('Unless the message is a "%s", the arguments of the "trans_html" filter must be an array of parameters, "%s" given.', TranslatableInterface::class, get_debug_type($arguments)));
+        }
+
+        if ('' === $message = (string) $message) {
+            return '';
+        }
+
+        if (null !== $count) {
+            $arguments['%count%'] = $count;
+        }
+
+        $placeholders = [];
+        foreach ($arguments as $key => $value) {
+            if ($value instanceof Markup) {
+                // private-use characters only, so that translators rewriting ASCII (e.g. pseudo-localization) leave the placeholder intact:
+                // a secret prefix drawn once per process, so that other parameters cannot forge it, then a counter, so that each one is unique
+                $i = ++self::$placeholderCount;
+                $placeholder = (self::$placeholderPrefix ??= self::createPlaceholderPrefix()).mb_chr(0xF0000 | ($i & 0x7FFF), 'UTF-8').mb_chr(0xF0000 | ($i >> 15 & 0x7FFF), 'UTF-8');
+                $placeholders[$placeholder] = (string) $value;
+                $arguments[$key] = $placeholder;
+            }
+        }
+
+        return strtr($this->getHtmlTranslator($charset)->trans($message, $tags, $arguments, $domain, $locale), $placeholders);
+    }
+
     public function createTranslatable(string $message, array $parameters = [], ?string $domain = null): TranslatableMessage
     {
         if (!class_exists(TranslatableMessage::class)) {
@@ -131,5 +188,24 @@ final class TranslationExtension extends AbstractExtension
         }
 
         return new TranslatableMessage($message, $parameters, $domain);
+    }
+
+    private static function createPlaceholderPrefix(): string
+    {
+        $prefix = '';
+        foreach (str_split(random_bytes(8)) as $byte) {
+            $prefix .= mb_chr(0xE100 + \ord($byte), 'UTF-8');
+        }
+
+        return $prefix;
+    }
+
+    private function getHtmlTranslator(string $charset): HtmlTranslator
+    {
+        if (!class_exists(HtmlTranslator::class)) {
+            throw new \LogicException(\sprintf('Using the "trans_html" filter requires symfony/translation >= 8.2. Try running "%s".', class_exists(TranslatableMessage::class) ? 'composer update symfony/translation' : 'composer require symfony/translation'));
+        }
+
+        return $this->htmlTranslator ??= new HtmlTranslator($this->getTranslator(), $charset);
     }
 }

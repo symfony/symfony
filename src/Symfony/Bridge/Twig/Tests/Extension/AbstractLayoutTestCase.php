@@ -976,6 +976,10 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 
     public function testSingleChoiceGroupedWithTranslatableGroupLabels()
     {
+        if (!class_exists(BoundsType::class)) {
+            $this->markTestSkipped('Requires symfony/form 8.2+.');
+        }
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
             'group_by' => static fn ($choice) => new TranslatableMessage('&c' === $choice ? 'Group&2' : 'Group&1'),

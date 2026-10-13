@@ -69,6 +69,15 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
         return [];
     }
 
+    public function getGlobalParameters(): array
+    {
+        if ($this->translator instanceof Translator || method_exists($this->translator, 'getGlobalParameters')) {
+            return $this->translator->getGlobalParameters();
+        }
+
+        return [];
+    }
+
     public function __call(string $method, array $args): mixed
     {
         return $this->translator->{$method}(...$args);

@@ -793,6 +793,76 @@ class OidcTokenHandlerTest extends TestCase
         }
     }
 
+    public function testDiscoveryAcceptsTheIssuerItAnnouncesWhenNoIssuerIsGiven()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://www.example.com', 'jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, [], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_config');
+
+        $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $handler->getUserBadgeFrom(self::buildJWS(json_encode(self::getValidClaims())))->getUserIdentifier());
+
+        try {
+            $handler->getUserBadgeFrom(self::buildJWS(json_encode(['iss' => 'https://other.example.com'] + self::getValidClaims())));
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertInstanceOf(InvalidSignatureException::class, $e->getPrevious());
+        }
+    }
+
+    public function testDiscoveryAcceptsTheIssuersAnnouncedBySeveralProvidersWhenNoIssuerIsGiven()
+    {
+        $httpClient1 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider1.example.com', 'jwks_uri' => 'https://provider1.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+        $httpClient2 = new MockHttpClient([
+            new JsonMockResponse(['issuer' => 'https://provider2.example.com', 'jwks_uri' => 'https://provider2.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getSecondJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, [], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), [$httpClient1, 'https://provider2.example.com/' => $httpClient2], 'oidc_config');
+
+        foreach ([1 => self::getJWK(), 2 => self::getSecondJWK()] as $provider => $jwk) {
+            $claims = ['iss' => \sprintf('https://provider%d.example.com', $provider), 'sub' => 'user-from-provider'.$provider] + self::getValidClaims();
+
+            $this->assertSame('user-from-provider'.$provider, $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode($claims), $jwk))->getUserIdentifier());
+        }
+
+        $this->expectException(BadCredentialsException::class);
+        $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode(['iss' => 'https://provider2.example.com'] + self::getValidClaims()), self::getJWK()));
+    }
+
+    #[DataProvider('getDocumentsAnnouncingNoIssuer')]
+    public function testDiscoveryRejectsADocumentAnnouncingNoIssuerWhenNoIssuerIsGiven(array $configuration, string $announced)
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse($configuration + ['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, [], 'sub', null, new Clock(), 0, true);
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_config');
+
+        try {
+            $handler->getUserBadgeFrom(self::buildJWS(json_encode(['iss' => ''] + self::getValidClaims())));
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException $e) {
+            $this->assertSame(\sprintf('The OIDC provider announced the issuer "%s", which is not allowed.', $announced), $e->getPrevious()?->getMessage());
+        }
+    }
+
+    public static function getDocumentsAnnouncingNoIssuer(): iterable
+    {
+        yield 'no issuer' => [[], 'null'];
+        yield 'an empty issuer' => [['issuer' => ''], ''];
+        yield 'a non-string issuer' => [['issuer' => ['https://www.example.com']], 'array'];
+    }
+
     public function testDiscoveryDocumentsOfEveryClientAreRequestedBeforeTheirJwks()
     {
         // the responses are lazy, so requesting every ".well-known" document before consuming

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Allow the issuers announced by the discovery documents when `OidcTokenHandler` is given an empty list of issuers
  * Log the access tokens rejected by `OidcTokenHandler` at the `debug` level instead of `error`
  * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in
  * Add `AuthenticationUtils::getReAuthenticationAttribute()` and `SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE`, the security attribute the current request is asking a re-authentication for

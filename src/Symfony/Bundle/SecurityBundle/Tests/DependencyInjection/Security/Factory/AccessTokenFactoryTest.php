@@ -445,6 +445,46 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertEquals(new Reference('cache.security.discovery'), $arguments[0]);
     }
 
+    public function testOidcTokenHandlerDiscoveryLeavesTheIssuersToTheDiscoveryDocumentsByDefault()
+    {
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'enforce_at_jwt_type' => false,
+                    'discovery' => [
+                        'base_uri' => 'https://www.example.com/realms/demo/',
+                        'check_issuer' => true,
+                    ],
+                    'audience' => 'audience',
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $factory->createAuthenticator($container, 'firewall1', $this->processConfig($config, $factory), 'userprovider');
+
+        $this->assertSame([], $container->getDefinition('security.access_token_handler.firewall1')->getArgument(3));
+    }
+
+    public function testOidcTokenHandlerRequiresIssuersWithoutDiscovery()
+    {
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'enforce_at_jwt_type' => false,
+                    'keyset' => 'keyset',
+                    'audience' => 'audience',
+                ],
+            ],
+        ];
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "access_token.token_handler.oidc": You must set "issuers" when "discovery" is not set.');
+
+        $this->processConfig($config, new AccessTokenFactory($this->createTokenHandlerFactories()));
+    }
+
     #[DataProvider('provideEnforceKeyUsageVerification')]
     public function testOidcTokenHandlerEnableDiscoveryArgsMatchMethodSignature(bool $enforceKeyUsageVerification)
     {
@@ -1288,6 +1328,48 @@ class AccessTokenFactoryTest extends TestCase
 
         $metadata = $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller')->getArgument(0)['firewall1'];
         $this->assertSame(['header'], $metadata['bearer_methods_supported']);
+    }
+
+    #[DataProvider('provideTokenHandlerIssuers')]
+    public function testAuthorizationServersDefaultToTheIssuersOfTheTokenHandler(array $tokenHandler, ?array $expected)
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig([
+            'token_handler' => $tokenHandler,
+            'resource_metadata' => [],
+        ], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $metadata = $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller')->getArgument(0)['firewall1'];
+        $this->assertSame($expected, $metadata['authorization_servers'] ?? null);
+    }
+
+    public static function provideTokenHandlerIssuers(): iterable
+    {
+        yield 'oidc' => [['oidc' => ['enforce_at_jwt_type' => false, 'keyset' => 'keyset', 'audience' => 'audience', 'issuers' => ['https://accounts.example.com', 'https://login.example.com']]], ['https://accounts.example.com', 'https://login.example.com']];
+        yield 'oidc with discovery' => [['oidc' => ['enforce_at_jwt_type' => false, 'discovery' => ['base_uri' => 'https://accounts.example.com/'], 'audience' => 'audience', 'issuers' => ['https://accounts.example.com']]], ['https://accounts.example.com']];
+        // the issuer announced by the discovery document is only known at runtime
+        yield 'oidc with discovery and no issuers' => [['oidc' => ['enforce_at_jwt_type' => false, 'discovery' => ['base_uri' => 'https://accounts.example.com/'], 'audience' => 'audience']], null];
+        yield 'oauth2' => [['oauth2' => ['issuer' => 'https://accounts.example.com']], ['https://accounts.example.com']];
+        yield 'oauth2 without issuer' => [['oauth2' => true], null];
+        yield 'a service' => [['id' => 'in_memory_token_handler_service_id'], null];
+    }
+
+    public function testConfiguredAuthorizationServersWinOverTheIssuersOfTheTokenHandler()
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig([
+            'token_handler' => ['oauth2' => ['issuer' => 'https://accounts.example.com']],
+            'resource_metadata' => ['authorization_servers' => 'https://login.example.com'],
+        ], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $metadata = $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller')->getArgument(0)['firewall1'];
+        $this->assertSame(['https://login.example.com'], $metadata['authorization_servers']);
     }
 
     public function testEachFirewallGetsItsOwnMetadata()

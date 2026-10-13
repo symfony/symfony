@@ -45,8 +45,12 @@ trait LockableTrait
 
     /**
      * Locks a command.
+     *
+     * @param string|null $name     The name of the lock, which defaults to the name of the command
+     * @param bool        $blocking Whether to wait for the lock to be released instead of returning false
+     * @param float|null  $ttl      The maximum expected duration of the command in seconds, after which the lock expires. Null uses the default TTL of the store, 300 seconds for the stores that expire locks. Stores that don't expire locks ignore the TTL
      */
-    private function lock(?string $name = null, bool $blocking = false): bool
+    private function lock(?string $name = null, bool $blocking = false, ?float $ttl = 300.0): bool
     {
         if (!class_exists(SemaphoreStore::class)) {
             throw new LogicException('To enable the locking feature you must install the symfony/lock component. Try running "composer require symfony/lock".');
@@ -76,7 +80,7 @@ trait LockableTrait
             }
         }
 
-        $this->lock = $this->lockFactory->createLock($name);
+        $this->lock = $this->lockFactory->createLock($name, $ttl);
         if (!$this->lock->acquire($blocking)) {
             $this->lock = null;
 

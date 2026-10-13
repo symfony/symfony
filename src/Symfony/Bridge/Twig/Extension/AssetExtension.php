@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Asset\Packages;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -41,6 +42,7 @@ final class AssetExtension extends AbstractExtension
      * If the package used to generate the path is an instance of
      * UrlPackage, you will always get a URL and not a path.
      */
+    #[AsTwigFunction('asset')]
     public function getAssetUrl(string $path, ?string $packageName = null): string
     {
         return $this->packages->getUrl($path, $packageName);
@@ -49,6 +51,7 @@ final class AssetExtension extends AbstractExtension
     /**
      * Returns the version of an asset.
      */
+    #[AsTwigFunction('asset_version')]
     public function getAssetVersion(string $path, ?string $packageName = null): string
     {
         return $this->packages->getVersion($path, $packageName);

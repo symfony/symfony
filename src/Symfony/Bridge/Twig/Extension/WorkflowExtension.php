@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlockerList;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -46,6 +47,7 @@ final class WorkflowExtension extends AbstractExtension
     /**
      * Returns true if the transition is enabled.
      */
+    #[AsTwigFunction('workflow_can')]
     public function canTransition(object $subject, string $transitionName, ?string $name = null): bool
     {
         return $this->workflowRegistry->get($subject, $name)->can($subject, $transitionName);
@@ -56,11 +58,13 @@ final class WorkflowExtension extends AbstractExtension
      *
      * @return Transition[]
      */
+    #[AsTwigFunction('workflow_transitions')]
     public function getEnabledTransitions(object $subject, ?string $name = null): array
     {
         return $this->workflowRegistry->get($subject, $name)->getEnabledTransitions($subject);
     }
 
+    #[AsTwigFunction('workflow_transition')]
     public function getEnabledTransition(object $subject, string $transition, ?string $name = null): ?Transition
     {
         return $this->workflowRegistry->get($subject, $name)->getEnabledTransition($subject, $transition);
@@ -69,6 +73,7 @@ final class WorkflowExtension extends AbstractExtension
     /**
      * Returns true if the place is marked.
      */
+    #[AsTwigFunction('workflow_has_marked_place')]
     public function hasMarkedPlace(object $subject, string $placeName, ?string $name = null): bool
     {
         return $this->workflowRegistry->get($subject, $name)->getMarking($subject)->has($placeName);
@@ -79,6 +84,7 @@ final class WorkflowExtension extends AbstractExtension
      *
      * @return string[]|int[]
      */
+    #[AsTwigFunction('workflow_marked_places')]
     public function getMarkedPlaces(object $subject, bool $placesNameOnly = true, ?string $name = null): array
     {
         $places = $this->workflowRegistry->get($subject, $name)->getMarking($subject)->getPlaces();
@@ -97,6 +103,7 @@ final class WorkflowExtension extends AbstractExtension
      *                                                Use a string (the place name) to get place metadata
      *                                                Use a Transition instance to get transition metadata
      */
+    #[AsTwigFunction('workflow_metadata')]
     public function getMetadata(object $subject, string $key, string|Transition|null $metadataSubject = null, ?string $name = null): mixed
     {
         return $this
@@ -107,6 +114,7 @@ final class WorkflowExtension extends AbstractExtension
         ;
     }
 
+    #[AsTwigFunction('workflow_transition_blockers')]
     public function buildTransitionBlockerList(object $subject, string $transitionName, ?string $name = null): TransitionBlockerList
     {
         $workflow = $this->workflowRegistry->get($subject, $name);

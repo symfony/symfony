@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Yaml\Dumper as YamlDumper;
+use Twig\Attribute\AsTwigFilter;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -30,6 +31,7 @@ final class YamlExtension extends AbstractExtension
         ];
     }
 
+    #[AsTwigFilter('yaml_encode')]
     public function encode(mixed $input, int $inline = 0, int $dumpObjects = 0): string
     {
         static $dumper;
@@ -39,6 +41,7 @@ final class YamlExtension extends AbstractExtension
         return $dumper->dump($input, $inline, 0, $dumpObjects);
     }
 
+    #[AsTwigFilter('yaml_dump')]
     public function dump(mixed $value, int $inline = 0, int $dumpObjects = 0): string
     {
         if (\is_resource($value)) {

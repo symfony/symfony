@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\Link;
+use Twig\Attribute\AsTwigFunction;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -49,6 +50,7 @@ final class WebLinkExtension extends AbstractExtension
      *
      * @return string The relation URI
      */
+    #[AsTwigFunction('link')]
     public function link(string $uri, string $rel, array $attributes = []): string
     {
         if (!$request = $this->requestStack->getMainRequest()) {
@@ -73,6 +75,7 @@ final class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
+    #[AsTwigFunction('preload')]
     public function preload(string $uri, array $attributes = []): string
     {
         return $this->link($uri, 'preload', $attributes);
@@ -85,6 +88,7 @@ final class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
+    #[AsTwigFunction('dns_prefetch')]
     public function dnsPrefetch(string $uri, array $attributes = []): string
     {
         return $this->link($uri, 'dns-prefetch', $attributes);
@@ -97,6 +101,7 @@ final class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
+    #[AsTwigFunction('preconnect')]
     public function preconnect(string $uri, array $attributes = []): string
     {
         return $this->link($uri, 'preconnect', $attributes);
@@ -109,6 +114,7 @@ final class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
+    #[AsTwigFunction('prefetch')]
     public function prefetch(string $uri, array $attributes = []): string
     {
         return $this->link($uri, 'prefetch', $attributes);
@@ -125,6 +131,7 @@ final class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
+    #[AsTwigFunction('prerender')]
     public function prerender(string $uri, array $attributes = []): string
     {
         return $this->link($uri, 'prerender', $attributes);

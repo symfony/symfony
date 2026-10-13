@@ -16,6 +16,8 @@ CHANGELOG
  * Add a `for _self` modifier to the `trans_default_domain` tag to apply the domain to the whole template
  * Add the `sign_url` filter to sign absolute URLs with `UriSigner`
  * Add the `trans_html` filter to translate messages whose tags are replaced by HTML elements while everything else is escaped
+ * Declare the functions and filters of the extensions that provide nothing else with the `#[AsTwigFunction]` and `#[AsTwigFilter]` attributes
+ * Make `RoutingExtension::isUrlGenerationSafe()` static
 
 8.1
 ---

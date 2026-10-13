@@ -18,7 +18,6 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 use Twig\Attribute\AsTwigFilter;
@@ -62,22 +61,27 @@ class AttributeExtensionTest extends TestCase
         $twig->getRuntime(StaticExtensionWithAttributes::class);
     }
 
-    public function testInvalidExtensionClass()
+    public function testExtensionClassWithAttributes()
     {
         $kernel = new class extends AttributeExtensionKernel {
             public function registerContainerConfiguration(LoaderInterface $loader): void
             {
                 $loader->load(static function (ContainerBuilder $container) {
-                    $container->register(InvalidExtensionWithAttributes::class, InvalidExtensionWithAttributes::class)
+                    $container->setParameter('kernel.secret', 'secret');
+                    $container->register(ExtensionClassWithAttributes::class, ExtensionClassWithAttributes::class)
                         ->setAutoconfigured(true);
+
+                    $container->setAlias('twig_test', 'twig')->setPublic(true);
                 });
             }
         };
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The class "Symfony\Bundle\TwigBundle\Tests\Functional\InvalidExtensionWithAttributes" cannot extend "Twig\Extension\AbstractExtension" and use the "#[Twig\Attribute\AsTwigFilter]" attribute on method "funFilter()", choose one or the other.');
-
         $kernel->boot();
+
+        /** @var Environment $twig */
+        $twig = $kernel->getContainer()->get('twig_test');
+
+        $this->assertSame('foo is fun', $twig->createTemplate('{{ "foo"|fun }}')->render());
     }
 
     #[Before, After]
@@ -143,11 +147,11 @@ class RuntimeExtensionWithAttributes
     }
 }
 
-class InvalidExtensionWithAttributes extends AbstractExtension
+class ExtensionClassWithAttributes extends AbstractExtension
 {
     #[AsTwigFilter('fun')]
-    public function funFilter(): string
+    public function funFilter(string $value): string
     {
-        return 'fun';
+        return $value.' is fun';
     }
 }

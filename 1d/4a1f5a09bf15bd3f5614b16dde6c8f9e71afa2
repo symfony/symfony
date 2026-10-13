@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T08:54:20Z
+
+I pushed a rework along the lines of my review. It fixes the default jar on 6.4, one commit per fix, and you're the author of the ones your tests found. Rejecting a foreign `Domain` and host-only cookies will go to 8.2 in a follow-up PR. Functional tests can rely on the current behavior there (ours did). Thank you @X-Coder264!

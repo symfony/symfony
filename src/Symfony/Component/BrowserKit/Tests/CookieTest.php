@@ -116,6 +116,13 @@ class CookieTest extends TestCase
         $this->assertTrue(Cookie::fromString('foo=bar; Max-Age = 0')->isExpired());
     }
 
+    public function testFromStringUsesTheDefaultPathWhenThePathAttributeDoesNotStartWithASlash()
+    {
+        $this->assertSame('/foo', Cookie::fromString('foo=bar; Path=relative', 'http://example.com/foo/bar')->getPath());
+        $this->assertSame('/foo', Cookie::fromString('foo=bar; Path=', 'http://example.com/foo/bar')->getPath());
+        $this->assertSame('/', Cookie::fromString('foo=bar; Path=relative')->getPath());
+    }
+
     public function testFromStringWithMaxAge()
     {
         $before = time();

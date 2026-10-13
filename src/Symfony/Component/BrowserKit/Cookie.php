@@ -189,6 +189,8 @@ class Cookie
                     }
 
                     continue;
+                } elseif ('path' === $attribute && !str_starts_with($attributeValue, '/')) {
+                    continue;
                 }
 
                 $values[$attribute] = $attributeValue;

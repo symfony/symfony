@@ -50,6 +50,64 @@ class ManagerRegistryTest extends TestCase
         $this->assertFalse(isset($foo->bar));
     }
 
+    #[DataProvider('provideResetNonLazyServiceCases')]
+    public function testResetNonLazyService(string $class)
+    {
+        $container = new $class();
+
+        $registry = new TestManagerRegistry('name', [], ['defaultManager' => 'foo'], 'defaultConnection', 'defaultManager', 'proxyInterfaceName');
+        $registry->setTestContainer($container);
+
+        $foo = $container->get('foo');
+        $foo->bar = 123;
+
+        $this->assertSame($foo, $registry->resetManager());
+        $this->assertSame($foo, $container->get('foo'));
+        $this->assertSame(DummyManager::class, $foo::class);
+        $this->assertNull($foo->bar);
+
+        $r = new \ReflectionClass($foo);
+        $foo->bar = 456;
+        $firstInstance = $r->initializeLazyObject($foo);
+        $this->assertNotSame($foo, $firstInstance);
+        $this->assertSame(456, $firstInstance->bar);
+
+        $registry->resetManager();
+
+        $this->assertSame($foo, $container->get('foo'));
+        $this->assertNull($foo->bar);
+
+        $secondInstance = $r->initializeLazyObject($foo);
+        $this->assertNotSame($firstInstance, $secondInstance);
+        $this->assertSame($secondInstance, $r->initializeLazyObject($secondInstance));
+    }
+
+    public static function provideResetNonLazyServiceCases(): iterable
+    {
+        $container = new ContainerBuilder();
+
+        // the registry knows the manager by an alias, as it does when the manager is decorated
+        $container->register('foo.manager', DummyManager::class)->setPublic(true);
+        $container->setAlias('foo', 'foo.manager')->setPublic(true);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        eval('?>'.$dumper->dump(['class' => 'NonLazyServiceDoctrineBridgeContainer']));
+
+        yield ['NonLazyServiceDoctrineBridgeContainer'];
+
+        $dumps = $dumper->dump(['class' => 'NonLazyServiceDoctrineBridgeContainerAsFiles', 'as_files' => true]);
+
+        $lastDump = array_pop($dumps);
+        foreach (array_reverse($dumps) as $dump) {
+            eval('?>'.$dump);
+        }
+        eval('?>'.$lastDump);
+
+        yield ['NonLazyServiceDoctrineBridgeContainerAsFiles'];
+    }
+
     #[DataProvider('provideResetServiceWithNativeLazyObjectsCases')]
     public function testResetServiceWithNativeLazyObjects(string $class)
     {

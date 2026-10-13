@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `DoctrineDataCollector::getSimilarQueryGroups()` to expose groups of identical SQL queries executed multiple times with different parameters
  * Add the `IterableToArrayCollection` transform for the ObjectMapper component
  * Throw a `ConstraintDefinitionException` when a field checked by `UniqueEntity` holds an array or is a to-many association
  * Allow using closures with the `#[MapEntity]` attribute

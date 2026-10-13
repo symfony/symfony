@@ -198,6 +198,81 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][1]['runnable']);
     }
 
+    public function testCollectSimilarQueryGroups()
+    {
+        $queries = [
+            ['sql' => 'SELECT * FROM post WHERE author_id = ?', 'params' => [1], 'types' => [], 'executionMS' => 0.2],
+            ['sql' => 'SELECT * FROM post WHERE author_id = ?', 'params' => [2], 'types' => [], 'executionMS' => 0.3],
+            ['sql' => 'SELECT * FROM post WHERE author_id = ?', 'params' => [2], 'types' => [], 'executionMS' => 0.1],
+            ['sql' => 'SELECT * FROM post WHERE author_id = ?', 'params' => [3], 'types' => [], 'executionMS' => 0.15],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+        $c = unserialize(serialize($c));
+
+        $groups = $c->getSimilarQueryGroups();
+
+        $this->assertCount(1, $groups['default']);
+        $this->assertSame('SELECT * FROM post WHERE author_id = ?', $groups['default'][0]['sql']);
+        $this->assertSame(4, $groups['default'][0]['count']);
+        $this->assertEqualsWithDelta(0.75, $groups['default'][0]['executionMS'], .01);
+        $this->assertSame([0, 1, 2, 3], $groups['default'][0]['indexes']);
+    }
+
+    public function testCollectSimilarQueryGroupsIgnoresIdenticalParamsAndSingleQueries()
+    {
+        $queries = [
+            ['sql' => 'SELECT * FROM table1 WHERE id = ?', 'params' => [1], 'types' => [], 'executionMS' => 0],
+            ['sql' => 'SELECT * FROM table1 WHERE id = ?', 'params' => [1], 'types' => [], 'executionMS' => 0],
+            ['sql' => 'SELECT * FROM table2', 'params' => [], 'types' => [], 'executionMS' => 0],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+        $c = unserialize(serialize($c));
+
+        $this->assertSame(['default' => []], $c->getSimilarQueryGroups());
+    }
+
+    public function testCollectSimilarQueryGroupsWithNoQueries()
+    {
+        $c = $this->createCollector([]);
+        $c->collect(new Request(), new Response());
+        $c = unserialize(serialize($c));
+
+        $this->assertSame([], $c->getSimilarQueryGroups());
+    }
+
+    public function testCollectSimilarQueryGroupsWithUnserializableParams()
+    {
+        $queries = [
+            ['sql' => 'SELECT * FROM post WHERE author_id = ?', 'params' => [1, static fn () => null], 'types' => [], 'executionMS' => 0],
+            ['sql' => 'SELECT * FROM post WHERE author_id = ?', 'params' => [2, static fn () => null], 'types' => [], 'executionMS' => 0],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+        $c = unserialize(serialize($c));
+
+        $this->assertSame([0, 1], $c->getSimilarQueryGroups()['default'][0]['indexes']);
+    }
+
+    public function testCollectSimilarQueryGroupsWithResourceParams()
+    {
+        $queries = [
+            ['sql' => 'SELECT * FROM post WHERE data = ?', 'params' => [fopen('php://memory', 'r+')], 'types' => [], 'executionMS' => 0],
+            ['sql' => 'SELECT * FROM post WHERE data = ?', 'params' => [fopen('php://memory', 'r+')], 'types' => [], 'executionMS' => 0],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+        $c = unserialize(serialize($c));
+
+        $this->assertSame([0, 1], $c->getSimilarQueryGroups()['default'][0]['indexes']);
+    }
+
+    public function testGetSimilarQueryGroupsWithoutCollectedData()
+    {
+        $this->assertSame([], $this->createCollector([])->getSimilarQueryGroups());
+    }
+
     #[DataProvider('paramProvider')]
     public function testSerialization($param, array $types, $expected)
     {

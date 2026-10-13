@@ -43,6 +43,7 @@ class DoctrineDataCollector extends DataCollector
     {
         $this->data = [
             'queries' => $this->collectQueries(),
+            'similar_query_groups' => $this->collectSimilarQueryGroups(),
             'connections' => $this->connections,
             'managers' => $this->managers,
         ];
@@ -57,6 +58,17 @@ class DoctrineDataCollector extends DataCollector
         }
 
         return $queries;
+    }
+
+    private function collectSimilarQueryGroups(): array
+    {
+        $groups = [];
+
+        foreach ($this->debugDataHolder->getData() as $name => $data) {
+            $groups[$name] = $this->groupSimilarQueries($data);
+        }
+
+        return $groups;
     }
 
     public function reset(): void
@@ -83,6 +95,23 @@ class DoctrineDataCollector extends DataCollector
     public function getQueries(): array
     {
         return $this->data['queries'];
+    }
+
+    /**
+     * Returns groups of identical SQL queries executed multiple times with
+     * different parameters, indexed by connection name.
+     *
+     * Executing the same SQL repeatedly with different parameters is the
+     * typical signature of N+1 queries caused by ORM lazy loading.
+     *
+     * The "indexes" key holds the offsets of the grouped queries in
+     * getQueries()[$connectionName].
+     *
+     * @return array<string, list<array{sql: string, count: int, executionMS: float, indexes: list<int>}>>
+     */
+    public function getSimilarQueryGroups(): array
+    {
+        return $this->data['similar_query_groups'] ?? [];
     }
 
     public function getTime(): float
@@ -138,6 +167,76 @@ class DoctrineDataCollector extends DataCollector
         }
 
         return $queries;
+    }
+
+    /**
+     * Groups raw queries by SQL, keeping only the ones executed with at least
+     * two distinct sets of parameters.
+     *
+     * Only offsets are kept: the parameters themselves are already stored,
+     * sanitized, under the "queries" key.
+     */
+    private function groupSimilarQueries(array $queries): array
+    {
+        $groups = [];
+
+        foreach ($queries as $i => $query) {
+            $params = $query['params'] ?? [];
+            if (!\is_array($params)) {
+                $params = [$params];
+            }
+
+            $group = &$groups[$query['sql']];
+            $group ??= ['sql' => $query['sql'], 'count' => 0, 'executionMS' => 0., 'indexes' => [], 'paramHashes' => []];
+            ++$group['count'];
+            $group['executionMS'] += (float) ($query['executionMS'] ?? 0);
+            $group['indexes'][] = $i;
+            $group['paramHashes'][self::hashParams($params)] = true;
+            unset($group);
+        }
+
+        $similarGroups = [];
+        foreach ($groups as $group) {
+            if (\count($group['paramHashes']) < 2) {
+                continue;
+            }
+
+            unset($group['paramHashes']);
+            $similarGroups[] = $group;
+        }
+
+        return $similarGroups;
+    }
+
+    /**
+     * Returns a fixed-size identity for a set of parameters.
+     *
+     * Resources all serialize to the same value, which would hide the very
+     * repetitions being looked for, and some objects cannot be serialized at
+     * all: both are replaced by a marker.
+     */
+    private static function hashParams(array $params): string
+    {
+        return hash('xxh128', serialize(self::normalizeParams($params)));
+    }
+
+    private static function normalizeParams(array $params): array
+    {
+        foreach ($params as $j => $param) {
+            if (\is_array($param)) {
+                $params[$j] = self::normalizeParams($param);
+            } elseif (\is_resource($param)) {
+                $params[$j] = \sprintf('/* Resource(%s)#%d */', get_resource_type($param), get_resource_id($param));
+            } elseif (\is_object($param)) {
+                try {
+                    $params[$j] = serialize($param);
+                } catch (\Throwable) {
+                    $params[$j] = \sprintf('/* %s#%d */', $param::class, spl_object_id($param));
+                }
+            }
+        }
+
+        return $params;
     }
 
     private function sanitizeQuery(string $connectionName, array $query): array

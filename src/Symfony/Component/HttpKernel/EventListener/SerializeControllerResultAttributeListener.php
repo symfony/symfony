@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,16 +36,18 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 final class SerializeControllerResultAttributeListener implements EventSubscriberInterface
 {
     /**
-     * @param SerializerInterface|(\Closure(): ?SerializerInterface)|null     $serializer
-     * @param ObjectMapperInterface|(\Closure(): ?ObjectMapperInterface)|null $objectMapper
-     * @param StreamWriterInterface|(\Closure(): ?StreamWriterInterface)|null $streamWriter
-     * @param TypeResolverInterface|(\Closure(): ?TypeResolverInterface)|null $typeResolver
+     * @param SerializerInterface|(\Closure(): ?SerializerInterface)|null       $serializer
+     * @param ObjectMapperInterface|(\Closure(): ?ObjectMapperInterface)|null   $objectMapper
+     * @param StreamWriterInterface|(\Closure(): ?StreamWriterInterface)|null   $streamWriter
+     * @param TypeResolverInterface|(\Closure(): ?TypeResolverInterface)|null   $typeResolver
+     * @param CacheItemPoolInterface|(\Closure(): ?CacheItemPoolInterface)|null $typeCache    The cache of the return types of controllers
      */
     public function __construct(
         private SerializerInterface|\Closure|null $serializer,
         private ObjectMapperInterface|\Closure|null $objectMapper = null,
         private StreamWriterInterface|\Closure|null $streamWriter = null,
         private TypeResolverInterface|\Closure|null $typeResolver = null,
+        private CacheItemPoolInterface|\Closure|null $typeCache = null,
     ) {
     }
 
@@ -155,8 +158,32 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
             };
         }
 
+        $reflector = $event->controllerMetadata?->getReflector();
+
+        // anonymous functions are left out: the name of one doesn't identify it
+        $key = match (true) {
+            $reflector instanceof \ReflectionMethod => $reflector->class.'::'.$reflector->name,
+            !$reflector instanceof \ReflectionFunction || $reflector->isAnonymous() => null,
+            default => $reflector->getClosureScopeClass()?->name.'::'.$reflector->name,
+        };
+
+        if (null === $key || !self::resolve($this->typeCache)) {
+            return $this->resolveReturnType($reflector);
+        }
+
+        $item = $this->typeCache->getItem(rawurlencode($key));
+
+        if (!$item->isHit()) {
+            $this->typeCache->save($item->set($this->resolveReturnType($reflector)));
+        }
+
+        return $item->get();
+    }
+
+    private function resolveReturnType(?\ReflectionFunctionAbstract $reflector): Type
+    {
         try {
-            return (self::resolve($this->typeResolver) ?? $this->typeResolver = TypeResolver::create())->resolve($event->controllerMetadata?->getReflector());
+            return (self::resolve($this->typeResolver) ?? $this->typeResolver = TypeResolver::create())->resolve($reflector);
         } catch (UnsupportedException $e) {
             throw new \LogicException(\sprintf('The "stream" option of the "#[%s]" attribute requires the "map" option or a return type on the controller: %s', Serialize::class, $e->getMessage()), 0, $e);
         }

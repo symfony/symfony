@@ -221,6 +221,13 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(0, new ServiceClosureArgument(new Reference($config['response']['serializer'])));
         }
 
+        if ($container->getParameter('kernel.debug')) {
+            // return types are read from the controllers at runtime, so they cannot be cached in debug mode
+            $container->removeDefinition('serialize_controller_result_listener.cache_warmer');
+            $container->removeDefinition('serialize_controller_result_listener.type_cache');
+            $container->removeDefinition('cache.serialize_controller_result');
+        }
+
         $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override'], $config['allowed_http_method_override']);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);

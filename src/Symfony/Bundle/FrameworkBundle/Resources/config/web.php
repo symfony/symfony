@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\ExpressionLanguage\ConstantFunctionProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\Attribute\Cache;
@@ -22,6 +24,7 @@ use Symfony\Component\HttpKernel\Attribute\Lock;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
+use Symfony\Component\HttpKernel\CacheWarmer\SerializeControllerResultCacheWarmer;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
@@ -238,8 +241,29 @@ return static function (ContainerConfigurator $container) {
             service_closure('object_mapper')->nullOnInvalid(),
             service_closure('json_streamer.stream_writer')->nullOnInvalid(),
             service_closure('type_info.resolver')->nullOnInvalid(),
+            service_closure('serialize_controller_result_listener.type_cache')->nullOnInvalid(),
         ])
         ->tag('kernel.event_subscriber')
+
+        ->set('serialize_controller_result_listener.cache_warmer', SerializeControllerResultCacheWarmer::class)
+            ->args([
+                abstract_arg('controller classes, set in RegisterControllerArgumentLocatorsPass'),
+                '%kernel.build_dir%/serialize_controller_result.php',
+                service('type_info.resolver')->nullOnInvalid(),
+            ])
+            ->tag('kernel.cache_warmer')
+            ->tag('container.remove_if_missing', ['service' => 'json_streamer.stream_writer'])
+
+        ->set('cache.serialize_controller_result')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'json_streamer.stream_writer'])
+
+        ->set('serialize_controller_result_listener.type_cache', CacheItemPoolInterface::class)
+            ->factory([PhpArrayAdapter::class, 'create'])
+            ->args(['%kernel.build_dir%/serialize_controller_result.php', service('cache.serialize_controller_result')])
+            ->tag('container.remove_if_missing', ['service' => 'json_streamer.stream_writer'])
 
         ->set('rate_limiter.attribute_listener', RateLimitAttributeListener::class)
             ->args([

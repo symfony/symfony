@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -295,6 +298,59 @@ class SerializeControllerResultListenerTest extends TestCase
         $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
     }
 
+    #[DataProvider('provideStreamedControllers')]
+    public function testStreamCachesTheReturnTypeOfTheController(callable $controller)
+    {
+        $cache = new ArrayAdapter();
+        $streamWriter = JsonStreamWriter::create([], $this->streamWritersDir);
+
+        $viewEvent = $this->createViewEvent([new ProductCreated(1)], $controller);
+        $listener = new SerializeControllerResultAttributeListener(null, null, $streamWriter, TypeResolver::create(), $cache);
+        $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+
+        self::assertSame('[{"productId":1}]', self::getStreamedContent($viewEvent->getResponse()));
+
+        $viewEvent = $this->createViewEvent([new ProductCreated(2)], $controller);
+        $listener = new SerializeControllerResultAttributeListener(null, null, $streamWriter, fn () => $this->fail('The type resolver should not be resolved.'), $cache);
+        $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+
+        self::assertSame('[{"productId":2}]', self::getStreamedContent($viewEvent->getResponse()));
+    }
+
+    public static function provideStreamedControllers(): iterable
+    {
+        yield 'method' => [[new StreamApiController(), 'list']];
+        yield 'invokable' => [new InvokableStreamApiController()];
+    }
+
+    public function testStreamDoesNotCacheTheReturnTypeOfAnAnonymousFunction()
+    {
+        $viewEvent = $this->createViewEvent(new ProductCreated(10), static fn (): ProductCreated => new ProductCreated(10));
+
+        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir), TypeResolver::create(), fn () => $this->fail('The type cache should not be resolved.'));
+        $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+
+        self::assertSame('{"productId":10}', self::getStreamedContent($viewEvent->getResponse()));
+    }
+
+    public function testStreamDoesNotCacheAnUnsupportedReturnType()
+    {
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cache->method('getItem')->willReturn(new CacheItem());
+        $cache->expects($this->never())->method('save');
+
+        $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'untyped']);
+
+        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir), TypeResolver::create(), $cache);
+
+        try {
+            $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+            self::fail('The listener should have thrown.');
+        } catch (\LogicException $e) {
+            self::assertStringStartsWith('The "stream" option of the "#[Symfony\Component\HttpKernel\Attribute\Serialize]" attribute requires the "map" option or a return type on the controller:', $e->getMessage());
+        }
+    }
+
     public function testStreamRequiresTheJsonFormat()
     {
         $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'show']);
@@ -441,6 +497,25 @@ class StreamApiController
     public function untyped()
     {
         return new ProductCreated(10);
+    }
+
+    /**
+     * @return list<ProductCreated>
+     */
+    public function list(): array
+    {
+        return [new ProductCreated(10)];
+    }
+}
+
+class InvokableStreamApiController
+{
+    /**
+     * @return list<ProductCreated>
+     */
+    public function __invoke(): array
+    {
+        return [new ProductCreated(10)];
     }
 }
 

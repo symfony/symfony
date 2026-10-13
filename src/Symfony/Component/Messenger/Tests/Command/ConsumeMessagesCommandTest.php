@@ -333,6 +333,35 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
+    public function testRunWithStopWhenEmptyOption()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')])],
+            [new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')])],
+            [],
+        ]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', new MessageBus());
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--stop-when-empty' => true,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+        $this->assertStringContainsString('exit once it has found no message left in the', $tester->getDisplay());
+    }
+
     public function testRunWithMemoryLimit()
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);

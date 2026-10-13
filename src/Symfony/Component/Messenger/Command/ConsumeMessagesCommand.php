@@ -78,6 +78,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
                 new InputOption('failure-limit', 'f', InputOption::VALUE_REQUIRED, 'The number of failed messages the worker can consume'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can handle new messages'),
+                new InputOption('stop-when-empty', null, InputOption::VALUE_NONE, 'Stop the worker once the transports have no message left instead of waiting for new ones'),
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
@@ -119,6 +120,12 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
                 If a message is being handled, the worker will stop after the processing is finished:
 
                     <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
+
+                Use the <info>--stop-when-empty</info> option to handle the messages that are already in the
+                transports and exit instead of waiting for new ones. Delayed messages, including failed
+                messages that wait for their retry delay, are left in the transports:
+
+                    <info>php %command.full_name% <receiver-name> --stop-when-empty</info>
 
                 Use the <info>--bus</info> option to specify the message bus to dispatch received messages
                 to instead of trying to determine it automatically. This is required if the
@@ -303,6 +310,10 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $stopsWhen[] = "been running for {$timeLimit}s";
         }
 
+        if ($stopWhenEmpty = $input->getOption('stop-when-empty')) {
+            $stopsWhen[] = 'found no message left in the transports';
+        }
+
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
         $io = new SymfonyStyle($input, $output);
@@ -356,6 +367,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
             'time_limit' => null !== $timeLimit ? (int) $timeLimit : null,
+            'stop_when_empty' => $stopWhenEmpty,
         ];
         if ($queues = $input->getOption('queues')) {
             $options['queues'] = $queues;

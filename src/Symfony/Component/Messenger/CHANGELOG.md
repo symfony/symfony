@@ -58,6 +58,7 @@ CHANGELOG
  * Add the invokable `WorkerRestarter` service to stop the workers of some or all transports from code
  * Add the `messenger.deduplication.lock_factory` option to take the deduplication locks from another lock factory than `lock.factory`
  * Add `SenderStampInterface` for the non-sendable stamps that an outbox keeps for the sender of the messages it forwards
+ * Add a `--stop-when-empty` option to the `messenger:consume` command and a `stop_when_empty` option to `Worker::run()` to handle the pending messages and exit instead of waiting for new ones
 
 8.1
 ---

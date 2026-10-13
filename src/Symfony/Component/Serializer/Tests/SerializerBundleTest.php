@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Doctrine\Serializer\Normalizer\CollectionDenormalizer;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
@@ -328,6 +332,22 @@ class SerializerBundleTest extends TestCase
 
         $this->assertSame(BackedEnumNormalizer::class, $definition->getClass());
         $this->assertSame(-915, $tag[0]['priority']);
+    }
+
+    public function testCollectionDenormalizerFollowsTheDoctrineBridge()
+    {
+        $container = $this->load(['enabled' => true]);
+
+        $this->assertSame(class_exists(CollectionDenormalizer::class), $container->hasDefinition('serializer.denormalizer.doctrine_collection'));
+    }
+
+    #[RunInSeparateProcess]
+    public function testCollectionDenormalizerNeedsDoctrineCollections()
+    {
+        ClassExistsMock::register(ContainerRemoveMissingDependenciesPass::class);
+        ClassExistsMock::withMockedClasses([ArrayCollection::class => false]);
+
+        $this->assertFalse($this->load(['enabled' => true])->hasDefinition('serializer.denormalizer.doctrine_collection'));
     }
 
     public function testCachePoolIsRegisteredAlongsideTheSerializer()

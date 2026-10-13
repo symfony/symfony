@@ -315,6 +315,72 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertArrayHasKey('A', $retriedEnvelopes);
     }
 
+    public function testRetryWithoutDelayAffectsOnlyOriginalQueue()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
+            'exchange' => [
+                'name' => 'messages_fanout',
+                'type' => 'fanout',
+            ],
+            'queues' => [
+                'fanout_A' => [],
+                'fanout_B' => [],
+            ],
+        ]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
+
+        $sender->send(new Envelope(new DummyMessage('Payload')));
+
+        $receivedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(2, $receivedEnvelopes);
+
+        $retryEnvelope = $receivedEnvelopes['fanout_A']
+            ->with(new DelayStamp(0))
+            ->with(new RedeliveryStamp(1));
+        $sender->send($retryEnvelope);
+
+        $retriedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(1, $retriedEnvelopes);
+        $this->assertArrayHasKey('fanout_A', $retriedEnvelopes);
+    }
+
+    public function testRetryWithoutDelayReachesOriginalQueueOfDirectExchange()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
+            'exchange' => [
+                'name' => 'messages_direct',
+                'type' => 'direct',
+                'default_publish_routing_key' => 'direct_routing_key',
+            ],
+            'queues' => [
+                'direct_queue' => ['binding_keys' => ['direct_routing_key']],
+            ],
+        ]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
+
+        $sender->send(new Envelope(new DummyMessage('Payload')));
+
+        $receivedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertArrayHasKey('direct_queue', $receivedEnvelopes);
+
+        $retryEnvelope = $receivedEnvelopes['direct_queue']
+            ->with(new DelayStamp(0))
+            ->with(new RedeliveryStamp(1));
+        $sender->send($retryEnvelope);
+
+        $retriedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(1, $retriedEnvelopes);
+        $this->assertArrayHasKey('direct_queue', $retriedEnvelopes);
+    }
+
     public function testItReceivesSignals()
     {
         $serializer = $this->createSerializer();

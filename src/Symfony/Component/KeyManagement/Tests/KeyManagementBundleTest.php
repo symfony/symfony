@@ -11,9 +11,16 @@
 
 namespace Symfony\Component\KeyManagement\Tests;
 
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Events;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
+use Doctrine\ORM\ORMSetup;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,6 +34,8 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterEncryptedColumnsPass;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
 use Symfony\Component\KeyManagement\DataCollector\KeyManagementDataCollector;
 use Symfony\Component\KeyManagement\Debug\TraceableKms;
@@ -38,6 +47,7 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\KeyManagementBundle;
 use Symfony\Component\KeyManagement\Local\SodiumKms;
+use Symfony\Component\KeyManagement\Tests\Fixtures\Entity\Speaker;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\inline_service;
 
@@ -172,6 +182,40 @@ class KeyManagementBundleTest extends TestCase
     }
 
     #[RequiresPhpExtension('sodium')]
+    #[RequiresPhpExtension('pdo_sqlite')]
+    public function testAnEncryptedPropertyOfAScannedEntityIsEncryptedAtRest()
+    {
+        if (!class_exists(EntityManager::class) || !class_exists(EncryptedColumnListener::class)) {
+            $this->markTestSkipped('doctrine/orm or symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $kernel = new TestKeyManagementKernel('encrypted_columns', false, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $connection = $container->get('test.dbal');
+        $container->get('test.store')->createTable();
+
+        $config = ORMSetup::createConfiguration(true);
+        $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/Fixtures/Entity'], true));
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        $config->enableNativeLazyObjects(true);
+        $eventManager = new EventManager();
+        $eventManager->addEventListener(Events::loadClassMetadata, $container->get('test.encrypted_column_listener'));
+        $entityManager = new EntityManager($connection, $config, $eventManager);
+        new SchemaTool($entityManager)->createSchema([$entityManager->getClassMetadata(Speaker::class)]);
+
+        $speaker = new Speaker();
+        $speaker->phone = '+33 6 12 34 56 78';
+        $entityManager->persist($speaker);
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $stored = $connection->fetchOne('SELECT phone FROM Speaker');
+        $this->assertNotNull(Envelope::fromBytes($stored)->reference, 'the column encrypts with the store, as the envelope interfaces do.');
+        $this->assertSame('+33 6 12 34 56 78', $entityManager->find(Speaker::class, $speaker->id)->phone);
+    }
+
+    #[RequiresPhpExtension('sodium')]
     public function testACompositeClientIsADefaultLikeAnyOtherAndEachMemberIsTraced()
     {
         $kernel = new TestKeyManagementKernel('redundant', true, $this->varDir);
@@ -224,6 +268,15 @@ class KeyManagementBundleTest extends TestCase
         }
 
         $this->assertContains(RegisterFlysystemStoragesPass::class, $this->buildPasses());
+    }
+
+    public function testTheEncryptedColumnsPassIsRegisteredWhenTheBridgeIsInstalled()
+    {
+        if (!class_exists(RegisterEncryptedColumnsPass::class)) {
+            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $this->assertContains(RegisterEncryptedColumnsPass::class, $this->buildPasses());
     }
 
     public function testTheBlindIndexesPassIsRegisteredWhenTheBridgeIsInstalled()
@@ -328,6 +381,18 @@ class TestKeyManagementKernel extends AbstractKernel
             $services->alias('test.store', 'key_management.store')->public();
             $config['store'] = ['connection' => 'test.dbal', 'key_id' => 'app'];
             $config['doctrine_dbal'] = ['types' => ['test_encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone']]];
+        }
+
+        if ('encrypted_columns' === $this->environment) {
+            $services->set('test.dbal', Connection::class)
+                ->factory([DriverManager::class, 'getConnection'])
+                ->args([['driver' => 'pdo_sqlite', 'memory' => true]])
+                ->public();
+            $services->alias('test.store', 'key_management.store')->public();
+            $services->alias('test.encrypted_column_listener', 'key_management.encrypted_column_listener')->public();
+            $services->defaults()->autoconfigure();
+            $services->load('Symfony\\Component\\KeyManagement\\Tests\\Fixtures\\Entity\\', 'Fixtures/Entity/*');
+            $config['store'] = ['connection' => 'test.dbal', 'key_id' => 'app'];
         }
 
         $container->extension('key_management', $config);

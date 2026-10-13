@@ -35,6 +35,7 @@ use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVaultFactory;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
@@ -54,6 +55,7 @@ use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 use Symfony\Component\KeyManagement\KeyManagementBundle;
 use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
+use Symfony\Component\KeyManagement\Tests\Fixtures\Entity\Speaker;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class KeyManagementBundleExtensionTest extends TestCase
@@ -135,6 +137,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield 'google cloud' => ['key_management.factory.google_cloud_kms', ['class' => GoogleCloudKmsFactory::class, 'package' => 'symfony/google-cloud-key-management', 'parent_packages' => $parents]];
         yield 'kmip' => ['key_management.factory.kmip', ['class' => KmipKmsFactory::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => $parents]];
         yield 'blind index listener' => ['key_management.blind_index_listener', ['class' => BlindIndexListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => $parents]];
+        yield 'encrypted column listener' => ['key_management.encrypted_column_listener', ['class' => EncryptedColumnListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => $parents]];
         yield 'envelope normalizer' => ['serializer.normalizer.key_management_envelope', ['class' => DenormalizerInterface::class]];
     }
 
@@ -903,6 +906,60 @@ class KeyManagementBundleExtensionTest extends TestCase
     {
         yield 'the bridge' => ['Symfony\\Component\\KeyManagement\\Bridge\\DoctrineDbal\\', 'symfony/doctrine-dbal-key-management'];
         yield 'DBAL' => ['Doctrine\\DBAL\\', 'doctrine/dbal'];
+    }
+
+    public function testTheEncryptedColumnsOfTheScannedEntitiesGetTheirTypes()
+    {
+        if (!class_exists(EncryptedColumnListener::class)) {
+            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register(Speaker::class, Speaker::class)->setAutoconfigured(true);
+            $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=AAAA']]);
+        });
+
+        $types = $container->getDefinition('key_management.doctrine_dbal.encrypted_types');
+        $this->assertSame('key_management.envelope_encrypter.app', (string) $types->getArgument(0));
+        $this->assertSame(['encrypted_string@speaker.contact' => ['type' => 'string', 'key' => 'speaker.contact']], $types->getArgument(1));
+
+        $listener = $container->getDefinition('key_management.encrypted_column_listener');
+        $this->assertSame(EncryptedColumnListener::class, $listener->getClass());
+        $this->assertSame([['event' => 'loadClassMetadata']], $listener->getTag('doctrine.event_listener'));
+        $this->assertSame(['speaker.contact' => ['string' => 'encrypted_string@speaker.contact']], $listener->getArgument(0));
+    }
+
+    public function testTheEncryptedColumnListenerStaysWithoutEncryptedColumns()
+    {
+        if (!class_exists(EncryptedColumnListener::class)) {
+            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=AAAA']]);
+        });
+
+        $this->assertSame([], $container->getDefinition('key_management.encrypted_column_listener')->getArgument(0), 'the listener reports an entity the container did not scan.');
+    }
+
+    public function testEncryptedColumnsWithoutAStoreNorADefaultClientAreRefused()
+    {
+        if (!class_exists(EncryptedColumnListener::class)) {
+            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(\sprintf('The encrypted columns of "%s" need an envelope encrypter: configure "key_management.store", or set "key_management.default_client".', Speaker::class));
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register(Speaker::class, Speaker::class)->setAutoconfigured(true);
+            $container->loadFromExtension('key_management', [
+                'clients' => [
+                    'aws' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                    'azure' => 'sodium://?keys[backup]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                ],
+            ]);
+        });
     }
 
     #[RunInSeparateProcess]

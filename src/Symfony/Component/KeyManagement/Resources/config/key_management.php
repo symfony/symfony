@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVaultFactory;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKmsFactory;
@@ -83,5 +84,11 @@ return static function (ContainerConfigurator $container) {
             ->args([service_locator([])])
             ->tag('doctrine.event_listener', ['event' => 'onFlush'])
             ->tag('container.remove_if_missing', ['class' => BlindIndexListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => ['symfony/key-management']])
+
+        // kept when the container finds no encrypted column, so that a column it missed is reported instead of being stored in clear
+        ->set('key_management.encrypted_column_listener', EncryptedColumnListener::class)
+            ->args([[]])
+            ->tag('doctrine.event_listener', ['event' => 'loadClassMetadata'])
+            ->tag('container.remove_if_missing', ['class' => EncryptedColumnListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => ['symfony/key-management']])
     ;
 };

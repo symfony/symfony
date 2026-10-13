@@ -215,10 +215,7 @@ class ExceptionCaster
         $prefix = Caster::PREFIX_VIRTUAL;
 
         if (isset($f['file'], $f['line'])) {
-            $cacheKey = $f;
-            unset($cacheKey['object'], $cacheKey['args']);
-            $cacheKey[] = self::$srcContext;
-            $cacheKey = implode('-', $cacheKey);
+            $cacheKey = "{$f['file']}-{$f['line']}-".($f['class'] ?? '').'-'.($f['type'] ?? '').'-'.($f['function'] ?? '').'-'.self::$srcContext;
 
             if (isset(self::$framesCache[$cacheKey])) {
                 $a[$prefix.'src'] = self::$framesCache[$cacheKey];

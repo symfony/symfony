@@ -78,6 +78,26 @@ class ExceptionCasterTest extends TestCase
         $this->assertSame(['foo'], $ref);
     }
 
+    public function testFrameWithArrayValue()
+    {
+        $this->assertDumpWithExtraFrameValue(['foo' => 'bar']);
+    }
+
+    public function testFrameWithObjectValue()
+    {
+        $this->assertDumpWithExtraFrameValue(new \stdClass());
+    }
+
+    public function testFrameWithStringableValue()
+    {
+        $this->assertDumpWithExtraFrameValue(new class implements \Stringable {
+            public function __toString(): string
+            {
+                throw new \LogicException('__toString() should not be called.');
+            }
+        });
+    }
+
     public function testDefaultSettingsOnError()
     {
         $e = $this->getTestError('foo');
@@ -384,5 +404,39 @@ class ExceptionCasterTest extends TestCase
             EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, [$f], Caster::EXCLUDE_VERBOSE);
+    }
+
+    private function assertDumpWithExtraFrameValue(mixed $value): void
+    {
+        $e = $this->getTestException('foo');
+        $trace = $e->getTrace();
+        $trace[0]['locals'] = $value;
+        (new \ReflectionProperty(\Exception::class, 'trace'))->setValue($e, $trace);
+
+        $expectedDump = <<<'EODUMP'
+            Exception {
+              #message: "foo"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              trace: {
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d {
+                  Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
+                  › {
+                  ›     return new \Exception(''.$msg);
+                  › }
+                }
+                %s%eTests%eCaster%eExceptionCasterTest.php:%d { …}
+            %A
+            EODUMP;
+
+        set_error_handler(static function (int $type, string $message, string $file, int $line) {
+            throw new \ErrorException($message, 0, $type, $file, $line);
+        });
+        try {
+            $this->assertDumpMatchesFormat($expectedDump, $e);
+        } finally {
+            restore_error_handler();
+        }
     }
 }

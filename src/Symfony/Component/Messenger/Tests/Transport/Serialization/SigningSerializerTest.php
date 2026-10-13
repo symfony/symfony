@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageEnum;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyStampHoldingAnObject;
 use Symfony\Component\Messenger\Transport\Serialization\MessageTypeAwareSerializerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
@@ -192,6 +193,30 @@ class SigningSerializerTest extends TestCase
         // a stray (and here invalid) signature on a type that is not configured for signing is ignored
         $decoded = $serializer->decode(['body' => 'irrelevant', 'headers' => ['type' => DummyMessage::class, 'Body-Sign' => 'not-a-valid-signature', 'Sign-Algo' => 'sha256']]);
         $this->assertInstanceOf(DummyMessage::class, $decoded->getMessage());
+    }
+
+    public function testDecodeRejectsMissingSignatureOfTheDecodedMessageWhateverTheReportedType()
+    {
+        $inner = new class implements SerializerInterface, MessageTypeAwareSerializerInterface {
+            public function getMessageType(array $encodedEnvelope): ?string
+            {
+                return \stdClass::class;
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                return new Envelope(new DummyMessage('hello'));
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return ['body' => 'irrelevant'];
+            }
+        };
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Message "%s" requires a signature but none was found.', DummyMessage::class));
+        (new SigningSerializer($inner, 'secret-key', [DummyMessage::class]))->decode(['body' => 'irrelevant', 'headers' => []]);
     }
 
     public function testDecodeDoesNotRejectUnknownTypeWhenNoMessageTypeRequiresSignature()
@@ -471,8 +496,37 @@ class SigningSerializerTest extends TestCase
 
     public static function provideEnumCasesCarriedBySignedMessages(): iterable
     {
-        yield 'in the stamps' => ['a:0:{}', 'a:1:{i:0;E:33:"Unknown\Missing\EnumName:CaseName";}'];
+        $stamps = serialize([DummyStampHoldingAnObject::class => [new DummyStampHoldingAnObject(DummyMessageEnum::A)]]);
+
+        yield 'in the stamps' => ['a:0:{}', str_replace(serialize(DummyMessageEnum::A), 'E:33:"Unknown\Missing\EnumName:CaseName";', $stamps)];
         yield 'in a property of the message' => ['s:5:"hello"', 'E:33:"Unknown\Missing\EnumName:CaseName"'];
+    }
+
+    #[DataProvider('provideMessagesThatAStampHoldsToo')]
+    public function testDecodeRejectsMissingSignatureOfAMessageThatAStampHoldsToo(string $search, string $replace)
+    {
+        $message = new DummyMessage('hello');
+        $body = str_replace($search, $replace, serialize(new Envelope($message, [new DummyStampHoldingAnObject($message)])));
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage(\sprintf('Message "%s" requires a signature but none was found.', DummyMessage::class));
+        $this->createSerializer([DummyMessage::class])->decode(['body' => addslashes($body), 'headers' => []]);
+    }
+
+    public static function provideMessagesThatAStampHoldsToo(): iterable
+    {
+        yield 'carrying an enum case whose class is not loaded' => ['s:5:"hello"', 'E:33:"Unknown\Missing\EnumName:CaseName"'];
+        yield 'carrying a string that contains "C:"' => ['s:5:"hello"', 's:6:"C:\foo"'];
+    }
+
+    public function testDecodeAcceptsUnsignedMessageThatAStampHoldsToo()
+    {
+        $serializer = $this->createSerializer([DummyMessageEnum::class]);
+        $message = new DummyMessage('C:\foo');
+
+        $envelope = $serializer->decode($serializer->encode(new Envelope($message, [new DummyStampHoldingAnObject($message)])));
+
+        $this->assertEquals($message, $envelope->getMessage());
     }
 
     #[DataProvider('provideUnsignedMessagesOfClassesThatDoNotExist')]

@@ -89,7 +89,12 @@ final class SigningSerializer implements SerializerInterface
             }
 
             if (!$this->shouldSign($type)) {
-                return $envelope ?? $this->inner->decode($encodedEnvelope);
+                $envelope ??= $this->inner->decode($encodedEnvelope);
+
+                // the class of the decoded message is checked too, as it can differ from the type read before decoding
+                if (!$this->shouldSign($type = $envelope->getMessage()::class)) {
+                    return $envelope;
+                }
             }
 
             if (!$sign) {

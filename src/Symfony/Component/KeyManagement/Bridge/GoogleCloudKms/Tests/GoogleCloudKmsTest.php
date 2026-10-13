@@ -541,6 +541,20 @@ class GoogleCloudKmsTest extends TestCase
         }
     }
 
+    public function testRedirectsAreNotFollowed()
+    {
+        $response = new MockResponse('', ['http_code' => 307, 'response_headers' => ['location' => 'https://elsewhere.example.com/']]);
+        $client = (new MockHttpClient($response, self::BASE))->withOptions(['max_redirects' => 20]);
+
+        try {
+            (new GoogleCloudKms($client, $this->staticToken('T')))->encrypt(self::KEY, 'hello');
+            $this->fail('A RuntimeException should have been thrown.');
+        } catch (RuntimeException) {
+        }
+
+        $this->assertSame(0, $response->getRequestOptions()['max_redirects']);
+    }
+
     public function testGenerateDataKeyDrawsLocallyAndCallsEncrypt()
     {
         $captured = null;

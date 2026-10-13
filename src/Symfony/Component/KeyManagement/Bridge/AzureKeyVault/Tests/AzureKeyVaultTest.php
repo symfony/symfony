@@ -799,6 +799,20 @@ class AzureKeyVaultTest extends TestCase
         }
     }
 
+    public function testRedirectsAreNotFollowed()
+    {
+        $response = new MockResponse('', ['http_code' => 307, 'response_headers' => ['location' => 'https://elsewhere.example.com/']]);
+        $client = (new MockHttpClient($response, self::VAULT))->withOptions(['max_redirects' => 20]);
+
+        try {
+            (new AzureKeyVault($client, $this->staticToken('T')))->encrypt('app-key', 'hello');
+            $this->fail('A RuntimeException should have been thrown.');
+        } catch (RuntimeException) {
+        }
+
+        $this->assertSame(0, $response->getRequestOptions()['max_redirects']);
+    }
+
     public function testGenerateDataKeyDrawsLocallyAndCallsWrapKey()
     {
         $captured = null;

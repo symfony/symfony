@@ -27,8 +27,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * When no HTTP client is given, the factory builds one with a 5-second idle timeout and a 10-second maximum duration.
  * The token requests use the same client and the same timeouts.
- * This client doesn't follow redirects. On a 307 or 308 redirect to another host, the request body would be sent again, with the client secret or the plaintext in it.
  * The `timeout` and `max_duration` options, in seconds, override the timeouts on either client.
+ * Requests don't follow redirects, whatever the client. On a 307 or 308 redirect to another host, the request body would be sent again, with the client secret or the plaintext in it.
  *
  * The host is the full vault DNS name (`<name>.vault.azure.net`, or `<name>.managedhsm.azure.net` for Managed HSM).
  * The audience comes from the host suffix and the `audience` option overrides it, but the authority is always the public Microsoft Entra one:

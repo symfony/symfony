@@ -130,6 +130,7 @@ final class ServiceAccountTokenProvider implements TokenProviderInterface
                     'grant_type' => self::GRANT_TYPE,
                     'assertion' => $assertion,
                 ]),
+                'max_redirects' => 0,
             ]);
             $status = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {

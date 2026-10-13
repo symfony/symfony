@@ -171,7 +171,7 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
             $headers['X-Vault-Namespace'] = $this->namespace;
         }
 
-        $options = ['headers' => $headers];
+        $options = ['headers' => $headers, 'max_redirects' => 0];
         if ($body) {
             $options['json'] = $body;
         }

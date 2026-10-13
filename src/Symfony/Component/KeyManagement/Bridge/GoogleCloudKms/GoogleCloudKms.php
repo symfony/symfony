@@ -230,6 +230,7 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
                     'Content-Type' => 'application/json',
                 ],
                 'json' => $body,
+                'max_redirects' => 0,
             ]);
             $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {

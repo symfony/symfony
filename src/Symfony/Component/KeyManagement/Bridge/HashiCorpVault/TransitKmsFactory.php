@@ -32,8 +32,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * The HTTP client given to the factory is what the DSN's base URI is applied to, so that its timeout, retry policy or certificates reach Vault.
  * Without one, the factory builds a client with a 5-second idle timeout and a 10-second maximum duration.
- * This client doesn't follow redirects, since the `X-Vault-Token` header would follow a redirect to another host.
  * The `timeout` and `max_duration` options, in seconds, override the timeouts on either client.
+ * Requests don't follow redirects, whatever the client, since the `X-Vault-Token` header would follow a redirect to another host.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *

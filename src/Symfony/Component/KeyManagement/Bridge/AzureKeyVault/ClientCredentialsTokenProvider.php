@@ -69,6 +69,7 @@ final class ClientCredentialsTokenProvider implements TokenProviderInterface
                     'client_secret' => $this->clientSecret,
                     'scope' => $this->audience,
                 ]),
+                'max_redirects' => 0,
             ]);
             $status = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {

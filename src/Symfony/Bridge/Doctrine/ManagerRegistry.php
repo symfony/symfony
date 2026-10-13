@@ -80,34 +80,46 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
             return;
         }
 
-        $asProxy = $r->initializeLazyObject($manager) !== $manager;
-        $initializer = \Closure::bind(
-            function ($manager) use ($name, $asProxy) {
-                $name = $this->aliases[$name] ?? $name;
-                if ($asProxy) {
-                    $manager = false;
-                }
+        $factory = \Closure::bind(
+            function ($lazyLoad) use ($name) {
+                $id = $this->aliases[$name] ?? $name;
 
-                $manager = match (true) {
-                    isset($this->fileMap[$name]) => $this->load($this->fileMap[$name], $manager),
-                    !$method = $this->methodMap[$name] ?? null => throw new \LogicException(\sprintf('The "%s" service is synthetic and cannot be reset.', $name)),
-                    (new \ReflectionMethod($this, $method))->isStatic() => $this->{$method}($this, $manager),
-                    default => $this->{$method}($manager),
+                return match (true) {
+                    isset($this->fileMap[$id]) => $this->load($this->fileMap[$id], $lazyLoad),
+                    !$method = $this->methodMap[$id] ?? null => throw new \LogicException(\sprintf('The "%s" service is synthetic and cannot be reset.', $id)),
+                    (new \ReflectionMethod($this, $method))->isStatic() => $this->{$method}($this, $lazyLoad),
+                    default => $this->{$method}($lazyLoad),
                 };
-
-                if ($asProxy) {
-                    return $manager;
-                }
             },
             $this->container,
             Container::class
         );
 
+        // The factory of a lazy service returns a new uninitialized lazy object, while the one of a non-lazy service builds it right away
+        $instance = \Closure::bind(
+            function () use ($factory) {
+                [$services, $privates] = [$this->services, $this->privates];
+
+                try {
+                    return $factory(true);
+                } finally {
+                    [$this->services, $this->privates] = [$services, $privates];
+                }
+            },
+            $this->container,
+            Container::class
+        )();
+
         try {
-            if ($asProxy) {
-                $r->resetAsLazyProxy($manager, $initializer);
+            if (!(new \ReflectionClass($instance))->isUninitializedLazyObject($instance)) {
+                // A non-lazy manager cannot be rebuilt in place, so it forwards to the new instance instead
+                $r->resetAsLazyProxy($manager, static fn () => $instance);
+            } elseif ($r->initializeLazyObject($manager) !== $manager) {
+                $r->resetAsLazyProxy($manager, static fn () => $factory(false));
             } else {
-                $r->resetAsLazyGhost($manager, $initializer);
+                $r->resetAsLazyGhost($manager, static function ($manager) use ($factory) {
+                    $factory($manager);
+                });
             }
         } catch (\Error $e) {
             if (__FILE__ !== $e->getFile()) {

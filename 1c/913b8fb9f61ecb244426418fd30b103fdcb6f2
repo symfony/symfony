@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T06:40:24Z
+
+The test is good, but `'not-an-envelope'` in the existing test already starts with an unknown format id (0x6e), so the truly malformed case is the one without a test; `"\x01\xff\xff"` there would make the pair cover what the description says.

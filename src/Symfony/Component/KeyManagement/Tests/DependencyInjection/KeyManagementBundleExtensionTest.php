@@ -12,6 +12,7 @@
 namespace Symfony\Component\KeyManagement\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -910,8 +911,8 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testTheEncryptedColumnsOfTheScannedEntitiesGetTheirTypes()
     {
-        if (!class_exists(EncryptedColumnListener::class)) {
-            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class)) {
+            $this->markTestSkipped('doctrine/orm or symfony/doctrine-orm-key-management is not installed.');
         }
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -944,8 +945,8 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testEncryptedColumnsWithoutAStoreNorADefaultClientAreRefused()
     {
-        if (!class_exists(EncryptedColumnListener::class)) {
-            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class)) {
+            $this->markTestSkipped('doctrine/orm or symfony/doctrine-orm-key-management is not installed.');
         }
 
         $this->expectException(\LogicException::class);

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -134,6 +135,31 @@ class ValidationBundleTest extends TestCase
 
         $this->assertFalse($definition->getArgument(2));
         $this->assertSame('https://example.com', $definition->getArgument(3));
+    }
+
+    public function testNotCompromisedPasswordIsDisabledWhenFrameworkTestIsEnabled()
+    {
+        $this->assertTrue($this->load([])->getDefinition('validator.not_compromised_password')->getArgument(2));
+        $this->assertTrue($this->load([], framework: ['test' => false])->getDefinition('validator.not_compromised_password')->getArgument(2));
+        $this->assertFalse($this->load([], framework: ['test' => true])->getDefinition('validator.not_compromised_password')->getArgument(2));
+        $this->assertFalse($this->load([], framework: ['test' => null])->getDefinition('validator.not_compromised_password')->getArgument(2));
+        $this->assertFalse($this->load(['not_compromised_password' => ['endpoint' => 'https://example.com']], framework: ['test' => true])->getDefinition('validator.not_compromised_password')->getArgument(2));
+    }
+
+    #[DataProvider('provideExplicitNotCompromisedPasswordConfigs')]
+    public function testExplicitNotCompromisedPasswordConfigWinsOverFrameworkTest(array $config, bool $enabled)
+    {
+        $this->assertSame($enabled, $this->load($config, framework: ['test' => true])->getDefinition('validator.not_compromised_password')->getArgument(2));
+        $this->assertSame($enabled, $this->load($config, framework: ['test' => false])->getDefinition('validator.not_compromised_password')->getArgument(2));
+    }
+
+    public static function provideExplicitNotCompromisedPasswordConfigs(): iterable
+    {
+        yield 'true' => [['not_compromised_password' => true], true];
+        yield 'null' => [['not_compromised_password' => null], true];
+        yield 'enabled' => [['not_compromised_password' => ['enabled' => true]], true];
+        yield 'false' => [['not_compromised_password' => false], false];
+        yield 'disabled' => [['not_compromised_password' => ['enabled' => false, 'endpoint' => 'https://example.com']], false];
     }
 
     public function testAutoMapping()
@@ -275,7 +301,7 @@ class ValidationBundleTest extends TestCase
     /**
      * @param array<string, mixed> $config
      */
-    private function load(array $config, bool $debug = false, bool $merge = true, bool $cache = true, bool $profiler = false, ?string $projectDir = null): ContainerBuilder
+    private function load(array $config, bool $debug = false, bool $merge = true, bool $cache = true, bool $profiler = false, ?string $projectDir = null, ?array $framework = null): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'kernel.debug' => $debug,
@@ -302,6 +328,20 @@ class ValidationBundleTest extends TestCase
         $bundle->build($container);
         $container->registerExtension($bundle->getContainerExtension());
         $container->loadFromExtension('validation', $config);
+
+        if (null !== $framework) {
+            $container->registerExtension(new class extends Extension {
+                public function load(array $configs, ContainerBuilder $container): void
+                {
+                }
+
+                public function getAlias(): string
+                {
+                    return 'framework';
+                }
+            });
+            $container->loadFromExtension('framework', $framework);
+        }
 
         if (!$merge) {
             // the caller compiles, which runs the passes build() registered

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Default the `validation.not_compromised_password.enabled` option to `false` when `framework.test` is enabled
  * Add the `Audio` constraint for validating audio files
  * Allow nesting a group-less `Valid` constraint in `Sequentially` to cascade only after preceding constraints pass
  * Render an uncaught `ValidationFailedException` as a 422 response by adding `#[WithHttpStatus(422)]` to it

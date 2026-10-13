@@ -43,6 +43,8 @@ class ValidationBundle extends AbstractBundle
 {
     private const MAPPING_FILE_PATTERN = '/\.(xml|ya?ml)$/';
 
+    private bool $frameworkTest = false;
+
     public function getPath(): string
     {
         return $this->path ??= __DIR__;
@@ -81,8 +83,16 @@ class ValidationBundle extends AbstractBundle
                     ->end()
                 ->end()
                 ->arrayNode('not_compromised_password')
-                    ->canBeDisabled('When disabled, compromised passwords will be accepted as valid.')
+                    ->addDefaultsIfNotSet()
+                    ->treatFalseLike(['enabled' => false])
+                    ->treatTrueLike(['enabled' => true])
+                    ->treatNullLike(['enabled' => true])
                     ->children()
+                        ->booleanNode('enabled')
+                            ->info('When disabled, compromised passwords will be accepted as valid. Defaults to false when "framework.test" is enabled, to true otherwise.')
+                            ->defaultNull()
+                            ->resolvesAtCompileTime()
+                        ->end()
                         ->scalarNode('endpoint')
                             ->defaultNull()
                             ->info('API endpoint for the NotCompromisedPassword Validator.')
@@ -141,6 +151,20 @@ class ValidationBundle extends AbstractBundle
                 ->end()
             ->end()
         ;
+    }
+
+    public function prependExtension(ContainerConfigurator $configurator, ContainerBuilder $container): void
+    {
+        $this->frameworkTest = false;
+
+        if ($container->hasExtension('framework')) {
+            foreach ($container->getExtensionConfig('framework') as $config) {
+                if (\array_key_exists('test', $config)) {
+                    // "test: ~" enables the option, like "test: true"
+                    $this->frameworkTest = true === $container->getParameterBag()->resolveValue($config['test'] ?? true);
+                }
+            }
+        }
     }
 
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
@@ -229,7 +253,7 @@ class ValidationBundle extends AbstractBundle
         }
 
         $container->getDefinition('validator.not_compromised_password')
-            ->setArgument(2, $config['not_compromised_password']['enabled'])
+            ->setArgument(2, $config['not_compromised_password']['enabled'] ?? !$this->frameworkTest)
             ->setArgument(3, $config['not_compromised_password']['endpoint'])
         ;
 

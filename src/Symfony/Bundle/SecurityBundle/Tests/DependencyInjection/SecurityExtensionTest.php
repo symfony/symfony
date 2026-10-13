@@ -31,6 +31,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -1856,6 +1857,48 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasAlias(\sprintf('.%s $%s', PasswordHasherInterface::class, TestUserChecker::class)));
     }
 
+    #[DataProvider('provideFrameworkConfigsEnablingTest')]
+    public function testHashersUseTheLowestCostsWhenFrameworkTestIsEnabled(array $frameworkConfigs)
+    {
+        $hashers = $this->getPasswordHashersMap($frameworkConfigs, [
+            'App\User' => 'auto',
+            'App\Admin' => 'bcrypt',
+            'App\Legacy' => ['algorithm' => 'bcrypt', 'cost' => 12],
+        ]);
+
+        $this->assertSame(['auto', 4, 10, 3], [$hashers['App\User']['algorithm'], $hashers['App\User']['cost'], $hashers['App\User']['memory_cost'], $hashers['App\User']['time_cost']]);
+        $this->assertSame([3, 10 << 10, 4, \PASSWORD_BCRYPT], $hashers['App\Admin']['arguments']);
+        $this->assertSame([3, 10 << 10, 12, \PASSWORD_BCRYPT], $hashers['App\Legacy']['arguments']);
+    }
+
+    public static function provideFrameworkConfigsEnablingTest(): iterable
+    {
+        yield 'true' => [[['test' => true]]];
+        yield 'null' => [[['test' => null]]];
+        yield 'parameter' => [[['test' => '%app.test%']]];
+        yield 'last one wins' => [[['test' => false], ['test' => true], ['secret' => 's3cr3t']]];
+    }
+
+    #[DataProvider('provideFrameworkConfigsNotEnablingTest')]
+    public function testHashersKeepTheirDefaultCostsWhenFrameworkTestIsNotEnabled(array $frameworkConfigs)
+    {
+        $hashers = $this->getPasswordHashersMap($frameworkConfigs, [
+            'App\User' => 'auto',
+            'App\Admin' => 'bcrypt',
+        ]);
+
+        $this->assertSame(['auto', null, null, null], [$hashers['App\User']['algorithm'], $hashers['App\User']['cost'], $hashers['App\User']['memory_cost'], $hashers['App\User']['time_cost']]);
+        $this->assertSame([null, null, null, \PASSWORD_BCRYPT], $hashers['App\Admin']['arguments']);
+    }
+
+    public static function provideFrameworkConfigsNotEnablingTest(): iterable
+    {
+        yield 'unset' => [[['secret' => 's3cr3t']]];
+        yield 'false' => [[['test' => false]]];
+        yield 'last one wins' => [[['test' => true], ['test' => false]]];
+        yield 'env var' => [[['test' => '%env(bool:APP_TEST)%']]];
+    }
+
     public function testAuthenticatorsDecoration()
     {
         $container = $this->getRawContainer();
@@ -2516,6 +2559,34 @@ class SecurityExtensionTest extends TestCase
         $this->expectExceptionMessage('The OIDC "backchannel_logout.path" option must be a path starting with "/".');
 
         $container->compile();
+    }
+
+    private function getPasswordHashersMap(array $frameworkConfigs, array $passwordHashers): array
+    {
+        $container = $this->getRawContainer();
+        $container->setParameter('app.test', true);
+        $container->registerExtension(new class extends Extension {
+            public function load(array $configs, ContainerBuilder $container): void
+            {
+            }
+
+            public function getAlias(): string
+            {
+                return 'framework';
+            }
+        });
+
+        foreach ($frameworkConfigs as $config) {
+            $container->loadFromExtension('framework', $config);
+        }
+
+        $container->loadFromExtension('security', [
+            'password_hashers' => $passwordHashers,
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+        $container->compile();
+
+        return $container->getDefinition('security.password_hasher_factory')->getArgument(0);
     }
 }
 

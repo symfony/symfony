@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Default the `cost`, `time_cost` and `memory_cost` options of password hashers to the lowest values bcrypt and argon2 accept when `framework.test` is enabled
  * Tag the `security.authenticator.cache.expired_links` pool with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
  * Add the `cache.security.discovery` and `cache.security` cache pools, which `oidc_login`, the `dpop` option and the `oauth2` token handler use instead of `cache.app`
  * Default the `discovery.cache.id` option of the `oidc` and `oidc_user_info` token handlers to the `cache.security.discovery` pool

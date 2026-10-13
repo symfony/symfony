@@ -492,6 +492,7 @@ SecurityBundle
        resource: security.route_loader
        type: service
    ```
+ * When `framework.test` is enabled, password hashers use the lowest `cost`, `time_cost` and `memory_cost` that bcrypt and argon2 accept, unless these options are set. Set them explicitly to keep the previous costs in tests
 
 Serializer
 ----------
@@ -546,6 +547,7 @@ Validator
 
  * [BC BREAK] Remove the `GroupSequence::$cascadedGroup` property, it has had no effect since the validator stopped reading it in 2014, and reading it has thrown since 7.4 typed it without a default
  * The `File` constraint checks the `extensions` and `mimeTypes` options independently, where the configured `mimeTypes` used to be narrowed to the mime types derived from the matching extension
+ * When `framework.test` is enabled, the `NotCompromisedPassword` constraint accepts every password unless the `validation.not_compromised_password.enabled` option is set to `true`
 
 Webhook
 -------

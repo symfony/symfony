@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Ciphertext;
+use Symfony\Component\KeyManagement\DataKey;
+use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
@@ -86,6 +88,37 @@ class EnvelopeEncrypterTest extends TestCase
         $this->assertSame(SelfContainedFormat::ID, $envelope->format->id());
         $this->assertNotNull($envelope->wrappedDek, 'the wrapped key travels with the payload, which is what makes it self-sufficient.');
         $this->assertNull($envelope->reference);
+    }
+
+    public function testTheEnvelopeRecordsTheKeyIdReportedByTheBackend()
+    {
+        $resolving = new class implements DataKeyGeneratorInterface {
+            public const string ARN = 'arn:aws:kms:eu-west-1:111122223333:key/1234abcd';
+
+            private InMemoryKms $inner;
+
+            public function __construct()
+            {
+                $this->inner = new InMemoryKms();
+            }
+
+            public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
+            {
+                $dataKey = $this->inner->generateDataKey($keyId, $length, $aad);
+
+                return new DataKey($dataKey->use(static fn (#[\SensitiveParameter] string $plaintext): string => $plaintext), new Ciphertext($dataKey->wrapped->blob, self::ARN));
+            }
+
+            public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
+            {
+                return $this->inner->unwrapDataKey(new Ciphertext($wrapped->blob, 'alias/app-key'), $aad);
+            }
+        };
+
+        $envelope = (new EnvelopeEncrypter($resolving))->encrypt('alias/app-key', 'hello');
+
+        $this->assertSame($resolving::ARN, $envelope->keyId);
+        $this->assertSame('hello', (new EnvelopeEncrypter($resolving))->decrypt($envelope));
     }
 
     public function testAadRoundTrip()

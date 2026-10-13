@@ -1651,7 +1651,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     protected function getEnv(string $name): mixed
     {
-        $value = parent::getEnv($name);
+        // the empty locator that the parent sets when none is defined would hide the env var processors registered later
+        $removeFallbackLocator = !$this->has($id = 'container.env_var_processors_locator');
+
+        try {
+            $value = parent::getEnv($name);
+        } finally {
+            if ($removeFallbackLocator) {
+                unset($this->services[$id]);
+            }
+        }
+
         $bag = $this->getParameterBag();
 
         if (!\is_string($value) || !$bag instanceof EnvPlaceholderParameterBag) {

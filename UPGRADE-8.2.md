@@ -12,6 +12,7 @@ AssetMapper
 -----------
 
  * Add argument `$useEsm` to `ImportMapConfigReader::createRemoteEntry()`
+ * The `asset_mapper.missing_import_mode` option now defaults to `strict` in debug mode. A missing import then throws an exception instead of logging a warning. Set the option to `warn` to keep the previous behavior
 
 Config
 ------

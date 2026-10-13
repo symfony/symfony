@@ -105,9 +105,9 @@ class AssetMapperBundle extends AbstractBundle
                     ->cannotBeEmpty()
                 ->end()
                 ->enumNode('missing_import_mode')
-                    ->values(['strict', 'warn', 'ignore'])
-                    ->info('Behavior if an asset cannot be found when imported from JavaScript or CSS files - e.g. "import \'./non-existent.js\'". "strict" means an exception is thrown, "warn" means a warning is logged, "ignore" means the import is left as-is.')
-                    ->defaultValue('warn')
+                    ->values(['strict', 'warn', 'ignore', null])
+                    ->info('Behavior if an asset cannot be found when imported from JavaScript or CSS files - e.g. "import \'./non-existent.js\'". "strict" means an exception is thrown, "warn" means a warning is logged, "ignore" means the import is left as-is. Defaults to "strict" in debug mode and to "warn" otherwise.')
+                    ->defaultNull()
                 ->end()
                 ->arrayNode('extensions', 'extension')
                     ->info('Key-value pair of file extensions set to their mime type.')
@@ -240,11 +240,13 @@ class AssetMapperBundle extends AbstractBundle
                 ->setArgument(2, $config['extensions']);
         }
 
+        $missingImportMode = $config['missing_import_mode'] ?? ($container->getParameter('kernel.debug') ? 'strict' : 'warn');
+
         $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler')
-            ->setArgument(0, $config['missing_import_mode']);
+            ->setArgument(0, $missingImportMode);
 
         $container->getDefinition('asset_mapper.compiler.javascript_import_path_compiler')
-            ->setArgument(1, $config['missing_import_mode']);
+            ->setArgument(1, $missingImportMode);
 
         $container
             ->getDefinition('asset_mapper.importmap.remote_package_storage')

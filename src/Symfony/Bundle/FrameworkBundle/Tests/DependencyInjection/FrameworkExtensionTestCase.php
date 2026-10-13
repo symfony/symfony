@@ -882,6 +882,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
 
+    public function testSessionStorageFactoryFollowsTestByDefault()
+    {
+        foreach ([true, false] as $test) {
+            $container = $this->createContainer();
+            (new FrameworkExtension())->load([['test' => $test, 'session' => true]], $container);
+
+            $this->assertSame($test ? 'session.storage.factory.mock_file' : 'session.storage.factory.native', (string) $container->getAlias('session.storage.factory'));
+        }
+
+        $container = $this->createContainer();
+        (new FrameworkExtension())->load([['test' => true, 'session' => ['storage_factory_id' => 'session.storage.factory.native']]], $container);
+
+        $this->assertSame('session.storage.factory.native', (string) $container->getAlias('session.storage.factory'));
+    }
+
     public function testRequest()
     {
         $container = $this->createContainerFromFile('full');

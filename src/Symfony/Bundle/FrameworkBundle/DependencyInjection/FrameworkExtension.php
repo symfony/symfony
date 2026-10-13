@@ -253,6 +253,7 @@ class FrameworkExtension extends Extension
                 throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
             }
 
+            $config['session']['storage_factory_id'] ??= empty($config['test']) ? 'session.storage.factory.native' : 'session.storage.factory.mock_file';
             $this->registerSessionConfiguration($config['session'], $container, $loader);
             if (!empty($config['test'])) {
                 // test listener will replace the existing session listener

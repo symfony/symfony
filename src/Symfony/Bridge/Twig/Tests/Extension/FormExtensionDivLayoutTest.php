@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 use Twig\Loader\FilesystemLoader;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
@@ -351,6 +352,59 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"][.="[trans]<b>Bolded label</b>[/trans]"]', 0);
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"]/b[.="Bolded label"]');
+    }
+
+    public function testWidgetAttributesTakePrecedenceOverAttr()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'disabled' => true,
+            'attr' => ['id' => 'foo', 'name' => 'bar', 'disabled' => false, 'required' => false, 'class' => 'baz'],
+        ]);
+
+        $this->assertSame('<input type="text" id="name" name="name" disabled="disabled" required="required" class="baz" />', $this->renderWidget($form->createView()));
+    }
+
+    public function testButtonAttributesTakePrecedenceOverAttr()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
+            'disabled' => true,
+            'attr' => ['id' => 'foo', 'name' => 'bar', 'disabled' => false, 'class' => 'baz'],
+        ]);
+
+        $this->assertSame('<button type="button" id="name" name="name" disabled="disabled" class="baz">[trans]Name[/trans]</button>', $this->renderWidget($form->createView()));
+    }
+
+    public function testWidgetContainerAttributesTakePrecedenceOverAttr()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+            'csrf_protection' => false,
+            'attr' => ['id' => 'foo', 'class' => 'baz'],
+        ]);
+
+        $this->assertSame('<div id="name" class="baz"></div>', $this->renderWidget($form->createView()));
+    }
+
+    public function testWidgetAttributesBlockData()
+    {
+        if (!(new Environment(new ArrayLoader()))->getFunction('block_data')) {
+            $this->markTestSkipped('The "block_data" Twig function is not available.');
+        }
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'disabled' => true,
+            'attr' => ['disabled' => false, 'placeholder' => 'Placeholder', 'readonly' => true, 'hidden' => false],
+        ]);
+        $view = $form->createView();
+        $this->setTheme($view, ['theme_block_data.html.twig']);
+
+        $this->assertSame([
+            'id' => 'name',
+            'name' => 'name',
+            'disabled' => 'disabled',
+            'required' => 'required',
+            'placeholder' => '[trans]Placeholder[/trans]',
+            'readonly' => 'readonly',
+        ], json_decode($this->renderWidget($view), true));
     }
 
     protected function renderForm(FormView $view, array $vars = []): string

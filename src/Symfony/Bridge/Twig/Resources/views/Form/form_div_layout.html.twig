@@ -468,31 +468,44 @@
 {%- endblock form_rows -%}
 
 {%- block widget_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"
-    {%- if disabled %} disabled="disabled"{% endif -%}
-    {%- if required %} required="required"{% endif -%}
-    {{ block('attributes') }}
+    {%- set widget_attr = {id: id, name: full_name, ...(disabled ? {disabled: true} : {}), ...(required ? {required: true} : {})} -%}
+    {%- set attr = {...widget_attr, ...attr, ...widget_attr} -%}
+    {{- block('attributes')|trim|raw -}}
 {%- endblock widget_attributes -%}
 
 {%- block widget_container_attributes -%}
-    {%- if id is not empty %}id="{{ id }}"{% endif -%}
-    {{ block('attributes') }}
+    {%- if id is not empty -%}
+        {%- set attr = {id: id, ...attr, id: id} -%}
+        {{- block('attributes')|trim|raw -}}
+    {%- else -%}
+        {{- block('attributes') -}}
+    {%- endif -%}
 {%- endblock widget_container_attributes -%}
 
 {%- block button_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%}
-    {{ block('attributes') }}
+    {%- set button_attr = {id: id, name: full_name, ...(disabled ? {disabled: true} : {})} -%}
+    {%- set attr = {...button_attr, ...attr, ...button_attr} -%}
+    {{- block('attributes')|trim|raw -}}
 {%- endblock button_attributes -%}
 
 {% block attributes -%}
+    {%- set attrs = {} -%}
+    {%- if attr -%}
     {%- for attrname, attrvalue in attr -%}
-        {{- ' ' -}}
-        {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ translation_domain is same as(false) or attrvalue is null ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) }}"
+        {%- if attrname is same as('placeholder') or attrname is same as('title') -%}
+            {%- set attrvalue = translation_domain is same as(false) or attrvalue is null ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) -%}
+            {%- set attrs = {...attrs, (attrname): attrvalue} -%}
+            {{- ' ' ~ attrname }}="{{ attrvalue }}"
         {%- elseif attrvalue is same as(true) -%}
-            {{- attrname }}="{{ attrname }}"
+            {%- set attrs = {...attrs, (attrname): attrname} -%}
+            {{- ' ' ~ attrname }}="{{ attrname }}"
         {%- elseif attrvalue is not same as(false) -%}
-            {{- attrname }}="{{ attrvalue }}"
+            {%- set attrs = {...attrs, (attrname): attrvalue} -%}
+            {{- ' ' ~ attrname }}="{{ attrvalue }}"
         {%- endif -%}
     {%- endfor -%}
+    {%- endif -%}
+    {%- guard function block_export -%}
+        {%- do block_export(attrs) -%}
+    {%- endguard -%}
 {%- endblock attributes -%}

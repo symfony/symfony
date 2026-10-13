@@ -19,6 +19,7 @@ CHANGELOG
  * Declare the functions and filters of the extensions that provide nothing else with the `#[AsTwigFunction]` and `#[AsTwigFilter]` attributes
  * Make `RoutingExtension::isUrlGenerationSafe()` static
  * Add support for extracting the labels and help messages passed to the `form_label()`, `form_widget()`, `form_help()` and `form_row()` functions
+ * Export the attributes rendered by the `widget_attributes`, `widget_container_attributes`, `button_attributes` and `attributes` form theme blocks with `block_export()`, so that `block_data()` can return them as a hash
 
 8.1
 ---

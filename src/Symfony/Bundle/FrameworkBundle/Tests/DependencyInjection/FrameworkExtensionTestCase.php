@@ -974,6 +974,39 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new ServiceClosureArgument(new Reference('')), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
     }
 
+    public function testSerializeControllerResultTypeCacheIsDisabledInDebug()
+    {
+        foreach ([true, false] as $debug) {
+            $container = $this->createContainer(['kernel.debug' => $debug]);
+            (new FrameworkExtension())->load([], $container);
+
+            $this->assertSame(!$debug, $container->hasDefinition('serialize_controller_result_listener.cache_warmer'));
+            $this->assertSame(!$debug, $container->hasDefinition('serialize_controller_result_listener.type_cache'));
+            $this->assertSame(!$debug, $container->hasDefinition('cache.serialize_controller_result'));
+        }
+    }
+
+    public function testSerializeControllerResultTypeCacheRequiresTheJsonStreamer()
+    {
+        foreach ([true, false] as $jsonStreamer) {
+            $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($jsonStreamer) {
+                $container->loadFromExtension('framework', [
+                    'http_method_override' => false,
+                    'handle_all_throwables' => true,
+                    'php_errors' => ['log' => true],
+                ]);
+
+                if ($jsonStreamer) {
+                    $container->register('json_streamer.stream_writer');
+                }
+            });
+
+            $this->assertSame($jsonStreamer, $container->hasDefinition('serialize_controller_result_listener.cache_warmer'));
+            $this->assertSame($jsonStreamer, $container->hasDefinition('serialize_controller_result_listener.type_cache'));
+            $this->assertSame($jsonStreamer, $container->hasDefinition('cache.serialize_controller_result'));
+        }
+    }
+
     public function testRequestSerializerWithoutTheSerializerService()
     {
         $container = $this->createContainerFromFile('request_serializer_without_serializer', [], true, false);

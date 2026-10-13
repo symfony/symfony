@@ -236,5 +236,10 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             $container->getDefinition('controller_resolver')
                 ->addMethodCall('allowControllers', [array_unique($controllerClasses)]);
         }
+
+        if ($container->hasDefinition('serialize_controller_result_listener.cache_warmer')) {
+            $container->getDefinition('serialize_controller_result_listener.cache_warmer')
+                ->replaceArgument(0, array_values(array_unique($controllerClasses)));
+        }
     }
 }

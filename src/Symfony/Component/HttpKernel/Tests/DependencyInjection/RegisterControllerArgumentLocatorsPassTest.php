@@ -650,6 +650,26 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame([['allowControllers', [[RegisterTestController::class]]]], $controllerResolver->getMethodCalls());
     }
 
+    public function testTaggedControllersAreGivenToTheSerializeControllerResultCacheWarmer()
+    {
+        $container = new ContainerBuilder();
+        $container->register('argument_resolver.service')->addArgument([]);
+        $cacheWarmer = $container->register('serialize_controller_result_listener.cache_warmer')->addArgument([]);
+
+        $container->register('foo', RegisterTestController::class)
+            ->addTag('controller.service_arguments')
+        ;
+        $container->register('bar', RegisterTestController::class)
+            ->addTag('controller.service_arguments')
+        ;
+        $container->register('baz', ControllerDummy::class);
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $this->assertSame([RegisterTestController::class], $cacheWarmer->getArgument(0));
+    }
+
     public function testCompositeTypeArguments()
     {
         $container = new ContainerBuilder();

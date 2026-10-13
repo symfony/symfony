@@ -351,7 +351,7 @@ class TestKeyManagementKernel extends AbstractKernel
 
         if (\in_array($this->environment, ['service', 'env_service'], true)) {
             $services->set('app.kms', SodiumKms::class)
-                ->args([inline_service(InMemoryKeyLoader::class)->args([['app' => random_bytes(32)]])])
+                ->args([inline_service(InMemoryKeyLoader::class)->args([['app' => str_replace('%', '%%', random_bytes(32))]])])
                 ->public();
         }
 

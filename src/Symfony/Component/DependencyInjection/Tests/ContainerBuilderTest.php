@@ -39,6 +39,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -1375,6 +1376,26 @@ class ContainerBuilderTest extends TestCase
         }
     }
 
+    public function testEnvVarProcessorsRegisteredAfterResolvingEnvPlaceholders()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FOO)', 'foo');
+        $container->setParameter('bar', '%env(rot13:FOO)%');
+        $container->register('rot13', Rot13EnvVarProcessor::class)->addTag('container.env_var_processor');
+
+        $this->assertSame('foo', $container->resolveEnvPlaceholders('%env(FOO)%', true));
+
+        try {
+            $container->resolveEnvPlaceholders('%env(MISSING_ENV_VAR)%', true);
+            $this->fail('An EnvNotFoundException should have been thrown.');
+        } catch (EnvNotFoundException) {
+        }
+
+        $container->compile(true);
+
+        $this->assertSame('sbb', $container->getParameter('bar'));
+    }
+
     public function testMergeLogicException()
     {
         $container = new ContainerBuilder();
@@ -2693,5 +2714,18 @@ class FailsOnceConfigurator
         if (1 === ++self::$calls) {
             throw new \RuntimeException('First attempt fails.');
         }
+    }
+}
+
+class Rot13EnvVarProcessor implements EnvVarProcessorInterface
+{
+    public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
+    {
+        return str_rot13($getEnv($name));
+    }
+
+    public static function getProvidedTypes(): array
+    {
+        return ['rot13' => 'string'];
     }
 }

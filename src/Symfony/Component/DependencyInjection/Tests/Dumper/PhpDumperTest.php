@@ -1720,6 +1720,42 @@ class PhpDumperTest extends TestCase
         $this->assertSame('foo', $container->getParameter('BAR'));
     }
 
+    public function testPercentSpansWithWhitespaceAreNotParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', 'bar');
+        $container->register('foo', \ArrayObject::class)
+            ->setPublic(true)
+            ->addArgument([
+                '50% of 100%',
+                '%a b%',
+                "%a\tb%",
+                "%a\nb%",
+                "x%a\fb%y",
+                "50%\n%%x",
+                '%foo% is 50% of 100%% and %%foo%%',
+            ]);
+        $container->compile();
+
+        $expected = [
+            '50% of 100%',
+            '%a b%',
+            "%a\tb%",
+            "%a\nb%",
+            "x%a\fb%y",
+            "50%\n%x",
+            'bar is 50% of 100% and %foo%',
+        ];
+        $this->assertSame($expected, $container->get('foo')->getArrayCopy());
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Percent_Spans_With_Whitespace']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Percent_Spans_With_Whitespace();
+
+        $this->assertSame($expected, $container->get('foo')->getArrayCopy());
+    }
+
     public function testErroredDefinition()
     {
         $this->expectException(RuntimeException::class);

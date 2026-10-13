@@ -101,37 +101,24 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
         // __unserialize executed. This skips the in-PHP tokenizer below.
         // allowed_classes does not cover enums: unserialize() autoloads the class of an
         // enum case whatever the list. So once Envelope is loaded, autoloading is refused
-        // while unserialize() runs, and the tokenizer takes over when it was needed.
+        // while unserialize() runs, and the enum cases are replaced below when it was needed.
+        // The capital-S string format, which serialize() never writes, can spell any property name with escapes: the tokenizer below refuses it.
         // The "allowed_classes" allowlist is the SOLE line of defense here: this call
         // intentionally runs without installing the unserialize_callback_func / error
         // handler guards used by safelyUnserialize(). Any future change that widens
         // "allowed_classes" beyond Envelope MUST re-introduce those guards.
-        if (!str_contains($body, 'C:')) {
-            class_exists(Envelope::class);
-            $autoloadAttempted = false;
-            $autoloadGuard = static function () use (&$autoloadAttempted): never {
-                $autoloadAttempted = true;
+        if (!str_contains($body, 'C:') && !str_contains($body, 'S:') && false !== $type = self::unserializeMessageType($body)) {
+            return $type;
+        }
 
-                throw new \LogicException('Autoloading is not allowed while reading the message type.');
-            };
-            spl_autoload_register($autoloadGuard, true, true);
-
-            try {
-                $envelope = @unserialize($body, ['allowed_classes' => [Envelope::class]]);
-                $message = $envelope instanceof Envelope ? $envelope->getMessage() : null;
-            } catch (\Throwable) {
-                $message = null;
-            } finally {
-                spl_autoload_unregister($autoloadGuard);
-            }
-
-            if (!$autoloadAttempted) {
-                return match (true) {
-                    null === $message => null,
-                    $message instanceof \__PHP_Incomplete_Class => ((array) $message)['__PHP_Incomplete_Class_Name'],
-                    default => $message::class,
-                };
-            }
+        // The message can be a reference to a value written before it, e.g. by a stamp that
+        // holds it. Native unserialize() resolves it the way decode() does, which the tokenizer
+        // below cannot: the values that a Serializable payload unserializes are numbered too.
+        // So unless the body really carries such a payload ("C:" can be part of a string), its
+        // enum cases are replaced by incomplete objects of their class, which take the same
+        // places, and unserialize() reads it without looking up any class.
+        if (null !== $bodyWithoutEnumCases = self::replaceEnumCases($body)) {
+            return self::unserializeMessageType($bodyWithoutEnumCases) ?: null;
         }
 
         // Slow path: parse the serialized envelope without invoking unserialize() so that
@@ -173,6 +160,7 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
             }
 
             if ($isMessageKey) {
+                // A reference (r: or R:) is not followed: the values that a Serializable payload unserializes are numbered too.
                 if (!preg_match('/\G[OCE]:(\d+):"/A', $body, $m, 0, $offset)) {
                     return null;
                 }
@@ -262,14 +250,91 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
     }
 
     /**
+     * Reads the type of the message with native unserialize(), without autoloading any class.
+     *
+     * @return string|false|null false when unserialize() needed to autoload a class
+     */
+    private static function unserializeMessageType(string $body): string|false|null
+    {
+        class_exists(Envelope::class);
+        $autoloadAttempted = false;
+        $autoloadGuard = static function () use (&$autoloadAttempted): never {
+            $autoloadAttempted = true;
+
+            throw new \LogicException('Autoloading is not allowed while reading the message type.');
+        };
+        spl_autoload_register($autoloadGuard, true, true);
+
+        // An incomplete object stores the name of its class in a property that the payload can set too.
+        // Renaming that property in the payload, with the same length, keeps the name written in the object header.
+        $body = str_replace('__PHP_Incomplete_Class_Name', '__PHP_Incomplete_Class_Nam_', $body);
+
+        try {
+            $envelope = @unserialize($body, ['allowed_classes' => [Envelope::class]]);
+            $message = $envelope instanceof Envelope ? $envelope->getMessage() : null;
+        } catch (\Throwable) {
+            $message = null;
+        } finally {
+            spl_autoload_unregister($autoloadGuard);
+        }
+
+        return match (true) {
+            $autoloadAttempted => false,
+            null === $message => null,
+            $message instanceof \__PHP_Incomplete_Class => ((array) $message)['__PHP_Incomplete_Class_Name'],
+            default => $message::class,
+        };
+    }
+
+    /**
+     * Replaces the enum cases of a serialized value by incomplete objects of their class.
+     *
+     * Each one stays a single value, so the references of the body keep pointing to the same values.
+     * Returns null when the value carries a Serializable payload or is not a single serialized value.
+     */
+    private static function replaceEnumCases(string $body): ?string
+    {
+        $offset = 0;
+        $enumCasesAndSerializables = [];
+
+        if (!self::skipSerializedValue($body, $offset, 4096, $enumCasesAndSerializables) || isset($body[$offset])) {
+            return null;
+        }
+
+        $replaced = '';
+        $offset = 0;
+
+        foreach ($enumCasesAndSerializables as $start => $end) {
+            if ('C' === $body[$start]) {
+                return null;
+            }
+
+            // E:NN:"<FQCN>:<case>"; becomes O:NN:"<FQCN>":0:{}
+            $nameOffset = strpos($body, '"', $start) + 1;
+            $name = substr($body, $nameOffset, $end - 2 - $nameOffset);
+
+            if (!$colon = strpos($name, ':')) {
+                return null;
+            }
+
+            $replaced .= substr($body, $offset, $start - $offset).'O:'.$colon.':"'.substr($name, 0, $colon).'":0:{}';
+            $offset = $end;
+        }
+
+        return $replaced.substr($body, $offset);
+    }
+
+    /**
      * Advances $offset past one PHP-serialized value, without instantiating any object.
      *
      * Iterative (manual stack) to avoid PHP function-call overhead on deep payloads.
      * $maxDepth mirrors PHP's `unserialize_max_depth` so an adversarial deeply-nested
      * payload can't burn CPU or blow the stack here when native unserialize() would
      * have rejected it.
+     *
+     * @param array<int, int>|null $enumCasesAndSerializables Receives the start and end offsets of the enum cases (E:) and Serializable payloads (C:)
      */
-    private static function skipSerializedValue(string $body, int &$offset, int $maxDepth = 4096): bool
+    private static function skipSerializedValue(string $body, int &$offset, int $maxDepth = 4096, ?array &$enumCasesAndSerializables = null): bool
     {
         // $remaining[$d] = number of values still to parse at nesting level $d
         // (one $count pair contributes 2 values: a key and a value).
@@ -335,6 +400,7 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
                 case 'O': // O:NN:"FQCN":NN:{<key>;<value>; ...}
                 case 'C': // C:NN:"FQCN":NN:{<opaque payload>}
                     $sep ??= ':';
+                    $start = $offset;
                     if (':' !== ($body[$offset + 1] ?? '')) {
                         return false;
                     }
@@ -348,6 +414,9 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
                     }
                     $offset += 2;
                     if (';' === $sep) {
+                        if ('E' === $kind) {
+                            $enumCasesAndSerializables[$start] = $offset;
+                        }
                         break;
                     }
 
@@ -369,6 +438,7 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
                             return false;
                         }
                         ++$offset;
+                        $enumCasesAndSerializables[$start] = $offset;
                     }
                     break;
 

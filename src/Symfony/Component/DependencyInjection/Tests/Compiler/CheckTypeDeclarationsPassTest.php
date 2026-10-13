@@ -876,6 +876,19 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
+    public function testProcessDoesNotResolvePercentSpansWithWhitespace()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setString', ['%foo bar%'])
+            ->addMethodCall('setString', ["%foo\nbar%"]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testUnionTypePassesWithReference()
     {
         $container = new ContainerBuilder();

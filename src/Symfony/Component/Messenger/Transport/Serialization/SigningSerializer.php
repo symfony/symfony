@@ -181,17 +181,20 @@ final class SigningSerializer implements SerializerInterface
                 $failure = $envelope->getMessage();
                 $trust = $signed ? [TrustStamp::untrusted()] : [];
 
-                if (!$failure instanceof MessageDecodingFailedException) {
+                if ($failure instanceof MessageDecodingFailedException) {
+                    // encode() signs a failure that carries a signed envelope. An unsigned one is forged: it would attach unverified stamps to that envelope.
+                    if (!$signed && $this->hasValidSignature($failure->encodedEnvelope, true)) {
+                        throw new InvalidMessageSignatureException('The message is an unsigned decoding failure that carries a signed envelope; refusing to decode it.');
+                    }
+
+                    // a claim reference it carries is verified only once retrieved: the stamps of this failure must not reach the signed message it resolves to
+                    return $envelope->with(new UnverifiedDecodingFailureStamp(array_merge(...array_values($envelope->all())), $this->signedMessageTypes), ...$trust);
+                }
+
+                // the class of the decoded message is checked too, as it can differ from the type read before decoding
+                if (!$this->shouldSign($type = $envelope->getMessage()::class)) {
                     return $envelope->with(...$trust);
                 }
-
-                // encode() signs a failure that carries a signed envelope. An unsigned one is forged: it would attach unverified stamps to that envelope.
-                if (!$signed && $this->hasValidSignature($failure->encodedEnvelope, true)) {
-                    throw new InvalidMessageSignatureException('The message is an unsigned decoding failure that carries a signed envelope; refusing to decode it.');
-                }
-
-                // a claim reference it carries is verified only once retrieved: the stamps of this failure must not reach the signed message it resolves to
-                return $envelope->with(new UnverifiedDecodingFailureStamp(array_merge(...array_values($envelope->all())), $this->signedMessageTypes), ...$trust);
             }
 
             if ($signed) {

@@ -49,16 +49,17 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
 
     public function withOptions(array $options): static
     {
+        $clone = clone $this;
+
         if (\array_key_exists('base_uri', $options)) {
             if (\is_array($options['base_uri'])) {
-                $this->baseUris = $options['base_uri'];
+                $clone->baseUris = $options['base_uri'];
                 unset($options['base_uri']);
             } else {
-                $this->baseUris = [];
+                $clone->baseUris = [];
             }
         }
 
-        $clone = clone $this;
         $clone->maxRetries = (int) ($options['max_retries'] ?? $this->maxRetries);
         unset($options['max_retries']);
 

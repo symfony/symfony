@@ -87,6 +87,22 @@
             display: none;
         }
 
+        /* Mermaid adds the tooltip to the body, but its styles only apply inside the diagram */
+        .mermaidTooltip {
+            background: var(--page-background);
+            border: 1px solid var(--table-border-color);
+            border-radius: 4px;
+            box-shadow: var(--settings-modal-shadow);
+            color: var(--page-color);
+            max-width: 400px;
+            padding: 4px 8px;
+            pointer-events: none;
+            position: absolute;
+            transform: translateX(-50%);
+            white-space: pre-line;
+            z-index: 100;
+        }
+
         @keyframes scale {
             from { transform: scale(0); }
             to { transform: scale(1); }
@@ -164,6 +180,10 @@
             {% endfor %}
 
             const showNodeDetails = function (node, map) {
+                if (!map[node]) {
+                    return;
+                }
+
                 const dialog = document.getElementById('detailsDialog');
 
                 dialog.querySelector('tbody').innerHTML = '';
@@ -273,8 +293,14 @@
                         <h3>Definition</h3>
                         <pre class="sf-mermaid">
                             {{ data.dump }}
-                            {% for nodeId, events in data.listeners %}
-                                click {{ nodeId }} showNodeDetails{{ collector.hash(name) }}
+                            {% set descriptions = data.descriptions ?? [] %}
+                            {% for nodeId in data.listeners|merge(descriptions)|keys %}
+                                {% if descriptions[nodeId] is defined %}
+                                    {# Mermaid sanitizes tooltips as HTML but displays them as text, so special characters are written as Mermaid entities #}
+                                    click {{ nodeId }} showNodeDetails{{ collector.hash(name) }} "{{ descriptions[nodeId]|replace({'#': '#35;', '"': '#quot;', '&': '#amp;', '<': '#lt;', '>': '#gt;'}) }}"
+                                {% else %}
+                                    click {{ nodeId }} showNodeDetails{{ collector.hash(name) }}
+                                {% endif %}
                             {% endfor %}
                         </pre>
                         <a href="{{ collector.buildMermaidLiveLink(name) }}">View on mermaid.live</a>

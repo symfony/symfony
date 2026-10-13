@@ -8,6 +8,7 @@ CHANGELOG
  * Log the profiler URL of each request at debug level on the `profiler` channel
  * Add a Key Management panel
  * Display the duration and the transferred sizes of each request in the HTTP Client panel
+ * Show the descriptions of workflow places and transitions as tooltips in the Workflow panel
 
 8.1
 ---

@@ -293,4 +293,19 @@ class CookieJarTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $cookieJar->allValues('http://www.example.com'));
         $this->assertEmpty($cookieJar->allValues('http://wwwexample.com'));
     }
+
+    public function testCookiePathMatchesAtSegmentBoundaries()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar; Path=/foo', 'baz=qux; Path=/baz/'], 'http://example.com/');
+
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://example.com/foo'));
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://example.com/foo/bar'));
+        $this->assertSame([], $cookieJar->allValues('http://example.com/foobar'));
+        $this->assertSame(['baz' => 'qux'], $cookieJar->allValues('http://example.com/baz/qux'));
+        $this->assertSame([], $cookieJar->allValues('http://example.com/baz'));
+
+        $this->assertSame('bar', $cookieJar->get('foo', '/foo/bar')->getValue());
+        $this->assertNull($cookieJar->get('foo', '/foobar'));
+    }
 }

@@ -51,6 +51,7 @@ use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
+use Symfony\Component\Messenger\Transport\Serialization\IdentityStampHeaderMapper;
 use Symfony\Component\Messenger\Transport\Serialization\InteropSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\MessageStampNormalizer;
@@ -93,7 +94,12 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.transport.interop_serializer', InteropSerializer::class)
             ->args([
                 service('messenger.transport.symfony_serializer'),
+                null,
+                tagged_iterator('messenger.stamp_header_mapper'),
             ])
+
+        ->set('messenger.stamp_header_mapper.identity', IdentityStampHeaderMapper::class)
+            ->tag('messenger.stamp_header_mapper')
 
         ->set('serializer.normalizer.flatten_exception', FlattenExceptionNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])

@@ -58,6 +58,10 @@ use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\StampHeaderMapperInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Uid\Uuid;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\inline_service;
@@ -401,6 +405,23 @@ class MessengerBundleTest extends TestCase
 
         $this->assertInstanceOf(MessageDecodingFailedException::class, $failed->getMessage());
         $this->assertSame(\sprintf('Message "%s" requires a verified signature, but it is signed as unverified.', RedispatchMessage::class), $failed->getMessage()->getMessage());
+    }
+
+    public function testTheInteropSerializerMapsTheIdentityStampsAndTheStampsOfTheAutoconfiguredMappers()
+    {
+        $kernel = new TestInteropSerializerKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $serializer = $kernel->getContainer()->get('test.messenger.transport.interop_serializer');
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessage('Hey'), [new MessageIdStamp('message-id'), new FlowTenantStamp('acme')]));
+
+        $this->assertSame('message-id', $encoded['headers']['message_id'] ?? null);
+        $this->assertSame('acme', $encoded['headers']['tenant'] ?? null);
+
+        $envelope = $serializer->decode($encoded);
+
+        $this->assertSame('message-id', $envelope->last(MessageIdStamp::class)?->getId());
+        $this->assertSame('acme', $envelope->last(FlowTenantStamp::class)?->tenant);
     }
 
     private static function hideTheUidComponent(): void
@@ -905,4 +926,50 @@ interface AuditedMessage
 
 class AuditedDummyMessage extends DummyMessage implements AuditedMessage
 {
+}
+
+class TestInteropSerializerKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'transports' => ['orders' => ['dsn' => 'in-memory://', 'serializer' => 'messenger.transport.interop_serializer']],
+        ]);
+        $container->services()
+            ->set('serializer', Serializer::class)
+                ->args([[inline_service(ObjectNormalizer::class)], [inline_service(JsonEncoder::class)]])
+            ->set(TenantStampHeaderMapper::class)->autoconfigure()
+            ->alias('test.messenger.transport.interop_serializer', 'messenger.transport.interop_serializer')->public()
+        ;
+    }
+}
+
+class TenantStampHeaderMapper implements StampHeaderMapperInterface
+{
+    public function toHeaders(Envelope $envelope): array
+    {
+        return ($stamp = $envelope->last(FlowTenantStamp::class)) ? ['tenant' => $stamp->tenant] : [];
+    }
+
+    public function toStamps(array $headers): array
+    {
+        return \is_string($tenant = $headers['tenant'] ?? null) ? [new FlowTenantStamp($tenant)] : [];
+    }
 }

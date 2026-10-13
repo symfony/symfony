@@ -50,8 +50,10 @@ use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\IdentityStampHeaderMapper;
 use Symfony\Component\Messenger\Transport\Serialization\InteropSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\StampHeaderMapperInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV7;
@@ -870,9 +872,20 @@ class MessengerBundleExtensionTest extends TestCase
 
         $definition = $container->getDefinition('messenger.transport.interop_serializer');
         $this->assertSame(InteropSerializer::class, $definition->getClass());
-        $this->assertEquals([new Reference('messenger.transport.symfony_serializer')], $definition->getArguments());
+        $this->assertEquals(new Reference('messenger.transport.symfony_serializer'), $definition->getArgument(0));
+        $this->assertNull($definition->getArgument(1));
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $mappers = $definition->getArgument(2));
+        $this->assertSame('messenger.stamp_header_mapper', $mappers->getTag());
 
-        $this->assertFalse($this->createContainerFromFile('messenger_multiple_buses')->hasDefinition('messenger.transport.interop_serializer'));
+        $identityMapper = $container->getDefinition('messenger.stamp_header_mapper.identity');
+        $this->assertSame(IdentityStampHeaderMapper::class, $identityMapper->getClass());
+        $this->assertSame([[]], $identityMapper->getTag('messenger.stamp_header_mapper'));
+
+        $this->assertSame(['messenger.stamp_header_mapper' => [[]]], $container->getAutoconfiguredInstanceof()[StampHeaderMapperInterface::class]->getTags());
+
+        $container = $this->createContainerFromFile('messenger_multiple_buses');
+        $this->assertFalse($container->hasDefinition('messenger.transport.interop_serializer'));
+        $this->assertFalse($container->hasDefinition('messenger.stamp_header_mapper.identity'));
     }
 
     public function testMessengerTransportSerializerConfiguration()

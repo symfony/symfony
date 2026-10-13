@@ -9,6 +9,7 @@ CHANGELOG
  * Add the `messages` option of buses and the `$messageTypes` argument of `MessageBus`, to restrict the types of the messages the application can dispatch on a bus
  * Add the `unwrap_exceptions` option of buses and the `$unwrapExceptions` argument of `MessageBus`, to throw the exception of the failing handler instead of `HandlerFailedException` when the application dispatches a message
  * Add `InteropSerializer` and the `messenger.transport.interop_serializer` service to exchange messages with other applications
+ * Add `StampHeaderMapperInterface`, `IdentityStampHeaderMapper` and the `messenger.stamp_header_mapper` tag to let `InteropSerializer` exchange stamps as plain headers
  * Add `RedispatchStamp` to make a worker send a received message to its senders instead of handling it
  * Deprecate `RedispatchMessageHandler`, dispatch the message wrapped in the `RedispatchMessage` with a `TransportNamesStamp` instead
  * Add the listeners of a `messenger:consume` or `messenger:failed:retry` run to a `ScopedEventDispatcher` instead of to the event dispatcher of the application

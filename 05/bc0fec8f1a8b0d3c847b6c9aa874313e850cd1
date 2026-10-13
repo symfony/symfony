@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T05:34:09Z
+
+I updated the docblock: a null TTL doesn't mean that the lock never expires. Expiring stores always set an expiry when they save the key. So `null` uses the default TTL of the store, 300s for the stores that expire locks. Stores that don't expire locks ignore the TTL. I also changed the fixture to pass the TTL positionally, since we don't use named arguments on our own methods.

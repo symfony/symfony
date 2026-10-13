@@ -49,6 +49,14 @@ interface RewrappableDataKeyStoreInterface extends DataKeyStoreInterface
     public function rewrap(string $reference, Ciphertext $wrapped, string $client): void;
 
     /**
+     * The authenticated data this store wraps `$row` with, empty when its backend authenticates nothing.
+     *
+     * A rewrap happens outside the store, so it has to bind what the store binds,
+     * {@see StoredDataKey::wrappingContextFor()}, or leave a row the store can no longer open.
+     */
+    public function wrappingContextOf(StoredDataKey $row): string;
+
+    /**
      * Retires the current key of `$scope` by creating a fresh one, which becomes current.
      *
      * Payloads already written keep referring to the retired key, so nothing has to be rewritten.

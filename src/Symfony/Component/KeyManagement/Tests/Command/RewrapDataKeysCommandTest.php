@@ -20,7 +20,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\Command\RewrapDataKeysCommand;
+use Symfony\Component\KeyManagement\DataKey;
+use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyHandle;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\RuntimeException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
 use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
@@ -71,6 +75,103 @@ class RewrapDataKeysCommandTest extends TestCase
 
         $this->assertSame('survives the migration', $encrypter->decrypt($envelope));
         $this->assertSame($frozen, (string) $envelope, 'a payload is never rewritten by the migration.');
+    }
+
+    public function testTheRowsOfAContextBindingStoreStayReadableAfterTheMove()
+    {
+        $store = new InMemoryDataKeyStore(['aws' => $this->aws, 'azure' => $this->azure], 'aws', 'app', 32, null, null, true);
+        $handle = $store->current('user.email');
+        $plaintext = $handle->use(static fn (string $key): string => $key);
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, $this->locator()));
+        $tester->execute(['--to' => 'azure', '--key-id' => 'app']);
+        $store->forget();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame($plaintext, $store->get($handle->reference)->use(static fn (string $key): string => $key), 'a row re-wrapped without the context its store binds is one that store can no longer open.');
+    }
+
+    public function testAcceptUnboundMovesTheRowsWrittenBeforeTheStoreBoundAContext()
+    {
+        $store = new InMemoryDataKeyStore(['aws' => $this->aws, 'azure' => $this->azure], 'aws', 'app', 32, null, null, true);
+        $handle = $store->current('user.email');
+        $plaintext = $handle->use(static fn (string $key): string => $key);
+        // wrapped under no context on purpose: this is how the store wrote it before it bound one
+        $store->rewrap($handle->reference, $this->aws->encrypt('app', $plaintext), 'aws');
+        $store->forget();
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, $this->locator()));
+        $tester->execute(['--to' => 'azure', '--key-id' => 'app', '--accept-unbound' => true]);
+        $store->forget();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame($plaintext, $store->get($handle->reference)->use(static fn (string $key): string => $key));
+    }
+
+    public function testAcceptUnboundCanBeRunAgainOnRowsAlreadyMoved()
+    {
+        [$store, $plaintexts] = $this->storeHalfwayThroughAnAcceptUnboundRun();
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, $this->locator()));
+        $tester->execute(['--to' => 'aws', '--key-id' => 'app', '--accept-unbound' => true]);
+        $store->forget();
+
+        $tester->assertCommandIsSuccessful();
+        foreach ($plaintexts as $reference => $plaintext) {
+            $this->assertSame($plaintext, $store->get($reference)->use(static fn (string $key): string => $key));
+        }
+    }
+
+    public function testAcceptUnboundCanBeRunAgainOnABackendThatCannotTellAContextMismatchFromAnotherFailure()
+    {
+        [$store, $plaintexts] = $this->storeHalfwayThroughAnAcceptUnboundRun();
+        $kmip = $this->awsUnwrappingThrough(static function (OpenSslKms $kms, Ciphertext $wrapped, string $aad): DataKey {
+            try {
+                return $kms->unwrapDataKey($wrapped, $aad);
+            } catch (DecryptionFailedException) {
+                throw new RuntimeException('KMIP operation failed (reason 0x4).');
+            }
+        });
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, new ServiceLocator(['aws' => static fn (): DataKeyGeneratorInterface => $kmip, 'azure' => fn (): OpenSslKms => $this->azure])));
+        $tester->execute(['--to' => 'azure', '--key-id' => 'app', '--accept-unbound' => true]);
+        $store->forget();
+
+        $tester->assertCommandIsSuccessful();
+        foreach ($plaintexts as $reference => $plaintext) {
+            $this->assertSame($plaintext, $store->get($reference)->use(static fn (string $key): string => $key));
+        }
+    }
+
+    public function testAcceptUnboundReportsTheFailureThatIsNotTheContextMismatch()
+    {
+        [$store] = $this->storeHalfwayThroughAnAcceptUnboundRun();
+        $throttled = $this->awsUnwrappingThrough(static function (OpenSslKms $kms, Ciphertext $wrapped, string $aad): DataKey {
+            $kms->decrypt($wrapped, $aad);
+
+            throw new RuntimeException('The KMS throttled the request.');
+        });
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, new ServiceLocator(['aws' => static fn (): DataKeyGeneratorInterface => $throttled, 'azure' => fn (): OpenSslKms => $this->azure])));
+        $exit = $tester->execute(['--to' => 'azure', '--key-id' => 'app', '--accept-unbound' => true]);
+
+        $display = preg_replace('/\s+/', ' ', $tester->getDisplay());
+        $this->assertSame(Command::FAILURE, $exit);
+        $this->assertSame(2, substr_count($display, 'The KMS throttled the request.'), 'the failure of either shape is reported, not the context mismatch of the other one.');
+        $this->assertStringNotContainsString('Decryption failed.', $display);
+    }
+
+    public function testARowThatNoLongerMatchesItsKeyIsReportedAndLeftBehind()
+    {
+        $reference = $this->store->current('user.email')->reference;
+        $this->store->rewrap($reference, $this->azure->encrypt('app', random_bytes(32)), 'azure');
+
+        $tester = $this->tester();
+        $exit = $tester->execute(['--to' => 'aws', '--key-id' => 'app']);
+
+        $this->assertSame(Command::FAILURE, $exit);
+        $this->assertStringContainsString('1 left behind', preg_replace('/\s+/', ' ', $tester->getDisplay()));
+        $this->assertSame('azure', iterator_to_array($this->store->all(), false)[0]->client, 'a row whose binding no longer matches the key it holds is reported instead of being re-wrapped.');
     }
 
     public function testTheScopeAndTheReferenceAreLeftAlone()
@@ -254,6 +355,11 @@ class RewrapDataKeysCommandTest extends TestCase
                 $this->inner->rewrap($reference, $wrapped, $client);
             }
 
+            public function wrappingContextOf(StoredDataKey $row): string
+            {
+                return $this->inner->wrappingContextOf($row);
+            }
+
             public function current(string $scope): DataKeyHandle
             {
                 return $this->inner->current($scope);
@@ -284,6 +390,46 @@ class RewrapDataKeysCommandTest extends TestCase
 
         $this->assertSame(Command::FAILURE, $exit);
         $this->assertStringContainsString('No data key store is registered', $tester->getDisplay());
+    }
+
+    /**
+     * @return array{InMemoryDataKeyStore, array<string, string>}
+     */
+    private function storeHalfwayThroughAnAcceptUnboundRun(): array
+    {
+        $store = new InMemoryDataKeyStore(['aws' => $this->aws, 'azure' => $this->azure], 'aws', 'app', 32, null, null, true);
+        $moved = $store->current('user.email');
+        $old = $store->current('user.phone');
+        $plaintexts = [$moved->reference => $moved->use(static fn (string $key): string => $key), $old->reference => $old->use(static fn (string $key): string => $key)];
+        // wrapped under no context on purpose: this is a row the previous run did not reach yet
+        $store->rewrap($old->reference, $this->aws->encrypt('app', $plaintexts[$old->reference]), 'aws');
+        $store->forget();
+
+        return [$store, $plaintexts];
+    }
+
+    /**
+     * @param \Closure(OpenSslKms, Ciphertext, string): DataKey $unwrap
+     */
+    private function awsUnwrappingThrough(\Closure $unwrap): DataKeyGeneratorInterface
+    {
+        return new class($this->aws, $unwrap) implements DataKeyGeneratorInterface {
+            public function __construct(
+                private readonly OpenSslKms $kms,
+                private readonly \Closure $unwrap,
+            ) {
+            }
+
+            public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
+            {
+                return $this->kms->generateDataKey($keyId, $length, $aad);
+            }
+
+            public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
+            {
+                return ($this->unwrap)($this->kms, $wrapped, $aad);
+            }
+        };
     }
 
     private function tester(): CommandTester

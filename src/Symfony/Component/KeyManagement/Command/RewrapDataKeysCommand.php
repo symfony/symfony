@@ -20,6 +20,7 @@ use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DecrypterInterface;
 use Symfony\Component\KeyManagement\EncrypterInterface;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\ExceptionInterface;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
@@ -32,6 +33,13 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  * Each row is unwrapped with the client it records and re-wrapped with the target one, then the row
  * is updated. Encrypted payloads are neither read nor rewritten: they keep referring to the same
  * data keys, which is the whole point of holding those keys in a store.
+ *
+ * Both halves are bound to the context the store wraps with,
+ * {@see RewrappableDataKeyStoreInterface::wrappingContextOf()}. `--accept-unbound` also accepts a key
+ * wrapped under none. This is how a store that starts binding a context moves the rows written
+ * before it did. It is the only place where the old shape is accepted, never on a read. Each key is
+ * tried under no context first, then under the context of the store, so such a run can be resumed
+ * as well. Either way, the key is re-wrapped under the context of the store, never under none.
  *
  * The run is resumable and interruptible. Every row is committed on its own, and a row already
  * moved is simply no longer listed by `--from`, so running the command again picks up what is left.
@@ -66,6 +74,12 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
         Rows are committed one by one, so an interrupted run is resumed by running the same
         command again. Start with <comment>--dry-run</comment> to see the scope of the operation.
+
+        Turning on the wrapping context of a store leaves the rows written before it unreadable.
+        Move them over once with <comment>--accept-unbound</comment>, which also reads the keys wrapped
+        under no context. Every key is re-wrapped under the context of the store, never under none:
+
+          <info>php %command.full_name% --to=vault --key-id=app-dek --accept-unbound</info>
         HELP,
 )]
 final class RewrapDataKeysCommand
@@ -91,6 +105,8 @@ final class RewrapDataKeysCommand
         ?string $from = null,
         #[Option(description: 'List what would be moved without writing anything')]
         bool $dryRun = false,
+        #[Option(description: 'Also accept the keys wrapped under no context, written before the store bound one')]
+        bool $acceptUnbound = false,
     ): int {
         $errorIo = $io->getErrorStyle();
 
@@ -131,7 +147,7 @@ final class RewrapDataKeysCommand
 
             try {
                 if (!$dryRun) {
-                    $this->store->rewrap($row->reference, $this->rewrap($row, $target, $keyId), $to);
+                    $this->store->rewrap($row->reference, $this->rewrap($row, $target, $keyId, $this->store->wrappingContextOf($row), $acceptUnbound), $to);
                 }
                 ++$moved;
                 $io->writeln(\sprintf('%s %s (scope "%s") from "%s" to "%s"', $dryRun ? 'Would move' : 'Moved', $reference, $row->scope, $row->client, $to), OutputInterface::VERBOSITY_VERBOSE);
@@ -158,8 +174,12 @@ final class RewrapDataKeysCommand
      * Unwraps through {@see DataKeyGeneratorInterface::unwrapDataKey()}, not a bare `decrypt()`.
      *
      * That keeps the plaintext inside a {@see DataKey}, which wipes it once re-wrapped.
+     *
+     * This is the one path that opens a stored key without going through the store, so the binding is
+     * checked here too: a row the store refuses to open is reported and left as it is, instead of
+     * being re-wrapped into a row the store still refuses.
      */
-    private function rewrap(StoredDataKey $row, EncrypterInterface $target, string $keyId): Ciphertext
+    private function rewrap(StoredDataKey $row, EncrypterInterface $target, string $keyId, string $context, bool $acceptUnbound): Ciphertext
     {
         $source = $this->clients?->has($row->client) ? $this->clients->get($row->client) : null;
 
@@ -167,6 +187,27 @@ final class RewrapDataKeysCommand
             throw new LogicException(\sprintf('the client "%s" that wrapped it is not registered, or cannot unwrap data keys', $row->client));
         }
 
-        return $source->unwrapDataKey($row->wrapped)->use(static fn (#[\SensitiveParameter] string $dataKey): Ciphertext => $target->encrypt($keyId, $dataKey));
+        try {
+            $unwrapped = $source->unwrapDataKey($row->wrapped, $acceptUnbound ? '' : $context);
+        } catch (ExceptionInterface $e) {
+            if (!$acceptUnbound || '' === $context) {
+                throw $e;
+            }
+
+            try {
+                $unwrapped = $source->unwrapDataKey($row->wrapped, $context);
+            } catch (ExceptionInterface $retryFailure) {
+                // one of the two attempts is expected to fail on the context, so report the other failure
+                throw $e instanceof DecryptionFailedException ? $retryFailure : $e;
+            }
+        }
+
+        return $unwrapped->use(static function (#[\SensitiveParameter] string $dataKey) use ($row, $target, $keyId, $context): Ciphertext {
+            if (!hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $dataKey))) {
+                throw new DecryptionFailedException();
+            }
+
+            return $target->encrypt($keyId, $dataKey, $context);
+        });
     }
 }

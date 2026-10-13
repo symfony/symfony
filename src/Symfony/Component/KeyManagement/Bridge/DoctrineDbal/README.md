@@ -207,6 +207,16 @@ second in one scope. Passing `null` turns rotation off and hands that bound to
 the application. Retiring a key never deletes its row, so what it sealed stays
 readable.
 
+`bindWrappingContext: true`, `bind_wrapping_context` in the bundle, has the backend
+authenticate the reference and the scope of each data key as it wraps it, which is
+what a Vault Transit key created with `derived=true` requires and what a backend
+refusing authenticated data cannot do. Rows written before it was turned on are
+moved over by `key-management:rewrap-data-keys --accept-unbound`.
+
+Turning it on takes effect at once: until that command has moved them, the rows written before are refused, and so is encrypting under a scope whose current key is one of them.
+The command can be run again after an interruption.
+There is no way back: once the option is turned off again, the rows written or moved while it was on cannot be read, and the command cannot move them back.
+
 The table name is configurable, but a name that needs quoting, a reserved word
 such as `order` or a hyphenated name, is not supported, as for the Lock and
 Messenger stores. `configureSchema()` declares the table alongside the ones

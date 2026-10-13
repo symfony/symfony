@@ -253,6 +253,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame(3600, $arguments[6]);
         $this->assertSame('clock', (string) $arguments[7]);
         $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $arguments[7]->getInvalidBehavior());
+        $this->assertFalse($arguments[8], 'a store wraps under no authenticated data unless the deployment states that its backend enforces some.');
         $this->assertSame([['method' => 'forget']], $container->getDefinition('key_management.store')->getTag('kernel.reset'), 'the retained plaintexts must not survive a unit of work in a long-running process.');
 
         $encrypter = $container->getDefinition('key_management.stored_envelope_encrypter')->getArguments();
@@ -276,6 +277,28 @@ class KeyManagementBundleExtensionTest extends TestCase
                 'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key', 'read_self_contained' => true],
             ]);
         });
+    }
+
+    public function testTheStoreIsToldToBindItsWrappingContextWhenAsked()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                'store' => [
+                    'connection' => 'app.dbal',
+                    'client' => 'app',
+                    'key_id' => 'alias/app-key',
+                    'bind_wrapping_context' => true,
+                ],
+            ]);
+        });
+
+        $this->assertTrue($container->getDefinition('key_management.store')->getArgument(8));
     }
 
     public function testStoreBringsTheListenerThatPutsItsTableInTheSchema()

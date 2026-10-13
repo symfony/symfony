@@ -220,6 +220,7 @@ class ConfigurationTest extends TestCase
             'connection' => 'doctrine.dbal.default_connection',
             'table' => 'key_management_data_keys',
             'read_self_contained' => false,
+            'bind_wrapping_context' => false,
             'max_age' => 2592000,
         ], $config['store']);
     }

@@ -19,6 +19,7 @@ use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -472,6 +473,7 @@ class KeyManagementBundle extends AbstractBundle
      * Registers the encrypted Doctrine DBAL types that boot() declares.
      *
      * They encrypt with the encrypter the envelope interfaces resolve to: the store-backed one when a store is configured, the default client's otherwise.
+     * They get a lazy proxy of that encrypter, so that booting the kernel doesn't create the store and its database connection.
      *
      * With the Doctrine ORM bridge, they are registered even when none is configured.
      * RegisterEncryptedColumnsPass then adds the types of the columns marked with #[Encrypted], and removes the service when there is none.
@@ -497,7 +499,7 @@ class KeyManagementBundle extends AbstractBundle
         }
 
         $container->register('key_management.doctrine_dbal.encrypted_types', EncryptedTypes::class)
-            ->setArguments([new Reference($encrypter), $types])
+            ->setArguments([new LazyProxyArgument(new Reference($encrypter)), $types])
             ->setPublic(true);
     }
 }

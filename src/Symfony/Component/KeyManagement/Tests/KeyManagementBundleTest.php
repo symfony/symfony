@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
@@ -178,6 +179,28 @@ class KeyManagementBundleTest extends TestCase
 
         $stored = $connection->fetchOne('SELECT phone FROM speaker WHERE id = 1');
         $this->assertNotNull(Envelope::fromBytes($stored)->reference, 'the type encrypts with the store, as the envelope interfaces do.');
+        $this->assertSame('+33 6 12 34 56 78', $connection->convertToPHPValue($stored, 'test_encrypted_phone'));
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testTheDoctrineDbalTypesBuildTheStoreOnFirstUse(bool $debug)
+    {
+        if (!class_exists(DriverManager::class) || !class_exists(EncryptedTypes::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $kernel = new TestKeyManagementKernel('doctrine_dbal_types', $debug, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $this->assertFalse($container->initialized('test.dbal'));
+
+        $connection = $container->get('test.dbal');
+        $container->get('test.store')->createTable();
+        $stored = $connection->convertToDatabaseValue('+33 6 12 34 56 78', 'test_encrypted_phone');
+
         $this->assertSame('+33 6 12 34 56 78', $connection->convertToPHPValue($stored, 'test_encrypted_phone'));
     }
 

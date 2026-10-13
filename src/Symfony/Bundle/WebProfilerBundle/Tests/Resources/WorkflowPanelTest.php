@@ -84,12 +84,43 @@ class WorkflowPanelTest extends TestCase
         $this->assertSame(1, substr_count($panel, 'click transition0 '));
     }
 
+    public function testPanelShowsTheWorkflowDescription()
+    {
+        $metadataStore = new InMemoryMetadataStore(['description' => "Review \"posts\" & <b>#1</b>\nbefore publishing"]);
+        $definition = new Definition(['draft', 'review'], [new Transition('submit', 'draft', 'review')], null, $metadataStore);
+
+        $panel = $this->renderPanel(new Workflow($definition, null, null, 'blog'), new EventDispatcher());
+
+        $this->assertStringContainsString("<p class=\"text-muted\">Review &quot;posts&quot; &amp; &lt;b&gt;#1&lt;/b&gt;<br />\nbefore publishing</p>", $panel);
+    }
+
+    public function testPanelRendersProfilesWithoutDescriptions()
+    {
+        $metadataStore = new InMemoryMetadataStore(['description' => 'The blog workflow'], ['review' => ['description' => 'Waiting for a review']]);
+        $definition = new Definition(['draft', 'review'], [new Transition('submit', 'draft', 'review')], null, $metadataStore);
+        $collector = new WorkflowDataCollector([new Workflow($definition, null, null, 'blog')], new EventDispatcher(), new FileLinkFormatter());
+        $collector->lateCollect();
+        $data = $collector->__serialize();
+        unset($data['data']['workflows']['blog']['description'], $data['data']['workflows']['blog']['descriptions']);
+        $collector->__unserialize($data);
+
+        $panel = $this->renderCollector($collector);
+
+        $this->assertStringContainsString('<h3>Definition</h3>', $panel);
+        $this->assertStringNotContainsString('The blog workflow', $panel);
+        $this->assertStringNotContainsString('Waiting for a review', $panel);
+    }
+
     private function renderPanel(Workflow $workflow, EventDispatcher $dispatcher): string
     {
         $collector = new WorkflowDataCollector([$workflow], $dispatcher, new FileLinkFormatter());
         $collector->lateCollect();
-        $collector = unserialize(serialize($collector));
 
+        return $this->renderCollector(unserialize(serialize($collector)));
+    }
+
+    private function renderCollector(WorkflowDataCollector $collector): string
+    {
         $loader = new FilesystemLoader();
         $loader->addPath(\dirname(__DIR__, 2).'/Resources/views', 'WebProfiler');
 

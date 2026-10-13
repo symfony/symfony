@@ -69,6 +69,7 @@ class WorkflowDataCollectorTest extends TestCase
         $this->assertArrayHasKey('listeners', $data['workflow1']);
 
         $this->assertSame([], $data['workflow1']['listeners']);
+        $this->assertNull($data['workflow1']['description']);
         $this->assertArrayHasKey('workflow2', $data);
         $this->assertArrayHasKey('dump', $data['workflow2']);
         $this->assertStringStartsWith("graph LR\n", $data['workflow1']['dump']);
@@ -100,6 +101,7 @@ class WorkflowDataCollectorTest extends TestCase
         $collector = new WorkflowDataCollector([new Workflow($definition, null, null, 'blog')], new EventDispatcher(), new FileLinkFormatter());
         $collector->lateCollect();
 
+        $this->assertSame('The blog workflow', $collector->getWorkflows()['blog']['description']);
         $this->assertSame(['place1' => 'Waiting for a "go"', 'transition0' => 'Ask for a review'], $collector->getWorkflows()['blog']['descriptions']);
     }
 

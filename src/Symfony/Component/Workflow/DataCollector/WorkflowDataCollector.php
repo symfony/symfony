@@ -57,10 +57,12 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
             // We always use a workflow type because we want to mermaid to
             // create a node for transitions
             $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
+            $description = $workflow->getDefinition()->getMetadataStore()->getMetadata('description');
             $this->data['workflows'][$workflow->getName()] = [
                 'dump' => $dumper->dump($workflow->getDefinition()),
                 'calls' => $calls,
                 'listeners' => $this->getEventListeners($workflow),
+                'description' => \is_string($description) ? $description : null,
                 'descriptions' => $this->getDescriptions($workflow->getDefinition()),
             ];
         }

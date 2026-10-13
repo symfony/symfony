@@ -290,6 +290,10 @@
                     <h2 class="tab-title">{{ name }}{% if data.calls|length %} ({{ data.calls|length }}){% endif %}</h2>
 
                     <div class="tab-content">
+                        {% if data.description ?? null %}
+                            <p class="text-muted">{{ data.description|nl2br }}</p>
+                        {% endif %}
+
                         <h3>Definition</h3>
                         <pre class="sf-mermaid">
                             {{ data.dump }}

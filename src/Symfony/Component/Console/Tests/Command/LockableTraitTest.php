@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -34,6 +35,7 @@ class LockableTraitTest extends TestCase
         require_once self::$fixturesPath.'/FooLock2Command.php';
         require_once self::$fixturesPath.'/FooLock3Command.php';
         require_once self::$fixturesPath.'/FooLock4InvokableCommand.php';
+        require_once self::$fixturesPath.'/FooLock5InvokableCommand.php';
     }
 
     public function testLockIsReleased()
@@ -63,6 +65,30 @@ class LockableTraitTest extends TestCase
 
         $lock->release();
         $this->assertSame(2, $tester->execute([]));
+    }
+
+    public function testTheLockExpiresAfterFiveMinutesByDefault()
+    {
+        $lock = $this->createStub(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(true);
+
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory->expects($this->once())->method('createLock')->with('foo:lock3', 300.0)->willReturn($lock);
+
+        $this->assertSame(2, new CommandTester(new \FooLock3Command($lockFactory))->execute([]));
+    }
+
+    #[TestWith([null])]
+    #[TestWith([3600.0])]
+    public function testTheLockIsCreatedWithTheGivenTtl(?float $ttl)
+    {
+        $lock = $this->createStub(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(true);
+
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory->expects($this->once())->method('createLock')->with('foo:lock5', $ttl)->willReturn($lock);
+
+        $this->assertSame(2, new CommandTester(new \FooLock5InvokableCommand($lockFactory, $ttl))->execute([]));
     }
 
     public function testMultipleLockCallsThrowLogicException()

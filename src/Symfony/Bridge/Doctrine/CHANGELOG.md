@@ -14,6 +14,7 @@ CHANGELOG
  * Add the `EntityExists` constraint for validating that a value references an existing entity
  * Add `CollectionDenormalizer` to denormalize arrays into Doctrine collections
  * Add `before` and `after` to the `doctrine.event_listener` tag to order listeners
+ * Add `ExposeDecoratedManagersPass` so that `ManagerRegistry::resetManager()` resets a decorated manager instead of its decorator
 
 8.1
 ---

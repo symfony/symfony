@@ -14,10 +14,14 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\ExposeDecoratedManagersPass;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DummyManager;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DummyManagerDecorator;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 
@@ -101,6 +105,43 @@ class ManagerRegistryTest extends TestCase
         eval('?>'.$lastDump);
 
         yield ['NativeLazyServiceDoctrineBridgeContainerAsFiles'];
+    }
+
+    public function testResetDecoratedService()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('doctrine', TestManagerRegistry::class);
+        $container->register('foo', DummyManager::class)->setPublic(true)->setLazy(true);
+        $container->register('foo.decorator', DummyManagerDecorator::class)
+            ->setDecoratedService('foo')
+            ->setArguments([new Reference('.inner')]);
+        $container->addCompilerPass(new ExposeDecoratedManagersPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'DecoratedLazyServiceDoctrineBridgeContainer']));
+
+        $container = new \DecoratedLazyServiceDoctrineBridgeContainer();
+
+        $registry = new TestManagerRegistry('name', [], ['defaultManager' => 'foo'], 'defaultConnection', 'defaultManager', 'proxyInterfaceName');
+        $registry->setTestContainer($container);
+        $registry->setDecoratedManagers(['foo' => 'foo.decorator.inner']);
+
+        $decorator = $container->get('foo');
+        self::assertInstanceOf(DummyManagerDecorator::class, $decorator);
+
+        $foo = $decorator->getWrapped();
+        $foo->bar = 123;
+        self::assertTrue(isset($foo->bar));
+
+        self::assertSame($decorator, $registry->resetManager());
+
+        // the decorator and the manager it wraps both keep their identity, only the manager is reset
+        self::assertSame($decorator, $container->get('foo'));
+        self::assertSame($foo, $decorator->getWrapped());
+        self::assertSame(DummyManager::class, $foo::class);
+        self::assertFalse(isset($foo->bar));
     }
 
     /**

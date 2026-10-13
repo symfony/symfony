@@ -24,6 +24,18 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
 {
     protected Container $container;
 
+    private array $decoratedManagers = [];
+
+    /**
+     * Maps the service id of a decorated manager to the service id of the manager it decorates.
+     *
+     * @internal
+     */
+    public function setDecoratedManagers(array $decoratedManagers): void
+    {
+        $this->decoratedManagers = $decoratedManagers;
+    }
+
     protected function getService($name): object
     {
         return $this->container->get($name);
@@ -31,6 +43,9 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
 
     protected function resetService($name): void
     {
+        // Resetting a decorator would only rebuild it around the very same manager instance.
+        $name = $this->decoratedManagers[$name] ?? $name;
+
         if (!$this->container->initialized($name)) {
             return;
         }

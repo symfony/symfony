@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\HashiCorpVault\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -100,5 +101,76 @@ class TransitKmsFactoryTest extends TestCase
         $kms->encrypt('app', 'hello');
 
         $this->assertSame(['https://vault.local:8200/v1/transit/encrypt/app'], $urls);
+    }
+
+    public function testTimeoutOptionsAreAppliedToTheGivenHttpClient()
+    {
+        $timeouts = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$timeouts): MockResponse {
+            $timeouts[] = [$options['timeout'], $options['max_duration']];
+
+            return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:abc']]));
+        });
+
+        $kms = (new TransitKmsFactory($client))->create(Dsn::fromString('hashicorp-vault-transit://s.token@vault.local:8200/v1/?timeout=2.5&max_duration=7'));
+        $kms->encrypt('app', 'hello');
+
+        $this->assertSame([[2.5, 7.0]], $timeouts);
+    }
+
+    public function testTheGivenHttpClientKeepsItsOwnTimeouts()
+    {
+        $timeouts = [];
+        $client = (new MockHttpClient(static function (string $method, string $url, array $options) use (&$timeouts): MockResponse {
+            $timeouts[] = [$options['timeout'], $options['max_duration']];
+
+            return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:abc']]));
+        }))->withOptions(['timeout' => 42.0, 'max_duration' => 120.0]);
+
+        $kms = (new TransitKmsFactory($client))->create(Dsn::fromString('hashicorp-vault-transit://s.token@vault.local:8200/v1/'));
+        $kms->encrypt('app', 'hello');
+
+        $this->assertSame([[42.0, 120.0]], $timeouts);
+    }
+
+    public function testTheClientBuiltByTheFactoryHasDefaultTimeouts()
+    {
+        $kms = (new TransitKmsFactory())->create(Dsn::fromString('hashicorp-vault-transit://t@vault.example.com'));
+
+        $client = (new \ReflectionProperty(TransitKms::class, 'client'))->getValue($kms);
+        $options = (new \ReflectionProperty($client, 'defaultOptions'))->getValue($client);
+
+        $this->assertSame(5.0, $options['timeout']);
+        $this->assertSame(10.0, $options['max_duration']);
+        $this->assertSame(0, $options['max_redirects']);
+    }
+
+    public function testTimeoutOptionsOverrideTheDefaultsOfTheClientBuiltByTheFactory()
+    {
+        $kms = (new TransitKmsFactory())->create(Dsn::fromString('hashicorp-vault-transit://t@vault.example.com?timeout=3&max_duration=60'));
+
+        $client = (new \ReflectionProperty(TransitKms::class, 'client'))->getValue($kms);
+        $options = (new \ReflectionProperty($client, 'defaultOptions'))->getValue($client);
+
+        $this->assertSame(3.0, $options['timeout']);
+        $this->assertSame(60.0, $options['max_duration']);
+    }
+
+    #[DataProvider('provideInvalidTimeoutOptions')]
+    public function testInvalidTimeoutOptionIsRejected(string $query, string $option)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s" option of the "hashicorp-vault-transit://" DSN must be positive.', $option));
+        (new TransitKmsFactory())->create(Dsn::fromString('hashicorp-vault-transit://t@vault.local/v1/?'.$query));
+    }
+
+    public static function provideInvalidTimeoutOptions(): iterable
+    {
+        yield ['timeout=0', 'timeout'];
+        yield ['timeout=-1', 'timeout'];
+        yield ['timeout=abc', 'timeout'];
+        yield ['timeout=1e999', 'timeout'];
+        yield ['max_duration=0', 'max_duration'];
+        yield ['max_duration=-5', 'max_duration'];
     }
 }

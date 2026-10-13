@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\AzureKeyVault\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -164,5 +165,82 @@ class AzureKeyVaultFactoryTest extends TestCase
         $this->assertCount(2, $urls);
         $this->assertStringStartsWith('https://login.microsoftonline.com/t/oauth2/', $urls[0]);
         $this->assertStringStartsWith('https://my-vault.vault.azure.net/keys/app/encrypt', $urls[1]);
+    }
+
+    public function testTimeoutOptionsAreAppliedToTheGivenHttpClient()
+    {
+        $timeouts = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$timeouts): MockResponse {
+            $timeouts[] = [$options['timeout'], $options['max_duration']];
+
+            return str_contains($url, '/oauth2/')
+                ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
+                : new MockResponse(json_encode(['kid' => 'https://my-vault.vault.azure.net/keys/app/v1', 'value' => 'CipherFromAzure']));
+        });
+
+        $kms = (new AzureKeyVaultFactory($client))->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t&timeout=2.5&max_duration=7'));
+        $kms->encrypt('app', 'hello');
+
+        $this->assertSame([[2.5, 7.0], [2.5, 7.0]], $timeouts);
+    }
+
+    public function testTheGivenHttpClientKeepsItsOwnTimeouts()
+    {
+        $timeouts = [];
+        $client = (new MockHttpClient(static function (string $method, string $url, array $options) use (&$timeouts): MockResponse {
+            $timeouts[] = [$options['timeout'], $options['max_duration']];
+
+            return str_contains($url, '/oauth2/')
+                ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
+                : new MockResponse(json_encode(['kid' => 'https://my-vault.vault.azure.net/keys/app/v1', 'value' => 'CipherFromAzure']));
+        }))->withOptions(['timeout' => 42.0, 'max_duration' => 120.0]);
+
+        $kms = (new AzureKeyVaultFactory($client))->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t'));
+        $kms->encrypt('app', 'hello');
+
+        $this->assertSame([[42.0, 120.0], [42.0, 120.0]], $timeouts);
+    }
+
+    public function testTheClientBuiltByTheFactoryHasDefaultTimeouts()
+    {
+        $kms = (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t'));
+
+        $client = (new \ReflectionProperty(AzureKeyVault::class, 'client'))->getValue($kms);
+        $options = (new \ReflectionProperty($client, 'defaultOptions'))->getValue($client);
+        $tokens = (new \ReflectionProperty(AzureKeyVault::class, 'tokens'))->getValue($kms);
+
+        $this->assertSame(5.0, $options['timeout']);
+        $this->assertSame(10.0, $options['max_duration']);
+        $this->assertSame(0, $options['max_redirects']);
+        $this->assertSame($client, (new \ReflectionProperty(ClientCredentialsTokenProvider::class, 'client'))->getValue($tokens));
+    }
+
+    public function testTimeoutOptionsOverrideTheDefaultsOfTheClientBuiltByTheFactory()
+    {
+        $kms = (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t&timeout=3&max_duration=60'));
+
+        $client = (new \ReflectionProperty(AzureKeyVault::class, 'client'))->getValue($kms);
+        $options = (new \ReflectionProperty($client, 'defaultOptions'))->getValue($client);
+
+        $this->assertSame(3.0, $options['timeout']);
+        $this->assertSame(60.0, $options['max_duration']);
+    }
+
+    #[DataProvider('provideInvalidTimeoutOptions')]
+    public function testInvalidTimeoutOptionIsRejected(string $query, string $option)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s" option of the "azure-keyvault://" DSN must be positive.', $option));
+        (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t&'.$query));
+    }
+
+    public static function provideInvalidTimeoutOptions(): iterable
+    {
+        yield ['timeout=0', 'timeout'];
+        yield ['timeout=-1', 'timeout'];
+        yield ['timeout=abc', 'timeout'];
+        yield ['timeout=1e999', 'timeout'];
+        yield ['max_duration=0', 'max_duration'];
+        yield ['max_duration=-5', 'max_duration'];
     }
 }

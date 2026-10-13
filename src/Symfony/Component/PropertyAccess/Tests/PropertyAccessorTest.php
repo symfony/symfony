@@ -15,12 +15,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\AsymmetricVisibility;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ExtendedUninitializedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
@@ -461,6 +463,30 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
 
         $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
+    }
+
+    public function testIsReadableCachesPropertyPath()
+    {
+        $cache = new ArrayAdapter(0, false);
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, $cache);
+
+        $this->assertTrue($propertyAccessor->isReadable(['foo' => ['bar' => 'baz']], '[foo][bar]'));
+        $this->assertEquals([new PropertyPath('[foo][bar]')], array_values($cache->getValues()));
+    }
+
+    public function testIsReadableThrowsOnInvalidPropertyPath()
+    {
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::DO_NOT_THROW, new ArrayAdapter());
+
+        try {
+            $propertyAccessor->isReadable(new \stdClass(), 'foo[bar');
+            $this->fail('An InvalidPropertyPathException should have been thrown.');
+        } catch (InvalidPropertyPathException) {
+        }
+
+        $this->expectException(InvalidPropertyPathException::class);
+
+        $propertyAccessor->isReadable(new \stdClass(), 'foo[bar');
     }
 
     #[DataProvider('getValidWritePropertyPaths')]

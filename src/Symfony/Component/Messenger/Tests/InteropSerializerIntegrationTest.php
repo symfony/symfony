@@ -14,16 +14,20 @@ namespace Symfony\Component\Messenger\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnIdleListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
+use Symfony\Component\Messenger\Middleware\FlowContextMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
+use Symfony\Component\Messenger\Stamp\CorrelationStamp;
+use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
@@ -86,6 +90,31 @@ class InteropSerializerIntegrationTest extends TestCase
 
         $this->assertEquals([$message], $this->attempts);
         $this->assertCount(1, $transport->getAcknowledged());
+    }
+
+    public function testTheConsumerKeepsTheIdentityOfTheMessage()
+    {
+        $transport = new InMemoryTransport(new InteropSerializer(Serializer::create()));
+
+        $sent = (new MessageBus([
+            new FlowContextMiddleware(true),
+            new SendMessageMiddleware(new SendersLocator([DummyMessage::class => ['orders']], new ServiceLocator(['orders' => static fn () => $transport]))),
+        ]))->dispatch(new DummyMessage('Hello'));
+
+        $handled = [];
+        $bus = new MessageBus([
+            new FlowContextMiddleware(true),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function (DummyMessage $message, Envelope $envelope) use (&$handled) {
+                $handled[] = $envelope;
+            }]])),
+        ]);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnIdleListener());
+        (new Worker(['orders' => $transport], $bus, $dispatcher))->run();
+
+        $this->assertCount(1, $handled);
+        $this->assertSame($sent->last(MessageIdStamp::class)->getId(), $handled[0]->last(MessageIdStamp::class)?->getId());
+        $this->assertSame($sent->last(CorrelationStamp::class)->getId(), $handled[0]->last(CorrelationStamp::class)?->getId());
     }
 
     private function sendFromAppA(SenderInterface $sender, object $message): void

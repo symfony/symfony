@@ -37,6 +37,7 @@ use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\StampHeaderMapperInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -323,6 +324,8 @@ class MessengerBundle extends AbstractBundle
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(TransportFactoryInterface::class)
             ->addTag('messenger.transport_factory');
+        $container->registerForAutoconfiguration(StampHeaderMapperInterface::class)
+            ->addTag('messenger.stamp_header_mapper');
 
         $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
             $tagAttributes = get_object_vars($attribute);
@@ -496,6 +499,7 @@ class MessengerBundle extends AbstractBundle
         if (empty($config['transports'])) {
             $container->removeDefinition('messenger.transport.symfony_serializer');
             $container->removeDefinition('messenger.transport.interop_serializer');
+            $container->removeDefinition('messenger.stamp_header_mapper.identity');
             $container->removeDefinition('messenger.transport.amqp.factory');
             $container->removeDefinition('messenger.transport.redis.factory');
             $container->removeDefinition('messenger.transport.sqs.factory');

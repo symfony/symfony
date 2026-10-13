@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>
-                <target state="needs-review-translation">Ang mababang hangganan ay hindi dapat mas malaki kaysa sa mataas na hangganan.</target>
+                <target>Hindi dapat mas malaki ang ibabang hangganan kaysa sa itaas na hangganan.</target>
             </trans-unit>
         </body>
     </file>

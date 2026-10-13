@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T12:45:08Z
+
+I folded some hardening into your commit: `getMessageType()` now reads the type from the object header only, and `SigningSerializer` also checks the class of the message it decodes. The description has the details, and notes for the merge-up to 8.1 and 8.2.

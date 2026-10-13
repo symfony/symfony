@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Dumper\JsonSchemaDumper;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -107,6 +108,28 @@ class RouterBundleTest extends TestCase
         $this->expectExceptionMessage('The child config "resource" under "router" must be configured.');
 
         $this->load(['enabled' => true]);
+    }
+
+    #[TestWith([true, true])]
+    #[TestWith([false, null])]
+    public function testStrictRequirementsFollowTheDebugModeByDefault(bool $debug, ?bool $expected)
+    {
+        $container = $this->load(['resource' => '%kernel.project_dir%/config/routing.php'], [], ['kernel.debug' => $debug]);
+
+        $this->assertSame($expected, $container->findDefinition('router.default')->getArgument(2)['strict_requirements']);
+    }
+
+    #[TestWith([true, true])]
+    #[TestWith([false, true])]
+    #[TestWith([null, true])]
+    #[TestWith([true, false])]
+    #[TestWith([false, false])]
+    #[TestWith([null, false])]
+    public function testAnExplicitStrictRequirementsValueIsKept(?bool $strictRequirements, bool $debug)
+    {
+        $container = $this->load(['resource' => '%kernel.project_dir%/config/routing.php', 'strict_requirements' => $strictRequirements], [], ['kernel.debug' => $debug]);
+
+        $this->assertSame($strictRequirements, $container->findDefinition('router.default')->getArgument(2)['strict_requirements']);
     }
 
     #[RequiresMethod(JsonSchemaDumper::class, 'dumpNode')]

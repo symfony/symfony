@@ -88,12 +88,11 @@ class RouterBundle extends AbstractBundle
                 ->scalarNode('https_port')->defaultValue(443)->end()
                 ->scalarNode('strict_requirements')
                     ->info(
-                        "set to true to throw an exception when a parameter does not match the requirements\n".
-                        "set to false to disable exceptions when a parameter does not match the requirements (and return null instead)\n".
-                        "set to null to disable parameter checks against requirements\n".
-                        "'true' is the preferred configuration in development mode, while 'false' or 'null' might be preferred in production"
+                        "Set to true to throw an exception when a parameter does not match the requirements.\n".
+                        "Set to false to disable exceptions when a parameter does not match the requirements (and return null instead).\n".
+                        "Set to null to disable parameter checks against requirements.\n".
+                        'Defaults to true in debug mode and to null otherwise.'
                     )
-                    ->defaultTrue()
                 ->end()
                 ->booleanNode('utf8')->defaultTrue()->end()
             ->end()
@@ -140,7 +139,7 @@ class RouterBundle extends AbstractBundle
         $container->setParameter('router.cache_dir', '%kernel.build_dir%');
         $router = $container->findDefinition('router.default');
         $argument = $router->getArgument(2);
-        $argument['strict_requirements'] = $config['strict_requirements'];
+        $argument['strict_requirements'] = \array_key_exists('strict_requirements', $config) ? $config['strict_requirements'] : ($container->getParameter('kernel.debug') ? true : null);
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
         }

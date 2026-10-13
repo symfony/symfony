@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -172,6 +174,8 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertCount(1, $envelope->all(SerializedMessageStamp::class));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testItKeepsOnlyTheLocalStampsOfAnUnverifiedFailureThatDecodesToASignedMessage()
     {
         $envelope = $this->handleUnverifiedFailure(new DummyMessage('decoded'), 'the_bus');
@@ -185,24 +189,56 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertCount(1, $envelope->all(AckStamp::class));
     }
 
-    #[DataProvider('provideUnverifiedFailuresOfSignedMessages')]
-    public function testItRejectsAnUnverifiedFailureOnAnotherBusThanTheSignedMessageItDecodesTo(object $decodedMessage, array $decodedStamps, SerializerInterface $failureSerializer)
+    public function testItRejectsAnUnverifiedFailureOnAnotherBusThanTheSignedMessageItDecodesTo()
     {
         $this->expectException(InvalidMessageSignatureException::class);
         $this->expectExceptionMessage('the message belongs to the "the_bus" bus');
 
-        $this->handleUnverifiedFailure($decodedMessage, 'failed_bus', $decodedStamps, $failureSerializer);
+        $this->handleUnverifiedFailure(new \stdClass(), 'failed_bus', [TrustStamp::trusted()], new PhpSerializer());
     }
 
-    public static function provideUnverifiedFailuresOfSignedMessages(): iterable
+    #[DataProvider('provideUnverifiedFailuresOfMessagesSignedPerMessageType')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testItRejectsAnUnverifiedFailureOfAFailureTransportThatSignsMessageTypesOnAnotherBusThanTheSignedMessageItDecodesTo(object $decodedMessage, array $decodedStamps, \Closure $createFailureSerializer)
     {
-        yield 'message type that requires a signature' => [new DummyMessage('decoded'), [], new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class])];
-        yield 'verified message' => [new \stdClass(), [TrustStamp::trusted()], new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class])];
-        yield 'verified message, from a failure transport that does not sign' => [new \stdClass(), [TrustStamp::trusted()], new PhpSerializer()];
+        $this->expectException(InvalidMessageSignatureException::class);
+        $this->expectExceptionMessage('the message belongs to the "the_bus" bus');
+
+        $this->handleUnverifiedFailure($decodedMessage, 'failed_bus', $decodedStamps, $createFailureSerializer());
     }
 
-    #[DataProvider('provideFailureSerializers')]
-    public function testItKeepsTheStampsOfAnUnverifiedFailureThatDecodesToAMessageWithoutSignature(SerializerInterface $failureSerializer)
+    public static function provideUnverifiedFailuresOfMessagesSignedPerMessageType(): iterable
+    {
+        yield 'message type that requires a signature' => [new DummyMessage('decoded'), [], static fn () => new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class])];
+        yield 'verified message' => [new \stdClass(), [TrustStamp::trusted()], static fn () => new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class])];
+    }
+
+    public function testItKeepsTheStampsOfAnUnverifiedFailureThatDecodesToAMessageWithoutSignature()
+    {
+        $this->assertKeepsTheStampsOfAnUnverifiedFailureThatDecodesToAMessageWithoutSignature(new PhpSerializer());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testItKeepsTheStampsOfAnUnverifiedFailureOfAFailureTransportThatSignsMessageTypesThatDecodesToAMessageWithoutSignature()
+    {
+        $this->assertKeepsTheStampsOfAnUnverifiedFailureThatDecodesToAMessageWithoutSignature(new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class]));
+    }
+
+    public function testItKeepsOnlyTheLocalStampsOfAnUnverifiedFailureThatDecodesToAVerifiedMessage()
+    {
+        $this->assertKeepsOnlyTheLocalStampsOfAnUnverifiedFailureThatDecodesToAVerifiedMessage(new PhpSerializer());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testItKeepsOnlyTheLocalStampsOfAnUnverifiedFailureOfAFailureTransportThatSignsMessageTypesThatDecodesToAVerifiedMessage()
+    {
+        $this->assertKeepsOnlyTheLocalStampsOfAnUnverifiedFailureThatDecodesToAVerifiedMessage(new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class]));
+    }
+
+    private function assertKeepsTheStampsOfAnUnverifiedFailureThatDecodesToAMessageWithoutSignature(SerializerInterface $failureSerializer): void
     {
         $envelope = $this->handleUnverifiedFailure(new \stdClass(), 'failed_bus', [], $failureSerializer);
 
@@ -214,8 +250,7 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertCount(1, $envelope->all(AckStamp::class));
     }
 
-    #[DataProvider('provideFailureSerializers')]
-    public function testItKeepsOnlyTheLocalStampsOfAnUnverifiedFailureThatDecodesToAVerifiedMessage(SerializerInterface $failureSerializer)
+    private function assertKeepsOnlyTheLocalStampsOfAnUnverifiedFailureThatDecodesToAVerifiedMessage(SerializerInterface $failureSerializer): void
     {
         $envelope = $this->handleUnverifiedFailure(new \stdClass(), 'the_bus', [TrustStamp::trusted()], $failureSerializer);
 
@@ -225,12 +260,6 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $this->assertSame([42], array_map(static fn (TransportMessageIdStamp $stamp): mixed => $stamp->getId(), $envelope->all(TransportMessageIdStamp::class)));
         $this->assertSame('async', $envelope->last(ReceivedStamp::class)?->getTransportName());
         $this->assertCount(1, $envelope->all(AckStamp::class));
-    }
-
-    public static function provideFailureSerializers(): iterable
-    {
-        yield 'from a failure transport that signs message types' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class])];
-        yield 'from a failure transport that does not sign' => [new PhpSerializer()];
     }
 
     #[DataProvider('provideTrustStamps')]
@@ -382,7 +411,7 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
     {
         $phpSerializer = new PhpSerializer();
         $encodedFailure = $phpSerializer->encode(new Envelope(new MessageDecodingFailedException('Could not retrieve the claim.', 0, null, ['body' => 'claim']), [new BusNameStamp($failureBusName), new RedeliveryStamp(1), new TransportMessageIdStamp('failed_id'), new SentToFailureTransportStamp('async')]));
-        $failure = ($failureSerializer ?? new SigningSerializer($phpSerializer, 'signing-key', [DummyMessage::class]))->decode($encodedFailure);
+        $failure = ($failureSerializer ?? SigningSerializer::forMessageTypes($phpSerializer, 'signing-key', [DummyMessage::class]))->decode($encodedFailure);
         $this->assertInstanceOf(MessageDecodingFailedException::class, $failure->getMessage());
 
         $serializer = $this->createStub(SerializerInterface::class);

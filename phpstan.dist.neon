@@ -56,6 +56,10 @@ parameters:
         -
             message: '#^Method Symfony\\Component\\Messenger\\Execution\\MessageExecutionStrategyInterface\:\:wait\(\) invoked with 2 parameters, 1 required\.$#'
             path: src/Symfony/Component/Messenger/Worker.php
+        # the $triggerDeprecation argument is a commented-out argument of MessageTypeAwareSerializerInterface::getMessageType(), which the serializers pass
+        -
+            message: '#^Method Symfony\\Component\\Messenger\\Transport\\Serialization\\MessageTypeAwareSerializerInterface\:\:getMessageType\(\) invoked with 2 parameters, 1 required\.$#'
+            path: src/Symfony/Component/Messenger/Transport/Serialization/*
         # the $context argument is a commented-out argument of WorkflowInterface::getMarking()
         -
             message: '#^PHPDoc tag @param references unknown parameter\: \$context$#'

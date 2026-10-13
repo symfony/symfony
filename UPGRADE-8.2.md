@@ -335,6 +335,34 @@ Messenger
  * [BC BREAK] Messages are signed by a serializer created for each transport, instead of by decorators of the serializer services.
    Encoding a message with `messenger.default_serializer`, or with another serializer service, does not sign it anymore, and decoding with it does not check the signature.
    Send and receive the messages through their transport instead
+ * Deprecate signing only the messages whose handlers have the `sign` option.
+   In 9.0, such handlers only accept the messages dispatched in the same process and the ones received from a transport that signs every message.
+   Symfony gives this option to the handlers of `RunCommandMessage`, `RunProcessMessage`, `ServiceCallMessage` and `RedispatchMessage`.
+   Set the `sign` option on the transports these messages are routed to, and on their failure transports.
+   Do it only when their queues contain no unsigned message, or route these messages to a new transport:
+
+   ```yaml
+   messenger:
+       transports:
+           async_signed:
+               dsn: '%env(MESSENGER_SIGNED_TRANSPORT_DSN)%'
+               sign: true
+       routing:
+           Symfony\Component\Console\Messenger\RunCommandMessage: async_signed
+   ```
+
+   A transport that creates messages in the same process, without a serializer, should add `TrustStamp::trusted()` to them
+ * Deprecate passing a list of message types to `SigningSerializer`, pass the algorithm instead to sign every message:
+
+   ```php
+   // before
+   new SigningSerializer($serializer, $signingKey, [RunCommandMessage::class]);
+
+   // after
+   new SigningSerializer($serializer, $signingKey);
+   ```
+ * Deprecate `MessageTypeAwareSerializerInterface` and the `getMessageType()` method of `PhpSerializer`, `Serializer`, `ClaimCheckSerializer` and `InteropSerializer`.
+   `SigningSerializer` does not read the type of a message when it signs every message
  * `SigningSerializer` signs every header written by the serializer it decorates, except `Content-Type`.
    When it verifies a signature, the serializer it decorates only gets the signed headers and `Content-Type`.
    A message with headers other than `type`, `Content-Type` and the `X-Message-Stamp-*` ones gets a `Sign-Headers` header, and earlier versions refuse it.

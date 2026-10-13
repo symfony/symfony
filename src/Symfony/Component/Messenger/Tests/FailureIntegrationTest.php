@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -640,6 +642,8 @@ class FailureIntegrationTest extends TestCase
     }
 
     #[DataProvider('provideMessagesRejectedForTheirSignature')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testMessageRejectedForItsSignatureIsSentToTheFailureTransportWithoutRetry(SerializerInterface $inner, array $encodedEnvelope)
     {
         $serializer = new SigningSerializer($inner, 'signing-key', [DummyMessage::class]);
@@ -692,6 +696,8 @@ class FailureIntegrationTest extends TestCase
     }
 
     #[DataProvider('provideUnverifiedFailureSerializers')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testUnverifiedFailureDoesNotPutItsStampsOnTheSignedMessageOfItsClaim(SerializerInterface $inner, bool $failureTransportHasClaimCheck)
     {
         $signingSerializer = new SigningSerializer($inner, 'signing-key', [DummyMessage::class]);
@@ -740,6 +746,8 @@ class FailureIntegrationTest extends TestCase
     }
 
     #[DataProvider('provideUnverifiedFailuresOfSignedClaims')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testUnverifiedFailureIsHandledOnlyOnTheBusOfTheSignedMessageOfItsClaim(SerializerInterface $inner, ?string $failureBusName, ?string $workerBusName, array $expectedCalls)
     {
         $signingSerializer = new SigningSerializer($inner, 'signing-key', [DummyMessage::class]);
@@ -803,8 +811,8 @@ class FailureIntegrationTest extends TestCase
     #[DataProvider('provideMessagesRefusedByATransportThatSignsEveryMessage')]
     public function testMessageRefusedByATransportThatSignsEveryMessageIsNeverHandled(SerializerInterface $inner, array $encodedEnvelope)
     {
-        $serializer = new SigningSerializer($inner, 'signing-key', ['*']);
-        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*'], 'sha256', true);
+        $serializer = new SigningSerializer($inner, 'signing-key');
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', 'sha256', true);
         $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
         $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
 
@@ -844,18 +852,17 @@ class FailureIntegrationTest extends TestCase
 
         foreach (['JSON' => new Serializer(), 'PHP' => new PhpSerializer()] as $format => $inner) {
             yield $format.' without signature' => [$inner, $inner->encode($envelope)];
-            yield $format.' signed with another key' => [$inner, (new SigningSerializer($inner, 'another-key', ['*']))->encode($envelope)];
-            yield $format.' signed by a transport that signs the message type with another key' => [$inner, (new SigningSerializer($inner, 'another-key', [DummyMessage::class]))->encode($envelope)];
+            yield $format.' signed with another key' => [$inner, (new SigningSerializer($inner, 'another-key'))->encode($envelope)];
             yield $format.' with a body-only signature' => [$inner, ['headers' => ['Body-Sign' => hash_hmac('sha256', $inner->encode($envelope)['body'], 'signing-key'), 'Sign-Algo' => 'sha256'] + ($inner->encode($envelope)['headers'] ?? [])] + $inner->encode($envelope)];
-            yield $format.' signed as unverified' => [$inner, (new SigningSerializer($inner, 'signing-key', ['*']))->encode($envelope->with(new ReceivedStamp('async')))];
+            yield $format.' signed as unverified' => [$inner, (new SigningSerializer($inner, 'signing-key'))->encode($envelope->with(new ReceivedStamp('async')))];
         }
     }
 
     #[DataProvider('provideInnerSerializers')]
     public function testMessageSignedByTransportsThatSignEveryMessageIsRetriedThenRetriedFromTheFailureTransport(SerializerInterface $inner)
     {
-        $serializer = new SigningSerializer($inner, 'signing-key', ['*']);
-        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*'], 'sha256', true);
+        $serializer = new SigningSerializer($inner, 'signing-key');
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', 'sha256', true);
         $transport = new SerializingFailureTestSenderAndReceiver($serializer, []);
         $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
         $senders = new ServiceLocator(['transport' => static fn () => $transport, 'failed' => static fn () => $failureTransport]);
@@ -907,8 +914,8 @@ class FailureIntegrationTest extends TestCase
     #[DataProvider('provideInnerSerializers')]
     public function testFailureOfATransportThatDoesNotSignIsSignedAsUnverifiedByAFailureTransportThatSignsEveryMessage(SerializerInterface $inner)
     {
-        $serializer = new SigningSerializer($inner, 'signing-key', [\stdClass::class]);
-        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*', \stdClass::class], 'sha256', true);
+        $serializer = $inner;
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', 'sha256', true);
         $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$serializer->encode(new Envelope(new DummyMessage('API')))]);
         $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
 
@@ -947,9 +954,9 @@ class FailureIntegrationTest extends TestCase
     #[DataProvider('provideInnerSerializers')]
     public function testFailureOfATransportThatDoesNotSignIsRefusedByATransportThatSignsEveryMessageWhenRedispatched(SerializerInterface $inner)
     {
-        $serializer = new SigningSerializer($inner, 'signing-key', [\stdClass::class]);
-        $signingSerializer = new SigningSerializer($inner, 'signing-key', ['*', \stdClass::class]);
-        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*', \stdClass::class], 'sha256', true);
+        $serializer = $inner;
+        $signingSerializer = new SigningSerializer($inner, 'signing-key');
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', 'sha256', true);
         $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$serializer->encode(new Envelope(new DummyMessage('API')))]);
         $signingTransport = new SerializingFailureTestSenderAndReceiver($signingSerializer, []);
         $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
@@ -1013,7 +1020,7 @@ class FailureIntegrationTest extends TestCase
             return $item;
         });
         $pool->method('save')->willReturn(true);
-        $serializer = new ClaimCheckSerializer(new SigningSerializer($inner, 'signing-key', ['*']), $pool, 300);
+        $serializer = new ClaimCheckSerializer(new SigningSerializer($inner, 'signing-key'), $pool, 300);
 
         $forgedData = serialize(['body' => '{"message":"forged"}', 'headers' => ['type' => 'Unknown\Missing\MessageClass', 'X-Message-Stamp-Unknown\Missing\StampClass' => '[{}]']]);
         $values['forged'] = $forgedData;
@@ -1086,8 +1093,8 @@ class FailureIntegrationTest extends TestCase
             return $item;
         });
         $pool->method('save')->willReturn(true);
-        $serializer = new ClaimCheckSerializer(new SigningSerializer($inner, 'signing-key', ['*']), $pool, 300);
-        $failureSerializer = new SigningSerializer($inner, 'signing-key', ['*'], 'sha256', true);
+        $serializer = new ClaimCheckSerializer(new SigningSerializer($inner, 'signing-key'), $pool, 300);
+        $failureSerializer = new SigningSerializer($inner, 'signing-key', 'sha256', true);
         $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$serializer->encode(new Envelope(new DummyMessage(str_repeat('a', 1000))))]);
         $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
 
@@ -1119,6 +1126,8 @@ class FailureIntegrationTest extends TestCase
     }
 
     #[DataProvider('provideInnerSerializers')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testMessageOfASignedTypeFromATransportThatDoesNotSerializeIsRetriedFromAFailureTransportThatSignsIt(SerializerInterface $inner)
     {
         $transport = new InMemoryTransport();
@@ -1326,7 +1335,20 @@ class FailureIntegrationTest extends TestCase
     }
 
     #[DataProvider('provideClaimsThatCannotBeRetrievedUntilThePoolIsBack')]
-    public function testClaimThatCouldNotBeRetrievedIsHandledOnItsOwnBus(string $innerClass, bool $signed, ?string $failureSerializerClass, int $maxRetries)
+    public function testClaimThatCouldNotBeRetrievedIsHandledOnItsOwnBus(string $innerClass, ?string $failureSerializerClass, int $maxRetries)
+    {
+        $this->assertClaimThatCouldNotBeRetrievedIsHandledOnItsOwnBus($innerClass, false, $failureSerializerClass, $maxRetries);
+    }
+
+    #[DataProvider('provideClaimsSignedPerMessageTypeThatCannotBeRetrievedUntilThePoolIsBack')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testClaimSignedPerMessageTypeThatCouldNotBeRetrievedIsHandledOnItsOwnBus(string $innerClass, ?string $failureSerializerClass, int $maxRetries)
+    {
+        $this->assertClaimThatCouldNotBeRetrievedIsHandledOnItsOwnBus($innerClass, true, $failureSerializerClass, $maxRetries);
+    }
+
+    private function assertClaimThatCouldNotBeRetrievedIsHandledOnItsOwnBus(string $innerClass, bool $signed, ?string $failureSerializerClass, int $maxRetries): void
     {
         $values = [];
         $pool = $this->createStub(CacheItemPoolInterface::class);
@@ -1402,14 +1424,19 @@ class FailureIntegrationTest extends TestCase
 
     public static function provideClaimsThatCannotBeRetrievedUntilThePoolIsBack(): iterable
     {
+        yield 'JSON, retried' => [Serializer::class, null, 1];
+        yield 'PHP, retried' => [PhpSerializer::class, null, 1];
+    }
+
+    public static function provideClaimsSignedPerMessageTypeThatCannotBeRetrievedUntilThePoolIsBack(): iterable
+    {
         foreach (['JSON' => Serializer::class, 'PHP' => PhpSerializer::class] as $format => $innerClass) {
-            yield $format.', retried' => [$innerClass, false, null, 1];
-            yield $format.' signed, retried' => [$innerClass, true, null, 1];
-            yield $format.' signed, from the failure transport' => [$innerClass, true, null, 0];
+            yield $format.', retried' => [$innerClass, null, 1];
+            yield $format.', from the failure transport' => [$innerClass, null, 0];
         }
 
-        yield 'JSON signed, from a PHP failure transport' => [Serializer::class, true, PhpSerializer::class, 0];
-        yield 'PHP signed, from a JSON failure transport' => [PhpSerializer::class, true, Serializer::class, 0];
+        yield 'JSON, from a PHP failure transport' => [Serializer::class, PhpSerializer::class, 0];
+        yield 'PHP, from a JSON failure transport' => [PhpSerializer::class, Serializer::class, 0];
     }
 
     public static function provideUndecodableMessages(): iterable
@@ -1435,7 +1462,7 @@ class FailureIntegrationTest extends TestCase
         }
 
         $failureTransportSignsAll ??= $signAll;
-        $createSerializer = static fn (string $class, bool $signAll, bool $acceptUnverified = false): SerializerInterface => $signAll ? new SigningSerializer(new $class(), 'signing-key', ['*'], 'sha256', $acceptUnverified) : new $class();
+        $createSerializer = static fn (string $class, bool $signAll, bool $acceptUnverified = false): SerializerInterface => $signAll ? new SigningSerializer(new $class(), 'signing-key', 'sha256', $acceptUnverified) : new $class();
 
         if ($signAll) {
             $encodedEnvelope = (new SigningSerializer(new class($encodedEnvelope) implements SerializerInterface {
@@ -1453,7 +1480,7 @@ class FailureIntegrationTest extends TestCase
                 {
                     return $this->encodedEnvelope;
                 }
-            }, 'signing-key', ['*']))->encode(new Envelope(new DummyMessage('API')));
+            }, 'signing-key'))->encode(new Envelope(new DummyMessage('API')));
         }
 
         $queues = ['transport' => [$encodedEnvelope], 'failed' => []];

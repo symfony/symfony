@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -28,6 +30,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithLegacySerializabl
 use Symfony\Component\Messenger\Tests\Fixtures\DummyStampHoldingAnObject;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyUnloadedMessageEnum;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 
 // Force-load the deprecated-Serializable fixture under an error handler that swallows
 // the PHP deprecation it triggers at class-declaration time.
@@ -272,8 +275,12 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageType()
     {
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/messenger 8.2: The "%s::getMessageType()" method is deprecated, "%s" does not need it when it signs every message.', PhpSerializer::class, SigningSerializer::class));
+
         $serializer = $this->createPhpSerializer();
 
         $this->assertSame(DummyMessage::class, $serializer->getMessageType($serializer->encode(new Envelope(new DummyMessage('Hello')))));
@@ -283,6 +290,8 @@ class PhpSerializerTest extends TestCase
     }
 
     #[DataProvider('provideMessagesOfClassesThatAreNotLoaded')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageTypeDoesNotAutoloadClassesNamedByTheBody(string $message, string $expectedType)
     {
         $this->assertSame($expectedType, $this->getMessageTypeWithoutAutoloading($message));
@@ -295,6 +304,8 @@ class PhpSerializerTest extends TestCase
         yield 'object holding an enum case' => ['O:25:"Unknown\Missing\ClassName":1:{s:4:"case";E:33:"Unknown\Missing\EnumName:CaseName";}', 'Unknown\Missing\ClassName'];
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageTypeOfAnEnumWhoseClassIsNotLoadedYet()
     {
         $this->assertFalse(enum_exists(DummyUnloadedMessageEnum::class, false));
@@ -305,6 +316,8 @@ class PhpSerializerTest extends TestCase
     }
 
     #[DataProvider('provideMessagesThatAStampHoldsToo')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageTypeOfAMessageThatAStampHoldsToo(string $body, string $expectedType)
     {
         $this->assertSame($expectedType, $this->getMessageTypeOfBodyWithoutAutoloading($body));
@@ -323,6 +336,8 @@ class PhpSerializerTest extends TestCase
         yield 'enum case whose class is not loaded' => [str_replace(serialize(DummyMessageEnum::A), 'E:33:"Unknown\Missing\EnumName:CaseName";', $body), 'Unknown\Missing\EnumName'];
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageTypeWithLegacySerializableProperty()
     {
         $serializer = $this->createPhpSerializer();
@@ -335,7 +350,7 @@ class PhpSerializerTest extends TestCase
             $errors[] = $msg;
 
             return true;
-        });
+        }, \E_ALL & ~\E_USER_DEPRECATED);
 
         try {
             $type = $serializer->getMessageType($encoded);
@@ -347,6 +362,8 @@ class PhpSerializerTest extends TestCase
         $this->assertSame([], $errors, 'getMessageType() should not emit PHP warnings.');
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageTypeReturnsNullForUndeterminableBody()
     {
         $serializer = $this->createPhpSerializer();
@@ -359,6 +376,8 @@ class PhpSerializerTest extends TestCase
     }
 
     #[DataProvider('provideAdversarialBodies')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageTypeRejectsOrMatchesPhpForAdversarialBody(string $body, ?string $expected)
     {
         $this->assertSame($expected, $this->createPhpSerializer()->getMessageType(['body' => addslashes($body)]));

@@ -26,7 +26,7 @@ final class UnverifiedDecodingFailureStamp implements NonSendableStampInterface
      */
     public function __construct(
         public readonly array $stamps,
-        private array $signedMessageTypes,
+        private array $signedMessageTypes = [],
     ) {
     }
 

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Failure;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
@@ -203,7 +205,20 @@ class FailedMessageRepositoryTest extends TestCase
     #[DataProvider('provideFailureTransportSerializers')]
     public function testRedispatchToATransportThatSignsEverythingIsAcceptedOnlyWhenTheFailureTransportVerifiedTheMessage(SerializerInterface $failureSerializer, bool $expectAccepted)
     {
-        $serializer = new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']);
+        $this->assertRedispatchToATransportThatSignsEverythingIsAccepted($failureSerializer, $expectAccepted);
+    }
+
+    #[DataProvider('provideFailureTransportSerializersThatSignMessageTypes')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testRedispatchToATransportThatSignsEverythingFromAFailureTransportThatSignsMessageTypes(\Closure $createFailureSerializer, bool $expectAccepted)
+    {
+        $this->assertRedispatchToATransportThatSignsEverythingIsAccepted($createFailureSerializer(), $expectAccepted);
+    }
+
+    private function assertRedispatchToATransportThatSignsEverythingIsAccepted(SerializerInterface $failureSerializer, bool $expectAccepted): void
+    {
+        $serializer = new SigningSerializer(new PhpSerializer(), 'signing-key');
         $envelope = $failureSerializer->decode($failureSerializer->encode(new Envelope(new DummyMessage('a'), [new SentToFailureTransportStamp('async')])))->with(new ReceivedStamp('failed'));
 
         $async = new InMemoryTransport($serializer);
@@ -220,10 +235,14 @@ class FailedMessageRepositoryTest extends TestCase
 
     public static function provideFailureTransportSerializers(): iterable
     {
-        yield 'signing every message' => [new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']), true];
-        yield 'signing the message type' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class]), true];
-        yield 'signing other message types' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [\stdClass::class]), false];
+        yield 'signing every message' => [new SigningSerializer(new PhpSerializer(), 'signing-key'), true];
         yield 'not signing' => [new PhpSerializer(), false];
+    }
+
+    public static function provideFailureTransportSerializersThatSignMessageTypes(): iterable
+    {
+        yield 'signing the message type' => [static fn () => new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class]), true];
+        yield 'signing other message types' => [static fn () => new SigningSerializer(new PhpSerializer(), 'signing-key', [\stdClass::class]), false];
     }
 
     public function testRedispatchDispatchesTheStrippedEnvelopeThenAcksTheOriginal()
@@ -275,6 +294,8 @@ class FailedMessageRepositoryTest extends TestCase
         $this->assertSame([], $sent[0]->all(SentToFailureTransportStamp::class));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testRedispatchDoesNotPutTheStampsOfAnUnverifiedFailureOnTheSignedMessageItDecodesTo()
     {
         $phpSerializer = new PhpSerializer();

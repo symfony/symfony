@@ -44,35 +44,71 @@ final class SigningSerializer implements SerializerInterface
     private const CONTENT_TYPE_HEADER = 'Content-Type';
 
     private array $signingKeys;
-    private bool $signAll;
+    private string $algorithm;
+    private bool $acceptUnverified;
 
     /**
-     * @param string|\Stringable|non-empty-list<string|\Stringable> $signingKey         The key, or a list of keys to rotate it: the first one signs, all of them verify
-     * @param list<class-string|'*'>                                $signedMessageTypes The message types that require a verified signature, or "*" to sign every message and to refuse a message without a valid signature before reading its type
-     * @param bool                                                  $acceptUnverified   Whether a serializer that signs every message accepts the messages signed as unverified, as the one of a failure transport does
+     * The message types that require a signature, when not every message is signed.
+     *
+     * @var list<class-string>|null
+     */
+    private ?array $signedMessageTypes = null;
+
+    /**
+     * Signs every message, and refuses a message without a valid signature before reading it.
+     *
+     * @param string|\Stringable|non-empty-list<string|\Stringable> $signingKey       The key, or a list of keys to rotate it: the first one signs, all of them verify
+     * @param string|list<class-string>                             $algorithm        The hashing algorithm of the HMAC, passing a list of message types instead is deprecated since Symfony 8.2
+     * @param bool|string                                           $acceptUnverified Whether to accept the messages signed as unverified, as the serializer of a failure transport does
      */
     public function __construct(
         private SerializerInterface $inner,
         #[\SensitiveParameter] string|\Stringable|array $signingKey,
-        private array $signedMessageTypes,
-        private string $algorithm = 'sha256',
-        private bool $acceptUnverified = false,
+        array|string $algorithm = 'sha256',
+        string|bool $acceptUnverified = false,
     ) {
         if (!$this->signingKeys = \is_array($signingKey) ? array_values($signingKey) : [$signingKey]) {
             throw new InvalidArgumentException('At least one signing key is required.');
         }
 
-        $this->signAll = \in_array('*', $signedMessageTypes, true);
+        if (\is_array($algorithm)) {
+            trigger_deprecation('symfony/messenger', '8.2', 'Passing a list of message types to "%s()" is deprecated, pass the algorithm instead to sign every message.', __METHOD__);
+
+            $this->signedMessageTypes = $algorithm;
+            $algorithm = \is_string($acceptUnverified) ? $acceptUnverified : 'sha256';
+            $acceptUnverified = false;
+        } elseif (!\is_bool($acceptUnverified)) {
+            throw new \TypeError(\sprintf('Argument 4 passed to "%s()" must be of type bool, string given.', __METHOD__));
+        }
+
+        $this->algorithm = $algorithm;
+        $this->acceptUnverified = $acceptUnverified;
+    }
+
+    /**
+     * Signs only the messages of the given types, for the transports that do not sign every message.
+     *
+     * @param list<class-string> $signedMessageTypes
+     *
+     * @internal
+     */
+    public static function forMessageTypes(SerializerInterface $inner, #[\SensitiveParameter] string|\Stringable|array $signingKey, array $signedMessageTypes, string $algorithm = 'sha256'): self
+    {
+        $serializer = new self($inner, $signingKey, $algorithm);
+        $serializer->signedMessageTypes = $signedMessageTypes;
+
+        return $serializer;
     }
 
     public function encode(Envelope $envelope): array
     {
         $encoded = $this->inner->encode($envelope);
 
-        if (!$this->signedMessageTypes) {
+        if ([] === $this->signedMessageTypes) {
             return $encoded;
         }
 
+        $signAll = null === $this->signedMessageTypes;
         $trusted = TrustStamp::isEnvelopeTrusted($envelope);
 
         if (($message = $envelope->getMessage()) instanceof MessageDecodingFailedException) {
@@ -81,9 +117,11 @@ final class SigningSerializer implements SerializerInterface
             $trusted = $trusted && $this->hasValidSignature($message->encodedEnvelope, false) && !isset($message->encodedEnvelope['headers'][self::UNVERIFIED_HEADER]);
 
             // a message refused for its signature stays refused: signing its failure, even as unverified, would let a failure transport accept it
-            $sign = !$message->getPrevious() instanceof InvalidMessageSignatureException && ($this->signAll || $this->hasValidSignature($message->encodedEnvelope, true));
-        } else {
-            $sign = $this->signAll || $this->shouldSign($message::class);
+            $sign = !$message->getPrevious() instanceof InvalidMessageSignatureException && ($signAll || $this->hasValidSignature($message->encodedEnvelope, true));
+        } elseif ($sign = $signAll || $this->shouldSign($message::class)) {
+            if (!$signAll) {
+                self::triggerSignedMessageTypeDeprecation($message::class);
+            }
         }
 
         if ($sign) {
@@ -116,16 +154,17 @@ final class SigningSerializer implements SerializerInterface
     public function decode(array $encodedEnvelope): Envelope
     {
         // no message type requires signing: act as a pass-through for the inner serializer
-        if (!$this->signedMessageTypes) {
+        if ([] === $this->signedMessageTypes) {
             return $this->inner->decode($encodedEnvelope);
         }
 
+        $signAll = null === $this->signedMessageTypes;
         $headers = $encodedEnvelope['headers'] ?? [];
         $sign = $headers['Body-Sign'] ?? null;
         $sign = \is_string($sign) ? $sign : null;
 
         try {
-            if ($signed = $this->hasValidSignature($encodedEnvelope, !$this->signAll)) {
+            if ($signed = $this->hasValidSignature($encodedEnvelope, !$signAll)) {
                 if (str_starts_with($sign, self::SIGNATURE_MARKER)) {
                     // the inner serializer only gets the signed headers, and so does a decode failure, as a failure transport signs it again
                     $encodedEnvelope['headers'] = $headers = array_intersect_key($headers, self::getSignedHeaders($encodedEnvelope) + ['Body-Sign' => true, 'Sign-Algo' => true, self::CONTENT_TYPE_HEADER => true]);
@@ -144,7 +183,11 @@ final class SigningSerializer implements SerializerInterface
                 // a body-only signature leaves the headers unverified
                 $trust = str_starts_with($sign, self::SIGNATURE_MARKER) ? [TrustStamp::trusted()] : [];
 
-                if (!$failure instanceof MessageDecodingFailedException || $this->hasValidSignature($failure->encodedEnvelope, !$this->signAll)) {
+                if (!$failure instanceof MessageDecodingFailedException || $this->hasValidSignature($failure->encodedEnvelope, !$signAll)) {
+                    if (!$signAll && $this->shouldSign($failure::class)) {
+                        self::triggerSignedMessageTypeDeprecation($failure::class);
+                    }
+
                     return $envelope->with(...$trust);
                 }
 
@@ -152,17 +195,29 @@ final class SigningSerializer implements SerializerInterface
                 return MessageDecodingFailedException::wrap($encodedEnvelope, $failure->getMessage(), $failure->getCode(), $failure->getPrevious())->with(...array_merge(...array_values($envelope->all())), ...$trust);
             }
 
-            if ($this->signAll && (!$signed || !$this->acceptUnverified)) {
-                // nothing that the signature does not cover is read: neither the type of the message nor its stamps
-                $error = match (true) {
-                    $signed => 'The message is signed as unverified: only a failure transport accepts it.',
-                    null === $sign => 'The message requires a signature but none was found.',
-                    !str_starts_with($sign, self::SIGNATURE_MARKER) => 'The signature of the message does not cover its headers.',
-                    $this->algorithm !== $algo = $headers['Sign-Algo'] ?? $this->algorithm => \sprintf('Expected "%s" signature algorithm, "%s" given.', $this->algorithm, $algo),
-                    default => 'Invalid message signature.',
-                };
+            if ($signAll) {
+                if (!$signed || !$this->acceptUnverified) {
+                    // nothing that the signature does not cover is read: neither the type of the message nor its stamps
+                    $error = match (true) {
+                        $signed => 'The message is signed as unverified: only a failure transport accepts it.',
+                        null === $sign => 'The message requires a signature but none was found.',
+                        !str_starts_with($sign, self::SIGNATURE_MARKER) => 'The signature of the message does not cover its headers.',
+                        $this->algorithm !== $algo = $headers['Sign-Algo'] ?? $this->algorithm => \sprintf('Expected "%s" signature algorithm, "%s" given.', $this->algorithm, $algo),
+                        default => 'Invalid message signature.',
+                    };
 
-                throw new InvalidMessageSignatureException($error);
+                    throw new InvalidMessageSignatureException($error);
+                }
+
+                // the type of a message signed as unverified is not read, as the handlers that require a signature refuse such a message
+                $envelope = $this->inner->decode($signedEnvelope);
+
+                if (!$envelope->getMessage() instanceof MessageDecodingFailedException) {
+                    return $envelope->with(TrustStamp::untrusted());
+                }
+
+                // a claim reference it carries is verified only once retrieved: the stamps of this failure must not reach the signed message it resolves to
+                return $envelope->with(new UnverifiedDecodingFailureStamp(array_merge(...array_values($envelope->all()))), TrustStamp::untrusted());
             }
 
             // a message signed as unverified is read like an unsigned one: the signature only tells that this key signed it as such
@@ -172,7 +227,7 @@ final class SigningSerializer implements SerializerInterface
             if (!$this->inner instanceof MessageTypeAwareSerializerInterface) {
                 $envelope = $this->inner->decode($unverifiedEnvelope);
                 $type = $envelope->getMessage()::class;
-            } elseif (null === $type = $this->inner->getMessageType($unverifiedEnvelope)) {
+            } elseif (null === $type = $this->inner->getMessageType($unverifiedEnvelope, false)) {
                 throw new InvalidMessageSignatureException('The message could not be verified and its type could not be determined; refusing to decode it.');
             }
 
@@ -213,6 +268,11 @@ final class SigningSerializer implements SerializerInterface
         } catch (\Throwable $e) {
             return MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), (int) $e->getCode(), $e);
         }
+    }
+
+    private static function triggerSignedMessageTypeDeprecation(string $type): void
+    {
+        trigger_deprecation('symfony/messenger', '8.2', 'Signing only the messages that require a signature, such as "%s", is deprecated. Set the "sign" option of their transport to sign every message. In 9.0, their handlers will refuse the messages of transports that do not sign every message.', $type);
     }
 
     private function shouldSign(string $type): bool

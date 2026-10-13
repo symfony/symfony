@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -606,13 +605,18 @@ class MessengerBundleExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('messenger_sign');
 
-        foreach (['async' => ['messenger.default_serializer', true, false], 'failed' => ['messenger.transport.symfony_serializer', true, true], 'plain' => ['messenger.default_serializer', false, false]] as $name => [$innerId, $signAll, $acceptUnverified]) {
+        foreach (['async' => ['messenger.default_serializer', true, false], 'failed' => ['messenger.transport.symfony_serializer', true, true], 'plain' => ['messenger.default_serializer', false, null]] as $name => [$innerId, $signAll, $acceptUnverified]) {
             $serializer = $container->getDefinition('.messenger.transport.'.$name.'.signing_serializer');
             $this->assertSame(SigningSerializer::class, $serializer->getClass());
             $this->assertSame($innerId, (string) $serializer->getArgument(0));
-            $this->assertSame($signAll, ['*'] === $serializer->getArgument(2));
-            $this->assertSame($acceptUnverified, $serializer->getArgument(4));
+            $this->assertSame($signAll ? null : [SigningSerializer::class, 'forMessageTypes'], $serializer->getFactory());
+            $this->assertSame($acceptUnverified, $signAll ? $serializer->getArgument(3) : null);
         }
+
+        $tags = $container->findTaggedServiceIds('messenger.receiver');
+        $this->assertTrue($tags['messenger.transport.async'][0]['sign'] ?? false);
+        $this->assertTrue($tags['messenger.transport.failed'][0]['sign'] ?? false);
+        $this->assertArrayNotHasKey('sign', $tags['messenger.transport.plain'][0]);
 
         $serializers = $container->getDefinition('messenger.transport.serializer_locator')->getArgument(0);
         $this->assertSame('.messenger.transport.async.claim_check_serializer', (string) $serializers['async']);
@@ -631,9 +635,8 @@ class MessengerBundleExtensionTest extends TestCase
         });
 
         $failed = $container->getDefinition('.messenger.transport.failed.signing_serializer');
-        $this->assertSame(['*'], $failed->getArgument(2));
-        $this->assertTrue($failed->getArgument(4));
-        $this->assertFalse($container->getDefinition('.messenger.transport.plain.signing_serializer')->getArgument(4));
+        $this->assertNull($failed->getFactory());
+        $this->assertTrue($failed->getArgument(3));
     }
 
     public static function provideFailureTransportsThatSignEveryMessage(): iterable
@@ -655,22 +658,22 @@ class MessengerBundleExtensionTest extends TestCase
         ]];
     }
 
-    public function testMessengerTransportsUsedAsFailureTransportsAcceptUnverifiedMessages()
+    public function testMessengerTransportsThatSignEveryMessageAcceptUnverifiedMessagesWhenUsedAsFailureTransports()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('messenger', [
                 'failure_transport' => 'failed',
                 'transports' => [
-                    'async' => ['dsn' => 'in-memory:///', 'failure_transport' => 'failed_async'],
-                    'plain' => 'in-memory:///',
-                    'failed' => 'in-memory:///',
-                    'failed_async' => 'in-memory:///',
+                    'async' => ['dsn' => 'in-memory:///', 'sign' => true, 'failure_transport' => 'failed_async'],
+                    'plain' => ['dsn' => 'in-memory:///', 'sign' => true],
+                    'failed' => ['dsn' => 'in-memory:///', 'sign' => true],
+                    'failed_async' => ['dsn' => 'in-memory:///', 'sign' => true],
                 ],
             ]);
         });
 
         foreach (['async' => false, 'plain' => false, 'failed' => true, 'failed_async' => true] as $name => $acceptUnverified) {
-            $this->assertSame($acceptUnverified, $container->getDefinition('.messenger.transport.'.$name.'.signing_serializer')->getArgument(4));
+            $this->assertSame($acceptUnverified, $container->getDefinition('.messenger.transport.'.$name.'.signing_serializer')->getArgument(3));
         }
     }
 
@@ -717,7 +720,9 @@ class MessengerBundleExtensionTest extends TestCase
             ]);
         });
 
-        $this->assertSame(['*'], $container->getDefinition('.messenger.transport.failed_signed.signing_serializer')->getArgument(2));
+        $failedSigned = $container->getDefinition('.messenger.transport.failed_signed.signing_serializer');
+        $this->assertNull($failedSigned->getFactory());
+        $this->assertTrue($failedSigned->getArgument(3));
     }
 
     public function testMessengerOutboxOfATransportThatSignsEveryMessageMustSignToo()
@@ -823,7 +828,7 @@ class MessengerBundleExtensionTest extends TestCase
 
         $signingSerializer = $container->getDefinition('.messenger.transport.orders.outbox.signing_serializer');
         $this->assertEquals(new Reference('messenger.default_serializer'), $signingSerializer->getArgument(0));
-        $this->assertSame(['*'], $signingSerializer->getArgument(2));
+        $this->assertNull($signingSerializer->getFactory());
         $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.orders.outbox')->getArgument(0));
         $this->assertSame('orders_failed', $container->getDefinition('.messenger.transport.orders.outbox_sender')->getArgument(4));
         $this->assertSame('orders_failed', $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(2)['orders.outbox']);
@@ -1216,8 +1221,8 @@ class MessengerBundleExtensionTest extends TestCase
             $container->addCompilerPass(new MessengerPass());
         });
 
-        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
-        $this->assertContains(RedispatchMessage::class, $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+        $this->assertTrue($container->hasDefinition('.messenger.signing_serializer.message_types'));
+        $this->assertContains(RedispatchMessage::class, $container->getDefinition('.messenger.signing_serializer.message_types')->getArgument(2));
     }
 
     public function testMessengerSigningSecretDefaultsToTheKernelSecret()
@@ -1226,7 +1231,8 @@ class MessengerBundleExtensionTest extends TestCase
             $container->loadFromExtension('messenger', []);
         });
 
-        $this->assertInstanceOf(Definition::class, $container->getDefinition('messenger.signing_serializer')->getArgument(1));
+        $this->assertSame('.messenger.signing_serializer.lazy_signing_key', (string) $container->getDefinition('messenger.signing_serializer')->getArgument(1));
+        $this->assertSame('.messenger.signing_serializer.lazy_signing_key', (string) $container->getDefinition('.messenger.signing_serializer.message_types')->getArgument(1));
         $this->assertEquals([[new Parameter('kernel.secret')]], $container->getDefinition('.messenger.signing_serializer.signing_key')->getArguments());
     }
 
@@ -1235,11 +1241,12 @@ class MessengerBundleExtensionTest extends TestCase
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('messenger', [
                 'serializer' => ['signing_secret' => ['new', 'old']],
-                'transports' => ['async' => ['dsn' => 'in-memory://', 'sign' => true]],
+                'transports' => ['async' => ['dsn' => 'in-memory://', 'sign' => true], 'plain' => 'in-memory://'],
             ]);
         });
 
         $this->assertSame(['new', 'old'], $container->getDefinition('.messenger.transport.async.signing_serializer')->getArgument(1));
+        $this->assertSame(['new', 'old'], $container->getDefinition('.messenger.transport.plain.signing_serializer')->getArgument(1));
     }
 
     private function getBusMiddlewareIds(ContainerBuilder $container, string $busId): array

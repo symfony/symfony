@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -152,6 +154,8 @@ class ClaimCheckSerializerTest extends TestCase
         $this->assertEquals(new DummyMessage(str_repeat('a', 1000)), $serializer->decode($failure->getMessage()->encodedEnvelope)->getMessage());
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testMessageTypeDoesNotRetrieveClaim()
     {
         $values = [];
@@ -164,8 +168,12 @@ class ClaimCheckSerializerTest extends TestCase
         $this->assertSame(DummyMessage::class, $serializer->getMessageType($encoded));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testMessageTypeIsDelegatedForRegularEnvelope()
     {
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/messenger 8.2: The "%s::getMessageType()" method is deprecated, "%s" does not need it when it signs every message.', ClaimCheckSerializer::class, SigningSerializer::class));
+
         $serializer = new ClaimCheckSerializer(new PhpSerializer(), $this->createStub(CacheItemPoolInterface::class), 10000);
         $encoded = $serializer->encode(new Envelope(new DummyMessage('hello')));
 
@@ -176,7 +184,7 @@ class ClaimCheckSerializerTest extends TestCase
     {
         $values = [];
         $serializer = new ClaimCheckSerializer(
-            new SigningSerializer(new PhpSerializer(), 'secret', [DummyMessage::class]),
+            new SigningSerializer(new PhpSerializer(), 'secret'),
             $this->createCachePool($values),
             512,
         );

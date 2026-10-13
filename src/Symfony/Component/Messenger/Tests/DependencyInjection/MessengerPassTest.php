@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -1424,10 +1426,11 @@ class MessengerPassTest extends TestCase
         (new ResolveClassPass())->process($container);
         (new MessengerPass())->process($container);
 
-        $this->assertSame([DummyMessage::class], $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+        $this->assertSame([DummyMessage::class], $container->getDefinition('.messenger.signing_serializer.message_types')->getArgument(2));
         $this->assertInstanceOf(ChildDefinition::class, $container->getDefinition('.messenger.transport.async.signing_serializer'));
         $this->assertInstanceOf(ChildDefinition::class, $signed = $container->getDefinition('.messenger.transport.signed.signing_serializer'));
-        $this->assertSame(['*', DummyMessage::class], $signed->getArgument(2));
+        $this->assertSame('messenger.signing_serializer', $signed->getParent());
+        $this->assertSame([null, 'signing-key', 'sha256', false], array_values($container->getDefinition('messenger.signing_serializer')->getArguments()));
     }
 
     public function testAllSignedMessagesAreMapped()
@@ -1449,20 +1452,98 @@ class MessengerPassTest extends TestCase
         (new ResolveClassPass())->process($container);
         (new MessengerPass())->process($container);
 
-        $this->assertSame([DummyMessage::class, DummyCommand::class], $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+        $this->assertSame([DummyMessage::class, DummyCommand::class], $container->getDefinition('.messenger.signing_serializer.message_types')->getArgument(2));
+    }
+
+    public function testAHandlerThatRequiresASignatureCannotBeBoundToATransportThatDoesNotSignEveryMessage()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async', 'sign' => true]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid handler service "%s": it requires a signature, so the "async" transport that its "transport" option refers to must sign every message; set the "sign" option of that transport to true.', DummyHandler::class));
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testAHandlerThatRequiresASignatureCanBeBoundToATransportThatSignsEveryMessageOrHandlesThemInThisProcess()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async', 'sign' => true]);
+        $container->register('messenger.transport.sync', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'sync', 'is_consumable' => false]);
+        $container->register('app.async_handler', DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async', 'sign' => true]);
+        $container->register('app.sync_handler', DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'sync', 'sign' => true]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame([DummyMessage::class => ['async', 'sync']], $container->getDefinition('messenger.senders_locator')->getArgument(0));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testRoutingAMessageWhoseHandlerRequiresASignatureToATransportThatDoesNotSignEveryMessageIsDeprecated()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([DummyMessage::class => ['async']]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['sign' => true]);
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/messenger 8.2: Routing message "%s" to the "async" transport is deprecated. A handler of this message requires a signature, but the transport does not sign every message. Set the "sign" option of the transport to true, or the handler will refuse these messages in 9.0.', DummyMessage::class));
+
+        (new MessengerPass())->process($container);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testRoutingAChildOfAMessageWhoseHandlerRequiresASignatureToATransportThatDoesNotSignEveryMessageIsDeprecated()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([ChildDummyMessage::class => ['messenger.transport.async']]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['sign' => true]);
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/messenger 8.2: Routing message "%s" to the "messenger.transport.async" transport is deprecated. A handler of this message requires a signature, but the transport does not sign every message. Set the "sign" option of the transport to true, or the handler will refuse these messages in 9.0.', ChildDummyMessage::class));
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testRoutingAMessageWhoseHandlerRequiresASignatureToATransportThatSignsEveryMessageOrHandlesItInThisProcessOrThroughAWildcardIsNotDeprecated()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([
+            DummyMessage::class => ['signed', 'sync', 'app.sender'],
+            'Symfony\Component\Messenger\Tests\Fixtures\*' => ['async'],
+            '*' => ['async'],
+        ]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
+        $container->register('messenger.transport.signed', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'signed', 'sign' => true]);
+        $container->register('messenger.transport.sync', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'sync', 'is_consumable' => false]);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['sign' => true]);
+        $container->register(DummyCommandHandler::class, DummyCommandHandler::class)->addTag('messenger.message_handler', ['sign' => true]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['signed', 'sync', 'app.sender'], $container->getDefinition('messenger.senders_locator')->getArgument(0)[DummyMessage::class]);
     }
 
     private function registerSigningSerializers(ContainerBuilder $container): void
     {
         $container->register('messenger.signing_serializer', SigningSerializer::class)
             ->setAbstract(true)
-            ->setArguments([null, 'signing-key', []])
+            ->setArguments([null, 'signing-key', 'sha256', false])
         ;
-        $container->setDefinition('.messenger.transport.async.signing_serializer', (new ChildDefinition('messenger.signing_serializer'))
+        $container->register('.messenger.signing_serializer.message_types', SigningSerializer::class)
+            ->setAbstract(true)
+            ->setFactory([SigningSerializer::class, 'forMessageTypes'])
+            ->setArguments([null, 'signing-key', [], 'sha256'])
+        ;
+        $container->setDefinition('.messenger.transport.async.signing_serializer', (new ChildDefinition('.messenger.signing_serializer.message_types'))
             ->replaceArgument(0, new Reference('messenger.default_serializer')));
         $container->setDefinition('.messenger.transport.signed.signing_serializer', (new ChildDefinition('messenger.signing_serializer'))
-            ->replaceArgument(0, new Reference('messenger.default_serializer'))
-            ->replaceArgument(2, ['*']));
+            ->replaceArgument(0, new Reference('messenger.default_serializer')));
     }
 
     public function testTaggedMiddlewareIsAddedBeforeSendMessage()
@@ -1800,7 +1881,7 @@ class MessengerPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('.messenger.transport.async.signing_serializer'));
         $this->assertSame('messenger.default_serializer', (string) $container->getAlias('.messenger.transport.async.signing_serializer'));
         $this->assertInstanceOf(ChildDefinition::class, $container->getDefinition('.messenger.transport.signed.signing_serializer'));
-        $this->assertSame([], $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+        $this->assertSame([], $container->getDefinition('.messenger.signing_serializer.message_types')->getArgument(2));
     }
 
     public function testAHandlerOfEveryMessageThatAsksForASignatureDoesNotMakeTransportsSignEveryMessage()
@@ -1817,9 +1898,9 @@ class MessengerPassTest extends TestCase
         (new ResolveClassPass())->process($container);
         (new MessengerPass())->process($container);
 
-        $this->assertSame([], $container->getDefinition('messenger.signing_serializer')->getArgument(2));
+        $this->assertSame([], $container->getDefinition('.messenger.signing_serializer.message_types')->getArgument(2));
         $this->assertSame('messenger.default_serializer', (string) $container->getAlias('.messenger.transport.async.signing_serializer'));
-        $this->assertSame(['*'], $container->getDefinition('.messenger.transport.signed.signing_serializer')->getArgument(2));
+        $this->assertSame('messenger.signing_serializer', $container->getDefinition('.messenger.transport.signed.signing_serializer')->getParent());
     }
 
     public function testItRegistersTypeMappingFromMessageTag()

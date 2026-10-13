@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\ObjectMapper\CacheWarmer\ObjectMapperCacheWarmer;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
+use Symfony\Component\ObjectMapper\Metadata\PropertyReadability;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
@@ -24,6 +25,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheWarmer\AbstractSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheWarmer\AbstractSourceView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheWarmer\ClosureTransformSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheWarmer\ClosureTransformView;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 
 class ObjectMapperCacheWarmerTest extends TestCase
 {
@@ -57,6 +60,19 @@ class ObjectMapperCacheWarmerTest extends TestCase
         $this->assertTrue($pool->getItem(self::propertyNamesKey(B::class))->isHit());
         $this->assertTrue($pool->getItem(self::propertyMetadataKey(A::class, B::class))->isHit());
         $this->assertArrayHasKey('foo', $pool->getItem(self::propertyMetadataKey(A::class, B::class))->get());
+    }
+
+    public function testWarmUpLeavesToThePropertyAccessorOnlyThePropertiesItDoesNotAccessAsPublicOnes()
+    {
+        $extractor = new ReflectionExtractor();
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, null, $extractor, $extractor);
+        $warmer = new ObjectMapperCacheWarmer([A::class => [B::class]], $this->file, new ReflectionObjectMapperMetadataFactory(), $propertyAccessor, $extractor, $extractor);
+        $warmer->warmUp(\dirname($this->file), \dirname($this->file));
+
+        $metadata = $this->getArrayPool()->getItem(self::propertyMetadataKey(A::class, B::class))->get();
+        $this->assertSame(PropertyReadability::INITIALIZED, $metadata['baz']['readability']);
+        $this->assertTrue($metadata['baz']['targetWritable']);
+        $this->assertSame(PropertyReadability::ACCESSOR, $metadata['concat']['readability']);
     }
 
     public function testWarmUpSkipsAPairWhoseMetadataCannotBeExportedAndKeepsTheOthers()

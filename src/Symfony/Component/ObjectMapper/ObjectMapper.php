@@ -135,6 +135,9 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             throw new MappingException(\sprintf('Expected the mapped object to be an instance of "%s" but got "%s".', $targetRefl->getName(), get_debug_type($mappedTarget)));
         }
 
+        // a child class returned by a transform can have setters that the metadata of the declared target does not know about
+        $writeDirectly = !$this->propertyAccessor || $mappedTarget::class === $declaredTarget::class;
+
         $objectMap[$source] = $mappedTarget;
         $this->initializeLazyObject($source);
         $sourceVars = null;
@@ -147,7 +150,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
                 $propertyMetadata = $this->propertyMetadataFactory->create($source, $declaredTarget, $parameterName);
                 if ($this->isReadable($source, $parameterName, $propertyMetadata['readability'], $sourceVars)) {
-                    $ctorArguments[$parameterName] = $this->getRawValue($source, $parameterName, $propertyMetadata['sourceDeclared']);
+                    $ctorArguments[$parameterName] = $this->getRawValue($source, $parameterName, $propertyMetadata['sourceDeclared'], $propertyMetadata['readability']);
                 } else {
                     $ctorArguments[$parameterName] = $parameter['hasDefault'] ? $parameter['default'] : null;
                 }
@@ -184,16 +187,17 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $value = $this->getRawValue($source, $sourcePropertyName, $propertyMapping['sourceDeclared']);
+                $value = $this->getRawValue($source, $sourcePropertyName, $propertyMapping['sourceDeclared'], $propertyMapping['sourceReadability']);
                 if ($fn && !$isClassRule && !$this->call($fn, $value, $source, $mappedTarget)) {
                     unset($ctorArguments[$targetPropertyName]);
 
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping, $propertyMapping['targetPropertyClass'], $declaredTarget, $targetPropertyName, $ctorArguments, $propertyMapping['targetWritable']);
+                $writable = $writeDirectly && $propertyMapping['targetWritable'];
+                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping, $propertyMapping['targetPropertyClass'], $declaredTarget, $targetPropertyName, $ctorArguments, $writable);
                 $explicitTargets[$targetPropertyName] = true;
-                $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value, $propertyMapping['targetWritable']);
+                $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value, $writable);
             }
 
             if ($propertyMetadata['mappings']) {
@@ -209,7 +213,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $implicitValues[$propertyName] = [$this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName, $propertyMetadata['sourceDeclared']), $objectMap, $propertyMetadata['sameNameMapping'], $propertyMetadata['targetPropertyClass'], $declaredTarget, $propertyName, $ctorArguments, $propertyMetadata['targetWritable']), $propertyMetadata['targetWritable']];
+                $writable = $writeDirectly && $propertyMetadata['targetWritable'];
+                $implicitValues[$propertyName] = [$this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName, $propertyMetadata['sourceDeclared'], $propertyMetadata['readability']), $objectMap, $propertyMetadata['sameNameMapping'], $propertyMetadata['targetPropertyClass'], $declaredTarget, $propertyName, $ctorArguments, $writable), $writable];
 
                 continue;
             }
@@ -218,7 +223,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 continue;
             }
 
-            $rawValue = $this->getRawValue($source, $propertyName, $propertyMetadata['sourceDeclared']);
+            $rawValue = $this->getRawValue($source, $propertyName, $propertyMetadata['sourceDeclared'], $propertyMetadata['mergeReadability']);
             if (
                 \is_object($rawValue)
                 // a self-referencing relation maps to the same target by definition, merging it would overwrite the target with the related object's values
@@ -247,8 +252,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             }
         }
 
-        foreach ($mapToProperties as $property => $value) {
-            if ($this->propertyAccessor) {
+        foreach ($mapToProperties as $property => [$value, $writable]) {
+            if (!$writable) {
                 if ($this->propertyAccessor->isWritable($mappedTarget, $property)) {
                     $this->propertyAccessor->setValue($mappedTarget, $property, $value);
                 }
@@ -256,7 +261,16 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 continue;
             }
 
-            $mappedTarget->{$property} = $value;
+            try {
+                $mappedTarget->{$property} = $value;
+            } catch (\TypeError $e) {
+                if (!$this->propertyAccessor) {
+                    throw $e;
+                }
+
+                // the accessor converts a DateTime to a DateTimeImmutable and back, or throws its own exception
+                $this->propertyAccessor->setValue($mappedTarget, $property, $value);
+            }
         }
 
         return $mappedTarget;
@@ -277,9 +291,12 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         };
     }
 
-    private function getRawValue(object $source, string $propertyName, bool $declared): mixed
+    /**
+     * @param PropertyReadability::* $readability
+     */
+    private function getRawValue(object $source, string $propertyName, bool $declared, int $readability): mixed
     {
-        if ($this->propertyAccessor) {
+        if (PropertyReadability::ACCESSOR === $readability) {
             try {
                 return $this->propertyAccessor->getValue($source, $propertyName);
             } catch (PropertyAccessorNoSuchPropertyException $e) {
@@ -362,8 +379,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
      */
     private function getDestinationContext(object $declaredTarget, object $mappedTarget, string $propertyName, array $ctorArguments, bool $writable): array
     {
-        $writable = \array_key_exists($propertyName, $ctorArguments)
-            || ($this->propertyAccessor ? $this->propertyAccessor->isWritable($mappedTarget, $propertyName) : $writable);
+        $writable = $writable || \array_key_exists($propertyName, $ctorArguments) || $this->propertyAccessor?->isWritable($mappedTarget, $propertyName);
 
         return $writable ? ['target' => $declaredTarget::class, 'target_property' => $propertyName] : [];
     }
@@ -371,10 +387,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     /**
      * Store the value either the constructor arguments or as a property to be mapped.
      *
-     * A property that is not writable without a PropertyAccessor is dropped right away.
+     * A property that cannot be written with an assignment is written by the PropertyAccessor, or dropped right away when there is none.
      *
-     * @param array<string, mixed> $mapToProperties
-     * @param array<string, mixed> $ctorArguments
+     * @param array<string, array{mixed, bool}> $mapToProperties
+     * @param array<string, mixed>              $ctorArguments
      */
     private function storeValue(string $propertyName, array &$mapToProperties, array &$ctorArguments, mixed $value, bool $writable): void
     {
@@ -385,7 +401,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         if ($writable || $this->propertyAccessor) {
-            $mapToProperties[$propertyName] = $value;
+            $mapToProperties[$propertyName] = [$value, $writable];
         }
     }
 

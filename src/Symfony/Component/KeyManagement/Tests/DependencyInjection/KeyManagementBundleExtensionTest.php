@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -883,7 +884,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         $definition = $container->getDefinition('key_management.doctrine_dbal.encrypted_types');
         $this->assertSame(EncryptedTypes::class, $definition->getClass());
         $this->assertTrue($definition->isPublic(), 'the bundle fetches it when the kernel boots.');
-        $this->assertSame('key_management.envelope_encrypter.app', (string) $definition->getArgument(0));
+        $this->assertEquals(new LazyProxyArgument(new Reference('key_management.envelope_encrypter.app')), $definition->getArgument(0));
         $this->assertSame(['encrypted_phone' => ['type' => 'string', 'key' => 'app']], $definition->getArgument(1));
     }
 
@@ -962,7 +963,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
 
         $types = $container->getDefinition('key_management.doctrine_dbal.encrypted_types');
-        $this->assertSame('key_management.envelope_encrypter.app', (string) $types->getArgument(0));
+        $this->assertEquals(new LazyProxyArgument(new Reference('key_management.envelope_encrypter.app')), $types->getArgument(0));
         $this->assertSame(['encrypted_string@speaker.contact' => ['type' => 'string', 'key' => 'speaker.contact']], $types->getArgument(1));
 
         $listener = $container->getDefinition('key_management.encrypted_column_listener');

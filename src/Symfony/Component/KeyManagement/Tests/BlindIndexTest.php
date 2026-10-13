@@ -153,6 +153,31 @@ class BlindIndexTest extends TestCase
         $this->assertSame($domain->of('a@b@example.org'), $domain->of('example.org'), 'the last @ is the separator');
     }
 
+    public function testAnInternationalizedDomainHasOneTagHoweverItIsSpelled()
+    {
+        $domain = new BlindIndex($this->kms, $this->wrappedKey, 'email-domain', new EmailDomain());
+        $address = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Email());
+
+        $this->assertSame($domain->of("caf\u{E9}.example"), $domain->of("cafe\u{301}.example"), 'precomposed and decomposed');
+        $this->assertSame($domain->of("caf\u{E9}.example"), $domain->of("CAF\u{C9}.example"));
+        $this->assertSame($domain->of("caf\u{E9}.example"), $domain->of('XN--CAF-DMA.example'));
+        $this->assertSame($address->of("ada@caf\u{E9}.example"), $address->of("ada@cafe\u{301}.example"));
+        $this->assertSame($address->of("ada@caf\u{E9}.example"), $address->of('ada@xn--caf-dma.example'));
+        $this->assertNotSame($address->of("ada@caf\u{E9}.example"), $address->of("Ada@caf\u{E9}.example"));
+        $this->assertNotSame($domain->of("stra\u{DF}e.de"), $domain->of('strasse.de'), 'non-transitional');
+    }
+
+    public function testADomainThatIsNotAValidInternationalizedOneIsLowercased()
+    {
+        $domain = new BlindIndex($this->kms, $this->wrappedKey, 'email-domain', new EmailDomain());
+        $address = new BlindIndex($this->kms, $this->wrappedKey, 'email', new Email());
+
+        $this->assertSame($domain->of('under_score.example'), $domain->of('Under_Score.EXAMPLE'));
+        $this->assertNotSame($domain->of('under_score.example'), $domain->of('other_score.example'));
+        $this->assertSame($address->of('ada@'), $address->of(' ada@ '));
+        $this->assertSame($domain->of(''), $domain->of('ada@'));
+    }
+
     public function testAnApplicationIndexesItsOwnProjection()
     {
         $index = new BlindIndex($this->kms, $this->wrappedKey, 'email', new class implements ProjectionInterface {

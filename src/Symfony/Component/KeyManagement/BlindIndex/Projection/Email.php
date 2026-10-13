@@ -28,6 +28,9 @@ use Symfony\Component\KeyManagement\BlindIndex\ProjectionInterface;
  * index do it writes a {@see ProjectionInterface} of its own, and knowingly indexes
  * two addresses the standard considers distinct as one.
  *
+ * The domain is folded the way {@see EmailDomain} folds it, so an internationalized one gets a
+ * single tag however it is spelled.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental
@@ -39,6 +42,6 @@ final class Email implements ProjectionInterface
         $value = trim($value);
         $at = strrpos($value, '@');
 
-        return false === $at ? $value : substr($value, 0, $at + 1).mb_strtolower(substr($value, $at + 1));
+        return false === $at ? $value : substr($value, 0, $at + 1).EmailDomain::fold(substr($value, $at + 1));
     }
 }

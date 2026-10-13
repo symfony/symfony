@@ -123,6 +123,16 @@ class CookieTest extends TestCase
         $this->assertSame('/', Cookie::fromString('foo=bar; Path=relative')->getPath());
     }
 
+    public function testFromStringIgnoresUnknownAttributes()
+    {
+        $cookie = Cookie::fromString('foo=bar; name=baz; value=qux; secure=1; unknown=value', 'http://example.com/');
+
+        $this->assertSame('foo', $cookie->getName());
+        $this->assertSame('bar', $cookie->getValue());
+        $this->assertFalse($cookie->isSecure());
+        $this->assertSame('foo=bar; domain=example.com; path=/', (string) $cookie);
+    }
+
     public function testFromStringWithMaxAge()
     {
         $before = time();

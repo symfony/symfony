@@ -23,7 +23,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * Builds an {@see AzureKeyVault} from a DSN of the form:
  *
- *     azure-keyvault://<clientId>:<clientSecret>@<vault-name>.vault.azure.net?tenant=<tenantId>[&algorithm=...&wrap_algorithm=...&api_version=...&audience=...]
+ *     azure-keyvault://<clientId>:<clientSecret>@<vault-name>.vault.azure.net?tenant=<tenantId>[&algorithm=...&wrap_algorithm=...&api_version=...&audience=...&timeout=...&max_duration=...]
+ *
+ * When no HTTP client is given, the factory builds one with a 5-second idle timeout and a 10-second maximum duration.
+ * The token requests use the same client and the same timeouts.
+ * This client doesn't follow redirects. On a 307 or 308 redirect to another host, the request body would be sent again, with the client secret or the plaintext in it.
+ * The `timeout` and `max_duration` options, in seconds, override the timeouts on either client.
  *
  * The host is the full vault DNS name (`<name>.vault.azure.net`, or `<name>.managedhsm.azure.net` for Managed HSM).
  * The audience comes from the host suffix and the `audience` option overrides it, but the authority is always the public Microsoft Entra one:
@@ -42,6 +47,8 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
     private const string SCHEME = 'azure-keyvault';
     private const string DEFAULT_AUDIENCE = 'https://vault.azure.net/.default';
     private const string MANAGED_HSM_AUDIENCE = 'https://managedhsm.azure.net/.default';
+    private const float DEFAULT_TIMEOUT = 5.0;
+    private const float DEFAULT_MAX_DURATION = 10.0;
 
     /**
      * @param HttpClientInterface|null $client The client the DSN's base URI is applied to, so that a timeout, a retry policy or the profiler set on the application's client reach the KMS; a client of its own is built when none is given
@@ -88,7 +95,8 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
             throw new UnsupportedSchemeException($dsn, [self::SCHEME]);
         }
 
-        self::validateOptions($dsn, ['tenant', 'algorithm', 'wrap_algorithm', 'api_version', 'audience']);
+        self::validateOptions($dsn, ['tenant', 'algorithm', 'wrap_algorithm', 'api_version', 'audience', 'timeout', 'max_duration']);
+        $timeouts = self::timeoutOptions($dsn);
 
         if (null === $dsn->host || '' === $dsn->host) {
             throw new InvalidArgumentException('The "azure-keyvault://" DSN must include the vault host (e.g. "azure-keyvault://<id>:<secret>@<name>.vault.azure.net?tenant=<tenant>").');
@@ -107,7 +115,7 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
 
         $audience = $dsn->getOption('audience') ?? self::inferAudience($dsn->host);
 
-        $client = $this->scopedClient($baseUri);
+        $client = $this->scopedClient($baseUri, $timeouts);
 
         return new AzureKeyVault(
             $client,
@@ -154,8 +162,32 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
         }
     }
 
-    private function scopedClient(string $baseUri): HttpClientInterface
+    /**
+     * @return array{timeout?: float, max_duration?: float}
+     */
+    private static function timeoutOptions(Dsn $dsn): array
     {
-        return $this->client?->withOptions(['base_uri' => $baseUri]) ?? HttpClient::createForBaseUri($baseUri);
+        $options = [];
+        foreach (['timeout', 'max_duration'] as $option) {
+            if (null === $value = $dsn->getOption($option)) {
+                continue;
+            }
+            if (!is_numeric($value) || !is_finite((float) $value) || (float) $value <= 0) {
+                throw new InvalidArgumentException(\sprintf('The "%s" option of the "%s://" DSN must be positive.', $option, $dsn->scheme));
+            }
+            $options[$option] = (float) $value;
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param array{timeout?: float, max_duration?: float} $timeouts
+     */
+    private function scopedClient(string $baseUri, array $timeouts): HttpClientInterface
+    {
+        $client = $this->client ?? HttpClient::create(['timeout' => self::DEFAULT_TIMEOUT, 'max_duration' => self::DEFAULT_MAX_DURATION, 'max_redirects' => 0]);
+
+        return $client->withOptions(['base_uri' => $baseUri] + $timeouts);
     }
 }

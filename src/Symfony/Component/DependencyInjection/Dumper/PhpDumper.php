@@ -2005,14 +2005,14 @@ class PhpDumper extends Dumper
         } elseif ($value instanceof Parameter) {
             return $this->dumpParameter($value);
         } elseif ($interpolate && \is_string($value)) {
-            if (preg_match('/^%([^%]+)%$/', $value, $match)) {
+            if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
                 // we do this to deal with non string values (Boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter($match[1]);
             }
             $replaceParameters = fn ($match) => "'.".$this->dumpParameter($match[2]).".'";
 
-            $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
+            $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%\s\']+)\1/', $replaceParameters, $this->export($value)));
 
             return $code;
         } elseif ($value instanceof \UnitEnum) {

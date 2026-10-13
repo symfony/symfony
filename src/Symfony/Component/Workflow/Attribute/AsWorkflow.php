@@ -27,12 +27,21 @@ use Symfony\Component\Workflow\WorkflowType;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsWorkflow
 {
+    use BuildMetadataTrait;
+
     /**
      * Stands for the name of the workflow in the events listened to by the listeners of a class using this attribute, until it is resolved when the container is compiled.
      *
      * @internal
      */
     public const NAME_PLACEHOLDER = '@self';
+
+    /**
+     * The metadata of the workflow, including its description.
+     *
+     * @var array<string, mixed>
+     */
+    public readonly array $metadata;
 
     /**
      * @param string|null                                      $name                 The name of the workflow; defaults to the snake_cased short name of the class, without its "Workflow" or "StateMachine" suffix
@@ -42,6 +51,7 @@ class AsWorkflow
      * @param \BackedEnum|string|list<\BackedEnum|string>|null $initialMarking       The initial place(s) of the subjects; defaults to the places whose "#[Place]" attribute sets "initial", or else to the first case of the "places" enum, or else to the first input place of the first transition
      * @param string|null                                      $markingProperty      The property or method of the subjects storing their marking, read by a MethodMarkingStore; defaults to "marking"
      * @param string|null                                      $markingStore         The id of a MarkingStoreInterface service; cannot be used with "markingProperty"
+     * @param string|null                                      $description          The description of the workflow, stored under the "description" key of its metadata
      * @param array<string, mixed>                             $metadata             The metadata of the workflow
      * @param bool                                             $auditTrail           Whether to log the transitions
      * @param list<string>|null                                $eventsToDispatch     The events to dispatch, or the events not to dispatch when prefixed with "!"; all the events by default
@@ -56,7 +66,8 @@ class AsWorkflow
         public readonly \BackedEnum|string|array|null $initialMarking = null,
         public readonly ?string $markingProperty = null,
         public readonly ?string $markingStore = null,
-        public readonly array $metadata = [],
+        ?string $description = null,
+        array $metadata = [],
         public readonly bool $auditTrail = false,
         public readonly ?array $eventsToDispatch = null,
         public readonly array $definitionValidators = [],
@@ -68,5 +79,6 @@ class AsWorkflow
         if (null !== $markingProperty && null !== $markingStore) {
             throw new LogicException(\sprintf('The "markingProperty" and "markingStore" arguments of "#[%s]" cannot be used together.', self::class));
         }
+        $this->metadata = self::buildMetadata($metadata, $description);
     }
 }

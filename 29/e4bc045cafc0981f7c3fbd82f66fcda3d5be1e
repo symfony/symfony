@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T06:40:20Z
+
+I don't think this can go in as is. AwsKms records the key ARN and AzureKeyVault records `name/version`, so `EncryptedType` over `EnvelopeEncrypter` refuses its own rows on both (`written under "arn:aws:kms:…", while "alias/app-key" was expected`); 8.2 reads them. Changing a column's key or scope in config now refuses every existing row too, against the README and the reasoning of #66637. And with the self-contained fallback wired, a payload of tenant-a assembled into that format reads as tenant-b, even after its row is deleted. Both halves already work with the existing API: the scope as AAD for the stored format, a check of `$envelope->keyId` for the self-contained one. Smaller: the README's `MigratingEnvelopes` example becomes a fatal error, the exception embeds an attacker-chosen key id, and the handle's default `$scope = ''` matches an expected `''`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T08:53:31Z
+
+I rechecked this on the current 8.2, and my position hasn't changed. The refusals with AWS ARNs and Azure `name/version` ids still reproduce. So do the refusal after a key or scope change and the bypass through the self-contained fallback. `#[Encrypted]` columns now get the same refusals, since the attribute passes its key the same way.
+
+With #66637, `EncryptedType` already refuses a value copied from another type. Passing `$key` from the type adds the refusals above without adding protection. I could accept a smaller shape: no change to `EnvelopeDecrypterInterface`, and a README paragraph instead. It would show the scope as AAD for stored payloads, and a check of `$envelope->keyId` for self-contained ones. WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T12:16:38Z
+
+Thanks, that's the shape I had in mind. I squashed a fix for two recipes into your commit, and updated the title and the description.
+
+The example AAD contained only the tenant, so a `user.notes` payload of the same tenant still read in the `user.email` column. The AAD now includes the column.
+
+Pinning `$expectedKeyId` from one envelope refused the app's own new payloads after an AWS alias move or an Azure key rotation. The check now accepts a list of ids, compares only the name on Azure, and skips stored payloads, whose `keyId` is null.
+
+I also removed the stored-format test, since `testTheAadMustMatch` already covers it.

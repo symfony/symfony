@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T13:26:11Z
+
+PR updated: rebased now that #66894 is merged up, so the three readers resolve `framework.test` on `$container` directly.

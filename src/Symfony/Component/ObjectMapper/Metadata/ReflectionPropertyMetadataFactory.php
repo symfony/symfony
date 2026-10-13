@@ -12,7 +12,12 @@
 namespace Symfony\Component\ObjectMapper\Metadata;
 
 use Symfony\Component\ObjectMapper\ClassHierarchyTrait;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfo;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfo;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 
 /**
  * Metadata is cached per source and target class: the decorated factory is expected to derive its mappings from classes, not from instances.
@@ -37,11 +42,24 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
      */
     private array $reflectionClasses = [];
 
+    private readonly ?PropertyReadInfoExtractorInterface $readInfoExtractor;
+    private readonly ?PropertyWriteInfoExtractorInterface $writeInfoExtractor;
+
+    /**
+     * @param ?PropertyReadInfoExtractorInterface  $readInfoExtractor  The extractor that the property accessor uses to read
+     * @param ?PropertyWriteInfoExtractorInterface $writeInfoExtractor The extractor that the property accessor uses to write
+     */
     public function __construct(
         private readonly ObjectMapperMetadataFactoryInterface $metadataFactory,
         private readonly ClassMetadataFactoryInterface $classMetadataFactory,
         private readonly ?PropertyAccessorInterface $propertyAccessor = null,
+        ?PropertyReadInfoExtractorInterface $readInfoExtractor = null,
+        ?PropertyWriteInfoExtractorInterface $writeInfoExtractor = null,
     ) {
+        // the extractors describe what the accessor does only when it is not decorated or extended
+        $isPropertyAccessor = null !== $propertyAccessor && PropertyAccessor::class === $propertyAccessor::class;
+        $this->readInfoExtractor = $isPropertyAccessor ? $readInfoExtractor : null;
+        $this->writeInfoExtractor = $isPropertyAccessor ? $writeInfoExtractor : null;
     }
 
     public function create(object $source, object $target, string $property): array
@@ -111,7 +129,7 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
     private function getReadability(\ReflectionClass $sourceRefl, \ReflectionClass $lookupRefl, string $property, ?\ReflectionProperty $declared, bool $hasMagicGet): int
     {
         if ($this->propertyAccessor) {
-            return PropertyReadability::ACCESSOR;
+            return $this->isReadDirectly($sourceRefl, $property) ? PropertyReadability::INITIALIZED : PropertyReadability::ACCESSOR;
         }
 
         // only a private property declared by a parent class is invisible to property_exists()
@@ -179,8 +197,84 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
         return $type instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;
     }
 
+    /**
+     * Tells whether the mapper can write the property with an assignment instead of using the property accessor.
+     */
     private function isWritable(\ReflectionClass $targetRefl, string $property): bool
     {
+        if ($this->propertyAccessor) {
+            return $this->isWrittenDirectly($targetRefl, $property);
+        }
+
         return $targetRefl->hasProperty($property) && $targetRefl->getProperty($property)->isPublic();
+    }
+
+    /**
+     * Tells whether reading the property directly gives the same result as the property accessor.
+     *
+     * In that case, the isReadable() method of the accessor returns true only when the property is initialized.
+     * __get() and __isset() can change this for a property that was unset.
+     */
+    private function isReadDirectly(\ReflectionClass $refl, string $property): bool
+    {
+        if (!$this->readInfoExtractor || !$this->isPlainPublicProperty($refl, $property) || $refl->hasMethod('__get') || $refl->hasMethod('__isset')) {
+            return false;
+        }
+
+        // the array cast of some internal classes, like \ArrayObject, does not return their properties
+        for ($class = $refl; $class; $class = $class->getParentClass()) {
+            if ($class->isInternal()) {
+                return false;
+            }
+        }
+
+        $readInfo = $this->readInfoExtractor->getReadInfo($refl->name, $property, self::getAccessorContext());
+
+        return PropertyReadInfo::TYPE_PROPERTY === $readInfo?->getType() && $property === $readInfo->getName();
+    }
+
+    /**
+     * Tells whether writing the property directly does the same as the property accessor.
+     *
+     * In that case, the isWritable() method of the accessor returns true.
+     * After a TypeError, the mapper calls the accessor, which converts the value or throws its own exception.
+     * Without __set(), the failed assignment did not run any code.
+     */
+    private function isWrittenDirectly(\ReflectionClass $refl, string $property): bool
+    {
+        if (!$this->writeInfoExtractor || !$this->isPlainPublicProperty($refl, $property) || $refl->hasMethod('__set')) {
+            return false;
+        }
+
+        // the accessor looks for adders and removers when the value is iterable
+        foreach ([true, false] as $adderRemover) {
+            $writeInfo = $this->writeInfoExtractor->getWriteInfo($refl->name, $property, ['enable_adder_remover_extraction' => $adderRemover] + self::getAccessorContext());
+
+            if (PropertyWriteInfo::TYPE_PROPERTY !== $writeInfo?->getType() || $property !== $writeInfo->getName() || PropertyWriteInfo::VISIBILITY_PUBLIC !== $writeInfo->getVisibility()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function isPlainPublicProperty(\ReflectionClass $refl, string $property): bool
+    {
+        return $refl->hasProperty($property) && ($reflProperty = $refl->getProperty($property))->isPublic() && !$reflProperty->isStatic() && !$reflProperty->hasHooks();
+    }
+
+    /**
+     * Returns the context that the property accessor passes to its extractors.
+     *
+     * All magic methods are allowed because we don't know which ones the accessor allows.
+     * This can only make more properties use the accessor.
+     */
+    private static function getAccessorContext(): array
+    {
+        return [
+            'enable_getter_setter_extraction' => true,
+            'enable_magic_methods_extraction' => PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_CALL,
+            'enable_constructor_extraction' => false,
+        ];
     }
 }

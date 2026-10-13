@@ -27,6 +27,8 @@ use Symfony\Component\ObjectMapper\Metadata\ReflectionPropertyNameCollectionFact
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()
@@ -68,6 +70,8 @@ return static function (ContainerConfigurator $container) {
                 service('object_mapper.metadata_factory'),
                 service('object_mapper.class_metadata_factory'),
                 service('property_accessor')->ignoreOnInvalid(),
+                service(PropertyReadInfoExtractorInterface::class)->ignoreOnInvalid(),
+                service(PropertyWriteInfoExtractorInterface::class)->ignoreOnInvalid(),
             ])
 
         // Cache
@@ -77,6 +81,8 @@ return static function (ContainerConfigurator $container) {
                 param('object_mapper.metadata.cache.file'),
                 service('object_mapper.metadata_factory'),
                 service('property_accessor')->ignoreOnInvalid(),
+                service(PropertyReadInfoExtractorInterface::class)->ignoreOnInvalid(),
+                service(PropertyWriteInfoExtractorInterface::class)->ignoreOnInvalid(),
             ])
             ->tag('kernel.cache_warmer')
             ->tag('container.remove_if_missing', ['service' => 'cache.system'])

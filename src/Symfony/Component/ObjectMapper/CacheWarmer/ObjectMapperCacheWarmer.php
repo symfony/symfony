@@ -21,6 +21,8 @@ use Symfony\Component\ObjectMapper\Metadata\ReflectionClassMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionPropertyMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionPropertyNameCollectionFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\VarExporter\Exception\ExceptionInterface as VarExporterExceptionInterface;
 use Symfony\Component\VarExporter\VarExporter;
 
@@ -40,6 +42,8 @@ final class ObjectMapperCacheWarmer extends AbstractPhpFileCacheWarmer
         string $phpArrayFile,
         private readonly ObjectMapperMetadataFactoryInterface $metadataFactory,
         private readonly ?PropertyAccessorInterface $propertyAccessor = null,
+        private readonly ?PropertyReadInfoExtractorInterface $readInfoExtractor = null,
+        private readonly ?PropertyWriteInfoExtractorInterface $writeInfoExtractor = null,
     ) {
         parent::__construct($phpArrayFile);
     }
@@ -52,7 +56,7 @@ final class ObjectMapperCacheWarmer extends AbstractPhpFileCacheWarmer
 
         $classMetadataFactory = new ReflectionClassMetadataFactory($this->metadataFactory);
         $propertyNameCollectionFactory = new ReflectionPropertyNameCollectionFactory();
-        $propertyMetadataFactory = new ReflectionPropertyMetadataFactory($this->metadataFactory, $classMetadataFactory, $this->propertyAccessor);
+        $propertyMetadataFactory = new ReflectionPropertyMetadataFactory($this->metadataFactory, $classMetadataFactory, $this->propertyAccessor, $this->readInfoExtractor, $this->writeInfoExtractor);
 
         $cachedClassMetadataFactory = new CacheClassMetadataFactory($classMetadataFactory, $arrayAdapter);
         $cachedPropertyNameCollectionFactory = new CachePropertyNameCollectionFactory($propertyNameCollectionFactory, $arrayAdapter);

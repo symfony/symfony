@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\ObjectMapper\Metadata\CachePropertyMetadataFactory;
+use Symfony\Component\ObjectMapper\Metadata\PropertyReadability;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -37,6 +38,11 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\ParentEntityResource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\TransformCallable;
 use Symfony\Component\ObjectMapper\Transform\MapCollection;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class ObjectMapperBundleTest extends TestCase
 {
@@ -61,6 +67,15 @@ class ObjectMapperBundleTest extends TestCase
         $objectMapper = $container->get('test.object_mapper');
         $this->assertInstanceOf(ObjectMapper::class, $objectMapper);
         $this->assertSame($objectMapper, $container->get('test.object_mapper_interface'));
+    }
+
+    public function testPublicPropertiesAreReadWithoutThePropertyAccessorWhenItUsesThePropertyInfoExtractors()
+    {
+        $kernel = new TestObjectMapperKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $propertyMetadataFactory = (new \ReflectionProperty(ObjectMapper::class, 'propertyMetadataFactory'))->getValue($kernel->getContainer()->get('test.object_mapper'));
+
+        $this->assertSame(PropertyReadability::INITIALIZED, $propertyMetadataFactory->create(new ObjectToBeMapped(), new ObjectMapped(), 'a')['readability']);
     }
 
     public function testTransformCallableIsAutoconfigured()
@@ -223,7 +238,10 @@ class TestObjectMapperKernel extends AbstractKernel
     private function configureContainer(ContainerConfigurator $container): void
     {
         $services = $container->services();
-        $services->set('property_accessor', PropertyAccessor::class);
+        $services->set('property_info.reflection_extractor', ReflectionExtractor::class);
+        $services->alias(PropertyReadInfoExtractorInterface::class, 'property_info.reflection_extractor');
+        $services->alias(PropertyWriteInfoExtractorInterface::class, 'property_info.reflection_extractor');
+        $services->set('property_accessor', PropertyAccessor::class)->args([PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, null, service(PropertyReadInfoExtractorInterface::class), service(PropertyWriteInfoExtractorInterface::class)]);
         $services->set(TransformCallable::class)->autoconfigure();
         $services->set(MapCollection::class)->autoconfigure();
         $services->set(ParentEntityResource::class)->autoconfigure();

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T05:33:48Z
+
+Thank you @bigboss86.
+
+I bumped polyfill-intl-idn to ^1.18. Older versions don't normalize, so `café` and `cafe\u{301}` still got two tags on servers without ext-intl.

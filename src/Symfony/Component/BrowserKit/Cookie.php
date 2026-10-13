@@ -39,6 +39,7 @@ class Cookie
     protected ?string $expires = null;
     protected string $path;
     protected string $rawValue;
+    private bool $hostOnly = false;
 
     /**
      * Sets a cookie.
@@ -155,6 +156,7 @@ class Cookie
         }
 
         $maxAge = null;
+        $hostOnly = null !== $url;
 
         foreach ($parts as $part) {
             $elements = explode('=', $part, 2);
@@ -196,6 +198,7 @@ class Cookie
                     continue;
                 }
 
+                $hostOnly = $hostOnly && 'domain' !== $attribute;
                 $values[$attribute] = $attributeValue;
             }
         }
@@ -206,7 +209,7 @@ class Cookie
             $values['expires'] = 0 < $maxAge ? (\PHP_INT_MAX - $now > $maxAge ? $now + $maxAge : \PHP_INT_MAX) : 1;
         }
 
-        return new static(
+        $cookie = new static(
             $values['name'],
             $values['value'],
             $values['expires'],
@@ -217,6 +220,9 @@ class Cookie
             $values['passedRawValue'],
             $values['samesite']
         );
+        $cookie->hostOnly = $hostOnly;
+
+        return $cookie;
     }
 
     private static function parseDate(string $dateValue): ?string
@@ -286,6 +292,14 @@ class Cookie
     public function getDomain(): string
     {
         return $this->domain;
+    }
+
+    /**
+     * Returns true if the cookie is sent only to the host that set it, not to its subdomains.
+     */
+    public function isHostOnly(): bool
+    {
+        return $this->hostOnly;
     }
 
     /**

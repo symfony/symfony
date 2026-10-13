@@ -343,4 +343,15 @@ class CookieJarTest extends TestCase
         $this->assertSame(['parent', 'self', 'ip'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->all()));
         $this->assertSame([], $cookieJar->allValues('http://bank.example/'));
     }
+
+    public function testHostOnlyCookiesAreNotSentToSubdomains()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['host=value', 'domain=value; Domain=example.com'], 'http://example.com/');
+
+        $this->assertSame(['host' => 'value', 'domain' => 'value'], $cookieJar->allValues('http://example.com/'));
+        $this->assertSame(['domain' => 'value'], $cookieJar->allValues('http://sub.example.com/'));
+        $this->assertSame('value', $cookieJar->get('host', '/', 'example.com')->getValue());
+        $this->assertNull($cookieJar->get('host', '/', 'sub.example.com'));
+    }
 }

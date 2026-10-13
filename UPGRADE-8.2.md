@@ -18,6 +18,7 @@ BrowserKit
 ----------
 
  * [BC BREAK] `CookieJar::updateFromSetCookie()` and `updateFromResponse()` ignore a cookie whose `Domain` attribute does not match the host of the response, as browsers do
+ * [BC BREAK] `CookieJar` sends a cookie set without a `Domain` attribute only to the host that set it, not to its subdomains, as browsers do
 
 Config
 ------

@@ -55,6 +55,9 @@ class CookieJar
                 if (!self::pathMatches($cookiePath, $path) || !isset($namedCookies[$name])) {
                     continue;
                 }
+                if ($domain && $namedCookies[$name]->isHostOnly() && ltrim($domain, '.') !== $namedCookies[$name]->getDomain()) {
+                    continue;
+                }
                 if (null === $match || self::isMoreSpecific($namedCookies[$name], $match)) {
                     $match = $namedCookies[$name];
                 }
@@ -192,6 +195,10 @@ class CookieJar
 
                 foreach ($namedCookies as $cookie) {
                     if ($cookie->isSecure() && 'https' !== $parts['scheme']) {
+                        continue;
+                    }
+
+                    if ($cookie->isHostOnly() && $parts['host'] !== $cookie->getDomain()) {
                         continue;
                     }
 

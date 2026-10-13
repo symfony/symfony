@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -187,7 +188,22 @@ class HttpClientBundleTest extends TestCase
         yield 'unset' => [[['secret' => 's3cr3t']]];
         yield 'false' => [[['test' => false]]];
         yield 'last one wins' => [[['test' => true], ['test' => false]]];
-        yield 'env var' => [[['test' => '%env(bool:APP_TEST)%']]];
+        yield 'undefined env var' => [[['test' => '%env(bool:UNDEFINED_FRAMEWORK_TEST)%']]];
+    }
+
+    #[TestWith(['true', true])]
+    #[TestWith(['false', false])]
+    public function testFrameworkTestSetByAnEnvVarDrivesTheRecorder(string $env, bool $enabled)
+    {
+        $_ENV['FRAMEWORK_TEST'] = $env;
+
+        try {
+            $container = $this->loadExtension([], [['test' => '%env(bool:FRAMEWORK_TEST)%']]);
+        } finally {
+            unset($_ENV['FRAMEWORK_TEST']);
+        }
+
+        $this->assertSame($enabled, $container->hasDefinition('http_client.recorder'));
     }
 
     #[DataProvider('provideExplicitRecorderConfigs')]

@@ -31,6 +31,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -95,14 +96,21 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $this->frameworkTest = false;
+        $test = false;
 
         if ($container->hasExtension('framework')) {
             foreach ($container->getExtensionConfig('framework') as $config) {
                 if (\array_key_exists('test', $config)) {
                     // "test: ~" enables the option, like "test: true"
-                    $this->frameworkTest = true === $container->getParameterBag()->resolveValue($config['test'] ?? true);
+                    $test = $config['test'] ?? true;
                 }
             }
+        }
+
+        try {
+            $this->frameworkTest = true === $container->resolveEnvPlaceholders($test, true);
+        } catch (ExceptionInterface) {
+            // FrameworkBundle reports the error with the name of the option
         }
     }
 

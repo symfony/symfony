@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Jose\Component\Core\JWK;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
@@ -1896,7 +1897,22 @@ class SecurityExtensionTest extends TestCase
         yield 'unset' => [[['secret' => 's3cr3t']]];
         yield 'false' => [[['test' => false]]];
         yield 'last one wins' => [[['test' => true], ['test' => false]]];
-        yield 'env var' => [[['test' => '%env(bool:APP_TEST)%']]];
+        yield 'undefined env var' => [[['test' => '%env(bool:UNDEFINED_FRAMEWORK_TEST)%']]];
+    }
+
+    #[TestWith(['true', 4])]
+    #[TestWith(['false', null])]
+    public function testFrameworkTestSetByAnEnvVarDrivesTheHasherCosts(string $env, ?int $cost)
+    {
+        $_ENV['FRAMEWORK_TEST'] = $env;
+
+        try {
+            $hashers = $this->getPasswordHashersMap([['test' => '%env(bool:FRAMEWORK_TEST)%']], ['App\User' => 'bcrypt']);
+        } finally {
+            unset($_ENV['FRAMEWORK_TEST']);
+        }
+
+        $this->assertSame($cost, $hashers['App\User']['arguments'][2]);
     }
 
     public function testAuthenticatorsDecoration()

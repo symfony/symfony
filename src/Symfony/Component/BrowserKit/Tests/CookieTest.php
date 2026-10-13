@@ -101,6 +101,82 @@ class CookieTest extends TestCase
         $this->assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::fromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
+    public function testFromStringTrimsAttributeNamesAndValues()
+    {
+        $cookie = Cookie::fromString('foo=bar; Domain = .example.com; Path = /account; Expires = Fri, 20 May 2011 15:25:52 GMT; SameSite = Lax', 'http://www.example.com/');
+
+        $this->assertSame('.example.com', $cookie->getDomain());
+        $this->assertSame('/account', $cookie->getPath());
+        $this->assertSame('1305905152', $cookie->getExpiresTime());
+        $this->assertSame('Lax', $cookie->getSameSite());
+
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age = 0')->isExpired());
+    }
+
+    public function testFromStringUsesTheDefaultPathWhenThePathAttributeDoesNotStartWithASlash()
+    {
+        $this->assertSame('/foo', Cookie::fromString('foo=bar; Path=relative', 'http://example.com/foo/bar')->getPath());
+        $this->assertSame('/foo', Cookie::fromString('foo=bar; Path=', 'http://example.com/foo/bar')->getPath());
+        $this->assertSame('/', Cookie::fromString('foo=bar; Path=relative')->getPath());
+    }
+
+    public function testFromStringIgnoresUnknownAttributes()
+    {
+        $cookie = Cookie::fromString('foo=bar; name=baz; value=qux; secure=1; unknown=value', 'http://example.com/');
+
+        $this->assertSame('foo', $cookie->getName());
+        $this->assertSame('bar', $cookie->getValue());
+        $this->assertFalse($cookie->isSecure());
+        $this->assertSame('foo=bar; domain=example.com; path=/', (string) $cookie);
+    }
+
+    public function testFromStringIgnoresTheValueOfSecureAndHttpOnly()
+    {
+        $cookie = Cookie::fromString('foo=bar; Secure=0; HttpOnly=0', 'https://example.com/');
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+
+        $cookie = Cookie::fromString('foo=bar; Secure; Secure=; HttpOnly; HttpOnly =', 'https://example.com/');
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+
+        $this->assertFalse(Cookie::fromString('foo=bar; Secure=1', 'http://example.com/')->isSecure());
+    }
+
+    public function testFromStringWithMaxAge()
+    {
+        $before = time();
+        $cookie = Cookie::fromString('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; Max-Age=60');
+
+        $this->assertGreaterThanOrEqual($before + 60, $cookie->getExpiresTime());
+        $this->assertLessThanOrEqual(time() + 60, $cookie->getExpiresTime());
+        $this->assertFalse($cookie->isExpired());
+
+        $this->assertSame((string) \PHP_INT_MAX, Cookie::fromString('foo=bar; Max-Age=99999999999999999999')->getExpiresTime());
+    }
+
+    public function testFromStringExpiresCookiesWithNonPositiveMaxAge()
+    {
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=0')->isExpired());
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=-1')->isExpired());
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=-99999999999999999999')->isExpired());
+        $this->assertTrue(Cookie::fromString('foo=bar; expires=Fri, 20 May 2099 15:25:52 GMT; Max-Age=0')->isExpired());
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=0; expires=Fri, 20 May 2099 15:25:52 GMT')->isExpired());
+    }
+
+    public function testFromStringIgnoresInvalidMaxAge()
+    {
+        $this->assertSame('1305905152', Cookie::fromString('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; Max-Age=')->getExpiresTime());
+        $this->assertSame('1305905152', Cookie::fromString('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; Max-Age=1.5')->getExpiresTime());
+        $this->assertSame('1305905152', Cookie::fromString('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; Max-Age=+60')->getExpiresTime());
+        $this->assertSame('1305905152', Cookie::fromString('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; Max-Age=60s')->getExpiresTime());
+
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=0; Max-Age=')->isExpired());
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=0; Max-Age=1.5')->isExpired());
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=0; Max-Age=+60')->isExpired());
+        $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=0; Max-Age=60s')->isExpired());
+    }
+
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
     {
         $this->expectException(InvalidArgumentException::class);

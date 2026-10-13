@@ -154,10 +154,13 @@ class Cookie
             $values['path'] = isset($urlParts['path']) ? substr($urlParts['path'], 0, strrpos($urlParts['path'], '/')) : '';
         }
 
-        foreach ($parts as $part) {
-            $part = trim($part);
+        $maxAge = null;
 
-            if ('secure' === strtolower($part)) {
+        foreach ($parts as $part) {
+            $elements = explode('=', $part, 2);
+            $attribute = strtolower(trim($elements[0]));
+
+            if ('secure' === $attribute) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
                 if (null === $url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
                     continue;
@@ -168,19 +171,39 @@ class Cookie
                 continue;
             }
 
-            if ('httponly' === strtolower($part)) {
+            if ('httponly' === $attribute) {
                 $values['httponly'] = true;
 
                 continue;
             }
 
-            if (2 === \count($elements = explode('=', $part, 2))) {
-                if ('expires' === strtolower($elements[0])) {
-                    $elements[1] = self::parseDate($elements[1]);
+            if (2 === \count($elements)) {
+                $attributeValue = trim($elements[1]);
+
+                if ('expires' === $attribute) {
+                    $attributeValue = self::parseDate($attributeValue);
+                } elseif ('max-age' === $attribute) {
+                    if (preg_match('/^-?\d+$/D', $attributeValue)) {
+                        $maxAge = (int) $attributeValue;
+                    }
+
+                    continue;
+                } elseif ('path' === $attribute && !str_starts_with($attributeValue, '/')) {
+                    continue;
+                } elseif ('domain' === $attribute && '' === $attributeValue) {
+                    continue;
+                } elseif (!\in_array($attribute, ['domain', 'path', 'samesite'], true)) {
+                    continue;
                 }
 
-                $values[strtolower($elements[0])] = $elements[1];
+                $values[$attribute] = $attributeValue;
             }
+        }
+
+        if (null !== $maxAge) {
+            $now = time();
+            // 1 is the earliest expiration time, 0 means a session cookie
+            $values['expires'] = 0 < $maxAge ? (\PHP_INT_MAX - $now > $maxAge ? $now + $maxAge : \PHP_INT_MAX) : 1;
         }
 
         return new static(

@@ -249,6 +249,31 @@ class KernelTest extends TestCase
         $kernel->shutdown();
     }
 
+    public function testShutdownDestroysServicesThatAreInAReferenceCycle()
+    {
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) {
+            $container->register('container_referencing', ContainerReferencingService::class)
+                ->setPublic(true)
+                ->addArgument(new Reference('service_container'));
+        }, null, 'shutdown');
+        $kernel->boot();
+        $kernel->getContainer()->get('container_referencing');
+        ContainerReferencingService::$destructed = false;
+
+        $gcEnabled = gc_enabled();
+        gc_disable();
+
+        try {
+            $kernel->shutdown();
+
+            $this->assertTrue(ContainerReferencingService::$destructed);
+        } finally {
+            if ($gcEnabled) {
+                gc_enable();
+            }
+        }
+    }
+
     public function testHandleCallsHandleOnHttpKernel()
     {
         $type = HttpKernelInterface::MAIN_REQUEST;
@@ -1064,5 +1089,20 @@ class KernelForTestWithLoadClassCache extends KernelForTest
 {
     public function doLoadClassCache(): void
     {
+    }
+}
+
+class ContainerReferencingService
+{
+    public static bool $destructed = false;
+
+    public function __construct(
+        private ContainerInterface $container,
+    ) {
+    }
+
+    public function __destruct()
+    {
+        self::$destructed = true;
     }
 }

@@ -234,7 +234,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 return;
             }
         } elseif (\is_string($value)) {
-            if ('%' === ($value[0] ?? '') && preg_match('/^%([^%]+)%$/', $value, $match)) {
+            if ('%' === ($value[0] ?? '') && preg_match('/^%([^%\s]+)%$/', $value, $match)) {
                 $value = $this->container->getParameter(substr($value, 1, -1));
             }
 

@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Attribute\AsFormType;
 use Symfony\Component\Form\Attribute\FormField;
+use Symfony\Component\Form\CacheWarmer\TypeInfoFormTypeGuesserCacheWarmer;
 use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\DataClassType;
 use Symfony\Component\Form\DependencyInjection\FormPass;
@@ -190,6 +191,31 @@ class FormPassTest extends TestCase
         foreach ([SpeakerData::class, PersonData::class, ContactData::class, AddressTrait::class] as $class) {
             $this->assertContainsEquals(new FileResource((new \ReflectionClass($class))->getFileName()), $container->getResources());
         }
+    }
+
+    public function testDataClassTypesListTheGuessedFieldsToTheTypeInfoCacheWarmer()
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->setDefinition('form.extension', $this->createExtensionDefinition());
+        $container->register('form.type_guesser.type_info.cache_warmer', TypeInfoFormTypeGuesserCacheWarmer::class)->setArguments([[], 'form_type_guesser.php'])->setPublic(true);
+        $container->register(UserData::class, UserData::class)->addResourceTag('form.data_class');
+        $container->register(AdminData::class, AdminData::class)->addResourceTag('form.data_class');
+        $container->register('.abstract.'.VehicleData::class, VehicleData::class)->setAbstract(true)->addResourceTag('form.data_class');
+        $container->register(CarData::class, CarData::class)->addResourceTag('form.data_class');
+        $container->register(SpeakerData::class, SpeakerData::class)->addResourceTag('form.data_class');
+        $container->register(KeynoteSpeakerData::class, KeynoteSpeakerData::class)->addResourceTag('form.data_class');
+
+        $container->compile();
+
+        $this->assertSame([
+            UserData::class => ['name', 'publicName'],
+            AdminData::class => ['role', 'name', 'publicName'],
+            VehicleData::class => ['name'],
+            CarData::class => ['name'],
+            SpeakerData::class => ['email', 'phoneNumber', 'city', 'name', 'company', 'bio'],
+            KeynoteSpeakerData::class => ['talk', 'email', 'phoneNumber', 'city', 'name', 'company', 'bio'],
+        ], $container->getDefinition('form.type_guesser.type_info.cache_warmer')->getArgument(0));
     }
 
     public function testDataClassTypesAreAddedToTheDebugCommand()

@@ -31,6 +31,16 @@ That type converts the value first, then the value is encrypted under the key.
 The column is stored as a binary one.
 When the encrypter uses a data key store, the key is the scope of the data key.
 
+Each value is authenticated with the name of its encrypted type.
+For these columns, the bundle registers types called `encrypted_<type>@<key>`, for example `encrypted_string@speaker.contact`.
+Changing the key or the type of the column changes the name of the type, and the values written before can't be read anymore.
+The same happens when you later declare a type for that key and type in `key_management.doctrine_dbal.types`, since the column then uses the declared type.
+To avoid this, declare the type before writing any value.
+The name of a declared type doesn't change when you change the key or the type in the declaration.
+You can also set `context` to `false` in the declaration, to turn off the authentication of the name.
+Columns with the same key and type also use the same encrypted type, so a value copied from one column to the other is read.
+Give these columns different keys to keep them apart.
+
 `EncryptedColumnListener` gives each of these columns the encrypted type registered for its key and its type.
 It runs when the metadata of a class is loaded, so the metadata cache keeps that type.
 This is why the listener doesn't register the types.
@@ -44,7 +54,7 @@ use Doctrine\ORM\Events;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 
-Type::getTypeRegistry()->register('app_speaker_contact', new EncryptedType(new StringType(), $encrypter, 'speaker.contact'));
+Type::getTypeRegistry()->register('app_speaker_contact', new EncryptedType(new StringType(), $encrypter, 'speaker.contact', 'app_speaker_contact'));
 
 $eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnListener([
     'speaker.contact' => ['string' => 'app_speaker_contact'],

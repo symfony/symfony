@@ -861,7 +861,23 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertSame(EncryptedTypes::class, $definition->getClass());
         $this->assertTrue($definition->isPublic(), 'the bundle fetches it when the kernel boots.');
         $this->assertSame('key_management.envelope_encrypter.app', (string) $definition->getArgument(0));
-        $this->assertSame(['encrypted_phone' => ['type' => 'string', 'key' => 'app']], $definition->getArgument(1));
+        $this->assertSame(['encrypted_phone' => ['type' => 'string', 'key' => 'app', 'context' => true]], $definition->getArgument(1));
+    }
+
+    public function testADoctrineDbalTypeThatAuthenticatesNoContextIsDeclaredAsSuch()
+    {
+        if (!class_exists(Type::class) || !class_exists(EncryptedTypes::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                'doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'app', 'context' => false]]],
+            ]);
+        });
+
+        $this->assertSame(['encrypted_phone' => ['type' => 'string', 'key' => 'app', 'context' => false]], $container->getDefinition('key_management.doctrine_dbal.encrypted_types')->getArgument(1));
     }
 
     public function testWithoutDoctrineDbalTypesNothingIsRegisteredForThem()

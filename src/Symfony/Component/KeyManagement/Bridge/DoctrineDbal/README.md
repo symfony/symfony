@@ -21,6 +21,7 @@ $type = new EncryptedType(
     Type::getTypeRegistry()->get('string'),
     $envelopeEncrypter,
     'alias/app-key',
+    'app_user_email',
 );
 
 Type::getTypeRegistry()->register('app_user_email', $type);
@@ -53,6 +54,10 @@ class User
     public string $email;
 }
 ```
+
+A type authenticates its own name with every value, so a value written for another column is refused instead of read.
+Renaming a registered type therefore makes the values written under the former name unreadable.
+A `null` name, or `context: false` in a declaration, turns that off for a backend refusing authenticated data.
 
 Where to register the types
 ---------------------------
@@ -162,6 +167,7 @@ Type::getTypeRegistry()->register('app_user_email', new EncryptedType(
     Type::getTypeRegistry()->get('string'),
     $encrypter,
     'user.email',
+    'app_user_email',
 ));
 ```
 
@@ -343,8 +349,8 @@ ever issued.
 
 ```php
 $platform = $connection->getDatabasePlatform();
-$legacy = new EncryptedType($parent, new EnvelopeEncrypter($awsKms), 'alias/app-key');
-$target = new EncryptedType($parent, $encrypter, 'user.email');
+$legacy = new EncryptedType($parent, new EnvelopeEncrypter($awsKms), 'alias/app-key', 'app_user_email');
+$target = new EncryptedType($parent, $encrypter, 'user.email', 'app_user_email');
 
 foreach ($connection->iterateAssociative('SELECT id, email FROM user ORDER BY id') as $row) {
     $connection->update(
@@ -407,12 +413,13 @@ Either way:
     and the ciphertext outgrows it by the envelope's framing, so a column sized
     after it would truncate the ciphertext and destroy the authentication tag
     with it.
-  * **A ciphertext is not bound to its row.** The type passes no AAD, because
-    `convertToDatabaseValue()` never sees the table, the column or the row it
-    converts for. Within one scope, or one master key, an encrypted value copied
-    into another row of the same type decrypts there. When moving a value
-    between rows must be detectable, bind the row yourself: put its identity in
-    the payload and check it after decryption.
+  * **A ciphertext is not bound to its row.** The type authenticates its name
+    with every value, but not the row, because `convertToDatabaseValue()` never
+    sees the table, the column or the row it converts for. Within one scope, or
+    one master key, an encrypted value copied into another row of the same type
+    decrypts there. When moving a value between rows must be detectable, bind
+    the row yourself: put its identity in the payload and check it after
+    decryption.
 
 Resources
 ---------

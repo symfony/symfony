@@ -21,6 +21,14 @@ namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute;
  * The column keeps the type its mapping gives it, declared on the column or guessed from the type of the property.
  * The value is converted by that type first, then encrypted, and the column is stored as a binary one.
  *
+ * The value is authenticated with the name of its encrypted type.
+ * That type is called `encrypted_<type>@<key>`, unless "key_management.doctrine_dbal.types" declares a type for that key and type.
+ * Changing the key or the type of the column changes the name of the type, and the values written before can't be read anymore.
+ * Declaring a type for that key and type later has the same effect.
+ * To avoid this, declare the type before writing any value.
+ * The name of a declared type doesn't change when you change the key or the type in the declaration.
+ * You can also set "context" to false in the declaration, to turn off the authentication of the name.
+ *
  * {@see \Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener} gives the column the encrypted type registered for its key and its type.
  *
  * @author Nicolas Grekas <p@tchwork.com>

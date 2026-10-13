@@ -84,6 +84,26 @@ class CookieJarTest extends TestCase
         $this->assertEquals('bar', $cookieJar->get('bar')->getValue(), '->updateFromSetCookie() keeps existing cookies');
     }
 
+    public function testUpdateFromSetCookieWithMaxAge()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar', 'baz=qux'], 'http://example.com/');
+        $cookieJar->updateFromSetCookie(['foo=bar; Max-Age=0', 'baz=qux; Max-Age=60'], 'http://example.com/');
+
+        $this->assertSame(['baz' => 'qux'], $cookieJar->allValues('http://example.com/'));
+        $this->assertNull($cookieJar->get('foo'));
+    }
+
+    public function testUpdateFromSetCookieIgnoresAnEmptyDomainAttribute()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar; Domain='], 'http://example.com/');
+
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://example.com/'));
+        $this->assertSame([], $cookieJar->allValues('http://other.example/'));
+        $this->assertSame('example.com', $cookieJar->get('foo')->getDomain());
+    }
+
     public function testUpdateFromEmptySetCookie()
     {
         $cookieJar = new CookieJar();
@@ -291,5 +311,20 @@ class CookieJarTest extends TestCase
 
         $this->assertEquals(['foo' => 'bar'], $cookieJar->allValues('http://www.example.com'));
         $this->assertSame([], $cookieJar->allValues('http://wwwexample.com'));
+    }
+
+    public function testCookiePathMatchesAtSegmentBoundaries()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar; Path=/foo', 'baz=qux; Path=/baz/'], 'http://example.com/');
+
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://example.com/foo'));
+        $this->assertSame(['foo' => 'bar'], $cookieJar->allValues('http://example.com/foo/bar'));
+        $this->assertSame([], $cookieJar->allValues('http://example.com/foobar'));
+        $this->assertSame(['baz' => 'qux'], $cookieJar->allValues('http://example.com/baz/qux'));
+        $this->assertSame([], $cookieJar->allValues('http://example.com/baz'));
+
+        $this->assertSame('bar', $cookieJar->get('foo', '/foo/bar')->getValue());
+        $this->assertNull($cookieJar->get('foo', '/foobar'));
     }
 }

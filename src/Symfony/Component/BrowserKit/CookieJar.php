@@ -52,7 +52,7 @@ class CookieJar
             }
 
             foreach ($pathCookies as $cookiePath => $namedCookies) {
-                if (!str_starts_with($path, $cookiePath) || !isset($namedCookies[$name])) {
+                if (!self::pathMatches($cookiePath, $path) || !isset($namedCookies[$name])) {
                     continue;
                 }
                 if (null === $match || self::isMoreSpecific($namedCookies[$name], $match)) {
@@ -179,7 +179,7 @@ class CookieJar
             }
 
             foreach ($pathCookies as $path => $namedCookies) {
-                if (!str_starts_with($parts['path'], $path)) {
+                if (!self::pathMatches($path, $parts['path'])) {
                     continue;
                 }
 
@@ -234,5 +234,14 @@ class CookieJar
         }
 
         return \strlen(ltrim($cookie->getDomain(), '.')) > \strlen(ltrim($other->getDomain(), '.'));
+    }
+
+    private static function pathMatches(string $cookiePath, string $requestPath): bool
+    {
+        if ($cookiePath === $requestPath) {
+            return true;
+        }
+
+        return str_starts_with($requestPath, $cookiePath) && (str_ends_with($cookiePath, '/') || '/' === $requestPath[\strlen($cookiePath)]);
     }
 }

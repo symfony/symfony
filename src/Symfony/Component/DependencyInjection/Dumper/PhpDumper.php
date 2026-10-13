@@ -2054,7 +2054,7 @@ class PhpDumper extends Dumper
         } elseif ($value instanceof Parameter) {
             return $this->dumpParameter($value);
         } elseif ($interpolate && \is_string($value)) {
-            if (preg_match('/^%([^%]+)%$/', $value, $match)) {
+            if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
                 // we do this to deal with non string values (Boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter($match[1]);
@@ -2062,7 +2062,7 @@ class PhpDumper extends Dumper
 
             $replaceParameters = fn ($match) => "'.".$this->dumpParameter($match[2]).".'";
 
-            return str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
+            return str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%\s\']+)\1/', $replaceParameters, $this->export($value)));
         } elseif ($value instanceof \UnitEnum) {
             return \sprintf('\%s::%s', $value::class, $value->name);
         } elseif ($value instanceof AbstractArgument) {

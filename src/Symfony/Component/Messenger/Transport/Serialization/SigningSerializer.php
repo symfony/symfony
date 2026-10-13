@@ -109,7 +109,10 @@ final class SigningSerializer implements SerializerInterface
                     throw new InvalidMessageSignatureException('The message is an unsigned decoding failure that carries a signed envelope; refusing to decode it.');
                 }
 
-                return $envelope;
+                // the class of the decoded message is checked too, as it can differ from the type read before decoding
+                if (!$this->shouldSign($type = $envelope->getMessage()::class)) {
+                    return $envelope;
+                }
             }
 
             if (!$sign) {

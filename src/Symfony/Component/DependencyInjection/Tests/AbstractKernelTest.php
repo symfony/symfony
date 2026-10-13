@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Kernel\BundleInterface;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 
 class AbstractKernelTest extends TestCase
@@ -191,6 +192,27 @@ class AbstractKernelTest extends TestCase
 
         $kernel = $this->createKernelWithBundles([$bundle]);
         $kernel->boot();
+    }
+
+    public function testShutdownDestroysServicesThatAreInAReferenceCycle()
+    {
+        $kernel = new ContainerReferencingKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $kernel->getContainer()->get('container_referencing');
+        ContainerReferencingService::$destructed = false;
+
+        $gcEnabled = gc_enabled();
+        gc_disable();
+
+        try {
+            $kernel->shutdown();
+
+            $this->assertTrue(ContainerReferencingService::$destructed);
+        } finally {
+            if ($gcEnabled) {
+                gc_enable();
+            }
+        }
     }
 
     public function testShutdownCallsShutdownOnBundles()
@@ -576,6 +598,31 @@ class ConfigureContainerKernel extends TestKernel
     private function configureContainer(ContainerConfigurator $container): void
     {
         $container->parameters()->set('configured', true);
+    }
+}
+
+class ContainerReferencingKernel extends TestKernel
+{
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->register('container_referencing', ContainerReferencingService::class)
+            ->setPublic(true)
+            ->addArgument(new Reference('service_container'));
+    }
+}
+
+class ContainerReferencingService
+{
+    public static bool $destructed = false;
+
+    public function __construct(
+        private ContainerInterface $container,
+    ) {
+    }
+
+    public function __destruct()
+    {
+        self::$destructed = true;
     }
 }
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T06:40:26Z
+
+Reproduced, and the option closes it. What about binding the format id into the AAD of the local AEAD as well? That refuses the assembled payload for every client, outside the bundle too, and it's free while the component is unreleased. The "both formats" error could also point bundle users to `read_self_contained`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T09:20:26Z
+
+I squashed in the error message that points to `read_self_contained`, and fixed a README sentence that still said the bundle always reads the old format. My question about the format id is still open. It's a two-line change in `LocalAead`, prefixing the AAD with `\chr($format->id())` when sealing and when opening. The only test it breaks is the one that reads the assembled payload. WDYT?

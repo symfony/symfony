@@ -20,6 +20,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\Workflow\Debug\ListenerExtractor;
 use Symfony\Component\Workflow\Debug\TraceableWorkflow;
+use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Dumper\MermaidDumper;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\TransitionBlocker;
@@ -60,6 +61,7 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
                 'dump' => $dumper->dump($workflow->getDefinition()),
                 'calls' => $calls,
                 'listeners' => $this->getEventListeners($workflow),
+                'descriptions' => $this->getDescriptions($workflow->getDefinition()),
             ];
         }
     }
@@ -147,5 +149,25 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
         }
 
         return $normalizedListeners;
+    }
+
+    private function getDescriptions(Definition $definition): array
+    {
+        $metadataStore = $definition->getMetadataStore();
+        $descriptions = [];
+        $placeId = 0;
+        foreach ($definition->getPlaces() as $place) {
+            if (\is_string($description = $metadataStore->getMetadata('description', $place))) {
+                $descriptions["place{$placeId}"] = $description;
+            }
+            ++$placeId;
+        }
+        foreach ($definition->getTransitions() as $k => $transition) {
+            if (\is_string($description = $metadataStore->getMetadata('description', $transition))) {
+                $descriptions["transition$k"] = $description;
+            }
+        }
+
+        return $descriptions;
     }
 }

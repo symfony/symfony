@@ -20,9 +20,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Workflow\DataCollector\WorkflowDataCollector;
+use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\EventListener\ExpressionLanguage;
 use Symfony\Component\Workflow\EventListener\GuardListener;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
+use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
 class WorkflowDataCollectorTest extends TestCase
@@ -84,6 +87,20 @@ class WorkflowDataCollectorTest extends TestCase
         $this->assertArrayHasKey('workflow.workflow2.guard.t1', $listeners['transition0']);
         $this->assertSame('Symfony\Component\Workflow\EventListener\GuardListener::onTransition()', $listeners['transition0']['workflow.workflow2.guard.t1'][0]['title']);
         $this->assertSame(['my_expression'], $listeners['transition0']['workflow.workflow2.guard.t1'][0]['guardExpressions']);
+    }
+
+    public function testDescriptions()
+    {
+        $submit = new Transition('submit', 'draft', 'review');
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$submit] = ['description' => 'Ask for a review'];
+        $metadataStore = new InMemoryMetadataStore(['description' => 'The blog workflow'], ['review' => ['description' => 'Waiting for a "go"']], $transitionsMetadata);
+        $definition = new Definition(['draft', 'review', 'published'], [$submit, new Transition('publish', 'review', 'published')], null, $metadataStore);
+
+        $collector = new WorkflowDataCollector([new Workflow($definition, null, null, 'blog')], new EventDispatcher(), new FileLinkFormatter());
+        $collector->lateCollect();
+
+        $this->assertSame(['place1' => 'Waiting for a "go"', 'transition0' => 'Ask for a review'], $collector->getWorkflows()['blog']['descriptions']);
     }
 
     public static function noop()

@@ -64,6 +64,26 @@ class WorkflowPanelTest extends TestCase
         $this->assertStringContainsString('\u003C!--|\u003Cscript\u003E', $panel);
     }
 
+    public function testPanelShowsTheDescriptionsAsTooltips()
+    {
+        $submit = new Transition('submit', 'draft', 'review');
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$submit] = ['description' => 'Ask for a review'];
+        $metadataStore = new InMemoryMetadataStore([], ['review' => ['description' => "Waiting for a \"go\" & <b>#1</b>\non Monday"]], $transitionsMetadata);
+        $definition = new Definition(['draft', 'review'], [$submit], null, $metadataStore);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('workflow.blog.leave.draft', 'var_dump');
+        $dispatcher->addListener('workflow.blog.guard.submit', 'var_dump');
+
+        $panel = $this->renderPanel(new Workflow($definition, null, $dispatcher, 'blog'), $dispatcher);
+        $callback = 'showNodeDetails'.hash('xxh128', 'blog');
+
+        $this->assertStringContainsString("click place0 {$callback}\n", $panel);
+        $this->assertStringContainsString("click place1 {$callback} \"Waiting for a #quot;go#quot; #amp; #lt;b#gt;#35;1#lt;/b#gt;\non Monday\"\n", $panel);
+        $this->assertStringContainsString("click transition0 {$callback} \"Ask for a review\"\n", $panel);
+        $this->assertSame(1, substr_count($panel, 'click transition0 '));
+    }
+
     private function renderPanel(Workflow $workflow, EventDispatcher $dispatcher): string
     {
         $collector = new WorkflowDataCollector([$workflow], $dispatcher, new FileLinkFormatter());

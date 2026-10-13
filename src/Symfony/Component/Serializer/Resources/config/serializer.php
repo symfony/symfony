@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Bridge\Doctrine\Serializer\Normalizer\CollectionDenormalizer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
@@ -151,6 +153,11 @@ return static function (ContainerConfigurator $container) {
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -990])
+
+        ->set('serializer.denormalizer.doctrine_collection', CollectionDenormalizer::class)
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -990])
+            ->tag('container.remove_if_missing', ['class' => CollectionDenormalizer::class])
+            ->tag('container.remove_if_missing', ['class' => ArrayCollection::class])
 
         // Loader
         ->set('serializer.mapping.chain_loader', LoaderChain::class)

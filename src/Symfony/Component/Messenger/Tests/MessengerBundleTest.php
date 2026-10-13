@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\InMemoryStore;
@@ -29,6 +30,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
@@ -59,6 +61,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\StampHeaderMapperInterface;
+use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -422,6 +425,29 @@ class MessengerBundleTest extends TestCase
 
         $this->assertSame('message-id', $envelope->last(MessageIdStamp::class)?->getId());
         $this->assertSame('acme', $envelope->last(FlowTenantStamp::class)?->tenant);
+    }
+
+    public function testAnOutboxCreatedFromADsnForwardsItsMessagesWhenConsumed()
+    {
+        $kernel = new TestOutboxDsnKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $bus = $container->get('test.messenger.default_bus');
+        $orders = $container->get('test.messenger.receiver_locator')->get('orders');
+        $outbox = $container->get('test.messenger.receiver_locator')->get('orders.outbox');
+
+        $bus->dispatch(new DummyMessage('Hey'));
+
+        $this->assertSame([], $orders->get());
+        $this->assertCount(1, $outbox->get());
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        new Worker(['orders.outbox' => $outbox], $bus, $dispatcher)->run();
+
+        $this->assertSame([], $outbox->get());
+        $this->assertCount(1, $forwarded = $orders->get());
+        $this->assertEquals(new DummyMessage('Hey'), $forwarded[0]->getMessage());
     }
 
     private static function hideTheUidComponent(): void
@@ -971,5 +997,39 @@ class TenantStampHeaderMapper implements StampHeaderMapperInterface
     public function toStamps(array $headers): array
     {
         return \is_string($tenant = $headers['tenant'] ?? null) ? [new FlowTenantStamp($tenant)] : [];
+    }
+}
+
+class TestOutboxDsnKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'transports' => [
+                'orders' => ['dsn' => 'in-memory://', 'outbox' => 'in-memory://?serialize=true'],
+            ],
+            'routing' => [DummyMessage::class => 'orders'],
+        ]);
+        $container->services()
+            ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
+            ->alias('test.messenger.receiver_locator', 'messenger.receiver_locator')->public()
+        ;
     }
 }

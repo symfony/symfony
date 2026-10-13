@@ -165,7 +165,7 @@ class MessengerBundle extends AbstractBundle
                             ->end()
                             ->scalarNode('outbox')
                                 ->defaultNull()
-                                ->info('Name of the transport that stores the messages inside the current database transaction; consume that transport to forward them to this one.')
+                                ->info('Name or DSN of the transport that stores the messages inside the current database transaction; consume that transport to forward them to this one. A value that is not the name of a configured transport is a DSN, used to create the "orders.outbox" transport for an "orders" transport.')
                             ->end()
                             ->arrayNode('retry_strategy')
                                 ->addDefaultsIfNotSet()
@@ -519,6 +519,39 @@ class MessengerBundle extends AbstractBundle
                 ->replaceArgument(1, $config['serializer']['signing_secret']);
         }
 
+        $transports = $config['transports'];
+        foreach ($transports as $name => $transport) {
+            if (!$transport['outbox'] || isset($transports[$transport['outbox']])) {
+                continue;
+            }
+
+            $usedEnvs = [];
+            $container->resolveEnvPlaceholders($transport['outbox'], null, $usedEnvs);
+
+            if (!$usedEnvs && !str_contains($transport['outbox'], ':')) {
+                throw new LogicException(\sprintf('Invalid Messenger configuration: the outbox "%s" of the "%s" transport is neither a configured transport nor a DSN.', $transport['outbox'], $name));
+            }
+
+            if (isset($transports[$outboxName = $name.'.outbox'])) {
+                throw new LogicException(\sprintf('Invalid Messenger configuration: the outbox DSN of the "%s" transport cannot create the "%s" transport, which is configured already.', $name, $outboxName));
+            }
+
+            // the outbox signs, retries and sends failed messages like the transport it serves,
+            // but it uses the default serializer because the serializer of that transport could drop the stamps that the outbox needs
+            $config['transports'][$outboxName] = [
+                'dsn' => $transport['outbox'],
+                'serializer' => null,
+                'sign' => $transport['sign'],
+                'options' => [],
+                'failure_transport' => $transport['failure_transport'],
+                'outbox' => null,
+                'retry_strategy' => $transport['retry_strategy'],
+                'rate_limiter' => null,
+                'priority' => 0,
+            ];
+            $config['transports'][$name]['outbox'] = $outboxName;
+        }
+
         $failureTransports = [];
         if ($config['failure_transport']) {
             if (!isset($config['transports'][$config['failure_transport']])) {
@@ -653,9 +686,6 @@ class MessengerBundle extends AbstractBundle
             }
 
             if ($transport['outbox']) {
-                if (!isset($config['transports'][$transport['outbox']])) {
-                    throw new LogicException(\sprintf('Invalid Messenger configuration: the outbox "%s" of the "%s" transport is not a configured transport.', $transport['outbox'], $name));
-                }
                 if ($transport['outbox'] === $name) {
                     throw new LogicException(\sprintf('Invalid Messenger configuration: the "%s" transport cannot be its own outbox.', $name));
                 }

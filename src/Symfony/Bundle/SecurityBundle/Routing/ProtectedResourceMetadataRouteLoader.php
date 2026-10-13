@@ -21,6 +21,8 @@ use Symfony\Component\Routing\RouteCollection;
  * resource identifier.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
+ *
+ * @internal
  */
 final class ProtectedResourceMetadataRouteLoader
 {

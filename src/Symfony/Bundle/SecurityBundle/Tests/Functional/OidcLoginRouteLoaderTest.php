@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Jose\Component\Core\JWK;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -28,6 +30,17 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
 
         $this->assertSame([], array_filter(array_keys($routes->all()), static fn (string $name) => str_starts_with($name, '_oidc_login_')));
         $this->assertNotNull($routes->get('_logout_main'));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLogoutRouteLoaderServiceIsDeprecated()
+    {
+        $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_legacy_logout_route_loader.yml']);
+
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.2: The "security.route_loader.logout" service is deprecated, use "security.route_loader" instead.');
+
+        $this->assertNotNull(static::getContainer()->get('router')->getRouteCollection()->get('_logout_main'));
     }
 
     public function testRouteLoaderDeclaresTheCallbackAndStartRoutes()

@@ -477,6 +477,21 @@ SecurityBundle
  * Deprecate the `ExpressionCacheWarmer` class, as the expressions of `access_control` rules are compiled when warming up the cache
  * The `security.expression_language` service is decorated by a `CompiledExpressionLanguage`; inject it as a `Symfony\Component\ExpressionLanguage\ExpressionLanguage`, not as a `Symfony\Component\Security\Core\Authorization\ExpressionLanguage`
  * `KernelTestCase::ensureKernelShutdown()` now clears the `security.authenticator.cache.expired_links` pool when `framework.test` is enabled, so that the `max_uses` option of login links counts the uses of each test only. A test that relied on a login link used by a previous test, or before a kernel shutdown in the same test, should use the link itself
+ * Deprecate the `security.route_loader.logout` service, import `security.route_loader` instead. The new service also loads the routes of the `oidc_login` and `access_token` authenticators
+
+   ```yaml
+   # config/routes/security.yaml
+
+   # before
+   _security_logout:
+       resource: security.route_loader.logout
+       type: service
+
+   # after
+   _security:
+       resource: security.route_loader
+       type: service
+   ```
 
 Serializer
 ----------

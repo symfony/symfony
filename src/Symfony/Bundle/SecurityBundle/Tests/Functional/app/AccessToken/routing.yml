@@ -4,8 +4,8 @@ foo_route:
 bar_route:
     path: /bar
     defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AccessTokenBundle\Controller\BarController::__invoke }
-_security_protected_resource_metadata:
-    resource: security.authenticator.access_token.route_loader
+_security:
+    resource: security.route_loader
     type: service
 scoped_route:
     path: /scoped

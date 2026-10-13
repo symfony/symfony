@@ -15,6 +15,8 @@ use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
 use Symfony\Bundle\SecurityBundle\Routing\LogoutRouteLoader;
 use Symfony\Bundle\SecurityBundle\Routing\OidcLoginRouteLoader;
+use Symfony\Bundle\SecurityBundle\Routing\ProtectedResourceMetadataRouteLoader;
+use Symfony\Bundle\SecurityBundle\Routing\SecurityRouteLoader;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -288,23 +290,37 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
 
+        ->set('security.route_loader', SecurityRouteLoader::class)
+            ->args([[
+                inline_service(LogoutRouteLoader::class)
+                    ->args([
+                        '%security.logout_uris%',
+                        'security.logout_uris',
+                    ]),
+                inline_service(OidcLoginRouteLoader::class)
+                    ->args([
+                        '%security.oidc_login.callback_uris%',
+                        'security.oidc_login.callback_uris',
+                        '%security.oidc_login.start_paths%',
+                        'security.oidc_login.start_paths',
+                        '%security.oidc_login.backchannel_logout_paths%',
+                        'security.oidc_login.backchannel_logout_paths',
+                    ]),
+                inline_service(ProtectedResourceMetadataRouteLoader::class)
+                    ->args([
+                        '%security.access_token.resource_metadata_paths%',
+                        'security.access_token.resource_metadata_paths',
+                    ]),
+            ]])
+            ->tag('routing.route_loader')
+
         ->set('security.route_loader.logout', LogoutRouteLoader::class)
             ->args([
                 '%security.logout_uris%',
                 'security.logout_uris',
             ])
             ->tag('routing.route_loader')
-
-        ->set('security.authenticator.oidc_login.route_loader', OidcLoginRouteLoader::class)
-            ->args([
-                '%security.oidc_login.callback_uris%',
-                'security.oidc_login.callback_uris',
-                '%security.oidc_login.start_paths%',
-                'security.oidc_login.start_paths',
-                '%security.oidc_login.backchannel_logout_paths%',
-                'security.oidc_login.backchannel_logout_paths',
-            ])
-            ->tag('routing.route_loader')
+            ->deprecate('symfony/security-bundle', '8.2', 'The "%service_id%" service is deprecated, use "security.route_loader" instead.')
 
         // Provisioning
         ->set('security.user.provider.missing', MissingUserProvider::class)

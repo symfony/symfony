@@ -1,0 +1,5 @@
+imports:
+    - { resource: ./config.yml }
+
+framework:
+    router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing_legacy_logout_route_loader.yml" }

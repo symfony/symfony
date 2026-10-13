@@ -34,7 +34,6 @@ use Jose\Component\Signature\Algorithm\RS256;
 use Jose\Component\Signature\Algorithm\RS384;
 use Jose\Component\Signature\Algorithm\RS512;
 use Symfony\Bundle\SecurityBundle\Controller\ProtectedResourceMetadataController;
-use Symfony\Bundle\SecurityBundle\Routing\ProtectedResourceMetadataRouteLoader;
 use Symfony\Component\Security\Http\AccessToken\ChainAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\Dpop\DpopSenderConstraint;
 use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
@@ -106,13 +105,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 [],
             ])
-
-        ->set('security.authenticator.access_token.route_loader', ProtectedResourceMetadataRouteLoader::class)
-            ->args([
-                '%security.access_token.resource_metadata_paths%',
-                'security.access_token.resource_metadata_paths',
-            ])
-            ->tag('routing.route_loader')
 
         ->set('security.access.oauth2_scope_voter', OAuth2ScopeVoter::class)
             ->tag('security.voter', ['priority' => 245])

@@ -56,7 +56,7 @@ class LogoutTest extends AbstractWebTestCase
         $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_cookie_clearing.yml']);
 
         $cookieJar = $client->getCookieJar();
-        $cookieJar->set(new Cookie('flavor', 'chocolate', strtotime('+1 day'), null, 'somedomain'));
+        $cookieJar->set(new Cookie('flavor', 'chocolate', strtotime('+1 day'), null, 'localhost'));
 
         $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
         $client->request('GET', '/logout');

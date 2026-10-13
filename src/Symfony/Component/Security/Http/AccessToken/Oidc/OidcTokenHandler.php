@@ -89,6 +89,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
      *                                              the token must name. A resource server answering for several
      *                                              identifiers, as one deployed behind more than one API base URL is,
      *                                              declares them all.
+     * @param list<string>        $issuers          The allowed values of the "iss" claim; when empty, the issuers announced by the discovery documents are allowed
      * @param bool|null           $enforceAtJwtType Whether the "typ" header of the token must be "at+jwt" or "application/at+jwt",
      *                                              which RFC 9068 §4 requires from a JWT access token. This is what tells an access
      *                                              token apart from the ID token the provider issues for the same audience, which
@@ -152,7 +153,8 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         $this->discoveryClients = array_values($clients);
         $this->discoveryIssuers = array_map(static fn ($key) => \is_string($key) ? $key : null, array_keys($clients));
         $pinned = array_filter($this->discoveryIssuers, \is_string(...));
-        $this->bindKeysToIssuers = 1 < \count($clients) || $pinned;
+        // without allowed issuers, the keys of a discovery document only verify the tokens of the issuer that this document announces
+        $this->bindKeysToIssuers = 1 < \count($clients) || $pinned || !$this->issuers;
         $this->oidcConfigurationCacheKey = $this->bindKeysToIssuers ? $oidcConfigurationCacheKey.'.issuer_keysets' : $oidcConfigurationCacheKey;
         $this->enforceKeyUsageVerification = $enforceKeyUsageVerification;
 
@@ -182,16 +184,18 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         }
 
         $jwkset = $this->signatureKeyset;
+        $issuers = $this->issuers;
         if ($this->discoveryClients) {
             $keys = $this->discoveryCache->get($this->oidcConfigurationCacheKey, [$this, 'computeDiscoveryKeys']);
 
             $jwkset = $this->bindKeysToIssuers ? $keys : JWKSet::createFromKeyData(['keys' => $keys]);
+            $issuers = $issuers ?: array_keys($keys);
         }
 
         try {
             $accessToken = $this->decryptIfNeeded($accessToken);
             $claims = $this->loadAndVerifyJws($accessToken, $jwkset);
-            $this->verifyClaims($claims);
+            $this->verifyClaims($claims, $issuers);
 
             if (empty($claims[$this->claim])) {
                 throw new MissingClaimException(\sprintf('"%s" claim not found.', $this->claim));
@@ -255,7 +259,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
                         throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which does not match the expected issuer "%s".', \is_string($issuer) ? $issuer : get_debug_type($issuer), $expectedIssuer));
                     }
 
-                    if (!\is_string($issuer) || !\in_array($issuer, $this->issuers, true)) {
+                    if (!\is_string($issuer) || ($this->issuers ? !\in_array($issuer, $this->issuers, true) : '' === $issuer)) {
                         throw new \RuntimeException(\sprintf('The OIDC provider announced the issuer "%s", which is not allowed.', \is_string($issuer) ? $issuer : get_debug_type($issuer)));
                     }
 
@@ -342,7 +346,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
         return $claims;
     }
 
-    private function verifyClaims(array $claims): array
+    private function verifyClaims(array $claims, array $issuers): array
     {
         // Verify the claims
         $clock = $this->getClock();
@@ -351,7 +355,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
             new Checker\NotBeforeChecker(clock: $clock, allowedTimeDrift: $this->allowedTimeDrift),
             new Checker\ExpirationTimeChecker(clock: $clock, allowedTimeDrift: $this->allowedTimeDrift),
             new Checker\CallableChecker('aud', fn ($value) => $this->matchesAudience($value)),
-            new Checker\IssuerChecker($this->issuers),
+            new Checker\IssuerChecker($issuers),
         ];
         $claimCheckerManager = new ClaimCheckerManager($checkers);
 

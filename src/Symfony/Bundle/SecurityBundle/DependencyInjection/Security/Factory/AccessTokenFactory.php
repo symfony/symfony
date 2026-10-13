@@ -138,7 +138,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                         ->acceptAndWrap(['string'])
                         ->scalarPrototype()->end()
                         ->defaultValue([])
-                        ->info('The issuer identifiers of the authorization servers issuing the access tokens this firewall accepts (e.g. "https://accounts.example.com"). This is what tells a client holding no token where to go and get one.')
+                        ->info('The issuer identifiers of the authorization servers issuing the access tokens this firewall accepts (e.g. "https://accounts.example.com"). This is what tells a client holding no token where to go and get one. Defaults to the issuers of the "oidc" or "oauth2" token handler.')
                     ->end()
                     ->scalarNode('jwks_uri')
                         ->defaultNull()
@@ -231,7 +231,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             ->replaceArgument(3, $successHandler)
             ->replaceArgument(4, $failureHandler)
             ->replaceArgument(5, $config['realm'])
-            ->replaceArgument(6, $resourceMetadataUri = isset($config['resource_metadata']) ? $this->createResourceMetadata($container, $firewallName, $config['resource_metadata'], $config['token_extractors'], $config['dpop']) : null)
+            ->replaceArgument(6, $resourceMetadataUri = isset($config['resource_metadata']) ? $this->createResourceMetadata($container, $firewallName, $config['resource_metadata'], $config['token_extractors'], $config['dpop'], $config['token_handler']) : null)
             ->replaceArgument(7, $senderConstraintId ? new Reference($senderConstraintId) : null)
         ;
 
@@ -322,7 +322,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
      *
      * @param array<string> $extractors
      */
-    private function createResourceMetadata(ContainerBuilder $container, string $firewallName, array $config, array $extractors, array $dpop): string
+    private function createResourceMetadata(ContainerBuilder $container, string $firewallName, array $config, array $extractors, array $dpop, array $tokenHandler): string
     {
         $parts = null === $config['resource'] ? [] : parse_url($config['resource']);
         $origin = isset($parts['scheme'], $parts['host']) ? $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '') : null;
@@ -344,9 +344,10 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         // every parameter the firewall configuration already carries is derived from it, so
         // that the document keeps describing what the firewall enforces instead of a copy of
         // it kept in sync by hand; a protocol feature added later derives its own the same way
+        $issuers = $tokenHandler['oidc']['issuers'] ?? (isset($tokenHandler['oauth2']['issuer']) ? [$tokenHandler['oauth2']['issuer']] : []);
         $metadata = [
             'resource' => $config['resource'],
-            'authorization_servers' => $config['authorization_servers'],
+            'authorization_servers' => $config['authorization_servers'] ?: $issuers,
             'jwks_uri' => $config['jwks_uri'],
             'scopes_supported' => $config['scopes_supported'],
             'bearer_methods_supported' => $config['bearer_methods_supported'] ?: $this->createBearerMethods($extractors),

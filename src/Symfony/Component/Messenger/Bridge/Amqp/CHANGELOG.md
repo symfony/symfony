@@ -11,6 +11,7 @@ CHANGELOG
  * Add `bindings` option to `queues` to configure additional exchange-queue bindings
  * Make `AmqpSender` and `AmqpTransport` implement `BatchSenderInterface`, waiting once for the publisher confirms of a batch when `confirm_timeout` is set
  * Make `AmqpStamp` implement `SenderStampInterface` so that an outbox keeps it
+ * Set the native `message_id` and `correlation_id` properties of sent messages from `MessageIdStamp` and `CorrelationStamp`
 
 8.1
 ---

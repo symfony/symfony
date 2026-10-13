@@ -14,7 +14,9 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\CorrelationStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -93,6 +95,15 @@ class AmqpSender implements BatchSenderInterface
 
         if ($priorityStamp = $envelope->last(AmqpPriorityStamp::class)) {
             $amqpStamp = AmqpStamp::createWithAttributes(['priority' => $priorityStamp->priority], $amqpStamp);
+        }
+
+        // AMQP rejects message_id and correlation_id values longer than 255 bytes
+        if (!($amqpStamp?->getAttributes()['message_id'] ?? null) && ($id = $envelope->last(MessageIdStamp::class)?->getId()) && 255 >= \strlen($id)) {
+            $amqpStamp = AmqpStamp::createWithAttributes(['message_id' => $id], $amqpStamp);
+        }
+
+        if (!($amqpStamp?->getAttributes()['correlation_id'] ?? null) && ($id = $envelope->last(CorrelationStamp::class)?->getId()) && 255 >= \strlen($id)) {
+            $amqpStamp = AmqpStamp::createWithAttributes(['correlation_id' => $id], $amqpStamp);
         }
 
         if ($amqpStamp?->getAttributes()['message_id'] ?? null) {

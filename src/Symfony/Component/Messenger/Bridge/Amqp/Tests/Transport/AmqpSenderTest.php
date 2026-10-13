@@ -22,7 +22,10 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\CausationStamp;
+use Symfony\Component\Messenger\Stamp\CorrelationStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -196,6 +199,84 @@ class AmqpSenderTest extends TestCase
 
         $transportMessageIdStamp = $returnedEnvelope->last(TransportMessageIdStamp::class);
         $this->assertNull($transportMessageIdStamp);
+    }
+
+    public function testIdentityStampsSetTheNativeProperties()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'), [new MessageIdStamp('message-id'), new CorrelationStamp('correlation-id'), new CausationStamp('causation-id')]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, new AmqpStamp(null, \AMQP_NOPARAM, ['message_id' => 'message-id', 'correlation_id' => 'correlation-id']));
+
+        $sent = (new AmqpSender($connection, $serializer))->send($envelope);
+
+        $this->assertSame('message-id', $sent->last(TransportMessageIdStamp::class)?->getId());
+    }
+
+    public function testAmqpStampAttributesWinOverIdentityStamps()
+    {
+        $stamp = new AmqpStamp('rk', \AMQP_NOPARAM, ['message_id' => 'amqp-message-id', 'correlation_id' => 'amqp-correlation-id']);
+        $envelope = new Envelope(new DummyMessage('Oy'), [$stamp, new MessageIdStamp('message-id'), new CorrelationStamp('correlation-id')]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, $stamp);
+
+        $sent = (new AmqpSender($connection, $serializer))->send($envelope);
+
+        $this->assertSame('amqp-message-id', $sent->last(TransportMessageIdStamp::class)?->getId());
+    }
+
+    public function testIdentityStampsLongerThanAmqpAllowsDoNotSetTheNativeProperties()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'), [new MessageIdStamp($messageId = str_repeat('m', 255)), new CorrelationStamp(str_repeat('c', 256))]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, new AmqpStamp(null, \AMQP_NOPARAM, ['message_id' => $messageId]));
+
+        (new AmqpSender($connection, $serializer))->send($envelope);
+    }
+
+    public function testRetryKeepsTheIdentityOfTheMessage()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getCorrelationId')->willReturn('correlation-id');
+
+        $envelope = new Envelope(new DummyMessage('Oy'), [
+            new AmqpReceivedStamp($amqpEnvelope, 'original_queue'),
+            new RedeliveryStamp(1),
+            new MessageIdStamp('message-id'),
+            new CorrelationStamp('correlation-id'),
+        ]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('publish')
+            ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) {
+                $this->assertTrue($stamp->isRetryAttempt());
+                $this->assertSame('message-id', $stamp->getAttributes()['message_id']);
+                $this->assertSame('correlation-id', $stamp->getAttributes()['correlation_id']);
+
+                return true;
+            }));
+
+        $sent = (new AmqpSender($connection, $serializer))->send($envelope);
+
+        $this->assertSame('message-id', $sent->last(TransportMessageIdStamp::class)?->getId());
     }
 
     public function testDoNotUseRetryRoutingKeyWhenSendingToFailureTransport()

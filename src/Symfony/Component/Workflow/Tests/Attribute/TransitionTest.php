@@ -25,6 +25,14 @@ class TransitionTest extends TestCase
         $this->assertSame(['label' => 'Publish'], (new Transition('draft', 'published', metadata: ['label' => 'Publish']))->metadata);
     }
 
+    public function testDescriptionIsTheThirdArgument()
+    {
+        $attribute = new Transition('draft', 'published', 'Makes the article public');
+
+        $this->assertSame(['description' => 'Makes the article public'], $attribute->metadata);
+        $this->assertNull($attribute->guard);
+    }
+
     public function testDescriptionAndDescriptionMetadataCannotBeUsedTogether()
     {
         $this->expectException(LogicException::class);

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T14:38:00Z
+
+Thanks @logosur! I squashed one change into your commit. The clients built for Azure and Google Cloud now also follow no redirect. HttpClient drops the `Authorization` header on a redirect to another host, but a 307 or 308 sends the body again. That body contains the client secret, the signed assertion or the plaintext.
+
+For AWS, async-aws provides `AwsHttpClientFactory::createRetryableClient()` for this exact case (async-aws/core 1.15+). The factory can build `HttpClient::create(['timeout' => 5, 'max_duration' => 10, 'max_redirects' => 0])` and pass it to that helper, so the AWS retry strategy is kept. Up for adding it here, with the two DSN options? The bridge would then require `async-aws/core: ^1.15`.

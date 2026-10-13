@@ -311,7 +311,7 @@ class Connection
             }
 
             $this->publishOnExchange(
-                $this->exchange(),
+                $amqpStamp?->isRetryAttempt() ? $this->getDefaultExchange() : $this->exchange(),
                 $body,
                 $this->getRoutingKeyForMessage($amqpStamp),
                 $headers,
@@ -635,5 +635,16 @@ class Connection
 
             throw $e;
         }
+    }
+
+    /**
+     * The default exchange routes a message to the queue named by its routing key, which is how retries are sent back only to their original queue.
+     */
+    private function getDefaultExchange(): \AMQPExchange
+    {
+        $exchange = $this->amqpFactory->createExchange($this->channel());
+        $exchange->setName('');
+
+        return $exchange;
     }
 }

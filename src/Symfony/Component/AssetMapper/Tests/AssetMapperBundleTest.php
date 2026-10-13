@@ -105,6 +105,28 @@ class AssetMapperBundleTest extends TestCase
         $this->assertTrue($container->hasDefinition('asset_mapper.dev_server_subscriber'));
     }
 
+    #[TestWith([true, 'strict'])]
+    #[TestWith([false, 'warn'])]
+    public function testTheMissingImportModeFollowsTheDebugMode(bool $debug, string $expectedMode)
+    {
+        $container = $this->createContainer([], $debug);
+
+        $this->assertSame($expectedMode, $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler')->getArgument(0));
+        $this->assertSame($expectedMode, $container->getDefinition('asset_mapper.compiler.javascript_import_path_compiler')->getArgument(1));
+    }
+
+    #[TestWith(['warn', true])]
+    #[TestWith(['ignore', true])]
+    #[TestWith(['strict', false])]
+    #[TestWith(['ignore', false])]
+    public function testAnExplicitMissingImportModeIsKept(string $mode, bool $debug)
+    {
+        $container = $this->createContainer(['missing_import_mode' => $mode], $debug);
+
+        $this->assertSame($mode, $container->getDefinition('asset_mapper.compiler.css_asset_url_compiler')->getArgument(0));
+        $this->assertSame($mode, $container->getDefinition('asset_mapper.compiler.javascript_import_path_compiler')->getArgument(1));
+    }
+
     public function testTheAssetPackageSkipsTheVersionOfMappedAssets()
     {
         $definition = $this->createContainer(['server' => false, 'public_prefix' => '/assets_path/'])->getDefinition('asset_mapper.asset_package');
@@ -202,7 +224,7 @@ class AssetMapperBundleTest extends TestCase
             'server' => '%kernel.debug%',
             'public_prefix' => '/assets/',
             'metadata_dir' => null,
-            'missing_import_mode' => 'warn',
+            'missing_import_mode' => null,
             'extensions' => [],
             'importmap_path' => '%kernel.project_dir%/importmap.php',
             'importmap_polyfill' => 'es-module-shims',

@@ -13,6 +13,7 @@ CHANGELOG
  * Add a `--no-esm` option to `importmap:require` and an `esm` option to importmap entries
  * Add the `asset_mapper.minimum_release_age` option to delay JavaScript package updates until a version reaches a minimum age
  * Add `PackageUpdateInfo::$withheldVersion` to report a version that the minimum release age keeps out of reach
+ * Make the `asset_mapper.missing_import_mode` option default to `strict` in debug mode and to `warn` otherwise
 
 8.0
 ---

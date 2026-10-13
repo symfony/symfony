@@ -212,7 +212,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     public function isReadable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
     {
         if (!$propertyPath instanceof PropertyPathInterface) {
-            $propertyPath = new PropertyPath($propertyPath);
+            $propertyPath = $this->getPropertyPath($propertyPath);
         }
 
         try {

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-12T19:01:24Z
+
+Is there any performance benefit? The extensions are already lazy-loaded, and calling getFunctions/getFilters does not trigger the initialization since these methods does not access the class properties.
+
+What's the plan to migrate to attribute-extension only in a BC way? If there is no plan, I'd rather stay with the current extensions that are easier to use in a standalone Twig Environment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T19:08:19Z
+
+There's one, the PR description gives some numbers. I didn't think about a plan yet, not sure it's important.
+The plan could be as simple as making all of them `@internal`... For another PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-10-13T08:30:52Z
+
+@GromNaN the extensions are still usable standalone. And once bumping the min supported version of Twig to 3.31, the duplicate metadata of functions can be dropped by using the pattern documented in the Twig PR.

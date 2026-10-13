@@ -34,11 +34,17 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
  */
 final class SerializeControllerResultAttributeListener implements EventSubscriberInterface
 {
+    /**
+     * @param SerializerInterface|(\Closure(): ?SerializerInterface)|null     $serializer
+     * @param ObjectMapperInterface|(\Closure(): ?ObjectMapperInterface)|null $objectMapper
+     * @param StreamWriterInterface|(\Closure(): ?StreamWriterInterface)|null $streamWriter
+     * @param TypeResolverInterface|(\Closure(): ?TypeResolverInterface)|null $typeResolver
+     */
     public function __construct(
-        private readonly ?SerializerInterface $serializer,
-        private readonly ?ObjectMapperInterface $objectMapper = null,
-        private readonly ?StreamWriterInterface $streamWriter = null,
-        private ?TypeResolverInterface $typeResolver = null,
+        private SerializerInterface|\Closure|null $serializer,
+        private ObjectMapperInterface|\Closure|null $objectMapper = null,
+        private StreamWriterInterface|\Closure|null $streamWriter = null,
+        private TypeResolverInterface|\Closure|null $typeResolver = null,
     ) {
     }
 
@@ -54,10 +60,10 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
         }
 
         if ($event->attribute->stream) {
-            if (!$this->streamWriter) {
+            if (!self::resolve($this->streamWriter)) {
                 throw new \LogicException(\sprintf('The "symfony/json-streamer" component is required to use the "stream" option of the "#[%s]" attribute. Try running "composer require symfony/json-streamer".', Serialize::class));
             }
-        } elseif (!$this->serializer) {
+        } elseif (!self::resolve($this->serializer)) {
             throw new \LogicException(\sprintf('The "symfony/serializer" component is required to use the "#[%s]" attribute. Try running "composer require symfony/serializer".', Serialize::class));
         }
 
@@ -120,7 +126,7 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
 
     private function map(mixed $value, string $class): mixed
     {
-        if (!$this->objectMapper) {
+        if (!self::resolve($this->objectMapper)) {
             throw new \LogicException(\sprintf('The "symfony/object-mapper" component is required to use the "map" option of the "#[%s]" attribute. Try running "composer require symfony/object-mapper".', Serialize::class));
         }
 
@@ -150,9 +156,23 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
         }
 
         try {
-            return ($this->typeResolver ??= TypeResolver::create())->resolve($event->controllerMetadata?->getReflector());
+            return (self::resolve($this->typeResolver) ?? $this->typeResolver = TypeResolver::create())->resolve($event->controllerMetadata?->getReflector());
         } catch (UnsupportedException $e) {
             throw new \LogicException(\sprintf('The "stream" option of the "#[%s]" attribute requires the "map" option or a return type on the controller: %s', Serialize::class, $e->getMessage()), 0, $e);
         }
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param T|(\Closure(): ?T)|null $dependency
+     *
+     * @param-out T|null $dependency
+     *
+     * @return T|null
+     */
+    private static function resolve(?object &$dependency): ?object
+    {
+        return $dependency instanceof \Closure ? $dependency = $dependency() : $dependency;
     }
 }

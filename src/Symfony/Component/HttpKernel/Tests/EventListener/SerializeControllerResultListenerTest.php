@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class SerializeControllerResultListenerTest extends TestCase
 {
@@ -316,6 +318,56 @@ class SerializeControllerResultListenerTest extends TestCase
         $this->expectExceptionMessage('The "symfony/json-streamer" component is required to use the "stream" option of the "#[Symfony\Component\HttpKernel\Attribute\Serialize]" attribute.');
 
         $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+    }
+
+    public function testSerializeDoesNotResolveTheStreamingDependencies()
+    {
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())
+            ->method('serialize')
+            ->with(new ProductView(10), 'json', [])
+            ->willReturn('{"productId": 10}');
+
+        $viewEvent = $this->createViewEvent(new ProductCreated(10));
+        $unexpected = fn () => $this->fail('The dependency should not be resolved.');
+
+        $listener = new SerializeControllerResultAttributeListener(static fn () => $serializer, static fn () => new ObjectMapper(), $unexpected, $unexpected);
+        $listener->onView(new ControllerAttributeEvent(new Serialize(map: ProductView::class), $viewEvent));
+
+        self::assertSame('{"productId": 10}', $viewEvent->getResponse()->getContent());
+    }
+
+    public function testStreamDoesNotResolveTheSerializer()
+    {
+        $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'show']);
+        $unexpected = fn () => $this->fail('The dependency should not be resolved.');
+
+        $listener = new SerializeControllerResultAttributeListener($unexpected, $unexpected, fn () => JsonStreamWriter::create([], $this->streamWritersDir), static fn () => TypeResolver::create());
+        $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
+
+        self::assertSame('{"productId":10}', self::getStreamedContent($viewEvent->getResponse()));
+    }
+
+    #[DataProvider('provideMissingDependencies')]
+    public function testDependencyResolvedToNull(Serialize $attribute, bool $withSerializer, string $expectedMessage)
+    {
+        $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'show']);
+        $serializer = $withSerializer ? $this->createStub(SerializerInterface::class) : null;
+        $missing = static fn () => null;
+
+        $listener = new SerializeControllerResultAttributeListener(static fn () => $serializer, $missing, $missing, $missing);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $listener->onView(new ControllerAttributeEvent($attribute, $viewEvent));
+    }
+
+    public static function provideMissingDependencies(): iterable
+    {
+        yield 'serializer' => [new Serialize(), false, 'The "symfony/serializer" component is required to use the "#[Symfony\Component\HttpKernel\Attribute\Serialize]" attribute.'];
+        yield 'object mapper' => [new Serialize(map: ProductView::class), true, 'The "symfony/object-mapper" component is required to use the "map" option of the "#[Symfony\Component\HttpKernel\Attribute\Serialize]" attribute.'];
+        yield 'stream writer' => [new Serialize(stream: true), false, 'The "symfony/json-streamer" component is required to use the "stream" option of the "#[Symfony\Component\HttpKernel\Attribute\Serialize]" attribute.'];
     }
 
     private function createViewEvent(mixed $controllerResult, ?callable $controller = null): ViewEvent

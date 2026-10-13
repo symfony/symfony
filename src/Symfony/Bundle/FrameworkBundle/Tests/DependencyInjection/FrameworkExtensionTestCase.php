@@ -41,6 +41,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\CacheBundle;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -942,7 +943,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->compile();
 
         $this->assertEquals(new Reference('serializer'), $container->getDefinition('argument_resolver.request_payload')->getArgument(0));
-        $this->assertEquals(new Reference('serializer', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
+        $this->assertEquals(new ServiceClosureArgument(new Reference('serializer', ContainerInterface::NULL_ON_INVALID_REFERENCE)), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
     }
 
     public function testRequestAndResponseSerializers()
@@ -952,7 +953,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->compile();
 
         $this->assertEquals(new Reference('serializer.request'), $container->getDefinition('argument_resolver.request_payload')->getArgument(0));
-        $this->assertEquals(new Reference('serializer.response'), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
+        $this->assertEquals(new ServiceClosureArgument(new Reference('serializer.response')), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
     }
 
     public function testEmptySerializerIdsAreNotIgnored()
@@ -970,7 +971,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container->compile();
 
         $this->assertEquals(new Reference(''), $container->getDefinition('argument_resolver.request_payload')->getArgument(0));
-        $this->assertEquals(new Reference(''), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
+        $this->assertEquals(new ServiceClosureArgument(new Reference('')), $container->getDefinition('serialize_controller_result_listener')->getArgument(0));
     }
 
     public function testRequestSerializerWithoutTheSerializerService()

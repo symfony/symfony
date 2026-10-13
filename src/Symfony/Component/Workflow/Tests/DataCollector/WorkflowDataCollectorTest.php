@@ -93,10 +93,12 @@ class WorkflowDataCollectorTest extends TestCase
     public function testDescriptions()
     {
         $submit = new Transition('submit', 'draft', 'review');
+        $publish = new Transition('publish', 'review', 'published');
         $transitionsMetadata = new \SplObjectStorage();
         $transitionsMetadata[$submit] = ['description' => 'Ask for a review'];
-        $metadataStore = new InMemoryMetadataStore(['description' => 'The blog workflow'], ['review' => ['description' => 'Waiting for a "go"']], $transitionsMetadata);
-        $definition = new Definition(['draft', 'review', 'published'], [$submit, new Transition('publish', 'review', 'published')], null, $metadataStore);
+        $transitionsMetadata[$publish] = ['description' => ''];
+        $metadataStore = new InMemoryMetadataStore(['description' => 'The blog workflow'], ['review' => ['description' => 'Waiting for a "go"'], 'published' => ['description' => '']], $transitionsMetadata);
+        $definition = new Definition(['draft', 'review', 'published'], [$submit, $publish], null, $metadataStore);
 
         $collector = new WorkflowDataCollector([new Workflow($definition, null, null, 'blog')], new EventDispatcher(), new FileLinkFormatter());
         $collector->lateCollect();

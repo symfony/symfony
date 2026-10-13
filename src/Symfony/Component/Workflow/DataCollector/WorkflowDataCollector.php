@@ -158,14 +158,15 @@ final class WorkflowDataCollector extends DataCollector implements LateDataColle
         $metadataStore = $definition->getMetadataStore();
         $descriptions = [];
         $placeId = 0;
+        // An empty description is skipped, as Mermaid rejects an empty tooltip and would fail to render the whole diagram
         foreach ($definition->getPlaces() as $place) {
-            if (\is_string($description = $metadataStore->getMetadata('description', $place))) {
+            if (\is_string($description = $metadataStore->getMetadata('description', $place)) && '' !== $description) {
                 $descriptions["place{$placeId}"] = $description;
             }
             ++$placeId;
         }
         foreach ($definition->getTransitions() as $k => $transition) {
-            if (\is_string($description = $metadataStore->getMetadata('description', $transition))) {
+            if (\is_string($description = $metadataStore->getMetadata('description', $transition)) && '' !== $description) {
                 $descriptions["transition$k"] = $description;
             }
         }

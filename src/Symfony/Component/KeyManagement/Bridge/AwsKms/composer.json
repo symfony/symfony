@@ -21,8 +21,9 @@
     ],
     "require": {
         "php": ">=8.4.1",
-        "async-aws/core": "^1.7",
+        "async-aws/core": "^1.15",
         "async-aws/kms": "^1.0",
+        "symfony/http-client": "^7.4|^8.0",
         "symfony/key-management": "^8.2"
     },
     "autoload": {

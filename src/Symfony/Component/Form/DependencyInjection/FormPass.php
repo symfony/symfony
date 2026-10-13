@@ -68,10 +68,11 @@ class FormPass implements CompilerPassInterface
         }
 
         $dataClasses = [];
+        $dataClassTypes = [];
         // abstract data classes get a type too, they can be the parent type of concrete ones
         foreach (array_keys($container->findTaggedResourceIds('form.data_class', false)) as $id) {
             $class = $container->getDefinition($id)->getClass();
-            $container->setDefinition($typeId = '.form.data_class_type.'.$class, $this->createDataClassTypeDefinition($container, $class));
+            $container->setDefinition($typeId = '.form.data_class_type.'.$class, $dataClassTypes[$class] = $this->createDataClassTypeDefinition($container, $class));
 
             $servicesMap[$class] = new Reference($typeId);
             $dataClasses[] = $class;
@@ -83,6 +84,10 @@ class FormPass implements CompilerPassInterface
             $commandDefinition->setArgument(1, array_keys($namespaces));
             $commandDefinition->setArgument(2, array_keys($servicesMap));
             $commandDefinition->setArgument('$dataClassTypes', $dataClasses);
+        }
+
+        if ($container->hasDefinition('form.type_guesser.type_info.cache_warmer')) {
+            $container->getDefinition('form.type_guesser.type_info.cache_warmer')->replaceArgument(0, $this->getGuessedFields($dataClassTypes));
         }
 
         if ($csrfTokenIds && $container->hasDefinition('form.type_extension.csrf')) {
@@ -224,6 +229,37 @@ class FormPass implements CompilerPassInterface
         $parameterBag = $container->getParameterBag();
 
         return new Definition(DataClassType::class, [$class, $parent, StringUtil::fqcnToBlockPrefix($class) ?: '', $parameterBag->escapeValue($fields), $parameterBag->escapeValue($options)]);
+    }
+
+    /**
+     * Lists the fields that have no type, for which the type guessers are called.
+     *
+     * @param array<class-string, Definition> $dataClassTypes
+     *
+     * @return array<class-string, list<string>>
+     */
+    private function getGuessedFields(array $dataClassTypes): array
+    {
+        $guessedFields = [];
+
+        foreach ($dataClassTypes as $class => $definition) {
+            $fields = [];
+
+            // the parent types add their fields to the form of the child class, so the guessers are called with the child class
+            do {
+                foreach ($definition->getArgument(3) as $name => [$type]) {
+                    if (null === $type) {
+                        $fields[$name] = $name;
+                    }
+                }
+            } while ($definition = $dataClassTypes[$definition->getArgument(1)] ?? null);
+
+            if ($fields) {
+                $guessedFields[$class] = array_values($fields);
+            }
+        }
+
+        return $guessedFields;
     }
 
     private function validateOptionValues(array $options, string $context, string $path = ''): void

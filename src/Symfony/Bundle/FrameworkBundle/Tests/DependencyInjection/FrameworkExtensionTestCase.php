@@ -34,6 +34,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PdoTagAwareAdapter;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
@@ -64,6 +65,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\Attribute\AsFormType;
+use Symfony\Component\Form\CacheWarmer\TypeInfoFormTypeGuesserCacheWarmer;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\TypeInfoFormTypeGuesser;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
@@ -1043,6 +1045,26 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame(TypeInfoFormTypeGuesser::class, $definition->getClass());
         $this->assertTrue($definition->hasTag('form.type_guesser'));
+        $this->assertEquals(new Reference('form.type_guesser.type_info.cache', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+
+        $cache = $container->getDefinition('form.type_guesser.type_info.cache');
+        $this->assertSame([PhpArrayAdapter::class, 'create'], $cache->getFactory());
+        $this->assertEquals(new Reference('cache.form'), $cache->getArgument(1));
+        $this->assertTrue($container->hasDefinition('cache.form'));
+
+        $warmer = $container->getDefinition('form.type_guesser.type_info.cache_warmer');
+        $this->assertSame(TypeInfoFormTypeGuesserCacheWarmer::class, $warmer->getClass());
+        $this->assertTrue($warmer->hasTag('kernel.cache_warmer'));
+        $this->assertSame($cache->getArgument(0), $warmer->getArgument(1));
+    }
+
+    public function testFormTypeGuesserReadingTheDeclaredTypeOfPropertiesIsNotCachedInDebug()
+    {
+        $container = $this->createContainerFromFile('full', ['kernel.debug' => true]);
+
+        $this->assertFalse($container->hasDefinition('form.type_guesser.type_info.cache_warmer'));
+        $this->assertFalse($container->hasDefinition('form.type_guesser.type_info.cache'));
+        $this->assertFalse($container->hasDefinition('cache.form'));
     }
 
     public function testDoctrineMappedClassAttributesAreForwardedToTheTag()

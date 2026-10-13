@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -24,6 +25,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Tests\Fixtures\TypeInfoFormTypeGuesserCase;
 use Symfony\Component\Form\Tests\Fixtures\TypeInfoFormTypeGuesserChildCase;
 use Symfony\Component\Form\TypeInfoFormTypeGuesser;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
 class TypeInfoFormTypeGuesserTest extends TestCase
 {
@@ -31,6 +33,18 @@ class TypeInfoFormTypeGuesserTest extends TestCase
     public function testGuessType(?TypeGuess $expected, string $class, string $property)
     {
         $this->assertEquals($expected, (new TypeInfoFormTypeGuesser())->guessType($class, $property));
+    }
+
+    #[DataProvider('provideGuessTypeCases')]
+    public function testGuessTypeFromCache(?TypeGuess $expected, string $class, string $property)
+    {
+        $cache = new ArrayAdapter();
+        (new TypeInfoFormTypeGuesser(null, $cache))->guessType($class, $property);
+
+        $typeResolver = $this->createMock(TypeResolverInterface::class);
+        $typeResolver->expects($this->never())->method('resolve');
+
+        $this->assertEquals($expected, (new TypeInfoFormTypeGuesser($typeResolver, $cache))->guessType($class, $property));
     }
 
     public static function provideGuessTypeCases(): iterable
@@ -63,6 +77,18 @@ class TypeInfoFormTypeGuesserTest extends TestCase
     public function testGuessRequired(?ValueGuess $expected, string $class, string $property)
     {
         $this->assertEquals($expected, (new TypeInfoFormTypeGuesser())->guessRequired($class, $property));
+    }
+
+    #[DataProvider('provideGuessRequiredCases')]
+    public function testGuessRequiredFromCache(?ValueGuess $expected, string $class, string $property)
+    {
+        $cache = new ArrayAdapter();
+        (new TypeInfoFormTypeGuesser(null, $cache))->guessType($class, $property);
+
+        $typeResolver = $this->createMock(TypeResolverInterface::class);
+        $typeResolver->expects($this->never())->method('resolve');
+
+        $this->assertEquals($expected, (new TypeInfoFormTypeGuesser($typeResolver, $cache))->guessRequired($class, $property));
     }
 
     public static function provideGuessRequiredCases(): iterable

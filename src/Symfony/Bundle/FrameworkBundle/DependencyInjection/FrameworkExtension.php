@@ -363,6 +363,12 @@ class FrameworkExtension extends Extension
     {
         $loader->load('form.php');
 
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('form.type_guesser.type_info.cache_warmer');
+            $container->removeDefinition('form.type_guesser.type_info.cache');
+            $container->removeDefinition('cache.form');
+        }
+
         if (!property_exists(ValidatorExtension::class, 'violationMapper')) {
             $container->removeDefinition('form.violation_mapper');
             $container->removeAlias(ViolationMapperInterface::class);

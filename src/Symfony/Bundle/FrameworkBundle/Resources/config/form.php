@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Form\CacheWarmer\TypeInfoFormTypeGuesserCacheWarmer;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
@@ -93,8 +96,25 @@ return static function (ContainerConfigurator $container) {
             ->tag('form.type_guesser')
 
         ->set('form.type_guesser.type_info', TypeInfoFormTypeGuesser::class)
-            ->args([service('type_info.resolver')->nullOnInvalid()])
+            ->args([service('type_info.resolver')->nullOnInvalid(), service('form.type_guesser.type_info.cache')->nullOnInvalid()])
             ->tag('form.type_guesser')
+
+        ->set('form.type_guesser.type_info.cache_warmer', TypeInfoFormTypeGuesserCacheWarmer::class)
+            ->args([
+                abstract_arg('the guessed fields of the data classes, set by FormPass'),
+                '%kernel.build_dir%/form_type_guesser.php',
+                service('type_info.resolver')->nullOnInvalid(),
+            ])
+            ->tag('kernel.cache_warmer')
+
+        ->set('cache.form')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+
+        ->set('form.type_guesser.type_info.cache', CacheItemPoolInterface::class)
+            ->factory([PhpArrayAdapter::class, 'create'])
+            ->args(['%kernel.build_dir%/form_type_guesser.php', service('cache.form')])
 
         ->alias('form.property_accessor', 'property_accessor')
 

@@ -344,6 +344,28 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['n3w', 's3cr3t'], $container->getDefinition('uri_signer')->getArgument(0));
     }
 
+    #[TestWith(['true', true])]
+    #[TestWith(['false', false])]
+    public function testTheEnvVarOfTheTestOptionIsResolvedWhenTheContainerIsCompiled(string $env, bool $enabled)
+    {
+        $_ENV['FRAMEWORK_TEST'] = $env;
+
+        try {
+            $container = $this->createContainerFromClosure(static function ($container) {
+                $container->loadFromExtension('framework', [
+                    'secret' => 's3cr3t',
+                    'session' => true,
+                    'test' => '%env(bool:FRAMEWORK_TEST)%',
+                ]);
+            });
+        } finally {
+            unset($_ENV['FRAMEWORK_TEST']);
+        }
+
+        $this->assertSame($enabled, $container->hasDefinition('test.service_container'));
+        $this->assertSame($enabled ? 'session.storage.factory.mock_file' : 'session.storage.factory.native', (string) $container->getAlias('session.storage.factory'));
+    }
+
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testHincludeGlobalTemplateParameterIsDeprecated()

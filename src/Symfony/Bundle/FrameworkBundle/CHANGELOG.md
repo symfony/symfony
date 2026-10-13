@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve the env vars of the `framework.test` option while the container is compiled
  * Default `framework.session.storage_factory_id` to `session.storage.factory.mock_file` when `framework.test` is `true`
  * Add `KernelBrowser::sendWebhook()` to post a webhook signed as its `webhook.routing` entry expects
  * Add `WebhookAssertionsTrait` to `KernelTestCase` to assert on the webhooks sent with the `webhook.transport` service

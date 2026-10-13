@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
@@ -144,6 +145,22 @@ class ValidationBundleTest extends TestCase
         $this->assertFalse($this->load([], framework: ['test' => true])->getDefinition('validator.not_compromised_password')->getArgument(2));
         $this->assertFalse($this->load([], framework: ['test' => null])->getDefinition('validator.not_compromised_password')->getArgument(2));
         $this->assertFalse($this->load(['not_compromised_password' => ['endpoint' => 'https://example.com']], framework: ['test' => true])->getDefinition('validator.not_compromised_password')->getArgument(2));
+        $this->assertTrue($this->load([], framework: ['test' => '%env(bool:UNDEFINED_FRAMEWORK_TEST)%'])->getDefinition('validator.not_compromised_password')->getArgument(2));
+    }
+
+    #[TestWith(['true', false])]
+    #[TestWith(['false', true])]
+    public function testFrameworkTestSetByAnEnvVarDrivesNotCompromisedPassword(string $env, bool $enabled)
+    {
+        $_ENV['FRAMEWORK_TEST'] = $env;
+
+        try {
+            $container = $this->load([], framework: ['test' => '%env(bool:FRAMEWORK_TEST)%']);
+        } finally {
+            unset($_ENV['FRAMEWORK_TEST']);
+        }
+
+        $this->assertSame($enabled, $container->getDefinition('validator.not_compromised_password')->getArgument(2));
     }
 
     #[DataProvider('provideExplicitNotCompromisedPasswordConfigs')]

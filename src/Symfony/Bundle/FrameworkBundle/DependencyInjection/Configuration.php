@@ -83,7 +83,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultNull()
                     ->setDeprecated('symfony/framework-bundle', '8.2', 'Setting the "%path%.%node%" configuration option is deprecated, use the "SYMFONY_IDE" env var instead.')
                 ->end()
-                ->booleanNode('test')->end()
+                ->booleanNode('test')->resolvesAtCompileTime()->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
                 ->booleanNode('set_locale_from_accept_language')
                     ->info('Whether to use the Accept-Language HTTP header to set the Request locale (only when the "_locale" request attribute is not passed).')

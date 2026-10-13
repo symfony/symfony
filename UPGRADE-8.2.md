@@ -185,6 +185,7 @@ FrameworkBundle
  * Deprecate `DependencyInjection\Compiler\JsonPathPass`, use the one from the JsonPath component instead
  * Deprecate `Controller\TemplateController`, use the one from TwigBundle instead. Its service now exists when TwigBundle is registered instead of whenever routing is, and the old service id keeps working as a deprecated alias
  * The secrets vault no longer loads env vars when its directory is in the project but does not exist when the container is built (`config/secrets/` by default). The env var of `framework.secret` is then not derived from `SYMFONY_DECRYPTION_SECRET` anymore when it is empty or not defined: define it, or create the vault. In non-debug environments, clear the cache after creating the first vault
+ * The env vars of the `framework.test` option are now read while the container is compiled. With `test: '%env(bool:FOO)%'`, the test services are not loaded anymore when `FOO` is false. They used to be loaded whatever the value of `FOO`. The container also fails to compile when `FOO` is not defined
 
 HttpClient
 ----------

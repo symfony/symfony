@@ -13,8 +13,11 @@ namespace Symfony\Component\KeyManagement\Bridge\HashiCorpVault\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\StaticTokenProvider;
+use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TokenProviderInterface;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKms;
 use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
@@ -25,6 +28,8 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 class TransitKmsTest extends TestCase
 {
+    private const string INVALID_TOKEN_BODY = '{"errors":["2 errors occurred:\n\t* permission denied\n\t* invalid token\n\n"]}';
+
     public function testEncryptSendsBase64PlaintextAndReturnsTheVaultBlob()
     {
         $captured = null;
@@ -34,7 +39,7 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:abc']]));
         }, 'https://vault.local/v1/');
 
-        $kms = new TransitKms($client, 's.token');
+        $kms = new TransitKms($client, new StaticTokenProvider('s.token'));
         $ciphertext = $kms->encrypt('app', 'hello');
 
         $this->assertSame('app', $ciphertext->keyId);
@@ -59,7 +64,7 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:x']]));
         }, 'https://vault.local/v1/');
 
-        (new TransitKms($client, 't'))->encrypt('app', 'hello', 'opaque-aad');
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello', 'opaque-aad');
 
         $this->assertSame(base64_encode('opaque-aad'), $captured['context']);
     }
@@ -79,7 +84,7 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:x']]));
         }, 'https://vault.local/v1/');
 
-        $kms = new TransitKms($client, 't');
+        $kms = new TransitKms($client, new StaticTokenProvider('t'));
         $ciphertext = $kms->encrypt('app', 'hello', 'opaque-aad');
         $kms->decrypt($ciphertext, 'opaque-aad');
 
@@ -99,7 +104,7 @@ class TransitKmsTest extends TestCase
 
         $this->expectException(UnsupportedOperationException::class);
         $this->expectExceptionMessage('derived');
-        (new TransitKms($client, 't'))->encrypt('app', 'hello', 'opaque-aad');
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello', 'opaque-aad');
     }
 
     public function testEmptyAadNeverTriggersTheKeyRead()
@@ -111,7 +116,7 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:x']]));
         }, 'https://vault.local/v1/');
 
-        (new TransitKms($client, 't'))->encrypt('app', 'hello');
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello');
 
         $this->assertSame(['https://vault.local/v1/transit/encrypt/app'], $urls);
     }
@@ -124,7 +129,7 @@ class TransitKmsTest extends TestCase
         );
 
         $this->expectException(KeyNotFoundException::class);
-        (new TransitKms($client, 't'))->encrypt('missing', 'hello', 'opaque-aad');
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('missing', 'hello', 'opaque-aad');
     }
 
     public function testUnknownKeyOnTheAadCheckStaysMaskedOnDecrypt()
@@ -135,7 +140,7 @@ class TransitKmsTest extends TestCase
         );
 
         $this->expectException(DecryptionFailedException::class);
-        (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:x', 'missing'), 'opaque-aad');
+        (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:x', 'missing'), 'opaque-aad');
     }
 
     public function testDecryptDecodesPlaintext()
@@ -145,7 +150,7 @@ class TransitKmsTest extends TestCase
             'https://vault.local/v1/',
         );
 
-        $plaintext = (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:abc', 'app'));
+        $plaintext = (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:abc', 'app'));
 
         $this->assertSame('hello', $plaintext);
     }
@@ -158,7 +163,7 @@ class TransitKmsTest extends TestCase
         );
 
         $this->expectException(DecryptionFailedException::class);
-        (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:tampered', 'app'));
+        (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:tampered', 'app'));
     }
 
     public function testDecryptOnHttp500IsNotASilentDecryptionFailure()
@@ -170,7 +175,7 @@ class TransitKmsTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('HTTP 500');
-        (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:x', 'app'));
+        (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:x', 'app'));
     }
 
     public static function provideNonDecryptClientErrors(): iterable
@@ -190,7 +195,7 @@ class TransitKmsTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('HTTP %d', $status));
-        (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:x', 'app'));
+        (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:x', 'app'));
     }
 
     public function testHttp404OnEncryptSurfacesAsKeyNotFound()
@@ -201,7 +206,7 @@ class TransitKmsTest extends TestCase
         );
 
         $this->expectException(KeyNotFoundException::class);
-        (new TransitKms($client, 't'))->encrypt('missing', 'hello');
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('missing', 'hello');
     }
 
     public function testHttp404OnDecryptIsMaskedAsDecryptionFailure()
@@ -212,7 +217,7 @@ class TransitKmsTest extends TestCase
         );
 
         $this->expectException(DecryptionFailedException::class);
-        (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:x', 'missing'));
+        (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:x', 'missing'));
     }
 
     public function testNonJsonErrorBodySurfacesAsRuntimeExceptionWithoutTheBody()
@@ -223,7 +228,7 @@ class TransitKmsTest extends TestCase
         );
 
         try {
-            (new TransitKms($client, 't'))->encrypt('app', 'hello');
+            (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello');
             $this->fail('A RuntimeException should have been thrown.');
         } catch (RuntimeException $e) {
             $this->assertStringContainsString('HTTP 503', $e->getMessage());
@@ -239,7 +244,7 @@ class TransitKmsTest extends TestCase
         );
 
         try {
-            (new TransitKms($client, 't'))->encrypt('app', 'hello');
+            (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello');
             $this->fail('A RuntimeException should have been thrown.');
         } catch (RuntimeException $e) {
             $this->assertStringContainsString('HTTP 301', $e->getMessage());
@@ -253,7 +258,7 @@ class TransitKmsTest extends TestCase
         $client = (new MockHttpClient($response, 'https://vault.local/v1/'))->withOptions(['max_redirects' => 20]);
 
         try {
-            (new TransitKms($client, 's.token'))->encrypt('app', 'hello');
+            (new TransitKms($client, new StaticTokenProvider('s.token')))->encrypt('app', 'hello');
             $this->fail('A RuntimeException should have been thrown.');
         } catch (RuntimeException) {
         }
@@ -275,7 +280,7 @@ class TransitKmsTest extends TestCase
             ]));
         }, 'https://vault.local/v1/');
 
-        $dataKey = (new TransitKms($client, 't'))->generateDataKey('app', 32);
+        $dataKey = (new TransitKms($client, new StaticTokenProvider('t')))->generateDataKey('app', 32);
 
         [$url, $body] = $captured;
         $this->assertSame('https://vault.local/v1/transit/datakey/plaintext/app', $url);
@@ -288,7 +293,7 @@ class TransitKmsTest extends TestCase
 
     public function testGenerateDataKeyRejectsUnsupportedLengths()
     {
-        $kms = new TransitKms(new MockHttpClient([], 'https://vault.local/v1/'), 't');
+        $kms = new TransitKms(new MockHttpClient([], 'https://vault.local/v1/'), new StaticTokenProvider('t'));
 
         $this->expectException(InvalidArgumentException::class);
         $kms->generateDataKey('app', 24);
@@ -316,7 +321,7 @@ class TransitKmsTest extends TestCase
             ]));
         }, 'https://vault.local/v1/');
 
-        (new TransitKms($client, 't'))->generateDataKey('app', $byteLength);
+        (new TransitKms($client, new StaticTokenProvider('t')))->generateDataKey('app', $byteLength);
 
         $this->assertSame($expectedBits, $captured['bits']);
     }
@@ -330,7 +335,7 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['plaintext' => base64_encode(str_repeat("\xCC", 32))]]));
         }, 'https://vault.local/v1/');
 
-        $dataKey = (new TransitKms($client, 't'))->unwrapDataKey(new Ciphertext('vault:v1:wrapped', 'app'));
+        $dataKey = (new TransitKms($client, new StaticTokenProvider('t')))->unwrapDataKey(new Ciphertext('vault:v1:wrapped', 'app'));
 
         $this->assertSame('https://vault.local/v1/transit/decrypt/app', $captured);
         $this->assertSame(str_repeat("\xCC", 32), $dataKey->use(static fn (string $p): string => $p));
@@ -346,7 +351,7 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:x']]));
         }, 'https://vault.local/v1/');
 
-        $kms = new TransitKms($client, 't', 'kms-transit', 'tenant-acme');
+        $kms = new TransitKms($client, new StaticTokenProvider('t'), 'kms-transit', 'tenant-acme');
         $kms->encrypt('app', 'hello');
 
         [$url, $headers] = $captured;
@@ -363,7 +368,7 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:x']]));
         }, 'https://vault.local/v1/');
 
-        (new TransitKms($client, 't', 'kms/transit'))->encrypt('app', 'hello');
+        (new TransitKms($client, new StaticTokenProvider('t'), 'kms/transit'))->encrypt('app', 'hello');
 
         $this->assertSame('https://vault.local/v1/kms/transit/encrypt/app', $captured);
     }
@@ -377,7 +382,7 @@ class TransitKmsTest extends TestCase
             return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:x']]));
         }, 'https://vault.local/v1/');
 
-        (new TransitKms($client, 't'))->encrypt('keys/with/slashes', 'hello');
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('keys/with/slashes', 'hello');
 
         $this->assertStringContainsString('/encrypt/keys%2Fwith%2Fslashes', $captured);
     }
@@ -391,7 +396,7 @@ class TransitKmsTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('malformed');
-        (new TransitKms($client, 't'))->encrypt('app', 'hello');
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello');
     }
 
     public function testAStringDataFieldIsAClearRuntimeError()
@@ -400,7 +405,7 @@ class TransitKmsTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('malformed');
-        (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:abc', 'app'));
+        (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:abc', 'app'));
     }
 
     public function testOnlyStringErrorEntriesAreReported()
@@ -412,7 +417,7 @@ class TransitKmsTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('(HTTP 403): "permission denied"');
-        (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:x', 'app'));
+        (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:x', 'app'));
     }
 
     public function testTransportErrorWhileReadingTheBodySurfacesAsRuntimeException()
@@ -424,7 +429,7 @@ class TransitKmsTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('HTTP 200');
-        (new TransitKms($client, 't'))->decrypt(new Ciphertext('vault:v1:abc', 'app'));
+        (new TransitKms($client, new StaticTokenProvider('t')))->decrypt(new Ciphertext('vault:v1:abc', 'app'));
     }
 
     public function testTransportErrorWhileReadingAnErrorBodySurfacesAsRuntimeException()
@@ -436,7 +441,7 @@ class TransitKmsTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('HTTP 500');
-        (new TransitKms($client, 't'))->encrypt('app', 'hello');
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello');
     }
 
     public function testDeterministicModeIsRejected()
@@ -444,6 +449,213 @@ class TransitKmsTest extends TestCase
         $client = new MockHttpClient([], 'https://vault.local/v1/');
 
         $this->expectException(UnsupportedOperationException::class);
-        (new TransitKms($client, 't'))->encrypt('app', 'hello', deterministic: true);
+        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello', deterministic: true);
+    }
+
+    public function testInvalidTokenIsRefreshedAndRetried()
+    {
+        $tokens = $this->tokenSequence('expired', 'fresh');
+        $sentTokens = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentTokens): MockResponse {
+            $sentTokens[] = $token = self::header($options['headers'], 'X-Vault-Token');
+
+            return 'expired' === $token
+                ? new MockResponse(self::INVALID_TOKEN_BODY, ['http_code' => 403])
+                : new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:x']]));
+        }, 'https://vault.local/v1/');
+
+        $ciphertext = (new TransitKms($client, $tokens))->encrypt('app', 'hello');
+
+        $this->assertSame('vault:v1:x', $ciphertext->blob);
+        $this->assertSame(['expired', 'fresh'], $sentTokens);
+        $this->assertSame(['expired'], $tokens->invalidated);
+    }
+
+    public function testPermissionDeniedWithoutInvalidTokenIsNotRetried()
+    {
+        $tokens = $this->tokenSequence('valid', 'unused');
+        $client = new MockHttpClient([
+            new MockResponse(json_encode(['errors' => ["1 error occurred:\n\t* permission denied\n\n"]]), ['http_code' => 403]),
+        ], 'https://vault.local/v1/');
+
+        try {
+            (new TransitKms($client, $tokens))->encrypt('app', 'hello', 'opaque-aad');
+            $this->fail('The 403 should be reported.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('HTTP 403', $e->getMessage());
+            $this->assertStringContainsString('permission denied', $e->getMessage());
+        }
+
+        $this->assertSame(1, $client->getRequestsCount());
+        $this->assertSame([], $tokens->invalidated);
+    }
+
+    public function testUnauthorizedIsNotRetried()
+    {
+        $tokens = $this->tokenSequence('valid', 'unused');
+        $client = new MockHttpClient([
+            new MockResponse(json_encode(['errors' => ['invalid token']]), ['http_code' => 401]),
+        ], 'https://vault.local/v1/');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('HTTP 401');
+
+        try {
+            (new TransitKms($client, $tokens))->encrypt('app', 'hello');
+        } finally {
+            $this->assertSame([], $tokens->invalidated);
+        }
+    }
+
+    public function testInvalidReplacementTokenIsInvalidatedAndReported()
+    {
+        $tokens = $this->tokenSequence('expired', 'also-expired');
+        $client = new MockHttpClient([
+            new MockResponse(self::INVALID_TOKEN_BODY, ['http_code' => 403]),
+            new MockResponse(self::INVALID_TOKEN_BODY, ['http_code' => 403]),
+        ], 'https://vault.local/v1/');
+
+        try {
+            (new TransitKms($client, $tokens))->decrypt(new Ciphertext('vault:v1:x', 'app'));
+            $this->fail('The second 403 should be reported.');
+        } catch (RuntimeException $e) {
+            $this->assertNotInstanceOf(DecryptionFailedException::class, $e);
+            $this->assertStringContainsString('invalid token', $e->getMessage());
+        }
+
+        $this->assertSame(2, $client->getRequestsCount());
+        $this->assertSame(['expired', 'also-expired'], $tokens->invalidated);
+    }
+
+    public function testReacquiringTheSameRejectedTokenIsNotRetriedAndLeavesItUncached()
+    {
+        $tokens = $this->tokenSequence('stale', 'stale');
+        $client = new MockHttpClient([
+            new MockResponse(self::INVALID_TOKEN_BODY, ['http_code' => 403]),
+        ], 'https://vault.local/v1/');
+
+        try {
+            (new TransitKms($client, $tokens))->encrypt('app', 'hello');
+            $this->fail('The 403 should be reported.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('HTTP 403', $e->getMessage());
+        }
+
+        $this->assertSame(1, $client->getRequestsCount());
+        $this->assertSame(['stale', 'stale'], $tokens->invalidated);
+    }
+
+    public function testTheKeyReadOfTheAadPreflightIsRetriedToo()
+    {
+        $tokens = $this->tokenSequence('expired', 'fresh');
+        $client = new MockHttpClient([
+            new MockResponse(self::INVALID_TOKEN_BODY, ['http_code' => 403]),
+            new MockResponse(json_encode(['data' => ['derived' => false]])),
+        ], 'https://vault.local/v1/');
+
+        $this->expectException(UnsupportedOperationException::class);
+        (new TransitKms($client, $tokens))->encrypt('app', 'hello', 'opaque-aad');
+    }
+
+    public function testRefreshFailurePropagatesAndCancelsTheResponse()
+    {
+        $error = new RuntimeException('Login failed.');
+        $tokens = new class($error) implements TokenProviderInterface {
+            private int $calls = 0;
+
+            public function __construct(private readonly RuntimeException $error)
+            {
+            }
+
+            public function getToken(): string
+            {
+                if (1 < ++$this->calls) {
+                    throw $this->error;
+                }
+
+                return 'expired';
+            }
+
+            public function invalidateToken(#[\SensitiveParameter] string $token): void
+            {
+            }
+        };
+        $canceledResponses = 0;
+        $client = (new MockHttpClient([
+            new MockResponse(self::INVALID_TOKEN_BODY, ['http_code' => 403]),
+        ], 'https://vault.local/v1/'))->withOptions(['on_progress' => static function (int $downloaded, int $downloadSize, array $info) use (&$canceledResponses): void {
+            if ($info['canceled'] ?? false) {
+                ++$canceledResponses;
+            }
+        }]);
+
+        try {
+            (new TransitKms($client, $tokens))->encrypt('app', 'hello');
+            $this->fail('The refresh failure should be reported.');
+        } catch (RuntimeException $e) {
+            $this->assertSame($error, $e);
+        }
+
+        $this->assertSame(1, $canceledResponses);
+    }
+
+    public function testTokenProviderTransportFailureIsWrapped()
+    {
+        $tokens = new class implements TokenProviderInterface {
+            public function getToken(): string
+            {
+                throw new TransportException('Vault unavailable.');
+            }
+
+            public function invalidateToken(#[\SensitiveParameter] string $token): void
+            {
+            }
+        };
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to reach Vault.');
+        (new TransitKms(new MockHttpClient([], 'https://vault.local/v1/'), $tokens))->encrypt('app', 'hello');
+    }
+
+    /**
+     * @return TokenProviderInterface&object{invalidated: list<string>}
+     */
+    private function tokenSequence(string ...$tokens): TokenProviderInterface
+    {
+        return new class($tokens) implements TokenProviderInterface {
+            /** @var list<string> */
+            public array $invalidated = [];
+
+            /**
+             * @param list<string> $tokens
+             */
+            public function __construct(private array $tokens)
+            {
+            }
+
+            public function getToken(): string
+            {
+                return array_shift($this->tokens) ?? throw new \LogicException('No token left.');
+            }
+
+            public function invalidateToken(#[\SensitiveParameter] string $token): void
+            {
+                $this->invalidated[] = $token;
+            }
+        };
+    }
+
+    /**
+     * @param list<string> $headers
+     */
+    private static function header(array $headers, string $name): ?string
+    {
+        foreach ($headers as $header) {
+            if (str_starts_with($header, $name.': ')) {
+                return substr($header, \strlen($name) + 2);
+            }
+        }
+
+        return null;
     }
 }

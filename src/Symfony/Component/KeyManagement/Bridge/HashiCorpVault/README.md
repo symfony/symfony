@@ -14,11 +14,12 @@ are not covered by Symfony's
 
 ```php
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\StaticTokenProvider;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKms;
 
 $kms = new TransitKms(
     HttpClient::createForBaseUri('https://vault.example.com:8200/v1/'),
-    $_SERVER['VAULT_TOKEN'],
+    new StaticTokenProvider($_SERVER['VAULT_TOKEN']),
 );
 
 $ciphertext = $kms->encrypt('app-key', 'hello world');
@@ -29,6 +30,50 @@ $plaintext = $kms->decrypt($ciphertext);
 $dataKey = $kms->generateDataKey('app-key', 32);
 $result = $dataKey->use(fn (string $dek): string => /* local AEAD encrypt */);
 ```
+
+Authentication
+--------------
+
+`TransitKms` gets its Vault token from a
+[`TokenProviderInterface`](TokenProviderInterface.php):
+
+ * `StaticTokenProvider` returns a token obtained out of band, like the one of
+   the DSN;
+ * `KubernetesAuthTokenProvider` logs in to the
+   [Kubernetes auth method](https://developer.hashicorp.com/vault/docs/auth/kubernetes)
+   with the pod's service-account token, so that no long-lived Vault token or
+   sidecar is needed. The service-account token is read at each login, since
+   the kubelet rotates it, and the Vault token is cached in memory until
+   60 seconds before its lease ends.
+
+```php
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\KubernetesAuthTokenProvider;
+use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKms;
+
+$client = HttpClient::createForBaseUri('https://vault.example.com:8200/v1/');
+$kms = new TransitKms($client, new KubernetesAuthTokenProvider($client, 'my-app'));
+```
+
+The provider takes the auth mount point (`kubernetes` by default), the path
+of the service-account token and the Vault Enterprise namespace as further
+arguments. Other auth methods are plugged in by implementing
+`TokenProviderInterface`. In a Symfony application, define such a `TransitKms`
+service yourself and reference it as `service://<id>` in
+`key_management.clients`.
+
+The Vault token is cached in memory, so each PHP process logs in on its own.
+With PHP-FPM, every request logs in again and gets a new Vault token, which
+Vault stores until its lease ends. To avoid that, use a worker runtime like
+FrankenPHP. You can also wrap the provider in your own `TokenProviderInterface`
+that caches the token in a store shared by all processes.
+
+Since version 1.17, Vault answers an expired or revoked token with HTTP 403 and
+an "invalid token" error. The bridge then calls `invalidateToken()`, gets a new
+token and retries the request once if that token differs. Any other 403, like a
+policy that lacks a capability, is reported directly without invalidating the
+token, since a new token would not fix it. Older versions only answer
+"permission denied", so the request is not retried.
 
 DSN scheme
 ----------

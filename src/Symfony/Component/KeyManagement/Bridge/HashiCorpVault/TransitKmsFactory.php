@@ -85,7 +85,7 @@ final class TransitKmsFactory implements KmsFactoryInterface
 
         return new TransitKms(
             $this->scopedClient($baseUri, $timeouts),
-            $dsn->user,
+            new StaticTokenProvider($dsn->user),
             $dsn->getOption('mount', 'transit'),
             $dsn->getOption('namespace'),
         );

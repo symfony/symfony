@@ -108,6 +108,22 @@ jobs:
           REDIS_MASTER_PORT_NUMBER: "6379"
         options: >-
           --name=redis-replica
+      vault:
+        image: hashicorp/vault:2.1.1
+        ports:
+          - 8200:8200
+        volumes:
+          - ${{ github.workspace }}:/symfony:ro
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: root
+          VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+        options: >-
+          --name=vault
+          --cap-add=IPC_LOCK
+          --health-cmd "vault status -address=http://127.0.0.1:8200"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
       memcached:
         image: memcached:1.6.5
         ports:
@@ -308,6 +324,9 @@ jobs:
           echo "KMIP_TEST_KEY_PASSPHRASE=test-passphrase" >> "$GITHUB_ENV"
           echo "KMIP_TEST_REQUIRED=1" >> "$GITHUB_ENV"
 
+      - name: Provision Vault
+        run: docker exec -e VAULT_TOKEN=root vault sh /symfony/src/Symfony/Component/KeyManagement/Bridge/HashiCorpVault/Tests/Fixtures/vault/provision.sh
+
       - name: Run tests
         run: ./phpunit --group integration --exclude-group kmip-integration
         env:
@@ -326,6 +345,8 @@ jobs:
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
           MONGODB_URI: 'mongodb://localhost:27017'
           AWS_ENDPOINT_URL: "http://localhost:4566"
+          HASHICORP_VAULT_TEST_ADDR: http://localhost:8200
+          HASHICORP_VAULT_TEST_TOKEN: root
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
           PGBOUNCER_HOST: localhost:6432

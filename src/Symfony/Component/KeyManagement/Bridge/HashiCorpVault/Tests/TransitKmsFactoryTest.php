@@ -103,6 +103,21 @@ class TransitKmsFactoryTest extends TestCase
         $this->assertSame(['https://vault.local:8200/v1/transit/encrypt/app'], $urls);
     }
 
+    public function testTheDsnTokenIsSentToVault()
+    {
+        $headers = null;
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$headers): MockResponse {
+            $headers = $options['headers'];
+
+            return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:abc']]));
+        });
+
+        $kms = (new TransitKmsFactory($client))->create(Dsn::fromString('hashicorp-vault-transit://s.token@vault.local:8200/v1/'));
+        $kms->encrypt('app', 'hello');
+
+        $this->assertContains('X-Vault-Token: s.token', $headers);
+    }
+
     public function testTimeoutOptionsAreAppliedToTheGivenHttpClient()
     {
         $timeouts = [];

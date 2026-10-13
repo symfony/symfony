@@ -133,6 +133,19 @@ class CookieTest extends TestCase
         $this->assertSame('foo=bar; domain=example.com; path=/', (string) $cookie);
     }
 
+    public function testFromStringIgnoresTheValueOfSecureAndHttpOnly()
+    {
+        $cookie = Cookie::fromString('foo=bar; Secure=0; HttpOnly=0', 'https://example.com/');
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+
+        $cookie = Cookie::fromString('foo=bar; Secure; Secure=; HttpOnly; HttpOnly =', 'https://example.com/');
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+
+        $this->assertFalse(Cookie::fromString('foo=bar; Secure=1', 'http://example.com/')->isSecure());
+    }
+
     public function testFromStringWithMaxAge()
     {
         $before = time();

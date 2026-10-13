@@ -158,9 +158,10 @@ class Cookie
         $maxAge = null;
 
         foreach ($parts as $part) {
-            $part = trim($part);
+            $elements = explode('=', $part, 2);
+            $attribute = strtolower(trim($elements[0]));
 
-            if ('secure' === strtolower($part)) {
+            if ('secure' === $attribute) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
                 if (null === $url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
                     continue;
@@ -171,14 +172,13 @@ class Cookie
                 continue;
             }
 
-            if ('httponly' === strtolower($part)) {
+            if ('httponly' === $attribute) {
                 $values['httponly'] = true;
 
                 continue;
             }
 
-            if (2 === \count($elements = explode('=', $part, 2))) {
-                $attribute = strtolower(trim($elements[0]));
+            if (2 === \count($elements)) {
                 $attributeValue = trim($elements[1]);
 
                 if ('expires' === $attribute) {

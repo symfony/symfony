@@ -589,6 +589,26 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', [], 5000, $amqpStamp);
     }
 
+    public function testItRetriesTheMessageWithoutDelayThroughTheDefaultExchange()
+    {
+        $factory = $this->createStub(AmqpFactory::class);
+        $factory->method('createConnection')->willReturn($this->createStub(\AMQPConnection::class));
+        $factory->method('createChannel')->willReturn($this->createStub(\AMQPChannel::class));
+        $factory->method('createQueue')->willReturn($this->createStub(\AMQPQueue::class));
+
+        $amqpExchange = $this->createMock(\AMQPExchange::class);
+        $amqpExchange->expects($this->never())->method('publish');
+        $defaultExchange = $this->createMock(\AMQPExchange::class);
+        $defaultExchange->expects($this->once())->method('setName')->with('');
+        $defaultExchange->expects($this->once())->method('publish')->with('{}', 'original_queue');
+        $factory->method('createExchange')->willReturn($amqpExchange, $defaultExchange);
+
+        $connection = Connection::fromDsn('amqp://localhost?exchange[default_publish_routing_key]=routing_key', [], $factory);
+
+        $amqpStamp = AmqpStamp::createFromAmqpEnvelope($this->createStub(\AMQPEnvelope::class), null, 'original_queue');
+        $connection->publish('{}', [], 0, $amqpStamp);
+    }
+
     public function testDailyDelayQueuesOptionIsNormalizedToBoolean()
     {
         $delayExchange = $this->createMock(\AMQPExchange::class);

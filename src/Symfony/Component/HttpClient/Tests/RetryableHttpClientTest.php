@@ -330,6 +330,22 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('http://example.com/b/foo-bar', $response->getInfo('url'));
     }
 
+    public function testWithOptionsKeepsTheBaseUrisOfTheOriginalClient()
+    {
+        $client = new RetryableHttpClient(new MockHttpClient(), new GenericRetryStrategy([500], 0), 1);
+        $client = $client->withOptions(['base_uri' => ['http://example.com/a/', 'http://example.com/b/']]);
+
+        $clone = $client->withOptions(['base_uri' => 'http://example.com/c/']);
+
+        self::assertSame('http://example.com/c/foo-bar', $clone->request('GET', 'foo-bar')->getInfo('url'));
+        self::assertSame('http://example.com/a/foo-bar', $client->request('GET', 'foo-bar')->getInfo('url'));
+
+        $clone = $client->withOptions(['base_uri' => ['http://example.com/d/', 'http://example.com/e/']]);
+
+        self::assertSame('http://example.com/d/foo-bar', $clone->request('GET', 'foo-bar')->getInfo('url'));
+        self::assertSame('http://example.com/a/foo-bar', $client->request('GET', 'foo-bar')->getInfo('url'));
+    }
+
     public function testRetryWithMultipleBaseUrisShufflesNestedArray()
     {
         $client = new RetryableHttpClient(

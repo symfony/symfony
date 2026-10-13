@@ -83,6 +83,16 @@ class CookieJarTest extends TestCase
         $this->assertEquals('bar', $cookieJar->get('bar')->getValue(), '->updateFromSetCookie() keeps existing cookies');
     }
 
+    public function testUpdateFromSetCookieWithMaxAge()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar', 'baz=qux'], 'http://example.com/');
+        $cookieJar->updateFromSetCookie(['foo=bar; Max-Age=0', 'baz=qux; Max-Age=60'], 'http://example.com/');
+
+        $this->assertSame(['baz' => 'qux'], $cookieJar->allValues('http://example.com/'));
+        $this->assertNull($cookieJar->get('foo'));
+    }
+
     public function testUpdateFromEmptySetCookie()
     {
         $cookieJar = new CookieJar();

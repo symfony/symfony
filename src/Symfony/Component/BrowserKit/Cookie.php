@@ -155,6 +155,8 @@ class Cookie
             $values['path'] = isset($urlParts['path']) ? substr($urlParts['path'], 0, strrpos($urlParts['path'], '/')) : '';
         }
 
+        $maxAge = null;
+
         foreach ($parts as $part) {
             $part = trim($part);
 
@@ -178,10 +180,22 @@ class Cookie
             if (2 === \count($elements = explode('=', $part, 2))) {
                 if ('expires' === strtolower($elements[0])) {
                     $elements[1] = self::parseDate($elements[1]);
+                } elseif ('max-age' === strtolower($elements[0])) {
+                    if (preg_match('/^-?\d+$/D', $elements[1])) {
+                        $maxAge = (int) $elements[1];
+                    }
+
+                    continue;
                 }
 
                 $values[strtolower($elements[0])] = $elements[1];
             }
+        }
+
+        if (null !== $maxAge) {
+            $now = time();
+            // 1 is the earliest expiration time, 0 means a session cookie
+            $values['expires'] = 0 < $maxAge ? (\PHP_INT_MAX - $now > $maxAge ? $now + $maxAge : \PHP_INT_MAX) : 1;
         }
 
         return new static(

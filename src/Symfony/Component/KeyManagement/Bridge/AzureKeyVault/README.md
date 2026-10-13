@@ -95,10 +95,10 @@ cloud (US government, China) needs another authority, so construct
 The `timeout` (idle timeout) and `max_duration` (whole request) options, in
 seconds, set the HTTP client's timeouts, for the token requests too. When the
 factory is given no client, it builds one with a 5-second `timeout` and a
-10-second `max_duration`. That client doesn't follow redirects. On a 307 or 308
-redirect to another host, the client secret or the plaintext would be sent
-again. A client given to the factory, like the application's `http_client`,
-keeps its own settings unless the DSN sets the timeouts.
+10-second `max_duration`. A client given to the factory, like the application's
+`http_client`, keeps its own settings unless the DSN sets the timeouts.
+Requests don't follow redirects, whatever the client. On a 307 or 308 redirect
+to another host, the client secret or the plaintext would be sent again.
 
 Examples:
 

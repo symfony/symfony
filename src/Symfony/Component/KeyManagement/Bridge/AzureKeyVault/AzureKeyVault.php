@@ -372,6 +372,7 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
                     'Content-Type' => 'application/json',
                 ],
                 'json' => $body,
+                'max_redirects' => 0,
             ]);
             $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {

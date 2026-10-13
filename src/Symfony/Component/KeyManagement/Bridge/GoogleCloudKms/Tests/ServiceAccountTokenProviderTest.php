@@ -210,6 +210,20 @@ class ServiceAccountTokenProviderTest extends TestCase
         }
     }
 
+    public function testRedirectsAreNotFollowed()
+    {
+        $response = new MockResponse('', ['http_code' => 307, 'response_headers' => ['location' => 'https://elsewhere.example.com/']]);
+        $client = (new MockHttpClient($response))->withOptions(['max_redirects' => 20]);
+
+        try {
+            (new ServiceAccountTokenProvider($client, 'sa@x.iam.gserviceaccount.com', self::$privateKeyPem))->getToken();
+            $this->fail('A RuntimeException should have been thrown.');
+        } catch (RuntimeException) {
+        }
+
+        $this->assertSame(0, $response->getRequestOptions()['max_redirects']);
+    }
+
     public function testNumericStringExpiresInIsAccepted()
     {
         $client = new MockHttpClient(new MockResponse(json_encode(['access_token' => 'ya29.token', 'expires_in' => '3599'])));

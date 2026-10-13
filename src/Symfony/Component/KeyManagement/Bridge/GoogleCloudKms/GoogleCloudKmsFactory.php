@@ -32,8 +32,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * When no HTTP client is given, the factory builds one with a 5-second idle timeout and a 10-second maximum duration.
  * The token requests use the same client and the same timeouts.
- * This client doesn't follow redirects. On a 307 or 308 redirect to another host, the request body would be sent again, with the signed assertion or the plaintext in it.
  * The `timeout` and `max_duration` options, in seconds, override the timeouts on either client.
+ * Requests don't follow redirects, whatever the client. On a 307 or 308 redirect to another host, the request body would be sent again, with the signed assertion or the plaintext in it.
  *
  * Users that need Application Default Credentials, the metadata server, or
  * any other Google-AD flow should wire {@see GoogleCloudKms} manually with

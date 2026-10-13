@@ -129,6 +129,20 @@ class ClientCredentialsTokenProviderTest extends TestCase
         }
     }
 
+    public function testRedirectsAreNotFollowed()
+    {
+        $response = new MockResponse('', ['http_code' => 307, 'response_headers' => ['location' => 'https://elsewhere.example.com/']]);
+        $client = (new MockHttpClient($response))->withOptions(['max_redirects' => 20]);
+
+        try {
+            (new ClientCredentialsTokenProvider($client, 't', 'c', 's'))->getToken();
+            $this->fail('A RuntimeException should have been thrown.');
+        } catch (RuntimeException) {
+        }
+
+        $this->assertSame(0, $response->getRequestOptions()['max_redirects']);
+    }
+
     public function testTransportErrorWhileReadingTheBodySurfacesAsRuntimeException()
     {
         $client = new MockHttpClient(new MockResponse((static function (): \Generator {

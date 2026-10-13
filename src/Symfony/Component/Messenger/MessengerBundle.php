@@ -144,7 +144,7 @@ class MessengerBundle extends AbstractBundle
                             ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
                             ->booleanNode('sign')
                                 ->defaultFalse()
-                                ->info('Whether to sign every message sent to this transport with its trust level, and to refuse any message received from it that is unsigned, or signed as unverified when this is not a failure transport. When false, only the messages whose handlers ask for it are signed.')
+                                ->info('Whether to sign every message sent to this transport with its trust level, and to refuse any message received from it that is unsigned, or signed as unverified when this is not a failure transport. Handlers with the "sign" option require it on the transports their messages come from.')
                             ->end()
                             ->arrayNode('claim_check')
                                 ->children()
@@ -517,6 +517,8 @@ class MessengerBundle extends AbstractBundle
         if ($config['serializer']['signing_secret']) {
             $container->getDefinition('messenger.signing_serializer')
                 ->replaceArgument(1, $config['serializer']['signing_secret']);
+            $container->getDefinition('.messenger.signing_serializer.message_types')
+                ->replaceArgument(1, $config['serializer']['signing_secret']);
         }
 
         $transports = $config['transports'];
@@ -598,17 +600,19 @@ class MessengerBundle extends AbstractBundle
                 'priority' => $transport['priority'],
             ];
 
-            $signingSerializer = (new ChildDefinition('messenger.signing_serializer'))->replaceArgument(0, new Reference($serializerId));
-
             if ($transport['sign']) {
-                $signingSerializer->replaceArgument(2, ['*']);
+                // MessengerPass reads this attribute to find the transports that can receive the messages of handlers that require a signature
+                $tags['sign'] = true;
+                $signingSerializer = (new ChildDefinition('messenger.signing_serializer'))->replaceArgument(0, new Reference($serializerId));
+
+                if (\in_array($name, $failureTransports, true)) {
+                    $signingSerializer->replaceArgument(3, true);
+                }
+            } else {
+                // MessengerPass replaces this serializer with the inner one when no message type requires a signature
+                $signingSerializer = (new ChildDefinition('.messenger.signing_serializer.message_types'))->replaceArgument(0, new Reference($serializerId));
             }
 
-            if (\in_array($name, $failureTransports, true)) {
-                $signingSerializer->replaceArgument(4, true);
-            }
-
-            // MessengerPass replaces this serializer with the inner one when it has nothing to sign
             $container->setDefinition($transportSerializerId = '.messenger.transport.'.$name.'.signing_serializer', $signingSerializer);
 
             // the claim check wraps the signing serializer, so that the signature covers the claimed envelope and not only its reference

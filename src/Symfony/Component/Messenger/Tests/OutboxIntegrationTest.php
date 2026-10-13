@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\Container;
@@ -217,7 +219,20 @@ class OutboxIntegrationTest extends TestCase
     #[DataProvider('provideOutboxSerializers')]
     public function testATargetThatSignsEveryMessageAcceptsOnlyWhatItsOutboxVerified(SerializerInterface $outboxSerializer, bool $expectAccepted)
     {
-        $this->target = new InMemoryTransport(new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']), $this->clock);
+        $this->assertTargetThatSignsEveryMessageAcceptsOnlyWhatItsOutboxVerified($outboxSerializer, $expectAccepted);
+    }
+
+    #[DataProvider('provideOutboxSerializersThatSignMessageTypes')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testATargetThatSignsEveryMessageAcceptsOnlyWhatItsOutboxThatSignsMessageTypesVerified(\Closure $createOutboxSerializer, bool $expectAccepted)
+    {
+        $this->assertTargetThatSignsEveryMessageAcceptsOnlyWhatItsOutboxVerified($createOutboxSerializer(), $expectAccepted);
+    }
+
+    private function assertTargetThatSignsEveryMessageAcceptsOnlyWhatItsOutboxVerified(SerializerInterface $outboxSerializer, bool $expectAccepted): void
+    {
+        $this->target = new InMemoryTransport(new SigningSerializer(new PhpSerializer(), 'signing-key'), $this->clock);
         $this->outbox = new InMemoryTransport($outboxSerializer, $this->clock);
 
         $senders = new Container();
@@ -237,10 +252,14 @@ class OutboxIntegrationTest extends TestCase
 
     public static function provideOutboxSerializers(): iterable
     {
-        yield 'outbox signing every message' => [new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']), true];
-        yield 'outbox signing the message type' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class]), true];
-        yield 'outbox signing other message types' => [new SigningSerializer(new PhpSerializer(), 'signing-key', [\stdClass::class]), false];
+        yield 'outbox signing every message' => [new SigningSerializer(new PhpSerializer(), 'signing-key'), true];
         yield 'outbox not signing' => [new PhpSerializer(), false];
+    }
+
+    public static function provideOutboxSerializersThatSignMessageTypes(): iterable
+    {
+        yield 'outbox signing the message type' => [static fn () => new SigningSerializer(new PhpSerializer(), 'signing-key', [DummyMessage::class]), true];
+        yield 'outbox signing other message types' => [static fn () => new SigningSerializer(new PhpSerializer(), 'signing-key', [\stdClass::class]), false];
     }
 
     private function runWorker(string $transportName, ReceiverInterface $receiver): ?\Throwable

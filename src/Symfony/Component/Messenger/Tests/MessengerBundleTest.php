@@ -31,7 +31,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -406,8 +408,15 @@ class MessengerBundleTest extends TestCase
 
         $failed = $serializer->decode($serializer->encode(new Envelope(new RedispatchMessage(new DummyMessage('hello'), 'plain'), [new ReceivedStamp('plain')])));
 
-        $this->assertInstanceOf(MessageDecodingFailedException::class, $failed->getMessage());
-        $this->assertSame(\sprintf('Message "%s" requires a verified signature, but it is signed as unverified.', RedispatchMessage::class), $failed->getMessage()->getMessage());
+        $this->assertInstanceOf(RedispatchMessage::class, $failed->getMessage());
+        $this->assertFalse($failed->last(TrustStamp::class)?->isTrusted());
+
+        try {
+            $kernel->getContainer()->get('test.messenger.default_bus')->dispatch($failed);
+            $this->fail('The handler of a message signed as unverified must refuse it.');
+        } catch (HandlerFailedException $e) {
+            $this->assertInstanceOf(InvalidMessageSignatureException::class, current($e->getWrappedExceptions()));
+        }
     }
 
     public function testTheInteropSerializerMapsTheIdentityStampsAndTheStampsOfTheAutoconfiguredMappers()
@@ -829,6 +838,7 @@ class TestSignedFailureTransportKernel extends AbstractKernel
             ],
         ]);
         $container->services()
+            ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
             ->alias('test.messenger.transport.serializer_locator', 'messenger.transport.serializer_locator')->public()
         ;
     }

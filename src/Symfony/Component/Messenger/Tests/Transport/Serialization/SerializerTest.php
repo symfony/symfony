@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
@@ -37,6 +39,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithInterfaceWithSeri
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithSerializedTypeName;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -292,8 +295,12 @@ class SerializerTest extends TestCase
         $this->assertSame('application/json', $encoded['headers']['Content-Type']);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageType()
     {
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/messenger 8.2: The "%s::getMessageType()" method is deprecated, "%s" does not need it when it signs every message.', Serializer::class, SigningSerializer::class));
+
         $serializer = new Serializer();
 
         $this->assertSame(DummyMessage::class, $serializer->getMessageType($serializer->encode(new Envelope(new DummyMessage('Hello')))));
@@ -301,6 +308,8 @@ class SerializerTest extends TestCase
         $this->assertNull($serializer->getMessageType(['body' => '{}', 'headers' => []]));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetMessageTypeResolvesLogicalTypeViaTypeToClassMap()
     {
         $serializer = new Serializer(typeToClassMap: ['dummy.message' => DummyMessageWithSerializedTypeName::class]);

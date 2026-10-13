@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\HandlerFailureEvent;
@@ -986,11 +988,27 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ]));
 
         $middleware->handle(new Envelope(new DummyMessage('Hey')), new StackMiddleware());
-        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('async')]), new StackMiddleware());
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('async'), TrustStamp::trusted()]), new StackMiddleware());
         $middleware->handle(new Envelope(new DummyMessage('Hey'), [TrustStamp::trusted()]), new StackMiddleware());
         $middleware->handle(new Envelope(new DummyMessage('Hey'), [TrustStamp::untrusted(), TrustStamp::trusted()]), new StackMiddleware());
 
         $this->assertSame(4, $calls);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testAHandlerThatRequiresASignatureHandlingAnEnvelopeReceivedWithoutTrustStampIsDeprecated()
+    {
+        $calls = 0;
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor(static function () use (&$calls) { ++$calls; }, ['sign' => true])],
+        ]));
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/messenger 8.2: Handler "Closure" requires a signature, but message "%s" comes from a transport that did not verify it. Handling such a message is deprecated, and the handler will refuse it in 9.0. Set the "sign" option of the transport to sign every message, or make the transport add "%s::trusted()" to the messages it creates in this process.', DummyMessage::class, TrustStamp::class));
+
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new ReceivedStamp('async')]), new StackMiddleware());
+
+        $this->assertSame(1, $calls);
     }
 
     public function testABatchHandlerThatRequiresASignatureRefusesAnEnvelopeMarkedUntrusted()

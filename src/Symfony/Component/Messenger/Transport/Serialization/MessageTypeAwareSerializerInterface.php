@@ -16,6 +16,8 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
  * from the encoded envelope, without instantiating the payload.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated since Symfony 8.2, as SigningSerializer reads no message type when it signs every message
  */
 interface MessageTypeAwareSerializerInterface
 {
@@ -41,5 +43,5 @@ interface MessageTypeAwareSerializerInterface
      *
      * @return class-string|null
      */
-    public function getMessageType(array $encodedEnvelope): ?string;
+    public function getMessageType(array $encodedEnvelope /* , bool $triggerDeprecation = true */): ?string;
 }

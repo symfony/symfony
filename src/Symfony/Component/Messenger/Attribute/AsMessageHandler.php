@@ -46,7 +46,8 @@ class AsMessageHandler
         public ?int $priority = null,
 
         /**
-         * Whether messages should be signed when sent on a transport.
+         * Whether the handler requires a verified signature for the messages received from a transport.
+         * Such messages should come from transports that sign every message.
          */
         public bool $sign = false,
 

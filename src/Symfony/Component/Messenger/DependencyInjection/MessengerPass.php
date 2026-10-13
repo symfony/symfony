@@ -81,12 +81,15 @@ class MessengerPass implements CompilerPassInterface
         $handlerTransports = [];
         $hasSendersLocator = $container->hasDefinition('messenger.senders_locator');
         $receiverNames = null;
+        $trustedTransports = [];
 
         if ($container->hasDefinition('messenger.receiver_locator')) {
             $receiverNames = [];
             foreach ($container->findTaggedServiceIds('messenger.receiver') as $id => $tags) {
                 foreach ($tags as $tag) {
                     $receiverNames[$tag['alias'] ?? $id] = $id;
+                    // messages can be trusted when their transport signs every message or handles them in this process
+                    $trustedTransports[$tag['alias'] ?? $id] = $trustedTransports[$id] = ($tag['sign'] ?? false) || false === ($tag['is_consumable'] ?? true);
                 }
             }
         }
@@ -154,6 +157,10 @@ class MessengerPass implements CompilerPassInterface
 
                         if (!$hasSendersLocator) {
                             throw new RuntimeException(\sprintf('Invalid handler service "%s": the "transport" option needs the "messenger.senders_locator" service, which is not defined.', $serviceId));
+                        }
+
+                        if (($options['sign'] ?? false) && null !== $receiverNames && !$trustedTransports[$transport]) {
+                            throw new RuntimeException(\sprintf('Invalid handler service "%s": it requires a signature, so the "%s" transport that its "transport" option refers to must sign every message; set the "sign" option of that transport to true.', $serviceId, $transport));
                         }
 
                         unset($options['transport']);
@@ -253,19 +260,12 @@ class MessengerPass implements CompilerPassInterface
         }
         $container->addDefinitions($definitions);
 
-        if ($container->hasDefinition('messenger.signing_serializer')) {
-            $container->getDefinition('messenger.signing_serializer')->replaceArgument(2, array_keys($signedMessageTypes));
+        if ($container->hasDefinition('.messenger.signing_serializer.message_types')) {
+            $container->getDefinition('.messenger.signing_serializer.message_types')->replaceArgument(2, array_keys($signedMessageTypes));
 
             foreach ($container->getDefinitions() as $id => $definition) {
-                if (!$definition instanceof ChildDefinition || 'messenger.signing_serializer' !== $definition->getParent()) {
-                    continue;
-                }
-
-                if ($signAll = $definition->getArguments()['index_2'] ?? null) {
-                    // even as a failure transport, a transport that signs every message refuses the unverified messages of the types that require a signature
-                    $definition->replaceArgument(2, [...$signAll, ...array_keys($signedMessageTypes)]);
-                } elseif (!$signedMessageTypes) {
-                    // the signing serializer of a transport that does not sign every message has nothing to do when no message type requires a signature
+                // the signing serializer of a transport that does not sign every message has nothing to do when no message type requires a signature
+                if (!$signedMessageTypes && $definition instanceof ChildDefinition && '.messenger.signing_serializer.message_types' === $definition->getParent()) {
                     $container->setAlias($id, (string) $definition->getArgument(0));
                 }
             }
@@ -298,6 +298,10 @@ class MessengerPass implements CompilerPassInterface
             }
 
             $sendersLocatorDefinition->replaceArgument(0, $sendersMap);
+        }
+
+        if ($signedMessageTypes && $hasSendersLocator && null !== $receiverNames) {
+            $this->triggerUntrustedRoutingDeprecations($container, array_keys($signedMessageTypes), $trustedTransports);
         }
 
         foreach ($busIds as $bus) {
@@ -781,6 +785,37 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $container->getDefinition('messenger.transport.symfony_serializer')->setArgument(3, $typeToClassMap);
+    }
+
+    /**
+     * @param list<class-string>  $signedMessageTypes
+     * @param array<string, bool> $trustedTransports
+     */
+    private function triggerUntrustedRoutingDeprecations(ContainerBuilder $container, array $signedMessageTypes, array $trustedTransports): void
+    {
+        if (!\is_array($sendersMap = $container->getDefinition('messenger.senders_locator')->getArgument(0))) {
+            return;
+        }
+
+        // wildcards also match messages that the application never dispatches, so only explicit routes are checked
+        $sendersMap = array_filter($sendersMap, static fn ($type) => !str_ends_with($type, '*'), \ARRAY_FILTER_USE_KEY);
+        $classes = array_keys($sendersMap);
+
+        foreach ($container->findTaggedResourceIds('messenger.message', false) as $id => $tags) {
+            $classes[] = $container->getDefinition($id)->getClass();
+        }
+
+        foreach (array_unique([...$signedMessageTypes, ...$classes]) as $class) {
+            if (!$container->getReflectionClass($class, false) || !array_any($signedMessageTypes, static fn ($type) => is_a($class, $type, true))) {
+                continue;
+            }
+
+            foreach (SendersLocator::getSenderAliases($class, $sendersMap) as $sender) {
+                if (false === ($trustedTransports[$sender] ?? null)) {
+                    trigger_deprecation('symfony/messenger', '8.2', 'Routing message "%s" to the "%s" transport is deprecated. A handler of this message requires a signature, but the transport does not sign every message. Set the "sign" option of the transport to true, or the handler will refuse these messages in 9.0.', $class, $sender);
+                }
+            }
+        }
     }
 
     private function registerDebugCommandRouting(ContainerBuilder $container): void

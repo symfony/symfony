@@ -77,9 +77,13 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 $handler = $handlerDescriptor->getHandler();
                 $batchHandler = $handlerDescriptor->getBatchHandler();
 
-                // only an explicit marker counts: transports that bypass the signing serializer add none
-                if ($handlerDescriptor->getOption('sign') && false === $envelope->last(TrustStamp::class)?->isTrusted()) {
-                    throw new InvalidMessageSignatureException(\sprintf('Handler "%s" requires a verified signature, but message "%s" comes from data that was not verified.', $handlerDescriptor->getName(), $context['class']));
+                if ($handlerDescriptor->getOption('sign') && !TrustStamp::isEnvelopeTrusted($envelope)) {
+                    if ($envelope->last(TrustStamp::class)) {
+                        throw new InvalidMessageSignatureException(\sprintf('Handler "%s" requires a verified signature, but message "%s" comes from data that was not verified.', $handlerDescriptor->getName(), $context['class']));
+                    }
+
+                    // transports that bypass the signing serializer add no TrustStamp
+                    trigger_deprecation('symfony/messenger', '8.2', 'Handler "%s" requires a signature, but message "%s" comes from a transport that did not verify it. Handling such a message is deprecated, and the handler will refuse it in 9.0. Set the "sign" option of the transport to sign every message, or make the transport add "%s::trusted()" to the messages it creates in this process.', $handlerDescriptor->getName(), $context['class'], TrustStamp::class);
                 }
 
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {

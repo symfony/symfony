@@ -242,7 +242,7 @@ class ChainIntegrationTest extends TestCase
     public function testTheNextStepOfAnUntrustedStepIsRefusedByASigningTransport()
     {
         $this->transport = $this->addTransport('async', new PhpSerializer());
-        $signed = $this->addTransport('signed', new SigningSerializer(new PhpSerializer(), 'signing-key', ['*']));
+        $signed = $this->addTransport('signed', new SigningSerializer(new PhpSerializer(), 'signing-key'));
         $bus = $this->createBus([DummyMessage::class => ['async'], SecondMessage::class => ['signed']]);
 
         $bus->dispatch(new DummyMessage('trusted'), [new ChainStamp(new SecondMessage()), new TransportNamesStamp([])]);

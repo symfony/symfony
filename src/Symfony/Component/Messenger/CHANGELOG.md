@@ -40,7 +40,10 @@ CHANGELOG
  * Add `PropagatedStampInterface` and `FlowContextMiddleware` to copy stamps onto the messages dispatched while handling the message carrying them
  * Allow handler methods to declare `Envelope` or stamp-typed arguments after the message
  * Add `CorrelationStamp`, `MessageIdStamp` and `CausationStamp`, added by `FlowContextMiddleware` when the `messenger.identity_stamps` option is enabled
- * Add the `sign` transport option, `'*'` as a message type of `SigningSerializer` and its `$acceptUnverified` argument, to sign every message of a transport and refuse the unverified ones before reading their type
+ * Add the `sign` option of transports and the `$acceptUnverified` argument of `SigningSerializer` to sign every message of a transport
+ * Deprecate passing a list of message types to `SigningSerializer`, pass the algorithm instead to sign every message
+ * Deprecate signing only the messages whose handlers have the `sign` option, set the `sign` option of their transports instead
+ * Deprecate `MessageTypeAwareSerializerInterface` and the `getMessageType()` method of `PhpSerializer`, `Serializer`, `ClaimCheckSerializer` and `InteropSerializer`
  * Make `SigningSerializer` sign the messages it did not verify as unverified, and refuse such a message when its type requires a signature
  * Make `SigningSerializer` sign every header written by the serializer it decorates, except `Content-Type`, and pass only the signed headers to that serializer
  * Add `TrustStamp`, for transports that yield messages created in the same process to have `SigningSerializer` sign them as verified and `SendMessageMiddleware` honor their `RedispatchStamp`

@@ -315,7 +315,7 @@ class SyncTransportTest extends TestCase
         $transport->send(new Envelope(new DummyMessage('Hey'), [TrustStamp::untrusted()]));
         $transport->send(new Envelope(new DummyMessage('Hey')));
 
-        $signingSerializer = new SigningSerializer(new PhpSerializer(), 'secret', ['*']);
+        $signingSerializer = new SigningSerializer(new PhpSerializer(), 'secret');
         [$received, $untrusted, $dispatched] = $failureTransport->getSent();
 
         $this->assertSame('unverified', $signingSerializer->encode($received)['headers']['Sign-Trust'] ?? null);

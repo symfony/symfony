@@ -103,9 +103,16 @@ final class InteropSerializer implements SerializerInterface, MessageTypeAwareSe
         return $encoded;
     }
 
-    public function getMessageType(array $encodedEnvelope): ?string
+    /**
+     * @deprecated since Symfony 8.2, as SigningSerializer reads no message type when it signs every message
+     */
+    public function getMessageType(array $encodedEnvelope /* , bool $triggerDeprecation = true */): ?string
     {
-        return $this->inner instanceof MessageTypeAwareSerializerInterface ? $this->inner->getMessageType($this->withMessageType($encodedEnvelope)) : null;
+        if (\func_num_args() < 2 || func_get_arg(1)) {
+            trigger_deprecation('symfony/messenger', '8.2', 'The "%s()" method is deprecated, "%s" does not need it when it signs every message.', __METHOD__, SigningSerializer::class);
+        }
+
+        return $this->inner instanceof MessageTypeAwareSerializerInterface ? $this->inner->getMessageType($this->withMessageType($encodedEnvelope), false) : null;
     }
 
     private function withMessageType(array $encodedEnvelope, ?bool &$isTypeUnknown = null): array

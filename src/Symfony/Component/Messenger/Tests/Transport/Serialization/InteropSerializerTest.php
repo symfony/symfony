@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -26,6 +28,7 @@ use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\InteropSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\StampHeaderMapperInterface;
 
 class InteropSerializerTest extends TestCase
@@ -96,7 +99,6 @@ class InteropSerializerTest extends TestCase
         $serializer = new InteropSerializer(Serializer::create(), DummyMessage::class);
         $encodedEnvelope = ['body' => '{"message":"Hello"}', 'headers' => []];
 
-        $this->assertSame(DummyMessage::class, $serializer->getMessageType($encodedEnvelope));
         $this->assertEquals(new DummyMessage('Hello'), $serializer->decode($encodedEnvelope)->getMessage());
     }
 
@@ -104,9 +106,7 @@ class InteropSerializerTest extends TestCase
     {
         $serializer = new InteropSerializer(Serializer::create(), static fn (array $encodedEnvelope) => str_contains($encodedEnvelope['body'], '"message"') ? DummyMessage::class : null);
 
-        $this->assertSame(DummyMessage::class, $serializer->getMessageType(['body' => '{"message":"Hello"}']));
         $this->assertEquals(new DummyMessage('Hello'), $serializer->decode(['body' => '{"message":"Hello"}'])->getMessage());
-        $this->assertNull($serializer->getMessageType(['body' => '{"other":"Hello"}']));
         $this->assertInstanceOf(MessageDecodingFailedException::class, $serializer->decode(['body' => '{"other":"Hello"}'])->getMessage());
     }
 
@@ -130,8 +130,23 @@ class InteropSerializerTest extends TestCase
         $serializer = new InteropSerializer(Serializer::create(), static fn () => throw new \LogicException('The type header must be used.'));
         $encodedEnvelope = ['body' => '{"message":"Hello"}', 'headers' => ['type' => DummyMessage::class]];
 
-        $this->assertSame(DummyMessage::class, $serializer->getMessageType($encodedEnvelope));
         $this->assertEquals(new DummyMessage('Hello'), $serializer->decode($encodedEnvelope)->getMessage());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testGetMessageTypeUsesTheTypeHeaderThenTheGivenMessageType()
+    {
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/messenger 8.2: The "%s::getMessageType()" method is deprecated, "%s" does not need it when it signs every message.', InteropSerializer::class, SigningSerializer::class));
+
+        $this->assertSame(DummyMessage::class, (new InteropSerializer(Serializer::create(), DummyMessage::class))->getMessageType(['body' => '{"message":"Hello"}', 'headers' => []]));
+
+        $serializer = new InteropSerializer(Serializer::create(), static fn (array $encodedEnvelope) => str_contains($encodedEnvelope['body'], '"message"') ? DummyMessage::class : null);
+        $this->assertSame(DummyMessage::class, $serializer->getMessageType(['body' => '{"message":"Hello"}']));
+        $this->assertNull($serializer->getMessageType(['body' => '{"other":"Hello"}']));
+
+        $serializer = new InteropSerializer(Serializer::create(), static fn () => throw new \LogicException('The type header must be used.'));
+        $this->assertSame(DummyMessage::class, $serializer->getMessageType(['body' => '{"message":"Hello"}', 'headers' => ['type' => DummyMessage::class]]));
     }
 
     public function testIdentityStampsTravelAsPlainHeaders()

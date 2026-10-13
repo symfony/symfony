@@ -152,6 +152,8 @@ class SchedulerTransportTest extends TestCase
         }
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testFailedScheduledMessageOfASignedTypeIsRetriedFromAFailureTransportThatSignsIt()
     {
         $failureSerializer = new SigningSerializer(new PhpSerializer(), 'signing-key', [\stdClass::class]);

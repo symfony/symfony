@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T09:25:24Z
+
+Thanks @KalimeroMK, I pushed some changes.
+
+With the listener, the worker stops after the first empty poll. Messages can still be running in `--concurrency` children or waiting in a batch handler at that point. They are handled during the final flush, so the messages they dispatch stay in the transport. On a Doctrine SQLite queue, a handler that dispatches a follow-up message left it behind with `--concurrency=2`.
+
+The option is now a `stop_when_empty` worker option. The worker handles what is in flight, polls again, and stops only when nothing was handled. That's why `Worker::isStopping()` and the listener priority are gone.
+
+The first commit also polled a drained transport again before the ones that have a higher priority. The loop now restarts instead, so priorities are kept.

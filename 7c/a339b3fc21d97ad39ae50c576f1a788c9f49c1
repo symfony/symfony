@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T12:25:38Z
+
+I pushed one commit: symfony/doctrine-bridge doesn't require doctrine/collections, and a DBAL-only app doesn't install it. In such an app, the `serializer` service failed to build with `The collection class "Doctrine\Common\Collections\ArrayCollection" must implement "Doctrine\Common\Collections\Collection"`. The denormalizer is now also removed when `ArrayCollection` is missing.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-13T12:35:15Z
+
+Perfect use of `container.remove_if_missing`.

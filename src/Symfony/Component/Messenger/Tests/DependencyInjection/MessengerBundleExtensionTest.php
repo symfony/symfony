@@ -771,10 +771,99 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertEquals([['alias' => 'orders', 'is_failure_transport' => false, 'priority' => 0]], $transport->getTag('messenger.receiver'));
     }
 
-    public function testMessengerOutboxMustBeAConfiguredTransport()
+    public function testMessengerOutboxDsn()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'failure_transport' => 'failed',
+                'transports' => [
+                    'orders' => [
+                        'dsn' => 'amqp://localhost/%2f/orders',
+                        'outbox' => 'doctrine://default?queue_name=outbox',
+                    ],
+                    'failed' => 'doctrine://default?queue_name=failed',
+                ],
+            ]);
+        });
+
+        $outbox = $container->getDefinition('messenger.transport.orders.outbox');
+        $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $outbox->getFactory());
+        $this->assertSame('doctrine://default?queue_name=outbox', $outbox->getArgument(0));
+        $this->assertSame(['transport_name' => 'orders.outbox'], $outbox->getArgument(1));
+        $this->assertEquals([['alias' => 'orders.outbox', 'is_failure_transport' => false, 'priority' => 0]], $outbox->getTag('messenger.receiver'));
+
+        $this->assertEquals([new Reference('messenger.transport.orders'), new Reference('messenger.transport.orders.outbox'), 'orders', 'orders.outbox', 'failed'], $container->getDefinition('.messenger.transport.orders.outbox_sender')->getArguments());
+
+        $sendersLocatorId = (string) $container->getDefinition('messenger.senders_locator')->getArgument(1);
+        $senders = $container->getDefinition($sendersLocatorId)->getArgument(0);
+        $this->assertEquals(new Reference('.messenger.transport.orders.outbox_sender'), $senders['orders']->getValues()[0]);
+        $this->assertEquals(new Reference('messenger.transport.orders.outbox'), $senders['orders.outbox']->getValues()[0]);
+
+        $this->assertEquals(new Reference('messenger.retry.multiplier_retry_strategy.orders.outbox'), $container->getDefinition('messenger.retry_strategy_locator')->getArgument(0)['orders.outbox']);
+        $this->assertSame(['orders' => 'failed', 'failed' => 'failed', 'orders.outbox' => 'failed'], $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(2));
+    }
+
+    public function testMessengerOutboxDsnSignsRetriesAndFailsLikeTheTransportItServes()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'orders' => [
+                        'dsn' => 'in-memory://',
+                        'outbox' => 'in-memory://',
+                        'serializer' => 'app.interop_serializer',
+                        'sign' => true,
+                        'failure_transport' => 'orders_failed',
+                        'retry_strategy' => ['max_retries' => 7],
+                    ],
+                    'orders_failed' => ['dsn' => 'in-memory://', 'sign' => true],
+                ],
+            ]);
+        });
+
+        $signingSerializer = $container->getDefinition('.messenger.transport.orders.outbox.signing_serializer');
+        $this->assertEquals(new Reference('messenger.default_serializer'), $signingSerializer->getArgument(0));
+        $this->assertSame(['*'], $signingSerializer->getArgument(2));
+        $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.orders.outbox')->getArgument(0));
+        $this->assertSame('orders_failed', $container->getDefinition('.messenger.transport.orders.outbox_sender')->getArgument(4));
+        $this->assertSame('orders_failed', $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(2)['orders.outbox']);
+    }
+
+    public function testMessengerOutboxDsnFromAnEnvVar()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'orders' => ['dsn' => 'in-memory://', 'outbox' => '%env(OUTBOX_DSN)%'],
+                ],
+            ]);
+        });
+
+        $outbox = $container->getDefinition('messenger.transport.orders.outbox');
+        $this->assertSame('%env(OUTBOX_DSN)%', $container->resolveEnvPlaceholders($outbox->getArgument(0), '%%env(%s)%%'));
+        $this->assertSame([['keep' => true]], $outbox->getTag('kernel.test_state'));
+        $this->assertSame('orders.outbox', $container->getDefinition('.messenger.transport.orders.outbox_sender')->getArgument(3));
+    }
+
+    public function testMessengerOutboxDsnCannotCreateAConfiguredTransport()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Invalid Messenger configuration: the outbox "missing" of the "orders" transport is not a configured transport.');
+        $this->expectExceptionMessage('Invalid Messenger configuration: the outbox DSN of the "orders" transport cannot create the "orders.outbox" transport, which is configured already.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'orders' => ['dsn' => 'in-memory:///', 'outbox' => 'in-memory:///'],
+                    'orders.outbox' => 'in-memory:///',
+                ],
+            ]);
+        });
+    }
+
+    public function testMessengerOutboxMustBeAConfiguredTransportOrADsn()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Invalid Messenger configuration: the outbox "missing" of the "orders" transport is neither a configured transport nor a DSN.');
 
         $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('messenger', [

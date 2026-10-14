@@ -2890,6 +2890,16 @@ class ApplicationTest extends TestCase
     }
 
     #[RequiresPhpExtension('pcntl')]
+    public function testNestedApplicationLeavesTheExitToTheOuterApplication()
+    {
+        $process = new Process([\PHP_BINARY, __DIR__.'/Fixtures/application_nested_signal.php']);
+        $process->run();
+
+        $this->assertSame('Outer handled the signal. Inner done. Outer done.', $process->getOutput());
+        $this->assertSame(0, $process->getExitCode());
+    }
+
+    #[RequiresPhpExtension('pcntl')]
     public function testAlarmableCommandHandlerCalledAfterEventListener()
     {
         $command = new AlarmableCommand(1);

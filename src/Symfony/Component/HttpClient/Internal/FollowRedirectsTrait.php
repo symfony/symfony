@@ -35,6 +35,8 @@ trait FollowRedirectsTrait
             return new AsyncResponse($this->client, $method, $url, $options);
         }
 
+        // $url already contains the query: it must not be added again to redirect targets
+        unset($options['query']);
         $options['max_redirects'] = 0;
         $redirectHeaders = [
             'scheme' => parse_url($url, \PHP_URL_SCHEME),

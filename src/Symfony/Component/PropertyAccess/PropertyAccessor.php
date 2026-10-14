@@ -708,7 +708,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Gets a PropertyPath instance and caches it.
      */
-    private function getPropertyPath(string|PropertyPath $propertyPath): PropertyPath
+    private function getPropertyPath(string|PropertyPathInterface $propertyPath): PropertyPathInterface
     {
         if ($propertyPath instanceof PropertyPathInterface) {
             // Don't call the copy constructor has it is not needed here

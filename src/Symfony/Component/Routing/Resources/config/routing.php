@@ -16,6 +16,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\Routing\CacheWarmer\RouterCacheWarmer;
 use Symfony\Component\Routing\Controller\RedirectController;
+use Symfony\Component\Routing\DependencyInjection\RequestContextResetter;
 use Symfony\Component\Routing\DependencyInjection\Router;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper;
@@ -166,7 +167,11 @@ return static function (ContainerConfigurator $container) {
                 '_functions' => service('router.expression_language_provider')->ignoreOnInvalid(),
                 '_locale' => '%kernel.default_locale%',
             ]])
+            ->configurator(service('router.request_context.resetter'))
         ->alias(RequestContext::class, 'router.request_context')
+
+        ->set('router.request_context.resetter', RequestContextResetter::class)
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('router.expression_language_provider', ExpressionLanguageProvider::class)
             ->args([

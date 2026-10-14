@@ -15,14 +15,21 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
+use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
+use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\CacheAttributeController;
 
 class CacheAttributeListenerTest extends TestCase
@@ -681,6 +688,30 @@ class CacheAttributeListenerTest extends TestCase
         $this->listener->onKernelResponse($this->createEventMock($request, $this->response));
 
         $this->assertFalse($this->response->headers->has('CDN-Cache-Control'));
+    }
+
+    public function testKernelSetsTheCacheHeadersOnANotModifiedResponse()
+    {
+        $request = new Request();
+        $request->headers->set('If-None-Match', '"'.hash('sha256', '12345').'"');
+        $request->attributes->set('_controller', #[Cache(maxage: 60, public: true, etag: '"12345"')] static fn () => new Response());
+
+        $response = $this->createKernel()->handle($request);
+
+        $this->assertSame(304, $response->getStatusCode());
+        $this->assertSame('max-age=60, public', $response->headers->get('Cache-Control'));
+    }
+
+    private function createKernel(): HttpKernel
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ControllerAttributesListener([
+            KernelEvents::CONTROLLER_ARGUMENTS => [Cache::class => true],
+            KernelEvents::RESPONSE => [Cache::class => true],
+        ]));
+        $dispatcher->addSubscriber($this->listener);
+
+        return new HttpKernel($dispatcher, new ControllerResolver(), new RequestStack(), new ArgumentResolver());
     }
 
     private function createRequest(Cache ...$cache): Request

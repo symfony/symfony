@@ -163,7 +163,7 @@ class CacheAttributeListener implements EventSubscriberInterface
         }
 
         if ($response?->isNotModified($request)) {
-            $event->setController(static fn () => $response);
+            $event->setController(static fn () => $response, $event->getAttributes('*'));
             $event->stopPropagation();
         }
     }

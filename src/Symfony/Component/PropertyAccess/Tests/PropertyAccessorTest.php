@@ -24,6 +24,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\AsymmetricVisibility;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\CustomPropertyPath;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ExtendedUninitializedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
@@ -1191,5 +1192,18 @@ class PropertyAccessorTest extends TestCase
         yield ['publicPrivate', \Error::class];
         yield ['privatePrivate', NoSuchPropertyException::class];
         yield ['virtualNoSetHook', \Error::class];
+    }
+
+    public function testCustomPropertyPathImplementation()
+    {
+        $array = ['foo.bar' => ['baz' => 'value']];
+        $path = new CustomPropertyPath(['foo.bar', 'baz']);
+
+        $this->assertSame('value', $this->propertyAccessor->getValue($array, $path));
+        $this->assertTrue($this->propertyAccessor->isReadable($array, $path));
+        $this->assertTrue($this->propertyAccessor->isWritable($array, $path));
+
+        $this->propertyAccessor->setValue($array, $path, 'updated');
+        $this->assertSame(['foo.bar' => ['baz' => 'updated']], $array);
     }
 }

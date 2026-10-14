@@ -57,7 +57,7 @@ trait FollowRedirectsTrait
 
             $statusCode = $context->getStatusCode();
 
-            if ($statusCode < 300 || 400 <= $statusCode || null === $url = $context->getInfo('redirect_url')) {
+            if ($statusCode < 300 || 400 <= $statusCode || null === ($url = $context->getInfo('redirect_url')) || (str_starts_with($url, 'http:') && str_starts_with($context->getInfo('url'), 'https:'))) {
                 $context->passthru();
 
                 yield $chunk;

@@ -310,7 +310,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 return $response;
             }
 
-            if (0 >= $options['max_redirects'] || $info['redirect_count'] >= $options['max_redirects']) {
+            if (0 >= $options['max_redirects'] || $info['redirect_count'] >= $options['max_redirects'] || ('http:' === $location['scheme'] && 'https:' === $previousUrl['scheme'])) {
                 return $response;
             }
 

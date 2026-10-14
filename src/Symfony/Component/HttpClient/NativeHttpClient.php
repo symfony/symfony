@@ -414,7 +414,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
             $info['redirect_url'] = implode('', $url);
 
-            if ($info['redirect_count'] >= $maxRedirects) {
+            if ($info['redirect_count'] >= $maxRedirects || ('http:' === $url['scheme'] && 'https:' === $info['url']['scheme'])) {
                 return null;
             }
 

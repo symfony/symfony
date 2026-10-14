@@ -185,12 +185,31 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
     }
 
     #[RequiresPhpExtension('openssl')]
+    public function testRedirectFromHttpsToHttpIsNotFollowed()
+    {
+        TestSocketServer::start('tls/redirect-server.php', 8059);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'https://127.0.0.1:8059/', [
+            'body' => 'foo',
+            'verify_peer' => false,
+            'verify_host' => false,
+        ]);
+
+        $this->assertSame(301, $response->getStatusCode());
+        $this->assertSame('POST', $response->getInfo('http_method'));
+        $this->assertSame('https://127.0.0.1:8059/', $response->getInfo('url'));
+        $this->assertSame('http://127.0.0.1:8059/', $response->getInfo('redirect_url'));
+        $this->assertSame(0, $response->getInfo('redirect_count'));
+    }
+
+    #[RequiresPhpExtension('openssl')]
     public function testRedirectToADifferentSchemeDropsCredentials()
     {
         TestSocketServer::start('tls/redirect-server.php', 8059);
         $client = $this->getHttpClient(__FUNCTION__);
 
-        $response = $client->request('GET', 'https://127.0.0.1:8059/', [
+        $response = $client->request('GET', 'http://127.0.0.1:8059/upgrade', [
             'auth_basic' => 'foo:bar',
             'headers' => ['Cookie' => 'a=b', 'X-Custom' => 'kept'],
             'verify_peer' => false,
@@ -198,7 +217,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
         $headers = $response->toArray();
 
-        $this->assertSame('http://127.0.0.1:8059/', $response->getInfo('url'));
+        $this->assertSame('https://127.0.0.1:8059/echo', $response->getInfo('url'));
         $this->assertSame('kept', $headers['x-custom']);
         $this->assertArrayNotHasKey('authorization', $headers);
         $this->assertArrayNotHasKey('cookie', $headers);

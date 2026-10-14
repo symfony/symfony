@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by dalerazimov at 2026-10-14T05:43:32Z
+
+Yup, agreed. I will include it in this PR since this change introduces the blocking behavior
+
+I will update get() to keep reading from the stream and only throw the delayed-message error when there's nothing left to consume
+
+---------------------------------------------------------------------------
+
+by dalerazimov at 2026-10-14T07:50:20Z
+
+done. get() now reads the stream and re-throws only when there is nothing to consume
+
+i have also changed how testDelayedMessageIsNotLostWhenAddingItToTheStreamFails breaks XADD. with a string key, XREADGROUP failed first with WRONGTYPE, so the test was passing for the wrong reason. it now uses XSETID with the max id, so only XADD fails. added testStreamIsConsumedWhenAddingDelayedMessagesToItFails for the new behavior

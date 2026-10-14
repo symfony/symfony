@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T08:17:16Z
+
+Thanks @daFish! I ran the integration tests against a local Vault 2.1.1 and they pass. The derived-key preflight works as expected, so I'm ticking that item on #66042.
+
+I squashed a few changes into your commits. The README now says that the token is cached per process, so with PHP-FPM every request logs in again. It also no longer suggests `StaticTokenProvider` for a Vault Agent token. When the agent logs in again, a worker would keep the old token. The rest is house style.
+
+---------------------------------------------------------------------------
+
+by daFish at 2026-10-14T08:18:35Z
+
+@nicolas-grekas Great, thank you. The one thing I did not tested was the worker scenario though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T08:45:16Z
+
+I tested the worker case against Vault 2.1.1, with token expiry, JWT rotation, revocation and service resets between iterations: it just works :)

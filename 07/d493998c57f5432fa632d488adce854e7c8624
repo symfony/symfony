@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-10-14T17:58:22Z
+
+Thanks, both done.
+
+- systemd: the UPGRADE note now covers it: a command that doesn't handle `SIGTERM` ends up `failed` after `systemctl stop`, with the fixes (stop gracefully on `SIGTERM`, `SuccessExitStatus=143`, or a `console.signal` listener calling `setExitCode(0)`). `messenger:consume` isn't affected: it stops gracefully on `SIGTERM` and returns 0.
+- Every signal now exits with 128 + the signal number. You're right: an application that gives a meaning to `SIGUSR1`/`SIGUSR2` aborts the exit, so the code only matters when the signal actually stops the command.

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T13:05:16Z
+
+I squashed `'on_invalid' => 'ignore'` into your commit. When an app decorates the `logger` service, the resetter calls `clear()` on the decorator, not on the inner logger. Without the flag, a decorator that has no `clear()` method breaks every request after the first one with `Error: Call to undefined method App\DecoratingLogger::clear()`, in prod too. That's what #59188 did for `http_client`.

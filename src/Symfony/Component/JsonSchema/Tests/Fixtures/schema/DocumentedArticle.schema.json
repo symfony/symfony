@@ -1,0 +1,57 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/DocumentedArticle",
+    "$defs": {
+        "DocumentedArticle": {
+            "type": "object",
+            "properties": {
+                "headline": {
+                    "type": "string",
+                    "description": "The article headline."
+                },
+                "slug": {
+                    "type": "string",
+                    "title": "Slug",
+                    "description": "URL fragment.",
+                    "pattern": "^[a-z-]+$",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "examples": [
+                        "hello-world"
+                    ],
+                    "deprecated": true
+                },
+                "rating": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMaximum": 10,
+                    "multipleOf": 0.5
+                },
+                "contact": {
+                    "type": "string",
+                    "format": "email",
+                    "readOnly": true
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
+                "views": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                },
+                "kind": {
+                    "type": "string",
+                    "const": "article"
+                }
+            },
+            "required": [
+                "kind"
+            ]
+        }
+    }
+}

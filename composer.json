@@ -84,6 +84,7 @@
         "symfony/http-kernel": "self.version",
         "symfony/intl": "self.version",
         "symfony/json-path": "self.version",
+        "symfony/json-schema": "self.version",
         "symfony/json-streamer": "self.version",
         "symfony/key-management": "self.version",
         "symfony/ldap": "self.version",

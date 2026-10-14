@@ -1,0 +1,20 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/StrictInput",
+    "$defs": {
+        "StrictInput": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                }
+            }
+        }
+    }
+}

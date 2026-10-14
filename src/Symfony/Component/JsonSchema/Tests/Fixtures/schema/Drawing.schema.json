@@ -1,0 +1,81 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/Drawing",
+    "$defs": {
+        "Drawing": {
+            "type": "object",
+            "properties": {
+                "main": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/Circle",
+                            "required": [
+                                "kind"
+                            ]
+                        },
+                        {
+                            "$ref": "#/$defs/Square",
+                            "required": [
+                                "kind"
+                            ]
+                        }
+                    ]
+                },
+                "shapes": {
+                    "type": "array",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/Circle",
+                                "required": [
+                                    "kind"
+                                ]
+                            },
+                            {
+                                "$ref": "#/$defs/Square",
+                                "required": [
+                                    "kind"
+                                ]
+                            }
+                        ]
+                    },
+                    "default": []
+                }
+            }
+        },
+        "Circle": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "const": "circle"
+                },
+                "radius": {
+                    "type": "number",
+                    "default": 1.0
+                },
+                "color": {
+                    "type": "string",
+                    "default": "red"
+                }
+            }
+        },
+        "Square": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "const": "square"
+                },
+                "side": {
+                    "type": "number",
+                    "default": 1.0
+                },
+                "color": {
+                    "type": "string",
+                    "default": "red"
+                }
+            }
+        }
+    }
+}

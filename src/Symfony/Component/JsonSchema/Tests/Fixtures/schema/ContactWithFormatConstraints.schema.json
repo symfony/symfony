@@ -1,0 +1,107 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/ContactWithFormatConstraints",
+    "$defs": {
+        "ContactWithFormatConstraints": {
+            "type": "object",
+            "properties": {
+                "ipv4": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "ipv4"
+                },
+                "ipv6": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "ipv6"
+                },
+                "anyIp": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "host": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "hostname"
+                },
+                "birthday": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date"
+                },
+                "lastSeen": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "lastLogin": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date-time"
+                },
+                "anniversary": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date"
+                },
+                "wakeUp": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "pattern": "^\\d{2}:\\d{2}:\\d{2}$"
+                },
+                "alarm": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "pattern": "^\\d{2}:\\d{2}$"
+                },
+                "uuid": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "uuid"
+                },
+                "ulid": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "ulid"
+                },
+                "channels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "email",
+                            "sms",
+                            "push"
+                        ]
+                    },
+                    "default": [],
+                    "minItems": 1,
+                    "maxItems": 2
+                }
+            }
+        }
+    }
+}

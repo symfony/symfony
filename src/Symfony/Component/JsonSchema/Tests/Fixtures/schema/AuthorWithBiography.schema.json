@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/AuthorWithBiography",
+    "$defs": {
+        "AuthorWithBiography": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "biography": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

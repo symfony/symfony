@@ -1,0 +1,52 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/ConstrainedOrder",
+    "$defs": {
+        "ConstrainedOrder": {
+            "type": "object",
+            "properties": {
+                "reference": {
+                    "type": "string",
+                    "default": "",
+                    "minLength": 1
+                },
+                "lines": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "minItems": 1
+                },
+                "quantity": {
+                    "type": "integer",
+                    "default": 5,
+                    "multipleOf": 5
+                },
+                "price": {
+                    "type": "number",
+                    "default": 1.0,
+                    "multipleOf": 0.25
+                },
+                "publicIpv4": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "ipv4"
+                },
+                "publicIpv6": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "ipv6"
+                }
+            },
+            "required": [
+                "reference",
+                "lines"
+            ]
+        }
+    }
+}

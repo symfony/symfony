@@ -1,0 +1,56 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/BookWithAuthors",
+    "$defs": {
+        "BookWithAuthors": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "author": {
+                    "$ref": "#/$defs/Author"
+                },
+                "coAuthor": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/Author"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "reviewers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/Author"
+                    },
+                    "default": []
+                },
+                "authorsByRole": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/$defs/Author"
+                    },
+                    "default": {}
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
+                }
+            }
+        },
+        "Author": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

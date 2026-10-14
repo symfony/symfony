@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$ref": "#/$defs/ProductPair",
+    "$defs": {
+        "ProductPair": {
+            "type": "object",
+            "properties": {
+                "catalog": {
+                    "$ref": "#/$defs/Product"
+                },
+                "inventory": {
+                    "$ref": "#/$defs/Inventory.Product"
+                }
+            }
+        },
+        "Product": {
+            "type": "object",
+            "properties": {
+                "sku": {
+                    "type": "string"
+                }
+            }
+        },
+        "Inventory.Product": {
+            "type": "object",
+            "properties": {
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

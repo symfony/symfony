@@ -55,7 +55,12 @@ final class ControllerArgumentsEvent extends KernelEvent
     }
 
     /**
-     * @param list<object>|null $attributes
+     * Replaces the controller and the attributes that apply to it.
+     *
+     * Attributes like #[IsGranted] are handled at priority -10000, for the controller that runs at that point.
+     * To keep applying the attributes of the replaced controller, pass $event->getAttributes('*') as $attributes.
+     *
+     * @param list<object>|null $attributes The attributes that apply to the new controller, or null to use the attributes declared on the new controller
      */
     public function setController(callable $controller, ?array $attributes = null): void
     {

@@ -118,6 +118,12 @@ HttpKernel
    ```
  * Deprecate passing a `ControllerArgumentsEvent` to the `ViewEvent` constructor; pass a `ControllerArgumentsMetadata` instead
  * Deprecate `Bundle::registerCommands()`, use the `#[AsCommand]` attribute or the `console.command` service tag instead of overriding this method
+ * Controller attributes like `#[IsGranted]`, `#[IsCsrfTokenValid]`, `#[IsSignatureValid]` and `#[Cache]` are now handled at priority -10000 on `kernel.controller_arguments`, instead of 30 to 10.
+   A listener that replaces the controller with `setController()` now runs before them, so it must pass the attributes that should still apply:
+
+   ```php
+   $event->setController($controller, $event->getAttributes('*'));
+   ```
 
 Messenger
 ---------

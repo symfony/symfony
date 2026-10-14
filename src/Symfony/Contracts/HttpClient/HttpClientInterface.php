@@ -45,9 +45,11 @@ interface HttpClientInterface
         // mixed - any extra data to attach to the request (scalar, callable, object...) that
         //   MUST be available via $response->getInfo('user_data') - not used internally
         'user_data' => null,
-        // int - the maximum number of redirects to follow; a value lower than or equal to 0
-        //   means redirects should not be followed; "Authorization" and "Cookie" headers MUST
-        //   NOT follow except for the initial host name
+        // int - the maximum number of redirects to follow; 0 means redirects should not be
+        //   followed; a negative value ~N means at most N redirects should be followed, and
+        //   only while they keep the scheme, host and port of the request - implementations
+        //   that don't support this SHOULD treat negative values as 0; "Authorization" and
+        //   "Cookie" headers MUST NOT follow except for the initial host name
         'max_redirects' => 20,
         // string - defaults to the best supported version, typically 1.1 or 2.0
         'http_version' => null,

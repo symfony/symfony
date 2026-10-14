@@ -22,6 +22,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class NoPrivateNetworkHttpClientTest extends TestCase
 {
@@ -260,6 +261,23 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertSame('kept', $headers['x-custom']);
         $this->assertArrayNotHasKey('authorization', $headers);
         $this->assertArrayNotHasKey('cookie', $headers);
+    }
+
+    public function testNegativeMaxRedirectsFollowsSameOriginRedirectsOnly()
+    {
+        TestHttpServer::start();
+        $client = new NoPrivateNetworkHttpClient(new NativeHttpClient(), '10.0.0.0/8');
+
+        $response = $client->request('GET', 'http://localhost:8057/302?location=/302/relative', ['max_redirects' => ~2]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+        $this->assertSame(2, $response->getInfo('redirect_count'));
+
+        $response = $client->request('GET', 'http://localhost:8057/302?location=http://127.0.0.1:8057/', ['max_redirects' => ~2]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://127.0.0.1:8057/', $response->getInfo('redirect_url'));
     }
 
     public function testHeadersArePassedOnRedirect()

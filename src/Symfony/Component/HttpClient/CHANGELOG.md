@@ -21,6 +21,8 @@ CHANGELOG
  * Allow passing the `query` and `body` options as lists of single-entry arrays to repeat a field
  * Make `http_version: 2.0` use HTTP/2 with prior knowledge on `http://` URLs in `CurlHttpClient` and `AmpHttpClient`
  * Stop following redirects from `https://` to `http://` URLs
+ * Add support for `~N` as `max_redirects` option to follow at most N redirects that stay on the same origin
+ * Deprecate passing -1 as `max_redirects` option, pass 0 instead
 
 8.1
 ---

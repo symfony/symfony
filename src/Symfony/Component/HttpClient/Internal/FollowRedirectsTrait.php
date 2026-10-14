@@ -31,7 +31,11 @@ trait FollowRedirectsTrait
      */
     private function followRedirects(string $method, string $url, string $host, array $options, \Closure $onRedirect): AsyncResponse
     {
-        if (0 >= $maxRedirects = $options['max_redirects']) {
+        if ($sameOrigin = 0 > $maxRedirects = $options['max_redirects']) {
+            $maxRedirects = ~$maxRedirects;
+        }
+
+        if (0 >= $maxRedirects) {
             return new AsyncResponse($this->client, $method, $url, $options);
         }
 
@@ -48,7 +52,7 @@ trait FollowRedirectsTrait
             $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Host:') && 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:'));
         }
 
-        return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $onRedirect): \Generator {
+        return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, $sameOrigin, &$redirectHeaders, $onRedirect): \Generator {
             if (null !== $chunk->getError() || $chunk->isTimeout() || !$chunk->isFirst()) {
                 yield $chunk;
 
@@ -66,6 +70,16 @@ trait FollowRedirectsTrait
             }
 
             $host = parse_url($url, \PHP_URL_HOST);
+            $isSameOrigin = parse_url($url, \PHP_URL_SCHEME) === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === parse_url($url, \PHP_URL_PORT);
+
+            if ($sameOrigin && !$isSameOrigin) {
+                $context->passthru();
+
+                yield $chunk;
+
+                return;
+            }
+
             $onRedirect($host, $url, $options);
 
             // Do like curl and browsers: turn POST to GET on 301, 302 and 303
@@ -82,8 +96,7 @@ trait FollowRedirectsTrait
             }
 
             // Authorization and Cookie headers MUST NOT follow except for the initial scheme, host and port
-            $port = parse_url($url, \PHP_URL_PORT);
-            $options['headers'] = parse_url($url, \PHP_URL_SCHEME) === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+            $options['headers'] = $isSameOrigin ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
 
             static $redirectCount = 0;
             $context->setInfo('redirect_count', ++$redirectCount);

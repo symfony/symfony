@@ -118,6 +118,8 @@ class HttpOptions
     }
 
     /**
+     * @param int $max The maximum number of redirects to follow, or ~N to follow at most N redirects that stay on the same origin
+     *
      * @return $this
      */
     public function setMaxRedirects(int $max): static

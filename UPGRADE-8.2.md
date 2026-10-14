@@ -198,6 +198,8 @@ HttpClient
 
  * [BC BREAK] Widen the type of the `$buffer` argument of `HttpOptions::buffer()` from `bool` to `mixed`, so that the stream and closure forms the option accepts can be passed; a class extending `HttpOptions` and overriding that method must widen it too
  * [BC BREAK] An explicit `http_version` of `2.0` makes `CurlHttpClient` and `AmpHttpClient` require HTTP/2: they use prior knowledge on `http://` URLs instead of offering an upgrade, and offer only `h2` during the TLS handshake on `https://` URLs (with curl 8.10 or higher); servers that speak only HTTP/1.1 are not reachable that way anymore, unset the option for them
+ * [BC BREAK] Values of the `max_redirects` option lower than -1 don't disable redirects anymore. `~N` (that is, `-N - 1`) now follows at most N redirects that stay on the scheme, host and port of the request. Pass 0 to disable redirects
+ * Deprecate passing -1 as `max_redirects` option, pass 0 instead
  * [BC BREAK] Redirects from `https://` to `http://` URLs are not followed anymore. The 3xx response is returned instead, and its `redirect_url` info contains the target URL. Request that URL yourself if you want to follow the redirect
  * `KernelTestCase::ensureKernelShutdown()` now clears the responses cached in the `cache.http_client` pool when `framework.test` is enabled, so that each test starts with no cached response. A test that relied on a response cached by a previous test, or before a kernel shutdown in the same test, should request it itself
 

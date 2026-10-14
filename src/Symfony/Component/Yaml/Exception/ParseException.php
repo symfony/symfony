@@ -44,7 +44,7 @@ class ParseException extends RuntimeException
     /**
      * Gets the snippet of code near the error.
      */
-    public function getSnippet(): string
+    public function getSnippet(): ?string
     {
         return $this->snippet;
     }
@@ -66,7 +66,7 @@ class ParseException extends RuntimeException
      *
      * This method returns null if a string is parsed.
      */
-    public function getParsedFile(): string
+    public function getParsedFile(): ?string
     {
         return $this->parsedFile;
     }

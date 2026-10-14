@@ -239,6 +239,23 @@ class ControllerAttributesListenerTest extends TestCase
         $this->assertContains(KernelEvents::CONTROLLER_ARGUMENTS.'.'.Qux::class, $dispatchedEvents);
     }
 
+    public function testControllerArgumentsAttributesAreHandledBeforeListenersThatReplaceTheController()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->createListener());
+        $dispatcher->addListener(KernelEvents::CONTROLLER_ARGUMENTS.'.'.Buz::class, static function () {
+            throw new \RuntimeException('Access denied by a controller attribute listener.');
+        });
+        $dispatcher->addListener(KernelEvents::CONTROLLER_ARGUMENTS, static function (ControllerArgumentsEvent $event) {
+            $event->setController(static fn () => new Response('Served without checking the attributes of the controller.'));
+        });
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Access denied by a controller attribute listener.');
+
+        $dispatcher->dispatch($this->createControllerArgumentsEvent('buzAction'), KernelEvents::CONTROLLER_ARGUMENTS);
+    }
+
     private function createListener(?array $attributesWithListenersByEvent = null): ControllerAttributesListener
     {
         return new ControllerAttributesListener($attributesWithListenersByEvent ?? [

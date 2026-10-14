@@ -116,7 +116,8 @@ class ControllerAttributesListener implements EventSubscriberInterface
     {
         return [
             KernelEvents::CONTROLLER => ['beforeController', -10000],
-            KernelEvents::CONTROLLER_ARGUMENTS => ['beforeController', -10000],
+            // Before listeners with the default priority, which could otherwise replace the controller before checks like #[IsGranted] run
+            KernelEvents::CONTROLLER_ARGUMENTS => ['beforeController', 30],
             KernelEvents::VIEW => ['afterController', 10000],
             KernelEvents::RESPONSE => ['afterController', 10000],
             KernelEvents::EXCEPTION => ['afterController', 10000],

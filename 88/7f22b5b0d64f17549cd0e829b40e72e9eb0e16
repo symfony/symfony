@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by daFish at 2026-10-14T14:24:01Z
+
+Thanks for the changes! I ran the checks against my account (fr-par):
+
+- **Disabled key:** encrypt, decrypt and generate-data-key all return 412 `precondition_failed` ("current key state does not allow decryption of data", etc.), which ends up as a `RuntimeException`, not masked.
+- **Key scheduled for deletion:** 412 "cannot act on deleted resource" on all three, again a `RuntimeException`. I added a 412 row to the decrypt test that checks such errors aren't masked.
+- **`key_id`:** always the lowercase UUID. Scaleway also accepts an uppercase id and returns it lowercased; we keep the id we sent, which works either way.
+- **Rotation:** a ciphertext from before the rotation still decrypts with the same id. Ciphertexts carry a version prefix (`01 00000001`, then `01 00000002`). Decrypt then also returns the ciphertext re-encrypted under the latest version, which the bridge currently ignores.
+- **Other region:** decrypting a fr-par ciphertext through nl-ams gives 404 `not_found`, so `DecryptionFailedException` as you expected. `testCiphertextFromAnotherRegionFailsToDecrypt` now covers it.
+
+`ScalewayKmsIntegrationTest` passes on the updated branch (13 tests). It covers round trips, AAD enforcement (wrong and missing AAD), a tampered ciphertext, Scaleway-generated and AAD-bound data keys, envelope encryption through the DSN, an unknown key on encrypt (`KeyNotFoundException`) and decrypt (`DecryptionFailedException`), another region, an invalid secret key (401/403 as `RuntimeException`), and AAD on an asymmetric key.

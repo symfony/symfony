@@ -24,14 +24,19 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * KMS backend powered by HashiCorp Vault's Transit secret engine.
  *
  * Crypto operations stay server-side: the master key never leaves Vault. The
  * caller passes a pre-configured {@see HttpClientInterface} (typically scoped
- * to the Vault base URL via `framework.http_client.scoped_clients`) plus the
- * Vault token; this class adds the auth headers on every request.
+ * to the Vault base URL via `framework.http_client.scoped_clients`) plus a
+ * {@see TokenProviderInterface}; this class adds the auth headers on every request.
+ *
+ * Vault answers an expired or revoked token with a 403 whose errors contain "invalid token".
+ * The token is then invalidated and the request is retried once with a new one.
+ * Other 403s, like a policy that lacks a capability, are not retried since a new token would not fix them.
  *
  * AAD maps to Vault's `context` parameter (HKDF input) and is refused for keys
  * not created with `derived=true`, since Vault silently ignores the context on
@@ -62,7 +67,7 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
 
     public function __construct(
         private readonly HttpClientInterface $client,
-        #[\SensitiveParameter] private readonly string $token,
+        private readonly TokenProviderInterface $tokens,
         private readonly string $mountPoint = 'transit',
         private readonly ?string $namespace = null,
     ) {
@@ -166,22 +171,34 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
      */
     private function request(string $method, string $path, array $body, string $keyId, bool $treatClientErrorAsDecryptionFailure = false): array
     {
-        $headers = ['X-Vault-Token' => $this->token];
-        if (null !== $this->namespace) {
-            $headers['X-Vault-Namespace'] = $this->namespace;
+        $token = $this->getToken();
+        $response = $this->send($method, $path, $body, $token);
+
+        if (self::isInvalidTokenResponse($response)) {
+            $this->tokens->invalidateToken($token);
+
+            try {
+                $newToken = $this->getToken();
+            } catch (\Throwable $e) {
+                $response->cancel();
+
+                throw $e;
+            }
+
+            if ($newToken === $token) {
+                // retrying with the same token cannot succeed, and it must not stay cached for the next call
+                $this->tokens->invalidateToken($newToken);
+            } else {
+                $response->cancel();
+                $response = $this->send($method, $path, $body, $newToken);
+
+                if (self::isInvalidTokenResponse($response)) {
+                    $this->tokens->invalidateToken($newToken);
+                }
+            }
         }
 
-        $options = ['headers' => $headers, 'max_redirects' => 0];
-        if ($body) {
-            $options['json'] = $body;
-        }
-
-        try {
-            $response = $this->client->request($method, $path, $options);
-            $status = $response->getStatusCode();
-        } catch (TransportExceptionInterface $e) {
-            throw new RuntimeException('Failed to reach Vault.', 0, $e);
-        }
+        $status = $response->getStatusCode();
 
         if (404 === $status) {
             if ($treatClientErrorAsDecryptionFailure) {
@@ -196,12 +213,7 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
                 throw new DecryptionFailedException();
             }
 
-            try {
-                $errors = $response->toArray(false)['errors'] ?? [];
-            } catch (DecodingExceptionInterface|TransportExceptionInterface $e) {
-                throw new RuntimeException(\sprintf('Vault request failed (HTTP %d) for "%s".', $status, $response->getInfo('url')), 0, $e);
-            }
-            $message = \is_array($errors) ? implode('; ', array_filter($errors, \is_string(...))) : '';
+            $message = implode('; ', self::errors($response));
 
             throw new RuntimeException(\sprintf('Vault request failed (HTTP %d): "%s".', $status, $message ?: 'unknown error'));
         }
@@ -219,6 +231,75 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
         }
 
         return $payload['data'];
+    }
+
+    private function getToken(): string
+    {
+        try {
+            return $this->tokens->getToken();
+        } catch (TransportExceptionInterface $e) {
+            throw new RuntimeException('Failed to reach Vault.', 0, $e);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    private function send(string $method, string $path, array $body, #[\SensitiveParameter] string $token): ResponseInterface
+    {
+        $headers = ['X-Vault-Token' => $token];
+        if (null !== $this->namespace) {
+            $headers['X-Vault-Namespace'] = $this->namespace;
+        }
+
+        $options = ['headers' => $headers, 'max_redirects' => 0];
+        if ($body) {
+            $options['json'] = $body;
+        }
+
+        try {
+            $response = $this->client->request($method, $path, $options);
+            $response->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new RuntimeException('Failed to reach Vault.', 0, $e);
+        }
+
+        return $response;
+    }
+
+    private static function isInvalidTokenResponse(ResponseInterface $response): bool
+    {
+        if (403 !== $response->getStatusCode()) {
+            return false;
+        }
+
+        try {
+            $errors = self::errors($response);
+        } catch (RuntimeException) {
+            return false;
+        }
+
+        foreach ($errors as $error) {
+            if (str_contains($error, 'invalid token')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function errors(ResponseInterface $response): array
+    {
+        try {
+            $errors = $response->toArray(false)['errors'] ?? [];
+        } catch (DecodingExceptionInterface|TransportExceptionInterface $e) {
+            throw new RuntimeException(\sprintf('Vault request failed (HTTP %d) for "%s".', $response->getStatusCode(), $response->getInfo('url')), 0, $e);
+        }
+
+        return \is_array($errors) ? array_values(array_filter($errors, \is_string(...))) : [];
     }
 
     /**

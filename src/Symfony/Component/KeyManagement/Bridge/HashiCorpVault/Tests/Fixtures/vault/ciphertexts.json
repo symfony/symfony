@@ -1,0 +1,14 @@
+{
+    "non-derived key": {
+        "key": "symfony-ci",
+        "aad": "",
+        "plaintext": "Personal data written before the deployment.",
+        "ciphertext": "vault:v1:CIp9IDO9ji9r9FJEdXQOxUYRK9dRPeQf1rsWPv9PocFCdk6K7DNTVQLgwvgl1g7dXOFGyvah3zKPv3jv/5pNrrSLwEVTxiM3"
+    },
+    "derived key with AAD": {
+        "key": "symfony-ci-derived",
+        "aad": "tenant-a",
+        "plaintext": "Tenant data written before the deployment.",
+        "ciphertext": "vault:v1:EJi9kRgB2GS1+ZokK0gC7g5MkrCJTENU1O6ds06CBWQpBMmPCOd+BGMRmDSKevJf5GjyXdnl+Q7bYdZaJNq/uKI+fB9PLw=="
+    }
+}

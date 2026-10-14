@@ -661,6 +661,7 @@ class Table
     {
         /** @var WrappableOutputFormatterInterface $formatter */
         $formatter = $this->output->getFormatter();
+        $isMarkdown = self::$styles['markdown'] === $this->style;
         $unmergedRows = [];
         for ($rowKey = 0; $rowKey < \count($rows); ++$rowKey) {
             $rows = $this->fillNextRows($rows, $rowKey);
@@ -716,6 +717,13 @@ class Table
                         // a width set through setColumnWidth() is a minimum, unlike one computed for an earlier row
                         $this->columnWidths[$i] = max($this->configuredColumnWidths[$i] ?? 0, $cellWidth + $lengthColumnBorder);
                     }
+                }
+                if ($isMarkdown && !$cell instanceof TableSeparator) {
+                    // double the backslashes before a <br> so that markdown does not escape it, and add one that the output formatter removes
+                    $escaped = preg_replace(['/\\\\++(?=[\r\n])/', '/\r\n?|\n/'], ['$0$0\\\\', '<br>'], str_replace('|', '\|', $cell ?? ''));
+                    $rows[$rowKey][$column] = $cell instanceof TableCell || $colspan > 1 ? new TableCell($escaped, ['colspan' => $colspan, 'style' => $cell instanceof TableCell ? $cell->getStyle() : null]) : $escaped;
+
+                    continue;
                 }
                 if (!str_contains($cell ?? '', "\n")) {
                     continue;
@@ -939,7 +947,7 @@ class Table
         $columnWidth = $this->columnWidths[$column] ?? 0;
         $cellWidth = max($cellWidth, $columnWidth);
 
-        return isset($this->columnMaxWidths[$column]) ? min($this->columnMaxWidths[$column], $cellWidth) : $cellWidth;
+        return isset($this->columnMaxWidths[$column]) && self::$styles['markdown'] !== $this->style ? min($this->columnMaxWidths[$column], $cellWidth) : $cellWidth;
     }
 
     /**

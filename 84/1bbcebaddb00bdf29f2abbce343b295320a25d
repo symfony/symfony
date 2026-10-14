@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T16:48:19Z
+
+Or `inheritStdio()` + `isStdioInherited()`, like `disableOutput()` + `isOutputDisabled()`?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-10-14T17:24:20Z
+
+Thanks Nicolas for the review
+
+---
+
+> Or `inheritStdio()` + `isStdioInherited()`,
+
+I like this one !
+
+> Should getIterator() and waitUntil() throw in this mode, instead of spinning at 100% CPU and returning false right away like in TTY mode?
+
+Yes
+
+---
+
+I'm working in it
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-10-14T17:33:37Z
+
+Done:
+
+- renamed to `inheritStdio()` + `isStdioInherited()`. Unlike `disableOutput()`/`enableOutput()`, there is no method to revert it: I don't see a use case, but it's easy to add if needed. Like `disableOutput()`, it throws when the process is running;
+- `getIterator()` and `waitUntil()` throw a `LogicException` when the standard streams are inherited. The process is not stopped, so `wait()` can still be called.
+
+I updated the title and the description accordingly.

@@ -107,6 +107,11 @@ final class SourceContextProvider implements ContextProviderInterface
 
     private function htmlEncode(string $s): string
     {
+        // skip HtmlDumper for printable ASCII contents (same output but much faster)
+        if (preg_match('/^[\x20-\x7E]*+$/D', $s)) {
+            return htmlspecialchars($s, \ENT_QUOTES, 'UTF-8');
+        }
+
         $html = '';
 
         $dumper = new HtmlDumper(static function ($line) use (&$html) { $html .= $line; }, $this->charset);

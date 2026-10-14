@@ -3259,6 +3259,14 @@ class ParserTest extends TestCase
         ));
     }
 
+    public function testParseMergeKeyWithSequenceOfTaggedValuesThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Merge items must be arrays');
+
+        $this->parser->parse("<<:\n  - !foo bar\n", Yaml::PARSE_CUSTOM_TAGS);
+    }
+
     public function testParseReferencesOnMergeKeysWithMappingsParsedAsObjects()
     {
         $yaml = <<<YAML

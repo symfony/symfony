@@ -350,7 +350,7 @@ class Parser
                                 }
 
                                 if (!\is_array($parsedItem)) {
-                                    throw new ParseException('Merge items must be arrays.', $this->getRealCurrentLineNb() + 1, $parsedItem, $this->filename);
+                                    throw new ParseException('Merge items must be arrays.', $this->getRealCurrentLineNb() + 1, \is_scalar($parsedItem) ? $parsedItem : null, $this->filename);
                                 }
 
                                 $data += $parsedItem; // array union

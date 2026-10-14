@@ -870,6 +870,22 @@ class InlineTest extends TestCase
         Inline::parse('{foo: !bar', Yaml::PARSE_CUSTOM_TAGS);
     }
 
+    public function testUnterminatedSequenceEndingWithAnchor()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "[&:"');
+
+        Inline::parse('[&:');
+    }
+
+    public function testUnterminatedMappingEndingWithAnchor()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "{foo: &bar"');
+
+        Inline::parse('{foo: &bar');
+    }
+
     public function testVeryLongQuotedStrings()
     {
         $longStringWithQuotes = str_repeat("x\r\n\\\"x\"x", 1000);

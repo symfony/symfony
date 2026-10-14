@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `ProcessBundle`
+ * Add `Process::inheritStdio()` and `Process::isStdioInherited()` to run a process with the standard input, output and error of the current process
 
 7.3
 ---

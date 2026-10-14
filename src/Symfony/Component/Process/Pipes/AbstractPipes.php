@@ -27,12 +27,15 @@ abstract class AbstractPipes implements PipesInterface
     private $input;
     private bool $blocked = true;
     private ?string $lastError = null;
+    private bool $hasInput;
 
     /**
-     * @param resource|string|\Iterator $input
+     * @param resource|string|\Iterator|null $input
      */
     public function __construct($input)
     {
+        $this->hasInput = null !== $input;
+
         if (\is_resource($input) || $input instanceof \Iterator) {
             $this->input = $input;
         } else {
@@ -48,6 +51,19 @@ abstract class AbstractPipes implements PipesInterface
             }
         }
         $this->pipes = [];
+    }
+
+    /**
+     * Returns the descriptors that make the process inherit the standard streams of the current process, except STDIN when an input is set.
+     */
+    protected function getInheritedStdioDescriptors(): array
+    {
+        // Fresh streams start at the current offset of each file descriptor. The STDIN/STDOUT/STDERR constants would make proc_open() seek back to the offset PHP last saw for them.
+        return [
+            $this->hasInput ? ['pipe', 'r'] : fopen('php://stdin', 'r'),
+            fopen('php://stdout', 'w'),
+            fopen('php://stderr', 'w'),
+        ];
     }
 
     /**

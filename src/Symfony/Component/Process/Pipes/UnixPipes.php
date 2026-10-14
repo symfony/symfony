@@ -27,6 +27,7 @@ class UnixPipes extends AbstractPipes
         private bool $ptyMode,
         mixed $input,
         private bool $haveReadSupport,
+        private bool $stdioInherited = false,
     ) {
         parent::__construct($input);
     }
@@ -48,6 +49,10 @@ class UnixPipes extends AbstractPipes
 
     public function getDescriptors(): array
     {
+        if ($this->stdioInherited) {
+            return $this->getInheritedStdioDescriptors();
+        }
+
         if (!$this->haveReadSupport) {
             $nullstream = fopen('/dev/null', 'c');
 

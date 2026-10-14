@@ -37,8 +37,9 @@ class WindowsPipes extends AbstractPipes
     public function __construct(
         mixed $input,
         private bool $haveReadSupport,
+        private bool $stdioInherited = false,
     ) {
-        if ($this->haveReadSupport) {
+        if ($this->haveReadSupport && !$this->stdioInherited) {
             // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
             // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
             //
@@ -104,6 +105,10 @@ class WindowsPipes extends AbstractPipes
 
     public function getDescriptors(): array
     {
+        if ($this->stdioInherited) {
+            return $this->getInheritedStdioDescriptors();
+        }
+
         if (!$this->haveReadSupport) {
             $nullstream = fopen('NUL', 'c');
 
@@ -138,7 +143,7 @@ class WindowsPipes extends AbstractPipes
         if ($blocking) {
             if ($w) {
                 @stream_select($r, $w, $e, 0, Process::TIMEOUT_PRECISION * 1E6);
-            } elseif ($this->fileHandles) {
+            } elseif ($this->fileHandles || $this->stdioInherited) {
                 usleep((int) (Process::TIMEOUT_PRECISION * 1E6));
             }
         }

@@ -67,6 +67,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterLocaleAwareServices
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\JsonPath\JsonPathBundle;
+use Symfony\Component\JsonSchema\JsonSchemaBundle;
 use Symfony\Component\JsonStreamer\JsonStreamerBundle;
 use Symfony\Component\KeyManagement\KeyManagementBundle;
 use Symfony\Component\Lock\LockBundle;
@@ -146,6 +147,7 @@ class_exists(Registry::class);
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ObjectMapperBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(KeyManagementBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(JsonSchemaBundle::class, ignoreOnInvalid: true)]
 class FrameworkBundle extends Bundle
 {
     public function boot(): void

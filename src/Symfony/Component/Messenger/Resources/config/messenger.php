@@ -41,6 +41,7 @@ use Symfony\Component\Messenger\Middleware\DispatchOnFailureMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\FlowContextMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\InboxMiddleware;
 use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
 use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
@@ -175,6 +176,14 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('messenger.middleware.dispatch_after_current_bus', DispatchAfterCurrentBusMiddleware::class)
+
+        ->set('messenger.middleware.inbox', InboxMiddleware::class)
+            ->args([
+                abstract_arg('inboxes, by transport name'),
+                abstract_arg('failure transport names'),
+                service('logger')->ignoreOnInvalid(),
+            ])
+            ->tag('monolog.logger', ['channel' => 'messenger'])
 
         ->set('messenger.middleware.chain', ChainMiddleware::class)
             ->args([

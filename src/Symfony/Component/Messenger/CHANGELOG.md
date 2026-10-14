@@ -63,6 +63,9 @@ CHANGELOG
  * Add the `messenger.deduplication.lock_factory` option to take the deduplication locks from another lock factory than `lock.factory`
  * Add `SenderStampInterface` for the non-sendable stamps that an outbox keeps for the sender of the messages it forwards
  * Add a `--stop-when-empty` option to the `messenger:consume` command and a `stop_when_empty` option to `Worker::run()` to handle the pending messages and exit instead of waiting for new ones
+ * Add `InboxInterface`, `InboxMiddleware` and the `inbox` option of transports to skip the handlers of the messages that the inbox of their transport recorded already
+ * Make `DispatchAfterCurrentBusMiddleware` dispatch at once the messages sent only to outboxes, and refuse the other ones, while an inbox records the current message
+ * Make the `messenger:setup-transports` command set up the inboxes of the transports
 
 8.1
 ---

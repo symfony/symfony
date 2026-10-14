@@ -31,6 +31,7 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
  * Dispatches the next message of a ChainStamp once the current message is handled.
  *
  * The next message is dispatched with a DispatchAfterCurrentBusStamp: it is handled after the current message, outside a transaction opened for it, and in a worker, after the handlers of the current message returned.
+ * While an inbox records the current message, the next message must be sent to a transport that has an outbox.
  * The remaining messages travel with it in a new ChainStamp, so a chain continues from where it stopped when a failed step is retried.
  * When an envelope carries several ChainStamps, their messages form one sequence, in stamp order.
  *

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Doctrine\SchemaListener\MessengerInboxDoctrineSchemaListener;
 use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -35,6 +36,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
+use Symfony\Component\Messenger\Bridge\Doctrine\Inbox\DoctrineInbox;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
@@ -44,6 +46,7 @@ use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\MessengerBundle;
 use Symfony\Component\Messenger\Middleware\FlowContextMiddleware;
+use Symfony\Component\Messenger\Middleware\InboxMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\MessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -774,6 +777,69 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertSame('amqp://localhost/%2f/orders', $transport->getArgument(0));
         $this->assertSame(['transport_name' => 'orders'], $transport->getArgument(1));
         $this->assertEquals([['alias' => 'orders', 'is_failure_transport' => false, 'priority' => 0]], $transport->getTag('messenger.receiver'));
+    }
+
+    public function testMessengerInbox()
+    {
+        $container = $this->createContainerFromFile('messenger_inbox');
+
+        $ordersInbox = $container->getDefinition('.messenger.transport.orders.inbox');
+        $this->assertSame(DoctrineInbox::class, $ordersInbox->getClass());
+        $this->assertEquals([new Reference('database_connection'), 'messenger_inbox', 604800], $ordersInbox->getArguments());
+
+        $invoicesInbox = $container->getDefinition('.messenger.transport.invoices.inbox');
+        $this->assertEquals([new Reference('doctrine.dbal.billing_connection'), 'billing_inbox', 86400], $invoicesInbox->getArguments());
+
+        $inboxMiddleware = $container->getDefinition('messenger.middleware.inbox');
+        $this->assertSame(InboxMiddleware::class, $inboxMiddleware->getClass());
+        $inboxes = $container->getDefinition((string) $inboxMiddleware->getArgument(0))->getArgument(0);
+        $this->assertEquals(['orders', 'invoices'], array_keys($inboxes));
+        $this->assertEquals(new Reference('.messenger.transport.orders.inbox'), $inboxes['orders']->getValues()[0]);
+        $this->assertSame(['failed', 'failed_invoices'], $inboxMiddleware->getArgument(1));
+
+        $this->assertEquals([new Reference('messenger.senders_locator'), new Reference('messenger.middleware.inbox')], $container->getDefinition('messenger.middleware.dispatch_after_current_bus')->getArguments());
+        $this->assertSame((string) $inboxMiddleware->getArgument(0), (string) $container->getDefinition('console.command.messenger_setup_transports')->getArgument(2));
+
+        $middleware = array_column($container->getParameter('messenger.bus.default.middleware'), 'id');
+        $this->assertSame(['send_message', 'inbox', 'chain', 'handle_message'], \array_slice($middleware, -4));
+    }
+
+    public function testMessengerInboxDoctrineSchemaListener()
+    {
+        if (!class_exists(MessengerInboxDoctrineSchemaListener::class)) {
+            $this->markTestSkipped('This test requires symfony/doctrine-bridge 8.2 or higher.');
+        }
+
+        $container = $this->createContainerFromFile('messenger_inbox');
+
+        $schemaListener = $container->getDefinition('messenger.inbox.doctrine_schema_listener');
+        $this->assertSame(MessengerInboxDoctrineSchemaListener::class, $schemaListener->getClass());
+        $this->assertEquals([new Reference('.messenger.transport.orders.inbox'), new Reference('.messenger.transport.invoices.inbox')], $schemaListener->getArgument(0)->getValues());
+        $this->assertSame([['event' => 'postGenerateSchema']], $schemaListener->getTag('doctrine.event_listener'));
+    }
+
+    public function testMessengerInboxNeedsIdentityStamps()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Invalid Messenger configuration: the inbox of the "orders" transport records messages by id, enable the "identity_stamps" option.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'orders' => ['dsn' => 'in-memory:///', 'inbox' => true],
+                ],
+            ]);
+        });
+    }
+
+    public function testMessengerWithoutInbox()
+    {
+        $container = $this->createContainerFromFile('messenger_outbox');
+
+        $this->assertFalse($container->hasDefinition('messenger.middleware.inbox'));
+        $this->assertFalse($container->hasDefinition('messenger.inbox.doctrine_schema_listener'));
+        $this->assertSame([], $container->getDefinition('messenger.middleware.dispatch_after_current_bus')->getArguments());
+        $this->assertNotContains('inbox', array_column($container->getParameter('messenger.bus.default.middleware'), 'id'));
     }
 
     public function testMessengerOutboxDsn()

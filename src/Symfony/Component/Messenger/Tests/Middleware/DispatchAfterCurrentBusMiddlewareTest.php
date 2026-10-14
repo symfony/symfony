@@ -337,6 +337,54 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus->dispatch($message);
     }
 
+    public function testErrorWhileHandlingAQueuedMessageDoesNotBreakNextDispatches()
+    {
+        $message = new DummyMessage('Hello');
+        $event = new DummyEvent('Event');
+
+        $middleware = new DispatchAfterCurrentBusMiddleware();
+        $handlingMiddleware = $this->createMock(MiddlewareInterface::class);
+
+        $eventBus = new MessageBus([
+            $middleware,
+            $handlingMiddleware,
+        ]);
+
+        $messageBus = new MessageBus([
+            $middleware,
+            new DispatchingMiddleware($eventBus, [
+                new Envelope($event, [new DispatchAfterCurrentBusStamp()]),
+            ]),
+            $handlingMiddleware,
+        ]);
+
+        $series = [$message, $event, $message, $event];
+
+        $handlingMiddleware->expects($this->exactly(4))
+            ->method('handle')
+            ->with($this->callback(static function (Envelope $envelope) use (&$series) {
+                return $envelope->getMessage() === array_shift($series);
+            }))
+            ->willReturnCallback(static function ($envelope, StackInterface $stack) {
+                static $call = 0;
+
+                if (2 === ++$call) {
+                    throw new \TypeError('Some error while handling the event');
+                }
+
+                return $stack->next()->handle($envelope, $stack);
+            });
+
+        try {
+            $messageBus->dispatch($message);
+            $this->fail('An exception should have been thrown.');
+        } catch (DelayedMessageHandlingException $e) {
+            $this->assertInstanceOf(\TypeError::class, $e->getWrappedExceptions()[0]);
+        }
+
+        $messageBus->dispatch($message);
+    }
+
     private function expectHandledMessage($message): Callback
     {
         return $this->callback(static fn (Envelope $envelope) => $envelope->getMessage() === $message);

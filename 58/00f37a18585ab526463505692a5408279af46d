@@ -1,0 +1,182 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-10-07T14:32:45Z
+
+regarding the component name, should it be `symfony/json-schema` or something like `symfony/json-schema-builder` or `symfony/json-schema-builder` ?
+
+The name `json-schema` is commonly used by packages providing a JSONSchema validator in most languages (which is covered by `justinrainbow/json-schema` in PHP). It might introduce confusion about the scope of the component (note that even if we decide to build our own validator for a schema instead of using the existing package, it should likely be a separate component as it would have different usage and different dependencies)
+
+---------------------------------------------------------------------------
+
+by stof at 2026-10-07T15:26:26Z
+
+> * about AI tools: nothing is required by default and objects are open, while symfony/ai derives `required` from the signature and closes objects with `additionalProperties: false`. Its `buildParameters()` also describes method parameters, which a `Type` can't express. How would symfony/ai move to this?
+
+Regarding the first question, I think the generator needs to have a toggle to switch between loose and strict objects (this naming comes from Zod in `JS` which has this concept as well). And maybe properties without a default value should always be required.
+Regarding method parameters, couldn't this be described as an array shape of the types of parameters ?
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2026-10-07T15:42:09Z
+
+> regarding the component name, should it be symfony/json-schema or something like symfony/json-schema-builder or symfony/json-schema-builder ?
+
+I see the point compared to `symfony/translator`, but next to `symfony/json-path` i feel like `symfony/json-schema` would be quite consistent
+
+---------------------------------------------------------------------------
+
+by soyuka at 2026-10-08T09:07:24Z
+
+Thanks! Patched in 8853cd14e06:
+
+> ShortNameDefinitionPolicy::$owners survives generate() calls
+
+It's wanted, one OpenAPI document = many `generate()` calls and `Input\Book`/`Output\Book` can't both be `Book`. It now implements `ResetInterface` for workers.
+
+> How would symfony/ai move to this?
+
+Agree with @stof, `allowExtraAttributes: false` already closes objects. Constructor arguments without default are now required (the serializer needs them), nullability doesn't make a property required. OpenAI strict mode would be a `DefinitionProcessor` in symfony/ai.
+Method parameters are an array shape indeed: `array{city: string, unit?: string}` gives `required: ['city']` and `additionalProperties: false`.
+
+> \Closure is then ignored
+
+removed
+
+> DialectKeywords is internal
+
+moved to public methods on `Dialect`, flag renamed `supportsNumericExclusiveBounds`
+
+> ignoredAttributes, allowExtraAttributes and format aren't [in the name]
+
+The generator now throws when one name is used for two different shapes instead of reusing the first one. To avoid the collision I'd hash these options in the default policy name (groups stay readable), would that be ok?
+
+> definitionName/definitionPrefix [...] serializer_attributes
+
+`serializer_attributes` is gone. For the naming hints, what about an `array $context` on `Configuration` passed as is to the extension points (like the serializer context)? `definitionName`/`definitionPrefix` would move there.
+
+> smaller ones
+
+all fixed (also `\GMP` and `TranslatableInterface` as strings)
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-10-08T21:13:11Z
+
+Thanks for this, it's great to see this land in Symfony!
+
+One architectural question: could the generation pipeline serve schema formats other than JSON Schema? The inputs ([TypeInfo](https://symfony.com/doc/current/components/type_info.html), [PropertyInfo](https://symfony.com/doc/current/components/property_info.html), [Serializer](https://symfony.com/doc/current/serializer.html) and [Validator](https://symfony.com/doc/current/validation.html) metadata) aren't JSON-specific. You could imagine the same pipeline producing GraphQL types, TypeScript definitions or even XSD. And if that's a goal, `JsonSchema` might turn out to be a narrow name.
+
+**How the pipeline is built today.** Reading the metadata is already format-neutral: which properties exist, groups, name conversion, required constructor arguments, defaults, definition naming. The output side is pure JSON Schema, though. Every extension point (class resolvers, property providers, enrichers, definition processors) passes JSON Schema arrays around. So JSON Schema already acts as the intermediate model.
+
+**Is anyone asking for other formats?** Not much, as far as I can tell:
+
+- **GraphQL** and **TypeScript** do get generated from PHP metadata ([API Platform's GraphQL `TypeBuilder`](https://github.com/api-platform/core/blob/2bba68f6c9dc83609759c48abdad9bc7c2880c4f/src/GraphQl/Type/TypeBuilder.php), [GraphQLite](https://github.com/thecodingmachine/graphqlite), [spatie/typescript-transformer](https://github.com/spatie/typescript-transformer)), so there's real usage there.
+- **XSD**: there's no library that generates XSD from PHP classes, only the reverse, XSD → PHP ([goetas-webservices/xsd2php](https://github.com/goetas-webservices/xsd2php)). An old request to generate XSD + JSON Schema from Config (#29560) was closed for lack of interest.
+- **Protobuf** and **Avro** are written by hand in their own formats ([`.proto`](https://protobuf.dev/programming-guides/proto3/), [`.avsc`](https://avro.apache.org/docs/1.12.0/specification/)), not derived from classes.
+- **AsyncAPI** [message payloads](https://www.asyncapi.com/docs/reference/specification/v3.0.0#message-object) are JSON Schema by default, so this PR already covers them.
+
+**Is JSON Schema a good enough starting point for other formats?** I think so. What JSON Schema has that the others can't express (some unions, `readOnly`/`writeOnly`, formats like uuid or email, `uniqueItems`, `multipleOf`) is a limitation of those target formats, so a format-agnostic model wouldn't solve it either. API Platform already works this way: it derives some GraphQL types from JSON Schema ([`FieldsBuilder::jsonSchemaToGraphQLType()`](https://github.com/api-platform/core/blob/2bba68f6c9dc83609759c48abdad9bc7c2880c4f/src/GraphQl/Type/FieldsBuilder.php#L751)).
+
+So I don't think this PR needs a new abstraction. JSON Schema works fine as the pivot, and other formats can be built as converters on top of `Schema`, outside the component:
+
+```mermaid
+flowchart LR
+    subgraph metadata [Metadata, format-neutral]
+        typeinfo[TypeInfo]
+        propertyinfo[PropertyInfo]
+        serializer[Serializer metadata]
+        validator[Validator metadata]
+    end
+    subgraph component [JsonSchema component]
+        generator["SchemaGenerator<br/>resolvers · providers · enrichers · processors"]
+        schema[("Schema<br/>JSON Schema + Dialect")]
+    end
+    metadata --> generator --> schema
+    schema --> js[JSON Schema 2020-12]
+    schema --> oa[OpenAPI 3.0 / 3.1, Swagger 2.0]
+    schema -- flatten --> mcp[MCP / symfony/ai tools]
+    schema -. converter, outside the component .-> gql[GraphQL SDL]
+    schema -. converter, outside the component .-> ts[TypeScript]
+    schema -. converter, outside the component .-> xsd[XSD]
+```
+
+That also makes `JsonSchema` the right name. The one thing it implies is that [`Schema`](https://github.com/soyuka/symfony/blob/ff1a007526c9b675534bbd67e93b6f172a254c83/src/Symfony/Component/JsonSchema/Schema.php) (and the TypeInfo `Type` already on [`PropertySchema`](https://github.com/soyuka/symfony/blob/ff1a007526c9b675534bbd67e93b6f172a254c83/src/Symfony/Component/JsonSchema/Enricher/PropertySchema.php)) becomes something converters rely on, so it's worth keeping it stable. A small open question: would it help if `Schema` exposed which class each definition came from? A converter could then name its types without having to parse `$ref`.
+
+PS: in [`ValidatedRegistration.schema.json`](https://github.com/soyuka/symfony/blob/ff1a007526c9b675534bbd67e93b6f172a254c83/src/Symfony/Component/JsonSchema/Tests/Fixtures/schema/ValidatedRegistration.schema.json), `username` gets `"default": ""` alongside `minLength: 3` (from `public string $username = ''` with `Length(min: 3)` in [`ValidatedRegistration.php`](https://github.com/soyuka/symfony/blob/ff1a007526c9b675534bbd67e93b6f172a254c83/src/Symfony/Component/JsonSchema/Tests/Fixtures/ValidatedRegistration.php)). That's valid JSON Schema, but the spec [recommends the default be valid against the schema](https://json-schema.org/draft/2020-12/json-schema-validation#section-9.2). Maybe skip the default when it breaks a constraint?
+
+---------------------------------------------------------------------------
+
+by soyuka at 2026-10-09T14:14:40Z
+
+> nullable constructor arguments without a default aren't required anymore
+
+Agree, thanks!
+
+> Doesn't that argue for hashing those options into the default name, as you proposed?
+
+Names are public (`components.schemas`, generated SDKs) so I'd rather not hash them. Done in 38e4b4a6932: names stay readable and a second shape asking for a taken name gets `.2`, `.3`... (`Author` then `Author.2` in your example). It's stable within a document and `reset()` starts a new one. The exception now only points to a custom policy. Description updated for the bundle.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-10-11T18:10:11Z
+
+Hey ! Love to see this feature landing I have several use case that would be useful in mind. But because this is already a big pr just asking if it would be open to other kind of inputs rather than Types ? For example a TreeBuilder or something else ?
+
+Also would this allow to parse a json schema splitter onto several files and still resolves / flatten the schema ?
+
+---------------------------------------------------------------------------
+
+by soyuka at 2026-10-12T12:47:35Z
+
+> The numbered suffix makes names depend on the order of the generate() calls
+
+Indeed, done in 440f105c90a: ignored attributes, extra attributes and format are now in the readable name (`Author-ignored.id`, `Author-closed`, `Author-format.json`) so a name only depends on the class and the configuration. I dropped the suffix entirely as it'd be order dependent for the `_` ambiguity too, the default policy throws instead (across calls as well) and points to a custom one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T13:56:07Z
+
+Thanks, names now only depend on the class and the configuration, whatever the order of the calls.
+
+Last nit: `ignoredAttributes: ['id', 'name']` and `['name', 'id']` give two names, so two definitions, for the same shape. Worth sorting the list before naming it? (groups too)
+
+About the name, I'd keep `symfony/json-schema`, like `json-path` and `json-streamer`. A validator would be a separate component anyway, as @stof said, and the README can say upfront that this one generates schemas and doesn't validate data.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T13:56:09Z
+
+@Neirda24 for a config tree, the Config component already has `JsonSchemaDumper`. Reading and resolving existing schema files is another job than generating them, so that'd be for a separate proposal.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-10-12T13:57:59Z
+
+But if the components is named json-schema it would make sense to handle both the generation and the parsing. Am I wrong?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-12T15:20:06Z
+
+@Neirda24 A name doesn't bind us :) If parsing is needed later, that'll be another PR.
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2026-10-13T21:52:38Z
+
+Just tasked Claude to swap `symfony/ai` and `mcp/sdk` to using this, and the diff looks quite promising at first glance. open gaps are def not blocking for merging into 8.2 since both projects will need to wait a while to adopt the component anyways due to the PHP version raise.
+
+Thanks @soyuka! :pray:
+
+* Symfony AI Prototype: https://github.com/chr-hertel/ai/pull/75
+* MCP SDK Prototype: https://github.com/chr-hertel/php-sdk/pull/83
+
+Will bring in the findings/blocker over time - not urgent :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T10:01:08Z
+
+I pushed 4 more commits after checking chr-hertel's prototypes. Discriminator maps use `anyOf` now, since some LLM providers reject `oneOf`. Empty array defaults are described as `[]` for lists and `{}` for maps. `flatten()` keeps the required properties of an inlined definition next to the ones of the reference. And a type property declared by a mapped class keeps its own schema.
+
+chr-hertel/ai#76 and chr-hertel/php-sdk#86 adapt the prototypes to this.

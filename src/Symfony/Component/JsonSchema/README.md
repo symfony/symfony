@@ -39,8 +39,8 @@ $schema->getDefinitions(); // ['Book-book.write' => [...]]
 
 // the schemas of one OpenAPI document, sharing their definitions
 $document = new SchemaDocument();
-$bookSchema = $generator->generate(Type::object(Book::class), new Configuration(Dialect::openApi31()), $document);
-$authorSchema = $generator->generate(Type::object(Author::class), new Configuration(Dialect::openApi31()), $document);
+$bookSchema = $generator->generate(Type::object(Book::class), new Configuration(dialect: Dialect::openApi31()), $document);
+$authorSchema = $generator->generate(Type::object(Author::class), new Configuration(dialect: Dialect::openApi31()), $document);
 $document->getDefinitions(); // ['Book' => [...], 'Author' => [...]]
 
 // a self-contained schema without any reference, e.g. for an MCP tool

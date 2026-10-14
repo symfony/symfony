@@ -16,6 +16,9 @@ namespace Symfony\Component\JsonSchema;
  */
 final class Dialect
 {
+    /**
+     * @optional-arguments-by-name
+     */
     public function __construct(
         public readonly string $refPath,
         public readonly NullSyntax $nullSyntax,

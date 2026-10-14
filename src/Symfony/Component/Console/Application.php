@@ -1118,8 +1118,9 @@ class Application implements ResetInterface
                 // We register application signals, so that we can dispatch the event
                 foreach ($this->signalsToDispatchEvent as $signal) {
                     // When this application runs inside another application that handles the signal, the outer application decides if the process exits
+                    // Otherwise, exit with 128 + the signal number, the exit code a shell reports for a process killed by the signal
                     $previousHandler = pcntl_signal_get_handler($signal);
-                    $signalEvent = new ConsoleSignalEvent($command, $input, $output, $signal, \is_array($previousHandler) && $previousHandler[0] instanceof SignalRegistry ? false : 0);
+                    $signalEvent = new ConsoleSignalEvent($command, $input, $output, $signal, \is_array($previousHandler) && $previousHandler[0] instanceof SignalRegistry ? false : 128 + $signal);
                     $alarmEvent = \SIGALRM === $signal ? new ConsoleAlarmEvent($command, $input, $output) : null;
 
                     $signalRegistry->register($signal, function ($signal) use ($signalEvent, $alarmEvent, $command, $commandSignals, $input, $output) {
@@ -1164,7 +1165,7 @@ class Application implements ResetInterface
                         $this->scheduleAlarm();
                     }
 
-                    if (false !== $exitCode = $command->handleSignal($signal)) {
+                    if (false !== $exitCode = $command->handleSignal($signal, 128 + $signal)) {
                         exit($exitCode);
                     }
                 });

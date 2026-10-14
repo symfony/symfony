@@ -41,6 +41,10 @@ Console
    the listing is still written on the error output and the exit code is still `1`
  * The application listing collapses the commands below a registered command to that command's own line;
    `list <namespace>`, the `--raw` option and the `json` and `md` formats keep listing every command
+ * When a signal stops the application, it exits with 128 + the signal number (e.g. `130` for `SIGINT`, `143` for
+   `SIGTERM`) instead of `0`. A command run as a systemd service that does not handle `SIGTERM` now ends up `failed`
+   after `systemctl stop`: stop the command gracefully on `SIGTERM`, add `SuccessExitStatus=143` to the unit, or call
+   `$event->setExitCode(0)` in a `ConsoleEvents::SIGNAL` listener to keep exiting with `0`
 
 DependencyInjection
 -------------------

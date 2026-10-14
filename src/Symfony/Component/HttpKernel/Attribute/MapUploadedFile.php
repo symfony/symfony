@@ -21,6 +21,9 @@ class MapUploadedFile extends ValueResolver
 {
     public ArgumentMetadata $metadata;
 
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         /** @var Constraint|array<Constraint>|null */
         public Constraint|array|null $constraints = null,

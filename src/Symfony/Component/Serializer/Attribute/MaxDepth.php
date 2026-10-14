@@ -21,6 +21,8 @@ class MaxDepth
 {
     /**
      * @param int $maxDepth The maximum serialization depth
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly int $maxDepth,

@@ -36,6 +36,8 @@ class Place
      * @param string|null          $description The description of the place, stored under the "description" key of its metadata
      * @param array<string, mixed> $metadata    The metadata of the place
      * @param bool                 $initial     Whether the place is part of the initial marking
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?string $description = null,

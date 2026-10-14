@@ -65,6 +65,8 @@ class Length extends Constraint
      * @param callable|null      $normalizer A callable to normalize value before it is validated
      * @param self::COUNT_*|null $countUnit  The character count unit for the length check (defaults to {@see Length::COUNT_CODEPOINTS})
      * @param string[]|null      $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?int $exactly = null,

@@ -51,6 +51,8 @@ class Callback extends Constraint
      * @param string|callable|null $callback The callback definition
      * @param string[]|null        $groups
      * @param string|null          $message  The violation message raised when the callback returns false; the callback must then return a boolean. When not set, the return value of the callback is ignored
+     *
+     * @stable-parameter-names
      */
     public function __construct(string|callable|null $callback = null, ?array $groups = null, mixed $payload = null, ?string $message = null)
     {

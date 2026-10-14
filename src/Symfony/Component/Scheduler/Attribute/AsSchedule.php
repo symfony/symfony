@@ -21,6 +21,8 @@ class AsSchedule
 {
     /**
      * @param string $name The name of the schedule that will be used when creating tasks
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $name = 'default',

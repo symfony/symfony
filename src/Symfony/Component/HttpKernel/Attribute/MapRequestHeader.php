@@ -21,6 +21,8 @@ final class MapRequestHeader extends ValueResolver
      * @param string|null  $name                       The name of the header parameter; if null, the name of the argument in the controller will be used
      * @param class-string $resolver                   The class name of the resolver to use
      * @param int          $validationFailedStatusCode The HTTP code to return if the validation fails
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly ?string $name = null,

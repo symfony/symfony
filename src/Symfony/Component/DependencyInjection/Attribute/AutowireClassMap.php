@@ -24,6 +24,8 @@ final class AutowireClassMap extends Autowire
      * @param string|null     $indexAttribute The name of the attribute that defines the key referencing each class
      *                                        in the tagged collection; defaults to the tag's last dot-segment
      * @param string|string[] $exclude        A FQCN or a list of FQCNs to exclude
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         string $tag,

@@ -24,6 +24,8 @@ final class Required
 {
     /**
      * @param int $priority The priority of the method call when the class declares several required methods; the higher the sooner it's called
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public int $priority = 0,

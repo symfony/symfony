@@ -33,6 +33,8 @@ class AsPeriodicTask
      * @param string[]|string|null     $transports One or many transports through which the message scheduling the task will go
      * @param string[]|string          $env        One or many environments the task is scheduled in; all of them when empty
      * @param array<mixed>|string      $stamps     One or many Messenger stamps to add to the message scheduling the task, as class names, each optionally mapped to the arguments its constructor takes
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly string|int $frequency,

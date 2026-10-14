@@ -31,6 +31,8 @@ final class AsCommand
      * @param string|(callable():string)|null $help        The help content of the command, displayed with the help page
      * @param string[]                        $usages      The list of usage examples, displayed with the help page
      * @param InputOption[]                   $options     Options to add after the ones the parameters of the command declare
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $name,

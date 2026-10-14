@@ -48,6 +48,8 @@ class Option
      * @param string|(callable():string)                                                 $description     The description of the option, displayed with the help page
      * @param array|string|null                                                          $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
      * @param array<string|Suggestion>|callable(CompletionInput):list<string|Suggestion> $suggestedValues The values used for input completion
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         string|callable $description = '',

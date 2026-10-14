@@ -63,6 +63,8 @@ class Bic extends Constraint
      * @param string|null                  $ibanPropertyPath Property path to the IBAN value when validating objects
      * @param string[]|null                $groups
      * @param self::VALIDATION_MODE_*|null $mode             The mode used to validate the BIC; pass null to use the default mode (strict)
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

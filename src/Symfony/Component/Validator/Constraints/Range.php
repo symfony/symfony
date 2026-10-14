@@ -56,6 +56,8 @@ class Range extends Constraint
      * @param int|float|non-empty-string|\DateTimeInterface|null $max                    The maximum value, either numeric, a datetime string representation or a \DateTimeInterface instance
      * @param non-empty-string|null                              $maxPropertyPath        Property path to the max value
      * @param string[]|null                                      $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

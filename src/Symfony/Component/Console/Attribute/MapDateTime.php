@@ -23,6 +23,8 @@ class MapDateTime
      * @param string|null $format   The DateTime format (@see https://php.net/datetime.format)
      * @param string|null $argument The argument name to read from (defaults to parameter name)
      * @param string|null $option   The option name to read from (mutually exclusive with $argument)
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly ?string $format = null,

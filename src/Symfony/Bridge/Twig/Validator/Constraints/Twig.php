@@ -26,6 +26,9 @@ class Twig extends Constraint
         self::INVALID_TWIG_ERROR => 'INVALID_TWIG_ERROR',
     ];
 
+    /**
+     * @stable-parameter-names
+     */
     #[HasNamedArguments]
     public function __construct(
         public string $message = 'This value is not a valid Twig template.',

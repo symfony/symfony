@@ -64,6 +64,8 @@ class MacAddress extends Constraint
 
     /**
      * @param self::ALL*|self::LOCAL_*|self::UNIVERSAL_*|self::UNICAST_*|self::MULTICAST_*|self::BROADCAST $type A mac address type to validate (defaults to {@see self::ALL})
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $message = 'This value is not a valid MAC address.',

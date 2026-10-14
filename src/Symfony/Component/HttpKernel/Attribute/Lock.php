@@ -36,6 +36,8 @@ final class Lock
      * @param bool                       $blocking Whether to wait for the lock to be released instead of rejecting the request with a "409 Conflict" response
      * @param string[]|string            $methods  HTTP methods to lock; empty means all methods
      * @param bool                       $read     Whether to acquire a read lock, shared with the other read locks of the same key; falls back to a write lock when the store does not support read locks
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly string|Expression|\Closure $key,

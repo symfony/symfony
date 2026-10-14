@@ -25,6 +25,8 @@ final class Serialize
      * @param array<string, mixed> $context The serialization context passed to the serializer, or the options passed to the stream writer when streaming
      * @param class-string|null    $map     The class that the object mapper maps the returned value to before serialization, item by item for iterables
      * @param bool                 $stream  Whether to stream the returned value as JSON with the stream writer instead of serializing it
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly int $code = 200,

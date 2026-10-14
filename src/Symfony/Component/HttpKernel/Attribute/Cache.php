@@ -31,6 +31,9 @@ final class Cache
      */
     public public(set) readonly array $variables;
 
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         /**
          * The expiration date as a valid date for the strtotime() function.

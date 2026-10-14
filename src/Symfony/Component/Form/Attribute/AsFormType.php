@@ -24,6 +24,8 @@ class AsFormType
 {
     /**
      * @param array<string, mixed> $options The default options of the derived form type
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public array $options = [],

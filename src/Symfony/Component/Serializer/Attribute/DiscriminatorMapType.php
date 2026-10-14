@@ -26,6 +26,8 @@ final class DiscriminatorMapType
      * @param class-string $class The class or interface declaring the discriminator map
      *
      * @throws InvalidArgumentException
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly string $type,

@@ -25,6 +25,8 @@ class AsDecorator
      * @param int                      $onInvalid The behavior to adopt when the decoration is invalid; must be one of the {@see ContainerInterface} constants
      * @param string|list<string>|null $within    Decorators of the same service that wrap this one, as service ids or classes
      * @param string|list<string>|null $around    Decorators of the same service that this one wraps, as service ids or classes
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $decorates,

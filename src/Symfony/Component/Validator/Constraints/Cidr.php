@@ -74,6 +74,9 @@ class Cidr extends Constraint
     /** @var callable|null */
     public $normalizer;
 
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         ?array $options = null,
         ?string $version = null,

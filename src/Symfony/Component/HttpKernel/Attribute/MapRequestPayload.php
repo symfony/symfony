@@ -36,6 +36,8 @@ class MapRequestPayload extends ValueResolver
      * @param class-string                                                     $resolver                   The class name of the resolver to use
      * @param int                                                              $validationFailedStatusCode The HTTP code to return if the validation fails
      * @param class-string|string|null                                         $type                       The element type for array deserialization
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly array|string|null $acceptFormat = null,

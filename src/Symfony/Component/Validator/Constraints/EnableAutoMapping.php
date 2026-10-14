@@ -25,6 +25,9 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
 class EnableAutoMapping extends Constraint
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(?array $options = null, mixed $payload = null)
     {
         if (null !== $options) {

@@ -40,6 +40,8 @@ class EntityExists extends Constraint
      * @param string|null $identifierField  Look the value up by this field instead of the identifier
      * @param string|null $repositoryMethod Call this repository method with the value instead of findOneBy(); a truthy return means the entity exists
      * @param string|null $invalidMessage   The message when the value cannot be converted to the field's type
+     *
+     * @stable-parameter-names
      */
     #[HasNamedArguments]
     public function __construct(

@@ -29,6 +29,9 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 class AutowireInline extends Autowire
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(string|array|null $class = null, array $arguments = [], array $calls = [], array $properties = [], ?string $parent = null, bool|string $lazy = false)
     {
         if (null === $class && null === $parent) {

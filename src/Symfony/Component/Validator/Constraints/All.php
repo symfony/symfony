@@ -28,6 +28,8 @@ class All extends Composite
     /**
      * @param array<Constraint>|Constraint|null $constraints
      * @param string[]|null                     $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(array|Constraint|null $constraints = null, ?array $groups = null, mixed $payload = null)
     {

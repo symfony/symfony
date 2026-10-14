@@ -25,6 +25,8 @@ class DiscriminatorMap
      * @param ?string                     $defaultType  The fallback value if nothing specified by $typeProperty
      *
      * @throws InvalidArgumentException
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly string $typeProperty,

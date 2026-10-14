@@ -23,6 +23,8 @@ class AutoconfigureResourceTag extends Autoconfigure
      *                                          tagged class, pass a closure receiving the concrete class-string
      *                                          (requires PHP 8.5), or a [class-string, method] callable whose static
      *                                          method is called on each concrete class (works on PHP 8.4)
+     *
+     * @stable-parameter-names
      */
     public function __construct(?string $name = null, array|\Closure $attributes = [])
     {

@@ -29,6 +29,8 @@ class ValueTransformer
     /**
      * @param (callable(mixed, array<string, mixed>=): mixed)|string|null $streamToNative
      * @param (callable(mixed, array<string, mixed>=): mixed)|string|null $nativeToStream
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         callable|string|null $streamToNative = null,

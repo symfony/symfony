@@ -30,6 +30,8 @@ class Sequentially extends Composite
     /**
      * @param Constraint[]|null $constraints An array of validation constraints
      * @param string[]|null     $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(array|Constraint|null $constraints = null, ?array $groups = null, mixed $payload = null)
     {

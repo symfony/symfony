@@ -22,6 +22,8 @@ class Template
      * @param string[]|null $vars     The controller method arguments to pass to the template
      * @param bool          $stream   Enables streaming the template
      * @param string|null   $block    The name of the block to use in the template
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $template,

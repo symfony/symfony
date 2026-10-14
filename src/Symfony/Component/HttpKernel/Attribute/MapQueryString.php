@@ -34,6 +34,8 @@ class MapQueryString extends ValueResolver
      * @param string|Expression|GroupSequence|GroupResolver|array<string>|null $validationGroups           The validation groups to use when validating the query string mapping
      * @param class-string                                                     $resolver                   The class name of the resolver to use
      * @param int                                                              $validationFailedStatusCode The HTTP code to return if the validation fails
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly array $serializationContext = [],

@@ -14,6 +14,9 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PARAMETER)]
 class Lazy
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         public bool|string|null $lazy = true,
     ) {

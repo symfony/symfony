@@ -19,6 +19,9 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION | \Attribute::IS_REPEATABLE)]
 class WhenNot
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         public string $env,
     ) {

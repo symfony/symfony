@@ -22,6 +22,8 @@ final class RequiredBundle
     /**
      * @param class-string<BundleInterface> $class           The bundle class to require
      * @param bool                          $ignoreOnInvalid Whether to silently skip if the class doesn't exist
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $class,

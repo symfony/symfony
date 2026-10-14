@@ -57,6 +57,8 @@ class AsWorkflow
      * @param list<string>|null                                $eventsToDispatch     The events to dispatch, or the events not to dispatch when prefixed with "!"; all the events by default
      * @param list<class-string<DefinitionValidatorInterface>> $definitionValidators The validators of the definition, in addition to the one of the type
      * @param class-string<\BackedEnum>|null                   $places               The string-backed enum that lists the places of the workflow: each case is a place, and each place must be a case
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly ?string $name = null,

@@ -24,6 +24,9 @@ final class IsCsrfTokenValid
     /** @var string[] */
     public readonly array $methods;
 
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         /**
          * Sets the id, or an Expression or a Closure evaluated to the id, used when generating the token.

@@ -22,6 +22,8 @@ class AsCallable
      * @param string|null                  $id     The id of the service, defaulting to "<service id>::<method>"
      * @param bool|class-string            $lazy   Whether to instantiate the service declaring the method only when the closure is first called (ignored for static methods), or the single-method interface to implement instead of returning a \Closure, which is always lazy
      * @param string|null                  $target The name of the autowiring alias to register for the service, to be used with #[Target]
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public array $tags = [],

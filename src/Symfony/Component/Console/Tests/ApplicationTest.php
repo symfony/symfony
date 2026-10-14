@@ -2489,6 +2489,18 @@ class ApplicationTest extends TestCase
     /**
      * @requires extension pcntl
      */
+    public function testNestedApplicationLeavesTheExitToTheOuterApplication()
+    {
+        $process = new Process([\PHP_BINARY, __DIR__.'/Fixtures/application_nested_signal.php']);
+        $process->run();
+
+        $this->assertSame('Outer handled the signal. Inner done. Outer done.', $process->getOutput());
+        $this->assertSame(0, $process->getExitCode());
+    }
+
+    /**
+     * @requires extension pcntl
+     */
     public function testOriginalHandlerRestoredAfterPop()
     {
         $this->assertSame(\SIG_DFL, pcntl_signal_get_handler(\SIGUSR1), 'Pre-condition: Original handler for SIGUSR1 must be SIG_DFL.');

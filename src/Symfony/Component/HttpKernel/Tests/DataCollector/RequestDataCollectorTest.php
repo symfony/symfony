@@ -630,6 +630,57 @@ class RequestDataCollectorTest extends TestCase
         $this->assertStringContainsString("--url 'http://test.com/main'", $c->getCurlCommand());
     }
 
+    public function testCurlCommandDoesNotDuplicateStoredBody()
+    {
+        $body = 'unique-request-body';
+        $request = Request::create('http://test.com/', 'POST', [], [], [], [], $body);
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+        $this->assertSame('', $c->getCurlCommand());
+        $c->lateCollect();
+
+        $serialized = serialize($c);
+        $this->assertSame(1, substr_count($serialized, $body));
+
+        $restored = unserialize($serialized);
+        $this->assertSame($body, $restored->getContent());
+        $this->assertSame($c->getCurlCommand(), $restored->getCurlCommand());
+        $this->assertStringEndsWith("--data-raw 'unique-request-body'", $restored->getCurlCommand());
+        $this->assertSame($serialized, serialize($c));
+        $this->assertSame($serialized, serialize($restored));
+    }
+
+    public function testCurlCommandFromExistingProfile()
+    {
+        $command = "curl --request POST --data-raw 'existing-body'";
+        $c = new RequestDataCollector();
+        $c->__unserialize(['data' => ['method' => 'POST', 'content' => 'existing-body', 'curlCommand' => $command]]);
+
+        $this->assertSame($command, $c->getCurlCommand());
+    }
+
+    #[DataProvider('provideCurlCommandBodies')]
+    public function testCurlCommandBodyAfterSerialization(string $method, string $body, bool $hasBody)
+    {
+        $c = new RequestDataCollector();
+        $c->collect(Request::create('http://test.com/', $method, [], [], [], [], $body), $this->createResponse());
+        $c->lateCollect();
+        $command = $c->getCurlCommand();
+        $c = unserialize(serialize($c));
+
+        $this->assertSame($command, $c->getCurlCommand());
+        $this->assertSame($hasBody, str_contains($command, '--data-raw'));
+    }
+
+    public static function provideCurlCommandBodies(): iterable
+    {
+        foreach (['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'] as $method) {
+            foreach (['', '0', "a'b\ntext"] as $body) {
+                yield [$method, $body, (bool) $body && !\in_array($method, ['GET', 'HEAD'], true)];
+            }
+        }
+    }
+
     public function testCurlCommandIsEmptyStringWhenNotCollected()
     {
         $c = new RequestDataCollector();

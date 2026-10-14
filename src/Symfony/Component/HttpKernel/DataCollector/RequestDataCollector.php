@@ -179,7 +179,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function lateCollect(): void
     {
         if (null !== $this->request) {
-            $this->data['curlCommand'] = $this->computeCurlCommand($this->request, $this->data['content']);
+            $this->data['curlCommand'] = $this->computeCurlCommand($this->request);
+            $this->data['curlCommandBody'] = $this->data['content'] && \in_array($this->request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH, Request::METHOD_DELETE], true);
             $this->request = null;
         }
 
@@ -506,7 +507,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return \is_string($controller) ? $controller : 'n/a';
     }
 
-    private function computeCurlCommand(Request $request, ?string $content): string
+    private function computeCurlCommand(Request $request): string
     {
         $command = ['curl', '--compressed'];
 
@@ -536,16 +537,18 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             )));
         }
 
-        if ($content && \in_array($method, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH, Request::METHOD_DELETE], true)) {
-            $command[] = '--data-raw '.$this->escapeArgument($content);
-        }
-
         return implode(" \\\n  ", $command);
     }
 
     public function getCurlCommand(): string
     {
-        return $this->data['curlCommand'] ?? '';
+        $command = $this->data['curlCommand'] ?? '';
+
+        if ($this->data['curlCommandBody'] ?? false) {
+            $command .= " \\\n  --data-raw ".$this->escapeArgument($this->data['content']);
+        }
+
+        return $command;
     }
 
     /**

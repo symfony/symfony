@@ -103,7 +103,7 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
             try {
                 // Execute the stored messages
                 $queueItem->getStack()->next()->handle($queueItem->getEnvelope(), $queueItem->getStack());
-            } catch (\Exception $exception) {
+            } catch (\Throwable $exception) {
                 // Gather all exceptions
                 $exceptions[] = $exception;
                 // Restore queue to previous state

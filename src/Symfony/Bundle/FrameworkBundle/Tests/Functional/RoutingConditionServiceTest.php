@@ -24,6 +24,22 @@ class RoutingConditionServiceTest extends AbstractWebTestCase
         $this->assertSame($code, $client->getResponse()->getStatusCode());
     }
 
+    public function testContextParametersAreResetBetweenRequests()
+    {
+        $client = static::createClient(['test_case' => 'RoutingConditionService']);
+        $client->disableReboot();
+
+        $client->request('GET', '/allowed/manually-tagged');
+        $context = $client->getContainer()->get('router')->getContext();
+        $context->setParameter('tenant', 'acme');
+
+        $client->request('GET', '/allowed/manually-tagged');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertFalse($context->hasParameter('tenant'));
+        $this->assertSame('en', $context->getParameter('_locale'));
+    }
+
     public static function provideRoutes(): iterable
     {
         yield 'allowed by an autoconfigured service' => [
